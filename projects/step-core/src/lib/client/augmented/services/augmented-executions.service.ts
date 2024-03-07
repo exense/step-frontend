@@ -15,7 +15,7 @@ import {
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
 } from '../../table/step-table-client.module';
-import { CompareCondition } from '../../../modules/basics/shared/compare-condition.enum';
+import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService {

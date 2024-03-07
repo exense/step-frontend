@@ -5,10 +5,12 @@ import {
   EventEmitter,
   inject,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
   QueryList,
+  SimpleChanges,
   ViewChild,
   ViewChildren,
   ViewEncapsulation,
@@ -68,7 +70,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
     FilterBarItemComponent,
   ],
 })
-export class FilterBarComponent implements OnInit, OnDestroy {
+export class FilterBarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() context!: TimeSeriesContext;
   @Input() activeFilters: FilterBarItem[] = [];
   @Input() activeGrouping = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS[0].attributes;
@@ -78,6 +80,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
   @Input() activeTimeRange!: TimeRangePickerSelection;
 
   @Input() filterOptions: FilterBarItem[] = [];
+  _unusedFilterOptions: FilterBarItem[] = [];
 
   @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
@@ -135,6 +138,19 @@ export class FilterBarComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const filterOptions = changes['filterOptions'].currentValue;
+    if (filterOptions) {
+      this.collectUnusedFilterOptions();
+    }
+  }
+
+  private collectUnusedFilterOptions() {
+    const filterItemsByAttribute: Record<string, FilterBarItem> = {};
+    this.activeFilters.forEach((item) => (filterItemsByAttribute[item.attributeName] = item));
+    this._unusedFilterOptions = this.filterOptions.filter((option) => !filterItemsByAttribute[option.attributeName]);
   }
 
   getValidFilters(): FilterBarItem[] {
@@ -305,7 +321,7 @@ export class FilterBarComponent implements OnInit, OnDestroy {
     const itemToDelete = this.activeFilters[index];
 
     this.activeFilters.splice(index, 1);
-
+    this.collectUnusedFilterOptions();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
@@ -313,11 +329,12 @@ export class FilterBarComponent implements OnInit, OnDestroy {
 
   private addFilter(item: FilterBarItem): void {
     this.activeFilters.push(item);
+    this.collectUnusedFilterOptions();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
       if (!item.attributeName) {
-        this.activeFilters.pop();
+        this.removeFilterItem(this.activeFilters.length - 1);
       }
     });
   }

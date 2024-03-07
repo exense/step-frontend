@@ -7,7 +7,7 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '../../table/step-table-client.module';
 import { map, Observable, of } from 'rxjs';
-import { CompareCondition } from '../../../modules/basics/shared/compare-condition.enum';
+import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 import { HttpClient } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';

@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, HostListener, inject, Input, OnDestroy, Output } from '@angular/core';
-import { ItemHoverReceiverService } from '../services/item-hover-receiver.service';
+import { ItemHoverReceiverService } from '../injectables/item-hover-receiver.service';
 
 @Directive({
   selector: '[stepItemHover]',

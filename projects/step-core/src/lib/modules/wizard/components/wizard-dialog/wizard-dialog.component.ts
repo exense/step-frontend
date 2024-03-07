@@ -1,8 +1,7 @@
 import { Component, HostListener, inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogsService } from '../../../../shared';
 import { WizardDialogData } from '../../types/wizard-dialog-data.interface';
-import { ModalWindowComponent } from '../../../basics/components/modal-window/modal-window.component';
+import { DialogsService, ModalWindowComponent } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-wizard-dialog',

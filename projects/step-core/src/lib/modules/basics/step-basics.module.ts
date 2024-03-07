@@ -8,7 +8,6 @@ import { HexadecimalInputFilterComponent } from './components/input-filter/hexad
 import { InputFilterComponent } from './components/input-filter/input-filter.component';
 import { ResourceLabelComponent } from './components/resource-label/resource-label.component';
 import { ArtefactIconPipe } from './pipes/artefact-icon.pipe';
-import { HasRightPipe } from './pipes/has-right.pipe';
 import { ZIndexDirective } from './directives/z-index.directive';
 import { JsonRawEditorComponent } from './components/json-raw-editor/json-raw-editor.component';
 import { ElementRefMapDirective } from './directives/element-ref-map.directive';
@@ -50,6 +49,11 @@ import { DialogRouteComponent } from './components/dialog-route/dialog-route.com
 import { MarkerComponent } from './components/marker/marker.component';
 import { AlertsContainerComponent } from './components/alerts-container/alerts-container.component';
 import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
+import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
+import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
+import { ProjectNamePipe } from './pipes/project-name.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -58,7 +62,6 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
     ArrayFilterComponent,
     ArrayFilterAdvancedComponent,
     InputFilterComponent,
-    HasRightPipe,
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
     ZIndexDirective,
@@ -96,11 +99,16 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
     DurationPipe,
     DialogRouteComponent,
     MarkerComponent,
     AlertsContainerComponent,
     InputModelFormatterDirective,
+    ProjectNamePipe,
   ],
   exports: [
     CommonModule,
@@ -111,7 +119,6 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
     ResourceLabelComponent,
     ArrayFilterComponent,
     InputFilterComponent,
-    HasRightPipe,
     HexadecimalInputFilterComponent,
     ArtefactIconPipe,
     ZIndexDirective,
@@ -149,12 +156,17 @@ import { InputModelFormatterDirective } from './directives/input-model-formatter
     PopoverComponent,
     SafeHtmlPipe,
     DescriptionHintComponent,
+    EnterTextValueDialogComponent,
+    ConfirmationDialogComponent,
+    MessagesListDialogComponent,
+    MessageDialogComponent,
     DurationPipe,
     DialogRouteComponent,
     ArrayFilterAdvancedComponent,
     MarkerComponent,
     AlertsContainerComponent,
     InputModelFormatterDirective,
+    ProjectNamePipe,
   ],
 })
 export class StepBasicsModule {}
@@ -184,22 +196,17 @@ export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
-export * from './pipes/has-right.pipe';
 export * from './pipes/array-item-label.pipe';
-export * from './services/credentials.service';
-export * from './services/auth.service';
-export * from './services/item-by-id-cache.service';
-export * from './services/cron-presets.token';
-export * from './shared/auth-context.interface';
-export * from './shared/compare-condition.enum';
-export * from './shared/credentials-strategy';
-export * from './shared/alert-type.enum';
-export * from './shared/screen-width.token';
-export * from './shared/is-small-screen.token';
-export * from './shared/resize-observable';
-export * from './shared/time-unit.enum';
-export * from './shared/generate-api-key-strategy';
-export * from './shared/create-range';
+export * from './injectables/item-by-id-cache.service';
+export * from './injectables/cron-presets.token';
+export * from './types/compare-condition.enum';
+export * from './types/alert-type.enum';
+export * from './types/screen-width.token';
+export * from './types/is-small-screen.token';
+export * from './types/resize-observable';
+export * from './types/time-unit.enum';
+export * from './types/generate-api-key-strategy';
+export * from './types/create-range';
 export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
@@ -212,49 +219,52 @@ export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
 export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
-export * from './shared/repository-parameters.token';
+export * from './types/repository-parameters.token';
 export * from './repository-parameters-initializer';
-export * from './services/array-item-label-value-extractor';
-export * from './shared/storage-proxy';
-export * from './shared/storage.token';
-export * from './shared/multiple-projects-strategy';
-export * from './shared/validators/json-validator';
-export * from './shared/validators/number-validator';
-export * from './shared/validators/boolean-validator';
-export * from './shared/validators/coma-split-array-validator';
-export * from './shared/is-used-by-dialog-data';
-export * from './shared/is-used-by-search-type';
-export * from './services/default-page.token';
-export * from './services/view-id-link-prefix.token';
-export * from './services/navigator.service';
-export * from './services/multiple-projects.service';
-export * from './services/generate-api-key.service';
-export * from './services/editor-resolver.service';
-export * from './services/app-config-container.service';
-export * from './services/file-downloader.service';
-export * from './services/popover-overlay.service';
-export * from './shared/logout-cleanup.token';
-export * from './services/is-used-by-dialog';
+export * from './injectables/array-item-label-value-extractor';
+export * from './types/storage-proxy';
+export * from './types/storage.token';
+export * from './types/multiple-projects-strategy';
+export * from './types/validators/json-validator';
+export * from './types/validators/number-validator';
+export * from './types/validators/boolean-validator';
+export * from './types/validators/coma-split-array-validator';
+export * from './types/is-used-by-dialog-data';
+export * from './types/is-used-by-search-type';
+export * from './injectables/multiple-projects.service';
+export * from './injectables/generate-api-key.service';
+export * from './injectables/editor-resolver.service';
+export * from './injectables/app-config-container.service';
+export * from './injectables/file-downloader.service';
+export * from './injectables/popover-overlay.service';
+export * from './types/link-display-type.enum';
+export * from './injectables/is-used-by-dialog';
 export * from './directives/item-hover.directive';
 export * from './directives/item-hold.directive';
-export * from './services/item-hover-receiver.service';
-export * from './services/item-hold-receiver.service';
-export * from './services/dialog-parent.service';
-export * from './services/alerts.service';
-export * from './services/navigator-query-params-cleanup.service';
-export * from './shared/navigator-query-params-cleanup.token';
-export * from './shared/bulk-operation-type.enum';
-export * from './shared/auth.guards';
-export * from './shared/marker-type.enum';
-export * from './shared/string-array-regex';
-export * from './shared/dialog-route';
-export * from './shared/dialog-route-result';
+export * from './injectables/item-hover-receiver.service';
+export * from './injectables/item-hold-receiver.service';
+export * from './injectables/object-utils.service';
+export * from './injectables/dialogs.service';
+export * from './types/bulk-operation-type.enum';
+export * from './types/string-array-regex';
+export * from './injectables/dialog-parent.service';
+export * from './injectables/alerts.service';
+export * from './types/marker-type.enum';
+export * from './types/dialog-route';
+export * from './types/dialog-route-result';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './directives/input-model-formatter.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
+export * from './pipes/project-name.pipe';
 export * from './components/description-hint/description-hint.component';
+export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';
+export * from './components/confirmation-dialog/confirmation-dialog.component';
+export * from './components/messages-list-dialog/messages-list-dialog.component';
+export * from './components/message-dialog/message-dialog.component';
 export * from './components/dialog-route/dialog-route.component';
 export * from './shared/model-formatters';
+export * from './types/mutable';
+export * from './types/date-format.enum';

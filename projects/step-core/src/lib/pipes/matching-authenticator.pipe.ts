@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { AuthService } from '../modules/basics/services/auth.service';
+import { AuthService } from '../modules/auth';
 
 @Pipe({
   name: 'matchingAuthenticator',

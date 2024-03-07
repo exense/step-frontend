@@ -25,18 +25,24 @@ import { BehaviorSubject, filter, of, pipe, switchMap, tap } from 'rxjs';
 
 const preferencesToKVPairArray = (preferences?: Preferences): KeyValue<string, string>[] => {
   const prefsObject = preferences?.preferences || {};
-  const result = Object.keys(prefsObject).reduce((result, key) => {
-    const value = prefsObject[key] || '';
-    return [...result, { key, value }];
-  }, [] as KeyValue<string, string>[]);
+  const result = Object.keys(prefsObject).reduce(
+    (result, key) => {
+      const value = prefsObject[key] || '';
+      return [...result, { key, value }];
+    },
+    [] as KeyValue<string, string>[],
+  );
   return result;
 };
 
 const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferences => {
-  const preferences = (values || []).reduce((res, { key, value }) => {
-    res[key] = value;
-    return res;
-  }, {} as { [key: string]: string });
+  const preferences = (values || []).reduce(
+    (res, { key, value }) => {
+      res[key] = value;
+      return res;
+    },
+    {} as { [key: string]: string },
+  );
   return { preferences };
 };
 
@@ -104,7 +110,7 @@ export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(
         filter((isConfirmed) => !!isConfirmed),
         switchMap(() => this._generateApiKey.revoke(id)),
-        this.reloadTokens
+        this.reloadTokens,
       )
       .subscribe();
   }
