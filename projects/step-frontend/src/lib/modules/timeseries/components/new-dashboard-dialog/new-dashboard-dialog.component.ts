@@ -2,8 +2,9 @@ import { Component, HostListener, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DashboardsService, DashboardView, DialogRouteResult } from '@exense/step-core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DashboardNavigatorService } from '../../injectables/dashboard-navigator.service';
+import { DashboardUrlService } from '../../injectables/dashboard-url.service';
 import { COMMON_IMPORTS } from '../../modules/_common';
+import { Router } from '@angular/router';
 
 type DialogRef = MatDialogRef<NewDashboardDialogComponent, DialogRouteResult>;
 type FormValue = NewDashboardDialogComponent['form']['value'];
@@ -19,7 +20,8 @@ export class NewDashboardDialogComponent {
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
   private _dashboardsService = inject(DashboardsService);
-  private _dashboardNavigator = inject(DashboardNavigatorService);
+  private _dashboardUrl = inject(DashboardUrlService);
+  private _router = inject(Router);
 
   readonly form = this._fb.group({
     name: this._fb.control('', Validators.required),
@@ -48,7 +50,7 @@ export class NewDashboardDialogComponent {
       const isSuccess = !!dashboard;
       const canNavigateBack = !isEditAfterSave;
       if (isEditAfterSave) {
-        this._dashboardNavigator.navigateToDashboard(dashboard);
+        this._router.navigateByUrl(this._dashboardUrl.dashboardEditorUrl(dashboard));
       }
       this._dialogRef.close({ isSuccess, canNavigateBack });
     });

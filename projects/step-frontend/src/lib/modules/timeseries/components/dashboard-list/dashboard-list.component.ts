@@ -10,15 +10,15 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
-import { DashboardNavigatorService } from '../../injectables/dashboard-navigator.service';
 import { COMMON_IMPORTS } from '../../modules/_common';
+import { DashboardUrlPipe } from '../../pipes/dashboard-url.pipe';
 
 @Component({
   selector: 'step-dashboard-list',
   templateUrl: './dashboard-list.component.html',
   styleUrls: ['./dashboard-list.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, DashboardUrlPipe],
   providers: [
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
     {
@@ -30,7 +30,6 @@ import { COMMON_IMPORTS } from '../../modules/_common';
 export class DashboardListComponent implements DialogParentService {
   private readonly TABLE_ID = 'dashboards';
   private readonly _dialogs = inject(DialogsService);
-  private _dashboardNavigator = inject(DashboardNavigatorService);
   private readonly _dashboardsService = inject(DashboardsService);
   private readonly _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   readonly dataSource: StepDataSource<DashboardView> = this._dataSourceFactory.createDataSource(this.TABLE_ID, {
@@ -43,10 +42,6 @@ export class DashboardListComponent implements DialogParentService {
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
-  }
-
-  createNewDashboard(): void {
-    this._dashboardNavigator.createDashboard();
   }
 
   delete(dashboard: DashboardView) {
@@ -64,9 +59,5 @@ export class DashboardListComponent implements DialogParentService {
           this.dataSource.reload();
         }
       });
-  }
-
-  navigateToDashboard(dashboard: DashboardView, editMode = false): void {
-    this._dashboardNavigator.navigateToDashboard(dashboard, editMode);
   }
 }
