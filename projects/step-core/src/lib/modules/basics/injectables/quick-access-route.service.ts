@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Route } from '@angular/router';
-import { ROUTE_ALIAS } from '../shared/quick-access-route';
+import { ROUTE_ALIAS } from '../types/quick-access-route';
 
 @Injectable({
   providedIn: 'root',

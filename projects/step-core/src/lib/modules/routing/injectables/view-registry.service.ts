@@ -7,6 +7,7 @@ import { SUB_ROUTE_DATA } from '../types/constants';
 import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predicate';
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
+import { QuickAccessRouteService } from '../../basics/step-basics.module';
 
 export interface CustomView {
   template: string;

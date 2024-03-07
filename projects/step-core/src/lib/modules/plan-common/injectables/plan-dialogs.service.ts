@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
-import { AugmentedPlansService, Plan } from '../client/step-client-module';
 import { EntityDialogsService } from '../../entity/entity.module';
+import { AugmentedPlansService, Plan } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',

@@ -1,8 +1,8 @@
-import { ActivatedRoute, ActivatedRouteSnapshot, CanActivateFn } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
-import { MultipleProjectsService } from '../services/multiple-projects.service';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { AuthService } from '../modules/auth';
 
 type EntityEditLink = Parameters<MultipleProjectsService['confirmEntityEditInASeparateProject']>[1];
 

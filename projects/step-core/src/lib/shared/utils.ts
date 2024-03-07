@@ -3,8 +3,6 @@ import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
-import { ActivatedRoute, ActivatedRouteSnapshot, CanActivateFn, Route, RouterStateSnapshot } from '@angular/router';
-import { inject, Injector, runInInjectionContext } from '@angular/core';
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),
@@ -82,29 +80,3 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
     }),
     {},
   );
-
-export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
-  const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-  const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-  return weightA - weightB;
-};
-
-export const sequenceCanActivateGuards = (guards: CanActivateFn[]): CanActivateFn => {
-  const injector = inject(Injector);
-
-  return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
-    from(guards).pipe(
-      concatMap((guard) => {
-        const result = runInInjectionContext(injector, () => guard(route, state));
-        if (result instanceof Observable) {
-          return result;
-        }
-        if (result instanceof Promise) {
-          return from(result);
-        }
-        return of(result);
-      }),
-      takeWhile((value) => value === true, true),
-      last(),
-    );
-};

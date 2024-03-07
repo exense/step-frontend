@@ -2,15 +2,15 @@ import { Component, inject, Input } from '@angular/core';
 import { map, of } from 'rxjs';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
 import { CustomColumnOptions } from '../../../table/table.module';
-import { PlanLinkDialogService } from '../../injectables/plan-link-dialog.service';
 import { StepBasicsModule, LinkDisplayType } from '../../../basics/step-basics.module';
 import { Plan } from '../../../../client/step-client-module';
+import { PlanUrlPipe } from '../../pipes/plan-url.pipe';
 
 @Component({
   selector: 'step-plan-link',
   templateUrl: './plan-link.component.html',
   styleUrls: ['./plan-link.component.scss'],
-  imports: [StepBasicsModule],
+  imports: [StepBasicsModule, PlanUrlPipe],
   standalone: true,
 })
 export class PlanLinkComponent implements CustomComponent {

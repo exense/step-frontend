@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MAT_LUXON_DATE_ADAPTER_OPTIONS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
@@ -39,7 +38,6 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
-import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
@@ -69,7 +67,6 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
-import { PlanUrlPipe } from './pipes/plan-url.pipe';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 
 @NgModule({
@@ -108,8 +105,6 @@ import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-para
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
-    EditableLabelTemplateDirective,
-    PlanUrlPipe,
     DashboardNavigationParamsPipe,
   ],
   imports: [
@@ -205,7 +200,6 @@ import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-para
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
-    PlanUrlPipe,
     DashboardNavigationParamsPipe,
   ],
   providers: [
@@ -249,9 +243,6 @@ export * from './components/lock-column/lock-column.component';
 export * from './components/html-description-cell/html-description-cell.component';
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
-export { PlanCreateDialogComponent } from './components/plan-create-dialog/plan-create-dialog.component';
-export * from './components/plan-link/plan-link.component';
-export * from './components/scheduler-task-link/scheduler-task-link.component';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
@@ -276,6 +267,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
+export * from './guards/check-project-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
@@ -298,13 +290,10 @@ export * from './modules/import-export';
 export * from './modules/plan-common';
 export * from './modules/routing';
 export * from './modules/auth';
-export * from './pipes/dashboard-link.pipe';
+export * from './modules/is-used-by';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
-export * from './pipes/plan-url.pipe';
-export { PlanNamePipe } from './pipes/plan-name.pipe';
-export * from './services/additional-right-rule.service';
 export * from './services/artefact-refresh-notification.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';

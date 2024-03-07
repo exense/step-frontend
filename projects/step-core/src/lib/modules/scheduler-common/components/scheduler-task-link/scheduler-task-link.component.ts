@@ -3,9 +3,8 @@ import { ExecutiontTaskParameters } from '../../../../client/step-client-module'
 import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.consant';
 import { SchedulerActionsService } from '../../injectables/scheduler-actions.service';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
-import { LinkDisplayType } from '../../../basics/step-basics.module';
+import { LinkDisplayType, CommonEditorUrlsService } from '../../../basics/step-basics.module';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonEditorUrlsService } from '../../modules/basics/step-basics.module';
 
 @Component({
   selector: 'step-scheduler-task-link',
