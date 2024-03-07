@@ -7,7 +7,7 @@ import {
 import { BaseEntitySelectionTableComponent } from '../../../entity/entity.module';
 import { TableComponent } from '../../../table/table.module';
 import { AugmentedKeywordsService, Keyword } from '../../../../client/step-client-module';
-import { DateFormat } from '../../../../shared';
+import { DateFormat } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-function-selection-table',

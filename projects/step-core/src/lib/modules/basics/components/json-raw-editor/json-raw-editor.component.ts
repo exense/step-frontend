@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, noop, Subject, combineLatest, takeUntil } from 'rxjs';
-import { jsonValidator } from '../../shared/validators/json-validator';
+import { jsonValidator } from '../../types/validators/json-validator';
 type OnChange = (value?: any) => void;
 type OnTouch = () => void;
 

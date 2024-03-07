@@ -18,8 +18,8 @@ import {
   EntityMenuItemsRegistryService,
 } from '../../../custom-registeries/custom-registries.module';
 import { EntityMenuContentDirective } from '../../directives/entity-menu-content.directive';
-import { Mutable } from '../../../../shared';
 import { OperationCompleteHandler } from '../../injectables/operation-complete-handler';
+import { Mutable } from '../../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
 
