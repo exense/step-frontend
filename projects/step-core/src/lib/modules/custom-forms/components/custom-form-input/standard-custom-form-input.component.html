@@ -1,0 +1,46 @@
+<step-form-field [showRequiredMarker]="required">
+  @if (!hideLabel) {
+    <step-label>{{ input?.label }}</step-label>
+  }
+  @switch (input?.type) {
+    @case (InputType.TEXT) {
+      <input
+        type="text"
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      />
+    }
+    @case (InputType.DROPDOWN) {
+      <mat-select
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      >
+        @for (item of dropdownItems; track item) {
+          <mat-option [value]="item">{{ item }}</mat-option>
+        }
+      </mat-select>
+    }
+    @case (InputType.CHECKBOX) {
+      <mat-select
+        [required]="required"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (blur)="invokeTouch()"
+      >
+        @for (item of checkboxItems; track item) {
+          <mat-option [value]="item">{{ item }}</mat-option>
+        }
+      </mat-select>
+    }
+    @default {}
+  }
+  @if (hint) {
+    <step-suffix class="icon-suffix">
+      <step-icon name="help-circle" [matTooltip]="hint" />
+    </step-suffix>
+  }
+</step-form-field>

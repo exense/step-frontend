@@ -4,36 +4,7 @@ import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
 import { ActivatedRoute, ActivatedRouteSnapshot, CanActivateFn, Route, RouterStateSnapshot } from '@angular/router';
-import { SUB_ROUTE_DATA } from './constants';
-import { concatMap, from, last, Observable, of, takeWhile } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-
-export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
-  const pathParts = fieldPath.split('.');
-
-  return pathParts.reduce((res: Record<string, unknown> | unknown, fieldName: string) => {
-    if (typeof res !== 'object' || res === null || res === undefined) {
-      return res;
-    }
-
-    return (res as Record<string, unknown>)[fieldName];
-  }, object);
-};
-
-export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: string, value: unknown): void => {
-  const pathParts = fieldPath.split('.');
-
-  pathParts.reduce((res: Record<string, unknown> | unknown, fieldName: string, index) => {
-    if (typeof res !== 'object' || res === null || res === undefined) {
-      return;
-    }
-    const container = res as Record<string, unknown>;
-
-    container[fieldName] = index < pathParts.length - 1 ? container[fieldName] ?? {} : value;
-
-    return container[fieldName];
-  }, object);
-};
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),

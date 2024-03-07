@@ -1,7 +1,7 @@
 import { Component, inject, Input } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { ExecutiontTaskParameters } from '../../client/step-client-module';
-import { ScheduledTaskDialogsService } from '../../services/scheduled-task-dialogs.service';
+import { ScheduledTaskDialogsService } from '../../modules/scheduler-common';
 
 type OnChange = (value?: ExecutiontTaskParameters) => void;
 type OnTouch = () => void;

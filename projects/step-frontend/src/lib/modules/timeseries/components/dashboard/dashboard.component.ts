@@ -11,11 +11,11 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import {
-  COMMON_IMPORTS,
   TimeseriesColorsPool,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  COMMON_IMPORTS,
 } from '../../modules/_common';
 
 //@ts-ignore
@@ -136,7 +136,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    let newDashlet: DashboardItem = {
+    const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -241,6 +241,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   handleChartDelete(index: number) {
     this.dashboard.dashlets.splice(index, 1);
+    this.context.updateAttributes(this.collectAllAttributes());
   }
 
   handleChartShiftLeft(index: number) {

@@ -1,8 +1,7 @@
 import { Component, inject, TrackByFunction, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ViewRegistryService } from '../../services/view-registry.service';
-import { SubRouteData } from '../../shared';
-import { AuthService } from '../../modules/basics/services/auth.service';
+import { SubRouteData, ViewRegistryService } from '../../modules/routing';
+import { AuthService } from '../../modules/auth';
 
 @Component({
   selector: 'step-settings',

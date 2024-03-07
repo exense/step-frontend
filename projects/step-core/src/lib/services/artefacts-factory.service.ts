@@ -7,8 +7,8 @@ import {
   DynamicValueString,
   KeywordsService,
 } from '../client/step-client-module';
-import { AuthService } from '../modules/basics/step-basics.module';
 import { DynamicFieldsSchema } from '../modules/dynamic-forms/shared/dynamic-fields-schema';
+import { AuthService } from '../modules/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +24,7 @@ export class ArtefactsFactoryService {
       map((artefact) => {
         artefact!.dynamicName!.dynamic = artefact!.useDynamicName;
         return artefact;
-      })
+      }),
     );
   }
 
@@ -37,27 +37,30 @@ export class ArtefactsFactoryService {
             artefact!.attributes!['name'] = keyword!.attributes!['name'];
             artefact!.dynamicName!.dynamic = artefact.useDynamicName;
             return { artefact, keyword };
-          })
+          }),
         );
       }),
       switchMap(({ artefact, keyword }) => {
         const inputs$ = this._screenTemplates.getInputsForScreenPost('functionTable');
         return inputs$.pipe(
           map((inputs) => {
-            const functionAttributes = inputs.reduce((res, input) => {
-              const attributeId = (input?.id || '').replace('attributes.', '');
-              if (!attributeId || !keyword?.attributes?.[attributeId]) {
+            const functionAttributes = inputs.reduce(
+              (res, input) => {
+                const attributeId = (input?.id || '').replace('attributes.', '');
+                if (!attributeId || !keyword?.attributes?.[attributeId]) {
+                  return res;
+                }
+                const dynamic = false;
+                const value = keyword.attributes[attributeId];
+                res[attributeId] = { value, dynamic };
                 return res;
-              }
-              const dynamic = false;
-              const value = keyword.attributes[attributeId];
-              res[attributeId] = { value, dynamic };
-              return res;
-            }, {} as Record<string, { value: string; dynamic: boolean }>);
+              },
+              {} as Record<string, { value: string; dynamic: boolean }>,
+            );
 
             (artefact as any)['function'] = { value: JSON.stringify(functionAttributes), dynamic: false };
             return { artefact, keyword };
-          })
+          }),
         );
       }),
       map(({ artefact, keyword }) => {
@@ -70,16 +73,19 @@ export class ArtefactsFactoryService {
           return artefact;
         }
 
-        const targetObject = (schema?.required || []).reduce((res, field) => {
-          const property = schema?.properties[field];
-          if (!property) {
-            return res;
-          }
+        const targetObject = (schema?.required || []).reduce(
+          (res, field) => {
+            const property = schema?.properties[field];
+            if (!property) {
+              return res;
+            }
 
-          const value = property.default;
-          res[field] = { value, dynamic: false };
-          return res;
-        }, {} as Record<string, DynamicValueString>);
+            const value = property.default;
+            res[field] = { value, dynamic: false };
+            return res;
+          },
+          {} as Record<string, DynamicValueString>,
+        );
 
         (artefact as any)['argument'] = {
           dynamic: false,
@@ -89,7 +95,7 @@ export class ArtefactsFactoryService {
         };
 
         return artefact;
-      })
+      }),
     );
   }
 
@@ -103,9 +109,9 @@ export class ArtefactsFactoryService {
             (artefact as any)['planId'] = planId;
             artefact.dynamicName!.dynamic = artefact.useDynamicName;
             return artefact;
-          })
+          }),
         );
-      })
+      }),
     );
   }
 }

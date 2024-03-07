@@ -2,9 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
-import { CommonEditorUrlsService, MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { CommonEditorUrlsService, MultipleProjectsService, DialogsService } from '../modules/basics/step-basics.module';
 import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
-import { DialogsService } from '../shared';
 
 @Injectable({
   providedIn: 'root',

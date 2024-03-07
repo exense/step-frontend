@@ -3,8 +3,6 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, filter, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../../../client/step-client-module';
-import { IsUsedByDialogService } from '../../../services/is-used-by-dialog.service';
-import { DialogsService } from '../../../shared';
 import {
   FileAlreadyExistingDialogComponent,
   FileAlreadyExistingDialogData,
@@ -12,6 +10,8 @@ import {
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
+import { DialogsService } from '../../basics/step-basics.module';
+import { IsUsedByDialogService } from '../../is-used-by';
 
 const RESOURCE_SEARCH_TYPE = 'RESOURCE_ID';
 
@@ -28,7 +28,7 @@ export class ResourceDialogsService {
   deleteResource(id: string, label: string): Observable<boolean> {
     return this._dialogs.showDeleteWarning(1, `Resource "${label}"`).pipe(
       filter((result) => result),
-      switchMap(() => this._resourcesService.deleteResource(id))
+      switchMap(() => this._resourcesService.deleteResource(id)),
     );
   }
 
@@ -54,16 +54,18 @@ export class ResourceDialogsService {
           data: {
             similarResources,
           },
-        }
+        },
       )
       .afterClosed();
   }
 
   showUpdateResourceWarning(): Observable<UpdateResourceWarningResultState | undefined> {
     return this._matDialog
-      .open<UpdateResourceWarningDialogComponent, null, UpdateResourceWarningResultState | undefined>(
-        UpdateResourceWarningDialogComponent
-      )
+      .open<
+        UpdateResourceWarningDialogComponent,
+        null,
+        UpdateResourceWarningResultState | undefined
+      >(UpdateResourceWarningDialogComponent)
       .afterClosed();
   }
 }

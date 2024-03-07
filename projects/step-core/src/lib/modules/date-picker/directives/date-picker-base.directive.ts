@@ -14,7 +14,7 @@ import { DateField } from '../types/date-field';
 import { DatePickerComponent } from '../components/date-picker/date-picker.component';
 import { ControlValueAccessor } from '@angular/forms';
 import { DateAdapterService } from '../injectables/date-adapter.service';
-import { Mutable } from '../../../shared';
+import { Mutable } from '../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<DatePickerBaseDirective<any>, 'formattedValue'>>;
 type OnChange<D> = (date?: D | null) => void;

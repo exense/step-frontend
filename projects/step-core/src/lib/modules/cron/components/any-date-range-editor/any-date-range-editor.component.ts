@@ -3,7 +3,7 @@ import { BaseEditorComponent } from '../base-editor/base-editor.component';
 import { RANGE_HOURS, RANGE_MINUTES } from '../../injectables/ranges.tokens';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
-import { AlertType } from '../../../basics/shared/alert-type.enum';
+import { AlertType } from '../../../basics/types/alert-type.enum';
 import { TOOLTIP_HOURS_RANGE, TOOLTIP_MINUTES_RANGE } from '../../injectables/tooltip.tokens';
 
 @Component({

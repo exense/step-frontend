@@ -38,18 +38,21 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
 
   private getUrlSearch(): Record<string, SearchValue> {
     const queryParams = this._activatedRoute.snapshot.queryParams;
-    const result = Object.entries(queryParams).reduce((res, [key, value]) => {
-      const tableKey = this.getTableKey(key);
-      if (!tableKey) {
+    const result = Object.entries(queryParams).reduce(
+      (res, [key, value]) => {
+        const tableKey = this.getTableKey(key);
+        if (!tableKey) {
+          return res;
+        }
+        const tableValue = this.parseUrlValue(value);
+        if (!tableValue) {
+          return res;
+        }
+        res[tableKey] = tableValue;
         return res;
-      }
-      const tableValue = this.parseUrlValue(value);
-      if (!tableValue) {
-        return res;
-      }
-      res[tableKey] = tableValue;
-      return res;
-    }, {} as Record<string, SearchValue>);
+      },
+      {} as Record<string, SearchValue>,
+    );
     return result;
   }
 
@@ -134,7 +137,7 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     if (this._router.getCurrentNavigation()) {
       const navigationEnd$ = this._router.events.pipe(
         filter((event) => event instanceof NavigationEnd),
-        first()
+        first(),
       );
       navigationEnd$.subscribe(() => this.changeQueryParams(queryParams));
       return;

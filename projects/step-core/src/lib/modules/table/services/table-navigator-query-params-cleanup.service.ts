@@ -1,7 +1,7 @@
-import { NavigatorQueryParamsCleanupService } from '../../basics/step-basics.module';
 import { Params } from '@angular/router';
 import { TABLE_QUERY_PREFIX } from './table-persistence-url-state.service';
 import { Injectable } from '@angular/core';
+import { NavigatorQueryParamsCleanupService } from '../../routing';
 
 @Injectable()
 export class TableNavigatorQueryParamsCleanupService implements NavigatorQueryParamsCleanupService {
