@@ -1,56 +1,42 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnDestroy,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, viewChild, ViewEncapsulation } from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
-import { Subject, takeUntil } from 'rxjs';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 
 @Component({
   selector: 'step-tree-node-name',
   templateUrl: './tree-node-name.component.html',
-  styleUrls: ['./tree-node-name.component.scss'],
+  styleUrl: './tree-node-name.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class TreeNodeNameComponent implements AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<void>();
+export class TreeNodeNameComponent {
+  private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
 
   readonly templateContainer = inject(TreeNodeTemplateContainerService);
 
-  @Input() node?: TreeNode;
+  node = input<TreeNode | undefined>();
 
-  @ViewChild('inputElement', { static: true })
-  inputElement!: ElementRef;
+  readonly isEditMode = computed(() => {
+    const editNodeId = this._treeState.editNodeId();
+    return !!editNodeId && editNodeId === this.node()?.id;
+  });
 
-  isEditMode: boolean = false;
+  readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('inputElement');
 
-  constructor(private _treeState: TreeStateService<any, TreeNode>) {}
+  private enterEditEffect = effect(() => {
+    const isEditMode = this.isEditMode();
+    if (!isEditMode) {
+      return;
+    }
+    const inputElement = this.inputElement()?.nativeElement;
+    if (!inputElement) {
+      return;
+    }
+    inputElement.value = this.node()?.name ?? '';
+    setTimeout(() => inputElement.focus(), 50);
+  });
 
   submitNameChange(): void {
-    this._treeState.updateEditNodeName(this.inputElement.nativeElement.value);
-  }
-
-  ngAfterViewInit(): void {
-    this._treeState.editNodeId$.pipe(takeUntil(this.terminator$)).subscribe((editNodeId) => {
-      this.isEditMode = !!editNodeId && editNodeId === this.node?.id;
-      if (this.isEditMode) {
-        this.inputElement.nativeElement.value = this.node!.name;
-        setTimeout(() => {
-          this.inputElement.nativeElement.focus();
-        }, 50);
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
+    this._treeState.updateEditNodeName(this.inputElement()!.nativeElement.value);
   }
 }

@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   EventEmitter,
   inject,
@@ -15,11 +16,12 @@ import {
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
 import {
+  TimeSeriesFilterItem,
   Execution,
+  MetricAttribute,
   OQLVerifyResponse,
   Tab,
   TimeRange,
-  TimeSeriesFilterItem,
   TimeSeriesService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
@@ -43,6 +45,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
 import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -70,7 +73,6 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
-  @Input() filters: TimeSeriesFilterItem[] = [];
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
@@ -79,15 +81,18 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() activeTimeRange!: TimeRangePickerSelection;
   @Input() editMode = false;
 
-  @Input() filterOptions: FilterBarItem[] = [];
-
   @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
 
+  private _destroyRef = inject(DestroyRef);
+
+  filterOptions: MetricAttribute[] = []; // dashboard attributes that are not used in filters yet
+
   activeGrouping: string[] = [];
+  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
 
   private emitFilterChange$ = new Subject<void>();
 
@@ -120,10 +125,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);
   private _snackbar = inject(MatSnackBar);
 
-  getInternalFilters() {
-    return this._internalFilters;
-  }
-
   ngOnInit(): void {
     if (!this.context) {
       throw new Error('Context input is mandatory');
@@ -133,14 +134,48 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
     this._internalFilters = this.context.getFilteringSettings().filterItems;
 
-    this.emitFilterChange$.pipe(debounceTime(this.EMIT_DEBOUNCE_TIME)).subscribe(() => {
-      this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
-        this.rawMeasurementsModeActive = response.hasUnknownFields;
-        if (!this.rawMeasurementsModeActive) {
-          this.emitFiltersChange();
+    this.context
+      .onAttributesChange()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((attributes: Record<string, MetricAttribute>) => {
+        const customGroupingOptions: { label: string; attributes: string[] }[] = [];
+        if (attributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Execution', attributes: [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] });
         }
+        if (attributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Plan', attributes: [TimeSeriesConfig.PLAN_ID_ATTRIBUTE] });
+        }
+        if (attributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]) {
+          customGroupingOptions.push({ label: 'Task', attributes: [TimeSeriesConfig.TASK_ID_ATTRIBUTE] });
+        }
+        this.groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS.concat(customGroupingOptions);
+        this.filterOptions = this.collectUnusedAttributes();
       });
-    });
+
+    this.emitFilterChange$
+      .pipe(debounceTime(this.EMIT_DEBOUNCE_TIME), takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        this.composeAndVerifyFullOql(this.activeGrouping).subscribe((response) => {
+          this.rawMeasurementsModeActive = response.hasUnknownFields;
+          if (!this.rawMeasurementsModeActive) {
+            this.emitFiltersChange();
+          }
+        });
+      });
+  }
+
+  public addUniqueFilterItems(items: FilterBarItem[]) {
+    const existingFilterAttributes: Record<string, boolean> = {};
+    this._internalFilters.forEach((item) => (existingFilterAttributes[item.attributeName] = true));
+    this._internalFilters = this._internalFilters.concat(
+      items.filter((item) => !existingFilterAttributes[item.attributeName]),
+    );
+  }
+
+  private collectUnusedAttributes(): MetricAttribute[] {
+    return this.context
+      .getAllAttributes()
+      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
   }
 
   getValidFilters(): FilterBarItem[] {
@@ -256,7 +291,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
       this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
     }
-
     this.emitFilterChange$.next();
   }
 
@@ -286,18 +320,10 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(item: FilterBarItem) {
-    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.attributeName);
-
-    if (filterIndex !== -1) {
-      const index =
-        filterIndex < this._internalFilters.length - this._internalFilters.length
-          ? filterIndex
-          : filterIndex + this._internalFilters.length;
-
-      this.filterComponents!.toArray()[index].menuTrigger!.openMenu();
-    } else {
-      this.addFilter(JSON.parse(JSON.stringify(item)));
+  addFilterItem(item: MetricAttribute) {
+    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.name);
+    if (filterIndex < 0) {
+      this.addFilter(FilterUtils.createFilterItemFromAttribute(item));
     }
   }
 
@@ -316,6 +342,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
     this._internalFilters.splice(index, 1);
     this._internalFilters = [...this._internalFilters];
+    this.filterOptions = this.collectUnusedAttributes();
     if (FilterUtils.filterItemIsValid(itemToDelete)) {
       this.emitFilterChange$.next();
     }
@@ -323,11 +350,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   private addFilter(item: FilterBarItem): void {
     this._internalFilters = [...this._internalFilters, item];
+    this.filterOptions = this.collectUnusedAttributes();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
     this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
-      if (!item.attributeName) {
-        this._internalFilters.pop();
+      if (!item.attributeName || (!this.editMode && !FilterUtils.filterItemIsValid(item))) {
+        this.removeFilterItem(this._internalFilters.length - 1);
       }
     });
   }

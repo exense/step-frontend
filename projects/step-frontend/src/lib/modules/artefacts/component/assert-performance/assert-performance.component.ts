@@ -53,9 +53,6 @@ export class AssertPerformanceComponent extends BaseArtefactComponent<AssertPerf
     createAggregatorTypeItem(AggregatorType.SUM, 'sum'),
   ];
 
-  readonly trackByOperator: TrackByFunction<OperatorTypeItem> = (index, item) => item.key;
-  readonly trackByAggregator: TrackByFunction<AggregatorTypeItem> = (index, item) => item.key;
-
   override contextChange(): void {
     super.contextChange();
     this.setDefaultFilters();

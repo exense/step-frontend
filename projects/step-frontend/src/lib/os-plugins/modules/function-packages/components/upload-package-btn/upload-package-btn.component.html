@@ -2,6 +2,7 @@
   type="button"
   mat-flat-button
   color="primary"
+  class="header-btn"
   [disabled]="!('kw-write' | hasRight | async)"
   (click)="addFunctionPackage()"
 >

@@ -3,7 +3,6 @@ import {
   AppConfigContainerService,
   AuthService,
   BookmarkCreateDialogComponent,
-  Dashlet,
   ViewRegistryService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,8 +20,6 @@ export class MainViewComponent {
 
   readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
   readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
-
-  readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;
 
   addBookmark(): void {
     this._matDialog.open(BookmarkCreateDialogComponent);

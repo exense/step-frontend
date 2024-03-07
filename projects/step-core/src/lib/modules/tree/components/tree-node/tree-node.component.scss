@@ -18,8 +18,10 @@ step-tree-node {
       }
     }
 
-    > .node-content {
-      padding: 8px 0;
+    .node-content {
+      padding: 0.8rem 0 0 0;
+      margin-bottom: 0.8rem;
+      z-index: 2;
       flex: 1;
       display: flex;
       align-items: center;
@@ -38,12 +40,16 @@ step-tree-node {
           display: flex;
         }
       }
+
+      &.drag-in-progress {
+        opacity: 0.3;
+      }
     }
 
     > .no-toggle,
-    > .mat-icon-button {
-      width: 2.4rem;
-      height: 2.4rem;
+    > .mat-mdc-icon-button {
+      width: 2.4rem !important;
+      height: 2.4rem !important;
     }
 
     &.skipped {

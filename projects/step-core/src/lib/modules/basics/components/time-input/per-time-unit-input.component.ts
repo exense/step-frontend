@@ -1,4 +1,4 @@
-import { TimeUnit } from '../../shared/time-unit.enum';
+import { TimeUnit } from '../../types/time-unit.enum';
 import { BaseTimeConverterComponent } from './base-time-converter.component';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
@@ -16,15 +16,27 @@ export class PerTimeUnitInputComponent extends BaseTimeConverterComponent {
     super(_ngControl);
   }
 
-  protected calculateDisplayValue(modelValue: number, modelMeasure: TimeUnit, displayMeasure?: TimeUnit): number {
+  protected override calculateBaseValue(modelValue: number, modelMeasure: TimeUnit): number {
+    return modelValue / modelMeasure;
+  }
+
+  protected override calculateDisplayValue(
+    modelValue: number,
+    modelMeasure: TimeUnit,
+    displayMeasure?: TimeUnit,
+  ): number {
     if (!displayMeasure) {
       return modelValue;
     }
-    const units = modelValue / modelMeasure;
+    const units = this.calculateBaseValue(modelValue, modelMeasure);
     return Math.round(units / displayMeasure);
   }
 
-  protected calculateModelValue(displayValue: number, modelMeasure: TimeUnit, displayMeasure?: TimeUnit): number {
+  protected override calculateModelValue(
+    displayValue: number,
+    modelMeasure: TimeUnit,
+    displayMeasure?: TimeUnit,
+  ): number {
     if (!displayMeasure) {
       return displayValue;
     }

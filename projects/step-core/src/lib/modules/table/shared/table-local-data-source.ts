@@ -18,9 +18,9 @@ import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
 import { TableRequestData, TableParameters } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
-import { Mutable } from '../../../shared';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
+import { Mutable } from '../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<
   Pick<TableLocalDataSource<any>, 'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$'>
@@ -52,7 +52,10 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   readonly totalFiltered$!: Observable<number>;
   readonly forceNavigateToFirstPage$!: Observable<unknown>;
 
-  constructor(source: T[] | Observable<T[]>, private _config: TableLocalDataSourceConfig<T> = {}) {
+  constructor(
+    source: T[] | Observable<T[]>,
+    private _config: TableLocalDataSourceConfig<T> = {},
+  ) {
     this.setupStreams(source, _config);
   }
 
@@ -89,7 +92,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
           totalFiltered,
         };
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
 
     const self = this as FieldAccessor;
@@ -107,7 +110,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       // Little time gap is required for local data source, to make sure that all previous data is rendered.
       // Otherwise, navigating to the first page may happen and data will be valid
       // but sum previous data maybe rendered
-      switchMap(() => timer(100))
+      switchMap(() => timer(100)),
     );
   }
 

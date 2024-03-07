@@ -7,6 +7,7 @@
         type="button"
         mat-flat-button
         color="primary"
+        class="header-btn"
         (click)="createPackage()"
         [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
       >
@@ -24,7 +25,7 @@
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
     <td mat-cell *matCellDef="let element">
-      {{ element.attributes?.['name'] }}
+      {{ element.attributes?.['name'] }} <step-status [status]="element.status"></step-status>
     </td>
   </ng-container>
   <ng-container matColumnDef="fileName" stepSearchCol>

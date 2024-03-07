@@ -12,6 +12,10 @@
 mat-card {
   margin-top: 1rem;
   border: solid 1px var.$light-white-gray;
+
+  mat-card-content {
+    margin-left: 0.8rem;
+  }
 }
 
 @include mixins.reportNodeHeader();

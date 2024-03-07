@@ -2,7 +2,7 @@ import { TableLocalDataSource } from './table-local-data-source';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
-import { Mutable } from '../../../shared';
+import { Mutable } from '../../basics/step-basics.module';
 
 type ReloadOptions<R> = { hideProgress?: boolean; request?: R } | undefined;
 type FieldAccessor = Mutable<Pick<TableFetchLocalDataSource<any>, 'inProgress$'>>;

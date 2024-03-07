@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';
@@ -29,6 +29,8 @@ export class TimeSeriesContext {
 
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
+  private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
+
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
   private selectedTimeRange: TimeRange; // this is the zooming selection.
@@ -55,6 +57,7 @@ export class TimeSeriesContext {
       filterItems: params.filters || [],
     });
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
+    this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(params.attributes || {});
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
   }
@@ -67,6 +70,40 @@ export class TimeSeriesContext {
     this.activeFilters$.complete();
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
+  }
+
+  /**
+   * This method will not trigger change event, only if there are real changes in at least one attribute, added or removed
+   */
+  updateAttributes(attributes: MetricAttribute[]): void {
+    const existingAttributes = this.dashboardAttributes$.getValue();
+    const existingAttributesSize = Object.keys(existingAttributes).length;
+    let hasChanges = attributes.length !== existingAttributesSize;
+    if (!hasChanges) {
+      // additional cycle to check all items is performed if lengths are not equal
+      hasChanges = attributes.some((newAttr) => !existingAttributes[newAttr.name]);
+    }
+    if (!hasChanges) {
+      // no need to do anything else
+      return;
+    }
+    // perform the final aggregation, when it really required
+    const newAttributesByIds = attributes.reduce(
+      (res, newAttr) => {
+        res[newAttr.name] = newAttr;
+        return res;
+      },
+      {} as Record<string, MetricAttribute>,
+    );
+    this.dashboardAttributes$.next(newAttributesByIds);
+  }
+
+  onAttributesChange(): Observable<Record<string, MetricAttribute>> {
+    return this.dashboardAttributes$.asObservable();
+  }
+
+  getAllAttributes(): MetricAttribute[] {
+    return Object.values(this.dashboardAttributes$.getValue());
   }
 
   enableCompareMode(context: TimeSeriesContext) {

@@ -1,11 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../../shared';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
-
-const NUMBER_CHARS_POSITIVE_ONLY = '0123456789.,'.split('');
-const NUMBER_CHARS_WITH_NEGATIVE = ['-', ...NUMBER_CHARS_POSITIVE_ONLY];
+import { DialogsService } from '../../../basics/step-basics.module';
+import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
 
 @Component({
   selector: 'step-dynamic-textfield',
