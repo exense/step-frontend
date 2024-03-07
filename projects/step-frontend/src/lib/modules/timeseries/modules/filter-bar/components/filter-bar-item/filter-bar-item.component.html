@@ -109,7 +109,7 @@
       </div>
       <step-ts-filter-bar-execution-item [values]="item.searchEntities"></step-ts-filter-bar-execution-item>
 
-      <div class="apply-checkbox">
+      <div class="apply-checkbox" *ngIf="updateTimeRangeOption">
         <mat-checkbox [(ngModel)]="item.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
           >Update time range
         </mat-checkbox>

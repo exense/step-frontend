@@ -95,7 +95,7 @@ export class AsyncOperationDialogComponent extends BaseModalWindowComponent impl
           return of(undefined);
         }),
         // A small delay to show the last progress value
-        switchMap((result) => timer(500).pipe(map(() => result)))
+        switchMap((result) => timer(500).pipe(map(() => result))),
       )
       .subscribe((result) => {
         if (!result) {

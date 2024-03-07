@@ -1,19 +1,22 @@
 <div class="main-name" [class.with-meta]="referenceMeta">
-  <step-editable-label [ngModel]="artefactName" (ngModelChange)="onArtefactNameChange($event)" [disabled]="isDisabled">
-  </step-editable-label>
+  <step-editable-label
+    [ngModel]="artefactName"
+    (ngModelChange)="onArtefactNameChange($event)"
+    [disabled]="isDisabled"
+  />
   @if (referenceMeta) {
     <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
       <step-popover>
-        <step-icon [name]="referenceMeta.icon"></step-icon>
+        <step-icon [name]="referenceMeta.icon" />
         {{ referenceMeta.description }}
         <step-popover-content>
           @if (referenceMeta.hintFor === hintFor.KEYWORD) {
             Click on
-            <step-icon name="edit-2"></step-icon>
+            <step-icon name="edit-2" />
             to specify selection criteria for any keyword
           } @else if (referenceMeta.hintFor === hintFor.PLAN) {
             Click on
-            <step-icon name="edit-2"></step-icon>
+            <step-icon name="edit-2" />
             to specify selection criteria for any plan
           }
         </step-popover-content>
@@ -29,7 +32,7 @@
       [color]="isEditorMode ? 'primary' : undefined"
       (click)="isEditorMode = !isEditorMode"
     >
-      <step-icon name="edit-2"></step-icon>
+      <step-icon name="edit-2" />
     </button>
   }
 </div>
@@ -49,6 +52,5 @@
     [allowNotSchemaFields]="true"
     [value]="artefactReferenceAttributes"
     (valueChange)="updateReferenceAttributes($event)"
-  >
-  </step-dynamic-field-group>
+  />
 }

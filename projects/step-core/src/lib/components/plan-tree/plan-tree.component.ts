@@ -8,11 +8,14 @@ import {
   TreeComponent,
   TreeStateService,
 } from '../../modules/tree/tree.module';
-import { PlanArtefactResolverService } from '../../services/plan-artefact-resolver.service';
-import { PlanEditorService } from '../../services/plan-editor.service';
-import { PlanInteractiveSessionService } from '../../services/plan-interactive-session.service';
-import { PlanTreeAction } from '../../shared/plan-tree-action.enum';
-import { PlanEditorPersistenceStateService } from '../../services/plan-editor-persistence-state.service';
+import {
+  PlanArtefactResolverService,
+  PlanEditorService,
+  PlanInteractiveSessionService,
+  PlanTreeAction,
+  PlanEditorPersistenceStateService,
+} from '../../modules/plan-common';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -20,7 +23,7 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
 @Component({
   selector: 'step-plan-tree',
   templateUrl: './plan-tree.component.html',
-  styleUrls: ['./plan-tree.component.scss'],
+  styleUrl: './plan-tree.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [
     {
@@ -36,7 +39,7 @@ export class PlanTreeComponent implements TreeActionsService {
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  readonly selectedNode$ = this._treeState.selectedNode$;
+  readonly selectedNode$ = toObservable(this._treeState.selectedNode);
   readonly selectedArtefact$ = this.selectedNode$.pipe(map((node) => node?.originalArtefact));
   @Input() isReadonly: boolean = false;
 

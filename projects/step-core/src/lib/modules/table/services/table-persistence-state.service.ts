@@ -9,31 +9,31 @@ import { Sort } from '@angular/material/sort';
 
 @Injectable()
 export class TablePersistenceStateService {
-  private config = inject(TablePersistenceConfig, { optional: true });
+  protected _config = inject(TablePersistenceConfig, { optional: true });
+  protected _filterConditionFactory = inject(FilterConditionFactoryService);
   private storage = inject(TableStorageService);
-  private filterConditionFactory = inject(FilterConditionFactoryService);
 
-  private get canStoreSearch(): boolean {
-    return !!this.config?.tableId && !!this.config?.storeSearch;
+  protected get canStoreSearch(): boolean {
+    return !!this._config?.tableId && !!this._config?.storeSearch;
   }
-  private get canStoreSort(): boolean {
-    return !!this.config?.tableId && !!this.config?.storeSort;
+  protected get canStoreSort(): boolean {
+    return !!this._config?.tableId && !!this._config?.storeSort;
   }
 
-  private get canStorePagination(): boolean {
-    return !!this.config?.tableId && !!this.config?.storePagination;
+  protected get canStorePagination(): boolean {
+    return !!this._config?.tableId && !!this._config?.storePagination;
   }
 
   private get searchKey(): string {
-    return `${this.config!.tableId!}_SEARCH`;
+    return `${this._config!.tableId!}_SEARCH`;
   }
 
   private get sortKey(): string {
-    return `${this.config!.tableId!}_SORT`;
+    return `${this._config!.tableId!}_SORT`;
   }
 
   private get paginationKey(): string {
-    return `${this.config!.tableId!}_PAGE`;
+    return `${this._config!.tableId!}_PAGE`;
   }
 
   saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
@@ -60,17 +60,20 @@ export class TablePersistenceStateService {
       return {};
     }
     const json = JSON.parse(jsonString);
-    return Object.entries(json).reduce((res, [key, value]) => {
-      if ((value as FilterConditionJson).filterConditionType !== undefined) {
-        const filterCondition = this.filterConditionFactory.create(value as FilterConditionJson);
-        if (filterCondition) {
-          res[key] = filterCondition;
+    return Object.entries(json).reduce(
+      (res, [key, value]) => {
+        if ((value as FilterConditionJson).filterConditionType !== undefined) {
+          const filterCondition = this._filterConditionFactory.create(value as FilterConditionJson);
+          if (filterCondition) {
+            res[key] = filterCondition;
+          }
+        } else {
+          res[key] = value as SearchValue;
         }
-      } else {
-        res[key] = value as SearchValue;
-      }
-      return res;
-    }, {} as Record<string, SearchValue>);
+        return res;
+      },
+      {} as Record<string, SearchValue>,
+    );
   }
 
   savePage(page: PageEvent): void {

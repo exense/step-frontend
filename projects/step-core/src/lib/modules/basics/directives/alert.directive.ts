@@ -1,5 +1,5 @@
 import { Directive, HostBinding, Input } from '@angular/core';
-import { AlertType } from '../shared/alert-type.enum';
+import { AlertType } from '../types/alert-type.enum';
 
 @Directive({
   selector: 'step-alert',

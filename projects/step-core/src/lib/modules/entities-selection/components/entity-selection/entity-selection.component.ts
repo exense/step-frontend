@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
 import { map, Observable, of } from 'rxjs';
-import { Mutable } from '../../../../shared';
+import { Mutable } from '../../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelected$'>>;
 
@@ -62,7 +62,7 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestr
 
   private onSelectionCollectorChange(
     currentValue?: SelectionCollector<KEY, ENTITY>,
-    previousValue?: SelectionCollector<KEY, ENTITY>
+    previousValue?: SelectionCollector<KEY, ENTITY>,
   ): void {
     if (!this.entity) {
       return;
@@ -84,7 +84,7 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestr
     }
 
     (this as FieldAccessor).isSelected$ = selectionCollector!.selected$.pipe(
-      map(() => selectionCollector!.isSelected(entity!))
+      map(() => selectionCollector!.isSelected(entity!)),
     );
   }
 }

@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 export type ExecutionTreePagingSetting = Record<string, { skip: number }>;
 
 export const EXECUTION_TREE_PAGING_SETTINGS = new InjectionToken<ExecutionTreePagingSetting>(
-  'Execution tree paging settings'
+  'Execution tree paging settings',
 );
 
 @Injectable()

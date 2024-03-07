@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MenuEntry } from './view-registry.service';
-import { Mutable } from '../shared';
+import { MenuEntry } from '../modules/routing';
+import { Mutable } from '../modules/basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<MenuItemsOverrideConfigService, 'menuItemsOverride$'>>;
 

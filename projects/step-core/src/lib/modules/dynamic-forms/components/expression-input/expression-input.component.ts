@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { DialogsService } from '../../../../shared';
+import { DialogsService } from '../../../basics/step-basics.module';
 
 type OnChange = (expression?: string) => void;
 type OnTouch = () => void;

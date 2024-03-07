@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { MarkerType } from '../../shared/marker-type.enum';
+import { MarkerType } from '../../types/marker-type.enum';
 
 @Component({
   selector: 'step-marker',

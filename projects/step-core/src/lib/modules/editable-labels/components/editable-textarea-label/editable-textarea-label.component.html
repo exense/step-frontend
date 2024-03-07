@@ -1,0 +1,26 @@
+@switch (state) {
+  @case (State.READABLE) {
+    <div class="editable-textarea-label" [matTooltip]="tooltip" (click)="onLabelClick()">
+      @if (value) {
+        <div class="editable-textarea-label-content" [innerHTML]="value"></div>
+      } @else {
+        <div class="editable-textarea-placeholder">
+          <ng-container *ngTemplateOutlet="labelTemplate" />
+        </div>
+      }
+    </div>
+  }
+  @case (State.EDITABLE) {
+    <step-form-field>
+      <textarea
+        #textarea
+        [rows]="textareaRows"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
+        (input)="onInput()"
+        (blur)="onBlur()"
+      ></textarea>
+    </step-form-field>
+    <step-editable-actions (cancel)="onCancel()" (apply)="onApply()" />
+  }
+}

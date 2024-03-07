@@ -3,35 +3,6 @@ import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
-import { Route } from '@angular/router';
-import { SUB_ROUTE_DATA } from './constants';
-
-export const getObjectFieldValue = (object: Record<string, unknown>, fieldPath: string): unknown => {
-  const pathParts = fieldPath.split('.');
-
-  return pathParts.reduce((res: Record<string, unknown> | unknown, fieldName: string) => {
-    if (typeof res !== 'object' || res === null || res === undefined) {
-      return res;
-    }
-
-    return (res as Record<string, unknown>)[fieldName];
-  }, object);
-};
-
-export const setObjectFieldValue = (object: Record<string, unknown>, fieldPath: string, value: unknown): void => {
-  const pathParts = fieldPath.split('.');
-
-  pathParts.reduce((res: Record<string, unknown> | unknown, fieldName: string, index) => {
-    if (typeof res !== 'object' || res === null || res === undefined) {
-      return;
-    }
-    const container = res as Record<string, unknown>;
-
-    container[fieldName] = index < pathParts.length - 1 ? container[fieldName] ?? {} : value;
-
-    return container[fieldName];
-  }, object);
-};
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),
@@ -107,11 +78,5 @@ export const toRecord = <T>(keyValuePairs: KeyValue<string, T>[]): Record<string
       ...acc,
       [key]: value,
     }),
-    {}
+    {},
   );
-
-export const routesPrioritySortPredicate = (routeA: Route, routeB: Route) => {
-  const weightA = routeA.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-  const weightB = routeB.data?.[SUB_ROUTE_DATA]?.weight ?? 1;
-  return weightA - weightB;
-};

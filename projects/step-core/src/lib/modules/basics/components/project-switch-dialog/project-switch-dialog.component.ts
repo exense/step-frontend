@@ -1,7 +1,7 @@
 import { Component, HostListener, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProjectSwitchDialogData } from '../../shared/project-switch-dialog-data.interface';
-import { ProjectSwitchDialogResult } from '../../shared/project-switch-dialog-result.enum';
+import { ProjectSwitchDialogData } from '../../types/project-switch-dialog-data.interface';
+import { ProjectSwitchDialogResult } from '../../types/project-switch-dialog-result.enum';
 
 type DialogRef = MatDialogRef<ProjectSwitchDialogComponent, ProjectSwitchDialogResult | undefined>;
 

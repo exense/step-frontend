@@ -12,7 +12,7 @@ export interface SelectionCollectorProviderConfig {
 
 export const selectionCollectionProvider = <KEY, ENTITY>(
   selectionKeyPropertyOrConfig: string | SelectionCollectorProviderConfig,
-  autoDeselectStrategy?: AutoDeselectStrategy
+  autoDeselectStrategy?: AutoDeselectStrategy,
 ): Provider[] => [
   SelectionCollectorFactoryService,
   {

@@ -1,10 +1,10 @@
 import { Component, inject, Input, OnChanges, SimpleChanges, Type, ViewChild } from '@angular/core';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
 import { CustomRegistryItem } from '../../shared/custom-registry-item';
-import { Mutable } from '../../../../shared';
 import { CustomRegistryService } from '../../services/custom-registry.service';
 import { CustomComponent } from '../../shared/custom-component';
 import { CustomItemRenderComponent } from '../custom-item-render/custom-item-render.component';
+import { Mutable } from '../../../basics/types/mutable';
 
 type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
 

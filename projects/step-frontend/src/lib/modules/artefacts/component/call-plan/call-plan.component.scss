@@ -4,3 +4,7 @@
 form {
   @include core.common-form-content;
 }
+
+step-editable-textarea-label {
+  margin-left: -1.6rem;
+}

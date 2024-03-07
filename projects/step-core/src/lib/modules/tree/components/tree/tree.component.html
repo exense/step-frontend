@@ -1,58 +1,57 @@
-<cdk-tree [dataSource]="_treeState.dataSource" [treeControl]="_treeState.treeControl" cdkDropListGroup>
-  <ng-container>
-    <cdk-tree-node
-      *cdkTreeNodeDef="let node"
-      cdkTreeNodePadding
-      [cdkTreeNodePaddingIndent]="paddingIdent"
-      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
-      cdkDropList
-      cdkDropListSortingDisabled="true"
-      [cdkDropListData]="node.id"
-      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
-      (click)="_treeState.selectNode(node, $event)"
-      (dblclick)="handleDblClick(node, $event)"
+<step-drag-drop-container>
+  @for (item of _treeState.flatTree(); track item.id) {
+    <div
+      class="node-container"
+      draggable="false"
+      [style.--level]="item.parentPath.length"
+      (click)="_treeState.selectNode(item, $event)"
+      (dblclick)="handleDblClick(item, $event)"
     >
-      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
       <step-tree-node
-        [style.padding-left.px]="node.level * paddingMultiplier"
-        [class.context-menu-open]="node.id === openedMenuNodeId"
-        [node]="node"
-        [canToggle]="false"
-        [treeContainer]="_treeContainer"
+        [class.context-menu-open]="item.id === openedMenuNodeId"
+        [class.is-drag-in-progress]="!!(item.id | isDragData | async)"
+        [node]="item"
+        [canToggle]="item.hasChild || item.expandable"
         [dragDisabled]="dragDisabled"
         (contextMenu)="openContextMenu($event)"
-      >
-      </step-tree-node>
-    </cdk-tree-node>
-  </ng-container>
-  <ng-container>
-    <cdk-tree-node
-      *cdkTreeNodeDef="let node; when: hasChild"
-      cdkTreeNodePadding
-      [cdkTreeNodePaddingIndent]="paddingIdent"
-      [class.cdk-tree-node-selected]="node.id | isNodeSelected | async"
-      [class.expanded]="_treeState.treeControl.isExpanded(node)"
-      cdkDropList
-      cdkDropListSortingDisabled="true"
-      (cdkDropListDropped)="_treeDragDrop.handleDrop()"
-      [cdkDropListData]="node.id"
-      (click)="_treeState.selectNode(node, $event)"
-      (dblclick)="handleDblClick(node, $event)"
-    >
-      <div *ngFor="let level of node.level | arrayOfSize" [style.--level]="level" class="node-line"></div>
-      <step-tree-node
-        [style.padding-left.px]="node.level * paddingMultiplier"
-        [class.context-menu-open]="node.id === openedMenuNodeId"
-        [node]="node"
-        [canToggle]="true"
-        [treeContainer]="_treeContainer"
-        [dragDisabled]="dragDisabled"
-        (contextMenu)="openContextMenu($event)"
-      >
-      </step-tree-node>
-    </cdk-tree-node>
-  </ng-container>
-</cdk-tree>
+        [stepDropArea]="item.id"
+        (dropItem)="handleDropNode($event)"
+      />
+      @if (dragDisabled) {
+        @for (pId of item.parentPath; track pId; let idx = $index) {
+          <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+        }
+      } @else {
+        @for (pId of item.parentPath; track pId; let idx = $index) {
+          <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+          <section
+            draggable="false"
+            class="middle-drop-container"
+            [style.--idx]="idx"
+            [stepDropArea]="pId"
+            [dropAdditionalInfo]="item.parentPath[idx + 1] || item.id"
+            (dropItem)="handleDropNode($event)"
+          >
+            <div></div>
+          </section>
+        }
+        <section
+          draggable="false"
+          class="middle-drop-container"
+          [style.--idx]="item.parentPath.length"
+          [stepDropArea]="item.id"
+          dropAdditionalInfo="first"
+          (dropItem)="handleDropNode($event)"
+        >
+          <div></div>
+        </section>
+      }
+    </div>
+  }
+  <step-drag-preview>
+    <step-tree-drag-preview />
+  </step-drag-preview>
+</step-drag-drop-container>
 <div
   #nodeContextMenuTrigger
   class="node-context-menu-trigger"
@@ -63,7 +62,7 @@
 ></div>
 <mat-menu #nodeContextMenu="matMenu">
   <ng-template matMenuContent let-node="node" let-multipleNodes="multipleNodes">
-    <ng-container *ngFor="let action of node | treeNodeActions: multipleNodes | async; trackBy: trackByAction">
+    @for (action of node | treeNodeActions: multipleNodes | async; track action.id) {
       <button
         class="tree-action-item"
         mat-menu-item
@@ -72,7 +71,9 @@
       >
         {{ action.label }}
       </button>
-      <mat-divider *ngIf="action.hasSeparator"></mat-divider>
-    </ng-container>
+      @if (action.hasSeparator) {
+        <mat-divider *ngIf="action.hasSeparator" />
+      }
+    }
   </ng-template>
 </mat-menu>
