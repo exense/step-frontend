@@ -265,6 +265,6 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/dialog-route/dialog-route.component';
-export * from './shared/model-formatters';
+export * from './types/model-formatters';
 export * from './types/mutable';
 export * from './types/date-format.enum';

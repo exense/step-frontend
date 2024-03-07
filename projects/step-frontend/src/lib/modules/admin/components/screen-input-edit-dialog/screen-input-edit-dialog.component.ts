@@ -1,8 +1,13 @@
 import { Component, HostBinding, inject } from '@angular/core';
-import { AugmentedScreenService, DialogRouteResult, Input as SInput } from '@exense/step-core';
+import {
+  AugmentedScreenService,
+  DialogRouteResult,
+  Input as SInput,
+  CUSTOM_UI_COMPONENTS_FORMATTER,
+  EXPRESSION_SCRIPT_FORMATTER,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
-import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
 
 type InputType = SInput['type'];
 type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>;

@@ -35,7 +35,8 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../routing';
-import { HasRightPipe } from '../auth';
+import { AUTH_EXPORTS } from '../auth';
+import { DRAG_DROP_EXPORTS } from '../drag-drop';
 import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
 import { CustomColumnEditorDialogComponent } from './components/custom-column-editor-dialog/custom-column-editor-dialog.component';
 import { CustomColumnEditorDropdownOptionsComponent } from './components/custom-column-editor-dropdown-options/custom-column-editor-dropdown-options.component';
@@ -51,7 +52,8 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     AsyncOperationsModule,
     StepBasicsModule,
     DatePickerModule,
-    HasRightPipe,
+    AUTH_EXPORTS,
+    DRAG_DROP_EXPORTS,
   ],
   declarations: [
     TableComponent,

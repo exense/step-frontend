@@ -3,9 +3,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ColumnEditorDialogData } from '../../types/column-editor-dialog-data';
 import { FormBuilder } from '@angular/forms';
 import { Input as SInput, ScreenInput } from '../../../../client/step-client-module';
-import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../../../basics/step-basics.module';
+import {
+  CUSTOM_UI_COMPONENTS_FORMATTER,
+  DialogsService,
+  EXPRESSION_SCRIPT_FORMATTER,
+} from '../../../basics/step-basics.module';
 import { inputFormCreate } from '../../types/column-editor-dialog.form';
-import { DialogsService } from '../../../../shared';
 
 type InputType = SInput['type'];
 
