@@ -26,7 +26,11 @@ export class TimeSeriesContext {
   readonly compareModeChange$ = new BehaviorSubject<TsCompareModeSettings>({ enabled: false });
   readonly editMode$: BehaviorSubject<boolean>;
 
-  stateChange$ = new Subject<void>();
+  /**
+   * General observable which emits when any part of the context has been change.
+   */
+  readonly stateChange$: Observable<void>;
+  private stateChangeInternal$ = new Subject<void>();
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
@@ -45,7 +49,6 @@ export class TimeSeriesContext {
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
-  private stateChangeSubscription: Subscription;
 
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
@@ -64,7 +67,7 @@ export class TimeSeriesContext {
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
 
     // any specific context change will trigger the main stateChange
-    this.stateChangeSubscription = merge(
+    this.stateChange$ = merge(
       this.compareModeChange$,
       this.inProgress$,
       this.fullTimeRangeChange$,
@@ -74,7 +77,8 @@ export class TimeSeriesContext {
       this.filterSettings$,
       this.chartsResolution$,
       this.chartsLockedState$,
-    ).subscribe(() => this.stateChange$.next());
+      this.stateChangeInternal$,
+    ) as Observable<void>;
   }
 
   destroy(): void {
@@ -85,14 +89,7 @@ export class TimeSeriesContext {
     this.activeFilters$.complete();
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
-    this.stateChangeSubscription.unsubscribe();
-  }
-
-  /**
-   * General observable which emits when any part of the context has been change.
-   */
-  onStateChange(): Observable<void> {
-    return this.stateChange$.asObservable();
+    this.stateChangeInternal$.complete();
   }
 
   updateEditMode(enabled: boolean) {
@@ -186,7 +183,7 @@ export class TimeSeriesContext {
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
     } else {
-      this.stateChange$.next();
+      this.stateChangeInternal$.next();
     }
   }
 
@@ -195,7 +192,7 @@ export class TimeSeriesContext {
     if (emitEvent) {
       this.selectedTimeRangeChange$.next(range);
     } else {
-      this.stateChange$.next();
+      this.stateChangeInternal$.next();
     }
   }
 

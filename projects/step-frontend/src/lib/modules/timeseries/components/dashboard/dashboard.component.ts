@@ -92,7 +92,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.dashboard = dashboard;
         this.context = this.createContext(this.dashboard, pageParams);
         this.updateUrl();
-        this.context.onStateChange().subscribe((stateChanged) => {
+        this.context.stateChange$.subscribe((stateChanged) => {
           this.updateUrl();
         });
 
@@ -253,7 +253,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const dashboardFilters = dashboard.filters
       ?.map(FilterUtils.convertApiFilterItem)
       .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
-    console.log(urlFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,

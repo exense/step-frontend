@@ -228,7 +228,7 @@ export class FilterUtils {
   }
 
   public static createEmptyFilterTextItem(attribute: string): FilterBarItem {
-    const fieldType = this.getFilterFieldType(attribute);
+    const fieldType: FilterBarItemType = this.determineFilterFieldType(attribute);
     return {
       removable: true,
       label: this.getFilterFieldLabel(attribute),
@@ -238,7 +238,7 @@ export class FilterUtils {
     } as FilterBarItem;
   }
 
-  private static getFilterFieldType(attribute: string): FilterBarItemType {
+  private static determineFilterFieldType(attribute: string): FilterBarItemType {
     switch (attribute) {
       case 'eId':
         return FilterBarItemType.EXECUTION;

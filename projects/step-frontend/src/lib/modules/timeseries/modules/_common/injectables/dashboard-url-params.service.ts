@@ -14,7 +14,6 @@ const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
 
 export interface DashboardUrlParams {
-  // [key: any]: string | undefined;
   refresh?: string;
   timeRange?: TimeRangeSelection;
   grouping?: string[];
@@ -37,7 +36,6 @@ export class DashboardUrlParamsService {
 
   collectUrlParams(): DashboardUrlParams {
     let params = this._activatedRoute.snapshot.queryParams;
-    console.log('PARAMS', params);
     params = Object.keys(params)
       .filter((key) => key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX))
       .reduce((acc, key) => {
@@ -136,7 +134,6 @@ export class DashboardUrlParamsService {
       accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
       return accumulator;
     }, {});
-    // params.rangeType = timeSelectionType;
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
       queryParams: prefixedParams,
