@@ -21,7 +21,7 @@ import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
 import { map, of } from 'rxjs';
 import { AsyncOperationCloseStatus } from '../../../async-operations/async-operations.module';
-import { BulkOperationType } from '../../../basics/shared/bulk-operation-type.enum';
+import { BulkOperationType } from '../../../basics/types/bulk-operation-type.enum';
 
 @Component({
   selector: 'step-bulk-operations',
@@ -48,7 +48,7 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
   @Input() entity?: string;
 
   readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(
-    map((selected) => selected.length === 0)
+    map((selected) => selected.length === 0),
   );
 
   invoke(operation: EntityBulkOperationInfo): void {

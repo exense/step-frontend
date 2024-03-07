@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewEncaps
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { noop } from 'rxjs';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
-import { DialogsService } from '../../../../shared';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
+import { DialogsService } from '../../../basics/step-basics.module';
 
 type DynamicValue = DynamicValueString | DynamicValueBoolean | DynamicValueInteger;
 
@@ -54,7 +54,10 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() elementRefMapKey?: string;
 
-  constructor(private _dialogService: DialogsService, @Optional() public _ngControl?: NgControl) {
+  constructor(
+    private _dialogService: DialogsService,
+    @Optional() public _ngControl?: NgControl,
+  ) {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;
     }

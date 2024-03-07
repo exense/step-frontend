@@ -12,9 +12,12 @@ import { CastEntityToTaskPipe } from './pipes/cast-entity-to-task.pipe';
 import { CastEntityToExecutionPipe } from './pipes/cast-entity-to-execution.pipe';
 import { EntityMenuButtonComponent } from './components/entity-menu-button/entity-menu-button.component';
 import { EntityMenuItemDirective } from './directives/entity-menu-item.directive';
+import { TableModule } from '../table/table.module';
+import { EntityColumnComponent } from './components/entity-column/entity-column.component';
+import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule],
+  imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule, TableModule],
   declarations: [
     EntityIconComponent,
     SelectEntityOfTypeComponent,
@@ -25,6 +28,8 @@ import { EntityMenuItemDirective } from './directives/entity-menu-item.directive
     CastEntityToExecutionPipe,
     EntityMenuButtonComponent,
     EntityMenuItemDirective,
+    EntityColumnComponent,
+    EntityColumnContainerComponent,
   ],
   exports: [
     EntityIconComponent,
@@ -35,6 +40,8 @@ import { EntityMenuItemDirective } from './directives/entity-menu-item.directive
     CastEntityToTaskPipe,
     CastEntityToExecutionPipe,
     EntityMenuButtonComponent,
+    EntityColumnComponent,
+    EntityColumnContainerComponent,
   ],
 })
 export class EntityModule {}
@@ -44,6 +51,8 @@ export * from './components/select-entity-of-type/select-entity-of-type.componen
 export * from './components/base-entity-selection-table/base-entity-selection-table.component';
 export * from './components/entity-menu/entity-menu.component';
 export * from './components/entity-menu-button/entity-menu-button.component';
+export * from './components/entity-column/entity-column.component';
+export * from './components/entity-column-container/entity-column-container.component';
 export * from './directives/entity-menu-content.directive';
 export * from './directives/entity-menu-item.directive';
 export * from './directives/entity-menu-item.directive';

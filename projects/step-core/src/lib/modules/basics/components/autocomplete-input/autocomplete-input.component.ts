@@ -13,7 +13,7 @@ import {
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, Subject, combineLatest, startWith, debounceTime, takeUntil, map } from 'rxjs';
 import { KeyValue } from '@angular/common';
-import { ArrayItemLabelValueExtractor } from '../../services/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type OnChange = (value: string) => void;
