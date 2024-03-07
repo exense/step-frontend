@@ -26,7 +26,7 @@
       <a
         matTooltip="Go to dashboard"
         matTooltipPosition="below"
-        [routerLink]="element | dashboardUrl"
+        [routerLink]="['/', 'dashboards', element.id]"
         class="name-column"
         >{{ element.name }}</a
       >
@@ -54,7 +54,7 @@
           mat-icon-button
           matTooltip="View dashboard"
           [disabled]="!('dashboard-write' | hasRight | async)"
-          [routerLink]="element | dashboardUrl"
+          [routerLink]="['/', 'dashboards', element.id]"
         >
           <step-icon name="eye" />
         </a>
@@ -63,7 +63,7 @@
             mat-icon-button
             matTooltip="Edit dashboard"
             [disabled]="!('dashboard-write' | hasRight | async)"
-            [routerLink]="element | dashboardUrl"
+            [routerLink]="['/', 'dashboards', element.id]"
             [queryParams]="{ edit: '1' }"
             queryParamsHandling="merge"
           >

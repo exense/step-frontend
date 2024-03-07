@@ -11,14 +11,13 @@ import {
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
 import { COMMON_IMPORTS } from '../../modules/_common';
-import { DashboardUrlPipe } from '../../pipes/dashboard-url.pipe';
 
 @Component({
   selector: 'step-dashboard-list',
   templateUrl: './dashboard-list.component.html',
   styleUrls: ['./dashboard-list.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, DashboardUrlPipe],
+  imports: [COMMON_IMPORTS],
   providers: [
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
     {
