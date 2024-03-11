@@ -103,7 +103,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
       filterBarItem.isHidden = !this.settings.showContextualFilters;
       filterBarItem.removable = true;
-      filterBarItem.freeTextValues = filterBarItem.type === 'FREE_TEXT' ? [searchValue] : [];
+      filterBarItem.freeTextValues = (filterBarItem.type === 'FREE_TEXT' ? [searchValue] : []);
       filterBarItem.searchEntities = (FilterUtils.isEntityFilter(filterBarItem) ? [{ searchValue: searchValue }] : []);
       filterBarItem.exactMatch = true;
       filterBarItem.isLocked = false;
