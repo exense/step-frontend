@@ -1,14 +1,13 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedSchedulerService,
-  checkProjectGuardFactory,
   CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
+  editScheduledTaskRoute,
   EditSchedulerTaskDialogComponent,
   EntityRegistry,
-  ScheduledTaskDialogsService,
-  SchedulerActionsService,
+  EditSchedulerTaskDialogUtilsService,
   SchedulerTaskLinkComponent,
   SimpleOutletComponent,
   StepCoreModule,
@@ -20,12 +19,9 @@ import { SchedulerTaskSelectionComponent } from './components/scheduler-task-sel
 import { ScheduledTaskListComponent } from './components/scheduled-task-list/scheduled-task-list.component';
 import { SchedulerConfigurationComponent } from './components/scheduler-configuration/scheduler-configuration.component';
 import './components/scheduler-configuration/scheduler-configuration.component';
-import { ScheduledTaskLogicService } from './services/scheduled-task-logic.service';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
 import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 import { map } from 'rxjs';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { TaskUrlPipe } from './pipes/task-url.pipe';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -34,15 +30,8 @@ import { TaskUrlPipe } from './pipes/task-url.pipe';
     SchedulerTaskSelectionComponent,
     SchedulerConfigurationComponent,
     CronExpressionCellComponent,
-    TaskUrlPipe,
   ],
   exports: [ScheduledTaskListComponent, SchedulerTaskSelectionComponent, SchedulerConfigurationComponent],
-  providers: [
-    {
-      provide: SchedulerActionsService,
-      useClass: ScheduledTaskLogicService,
-    },
-  ],
 })
 export class SchedulerModule {
   constructor(
@@ -84,32 +73,14 @@ export class SchedulerModule {
               resolve: {
                 taskAndConfig: () => {
                   const _api = inject(AugmentedSchedulerService);
-                  const _dialogs = inject(ScheduledTaskDialogsService);
+                  const _dialogs = inject(EditSchedulerTaskDialogUtilsService);
                   return _api.createExecutionTask().pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
                 },
               },
             }),
-            dialogRoute({
+            editScheduledTaskRoute({
               path: ':id',
-              dialogComponent: EditSchedulerTaskDialogComponent,
-              canActivate: [
-                checkProjectGuardFactory({
-                  entityType: 'task',
-                  getEntity: (id) => inject(AugmentedSchedulerService).getExecutionTaskByIdCached(id),
-                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
-                }),
-              ],
-              resolve: {
-                taskAndConfig: (route: ActivatedRouteSnapshot) => {
-                  const taskId = route.params['id'];
-                  const _api = inject(AugmentedSchedulerService);
-                  const _dialogs = inject(ScheduledTaskDialogsService);
-                  return _api
-                    .getExecutionTaskByIdCached(taskId)
-                    .pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
-                },
-              },
-              canDeactivate: [() => inject(AugmentedSchedulerService).cleanupCache()],
+              getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
             }),
           ],
         },

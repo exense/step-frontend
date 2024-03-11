@@ -14,6 +14,7 @@ import {
 import {
   BulkSelectionType,
   ControllerService,
+  IncludeTestcases,
   RegistrationStrategy,
   RepositoryObjectReference,
   selectionCollectionProvider,
@@ -23,7 +24,6 @@ import {
 } from '@exense/step-core';
 import { BehaviorSubject, combineLatest, filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;

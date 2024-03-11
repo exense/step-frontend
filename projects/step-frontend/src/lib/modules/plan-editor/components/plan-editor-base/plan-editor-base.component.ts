@@ -1,12 +1,14 @@
 import {
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   forwardRef,
   inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
@@ -36,6 +38,7 @@ import {
   AugmentedPlansService,
   PlanUrlPipe,
   CommonEntitiesUrlsService,
+  ExecutiontTaskParameters,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -113,6 +116,7 @@ export class PlanEditorBaseComponent
   @Input() compositeId?: string;
   @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
+  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   selectedTab = 'controls';
 

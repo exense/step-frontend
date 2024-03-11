@@ -14,7 +14,7 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
-import { DashletRegistryService, EntityRegistry, ViewRegistryService } from '@exense/step-core';
+import { DashletRegistryService, EntityRegistry, schedulePlanRoute, ViewRegistryService } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
@@ -36,7 +36,6 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
-import { ExecutionUrlPipe } from './pipes/execution-url.pipe';
 
 @NgModule({
   declarations: [
@@ -67,7 +66,6 @@ import { ExecutionUrlPipe } from './pipes/execution-url.pipe';
     ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
-    ExecutionUrlPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -159,6 +157,7 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'repository',
       component: RepositoryComponent,
+      children: [schedulePlanRoute()],
     });
 
     this._viewRegistry.registerRoute({
@@ -187,6 +186,7 @@ export class ExecutionModule {
             return { consumed: url };
           },
           component: ExecutionProgressComponent,
+          children: [schedulePlanRoute('modal')],
         },
       ],
     });

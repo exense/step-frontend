@@ -1,7 +1,9 @@
 import { Component, inject, Input } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { ExecutiontTaskParameters } from '../../client/step-client-module';
-import { ScheduledTaskDialogsService } from '../../modules/scheduler-common';
+import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.constant';
+import { AugmentedSchedulerService, ExecutiontTaskParameters } from '../../../../client/step-client-module';
+import { EntityDialogsService } from '../../../entity/injectables/entity-dialogs.service';
+import { map, of, switchMap } from 'rxjs';
 
 type OnChange = (value?: ExecutiontTaskParameters) => void;
 type OnTouch = () => void;
@@ -9,10 +11,13 @@ type OnTouch = () => void;
 @Component({
   selector: 'step-select-task',
   templateUrl: './select-task.component.html',
-  styleUrls: ['./select-task.component.scss'],
+  styleUrl: './select-task.component.scss',
+  imports: [SCHEDULER_COMMON_IMPORTS],
+  standalone: true,
 })
 export class SelectTaskComponent implements ControlValueAccessor {
-  private _taskDialogs = inject(ScheduledTaskDialogsService);
+  private _entityDialogs = inject(EntityDialogsService);
+  private _schedulerService = inject(AugmentedSchedulerService);
 
   @Input() showRequiredMarker?: boolean;
   @Input() label: string = 'Task';
@@ -44,14 +49,20 @@ export class SelectTaskComponent implements ControlValueAccessor {
   }
 
   selectTask(): void {
-    this._taskDialogs.selectTask().subscribe({
-      next: (task) => {
-        this.taskValue = task;
-        this.onChange?.(task);
-      },
-      complete: () => {
-        this.onTouch?.();
-      },
-    });
+    this._entityDialogs
+      .selectEntityOfType('tasks')
+      .pipe(
+        map((result) => result?.item?.id),
+        switchMap((id) => (!id ? of(undefined) : this._schedulerService.getExecutionTaskById(id))),
+      )
+      .subscribe({
+        next: (task) => {
+          this.taskValue = task;
+          this.onChange?.(task);
+        },
+        complete: () => {
+          this.onTouch?.();
+        },
+      });
   }
 }

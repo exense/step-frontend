@@ -1,7 +1,14 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { ArtefactInfo, AuthService, ControllerService, RepositoryObjectReference } from '@exense/step-core';
-import { ActivatedRoute } from '@angular/router';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
+import {
+  ArtefactInfo,
+  AuthService,
+  ControllerService,
+  RepositoryObjectReference,
+  IncludeTestcases,
+  ExecutiontTaskParameters,
+  ScheduledTaskTemporaryStorageService,
+} from '@exense/step-core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'step-repository',
@@ -15,6 +22,8 @@ export class RepositoryComponent implements OnInit {
   private _auth = inject(AuthService);
   private _controllersApi = inject(ControllerService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
+  private _router = inject(Router);
   private _cd = inject(ChangeDetectorRef);
 
   protected includedTestcases?: IncludeTestcases;
@@ -36,6 +45,10 @@ export class RepositoryComponent implements OnInit {
   handleIncludedTestCasesChange(includedTestcases: IncludeTestcases): void {
     this.includedTestcases = includedTestcases;
     this._cd.detectChanges();
+  }
+  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
+    this._router.navigate(['..', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
   }
 
   private setupLocationParams(): void {

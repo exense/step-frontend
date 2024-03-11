@@ -11,6 +11,7 @@ import {
   PlanCreateDialogComponent,
   PlanLinkComponent,
   quickAccessRoute,
+  schedulePlanRoute,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -132,11 +133,12 @@ export class PlanModule {
             },
           },
           canDeactivate: [
-            (_: unknown, route: ActivatedRouteSnapshot) => {
+            () => {
               inject(AugmentedPlansService).cleanupCache();
               return true;
             },
           ],
+          children: [schedulePlanRoute()],
         }),
       ],
     });

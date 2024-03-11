@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, forwardRef, inject, OnInit } from '@angular/core';
 import {
   AutoDeselectStrategy,
   ExecutiontTaskParameters,
@@ -9,9 +9,15 @@ import {
   FilterConditionFactoryService,
   DialogParentService,
   AuthService,
+  AugmentedSchedulerService,
+  EditSchedulerTaskDialogUtilsService,
+  CommonEntitiesUrlsService,
+  DialogRouteResult,
+  DialogsService,
 } from '@exense/step-core';
-import { ScheduledTaskLogicService } from '../../services/scheduled-task-logic.service';
 import { KeyValue } from '@angular/common';
+import { Router } from '@angular/router';
+import { map, of, pipe, switchMap, tap } from 'rxjs';
 
 type StatusItem = KeyValue<string, string>;
 
@@ -21,18 +27,35 @@ type StatusItem = KeyValue<string, string>;
   styleUrls: ['./scheduled-task-list.component.scss'],
   providers: [
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
-    ScheduledTaskLogicService,
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: DialogParentService,
-      useExisting: ScheduledTaskLogicService,
+      useExisting: forwardRef(() => ScheduledTaskListComponent),
     },
   ],
 })
-export class ScheduledTaskListComponent implements OnInit {
+export class ScheduledTaskListComponent implements OnInit, DialogParentService {
   private _auth = inject(AuthService);
+  private _dialogs = inject(DialogsService);
+  private _schedulerService = inject(AugmentedSchedulerService);
+  private _scheduledTaskDialogs = inject(EditSchedulerTaskDialogUtilsService);
+  private _router = inject(Router);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
-  readonly _logic = inject(ScheduledTaskLogicService);
+  private updateDataSourceAfterChange = pipe(
+    tap((result?: DialogRouteResult) => {
+      if (result?.isSuccess) {
+        this.dataSource.reload();
+      }
+    }),
+  );
+
+  readonly STATUS_ACTIVE_STRING = 'On';
+  readonly STATUS_INACTIVE_STRING = 'Off';
+  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
+
+  readonly dataSource = this._schedulerService.createSelectionDataSource();
+  readonly returnParentUrl = '/scheduler';
 
   isSchedulerEnabled: boolean = false;
 
@@ -44,8 +67,8 @@ export class ScheduledTaskListComponent implements OnInit {
       : '/settings/scheduler';
 
   readonly statusItems: StatusItem[] = [
-    { key: true.toString(), value: this._logic.STATUS_ACTIVE_STRING },
-    { key: false.toString(), value: this._logic.STATUS_INACTIVE_STRING },
+    { key: true.toString(), value: this.STATUS_ACTIVE_STRING },
+    { key: false.toString(), value: this.STATUS_INACTIVE_STRING },
   ];
 
   readonly extractor: ArrayItemLabelValueExtractor<StatusItem> = {
@@ -54,8 +77,54 @@ export class ScheduledTaskListComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this._logic.isSchedulerEnabled().subscribe((data) => {
+    this._schedulerService.isSchedulerEnabled().subscribe((data) => {
       this.isSchedulerEnabled = data;
     });
+  }
+
+  dialogSuccessfullyClosed(): void {
+    this.dataSource.reload();
+  }
+
+  executeTask(scheduledTask: ExecutiontTaskParameters) {
+    this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
+      this._router.navigateByUrl(this._commonEntitiesUrls.executionUrl(executionId));
+    });
+  }
+
+  switchActive(scheduledTask: ExecutiontTaskParameters) {
+    this._schedulerService
+      .getExecutionTaskById(scheduledTask.id!)
+      .pipe(
+        tap((task) => {
+          // switching task status in GUI immediately, note that this will be overwritten by updateDataSourceAfterChange
+          scheduledTask.active = !task.active;
+          return task;
+        }),
+        switchMap((task) =>
+          task.active
+            ? this._schedulerService.enableExecutionTask(task.id!, false)
+            : this._schedulerService.enableExecutionTask(task.id!, true),
+        ),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
+  }
+
+  deleteTask(scheduledTask: ExecutiontTaskParameters): void {
+    const paramName: string = scheduledTask.attributes!['name']!;
+
+    this._dialogs
+      .showDeleteWarning(1, `Task "${paramName}"`)
+      .pipe(
+        switchMap((isDeleteConfimred) =>
+          isDeleteConfimred
+            ? this._schedulerService.deleteExecutionTask(scheduledTask.id!).pipe(map(() => true))
+            : of(false),
+        ),
+        map((isSuccess) => ({ isSuccess })),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
   }
 }

@@ -1,6 +1,6 @@
 <step-table
   #table
-  [dataSource]="_logic.dataSource"
+  [dataSource]="dataSource"
   matSort
   matSortActive="attributes.name"
   matSortDirection="asc"
@@ -64,9 +64,9 @@
           'status-off': !element.active,
           'scheduler-disabled': !isSchedulerEnabled
         }"
-        (click)="_logic.switchActive(element)"
+        (click)="switchActive(element)"
       >
-        {{ element.active ? _logic.STATUS_ACTIVE_STRING : _logic.STATUS_INACTIVE_STRING }}
+        {{ element.active ? STATUS_ACTIVE_STRING : STATUS_INACTIVE_STRING }}
       </button>
     </td>
   </ng-container>
@@ -93,7 +93,7 @@
           mat-icon-button
           matTooltip="Execute schedule"
           [disabled]="!('plan-execute' | hasRight | async)"
-          (click)="_logic.executeTask(element)"
+          (click)="executeTask(element)"
         >
           <step-icon name="play"></step-icon>
         </button>
@@ -109,7 +109,7 @@
           mat-icon-button
           matTooltip="Delete schedule"
           [disabled]="!('task-delete' | hasRight | async)"
-          (click)="_logic.deleteTask(element)"
+          (click)="deleteTask(element)"
         >
           <step-icon name="trash-2"></step-icon>
         </button>

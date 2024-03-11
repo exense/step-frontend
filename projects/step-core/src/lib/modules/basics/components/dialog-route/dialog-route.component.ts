@@ -52,20 +52,17 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
     this.modalRef
       .afterClosed()
-      .pipe(takeUntil(this.dialogCloseTerminator$))
+      .pipe(
+        map((result) => {
+          result = result || {};
+          result.canNavigateBack = result.canNavigateBack ?? true;
+          return result;
+        }),
+        takeUntil(this.dialogCloseTerminator$),
+      )
       .subscribe((result) => {
-        result?.isSuccess
-          ? this._dialogParent?.dialogSuccessfullyClosed()
-          : this._dialogParent?.dialogNotSuccessfullyClosed?.();
-
-        const canNavigateBack = result?.canNavigateBack ?? true;
-        if (canNavigateBack) {
-          if (this._dialogParent?.returnParentUrl) {
-            this._router.navigateByUrl(this._dialogParent.returnParentUrl);
-          } else {
-            this._router.navigate(['..'], { relativeTo: this._activatedRoute });
-          }
-        }
+        this.proceedResult(result);
+        this.exitRoute(result);
       });
   }
 
@@ -73,5 +70,26 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
     this.dialogCloseTerminator$?.next();
     this.dialogCloseTerminator$?.complete();
     this.modalRef?.close();
+  }
+
+  private proceedResult(result?: DialogRouteResult): void {
+    result?.isSuccess
+      ? this._dialogParent?.dialogSuccessfullyClosed?.()
+      : this._dialogParent?.dialogNotSuccessfullyClosed?.();
+  }
+
+  private exitRoute(result?: DialogRouteResult): void {
+    if (this._dialogParent?.navigateBack) {
+      this._dialogParent.navigateBack(result);
+      return;
+    }
+
+    if (result?.canNavigateBack) {
+      if (this._dialogParent?.returnParentUrl) {
+        this._router.navigateByUrl(this._dialogParent.returnParentUrl);
+      } else {
+        this._router.navigate(['..'], { relativeTo: this._activatedRoute });
+      }
+    }
   }
 }
