@@ -8,12 +8,29 @@ step-ts-ranger {
   }
 
   .ranger {
+    .u-under {
+      background: #fbfbfb;
+    }
     .u-select {
       pointer-events: all;
       cursor: grabbing;
       position: relative;
-      box-shadow: var.$gray-450 1px 1px 7px;
       min-height: 100% !important;
+      background: unset;
+      height: 100% !important;
+
+      &:after {
+        content: ' ';
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: #000;
+        mix-blend-mode: soft-light;
+      }
+
       &:before {
         content: ' ';
         display: block;
@@ -22,8 +39,8 @@ step-ts-ranger {
         right: 0;
         top: 0;
         bottom: 0;
-        background: linear-gradient(0, var.$blue-100, var.$blue-600);
-        z-index: -1;
+        background: #595959;
+        mix-blend-mode: soft-light;
       }
     }
 
@@ -32,10 +49,37 @@ step-ts-ranger {
       width: 6px;
       height: 100%;
       background: var.$white;
-      border: 1px solid var.$gray-125;
+      border: 1px solid #e7e7e7;
+      box-shadow: 1px 1px 10px -1px #c1c1c1;
       cursor: ew-resize;
-      box-shadow: 1px 1px 5px var.$gray-150;
       border-radius: 2px;
+      z-index: 100;
+
+      &::before {
+        content: '';
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        border: 1px solid var.$gray-125;
+
+        /* Center the circle inside the grip */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      &::after {
+        content: '';
+        background: repeating-linear-gradient(to right, #d7d7d7, #dfdfdf 3px, transparent 2px, transparent 5px);
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
     }
 
     .u-grip-l {
