@@ -17,7 +17,7 @@ import {
   ExportDialogComponent,
   FunctionConfigurationDialogResolver,
   checkProjectGuardFactory,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -84,7 +84,7 @@ export class FunctionModule {
                 checkProjectGuardFactory({
                   entityType: 'keyword',
                   getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
-                  getEditorUrl: (id) => inject(CommonEditorUrlsService).keywordConfigurerUrl(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
                 }),
               ],
               resolve: {

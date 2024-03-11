@@ -4,6 +4,7 @@ import {
   AugmentedExecutionsService,
   AugmentedScreenService,
   AuthService,
+  CommonEntitiesUrlsService,
   Execution,
   ExecutionParameters,
   ExecutiontTaskParameters,
@@ -23,6 +24,7 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
   private _router = inject(Router);
+  private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
   private _executionService = inject(AugmentedExecutionsService);
   private _screenTemplates = inject(AugmentedScreenService);
   private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
@@ -77,7 +79,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       if (currentEId && this._executionTabManager) {
         this._executionTabManager.handleTabClose(currentEId, false);
       }
-      this._router.navigateByUrl(`/executions/open/${eId}`);
+      this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(eId, false));
     });
   }
 

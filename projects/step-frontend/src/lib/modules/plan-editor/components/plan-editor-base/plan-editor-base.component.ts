@@ -35,7 +35,7 @@ import {
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   PlanUrlPipe,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -99,7 +99,7 @@ export class PlanEditorBaseComponent
   private _matDialog = inject(MatDialog);
   private _cd = inject(ChangeDetectorRef);
   private _router = inject(Router);
-  private _commonEditorUrls = inject(CommonEditorUrlsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -266,7 +266,7 @@ export class PlanEditorBaseComponent
               return of(undefined);
             }
 
-            return this._router.navigateByUrl(this._commonEditorUrls.planEditorUrl(plan as Plan));
+            return this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan as Plan));
           }),
         )
         .subscribe();

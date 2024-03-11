@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AugmentedSchedulerService,
+  CommonEntitiesUrlsService,
   DialogParentService,
   DialogRouteResult,
   EditorResolverService,
@@ -22,6 +23,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
   private _router = inject(Router);
   private _multipleProjectList = inject(MultipleProjectsService);
   private _editorResolver = inject(EditorResolverService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   private updateDataSourceAfterChange = pipe(
     tap((result?: DialogRouteResult) => {
@@ -47,7 +49,7 @@ export class ScheduledTaskLogicService implements SchedulerActionsService, Dialo
 
   executeTask(scheduledTask: ExecutiontTaskParameters) {
     this._schedulerService.executeTask(scheduledTask.id!).subscribe((executionId) => {
-      this._router.navigate(['executions', executionId]);
+      this._router.navigateByUrl(this._commonEntitiesUrls.executionUrl(executionId));
     });
   }
 

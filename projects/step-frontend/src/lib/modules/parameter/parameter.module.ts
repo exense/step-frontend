@@ -2,7 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedParametersService,
   checkProjectGuardFactory,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -77,7 +77,7 @@ export class ParameterModule {
                 checkProjectGuardFactory({
                   entityType: 'parameter',
                   getEntity: (id) => inject(AugmentedParametersService).getParameterByIdCached(id),
-                  getEditorUrl: (id) => inject(CommonEditorUrlsService).parameterEditorUrl(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).parameterEditorUrl(id),
                 }),
               ],
               resolve: {

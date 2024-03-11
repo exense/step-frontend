@@ -2,7 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
   checkProjectGuardFactory,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,

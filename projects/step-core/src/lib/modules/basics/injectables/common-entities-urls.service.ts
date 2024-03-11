@@ -1,10 +1,17 @@
 import { Injectable } from '@angular/core';
-import { ExecutiontTaskParameters, Keyword, Parameter, Plan, Resource } from '../../../client/step-client-module';
+import {
+  Execution,
+  ExecutiontTaskParameters,
+  Keyword,
+  Parameter,
+  Plan,
+  Resource,
+} from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CommonEditorUrlsService {
+export class CommonEntitiesUrlsService {
   planEditorUrl(idOrPlan?: string | Plan): string {
     if (!idOrPlan) {
       return '';
@@ -43,5 +50,15 @@ export class CommonEditorUrlsService {
     }
     const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
     return `/scheduler/editor/${id}`;
+  }
+
+  executionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
+    if (!idOrExecution) {
+      return '';
+    }
+    const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
+    // /executions/open/id route is required, when one execution is opened from another
+    // for proper content rerender
+    return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
   }
 }

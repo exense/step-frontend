@@ -2,7 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
-import { CommonEditorUrlsService, MultipleProjectsService, DialogsService } from '../modules/basics/step-basics.module';
+import {
+  CommonEntitiesUrlsService,
+  MultipleProjectsService,
+  DialogsService,
+} from '../modules/basics/step-basics.module';
 import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
 
 @Injectable({
@@ -13,10 +17,10 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
   private _router = inject(Router);
-  private _commonEditorUrls = inject(CommonEditorUrlsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   resolveConfigurerUrl(idOrKeyword: string | Keyword): string {
-    return this._commonEditorUrls.keywordConfigurerUrl(idOrKeyword);
+    return this._commonEntitiesUrls.keywordConfigurerUrl(idOrKeyword);
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {

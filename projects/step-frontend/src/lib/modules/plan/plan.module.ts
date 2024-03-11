@@ -2,7 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedPlansService,
   checkProjectGuardFactory,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -109,7 +109,7 @@ export class PlanModule {
               entityType: 'plan',
               getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
               getEditorUrl: (id, route) => {
-                const planEditLink = inject(CommonEditorUrlsService).planEditorUrl(id);
+                const planEditLink = inject(CommonEntitiesUrlsService).planEditorUrl(id);
                 const artefactId = route.queryParams['artefactId'];
 
                 const editLinkParams = !artefactId

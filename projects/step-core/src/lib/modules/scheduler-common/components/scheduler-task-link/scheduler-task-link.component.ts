@@ -3,7 +3,7 @@ import { ExecutiontTaskParameters } from '../../../../client/step-client-module'
 import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.consant';
 import { SchedulerActionsService } from '../../injectables/scheduler-actions.service';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
-import { LinkDisplayType, CommonEditorUrlsService } from '../../../basics/step-basics.module';
+import { LinkDisplayType, CommonEntitiesUrlsService } from '../../../basics/step-basics.module';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -16,7 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class SchedulerTaskLinkComponent implements CustomComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _logic = inject(SchedulerActionsService, { optional: true });
-  private _commonEditorsUrl = inject(CommonEditorUrlsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _router = inject(Router);
 
   @Input() context?: ExecutiontTaskParameters;
@@ -31,7 +31,7 @@ export class SchedulerTaskLinkComponent implements CustomComponent {
     }
     // TODO temporary solution - scheduler dialog only uses new route based dialog when directly opend on the schedule page
     if (this._activatedRoute.routeConfig?.path === 'scheduler') {
-      this._router.navigateByUrl(this._commonEditorsUrl.schedulerTaskEditorUrl(this.context));
+      this._router.navigateByUrl(this._commonEntitiesUrls.schedulerTaskEditorUrl(this.context));
     } else {
       this._logic.editTask(this.context).subscribe();
     }

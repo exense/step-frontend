@@ -1,5 +1,11 @@
 import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ControllerService, DialogsService, PlanUrlPipe, ReportNode, CommonEditorUrlsService } from '@exense/step-core';
+import {
+  ControllerService,
+  DialogsService,
+  PlanUrlPipe,
+  ReportNode,
+  CommonEntitiesUrlsService,
+} from '@exense/step-core';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { Router } from '@angular/router';
@@ -13,7 +19,7 @@ export class ReportNodeComponent implements OnChanges {
   private _api = inject(ControllerService);
   private _dialogs = inject(DialogsService);
   private _router = inject(Router);
-  private _commonEditorUrls = inject(CommonEditorUrlsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   @Input() reportNodeId?: string;
 
@@ -46,7 +52,7 @@ export class ReportNodeComponent implements OnChanges {
     this._api
       .getReportNodeRootPlan(this.node!.id!)
       .pipe(
-        switchMap((plan) => this._router.navigateByUrl(this._commonEditorUrls.planEditorUrl(plan)!)),
+        switchMap((plan) => this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan)!)),
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);

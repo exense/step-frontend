@@ -235,7 +235,7 @@ export * from './injectables/app-config-container.service';
 export * from './injectables/file-downloader.service';
 export * from './injectables/popover-overlay.service';
 export * from './injectables/additional-initialization.service';
-export * from './injectables/common-editor-urls.service';
+export * from './injectables/common-entities-urls.service';
 export * from './types/link-display-type.enum';
 export * from './injectables/is-used-by-dialog';
 export * from './directives/item-hover.directive';

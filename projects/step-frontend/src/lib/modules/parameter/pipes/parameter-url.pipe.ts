@@ -1,13 +1,13 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { CommonEditorUrlsService, Parameter } from '@exense/step-core';
+import { CommonEntitiesUrlsService, Parameter } from '@exense/step-core';
 
 @Pipe({
   name: 'parameterUrl',
 })
 export class ParameterUrlPipe implements PipeTransform {
-  private _commonEditorUrls = inject(CommonEditorUrlsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   transform(idOrParameter?: string | Parameter): string {
-    return this._commonEditorUrls.parameterEditorUrl(idOrParameter);
+    return this._commonEntitiesUrls.parameterEditorUrl(idOrParameter);
   }
 }

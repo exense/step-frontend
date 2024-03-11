@@ -2,7 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedSchedulerService,
   checkProjectGuardFactory,
-  CommonEditorUrlsService,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EditSchedulerTaskDialogComponent,
@@ -96,7 +96,7 @@ export class SchedulerModule {
                 checkProjectGuardFactory({
                   entityType: 'task',
                   getEntity: (id) => inject(AugmentedSchedulerService).getExecutionTaskByIdCached(id),
-                  getEditorUrl: (id) => inject(CommonEditorUrlsService).schedulerTaskEditorUrl(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
                 }),
               ],
               resolve: {
