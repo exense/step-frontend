@@ -5,11 +5,7 @@
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
       (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
     >
-      <div
-        *stepTreeNodeTemplate="let node"
-        class="node-name"
-        [class.node-displayed]="node.id === (selectedNode$ | async)?.id"
-      >
+      <div *stepTreeNodeTemplate="let node" class="node-name" [class.node-displayed]="node.id === activeNode().id">
         <span>{{ node?.name }}</span>
         <button
           *ngIf="_planInteractiveSession?.isInteractiveSessionActive$ | async"
@@ -18,7 +14,7 @@
           matTooltip="Execute in interactive session"
           (click)="_planInteractiveSession?.execute(node.id)"
         >
-          <step-icon name="play-circle"></step-icon>
+          <step-icon name="play-circle" />
         </button>
         <button
           *ngIf="!isReadonly"
@@ -28,13 +24,13 @@
           matTooltip="Show actions menu (right click)"
           (click)="openTreeMenu($event, node.id)"
         >
-          <step-icon name="more-horizontal"></step-icon>
+          <step-icon name="more-horizontal" />
         </button>
       </div>
     </step-tree>
   </step-split-area>
 
-  <step-split-gutter></step-split-gutter>
+  <step-split-gutter />
 
   <step-split-area
     sizeType="flex"
@@ -42,9 +38,8 @@
     [size]="artefactDetailsSize"
     (sizeChange)="handleArtefactDetailsSizeChange($event)"
   >
-    <ng-container *ngIf="selectedArtefact$ | async as selectedArtefact">
-      <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()">
-      </step-artefact-details>
-    </ng-container>
+    @if (activeNodeArtefact(); as selectedArtefact) {
+      <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
+    }
   </step-split-area>
 </step-split>

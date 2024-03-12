@@ -3,9 +3,14 @@ import {
   Component,
   ContentChild,
   DestroyRef,
+  effect,
+  ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
+  HostListener,
   inject,
+  input,
   Input,
   Output,
   ViewChild,
@@ -38,10 +43,14 @@ import { TreeFlatNode } from '../../shared/tree-flat-node';
 export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNodeTemplateContainerService {
   private _destroyRef = inject(DestroyRef);
   private _treeActions = inject(TreeActionsService, { optional: true });
+  private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
   readonly contextMenuPosition = { x: 0, y: 0 };
+
+  @HostBinding('class.in-focus')
+  private isTreeInFocus = false;
 
   @ViewChild(DragDataService, { static: true }) private dragData!: DragDataService;
 
@@ -51,11 +60,20 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   @Input() dragDisabled: boolean = false;
 
+  /** @Input() **/
+  readonly forceFocus = input<boolean>(false);
+
   @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N; multipleNodes?: boolean }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N | TreeNode; event: MouseEvent }>();
 
   protected openedMenuNodeId?: string;
+
+  private forceFocusChange = effect(() => {
+    if (this.forceFocus()) {
+      this.isTreeInFocus = true;
+    }
+  });
 
   ngAfterViewInit(): void {
     this.dragData.dragData$
@@ -120,5 +138,10 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
       const insertAfterSiblingId = dropAdditionalInfo as string;
       this._treeState.insertSelectedNodesTo(newParentId, { insertAfterSiblingId });
     }
+  }
+
+  @HostListener('document:click', ['$event'])
+  private handleGlobalClick(event: MouseEvent): void {
+    this.isTreeInFocus = this.forceFocus() || this._elRef.nativeElement.contains(event.target as Node);
   }
 }
