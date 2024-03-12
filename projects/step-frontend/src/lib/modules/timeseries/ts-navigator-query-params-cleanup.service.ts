@@ -3,6 +3,9 @@ import { NavigatorQueryParamsCleanupService } from '@exense/step-core';
 import { Injectable } from '@angular/core';
 import { TS_PARAMS_KEY } from './modules/_common';
 
+/**
+ * @Deprecated
+ */
 @Injectable()
 export class TsNavigatorQueryParamsCleanupService implements NavigatorQueryParamsCleanupService {
   isCleanUpRequired(queryParams: Params): boolean {

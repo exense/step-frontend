@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DashboardView } from '@exense/step-core';
+import { TimeSeriesConfig } from '../modules/_common';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +23,7 @@ export class DashboardNavigatorService {
       }
     } else {
       this._router.navigate(['dashboards', dashboard.id], {
-        queryParams: { edit: editMode ? '1' : '0' },
+        queryParams: { [TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + 'edit']: editMode ? '1' : '0' },
         queryParamsHandling: 'merge',
       });
     }

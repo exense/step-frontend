@@ -15,15 +15,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take } from 'rxjs';
-import {
-  TimeSeriesFilterItem,
-  Execution,
-  MetricAttribute,
-  OQLVerifyResponse,
-  Tab,
-  TimeRange,
-  TimeSeriesService,
-} from '@exense/step-core';
+import { Execution, MetricAttribute, OQLVerifyResponse, Tab, TimeRange, TimeSeriesService } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   COMMON_IMPORTS,
