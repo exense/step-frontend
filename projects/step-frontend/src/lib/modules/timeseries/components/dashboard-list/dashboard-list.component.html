@@ -64,7 +64,7 @@
             matTooltip="Edit dashboard"
             [disabled]="!('dashboard-write' | hasRight | async)"
             [routerLink]="['/', 'dashboards', element.id]"
-            [queryParams]="{ edit: '1' }"
+            [queryParams]="editModeParams"
             queryParamsHandling="merge"
           >
             <step-icon name="edit" />

@@ -2,7 +2,7 @@ import { Component, HostListener, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DashboardsService, DashboardView, DialogRouteResult } from '@exense/step-core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { COMMON_IMPORTS } from '../../modules/_common';
+import { COMMON_IMPORTS, TimeSeriesConfig } from '../../modules/_common';
 import { Router } from '@angular/router';
 
 type DialogRef = MatDialogRef<NewDashboardDialogComponent, DialogRouteResult>;
@@ -48,7 +48,12 @@ export class NewDashboardDialogComponent {
       const isSuccess = !!dashboard;
       const canNavigateBack = !isEditAfterSave;
       if (isEditAfterSave) {
-        this._router.navigateByUrl(`/dashboards/${dashboard.id}`);
+        this._router.navigate(['/', 'dashboards', dashboard.id], {
+          queryParams: {
+            [`${TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX}edit`]: '1',
+          },
+          queryParamsHandling: 'merge',
+        });
       }
       this._dialogRef.close({ isSuccess, canNavigateBack });
     });

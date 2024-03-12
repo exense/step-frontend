@@ -10,7 +10,8 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
-import { COMMON_IMPORTS } from '../../modules/_common';
+import { COMMON_IMPORTS, TimeSeriesConfig } from '../../modules/_common';
+import { Params } from '@angular/router';
 
 @Component({
   selector: 'step-dashboard-list',
@@ -36,6 +37,10 @@ export class DashboardListComponent implements DialogParentService {
     description: 'description',
     actions: '',
   });
+
+  readonly editModeParams: Params = {
+    [`${TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX}edit`]: '1',
+  };
 
   readonly returnParentUrl = '/dashboards';
 
