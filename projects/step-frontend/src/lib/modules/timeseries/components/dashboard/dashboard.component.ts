@@ -8,25 +8,22 @@ import {
   MetricType,
   TimeRange,
   TimeRangeSelection,
-  TimeSeriesFilterItem,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
 import {
-  TimeSeriesConfig,
-  TimeseriesColorsPool,
-  TimeSeriesContext,
-  TimeSeriesContextsFactory,
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
+  FilterUtils,
   ResolutionPickerComponent,
+  TimeRangePickerSelection,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesContextsFactory,
 } from '../../modules/_common';
-
-//@ts-ignore
-import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
+import { defaultIfEmpty, forkJoin, merge, Observable, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,6 +32,9 @@ import {
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { MatMenuTrigger } from '@angular/material/menu';
+
+//@ts-ignore
+import uPlot = require('uplot');
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -82,6 +82,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   metricTypes?: MetricType[];
 
   hasWritePermission = false;
+
+  test: any = 3600;
+  test2: TimeUnit = TimeUnit.HOUR;
 
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();

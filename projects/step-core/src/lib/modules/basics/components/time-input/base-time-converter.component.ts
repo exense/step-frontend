@@ -189,7 +189,7 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   /*
    * This calculates the best fitting timeUnit for a given number of milliseconds
    *
-   * TODO: we should instead save the timeUnit in the BE and remove this
+   * TODO: we should instead save the timeUnit in the BE and remove this. (Lucian: timeseries work only with ms, so this is useful)
    */
   private autoDetermineDisplayMeasure(model: number, modelMeasure: TimeUnit): TimeUnit {
     const baseValue = this.calculateBaseValue(model, modelMeasure);

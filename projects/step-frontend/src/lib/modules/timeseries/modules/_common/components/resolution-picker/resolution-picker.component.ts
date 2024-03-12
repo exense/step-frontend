@@ -25,8 +25,8 @@ export class ResolutionPickerComponent implements OnInit {
     { label: 'Weeks', ms: 7 * 24 * 3_600_000 },
     { label: 'Months', ms: 31 * 24 * 3_600_000 },
   ];
-  _selectedUnit: ResolutionPickerOption = this.UNITS[0];
-  _inputValue?: string;
+  selectedUnit: ResolutionPickerOption = this.UNITS[0];
+  inputValue?: string;
 
   ngOnInit(): void {
     if (this.initialValue) {
@@ -36,25 +36,25 @@ export class ResolutionPickerComponent implements OnInit {
 
   private mapToClosestUnitAndValue(millis: number): void {
     if (millis < 1000) {
-      this._inputValue = '0';
+      this.inputValue = '0';
       return;
     }
     for (let i = this.UNITS.length - 1; i >= 0; i--) {
       const unit = this.UNITS[i];
       if (millis >= unit.ms) {
         const value = Math.round(millis / unit.ms);
-        this._inputValue = value.toString();
-        this._selectedUnit = this.UNITS[i];
+        this.inputValue = value.toString();
+        this.selectedUnit = this.UNITS[i];
         return;
       }
     }
   }
 
   applyResolution() {
-    const isValidNumber = this._inputValue && !isNaN(parseInt(this._inputValue)) && isFinite(this._inputValue as any);
+    const isValidNumber = this.inputValue && !isNaN(parseInt(this.inputValue)) && isFinite(this.inputValue as any);
     if (isValidNumber) {
-      let numberValue = parseInt(this._inputValue!);
-      this.resolutionChange.emit(this._selectedUnit.ms * numberValue);
+      let numberValue = parseInt(this.inputValue!);
+      this.resolutionChange.emit(this.selectedUnit.ms * numberValue);
     } else {
       this.resolutionChange.emit(0);
     }

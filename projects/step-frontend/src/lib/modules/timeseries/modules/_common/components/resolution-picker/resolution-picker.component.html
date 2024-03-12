@@ -13,9 +13,9 @@
     <div class="custom-input-container">
       <div class="custom-input-container">
         <step-form-field>
-          <input placeholder="0" type="number" [(ngModel)]="_inputValue" />
+          <input placeholder="0" type="number" [(ngModel)]="inputValue" />
         </step-form-field>
-        <mat-select [(ngModel)]="_selectedUnit" class="unit-select">
+        <mat-select [(ngModel)]="selectedUnit" class="unit-select">
           <mat-option *ngFor="let unit of UNITS" [value]="unit">
             {{ unit.label }}
           </mat-option>
