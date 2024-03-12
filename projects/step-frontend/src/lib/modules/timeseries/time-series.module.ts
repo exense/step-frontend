@@ -13,6 +13,7 @@ import { DashboardListComponent } from './components/dashboard-list/dashboard-li
 import { NewDashboardDialogComponent } from './components/new-dashboard-dialog/new-dashboard-dialog.component';
 import { AnalyticsPageComponent, ExecutionPerformanceComponent } from './modules/legacy';
 import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
+import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
 
@@ -27,6 +28,11 @@ import { map } from 'rxjs';
     {
       provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
       useClass: TsNavigatorQueryParamsCleanupService,
+      multi: true,
+    },
+    {
+      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
+      useClass: DashboardNavigatorQueryParamsCleanupService,
       multi: true,
     },
   ],

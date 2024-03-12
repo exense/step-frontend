@@ -4,6 +4,8 @@ export class TimeSeriesConfig {
   static readonly MAX_BUCKETS_IN_CHART = 100;
   static TRAILING_ZERO_PATTERN = /\.0+$|(\.[0-9]*[1-9])0+$/;
   static readonly ONE_HOUR_MS = 3600 * 1000;
+  static readonly DASHBOARD_URL_PARAMS_PREFIX = 'dc_';
+  static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
 
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
