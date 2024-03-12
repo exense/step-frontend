@@ -12,6 +12,7 @@ import { DashboardListComponent } from './components/dashboard-list/dashboard-li
 import { NewDashboardDialogComponent } from './components/new-dashboard-dialog/new-dashboard-dialog.component';
 import { AnalyticsPageComponent, ExecutionPerformanceComponent } from './modules/legacy';
 import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
+import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 
 @NgModule({
   imports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
@@ -24,6 +25,11 @@ import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-param
     {
       provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
       useClass: TsNavigatorQueryParamsCleanupService,
+      multi: true,
+    },
+    {
+      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
+      useClass: DashboardNavigatorQueryParamsCleanupService,
       multi: true,
     },
   ],
