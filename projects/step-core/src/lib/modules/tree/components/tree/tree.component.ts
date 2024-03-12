@@ -27,6 +27,8 @@ import { DragDataService, DropInfo } from '../../../drag-drop';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
+import { TreeFocusStateService } from '../../services/tree-focus-state.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-tree',
@@ -43,7 +45,9 @@ import { TreeFlatNode } from '../../shared/tree-flat-node';
 export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNodeTemplateContainerService {
   private _destroyRef = inject(DestroyRef);
   private _treeActions = inject(TreeActionsService, { optional: true });
+  private _treeFocusState = inject(TreeFocusStateService, { optional: true });
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private _doc = inject(DOCUMENT);
 
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
@@ -71,7 +75,7 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   private forceFocusChange = effect(() => {
     if (this.forceFocus()) {
-      this.isTreeInFocus = true;
+      this.setFocus(true);
     }
   });
 
@@ -140,8 +144,23 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
     }
   }
 
+  private setFocus(isInFocus: boolean) {
+    this.isTreeInFocus = isInFocus;
+    this._treeFocusState?.setTreeFocus(isInFocus);
+  }
+
   @HostListener('document:click', ['$event'])
   private handleGlobalClick(event: MouseEvent): void {
-    this.isTreeInFocus = this.forceFocus() || this._elRef.nativeElement.contains(event.target as Node);
+    const isInFocus = this.forceFocus() || this._elRef.nativeElement.contains(event.target as Node);
+    this.setFocus(isInFocus);
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  private handleTab(event: KeyboardEvent): void {
+    if (event.key !== 'Tab' || this.forceFocus()) {
+      return;
+    }
+    const isInFocus = this._elRef.nativeElement.contains(this._doc.activeElement);
+    this.setFocus(isInFocus);
   }
 }
