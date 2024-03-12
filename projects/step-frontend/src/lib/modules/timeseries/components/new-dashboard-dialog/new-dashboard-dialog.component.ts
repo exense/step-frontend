@@ -48,7 +48,7 @@ export class NewDashboardDialogComponent {
       const isSuccess = !!dashboard;
       const canNavigateBack = !isEditAfterSave;
       if (isEditAfterSave) {
-        this._dashboardNavigator.navigateToDashboard(dashboard);
+        this._dashboardNavigator.navigateToDashboard(dashboard, true);
       }
       this._dialogRef.close({ isSuccess, canNavigateBack });
     });
