@@ -83,9 +83,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   hasWritePermission = false;
 
-  test: any = 3600;
-  test2: TimeUnit = TimeUnit.HOUR;
-
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
     this.resolution = pageParams.resolution;
@@ -115,8 +112,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleResolutionChange(resolution: number) {
-    this.menuTrigger.closeMenu();
-    this.context.updateChartsResolution(resolution);
+    if (resolution > 1000) {
+      this.context.updateChartsResolution(resolution);
+    }
   }
 
   private updateUrl(): void {

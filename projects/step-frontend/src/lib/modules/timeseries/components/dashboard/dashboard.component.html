@@ -2,13 +2,17 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu" mat-raised-button>
+        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-raised-button>
           <step-icon name="settings" />
           Settings
         </button>
-        <step-time-input [(ngModel)]="test" [(displayMeasure)]="test2" />
-        <mat-menu #menu="matMenu">
-          <step-ts-resolution-picker [initialValue]="resolution" (resolutionChange)="handleResolutionChange($event)" />
+        <mat-menu #mainMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
+          <mat-menu #resolutionsMenu="matMenu" class="wide">
+            <div (click)="$event.stopPropagation()" class="resolution-select-container">
+              <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
+            </div>
+          </mat-menu>
         </mat-menu>
       </div>
       <div class="header-buttons-container">
