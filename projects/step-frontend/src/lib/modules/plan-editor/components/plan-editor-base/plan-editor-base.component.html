@@ -9,7 +9,7 @@
   <div class="actions-header">
     <div class="editable-labels">
       @if (planTypes$ | async; as planTypes) {
-        <step-editable-dropdown-label [items]="planTypes" [formControl]="planTypeControl" matTooltip="Plan type">
+        <step-editable-dropdown-label [items]="planTypes" [formControl]="planTypeControl" tooltip="Plan type">
           <span *stepEditableLabelTemplate>Plan type</span>
           <div *stepEditableListItemTemplate="let item" class="plan-type-item">
             <step-icon [name]="item.icon" />
