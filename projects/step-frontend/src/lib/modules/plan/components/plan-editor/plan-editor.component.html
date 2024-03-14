@@ -1,1 +1,12 @@
-<step-plan-editor-base stepPlanEditorKeyHandler [initialPlan]="_plan$ | async"> </step-plan-editor-base>
+<step-plan-editor-base stepPlanEditorKeyHandler [initialPlanContext]="_initialPlanContext$ | async">
+  <step-plan-editor-attributes>
+    <step-custom-forms
+      stScreen="planTable"
+      [stDisabled]="!('plan-write' | hasRight | async)"
+      [stInline]="true"
+      [stEditableLabelMode]="true"
+      [stModel]="(_planEditorService.plan$ | async)!"
+      (stModelChange)="_planEditorService.handlePlanChange()"
+    />
+  </step-plan-editor-attributes>
+</step-plan-editor-base>

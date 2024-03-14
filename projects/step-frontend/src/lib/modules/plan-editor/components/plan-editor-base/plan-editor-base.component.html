@@ -1,50 +1,33 @@
 <div>
-  <step-plan-alerts [compositeId]="compositeId" [plan]="_planEditService.plan$ | async"> </step-plan-alerts>
-  <step-alert type="info" *ngIf="showInteractiveWarning$ | async">
-    Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
-    &nbsp;'Run interactively' button
-  </step-alert>
+  <step-plan-alerts [planContext]="_planEditService.planContext$ | async" />
+  @if (showInteractiveWarning$ | async) {
+    <step-alert type="info">
+      Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
+      &nbsp;'Run interactively' button
+    </step-alert>
+  }
   <div class="actions-header">
     <div class="editable-labels">
-      <ng-container *ngIf="planTypes$ | async as planTypes">
-        <ng-template #planTypeLabel>Plan type</ng-template>
-
-        <ng-template #itemTemplate let-item>
-          <div class="plan-type-item">
-            <step-icon [name]="item.icon"></step-icon>
+      @if (planTypes$ | async; as planTypes) {
+        <step-editable-dropdown-label [items]="planTypes" [formControl]="planTypeControl" matTooltip="Plan type">
+          <span *stepEditableLabelTemplate>Plan type</span>
+          <div *stepEditableListItemTemplate="let item" class="plan-type-item">
+            <step-icon [name]="item.icon" />
             {{ item.planType }}
           </div>
-        </ng-template>
-
-        <step-editable-dropdown-label
-          [labelTemplate]="planTypeLabel"
-          [items]="planTypes"
-          [itemTemplate]="itemTemplate"
-          [formControl]="planTypeControl"
-          tooltip="Plan type"
-        ></step-editable-dropdown-label>
-      </ng-container>
-
-      <step-custom-forms
-        stScreen="planTable"
-        [stDisabled]="!('plan-write' | hasRight | async)"
-        [stInline]="true"
-        [stEditableLabelMode]="true"
-        [stModel]="(_planEditService.plan$ | async)!"
-        (stModelChange)="_planEditService.handlePlanChange()"
-      >
-      </step-custom-forms>
+        </step-editable-dropdown-label>
+      }
+      <ng-content select="step-plan-editor-attributes" />
     </div>
-    <ng-container *ngIf="_planEditService.plan$ | async as plan">
+    @if (_planEditService.planContext$ | async; as planContext) {
       <step-plan-editor-actions
-        [currentPlanId]="initialPlan?.id"
-        [plan]="plan"
-        [compositeId]="compositeId"
-        [showExecuteButton]="showExecuteButton"
+        [planContext]="planContext"
+        [showExecuteButton]="actionsConfig?.showExecuteButton"
+        [showExportSourceButton]="actionsConfig?.showExportSourceButton"
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
-        [description]="(_planEditService.plan$ | async)?.attributes?.['name']"
+        [description]="planContext?.plan?.attributes?.['name']"
         [repositoryObjectRef]="repositoryObjectRef"
         (discardAll)="_planEditService.discardAll()"
         (undo)="_planEditService.undo()"
@@ -55,37 +38,39 @@
         (reset)="resetInteractive()"
         (stop)="stopInteractive()"
         (showSource)="showPlanSource()"
-      ></step-plan-editor-actions>
-    </ng-container>
+      />
+    }
   </div>
 
   <step-split stepMaxHeightViewportHeightMinusOffsetTop>
     <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
-      <ng-container *ngIf="planClass">
-        <step-plan-type [itemKey]="planClass"> </step-plan-type>
-      </ng-container>
+      @if (planClass) {
+        <step-plan-type [itemKey]="planClass" />
+      }
     </step-split-area>
 
-    <step-split-gutter></step-split-gutter>
+    <step-split-gutter />
 
     <step-split-area
       [size]="planControlsSize"
       (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
     >
-      <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true">
-      </step-tabs>
+      <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true" />
       <div class="tab-content" [ngSwitch]="selectedTab">
-        <step-plan-artefact-list *ngSwitchCase="'controls'" (onSelection)="addControl($event)">
-        </step-plan-artefact-list>
-        <step-plan-function-list *ngSwitchCase="'keywords'" (onSelection)="addFunction($event)">
-        </step-plan-function-list>
-        <step-plan-otherplan-list *ngSwitchCase="'other'" (onSelection)="addPlan($event)"> </step-plan-otherplan-list>
-        <step-keyword-calls
-          *ngSwitchCase="'console'"
-          #keywordCalls
-          [keywordParameters$]="_interactiveSession.keywordParameters$"
-        >
-        </step-keyword-calls>
+        @switch (selectedTab) {
+          @case ('controls') {
+            <step-plan-artefact-list (onSelection)="addControl($event)" />
+          }
+          @case ('keywords') {
+            <step-plan-function-list (onSelection)="addFunction($event)" />
+          }
+          @case ('other') {
+            <step-plan-otherplan-list (onSelection)="addPlan($event)" />
+          }
+          @case ('console') {
+            <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
+          }
+        }
       </div>
     </step-split-area>
   </step-split>

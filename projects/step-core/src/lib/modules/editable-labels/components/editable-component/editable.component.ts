@@ -2,12 +2,15 @@ import {
   AfterContentInit,
   ChangeDetectorRef,
   Component,
+  computed,
+  contentChild,
   ContentChild,
   ElementRef,
   EventEmitter,
   HostBinding,
   HostListener,
   inject,
+  input,
   Input,
   OnChanges,
   Output,
@@ -33,19 +36,24 @@ type LabelTemplateAccessor = Mutable<Pick<EditableComponent<any>, 'labelTemplate
   // The provided template in our case is irrelevant
   template: '',
 })
-export abstract class EditableComponent<T> implements ControlValueAccessor, AfterContentInit, OnChanges {
+export abstract class EditableComponent<T> implements ControlValueAccessor {
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   protected _changeDetectorRef = inject(ChangeDetectorRef);
   protected _document = inject(DOCUMENT);
 
-  @Input('labelTemplate') labelTemplateInput!: TemplateRef<{}>;
+  /** @Input('labelTemplate') **/
+  labelTemplateInput = input<TemplateRef<{}> | undefined>(undefined, {
+    alias: 'labelTemplate',
+  });
+
   @Input() tooltip: string = '';
 
   @Output() stateChange = new EventEmitter<EditableComponentState>();
 
-  @ContentChild(EditableLabelTemplateDirective) labelTemplateDirective?: EditableLabelTemplateDirective;
+  /** @ContentChild(EditableLabelTemplateDirective) **/
+  private labelTemplateDirective = contentChild(EditableLabelTemplateDirective);
 
-  readonly labelTemplate!: TemplateRef<any>;
+  readonly labelTemplate = computed(() => this.labelTemplateDirective()?.templateRef ?? this.labelTemplateInput()!);
 
   protected readonly State = EditableComponentState;
 
@@ -59,20 +67,6 @@ export abstract class EditableComponent<T> implements ControlValueAccessor, Afte
 
   @HostBinding('class.disabled')
   protected isDisabled = false;
-
-  ngAfterContentInit(): void {
-    (this as LabelTemplateAccessor).labelTemplate = this.labelTemplateDirective?.templateRef!;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cLabelTemplate = changes['labelTemplateInput'];
-    if (cLabelTemplate?.previousValue !== cLabelTemplate?.currentValue && cLabelTemplate?.firstChange) {
-      const labelTemplate = cLabelTemplate?.currentValue;
-      if (!this.labelTemplateDirective?.templateRef) {
-        (this as LabelTemplateAccessor).labelTemplate = labelTemplate!;
-      }
-    }
-  }
 
   writeValue(value: T): void {
     this.value = value;
