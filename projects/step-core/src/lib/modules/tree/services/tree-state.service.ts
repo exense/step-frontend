@@ -56,7 +56,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   readonly selectedNode = computed(() => {
     const { accessCache } = this.treeData();
     const id = this.selectedNodeIdsInternal()[0];
-    return accessCache.get(id) as N;
+    return accessCache.get(id) as N | undefined;
   });
   readonly selectedNodes = computed(() => {
     const { accessCache } = this.treeData();

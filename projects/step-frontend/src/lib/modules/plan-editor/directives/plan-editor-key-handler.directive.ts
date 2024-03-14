@@ -1,22 +1,35 @@
-import { Directive, HostListener, inject } from '@angular/core';
+import { Directive, forwardRef, HostListener, inject } from '@angular/core';
 import {
   AuthService,
   PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
+  TreeFocusStateService,
 } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepPlanEditorKeyHandler]',
+  providers: [
+    {
+      provide: TreeFocusStateService,
+      useExisting: forwardRef(() => PlanEditorKeyHandlerDirective),
+    },
+  ],
 })
-export class PlanEditorKeyHandlerDirective {
+export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
   private _authService = inject(AuthService);
   private _document = inject(DOCUMENT);
 
   private _planEditorService = inject(PlanEditorService);
   private _planInteractiveSession = inject(PlanInteractiveSessionService, { optional: true });
   private _planArtefactResolver = inject(PlanArtefactResolverService, { optional: true });
+
+  private isTreeInFocus = false;
+
+  setTreeFocus(isInFocus: boolean): void {
+    this.isTreeInFocus = isInFocus;
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
@@ -138,9 +151,7 @@ export class PlanEditorKeyHandlerDirective {
     keys: string | string[],
     rights?: string | string[],
   ): boolean {
-    // Check event target to prevent false invocation
-    // When tree will be in focus, event will be captured from document's body
-    if (isEmitByTreeOnly && event.target !== this._document.body) {
+    if (isEmitByTreeOnly && !this.isTreeInFocus) {
       return false;
     }
 

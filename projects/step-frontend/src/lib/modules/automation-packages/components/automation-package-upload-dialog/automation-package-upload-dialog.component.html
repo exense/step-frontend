@@ -18,10 +18,10 @@
             </step-suffix>
           </step-form-field>
         </step-upload-container>
+        <input #fileInput type="file" (input)="selectFile()" />
       </form>
     </ng-template>
   </div>
-  <input #fileInput type="file" (input)="selectFile()" />
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
     <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
