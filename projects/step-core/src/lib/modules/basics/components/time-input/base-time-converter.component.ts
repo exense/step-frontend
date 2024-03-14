@@ -132,12 +132,18 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   }
 
   protected handleDisplayValueChange(value: number): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.displayValue = value;
     this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.internalDisplayMeasure);
     this.onChange?.(this.modelValue);
   }
 
   protected handleDisplayMeasureChange(value: TimeUnit): void {
+    if (this.isDisabled) {
+      return;
+    }
     if (this.displayMeasure) {
       this.displayMeasure = value;
       this.displayMeasureChange.emit(value);

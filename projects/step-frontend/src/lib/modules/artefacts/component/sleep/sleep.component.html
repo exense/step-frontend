@@ -1,18 +1,9 @@
 <form #form="ngForm">
-  <step-dynamic-textfield
+  <step-time-input
     label="Duration"
-    [(ngModel)]="context.artefact!.duration"
+    [(ngModel)]="context.artefact!.duration!.value"
     [disabled]="context.readonly"
     name="duration"
-  >
-  </step-dynamic-textfield>
-  <step-dynamic-textfield
-    label="Unit"
-    tooltip="Supported units are 'ms' for milliseconds, 's' for seconds and 'm' for minutes."
-    [(ngModel)]="context.artefact!.unit"
-    [disabled]="context.readonly"
-    name="unit"
-  >
-  </step-dynamic-textfield>
-  <step-waiting-artefacts-advanced [context]="context"> </step-waiting-artefacts-advanced>
+  />
+  <step-waiting-artefacts-advanced [context]="context" />
 </form>
