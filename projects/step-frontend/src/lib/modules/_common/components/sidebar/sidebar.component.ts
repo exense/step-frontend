@@ -55,13 +55,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
     map(([menuItems, dynamicMenuItems]) =>
       menuItems.concat(
-        dynamicMenuItems.map((element) => {
+        dynamicMenuItems!.map((element) => {
           const menuEntry = {
             title: element.customFields!['label'],
             id: element.id!,
             icon: element.customFields!['icon'],
             parentId: 'bookmarks-root',
-            weight: 1000 + dynamicMenuItems.length,
+            weight: 1000 + dynamicMenuItems!.length,
             isEnabledFct(): boolean {
               return true;
             },
