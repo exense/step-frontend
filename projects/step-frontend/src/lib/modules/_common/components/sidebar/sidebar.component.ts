@@ -21,6 +21,7 @@ import {
   ViewStateService,
   BookmarkService,
   MENU_ITEMS,
+  AugmentedBookmarksService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
@@ -51,8 +52,24 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuEntries$]).pipe(
-    map(([menuItems, dynamicMenuItems]) => menuItems.concat(dynamicMenuItems)),
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
+    map(([menuItems, dynamicMenuItems]) =>
+      menuItems.concat(
+        dynamicMenuItems.map((element) => {
+          const menuEntry = {
+            title: element.customFields!['label'],
+            id: element.id!,
+            icon: element.customFields!['icon'],
+            parentId: 'bookmarks-root',
+            weight: 1000 + dynamicMenuItems.length,
+            isEnabledFct(): boolean {
+              return true;
+            },
+          };
+          return menuEntry;
+        }),
+      ),
+    ),
   );
 
   readonly isOpened$ = this._sideBarState.isOpened$;

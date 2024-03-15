@@ -3,10 +3,12 @@ import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { take } from 'rxjs';
-import { BookmarkService } from '../../injectables/bookmark.service';
 import { MultipleProjectsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MENU_ITEMS } from '../../../routing';
 import { Bookmark } from '../../types/bookmark';
+import { AugmentedBookmarksService } from '../../../../client/augmented/services/augmented-bookmarks.service';
+import { User, UserService } from '../../../../client/generated';
+import { BookmarkService } from '../../injectables/bookmark.service';
 
 @Component({
   selector: 'step-bookmark-create-dialog',
@@ -17,10 +19,13 @@ import { Bookmark } from '../../types/bookmark';
 })
 export class BookmarkCreateDialogComponent implements OnInit {
   private _router = inject(Router);
-  private _bookmarkService = inject(BookmarkService);
   private _matDialogRef = inject(MatDialogRef);
   private _multipleProjects = inject(MultipleProjectsService);
-  readonly _data = inject<string | undefined>(MAT_DIALOG_DATA);
+  private _api = inject(AugmentedBookmarksService);
+  private _bookmarkService = inject(BookmarkService);
+  private _userApi = inject(UserService);
+  private user: Partial<User> = {};
+  readonly _data = inject<{ id: string; label: string } | undefined>(MAT_DIALOG_DATA);
   readonly _menuItems$ = inject(MENU_ITEMS);
 
   protected bookmark: Partial<Bookmark> = {};
@@ -29,12 +34,15 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private form!: NgForm;
 
   ngOnInit(): void {
+    this._userApi.getMyUser().subscribe((user) => {
+      this.user = user || {};
+    });
     const tenant = this._multipleProjects.currentProject()?.name;
     const slashIndex = this._router.url.indexOf('/');
     const link = this._router.url.slice(slashIndex + 1).split('?')[0];
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
-      label: this._data ?? '',
+      label: this._data?.label ?? '',
       page: initBookmark?.page,
       link,
       tenant,
@@ -49,10 +57,18 @@ export class BookmarkCreateDialogComponent implements OnInit {
       return;
     }
     if (this._data) {
-      this._bookmarkService.renameBookmark(this._data, this.bookmark.label!);
+      const bookmark = {
+        id: this._data!.id,
+        userId: this.user.id!,
+        url: this.bookmark.link!,
+        customFields: { ...this.bookmark },
+      };
+      this._api.saveUserBookmark(bookmark).subscribe();
     } else {
-      this._bookmarkService.createBookmark(this.bookmark);
+      const bookmark = { userId: this.user.id!, url: this.bookmark.link!, customFields: { ...this.bookmark } };
+      this._api.saveUserBookmark(bookmark).subscribe();
     }
+    this._bookmarkService.refreshBookmarks$.next({});
     this._matDialogRef.close();
   }
 

@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { COMMON_IMPORTS } from '../../../timeseries/modules/_common';
 import {
+  AugmentedBookmarksService,
   Bookmark,
   BookmarkCreateDialogComponent,
   BookmarkService,
   DialogsService,
-  TableLocalDataSource,
 } from '@exense/step-core';
 import { of, switchMap, take } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -19,31 +19,38 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ManageBookmarksListComponent {
   private _dialogs = inject(DialogsService);
-  private _bookmarkService = inject(BookmarkService);
   private _matDialog = inject(MatDialog);
+  private _bookmarksService = inject(BookmarkService);
+  readonly _bookmarksApiService = inject(AugmentedBookmarksService);
 
-  readonly dataSource = new TableLocalDataSource(this._bookmarkService.bookmarks$);
+  readonly dataSource = this._bookmarksApiService.createDataSource();
 
   renameBookmark(bookmark: Bookmark): void {
     this._matDialog
-      .open(BookmarkCreateDialogComponent, { data: bookmark.label })
+      .open(BookmarkCreateDialogComponent, { data: { id: bookmark.id, label: bookmark.label } })
       .afterClosed()
-      .subscribe(() => this.dataSource.reload());
+      .subscribe(() => {
+        this._bookmarksService.refreshBookmarks$.next({});
+        this.dataSource.reload();
+      });
   }
 
   deleteBookmark(bookmark: Bookmark): any {
     this._dialogs
-      .showDeleteWarning(1, `Bookmark "${bookmark.label}"`)
+      .showDeleteWarning(1, `Bookmark "${bookmark.id}"`)
       .pipe(
         switchMap((isDeleteConfirmed) => {
           if (isDeleteConfirmed) {
-            return this._bookmarkService.deleteBookmark(bookmark!.label);
+            return this._bookmarksApiService.deleteUserBookmark(bookmark.id!);
           } else {
             return of('');
           }
         }),
         take(1),
       )
-      .subscribe(() => this.dataSource.reload());
+      .subscribe(() => {
+        this._bookmarksService.refreshBookmarks$.next({});
+        this.dataSource.reload();
+      });
   }
 }

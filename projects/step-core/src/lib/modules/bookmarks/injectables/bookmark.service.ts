@@ -1,57 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, of } from 'rxjs';
-import { Bookmark } from '../types/bookmark';
-import { BookmarkStorageService } from './bookmark-storage.service';
-
-const bookmark = 'BOOKMARKS';
+import { BehaviorSubject } from 'rxjs';
+import { AugmentedBookmarksService } from '../../../client/augmented/services/augmented-bookmarks.service';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookmarkService {
-  private _bookmarkStorageService = inject(BookmarkStorageService);
-  private bookmarksInternal$ = new BehaviorSubject<Bookmark[]>(this._bookmarkStorageService.getStorageBookmarks());
-  readonly bookmarks$ = this.bookmarksInternal$.asObservable();
-  readonly bookmarkMenuEntries$ = this.bookmarks$.pipe(
-    map((bookmarks) =>
-      bookmarks.map((element) => {
-        const menuEntry = {
-          title: element.label!,
-          id: element.link!,
-          icon: element.icon!,
-          parentId: 'bookmarks-root',
-          weight: 1000 + bookmarks.length,
-          isEnabledFct(): boolean {
-            return true;
-          },
-        };
-        return menuEntry;
-      }),
-    ),
+  private _bookmarksApi = inject(AugmentedBookmarksService);
+
+  public refreshBookmarks$ = new BehaviorSubject<unknown>(undefined);
+
+  readonly bookmarks$ = this.refreshBookmarks$.pipe(
+    switchMap(() => this._bookmarksApi.findUserBookmarksByAttributes()),
   );
-
-  createBookmark(value: any): Observable<null | undefined> | any {
-    const bookmarks = this._bookmarkStorageService.getStorageBookmarks();
-    bookmarks.push(value);
-    this._bookmarkStorageService.setItem(bookmark, JSON.stringify(bookmarks));
-    this.bookmarksInternal$.next(bookmarks);
-  }
-
-  deleteBookmark(label?: string): Observable<string | undefined> {
-    const bookmarks = this._bookmarkStorageService.getStorageBookmarks();
-    const filteredBookmarks = bookmarks.filter((element: Bookmark) => element.label !== label);
-    this._bookmarkStorageService.setItem(bookmark, JSON.stringify(filteredBookmarks));
-    this.bookmarksInternal$.next(filteredBookmarks);
-    return of('');
-  }
-
-  renameBookmark(oldLabel: string, newLabel: string): Observable<string | undefined> {
-    const bookmarks = this._bookmarkStorageService.getStorageBookmarks();
-    const updatedBookmarks = bookmarks.map((element: Bookmark) =>
-      element.label !== oldLabel ? element : { ...element, label: newLabel },
-    );
-    this._bookmarkStorageService.setItem(bookmark, JSON.stringify(updatedBookmarks));
-    this.bookmarksInternal$.next(updatedBookmarks);
-    return of('');
-  }
 }
