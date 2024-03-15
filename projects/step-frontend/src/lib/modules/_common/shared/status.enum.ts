@@ -30,7 +30,10 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
   Status.RUNNING,
   Status.ABORTING,
   Status.EXPORTING,
-  Status.ENDED,
+  Status.FAILED,
+  Status.PASSED,
+  Status.INTERRUPTED,
+  Status.SKIPPED,
 ];
 
 export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
