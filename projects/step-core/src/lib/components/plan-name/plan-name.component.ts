@@ -12,8 +12,7 @@ const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
   referenceLabel: 'Reference plan',
   editSelectionCriteria: 'Edit Plan selection criteria',
   selectionCriteria: 'Plan selection criteria',
-  selectionCriteriaDescription:
-    'Selection criteria are used to select a Plan. For this the Plans attribute (i.e. name) has to be referenced.',
+  selectionCriteriaDescription: 'Select a Plan by referencing any of its attributes (i.e. its name)',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 

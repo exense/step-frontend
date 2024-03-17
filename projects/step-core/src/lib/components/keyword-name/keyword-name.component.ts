@@ -18,8 +18,7 @@ const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['capt
   referenceLabel: 'Reference keyword',
   editSelectionCriteria: 'Edit Keyword selection criteria',
   selectionCriteria: 'Keyword selection criteria',
-  selectionCriteriaDescription:
-    'Selection criteria are used to select a Keyword. For this the Keywords attribute (i.e. name) has to be referenced.',
+  selectionCriteriaDescription: 'Select a Keyword by referencing any of its attributes (i.e. its name)',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 
