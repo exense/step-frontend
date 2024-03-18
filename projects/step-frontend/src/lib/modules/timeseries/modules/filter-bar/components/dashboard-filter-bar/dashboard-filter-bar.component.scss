@@ -117,3 +117,18 @@ step-ts-dashboard-filter-bar {
     }
   }
 }
+
+step-tabs {
+  .mat-mdc-tab-link-container {
+    height: 3.6rem !important;
+
+    .mdc-tab {
+      height: 3rem !important;
+    }
+  }
+}
+
+#mat-tab-link-1,
+#mat-tab-link-2 {
+  height: 3rem !important;
+}
