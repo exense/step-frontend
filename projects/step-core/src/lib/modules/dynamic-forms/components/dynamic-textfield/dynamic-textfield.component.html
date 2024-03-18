@@ -18,10 +18,15 @@
     [showRequiredMarker]="showRequiredMarker"
     [class.ng-invalid]="!!_ngControl.invalid"
     [class.ng-touched]="_ngControl.touched"
-    [class.with-tooltip]="tooltip"
+    alignLabelAddon="near"
   >
     @if (label) {
       <step-label>{{ label }}</step-label>
+    }
+    @if (tooltip) {
+      <step-label-addon>
+        <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+      </step-label-addon>
     }
     @if (isNumber) {
       <input
@@ -43,11 +48,6 @@
         [disabled]="isDisabled"
         (blur)="onBlur()"
       />
-    }
-    @if (tooltip) {
-      <step-suffix class="icon-suffix">
-        <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
-      </step-suffix>
     }
     @if (!isNumber) {
       <step-suffix class="button-suffix">
