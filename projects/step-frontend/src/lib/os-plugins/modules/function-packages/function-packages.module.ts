@@ -70,7 +70,7 @@ export class FunctionPackagesModule {
 
   private registerViews(): void {
     this._viewRegistry.registerRoute({
-      path: 'functionPackages',
+      path: 'function-packages',
       component: FunctionPackageListComponent,
       children: [
         {
@@ -108,7 +108,7 @@ export class FunctionPackagesModule {
   }
 
   private registerMenuItems(): void {
-    this._viewRegistry.registerMenuEntry('Keyword packages', 'functionPackages', 'package', {
+    this._viewRegistry.registerMenuEntry('Keyword packages', 'function-packages', 'package', {
       weight: 20,
       parentId: 'automation-root',
     });
