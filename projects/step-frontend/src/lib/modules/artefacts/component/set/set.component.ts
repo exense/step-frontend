@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import {
   AbstractArtefact,
+  AceMode,
   ArtefactFormChangeHelperService,
   BaseArtefactComponent,
   DynamicValueString,
@@ -21,4 +22,6 @@ interface SetArtefact extends AbstractArtefact {
 export class SetComponent extends BaseArtefactComponent<SetArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
+
+  readonly AceMode = AceMode;
 }

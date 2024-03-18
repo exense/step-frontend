@@ -1,8 +1,8 @@
 import { DynamicValueInteger, DynamicValueString } from '../client/generated';
-import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
+import { AceMode } from '../modules/rich-editor';
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),

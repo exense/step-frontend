@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, viewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedKeywordEditorService,
@@ -7,16 +7,11 @@ import {
   Keyword,
   KeywordExecutorService,
   KeywordsService,
+  RichEditorComponent,
   ScriptLanguage,
 } from '@exense/step-core';
 import { forkJoin, Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import * as ace from 'ace-builds';
-import 'ace-builds/src-min-noconflict/theme-chrome.js';
-import 'ace-builds/src-min-noconflict/mode-javascript.js';
-import 'ace-builds/src-min-noconflict/mode-groovy.js';
-import 'ace-builds/src-min-noconflict/mode-java.js';
-import 'ace-builds/src-min-noconflict/ext-searchbox';
 import { DeactivateComponentDataInterface } from '../../types/deactivate-component-data.interface';
 
 @Component({
@@ -24,33 +19,26 @@ import { DeactivateComponentDataInterface } from '../../types/deactivate-compone
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
 })
-export class ScriptEditorComponent implements AfterViewInit, OnDestroy, DeactivateComponentDataInterface {
+export class ScriptEditorComponent implements AfterViewInit, DeactivateComponentDataInterface {
   private _keywordApi = inject(KeywordsService);
   private _keywordEditorApi = inject(AugmentedKeywordEditorService);
   private _keywordExecutor = inject(KeywordExecutorService);
   private _dialogsService = inject(DialogsService);
-  private initialScript?: String;
-  private trackChangesFn = () => this.trackChanges();
+  private initialScript?: string;
 
-  @ViewChild('editor', { static: false })
-  private editorElement!: ElementRef<HTMLDivElement>;
-  private editor?: ace.Ace.Editor;
+  private richEditor = viewChild(RichEditorComponent);
 
   protected _functionId = inject(ActivatedRoute).snapshot.params['id']! as string;
 
   protected keyword?: Keyword;
+  protected keywordScript?: string;
+  protected syntaxMode?: AceMode;
 
   noChanges = true;
   isAfterSave = false;
 
   ngAfterViewInit(): void {
-    this.setupEditor();
     this.loadKeyword();
-  }
-
-  ngOnDestroy(): void {
-    this.editor!.off('change', this.trackChangesFn);
-    this.editor!.destroy();
   }
 
   save(): void {
@@ -69,9 +57,14 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
     }
   }
 
-  private setupEditor(): void {
-    this.editor = ace.edit(this.editorElement.nativeElement);
-    this.editor.setTheme('ace/theme/chrome');
+  handleScriptChange(keywordScript: string): void {
+    this.isAfterSave = false;
+    this.keywordScript = keywordScript;
+    if (keywordScript === this.initialScript) {
+      this.noChanges = true;
+    } else {
+      this.noChanges = false;
+    }
   }
 
   private loadKeyword(): void {
@@ -81,24 +74,10 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
     ]).subscribe(([keyword, keywordScript]) => {
       this.keyword = keyword;
       this.initialScript = keywordScript;
-      this.editor!.getSession().setMode(this.determineKeywordMode());
-      this.editor!.setValue(keywordScript);
-      this.focusOnText();
-      this.editor!.on('change', this.trackChangesFn);
+      this.keywordScript = keywordScript;
+      this.syntaxMode = this.determineKeywordMode();
+      this.richEditor()?.focusOnText();
     });
-  }
-
-  private trackChanges(): void {
-    this.isAfterSave = false;
-    if (this.editor!.getValue() === this.initialScript) {
-      this.noChanges = true;
-    } else {
-      this.noChanges = false;
-    }
-  }
-
-  private focusOnText(): void {
-    this.editor!.focus();
   }
 
   private refreshInitVars(val?: string): void {
@@ -113,8 +92,7 @@ export class ScriptEditorComponent implements AfterViewInit, OnDestroy, Deactiva
   }
 
   private saveInternal(): Observable<void> {
-    const editorValue = this.editor!.getValue();
-    this.refreshInitVars(editorValue);
-    return this._keywordEditorApi.saveFunctionScript(this._functionId, editorValue);
+    this.refreshInitVars(this.keywordScript);
+    return this._keywordEditorApi.saveFunctionScript(this._functionId, this.keywordScript);
   }
 }

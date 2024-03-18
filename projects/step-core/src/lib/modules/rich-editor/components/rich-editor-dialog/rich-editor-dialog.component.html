@@ -1,0 +1,26 @@
+<step-modal-window [title]="_data.title">
+  <div step-modal-window-subtitle>
+    <section class="syntax-mode-selector">
+      @if (_data.predefinedMode) {
+        <step-form-field>
+          <input disabled [ngModel]="predefineModeLabel" />
+        </step-form-field>
+      } @else if (allowedModes.length > 0) {
+        <step-form-field>
+          <mat-select [(ngModel)]="selectedMode">
+            @for (mode of allowedModes; track mode.key) {
+              <mat-option [value]="mode.key">{{ mode.value }}</mat-option>
+            }
+          </mat-select>
+        </step-form-field>
+      }
+    </section>
+  </div>
+  <div step-modal-window-body>
+    <step-rich-editor [formControl]="textControl" [syntaxMode]="_data.predefinedMode ?? selectedMode" />
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

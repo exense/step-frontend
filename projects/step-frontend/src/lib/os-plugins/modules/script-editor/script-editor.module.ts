@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import {
   FunctionType,
   FunctionTypeRegistryService,
+  RichEditorComponent,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -10,11 +11,11 @@ import { ScriptEditorComponent } from './components/script-editor/script-editor.
 import './components/script-editor/script-editor.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import './components/function-type-script/function-type-script.component';
-import { canDeactivateFn } from './functions/can-deactivate-function';
+import { canDeactivateFn } from './guards/can-deactivate-function';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, RichEditorComponent],
   exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {
