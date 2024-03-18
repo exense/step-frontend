@@ -110,25 +110,10 @@ step-ts-dashboard-filter-bar {
         margin: 0 !important;
       }
       a.mdc-tab {
-        height: 3.6rem !important;
+        height: 3rem !important;
         min-width: 4rem !important;
         margin: 0 !important;
       }
     }
   }
-}
-
-step-tabs {
-  .mat-mdc-tab-link-container {
-    height: 3.6rem !important;
-
-    .mdc-tab {
-      height: 3rem !important;
-    }
-  }
-}
-
-#mat-tab-link-1,
-#mat-tab-link-2 {
-  height: 3rem !important;
 }
