@@ -8,24 +8,22 @@ import {
   MetricType,
   TimeRange,
   TimeRangeSelection,
-  TimeSeriesFilterItem,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
 import {
-  TimeSeriesConfig,
-  TimeseriesColorsPool,
-  TimeSeriesContext,
-  TimeSeriesContextsFactory,
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
+  FilterUtils,
+  ResolutionPickerComponent,
+  TimeRangePickerSelection,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesContextsFactory,
 } from '../../modules/_common';
-
-//@ts-ignore
-import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
+import { defaultIfEmpty, forkJoin, merge, Observable, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -33,6 +31,10 @@ import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
+import { MatMenuTrigger } from '@angular/material/menu';
+
+//@ts-ignore
+import uPlot = require('uplot');
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -48,13 +50,14 @@ const EDIT_PARAM_NAME = 'edit';
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
   providers: [DashboardUrlParamsService],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
+  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, ResolutionPickerComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
@@ -73,6 +76,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
+  resolution?: number;
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -81,6 +85,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
+    this.resolution = pageParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -104,6 +109,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  handleResolutionChange(resolution: number) {
+    if (resolution > 1000) {
+      this.context.updateChartsResolution(resolution);
+    }
   }
 
   private updateUrl(): void {
@@ -259,11 +270,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       attributes: attributesByIds,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
+      resolution: urlParams.resolution,
     });
   }
 
   subscribeForContextChange(): void {
-    merge(this.context.onFilteringChange(), this.context.onGroupingChange())
+    merge(this.context.onFilteringChange(), this.context.onGroupingChange(), this.context.onChartsResolutionChange())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.refreshAllCharts().subscribe();

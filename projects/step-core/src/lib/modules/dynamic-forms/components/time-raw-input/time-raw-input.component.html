@@ -2,9 +2,16 @@
   [showRequiredMarker]="showRequiredMarker"
   [class.ng-invalid]="!!parentControl?.invalid"
   [class.ng-touched]="!!parentControl?.touched"
-  [class.with-tooltip]="tooltip"
+  alignLabelAddon="near"
 >
-  <step-label *ngIf="label">{{ label }}</step-label>
+  @if (label) {
+    <step-label>{{ label }}</step-label>
+  }
+  @if (tooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+    </step-label-addon>
+  }
   <input
     type="number"
     [placeholder]="placeholder"
@@ -14,18 +21,15 @@
     [stepAllowChars]="allowedChars"
     min="0"
   />
-  <step-suffix *ngIf="tooltip" class="icon-suffix">
-    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
-  </step-suffix>
   <step-suffix>
     <mat-select
       [ngModel]="internalDisplayMeasure"
       (ngModelChange)="handleDisplayMeasureChange($event)"
       (blur)="handleBlur()"
     >
-      <mat-option *ngFor="let item of measureItems; trackBy: trackByMeasureItem" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
+      @for (item of measureItems; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
     </mat-select>
   </step-suffix>
   <step-suffix class="button-suffix">
@@ -35,7 +39,7 @@
       (click)="editConstantValue.emit()"
       [disabled]="!!isDisabled || !!parentControl?.disabled"
     >
-      <step-icon name="edit-2"></step-icon>
+      <step-icon name="edit-2" />
     </button>
   </step-suffix>
   <step-suffix class="button-suffix">
@@ -47,7 +51,7 @@
       (click)="toggleDynamicExpression.emit()"
       [disabled]="!!isDisabled || !!parentControl?.disabled"
     >
-      <step-icon name="zap"></step-icon>
+      <step-icon name="zap" />
     </button>
   </step-suffix>
 </step-form-field>

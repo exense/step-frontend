@@ -1,4 +1,13 @@
-import { Component, ElementRef, forwardRef, inject, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  forwardRef,
+  inject,
+  Input,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
 import {
@@ -15,7 +24,6 @@ import {
   PlanTreeAction,
   PlanEditorPersistenceStateService,
 } from '../../modules/plan-common';
-import { toObservable } from '@angular/core/rxjs-interop';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -39,8 +47,9 @@ export class PlanTreeComponent implements TreeActionsService {
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  readonly selectedNode$ = toObservable(this._treeState.selectedNode);
-  readonly selectedArtefact$ = this.selectedNode$.pipe(map((node) => node?.originalArtefact));
+  readonly activeNode = this._treeState.selectedNode;
+  readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
+
   @Input() isReadonly: boolean = false;
 
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;

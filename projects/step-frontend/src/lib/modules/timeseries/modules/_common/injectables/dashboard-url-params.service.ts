@@ -20,6 +20,7 @@ export interface DashboardUrlParams {
   filters: UrlFilterAttribute[];
   relativeRange?: string;
   editMode?: boolean;
+  resolution?: number;
 }
 
 export interface UrlFilterAttribute {
@@ -48,6 +49,7 @@ export class DashboardUrlParamsService {
       timeRange: this.extractTimeRange(params),
       grouping: params['grouping']?.split(','),
       filters: this.decodeUrlFilters(params),
+      resolution: params['resolution'],
     };
   }
 
@@ -153,6 +155,10 @@ export class DashboardUrlParamsService {
       params['to'] = timeSelection.absoluteSelection!.to;
     } else if (timeSelection.type === TimeRangeType.RELATIVE) {
       params['relativeRange'] = timeSelection.relativeSelection!.timeInMs;
+    }
+    const customResolution = context.getChartsResolution();
+    if (customResolution > 0) {
+      params['resolution'] = customResolution;
     }
 
     return params;

@@ -16,8 +16,8 @@ export class TreeDragPreviewComponent {
     let icon = '';
 
     if (nodes.length === 1) {
-      label = nodes[0].name;
-      icon = nodes[0].icon;
+      label = nodes[0]?.name ?? '';
+      icon = nodes[0]?.icon ?? '';
     } else if (nodes.length > 1) {
       label = `(${nodes.length}) items`;
       icon = 'list';
