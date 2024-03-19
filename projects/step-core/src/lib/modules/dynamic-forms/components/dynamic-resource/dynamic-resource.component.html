@@ -1,17 +1,16 @@
-<step-expression-input
-  *ngIf="dynamic; else constantValueTemplate"
-  [label]="label"
-  [tooltip]="tooltip"
-  [isParentInvalid]="!!_ngControl.invalid"
-  [showRequiredMarker]="showRequiredMarker"
-  [ngModel]="expression"
-  (ngModelChange)="onExpressionChange($event)"
-  [disabled]="isDisabled"
-  (toggleConstantValue)="toggleDynamicExpression(false)"
-  (blur)="onBlur()"
-></step-expression-input>
-
-<ng-template #constantValueTemplate>
+@if (dynamic) {
+  <step-expression-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [isParentInvalid]="!!_ngControl.invalid"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="expression"
+    (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
+    (toggleConstantValue)="toggleDynamicExpression(false)"
+    (blur)="onBlur()"
+  />
+} @else {
   <step-resource-input
     [label]="label"
     [stType]="type"
@@ -26,5 +25,5 @@
     (stModelChange)="onValueChange($event)"
     (dynamicSwitch)="toggleDynamicExpression(true)"
     (blur)="onBlur()"
-  ></step-resource-input>
-</ng-template>
+  />
+}

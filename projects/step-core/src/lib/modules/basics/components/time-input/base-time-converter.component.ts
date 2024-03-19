@@ -1,14 +1,5 @@
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { TimeUnit } from '../../types/time-unit.enum';
 
@@ -60,8 +51,6 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   protected isDisabled?: boolean;
   protected measureItems: KeyValue<TimeUnit, string>[] = [];
   protected displayValue: number = 0;
-
-  protected readonly trackByMeasureItem: TrackByFunction<KeyValue<TimeUnit, string>> = (index, { key }) => key;
 
   protected constructor(readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
