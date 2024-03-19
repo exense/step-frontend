@@ -1,15 +1,15 @@
 <step-modal-window [title]="modalTitle">
   <div step-modal-window-body>
-    <ng-container *ngIf="screenInput?.input as model">
-      <step-form-field>
+    @if (screenInput?.input; as model) {
+      <step-form-field alignLabelAddon="near">
         <step-label>ID</step-label>
-        <input type="text" [(ngModel)]="model.id" />
-        <step-suffix class="icon-suffix">
+        <step-label-addon>
           <step-icon
             name="help-circle"
             matTooltip="Keys containing 'pwd' or 'password' will be automatically protected"
-          ></step-icon>
-        </step-suffix>
+          />
+        </step-label-addon>
+        <input type="text" [(ngModel)]="model.id" />
       </step-form-field>
       <step-form-field>
         <step-label>Label</step-label>
@@ -29,15 +29,12 @@
       </step-form-field>
       <step-screen-input-dropdown-options *ngIf="model.type === 'DROPDOWN'" [model]="model">
       </step-screen-input-dropdown-options>
-      <step-form-field>
+      <step-form-field alignLabelAddon="near">
         <step-label>Default value</step-label>
+        <step-label-addon>
+          <step-icon name="help-circle" matTooltip="Defines the default value of this input field (Optional)" />
+        </step-label-addon>
         <input type="text" [(ngModel)]="model.defaultValue" />
-        <step-suffix class="icon-suffix">
-          <step-icon
-            name="help-circle"
-            matTooltip="Defines the default value of this input field (Optional)"
-          ></step-icon>
-        </step-suffix>
       </step-form-field>
       <step-form-field>
         <step-label>Activation expression</step-label>
@@ -52,33 +49,33 @@
           <mat-panel-title>Advanced</mat-panel-title>
         </mat-expansion-panel-header>
         <section class="advanced-body">
-          <step-form-field>
+          <step-form-field alignLabelAddon="near">
             <step-label>Value Cell Renders</step-label>
+            <step-label-addon>
+              <step-icon
+                name="help-circle"
+                matTooltip="The keys of registered components, that can be used for rendering"
+              />
+            </step-label-addon>
             <input
               type="text"
               [stepModelFormatter]="customUIComponentsFormatter"
               [(ngModel)]="model.customUIComponents"
             />
-            <step-suffix class="icon-suffix">
-              <step-icon
-                name="help-circle"
-                matTooltip="The keys of registered components, that can be used for rendering"
-              ></step-icon>
-            </step-suffix>
           </step-form-field>
-          <step-form-field>
+          <step-form-field alignLabelAddon="near">
             <step-label>Search service mapper</step-label>
-            <input type="text" [(ngModel)]="model.searchMapperService" />
-            <step-suffix class="icon-suffix">
+            <step-label-addon>
               <step-icon
                 name="help-circle"
                 matTooltip="When the input is used in a table, this service will be used to resolve the column filter to actual input values. The filter is passed in the body, a list of string is expected as a result (Optional)"
-              ></step-icon>
-            </step-suffix>
+              />
+            </step-label-addon>
+            <input type="text" [(ngModel)]="model.searchMapperService" />
           </step-form-field>
         </section>
       </mat-expansion-panel>
-    </ng-container>
+    }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>

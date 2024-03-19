@@ -5,33 +5,37 @@
   [class.ng-touched]="_ngControl.touched"
   alignLabelAddon="near"
 >
-  <step-label *ngIf="label">
-    {{ label }}
-  </step-label>
-  <step-label-addon *ngIf="tooltip">
-    <step-icon name="help-circle" [matTooltip]="tooltip"> </step-icon>
-  </step-label-addon>
+  @if (label) {
+    <step-label>{{ label }}</step-label>
+  }
+  @if (tooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="tooltip" />
+    </step-label-addon>
+  }
   <input
     type="number"
     [ngModel]="displayValue"
     (ngModelChange)="handleDisplayValueChange($event)"
     (blur)="handleBlur()"
   />
-  <step-suffix *ngIf="separator">
-    {{ separator }}
-  </step-suffix>
+  @if (separator) {
+    <step-suffix>{{ separator }}</step-suffix>
+  }
   <step-suffix>
     <mat-select
       [ngModel]="internalDisplayMeasure"
       (ngModelChange)="handleDisplayMeasureChange($event)"
       (blur)="handleBlur()"
     >
-      <mat-option *ngFor="let item of measureItems; trackBy: trackByMeasureItem" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
+      @for (item of measureItems; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
     </mat-select>
   </step-suffix>
-  <step-error *ngIf="_ngControl.touched && _ngControl.errors && errorsDictionary">
-    <step-errors-list [errors]="_ngControl.errors" [keysDictionary]="errorsDictionary"> </step-errors-list>
-  </step-error>
+  @if (_ngControl.touched && _ngControl.errors && errorsDictionary) {
+    <step-error>
+      <step-errors-list [errors]="_ngControl.errors" [keysDictionary]="errorsDictionary" />
+    </step-error>
+  }
 </step-form-field>
