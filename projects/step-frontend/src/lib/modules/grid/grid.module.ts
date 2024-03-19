@@ -41,19 +41,19 @@ export class GridModule {
 
   private registerRoutes(): void {
     this._viewRegistry.registerRoute({
-      path: 'gridagents',
+      path: 'grid-agents',
       component: AgentListComponent,
     });
     this._viewRegistry.registerRoute({
-      path: 'gridtokens',
+      path: 'grid-tokens',
       component: TokenListComponent,
     });
     this._viewRegistry.registerRoute({
-      path: 'gridtokengroups',
+      path: 'grid-token-groups',
       component: TokenGroupListComponent,
     });
     this._viewRegistry.registerRoute({
-      path: 'gridquotamanager',
+      path: 'grid-quota-manager',
       component: QuotaManagerComponent,
     });
   }

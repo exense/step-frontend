@@ -6,7 +6,7 @@ import { FunctionPackageConfigurationDialogComponent } from '../components/funct
 import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 import { Router } from '@angular/router';
 
-const ROOT_URL = '/functionPackages';
+const ROOT_URL = '/function-packages';
 
 @Injectable({
   providedIn: 'root',

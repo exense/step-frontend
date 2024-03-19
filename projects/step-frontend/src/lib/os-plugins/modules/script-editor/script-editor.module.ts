@@ -28,7 +28,7 @@ export class ScriptEditorModule {
 
   private registerViews(): void {
     this._viewRegistry.registerRoute({
-      path: 'scripteditor',
+      path: 'script-editor',
       component: SimpleOutletComponent,
       children: [
         {

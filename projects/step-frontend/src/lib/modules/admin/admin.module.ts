@@ -113,7 +113,7 @@ export class AdminModule {
 
     this._viewRegistry.registerRoute(
       {
-        path: 'myaccount',
+        path: 'my-account',
         component: MyAccountComponent,
       },
       {
