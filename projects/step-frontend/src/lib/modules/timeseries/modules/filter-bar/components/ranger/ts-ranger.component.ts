@@ -87,11 +87,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
-
     this.init(this.settings);
-    // window.addEventListener('resize', (e) => {
-    //   this.resizeChart();
-    // });
   }
 
   ngAfterViewInit(): void {
@@ -230,7 +226,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       axes: [
         {
           grid: {
-            stroke: TimeSeriesConfig.RANGER_COLORS.axesStroke,
             width: 1,
           },
         },
@@ -282,13 +277,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         {
           scale: 'y',
           points: { show: false },
-          stroke: TimeSeriesConfig.RANGER_COLORS.seriesStroke,
-          fill: (self: uPlot, seriesIdx: number) => {
-            return this._utils.multiColorsGradientFill(self, [
-              { offset: 0, color: TimeSeriesConfig.RANGER_COLORS.seriesGradientStart },
-              { offset: 1, color: TimeSeriesConfig.RANGER_COLORS.seriesGradientEnd },
-            ]);
-          },
+          fill: TimeSeriesConfig.RANGER_COLORS.series,
         },
       ],
       hooks: {
