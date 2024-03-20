@@ -44,7 +44,7 @@ export class TimeSeriesContext {
 
   private readonly activeFilters$: BehaviorSubject<FilterBarItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
-  private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
@@ -65,6 +65,7 @@ export class TimeSeriesContext {
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(params.attributes || {});
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
+    this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
 
     // any specific context change will trigger the main stateChange
     this.stateChange$ = merge(

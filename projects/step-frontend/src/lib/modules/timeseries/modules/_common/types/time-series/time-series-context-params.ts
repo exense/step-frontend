@@ -14,4 +14,5 @@ export interface TimeSeriesContextParams {
   keywordsContext?: TimeSeriesKeywordsContext;
   filteringSettings?: TsFilteringSettings;
   editMode?: boolean;
+  resolution?: number;
 }
