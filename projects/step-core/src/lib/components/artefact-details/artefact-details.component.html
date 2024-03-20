@@ -4,7 +4,7 @@
       <section class="artefact-info">
         @if (!artefact.dynamicName!.dynamic) {
           <div class="artefact-name">
-            <step-icon class="pos-abs" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
+            <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
             <step-editable-label name="name" [(ngModel)]="artefact.attributes!['name']" [disabled]="readonly" />
             <button
               type="button"
@@ -32,7 +32,9 @@
     }
     @if (!!artefactMeta?.component) {
       <section class="editor">
-        <step-icon class="pos-abs top-1" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
+        @if (artefactMeta!.label === 'CallPlan' || artefactMeta!.label === 'CallKeyword') {
+          <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
+        }
         <step-custom-item-render
           [artefactId]="artefact.id"
           [component]="artefactMeta!.component"
