@@ -34,12 +34,19 @@
       <section class="editor">
         @if (artefactMeta!.label === 'CallPlan' || artefactMeta!.label === 'CallKeyword') {
           <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
+          <step-custom-item-render
+            id="call-name-input"
+            [artefactId]="artefact.id"
+            [component]="artefactMeta!.component"
+            [context]="editorContext"
+          />
+        } @else {
+          <step-custom-item-render
+            [artefactId]="artefact.id"
+            [component]="artefactMeta!.component"
+            [context]="editorContext"
+          />
         }
-        <step-custom-item-render
-          [artefactId]="artefact.id"
-          [component]="artefactMeta!.component"
-          [context]="editorContext"
-        />
       </section>
     }
     <mat-expansion-panel [(expanded)]="showAttributes">

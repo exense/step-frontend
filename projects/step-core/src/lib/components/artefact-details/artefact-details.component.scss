@@ -21,12 +21,6 @@ step-artefact-details {
         flex: 1;
         min-width: 20rem;
         margin-left: -1.6rem;
-
-        step-form-field {
-          input {
-            padding-left: 4rem;
-          }
-        }
       }
     }
 
@@ -52,7 +46,17 @@ step-artefact-details {
     top: 1rem;
   }
 
-  .editable-label {
-    padding-left: 4rem !important;
+  .artefact-name,
+  #call-name-input {
+    step-editable-label {
+      .editable-label {
+        padding-left: 4rem !important;
+      }
+      .form-field-content {
+        input {
+          padding-left: 4rem !important;
+        }
+      }
+    }
   }
 }
