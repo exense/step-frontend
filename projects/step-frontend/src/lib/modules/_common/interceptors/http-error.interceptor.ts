@@ -24,13 +24,17 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       return throwError(() => error);
     }
 
+    let jsonError = error.error;
+    if (typeof error.error === 'string' && error.headers.get('Content-Type') === 'application/json') {
+      jsonError = JSON.parse(error.error);
+    }
     let parsedError;
-    if (error.error?.errorMessage) {
-      parsedError = HttpErrorInterceptor.formatError(error.error);
+    if (jsonError?.errorMessage) {
+      parsedError = HttpErrorInterceptor.formatError(jsonError);
     } else if (error.name && error.message) {
       parsedError = HttpErrorInterceptor.formatError(`${error.name}: ${error.message}`);
-    } else if (error.error) {
-      parsedError = HttpErrorInterceptor.formatError(error.error);
+    } else if (jsonError) {
+      parsedError = HttpErrorInterceptor.formatError(jsonError);
     } else {
       parsedError = HttpErrorInterceptor.formatError('Unknown HTTP error');
     }

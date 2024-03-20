@@ -9,28 +9,37 @@ import {
   TimeRange,
   TimeRangeSelection,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  TimeseriesColorsPool,
+  FilterBarItem,
+  FilterBarItemType,
+  FilterUtils,
+  ResolutionPickerComponent,
+  TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
 } from '../../modules/_common';
-
-//@ts-ignore
-import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
+import { defaultIfEmpty, forkJoin, merge, Observable, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  DashboardUrlParams,
+  DashboardUrlParamsService,
+} from '../../modules/_common/injectables/dashboard-url-params.service';
+import { MatMenuTrigger } from '@angular/material/menu';
+
+//@ts-ignore
+import uPlot = require('uplot');
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
-interface PageParams {
-  editMode?: boolean;
+interface MetricAttributeSelection extends MetricAttribute {
+  selected: boolean;
 }
 
 const EDIT_PARAM_NAME = 'edit';
@@ -40,14 +49,15 @@ const EDIT_PARAM_NAME = 'edit';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
+  providers: [DashboardUrlParamsService],
+  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, ResolutionPickerComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  readonly AGGREGATES: AggregationType[] = ['SUM', 'AVG', 'MIN', 'MAX', 'COUNT', 'RATE', 'MEDIAN'];
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
@@ -55,8 +65,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
+  private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
-  colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;
@@ -66,6 +76,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
+  resolution?: number;
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -73,7 +84,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   hasWritePermission = false;
 
   ngOnInit(): void {
-    const pageParams = this.extractUrlParams();
+    const pageParams = this._urlParamsService.collectUrlParams();
+    this.resolution = pageParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -83,7 +95,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
-        this.context = this.createContext(this.dashboard);
+        this.context = this.createContext(this.dashboard, pageParams);
+        this.updateUrl();
+        this.context.stateChange$.subscribe((stateChanged) => {
+          this.updateUrl();
+        });
+
         this.subscribeForContextChange();
         this.subscribeForTimeRangeChange();
         if (pageParams.editMode && this.hasWritePermission) {
@@ -94,11 +111,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  private extractUrlParams(): PageParams {
-    const initialParams: Params = this._route.snapshot.queryParams;
-    return {
-      editMode: initialParams[EDIT_PARAM_NAME] == '1',
-    };
+  handleResolutionChange(resolution: number) {
+    if (resolution > 1000) {
+      this.context.updateChartsResolution(resolution);
+    }
+  }
+
+  private updateUrl(): void {
+    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection);
   }
 
   ngOnDestroy(): void {
@@ -136,7 +156,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addDashlet(metric: MetricType) {
-    let newDashlet: DashboardItem = {
+    const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -176,40 +196,86 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  createContext(dashboard: DashboardView): TimeSeriesContext {
-    const dashboardTimeRange = dashboard.timeRange!;
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(dashboard.timeRange);
-    if (dashboard.timeRange.type === 'RELATIVE') {
-      const timeInMs = dashboardTimeRange.relativeSelection!.timeInMs;
+  private convertUrlFilters(
+    urlParams: DashboardUrlParams,
+    attributesDefinition: Record<string, MetricAttribute>,
+  ): FilterBarItem[] {
+    return urlParams.filters
+      .filter((i) => !!attributesDefinition[i.attribute])
+      .map((urlFilter) => {
+        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
+        switch (filterItem.type) {
+          case FilterBarItemType.OPTIONS:
+            urlFilter.values?.forEach((v) => {
+              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
+              if (foundOptions) {
+                foundOptions.isSelected = true;
+              } else {
+                filterItem.textValues?.push({ value: v, isSelected: true });
+              }
+            });
+            filterItem.exactMatch = true;
+            break;
+          case FilterBarItemType.FREE_TEXT:
+            filterItem.freeTextValues = urlFilter.values;
+            break;
+          case FilterBarItemType.EXECUTION:
+          case FilterBarItemType.TASK:
+          case FilterBarItemType.PLAN:
+            filterItem.exactMatch = true;
+            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
+            break;
+          case FilterBarItemType.NUMERIC:
+          case FilterBarItemType.DATE:
+            filterItem.min = urlFilter.min;
+            filterItem.max = urlFilter.max;
+            break;
+        }
+        return filterItem;
+      });
+  }
+
+  createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
+    const timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
+    if (timeRangeSelection.type === 'RELATIVE') {
+      const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
       const foundRelativeOption = this.timeRangeOptions.find((o) => {
-        return o.type === 'RELATIVE' && timeInMs === o.relativeSelection?.timeInMs;
+        return timeInMs === o.relativeSelection?.timeInMs;
       });
       this.timeRangeSelection = foundRelativeOption || {
         type: 'RELATIVE',
         relativeSelection: {
-          label: dashboardTimeRange.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+          label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
           timeInMs: timeInMs,
         },
       };
     } else {
       // absolute
-      this.timeRangeSelection = { ...dashboardTimeRange, type: dashboardTimeRange.type! };
+      this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
     const attributesByIds: Record<string, MetricAttribute> = {};
     this.dashboard.dashlets.forEach((d) =>
       d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
     );
+    const urlFilters = this.convertUrlFilters(urlParams, attributesByIds).filter(FilterUtils.filterItemIsValid);
+
+    // url filters are excluded from the dashboard filters
+    const dashboardFilters = dashboard.filters
+      ?.map(FilterUtils.convertApiFilterItem)
+      .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
       attributes: attributesByIds,
-      grouping: dashboard.grouping || [],
-      filters: dashboard.filters?.map(FilterUtils.convertApiFilterItem),
+      grouping: urlParams.grouping || dashboard.grouping || [],
+      filters: [...urlFilters, ...dashboardFilters],
+      resolution: urlParams.resolution,
     });
   }
 
   subscribeForContextChange(): void {
-    merge(this.context.onFilteringChange(), this.context.onGroupingChange())
+    merge(this.context.onFilteringChange(), this.context.onGroupingChange(), this.context.onChartsResolutionChange())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.refreshAllCharts().subscribe();
@@ -241,6 +307,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   handleChartDelete(index: number) {
     this.dashboard.dashlets.splice(index, 1);
+    this.context.updateAttributes(this.collectAllAttributes());
   }
 
   handleChartShiftLeft(index: number) {
@@ -287,7 +354,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentParams = { ...this._route.snapshot.queryParams };
 
     // Remove the specific parameter
-    currentParams[EDIT_PARAM_NAME] = null;
+    currentParams[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + 'edit'] = null;
 
     // Navigate with the updated parameters
     this._router.navigate([], {

@@ -1,11 +1,12 @@
-<ng-container *ngIf="!isEditMode">
-  <ng-template #defaultNameTemplate>
-    {{ node?.name }}
-  </ng-template>
-  <ng-container *ngIf="templateContainer.treeNodeTemplate?.templateRef as customTemplate; else defaultNameTemplate">
-    <ng-container *ngTemplateOutlet="customTemplate; context: { $implicit: node }"></ng-container>
-  </ng-container>
-</ng-container>
-<step-form-field [class.hidden]="!isEditMode">
+@if (!isEditMode()) {
+  @if (templateContainer.treeNodeTemplate?.templateRef) {
+    <ng-container
+      *ngTemplateOutlet="templateContainer.treeNodeTemplate!.templateRef!; context: { $implicit: node() }"
+    />
+  } @else {
+    {{ node()?.name }}
+  }
+}
+<step-form-field [class.hidden]="!isEditMode()">
   <input #inputElement type="text" (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
 </step-form-field>

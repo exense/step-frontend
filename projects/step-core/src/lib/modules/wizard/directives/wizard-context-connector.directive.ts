@@ -1,17 +1,6 @@
-import {
-  Directive,
-  EventEmitter,
-  forwardRef,
-  HostListener,
-  inject,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Directive, EventEmitter, forwardRef, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { first, Observable, of } from 'rxjs';
-import { Mutable } from '../../../shared';
 import { WizardStepMeta } from '../types/wizard-step-meta.interface';
 import { WizardStepLocalContext } from '../types/wizard-step-local-context.interface';
 import { WIZARD_GLOBAL_CONTEXT } from '../injectables/wizard-global-context.token';
@@ -23,6 +12,7 @@ import { WizardStepActionsService } from '../injectables/wizard-step-actions.ser
 import { WIZARD_STEP_FORM_CONFIG } from '../injectables/wizard-step-form-config.token';
 import { WIZARD_STEP_BEHAVIOR_CONFIG } from '../injectables/wizard-step-behavior-config.token';
 import { WizardStepBehaviorConfig } from '../types/wizard-step-behavior-config.interface';
+import { Mutable } from '../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<Pick<WizardContextConnectorDirective, 'stepForm' | 'isLast' | 'isFirst'>>;
 

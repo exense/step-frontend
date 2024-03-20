@@ -2,10 +2,10 @@ import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/cor
 import { FormBuilder, Validators } from '@angular/forms';
 import { distinctUntilChanged, map, shareReplay, startWith, Subject, takeUntil, tap } from 'rxjs';
 import { FieldSchemaType } from '../../shared/field-schema-type.enum';
-import { numberValidator } from '../../../basics/shared/validators/number-validator';
-import { booleanValidator } from '../../../basics/shared/validators/boolean-validator';
-import { jsonValidator } from '../../../basics/shared/validators/json-validator';
-import { comaSplitArrayValidator } from '../../../basics/shared/validators/coma-split-array-validator';
+import { numberValidator } from '../../../basics/types/validators/number-validator';
+import { booleanValidator } from '../../../basics/types/validators/boolean-validator';
+import { jsonValidator } from '../../../basics/types/validators/json-validator';
+import { comaSplitArrayValidator } from '../../../basics/types/validators/coma-split-array-validator';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
 
@@ -41,7 +41,7 @@ export class AddSchemaFieldDialogComponent implements OnInit, OnDestroy {
   protected readonly fieldType$ = this.fieldForm.controls.fieldType.valueChanges.pipe(
     startWith(this.fieldForm.controls.fieldType.value),
     shareReplay(1),
-    takeUntil(this._terminator$)
+    takeUntil(this._terminator$),
   );
 
   protected readonly isEnum$ = this.fieldType$.pipe(map((value) => value === FieldSchemaType.ENUM));
@@ -81,7 +81,7 @@ export class AddSchemaFieldDialogComponent implements OnInit, OnDestroy {
         tap(() => {
           defaultValueCtrl.clearValidators();
           enumItemsCtrl.clearValidators();
-        })
+        }),
       )
       .subscribe((fieldType) => {
         switch (fieldType) {

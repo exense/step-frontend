@@ -31,7 +31,7 @@
 
   <div class="filters">
     <mat-menu #addFilterMenu="matMenu">
-      @for (option of filterOptions; track option.attributeName) {
+      @for (option of _unusedFilterOptions; track option.attributeName) {
         @if (!option.isHidden) {
           <button mat-menu-item (click)="addFilterItem(option)">
             <span>{{ option.label }}</span>

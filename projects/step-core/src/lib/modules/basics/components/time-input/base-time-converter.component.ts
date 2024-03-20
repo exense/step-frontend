@@ -1,16 +1,7 @@
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { KeyValue } from '@angular/common';
-import { TimeUnit } from '../../shared/time-unit.enum';
+import { TimeUnit } from '../../types/time-unit.enum';
 
 type OnChange = (value: number) => void;
 type OnTouch = () => void;
@@ -33,6 +24,7 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   @Input() tooltip?: string;
   @Input() showRequiredMarker: boolean = false;
   @Input() errorsDictionary?: Record<string, string>;
+  @Output() blur = new EventEmitter<void>();
   protected separator?: string;
 
   @Input() allowedMeasures: TimeUnit[] = [
@@ -44,6 +36,9 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   ];
 
   @Input() measuresDictionary?: TimeUnitDictionary;
+
+  protected internalDisplayMeasure?: TimeUnit;
+  @Input() defaultDisplayMeasure?: TimeUnit;
   @Input() displayMeasure?: TimeUnit;
   @Output() displayMeasureChange = new EventEmitter<TimeUnit | undefined>();
 
@@ -56,8 +51,6 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   protected isDisabled?: boolean;
   protected measureItems: KeyValue<TimeUnit, string>[] = [];
   protected displayValue: number = 0;
-
-  protected readonly trackByMeasureItem: TrackByFunction<KeyValue<TimeUnit, string>> = (index, { key }) => key;
 
   protected constructor(readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
@@ -76,12 +69,17 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
   }
 
   writeValue(value: number): void {
+    if (!this.displayMeasure) {
+      this.internalDisplayMeasure = this.autoDetermineDisplayMeasure(value, this.modelMeasure);
+    }
     this.modelValue = value;
-    this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.displayMeasure);
+    this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.internalDisplayMeasure);
   }
 
   ngOnInit(): void {
-    this.fillMeasureItems(this.allowedMeasures, this.measuresDictionary);
+    if (!this.measureItems.length) {
+      this.fillMeasureItems(this.allowedMeasures, this.measuresDictionary);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -105,31 +103,57 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
 
     const cModelMeasure = changes['modelMeasure'];
     if (cModelMeasure?.previousValue !== cModelMeasure?.currentValue || cModelMeasure?.firstChange) {
-      this.displayValue = this.calculateDisplayValue(this.modelValue, cModelMeasure!.currentValue, this.displayMeasure);
+      this.displayValue = this.calculateDisplayValue(
+        this.modelValue,
+        cModelMeasure!.currentValue,
+        this.internalDisplayMeasure,
+      );
     }
 
     const cDisplayMeasure = changes['displayMeasure'];
     if (cDisplayMeasure?.previousValue !== cDisplayMeasure?.currentValue || cDisplayMeasure?.firstChange) {
-      this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, cDisplayMeasure!.currentValue);
+      const measure = cDisplayMeasure?.currentValue;
+      if (measure) {
+        this.internalDisplayMeasure = measure;
+        this.displayValue = this.calculateDisplayValue(this.modelValue, this.modelMeasure, this.internalDisplayMeasure);
+      }
     }
   }
 
   protected handleDisplayValueChange(value: number): void {
     this.displayValue = value;
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.internalDisplayMeasure);
     this.onChange?.(this.modelValue);
   }
 
   protected handleDisplayMeasureChange(value: TimeUnit): void {
-    this.displayMeasure = value;
-    this.displayMeasureChange.emit(value);
-    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.displayMeasure);
+    if (this.displayMeasure) {
+      this.displayMeasure = value;
+      this.displayMeasureChange.emit(value);
+    }
+    this.internalDisplayMeasure = value;
+    this.modelValue = this.calculateModelValue(this.displayValue, this.modelMeasure, this.internalDisplayMeasure);
     this.onChange?.(this.modelValue);
   }
 
   protected handleBlur(): void {
     this.onTouch?.();
+    this.blur.emit();
   }
+
+  protected abstract calculateBaseValue(modelValue: number, modelMeasure: TimeUnit): number;
+
+  protected abstract calculateDisplayValue(
+    modelValue: number,
+    modelMeasure: TimeUnit,
+    displayMeasure?: TimeUnit,
+  ): number;
+
+  protected abstract calculateModelValue(
+    displayValue: number,
+    modelMeasure: TimeUnit,
+    displayMeasure?: TimeUnit,
+  ): number;
 
   private fillMeasureItems(allowedMeasures?: TimeUnit[], measuresDictionary?: TimeUnitDictionary): void {
     allowedMeasures = allowedMeasures ?? this.allowedMeasures ?? [];
@@ -140,23 +164,36 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
       return { key, value };
     });
 
-    if (allowedMeasures.includes(this.displayMeasure!)) {
+    if (allowedMeasures.includes(this.internalDisplayMeasure!)) {
       return;
     }
 
-    this.displayMeasure = allowedMeasures[0];
-    this.displayMeasureChange.emit(this.displayMeasure);
+    if (this.displayMeasure) {
+      this.internalDisplayMeasure = allowedMeasures[0];
+      this.displayMeasure = allowedMeasures[0];
+      this.displayMeasureChange.emit(this.displayMeasure);
+    }
   }
 
-  protected abstract calculateDisplayValue(
-    modelValue: number,
-    modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
-  ): number;
+  /*
+   * This calculates the best fitting timeUnit for a given number of milliseconds
+   *
+   * TODO: we should instead save the timeUnit in the BE and remove this. (Lucian: timeseries work only with ms, so this is useful)
+   */
+  private autoDetermineDisplayMeasure(model: number, modelMeasure: TimeUnit): TimeUnit {
+    const baseValue = this.calculateBaseValue(model, modelMeasure);
+    const allowedMeasures = [...this.allowedMeasures].sort((a, b) => b - a);
+    const defaultValue = this.defaultDisplayMeasure ?? allowedMeasures[allowedMeasures.length - 1];
+    if (!baseValue) {
+      return defaultValue;
+    }
 
-  protected abstract calculateModelValue(
-    displayValue: number,
-    modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit
-  ): number;
+    for (const unit of allowedMeasures) {
+      if (baseValue % unit === 0 && baseValue / unit >= 1) {
+        return unit;
+      }
+    }
+
+    return defaultValue;
+  }
 }

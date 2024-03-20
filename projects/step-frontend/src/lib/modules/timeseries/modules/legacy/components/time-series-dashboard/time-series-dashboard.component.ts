@@ -14,6 +14,7 @@ import {
   TimeSeriesContextParams,
   TimeSeriesContextsFactory,
   COMMON_IMPORTS,
+  FilterUtils,
 } from '../../../_common';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
 import { FilterBarComponent } from '../../../filter-bar';
@@ -96,22 +97,17 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     activeFilters: FilterBarItem[],
   ) {
     const contextualFilters = Object.keys(contextualParams).map((key) => {
-      const fieldType = this.getFilterFieldType(key);
-      const isEntityFilter = [FilterBarItemType.PLAN, FilterBarItemType.TASK, FilterBarItemType.EXECUTION].includes(
-        fieldType,
-      );
-      const searchValue = contextualParams[key];
-      return {
-        isHidden: !this.settings.showContextualFilters,
-        removable: true,
-        label: this.getFilterFieldLabel(key),
-        type: fieldType,
-        attributeName: key,
-        freeTextValues: fieldType === 'FREE_TEXT' ? [searchValue] : [],
-        searchEntities: isEntityFilter ? [{ searchValue: searchValue }] : [],
-        isLocked: false,
-        exactMatch: true,
-      } as FilterBarItem;
+      const filterBarItem = FilterUtils.createEmptyFilterTextItem(key);
+
+      const searchValue: string = contextualParams[key]!;
+
+      filterBarItem.isHidden = !this.settings.showContextualFilters;
+      filterBarItem.removable = true;
+      filterBarItem.freeTextValues = filterBarItem.type === 'FREE_TEXT' ? [searchValue] : [];
+      filterBarItem.searchEntities = FilterUtils.isEntityFilter(filterBarItem) ? [{ searchValue: searchValue }] : [];
+      filterBarItem.exactMatch = true;
+      filterBarItem.isLocked = false;
+      return filterBarItem;
     });
     let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
     const filteredItems = ['Origin', 'Plan'];
@@ -131,32 +127,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       }
       return f;
     });
-  }
-
-  private getFilterFieldLabel(attribute: string): string {
-    switch (attribute) {
-      case 'eId':
-        return 'Execution';
-      case 'taskId':
-        return 'Task';
-      case 'plan':
-        return 'Plan';
-      default:
-        return attribute;
-    }
-  }
-
-  private getFilterFieldType(attribute: string): FilterBarItemType {
-    switch (attribute) {
-      case 'eId':
-        return FilterBarItemType.EXECUTION;
-      case 'taskId':
-        return FilterBarItemType.TASK;
-      case 'planId':
-        return FilterBarItemType.PLAN;
-      default:
-        return FilterBarItemType.FREE_TEXT;
-    }
   }
 
   public setChartsResolution(ms: number): void {

@@ -1,23 +1,7 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, computed, EventEmitter, inject, input, Input, Output, ViewEncapsulation } from '@angular/core';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeStateService } from '../../services/tree-state.service';
-import { TreeDragDropService } from '../../services/tree-drag-drop.service';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
-import { CdkDragEnter, CdkDragStart } from '@angular/cdk/drag-drop';
-import { Observable, of, Subject, takeUntil } from 'rxjs';
-import { DropInfo } from '../../shared/drop-info';
 
 const ICON_EXPANDED = 'chevron-down';
 const ICON_COLLAPSED = 'chevron-right';
@@ -25,73 +9,37 @@ const ICON_COLLAPSED = 'chevron-right';
 @Component({
   selector: 'step-tree-node',
   templateUrl: './tree-node.component.html',
-  styleUrls: ['./tree-node.component.scss'],
+  styleUrl: './tree-node.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class TreeNodeComponent implements OnInit, OnChanges, OnDestroy {
+export class TreeNodeComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
-  private _treeDragDrop = inject(TreeDragDropService);
 
-  private terminator$ = new Subject<void>();
-  private isExpanded: boolean = false;
+  node = input.required<TreeFlatNode>();
+  readonly isRootNode = computed(() => this.node().id === this._treeState.rootNodeId());
+  readonly isSelected = computed(() => this._treeState.selectedNodeIds().includes(this.node().id));
+  readonly isExpanded = computed(() => this._treeState.expandedNodeIds().includes(this.node().id));
+  readonly isHidden = computed(() => this._treeState.hideRoot() && this.isRootNode());
+  readonly isSelectedForInsert = computed(() => {
+    const nodeId = this.node().id;
+    const candidate = this._treeState.selectedForInsertCandidate();
+    if (candidate === null) {
+      return false;
+    }
+    return candidate === nodeId;
+  });
+  readonly toggleStateIcon = computed(() => (this.isExpanded() ? ICON_EXPANDED : ICON_COLLAPSED));
 
   @Input() canToggle: boolean = false;
-  @Input() node!: TreeFlatNode;
   @Input() dragDisabled: boolean = false;
-  @Input() treeContainer!: ElementRef<HTMLElement>;
   @Output() contextMenu = new EventEmitter<{ event: MouseEvent; nodeId: string }>();
 
-  protected dropInfo$: Observable<DropInfo | undefined> = of(undefined);
-  protected toggleStateIcon: string = ICON_COLLAPSED;
-  readonly isHideRoot = this._treeState.hideRoot;
-
   toggle(): void {
-    this._treeState.toggleNode(this.node.id);
-  }
-
-  dragStart(event: CdkDragStart<any>): void {
-    this.dropInfo$ = this._treeDragDrop.onDragStart(event);
-    this._treeState.selectNode(this.node, undefined, true);
-  }
-
-  dragEnter(event: CdkDragEnter<any>): void {
-    this._treeDragDrop.onEnter(event);
-  }
-
-  dragEnd(): void {
-    this._treeDragDrop.onDragEnd();
+    this._treeState.toggleNode(this.node().id);
   }
 
   openContextMenu(event: MouseEvent): void {
-    const nodeId = this.node.id;
+    const nodeId = this.node().id;
     this.contextMenu.emit({ event, nodeId });
-  }
-
-  ngOnInit(): void {
-    this._treeState.treeControl.expansionModel.changed
-      .pipe(takeUntil(this.terminator$))
-      .subscribe(() => this.updateExpandedFlag());
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cNode = changes['node'];
-    if (cNode?.currentValue !== cNode?.previousValue && cNode?.firstChange) {
-      this.updateExpandedFlag(cNode?.currentValue);
-    }
-  }
-
-  private updateExpandedFlag(node?: TreeFlatNode): void {
-    node = node || this.node;
-    const isExpanded = node && this._treeState.treeControl.isExpanded(node);
-    if (this.isExpanded === isExpanded) {
-      return;
-    }
-    this.isExpanded = isExpanded;
-    this.toggleStateIcon = isExpanded ? ICON_EXPANDED : ICON_COLLAPSED;
   }
 }

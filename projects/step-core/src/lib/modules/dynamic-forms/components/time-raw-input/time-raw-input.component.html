@@ -1,0 +1,57 @@
+<step-form-field
+  [showRequiredMarker]="showRequiredMarker"
+  [class.ng-invalid]="!!parentControl?.invalid"
+  [class.ng-touched]="!!parentControl?.touched"
+  alignLabelAddon="near"
+>
+  @if (label) {
+    <step-label>{{ label }}</step-label>
+  }
+  @if (tooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+    </step-label-addon>
+  }
+  <input
+    type="number"
+    [placeholder]="placeholder"
+    [ngModel]="displayValue"
+    (ngModelChange)="handleDisplayValueChange($event)"
+    (blur)="handleBlur()"
+    [stepAllowChars]="allowedChars"
+    min="0"
+  />
+  <step-suffix>
+    <mat-select
+      [ngModel]="internalDisplayMeasure"
+      (ngModelChange)="handleDisplayMeasureChange($event)"
+      (blur)="handleBlur()"
+    >
+      @for (item of measureItems; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
+    </mat-select>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="editConstantValue.emit()"
+      [disabled]="!!isDisabled || !!parentControl?.disabled"
+    >
+      <step-icon name="edit-2" />
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      matTooltip="Use a dynamic expression to set this attribute"
+      matTooltipPosition="below"
+      (click)="toggleDynamicExpression.emit()"
+      [disabled]="!!isDisabled || !!parentControl?.disabled"
+    >
+      <step-icon name="zap" />
+    </button>
+  </step-suffix>
+</step-form-field>

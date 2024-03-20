@@ -60,17 +60,20 @@ export class TablePersistenceStateService {
       return {};
     }
     const json = JSON.parse(jsonString);
-    return Object.entries(json).reduce((res, [key, value]) => {
-      if ((value as FilterConditionJson).filterConditionType !== undefined) {
-        const filterCondition = this._filterConditionFactory.create(value as FilterConditionJson);
-        if (filterCondition) {
-          res[key] = filterCondition;
+    return Object.entries(json).reduce(
+      (res, [key, value]) => {
+        if ((value as FilterConditionJson).filterConditionType !== undefined) {
+          const filterCondition = this._filterConditionFactory.create(value as FilterConditionJson);
+          if (filterCondition) {
+            res[key] = filterCondition;
+          }
+        } else {
+          res[key] = value as SearchValue;
         }
-      } else {
-        res[key] = value as SearchValue;
-      }
-      return res;
-    }, {} as Record<string, SearchValue>);
+        return res;
+      },
+      {} as Record<string, SearchValue>,
+    );
   }
 
   savePage(page: PageEvent): void {

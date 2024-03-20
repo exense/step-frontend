@@ -12,14 +12,13 @@
       <mat-panel-title>Advanced</mat-panel-title>
     </mat-expansion-panel-header>
     <section class="panel-content">
-      <step-dynamic-textfield
-        label="Pacing (ms)"
-        [isNumber]="true"
+      <step-dynamic-time-input
+        label="Pacing"
         [(ngModel)]="context.artefact!.pacing"
         [disabled]="context.readonly"
         name="pacing"
       >
-      </step-dynamic-textfield>
+      </step-dynamic-time-input>
     </section>
   </mat-expansion-panel>
 </form>

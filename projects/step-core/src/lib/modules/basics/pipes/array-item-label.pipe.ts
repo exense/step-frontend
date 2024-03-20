@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { ArrayItemLabelValueExtractor } from '../services/array-item-label-value-extractor';
+import { ArrayItemLabelValueExtractor } from '../injectables/array-item-label-value-extractor';
 
 @Pipe({
   name: 'arrayItemLabel',

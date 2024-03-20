@@ -7,7 +7,7 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '../../table/step-table-client.module';
 import { map, Observable, of } from 'rxjs';
-import { CompareCondition } from '../../../modules/basics/shared/compare-condition.enum';
+import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 import { HttpClient } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
@@ -72,7 +72,7 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     const body = new FormData();
     body.set('file', file);
 
-    const request$ = this._http.request('POST', `/rest/automation-packages`, {
+    const request$ = this._http.request('POST', `rest/automation-packages`, {
       body,
       headers: {
         enctype: 'multipart/form-data',
@@ -89,7 +89,7 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     const body = new FormData();
     body.set('file', file);
 
-    const request$ = this._http.request('PUT', `/rest/automation-packages/${id}?async=true`, {
+    const request$ = this._http.request('PUT', `rest/automation-packages/${id}?async=true`, {
       body,
       headers: {
         enctype: 'multipart/form-data',

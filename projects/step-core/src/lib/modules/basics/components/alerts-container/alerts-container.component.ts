@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AlertsService } from '../../services/alerts.service';
+import { AlertsService } from '../../injectables/alerts.service';
 
 @Component({
   selector: 'step-alerts-container',

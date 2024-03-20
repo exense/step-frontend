@@ -1,0 +1,34 @@
+@if (dynamic) {
+  <step-expression-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [placeholder]="placeholder"
+    [isParentInvalid]="!!_ngControl.invalid"
+    [isParentTouched]="!!_ngControl.touched"
+    [isParentDisabled]="isDisabled"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="expression"
+    (ngModelChange)="onExpressionChange($event)"
+    [disabled]="isDisabled"
+    (toggleConstantValue)="toggleDynamicExpression(false)"
+    (blur)="onBlur()"
+  />
+} @else {
+  <step-time-raw-input
+    [label]="label"
+    [tooltip]="tooltip"
+    [placeholder]="placeholder"
+    [parentControl]="_ngControl"
+    [showRequiredMarker]="showRequiredMarker"
+    [ngModel]="value"
+    (ngModelChange)="onValueChange($event)"
+    [modelMeasure]="modelMeasure"
+    [allowedMeasures]="allowedMeasures"
+    [defaultDisplayMeasure]="defaultDisplayMeasure"
+    [displayMeasure]="displayMeasure"
+    (displayMeasureChange)="displayMeasureChange.emit($event)"
+    (editConstantValue)="editConstantValue()"
+    (toggleDynamicExpression)="toggleDynamicExpression(true)"
+    (blur)="onBlur()"
+  />
+}

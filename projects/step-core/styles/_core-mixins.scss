@@ -41,19 +41,6 @@
   height: 100%;
 }
 
-@mixin tree-node-selected-for-insert($color) {
-  step-tree-node .tree-node.tree-node-selected-for-insert {
-    .node-content .node-icon {
-      border: 1px solid $color;
-    }
-
-    &:not(.skipped) .node-content .node-icon {
-      background: var.$white;
-      color: $color;
-    }
-  }
-}
-
 @mixin common-form-content($gap: 1rem) {
   display: flex;
   flex-direction: column;

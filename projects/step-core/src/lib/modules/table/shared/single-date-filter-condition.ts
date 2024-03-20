@@ -1,7 +1,7 @@
 import { FilterCondition } from './filter-condition';
 import { TableRequestFilter, TableCollectionFilter } from '../../../client/step-client-module';
 import { DateTime } from 'luxon';
-import { CompareCondition } from '../../basics/shared/compare-condition.enum';
+import { CompareCondition } from '../../basics/types/compare-condition.enum';
 import { FilterConditionType } from './filter-condition-type.enum';
 
 export class SingleDateFilterCondition extends FilterCondition<DateTime> {
