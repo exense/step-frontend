@@ -64,7 +64,7 @@ export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterCompone
     );
   }
 
-  protected override transformFilterValueToControlValue(value: string[]): unknown {
-    return value;
+  protected override transformFilterValueToControlValue(value?: string[]): unknown {
+    return value ?? [];
   }
 }
