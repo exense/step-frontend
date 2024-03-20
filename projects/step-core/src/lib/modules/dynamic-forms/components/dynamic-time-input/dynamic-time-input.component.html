@@ -1,5 +1,4 @@
-<ng-container *ngIf="dynamic; then expressionTemplate; else constantTemplate"> </ng-container>
-<ng-template #expressionTemplate>
+@if (dynamic) {
   <step-expression-input
     [label]="label"
     [tooltip]="tooltip"
@@ -13,10 +12,8 @@
     [disabled]="isDisabled"
     (toggleConstantValue)="toggleDynamicExpression(false)"
     (blur)="onBlur()"
-  >
-  </step-expression-input>
-</ng-template>
-<ng-template #constantTemplate>
+  />
+} @else {
   <step-time-raw-input
     [label]="label"
     [tooltip]="tooltip"
@@ -33,6 +30,5 @@
     (editConstantValue)="editConstantValue()"
     (toggleDynamicExpression)="toggleDynamicExpression(true)"
     (blur)="onBlur()"
-  >
-  </step-time-raw-input>
-</ng-template>
+  />
+}
