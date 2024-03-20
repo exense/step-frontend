@@ -8,16 +8,17 @@ import {
 } from '../../client/step-client-module';
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { Observable } from 'rxjs';
+import { HintFor } from '../../shared/hint-for.enum';
 
 const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['captions'] = {
-  searchReference: 'Select a keyword',
+  searchReference: 'No Keyword selected',
+  hintFor: HintFor.KEYWORD,
   dynamicReference: 'Dynamic keyword',
   referenceNotFound: 'Keyword not found',
   referenceLabel: 'Reference keyword',
   editSelectionCriteria: 'Edit Keyword selection criteria',
   selectionCriteria: 'Keyword selection criteria',
-  selectionCriteriaDescription:
-    'The Keyword selection criteria are used to reference the Keyword. Besides the name any other attribute of the Keyword can be referenced.',
+  selectionCriteriaDescription: 'Select a Keyword by referencing any of its attributes (i.e. its name)',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 
