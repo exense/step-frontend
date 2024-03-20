@@ -4,6 +4,8 @@ export class TimeSeriesConfig {
   static readonly MAX_BUCKETS_IN_CHART = 100;
   static TRAILING_ZERO_PATTERN = /\.0+$|(\.[0-9]*[1-9])0+$/;
   static readonly ONE_HOUR_MS = 3600 * 1000;
+  static readonly DASHBOARD_URL_PARAMS_PREFIX = 'dc_';
+  static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
 
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
@@ -22,9 +24,8 @@ export class TimeSeriesConfig {
   static readonly RANGER_FILTER_FIELDS = [this.EXECUTION_ID_ATTRIBUTE, this.PLAN_ID_ATTRIBUTE, this.TASK_ID_ATTRIBUTE];
   static readonly RANGER_COLORS = {
     axesStroke: '#bce8f1',
-    seriesStroke: '#d0d5dd',
-    seriesGradientStart: '#eeeeeedd',
-    seriesGradientEnd: '#eeeeee00',
+    series: '#a1d1fa',
+    seriesGradientEnd: '#b3dfff',
   };
   static readonly SERIES_LABEL_EMPTY = '<Empty>';
   static readonly SERIES_LABEL_VALUE = 'Value';

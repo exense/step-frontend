@@ -234,9 +234,14 @@ export class ChartDashletComponent implements OnInit {
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
       oqlFilter: this.composeRequestFilter(settings.metricKey!),
-      numberOfBuckets: 100,
       percentiles: this.getRequiredPercentiles(settings.primaryAxes!.aggregation!),
     };
+    const customResolution = this.context.getChartsResolution();
+    if (customResolution) {
+      request.intervalSize = customResolution;
+    } else {
+      request.numberOfBuckets = 100;
+    }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.createChart(response);

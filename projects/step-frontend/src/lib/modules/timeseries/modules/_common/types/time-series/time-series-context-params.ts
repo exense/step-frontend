@@ -13,4 +13,6 @@ export interface TimeSeriesContextParams {
   colorsPool?: TimeseriesColorsPool;
   keywordsContext?: TimeSeriesKeywordsContext;
   filteringSettings?: TsFilteringSettings;
+  editMode?: boolean;
+  resolution?: number;
 }
