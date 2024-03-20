@@ -62,7 +62,7 @@ export class AutomationPackageFilterComponent
     this.refreshTooltip$.complete();
   }
 
-  override assignValue(value: string): void {
+  override assignValue(value?: string): void {
     super.assignValue(value);
     this.selectedIds = this.filterControl.value;
     this.refreshTooltip$.next(undefined);
@@ -103,14 +103,14 @@ export class AutomationPackageFilterComponent
     return control.valueChanges.pipe(map((value) => arrayToRegex(value)));
   }
 
-  protected override transformFilterValueToControlValue(value: string): string[] {
-    return regexToArray(value);
+  protected override transformFilterValueToControlValue(value?: string): string[] {
+    return !value ? [] : regexToArray(value);
   }
 
   private setupTooltip(): void {
     const currentSelection$ = merge(
       this.refreshTooltip$.pipe(map(() => this.filterControl.value)),
-      this.filterControl.valueChanges
+      this.filterControl.valueChanges,
     );
 
     this.tooltipText$ = currentSelection$.pipe(
@@ -121,13 +121,13 @@ export class AutomationPackageFilterComponent
         const packageNames$ = ids.map((id) => {
           return this._entityAutomationPackageService.getEntityPackageById(id).pipe(
             map((automationPackage) => automationPackage?.attributes?.['name']),
-            distinctUntilChanged()
+            distinctUntilChanged(),
           );
         });
         return combineLatest(packageNames$);
       }),
       map((packageNames) => packageNames.filter((name) => !!name).join(', ')),
-      map((tooltip) => (tooltip ? 'Currently filtering: ' + tooltip : DEFAULT_TOOLTIP))
+      map((tooltip) => (tooltip ? 'Currently filtering: ' + tooltip : DEFAULT_TOOLTIP)),
     );
   }
 
