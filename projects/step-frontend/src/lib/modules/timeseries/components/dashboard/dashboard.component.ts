@@ -345,25 +345,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * @private
    */
   private refreshAllCharts(refreshRanger = false, force = false): void {
-    if (force || !this.refreshInProgress) {
-      this.refreshSubscription?.unsubscribe();
-      this.refreshInProgress = true;
-      this.refreshSubscription = of(null)
-        .pipe(
-          tap(() => (this.refreshInProgress = true)),
-          switchMap(() => {
-            const dashlets$ = this.dashlets?.map((dashlet) => dashlet.refresh());
-            if (refreshRanger) {
-              dashlets$.push(this.refreshRanger());
-            }
-            return forkJoin(dashlets$).pipe(defaultIfEmpty([]));
-          }),
-          tap(() => (this.refreshInProgress = false)),
-        )
-        .subscribe();
-    } else {
-      // skip refresh
+    if (this.refreshInProgress && !force) {
+      return;
     }
+    this.refreshSubscription?.unsubscribe();
+    this.refreshInProgress = true;
+    this.refreshSubscription = of(null)
+      .pipe(
+        tap(() => (this.refreshInProgress = true)),
+        switchMap(() => {
+          const dashlets$ = this.dashlets?.map((dashlet) => dashlet.refresh());
+          if (refreshRanger) {
+            dashlets$.push(this.refreshRanger());
+          }
+          return forkJoin(dashlets$).pipe(defaultIfEmpty([]));
+        }),
+        tap(() => (this.refreshInProgress = false)),
+      )
+      .subscribe();
   }
 
   handleChartDelete(index: number) {
