@@ -65,14 +65,14 @@
   </ng-container>
   <step-custom-columns screen="executionTable" />
   <ng-container matColumnDef="status" stepSearchCol>
-    <step-array-filter-advanced
+    <step-multi-level-array-filter
       *stepSearchCellDef
       #statusFilter
       stepFilterConnect
       [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
       [conditionFnAdditionalParams]="statusColumns"
       [remapValues]="remapStatuses"
-      [items]="(statusItems$ | async)!"
+      [items]="(statusItemsTree$ | async)!"
     />
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <step-execution-running-status-header

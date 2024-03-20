@@ -11,7 +11,7 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { EXECUTION_STATUS, Status } from '../../../_common/step-common.module';
+import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
 import { BehaviorSubject, of, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -32,7 +32,7 @@ export class ExecutionListComponent implements OnDestroy {
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
-  readonly statusItems$ = of(EXECUTION_STATUS);
+  readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
