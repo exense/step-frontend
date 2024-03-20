@@ -2,16 +2,17 @@ import { Component, EventEmitter, forwardRef, inject, Input, Output } from '@ang
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { CallPlan, Plan, AugmentedPlansService, DynamicValueString } from '../../client/step-client-module';
 import { Observable } from 'rxjs';
+import { HintFor } from '../../shared/hint-for.enum';
 
 const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
-  searchReference: 'Select a plan',
+  searchReference: 'No plan selected',
+  hintFor: HintFor.PLAN,
   dynamicReference: 'Dynamic plan',
   referenceNotFound: 'Plan not found',
   referenceLabel: 'Reference plan',
   editSelectionCriteria: 'Edit Plan selection criteria',
   selectionCriteria: 'Plan selection criteria',
-  selectionCriteriaDescription:
-    'The Plan selection criteria are used to reference the Plan. Besides the name any other attribute of the Plan can be referenced.',
+  selectionCriteriaDescription: 'Select a Plan by referencing any of its attributes (i.e. its name)',
   addSelectionCriteriaLabel: 'Add selection criteria',
 };
 
