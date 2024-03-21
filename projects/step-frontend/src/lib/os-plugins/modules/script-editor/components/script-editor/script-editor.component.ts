@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, signal, viewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedKeywordEditorService,
@@ -7,6 +7,7 @@ import {
   Keyword,
   KeywordExecutorService,
   KeywordsService,
+  RichEditorChangeStatus,
   RichEditorComponent,
   ScriptLanguage,
 } from '@exense/step-core';
@@ -34,8 +35,16 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
   protected keywordScript?: string;
   protected syntaxMode?: AceMode;
 
-  noChanges = true;
-  isAfterSave = false;
+  protected noChanges = signal(true);
+  protected isAfterSave = signal(false);
+
+  protected changeStatus = computed<RichEditorChangeStatus>(() =>
+    this.isAfterSave()
+      ? RichEditorChangeStatus.SAVED
+      : this.noChanges()
+        ? RichEditorChangeStatus.NO_CHANGES
+        : RichEditorChangeStatus.PENDING_CHANGES,
+  );
 
   ngAfterViewInit(): void {
     this.loadKeyword();
@@ -50,7 +59,7 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
   }
 
   canExit(): boolean | Observable<boolean> {
-    if (this.noChanges) {
+    if (this.noChanges()) {
       return true;
     } else {
       return this._dialogsService.showWarning('You have unsaved changes. Do you want to navigate anyway?');
@@ -58,12 +67,12 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
   }
 
   handleScriptChange(keywordScript: string): void {
-    this.isAfterSave = false;
+    this.isAfterSave.set(false);
     this.keywordScript = keywordScript;
     if (keywordScript === this.initialScript) {
-      this.noChanges = true;
+      this.noChanges.set(true);
     } else {
-      this.noChanges = false;
+      this.noChanges.set(false);
     }
   }
 
@@ -81,8 +90,8 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
   }
 
   private refreshInitVars(val?: string): void {
-    this.isAfterSave = true;
-    this.noChanges = true;
+    this.isAfterSave.set(true);
+    this.noChanges.set(true);
     this.initialScript = val;
   }
 

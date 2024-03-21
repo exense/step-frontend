@@ -204,6 +204,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    RICH_EDITOR_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,

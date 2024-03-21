@@ -2,33 +2,20 @@
   <mat-card-header>
     <mat-card-title> Script Editor - Keyword: {{ keyword?.attributes?.['name'] }}</mat-card-title>
     <section class="editor-buttons">
-      @if ('kw-write' | hasRight | async) {
-        <step-btn-group class="with-borders left-btn-group">
-          <button
-            type="button"
-            mat-stroked-button
-            (click)="save()"
-            matTooltip="Save this plan"
-            matTooltipPosition="below"
-          >
-            <step-icon name="save" />
-          </button>
-          <button
-            [class.status-no-changes]="noChanges && !isAfterSave"
-            [class.status-has-changes]="!noChanges"
-            [class.status-saved]="noChanges && isAfterSave"
-            disabled
-            type="button"
-            mat-stroked-button
-          >
-            {{ noChanges ? (isAfterSave ? 'Saved' : 'No changes') : isAfterSave ? 'Saved' : 'Pending changes' }}
-          </button>
-        </step-btn-group>
-      }
+      <step-rich-editor-settings-bar
+        [predefinedMode]="syntaxMode"
+        [showAutoFormatBtn]="!!('kw-write' | hasRight | async)"
+        [showChangeStatus]="true"
+        [changStatus]="changeStatus()"
+        [showSaveBtn]="!!('kw-write' | hasRight | async)"
+        saveBtnTooltip="Save this keyword"
+        (save)="save()"
+      />
       <step-btn-group class="with-borders">
         <button
           type="button"
           mat-stroked-button
+          class="btn-execute"
           (click)="execute()"
           matTooltip="Execute this plan"
           matTooltipPosition="below"

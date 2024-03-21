@@ -1,10 +1,13 @@
-import { Component, inject } from '@angular/core';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder } from '@angular/forms';
 import { RichEditorComponent } from '../rich-editor/rich-editor.component';
 import { AceMode } from '../../types/ace-mode.enum';
-import { KeyValue } from '@angular/common';
+import { RichEditorSettingsBarComponent } from '../rich-editor-settings-bar/rich-editor-settings-bar.component';
+import { RichEditorChangeStatus } from '../../types/rich-editor-change-status.enum';
+import { debounceTime, map, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface RichEditorDialogData {
   title: string;
@@ -15,38 +18,48 @@ export interface RichEditorDialogData {
 
 type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;
 
-const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
-  (result, readableKey) => {
-    const key = (AceMode as Record<string, AceMode>)[readableKey];
-    result[key] = readableKey;
-    return result;
-  },
-  {} as Record<AceMode, string>,
-);
-
 @Component({
   selector: 'step-rich-editor-dialog',
   standalone: true,
-  imports: [StepBasicsModule, RichEditorComponent],
+  imports: [StepBasicsModule, RichEditorComponent, RichEditorSettingsBarComponent],
   templateUrl: './rich-editor-dialog.component.html',
   styleUrl: './rich-editor-dialog.component.scss',
 })
-export class RichEditorDialogComponent {
+export class RichEditorDialogComponent implements OnInit {
   private _fb = inject(FormBuilder).nonNullable;
   private _dialogRef = inject<DialogRef>(MatDialogRef);
+  private _destroyRef = inject(DestroyRef);
+  private _dialogs = inject(DialogsService);
 
   protected _data = inject<RichEditorDialogData>(MAT_DIALOG_DATA);
   protected textControl = this._fb.control(this._data.text);
 
-  protected allowedModes: KeyValue<AceMode, string>[] = Object.entries(ALL_MODES)
-    .map(([key, value]) => ({ key, value }) as KeyValue<AceMode, string>)
-    .filter((item) => !this._data.allowedModes || this._data.allowedModes.includes(item.key));
+  protected selectedMode = AceMode.TEXT;
 
-  protected selectedMode: AceMode = this.allowedModes[0]?.key ?? AceMode.TEXT;
-  protected predefineModeLabel = !!this._data.predefinedMode ? ALL_MODES[this._data.predefinedMode] : undefined;
+  protected changeStatus = RichEditorChangeStatus.NO_CHANGES;
+
+  ngOnInit(): void {
+    this.textControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        map((value) => value !== this._data.text),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((hasChanges) => {
+        this.changeStatus = hasChanges ? RichEditorChangeStatus.PENDING_CHANGES : RichEditorChangeStatus.NO_CHANGES;
+      });
+  }
 
   cancel(): void {
-    this._dialogRef.close(this._data.text);
+    if (this.changeStatus === RichEditorChangeStatus.PENDING_CHANGES) {
+      this._dialogs.showWarning('You have unsaved changed. Do you want to close the dialog?').subscribe((confirmed) => {
+        if (confirmed) {
+          this._dialogRef.close(undefined);
+        }
+      });
+      return;
+    }
+    this._dialogRef.close(undefined);
   }
 
   save(): void {

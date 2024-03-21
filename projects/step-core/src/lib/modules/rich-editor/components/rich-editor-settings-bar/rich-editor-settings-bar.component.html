@@ -1,0 +1,50 @@
+<step-form-field>
+  @if (showSaveBtn()) {
+    <step-prefix class="button-prefix">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="save.emit()"
+        [matTooltip]="saveBtnTooltip()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="save" />
+      </button>
+    </step-prefix>
+  }
+  @if (showAutoFormatBtn()) {
+    <step-prefix class="button-prefix">
+      <button type="button" mat-stroked-button (click)="autoFormat.emit()" [disabled]="displayModes().length <= 1">
+        Auto format
+      </button>
+    </step-prefix>
+  }
+  <mat-select [(ngModel)]="selectedMode" [disabled]="displayModes().length <= 1">
+    @for (mode of displayModes(); track mode.key) {
+      <mat-option [value]="mode.key">{{ mode.value }}</mat-option>
+    }
+  </mat-select>
+  @if (showChangeStatus()) {
+    <step-suffix>
+      <span
+        [ngClass]="{
+          'status-no-changes': changStatus() === RichEditorChangeStatus.NO_CHANGES,
+          'status-pending-changes': changStatus() === RichEditorChangeStatus.PENDING_CHANGES,
+          'status-saved': changStatus() === RichEditorChangeStatus.SAVED
+        }"
+      >
+        @switch (changStatus()) {
+          @case (RichEditorChangeStatus.NO_CHANGES) {
+            No changes
+          }
+          @case (RichEditorChangeStatus.PENDING_CHANGES) {
+            Pending changes
+          }
+          @case (RichEditorChangeStatus.SAVED) {
+            Saved
+          }
+        }
+      </span>
+    </step-suffix>
+  }
+</step-form-field>

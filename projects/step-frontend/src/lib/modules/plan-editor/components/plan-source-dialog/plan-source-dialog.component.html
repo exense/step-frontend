@@ -1,6 +1,11 @@
 <step-modal-window title="Plan's Source">
+  <div step-modal-window-subtitle>
+    <section class="syntax-mode-selector">
+      <step-rich-editor-settings-bar [showAutoFormatBtn]="true" [predefinedMode]="AceMode.YAML" />
+    </section>
+  </div>
   <div step-modal-window-body>
-    <div #editor class="editor"></div>
+    <step-rich-editor [ngModel]="_planSource" [disabled]="true" [syntaxMode]="AceMode.YAML" />
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button matDialogClose>Close</button>

@@ -21,22 +21,13 @@ mat-card {
 
     .editor-buttons {
       padding-bottom: 1rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
     }
 
-    .left-btn-group {
-      margin-right: 2rem;
-    }
-
-    .status-saved {
-      color: var.$green-650;
-    }
-
-    .status-no-changes {
-      color: #000;
-    }
-
-    .status-has-changes {
-      color: var.$orange;
+    .btn-execute {
+      height: 3.4rem;
     }
   }
 }

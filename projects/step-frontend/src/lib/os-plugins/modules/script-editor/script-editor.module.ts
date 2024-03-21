@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import {
   FunctionType,
   FunctionTypeRegistryService,
-  RichEditorComponent,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -15,7 +14,7 @@ import { canDeactivateFn } from './guards/can-deactivate-function';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
-  imports: [StepCoreModule, RichEditorComponent],
+  imports: [StepCoreModule],
   exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {
