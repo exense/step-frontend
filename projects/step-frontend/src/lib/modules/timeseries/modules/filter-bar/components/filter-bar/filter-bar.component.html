@@ -93,7 +93,11 @@
           [activeTabId]="activeMode"
           (activeTabIdChange)="toggleOQLMode($event)"
         />
-        <step-timeseries-grouping [dimensions]="activeGrouping" (groupingChange)="handleGroupingChange($event)" />
+        <step-timeseries-grouping
+          [dimensions]="activeGrouping"
+          [groupingOptions]="groupingOptions"
+          (groupingChange)="handleGroupingChange($event)"
+        />
       </div>
     }
   </div>

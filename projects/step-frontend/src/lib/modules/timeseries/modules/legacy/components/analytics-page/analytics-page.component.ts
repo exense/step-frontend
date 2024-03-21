@@ -11,20 +11,27 @@ import {
   FilterBarItem,
   COMMON_IMPORTS,
   ResolutionPickerComponent,
+  ChartUrlParams,
+  TimeSeriesContext,
+  FilterUtils,
 } from '../../../_common';
 import { TimeSeriesDashboardComponent } from '../time-series-dashboard/time-series-dashboard.component';
 import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
+import {
+  DashboardUrlParams,
+  DashboardUrlParamsService,
+} from '../../../_common/injectables/dashboard-url-params.service';
 
 @Component({
   selector: 'step-analytics-page',
   templateUrl: './analytics-page.component.html',
   styleUrls: ['./analytics-page.component.scss'],
-  providers: [ChartUrlParamsService],
+  providers: [DashboardUrlParamsService],
   standalone: true,
   imports: [COMMON_IMPORTS, ResolutionPickerComponent, TimeSeriesDashboardComponent],
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
-  private _chartUrlParams = inject(ChartUrlParamsService);
+  private _chartUrlParams = inject(DashboardUrlParamsService);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
@@ -54,54 +61,75 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   migrationInProgress = false;
 
   timeSeriesService = inject(TimeSeriesService);
+  context?: TimeSeriesContext;
 
   ngOnInit(): void {
     let now = new Date().getTime();
-    let start;
-    let end;
-    let urlParams = this._chartUrlParams.getUrlParams();
-    if (urlParams.refresh === '1') {
+    let start: number;
+    let end: number;
+    let urlParams: DashboardUrlParams = this._chartUrlParams.collectUrlParams();
+    if (urlParams.refreshInterval) {
       this.refreshEnabled = true;
       this.selectedRefreshInterval = this.refreshIntervals[0];
     }
-    // if start is present, an absolute selection will be set. otherwise we check for relativeRange in url
-    if (urlParams.start) {
-      start = parseInt(urlParams.start);
-      end = urlParams.end ? parseInt(urlParams.end) : now;
+
+    if (urlParams.timeRange?.type === 'ABSOLUTE') {
+      start = urlParams.timeRange!.absoluteSelection!.from;
+      end = urlParams.timeRange!.absoluteSelection!.to;
       this.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: { from: start, to: end } };
     } else {
-      if (urlParams.relativeRange && !isNaN(urlParams.relativeRange as unknown as number)) {
-        const range = Number(urlParams.relativeRange);
-        this.timeRangeSelection = this.getClosestRangeOption(range);
+      if (urlParams.timeRange?.type === 'RELATIVE') {
+        this.timeRangeSelection = this.getClosestRangeOption(urlParams.timeRange!.relativeSelection!.timeInMs);
       } else {
         this.timeRangeSelection = this.timeRangeOptions[0];
       }
-      start = now - this.timeRangeSelection.relativeSelection!.timeInMs;
       end = now;
+      start = end - this.timeRangeSelection.relativeSelection!.timeInMs;
     }
-
-    delete urlParams.refresh; // in case it exists
-    delete urlParams.relativeRange; // in case it exists
-    delete urlParams.start;
-    delete urlParams.end;
 
     let timeRange = { from: start, to: end };
     this.activeTimeRange = timeRange;
+    const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, TimeSeriesConfig.KNOWN_ATTRIBUTES).filter(
+      FilterUtils.filterItemIsValid,
+    );
+    console.log(urlParams.filters);
+    const defaultFilters = this.getDefaultFilters();
+
     this.dashboardSettings = {
       contextId: new Date().getTime().toString(),
       includeThreadGroupChart: true,
       disableThreadGroupOnOqlMode: true,
       timeRange: timeRange,
-      contextualFilters: urlParams,
+      contextualFilters: {},
       showContextualFilters: true,
+      grouping: urlParams.grouping,
       timeRangeOptions: TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
       activeTimeRange: this.timeRangeSelection, // TODO handle url param
       filterOptions: this.getDefaultFilters(),
-      activeFilters: this.getDefaultFilters(),
+      activeFilters: this.mergeDefaultFiltersWithUrlFilters(defaultFilters, urlFilters),
     };
     if (this.refreshEnabled) {
       this.startInterval(this.selectedRefreshInterval.value);
     }
+  }
+
+  private mergeDefaultFiltersWithUrlFilters(defaultFilters: FilterBarItem[], urlFilters: FilterBarItem[]) {
+    defaultFilters.forEach((item, i) => {
+      let foundIndex = urlFilters.findIndex((el) => el.attributeName === item.attributeName);
+      if (foundIndex > -1) {
+        defaultFilters[i] = urlFilters[foundIndex]; // let's replace the default filter item
+        urlFilters.splice(foundIndex, 1);
+      }
+    });
+    return [...defaultFilters, ...urlFilters];
+  }
+
+  dashboardContextInitialized(context: TimeSeriesContext) {
+    this.context = context;
+    this._chartUrlParams.updateUrlParams(context, this.timeRangeSelection, this.selectedRefreshInterval.value);
+    context.stateChange$.subscribe(() => {
+      this._chartUrlParams.updateUrlParams(context, this.timeRangeSelection, this.selectedRefreshInterval.value);
+    });
   }
 
   handleDashboardTimeRangeChange(range: TimeRange) {

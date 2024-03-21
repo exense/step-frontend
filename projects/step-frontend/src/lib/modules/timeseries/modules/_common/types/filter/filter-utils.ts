@@ -1,5 +1,6 @@
 import { FilterBarItem, FilterBarItemType } from './filter-bar-item';
 import { MetricAttribute, TimeSeriesFilterItem } from '@exense/step-core';
+import { DashboardUrlParams, UrlFilterAttribute } from '../../injectables/dashboard-url-params.service';
 
 export class FilterUtils {
   static filterItemIsValid(item: FilterBarItem): boolean {
@@ -207,6 +208,7 @@ export class FilterUtils {
         break;
     }
     const knownValues = attribute.metadata['knownValues'];
+    console.log(attribute);
     if (knownValues && knownValues.length > 0) {
       item.type = FilterBarItemType.OPTIONS;
       item.textValues = knownValues.map((v: string) => ({ value: v, isSelected: false }));
@@ -249,6 +251,48 @@ export class FilterUtils {
       default:
         return FilterBarItemType.FREE_TEXT;
     }
+  }
+
+  public static convertUrlKnownFilters(
+    filters: UrlFilterAttribute[],
+    attributesDefinition: MetricAttribute[],
+  ): FilterBarItem[] {
+    const attributesById: Record<string, MetricAttribute> = {};
+    attributesDefinition.forEach((a) => (attributesById[a.name] = a));
+    console.log(JSON.stringify(attributesById));
+    return filters
+      .filter((i) => !!attributesById[i.attribute])
+      .map((urlFilter) => {
+        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesById[urlFilter.attribute]);
+        switch (filterItem.type) {
+          case FilterBarItemType.OPTIONS:
+            urlFilter.values?.forEach((v) => {
+              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
+              if (foundOptions) {
+                foundOptions.isSelected = true;
+              } else {
+                filterItem.textValues?.push({ value: v, isSelected: true });
+              }
+            });
+            filterItem.exactMatch = true;
+            break;
+          case FilterBarItemType.FREE_TEXT:
+            filterItem.freeTextValues = urlFilter.values;
+            break;
+          case FilterBarItemType.EXECUTION:
+          case FilterBarItemType.TASK:
+          case FilterBarItemType.PLAN:
+            filterItem.exactMatch = true;
+            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
+            break;
+          case FilterBarItemType.NUMERIC:
+          case FilterBarItemType.DATE:
+            filterItem.min = urlFilter.min;
+            filterItem.max = urlFilter.max;
+            break;
+        }
+        return filterItem;
+      });
   }
 
   public static isEntityFilter(filterItem: FilterBarItem): boolean {

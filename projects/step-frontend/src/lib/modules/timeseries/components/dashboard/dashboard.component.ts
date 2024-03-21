@@ -241,45 +241,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private convertUrlFilters(
-    urlParams: DashboardUrlParams,
-    attributesDefinition: Record<string, MetricAttribute>,
-  ): FilterBarItem[] {
-    return urlParams.filters
-      .filter((i) => !!attributesDefinition[i.attribute])
-      .map((urlFilter) => {
-        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
-        switch (filterItem.type) {
-          case FilterBarItemType.OPTIONS:
-            urlFilter.values?.forEach((v) => {
-              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
-              if (foundOptions) {
-                foundOptions.isSelected = true;
-              } else {
-                filterItem.textValues?.push({ value: v, isSelected: true });
-              }
-            });
-            filterItem.exactMatch = true;
-            break;
-          case FilterBarItemType.FREE_TEXT:
-            filterItem.freeTextValues = urlFilter.values;
-            break;
-          case FilterBarItemType.EXECUTION:
-          case FilterBarItemType.TASK:
-          case FilterBarItemType.PLAN:
-            filterItem.exactMatch = true;
-            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
-            break;
-          case FilterBarItemType.NUMERIC:
-          case FilterBarItemType.DATE:
-            filterItem.min = urlFilter.min;
-            filterItem.max = urlFilter.max;
-            break;
-        }
-        return filterItem;
-      });
-  }
-
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
     const timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
@@ -299,11 +260,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
-    const attributesByIds: Record<string, MetricAttribute> = {};
-    this.dashboard.dashlets.forEach((d) =>
-      d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
+    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap(
+      (d) => d.chartSettings?.attributes || [],
     );
-    const urlFilters = this.convertUrlFilters(urlParams, attributesByIds).filter(FilterUtils.filterItemIsValid);
+    const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
+      FilterUtils.filterItemIsValid,
+    );
 
     // url filters are excluded from the dashboard filters
     const dashboardFilters = dashboard.filters
@@ -312,7 +274,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
-      attributes: attributesByIds,
+      attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
       resolution: urlParams.resolution,
