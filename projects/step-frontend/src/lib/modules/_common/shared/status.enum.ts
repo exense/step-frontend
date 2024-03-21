@@ -14,7 +14,6 @@ export enum Status {
   TECHNICAL_ERROR = 'TECHNICAL_ERROR',
   INTERRUPTED = 'INTERRUPTED',
   EXPORTING = 'EXPORTING',
-  DONE = 'DONE',
 }
 
 export const EXECUTION_RESULT: ReadonlyArray<Status> = [
@@ -45,8 +44,8 @@ export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
     value: key,
   })),
   {
-    key: Status.DONE,
-    value: Status.DONE,
+    key: Status.ENDED,
+    value: Status.ENDED,
     children: [Status.FAILED, Status.PASSED, Status.INTERRUPTED, Status.SKIPPED].map((key) => ({ key, value: key })),
   },
 ];
