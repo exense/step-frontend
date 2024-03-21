@@ -48,7 +48,7 @@ export class RepositoryComponent implements OnInit {
   }
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
-    this._router.navigate(['..', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
+    this._router.navigate(['.', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
   }
 
   private setupLocationParams(): void {
