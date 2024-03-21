@@ -48,7 +48,7 @@
     </tr>
   </table>
 </div>
-<mat-paginator
+<step-paginator
   [disabled]="pageSizeInputDisabled"
   [length]="tableDataSource?.totalFiltered$ | async"
   [pageSizeOptions]="pageSizeOptions"
