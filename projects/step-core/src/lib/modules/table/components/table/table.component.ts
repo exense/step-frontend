@@ -2,14 +2,15 @@ import {
   AfterViewInit,
   Component,
   ContentChildren,
+  DestroyRef,
   EventEmitter,
   forwardRef,
   inject,
+  input,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  Optional,
   Output,
   QueryList,
   SimpleChanges,
@@ -39,6 +40,7 @@ import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -87,6 +89,8 @@ export class TableComponent<T>
     TableHighlightItemContainer
 {
   private _tableState = inject(TablePersistenceStateService);
+  private _sort = inject(MatSort, { optional: true });
+  private _destroyRef = inject(DestroyRef);
 
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
@@ -97,29 +101,13 @@ export class TableComponent<T>
   @Input() visibleColumns?: string[];
   @Input() defaultSearch?: Record<string, SearchValue>;
 
-  @Input() set filter(value: string | undefined) {
-    if (value === this.filter) {
-      return;
-    }
-    this.filter$.next(value);
-  }
+  /** @Input() **/
+  filter = input<string | undefined>(undefined);
 
-  get filter(): string | undefined {
-    return this.filter$.value;
-  }
+  /** @Input() **/
+  tableParams = input<TableParameters | undefined>(undefined);
 
-  @Input() set tableParams(value: TableParameters | undefined) {
-    if (value === this.tableParams) {
-      return;
-    }
-    this.tableParams$.next(value);
-  }
-
-  get tableParams(): TableParameters | undefined {
-    return this.tableParams$.value;
-  }
-
-  @ViewChild(MatTable) private _table?: MatTable<any>;
+  @ViewChild(MatTable) private table?: MatTable<any>;
   @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
@@ -144,14 +132,15 @@ export class TableComponent<T>
 
   searchColumns: SearchColumn[] = [];
 
-  pageSizeOptions: Array<number>;
-  readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
+  readonly pageSizeOptions = inject(ItemsPerPageService).getItemsPerPage((userPreferredItemsPerPage) =>
+    this.page._changePageSize(userPreferredItemsPerPage),
+  );
 
-  private terminator$ = new Subject<void>();
   private dataSourceTerminator$?: Subject<void>;
+
   private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
-  private filter$ = new BehaviorSubject<string | undefined>(undefined);
-  private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
+  private filter$ = toObservable(this.filter);
+  private tableParams$ = toObservable(this.tableParams);
 
   readonly hasFilter$ = this.search$.pipe(
     map((search) => {
@@ -176,20 +165,10 @@ export class TableComponent<T>
 
   highlightedItem?: unknown;
 
-  constructor(
-    @Optional() private _sort: MatSort,
-    _itemsPerPageService: ItemsPerPageService,
-  ) {
-    this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
-      this.page._changePageSize(userPreferredItemsPerPage),
-    );
-  }
-
   private terminateDatasource(): void {
-    if (this.dataSourceTerminator$) {
-      this.dataSourceTerminator$.next();
-      this.dataSourceTerminator$.complete();
-    }
+    this.dataSourceTerminator$?.next();
+    this.dataSourceTerminator$?.complete();
+    this.dataSourceTerminator$ = undefined;
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -363,7 +342,7 @@ export class TableComponent<T>
   private setupColumns(): void {
     const allCollDef = this.allCollDef;
 
-    allCollDef.forEach((col) => this._table!.addColumnDef(col));
+    allCollDef.forEach((col) => this.table!.addColumnDef(col));
 
     setTimeout(() => {
       this.displayColumns = this.determineDisplayColumns(this.visibleColumns);
@@ -378,6 +357,12 @@ export class TableComponent<T>
     this.search$.next(searchValue);
   }
 
+  private setupExternalSearchChangeHandle(): void {
+    this._tableState.externalSearchChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((externalSearch) => {
+      this.search$.next(externalSearch);
+    });
+  }
+
   onSearch(column: string, searchValue: SearchValue): void;
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
@@ -390,12 +375,12 @@ export class TableComponent<T>
     this.search$.next(search);
   }
 
-  getSearchValue(column: string): SearchValue | undefined {
-    return this.search$.value[column];
+  getSearchValue$(column: string): Observable<SearchValue | undefined> {
+    return this.search$.pipe(map((value) => value[column]));
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
-    const [search, filter, params] = [this.search$.value, this.filter$.value, this.tableParams$.value];
+    const [search, filter, params] = [this.search$.value, this.filter(), this.tableParams()];
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
@@ -406,6 +391,7 @@ export class TableComponent<T>
 
   ngOnInit(): void {
     this.setupDefaultSearch();
+    this.setupExternalSearchChangeHandle();
   }
 
   ngAfterViewInit(): void {
@@ -430,17 +416,13 @@ export class TableComponent<T>
     } else {
       this.hasCustom = true;
       const ready$ = combineLatest(customCols.map((col) => col.ready$));
-      ready$.pipe(takeUntil(this.terminator$)).subscribe(setup);
+      ready$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(setup);
     }
   }
 
   ngOnDestroy(): void {
     this.terminateDatasource();
     this.search$.complete();
-    this.filter$.complete();
-    this.tableParams$.complete();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -468,6 +450,6 @@ export class TableComponent<T>
       console.error('No datasource for export');
       return;
     }
-    this.tableDataSource.exportAsCSV(fields, this.tableParams);
+    this.tableDataSource.exportAsCSV(fields, this.tableParams());
   }
 }

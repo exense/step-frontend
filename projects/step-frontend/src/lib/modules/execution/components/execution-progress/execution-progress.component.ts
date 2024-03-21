@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, Inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
+import { Component, forwardRef, inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
 import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
@@ -196,6 +196,7 @@ export class ExecutionProgressComponent
 
   ngOnInit(): void {
     this.initExecutionChangeByRouting();
+    this.initSubTabChangeByRouting();
   }
 
   ngOnDestroy(): void {
@@ -262,6 +263,21 @@ export class ExecutionProgressComponent
       this.initRefreshExecution();
       this.initTabs();
     });
+  }
+
+  private initSubTabChangeByRouting(): void {
+    const subTab$ = this._activatedRoute.url.pipe(
+      filter(() => !!this.tabs?.length),
+      map((url) => url[url.length - 1].path),
+      distinctUntilChanged(),
+      filter((subPath) => {
+        const allowedTabs = this.tabs.map((tab) => tab.id);
+        return allowedTabs.includes(subPath) && subPath !== this.activeTabId;
+      }),
+      takeUntil(this._terminator$),
+    );
+
+    subTab$.subscribe((tab) => this.selectTab(tab));
   }
 
   private initRefreshExecution(): void {

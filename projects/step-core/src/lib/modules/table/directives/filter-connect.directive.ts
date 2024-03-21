@@ -1,17 +1,17 @@
-import { AfterViewInit, Directive, inject, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, DestroyRef, Directive, inject, Input } from '@angular/core';
 import { BaseFilterComponent } from '../../basics/step-basics.module';
 import { SearchValue } from '../shared/search-value';
 import { FilterCondition } from '../shared/filter-condition';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs';
 import { SearchColumnAccessor } from '../shared/search-column-accessor';
 import { FilterConditionFactoryService } from '../services/filter-condition-factory.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[stepFilterConnect]',
 })
-export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit {
+  private _destroyRef = inject(DestroyRef);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _searchCol = inject(SearchColumnAccessor, { optional: true });
   private _filter = inject<BaseFilterComponent<T, CV>>(BaseFilterComponent, { optional: true });
@@ -25,25 +25,22 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
   @Input() useRegex?: boolean;
 
   ngAfterViewInit(): void {
-    this.initializeValue();
+    this.setupValueChanges();
     this.setupFilterChanges();
   }
 
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
-  private initializeValue(): void {
+  private setupValueChanges(): void {
     if (!this.isConnected) {
       console.warn('[stepFilterConnect] not connected');
       return;
     }
-    const searchValue = this._searchCol!.getSearchValue();
-    const filterValue = this.convertToFilterValue(searchValue);
-    if (filterValue) {
-      this._filter!.assignValue(filterValue);
-    }
+
+    this._searchCol!.getSearchValue$()
+      .pipe(
+        map((searchValue) => this.convertToFilterValue(searchValue)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((filterValue) => this._filter!.assignValue(filterValue));
   }
 
   private setupFilterChanges(): void {
@@ -53,7 +50,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
     }
     this._filter!.filterChange.pipe(
       map((filterValue) => this.convertToSearchValue(filterValue)),
-      takeUntil(this.terminator$),
+      takeUntilDestroyed(this._destroyRef),
     ).subscribe((searchValue) => this._searchCol!.search(searchValue));
   }
 
