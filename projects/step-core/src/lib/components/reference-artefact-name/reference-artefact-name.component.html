@@ -6,8 +6,21 @@
   />
   @if (referenceMeta) {
     <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
-      <step-icon [name]="referenceMeta.icon" />
-      <span [matTooltip]="referenceMeta.tooltip || referenceMeta.description">{{ referenceMeta.description }}</span>
+      <step-popover>
+        <step-icon [name]="referenceMeta.icon" />
+        {{ referenceMeta.description }}
+        <step-popover-content>
+          @if (referenceMeta.hintFor === hintFor.KEYWORD) {
+            Click on
+            <step-icon name="edit-2" />
+            to specify selection criteria for any keyword
+          } @else if (referenceMeta.hintFor === hintFor.PLAN) {
+            Click on
+            <step-icon name="edit-2" />
+            to specify selection criteria for any plan
+          }
+        </step-popover-content>
+      </step-popover>
     </div>
   }
   @if (!isDisabled) {
@@ -31,6 +44,7 @@
 }
 @if (isEditorMode && !isDisabled && schema) {
   <step-dynamic-field-group
+    class="selection-criteria"
     [primaryFieldsLabel]="_artefactNameConfig.captions.selectionCriteria"
     [primaryFieldsDescription]="_artefactNameConfig.captions.selectionCriteriaDescription"
     [addFieldBtnLabel]="_artefactNameConfig.captions.addSelectionCriteriaLabel"
