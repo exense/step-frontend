@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
-  effect,
   forwardRef,
+  inject,
   input,
-  model,
   signal,
   ViewEncapsulation,
 } from '@angular/core';
@@ -44,17 +44,15 @@ type OnTouch = () => void;
 export class MultiLevelSelectComponent<T extends string | number | symbol>
   implements ControlValueAccessor, MultiLevelVisualSelectionService<T>
 {
+  private _cd = inject(ChangeDetectorRef);
+
   private onChange?: OnChange<T>;
   private onTouch?: OnTouch;
 
   protected isDisabled = false;
-  protected selectedItems = model<T[]>();
+  protected selectedItems: T[] = [];
 
   readonly visualSelectionState = signal<Record<T, SelectionState>>({} as Record<T, SelectionState>);
-
-  protected handleSelectedItemsChange = effect(() => {
-    this.onChange?.(this.selectedItems()!);
-  });
 
   /** @Input() **/
   items = input<MultiLevelItem<T>[]>([]);
@@ -86,7 +84,8 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
   protected plainItems = computed(() => this.itemsData().plainItems);
 
   writeValue(selectedItems: T[]): void {
-    this.selectedItems.set(selectedItems);
+    this.selectedItems = selectedItems;
+    this._cd.markForCheck();
   }
 
   registerOnChange(fn: OnChange<T>): void {
@@ -138,11 +137,10 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
       }
 
       queueMicrotask(() => {
-        this.selectedItems.update((selectedItems) => {
-          const updatedItems = selectedItems!.filter((item) => !itemsToRemove.includes(item));
-          updatedItems.push(...itemsToAdd);
-          return updatedItems;
-        });
+        const updatedItems = (this.selectedItems ?? []).filter((item) => !itemsToRemove.includes(item));
+        updatedItems.push(...itemsToAdd);
+        this.selectedItems = updatedItems;
+        this.onChange?.(updatedItems);
       });
 
       return;
@@ -187,5 +185,11 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
 
   protected handleBlur(): void {
     this.onTouch?.();
+  }
+
+  protected handleSelectedItemsChange(selectedItems: T[]): void {
+    const cache = this.accessCache();
+    const modelItems = selectedItems.filter((item) => !cache.get(item)?.children?.length);
+    this.onChange?.(modelItems);
   }
 }

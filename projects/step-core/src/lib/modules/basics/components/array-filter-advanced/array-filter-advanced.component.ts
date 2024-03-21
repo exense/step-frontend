@@ -51,7 +51,7 @@ export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterCompone
 
   protected override createControlChangeStream(control: FormControl<unknown>): Observable<string[]> {
     return control.valueChanges.pipe(
-      map((value) => value as string[]),
+      map((value) => (value ?? []) as string[]),
       map((values) => {
         if (!this.remapValues) {
           return values;

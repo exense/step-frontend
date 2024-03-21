@@ -1,4 +1,4 @@
-import { Component, forwardRef, input } from '@angular/core';
+import { Component, computed, forwardRef, input } from '@angular/core';
 import { BaseFilterComponent, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MultiLevelSelectComponent } from '../multi-level-select/multi-level-select.component';
 import { FormBuilder, FormControl } from '@angular/forms';
@@ -28,6 +28,20 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
   /** @Input() **/
   remapValues = input<Record<string, string> | undefined>(undefined);
 
+  private reverseRemap = computed(() => {
+    const remap = this.remapValues();
+    if (!remap) {
+      return undefined;
+    }
+    return Object.entries(remap).reduce(
+      (res, [key, value]) => {
+        res[value] = key;
+        return res;
+      },
+      {} as Record<string, string>,
+    );
+  });
+
   protected createControl(fb: FormBuilder): FormControl<T[]> {
     return fb.nonNullable.control([]);
   }
@@ -37,7 +51,7 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
       map((value) => value as string[]),
       map((values) => {
         const remapValues = this.remapValues();
-        if (!remapValues) {
+        if (!remapValues || !values) {
           return values;
         }
         return values.reduce((res, value) => {
@@ -49,6 +63,10 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
   }
 
   protected override transformFilterValueToControlValue(value: string[]): T[] {
-    return value as T[];
+    const reverseRemap = this.reverseRemap();
+    if (!reverseRemap || !value) {
+      return value as T[];
+    }
+    return [...new Set(value.map((item) => reverseRemap[item] ?? item))] as T[];
   }
 }
