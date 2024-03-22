@@ -91,9 +91,9 @@ export class PaginatorComponent {
       return '';
     }
 
-    const from = pageIndex * pageSize + 1;
+    const from = pageIndex * pageSize;
     const to = pageIndex < pagesCount - 1 ? from + pageSize : length;
-    return `${from} - ${to} of ${length}`;
+    return `${from + 1} - ${to} of ${length}`;
   });
 
   next(): void {
