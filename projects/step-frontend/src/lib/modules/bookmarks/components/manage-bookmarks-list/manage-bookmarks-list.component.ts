@@ -30,7 +30,7 @@ export class ManageBookmarksListComponent {
       .open(BookmarkCreateDialogComponent, { data: { id: bookmark.id, label: bookmark.label } })
       .afterClosed()
       .subscribe(() => {
-        this._bookmarksService.refreshBookmarks$.next({});
+        this._bookmarksService.refreshBookmarks();
         this.dataSource.reload();
       });
   }
@@ -49,7 +49,7 @@ export class ManageBookmarksListComponent {
         take(1),
       )
       .subscribe(() => {
-        this._bookmarksService.refreshBookmarks$.next({});
+        this._bookmarksService.refreshBookmarks();
         this.dataSource.reload();
       });
   }

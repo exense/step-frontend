@@ -9,7 +9,7 @@ import { switchMap } from 'rxjs/operators';
 export class BookmarkService {
   private _bookmarksApi = inject(AugmentedBookmarksService);
 
-  public refreshBookmarks$ = new BehaviorSubject<unknown>(undefined);
+  private refreshBookmarks$ = new BehaviorSubject<unknown>(undefined);
 
   readonly bookmarks$ = this.refreshBookmarks$.pipe(
     switchMap(() =>
@@ -24,4 +24,8 @@ export class BookmarkService {
     ),
     map((table) => table.data),
   );
+
+  refreshBookmarks(): void {
+    this.refreshBookmarks$.next(undefined);
+  }
 }

@@ -68,7 +68,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
       const bookmark = { userId: this.user.id!, url: this.bookmark.link!, customFields: { ...this.bookmark } };
       this._api.saveUserBookmark(bookmark).subscribe();
     }
-    this._bookmarkService.refreshBookmarks$.next({});
+    this._bookmarkService.refreshBookmarks();
     this._matDialogRef.close();
   }
 
