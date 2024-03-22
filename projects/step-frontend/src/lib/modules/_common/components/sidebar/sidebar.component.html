@@ -30,7 +30,7 @@
     <div id="sidebar-categories-tabs" #tabs>
       <div
         class="sidebar-collapsable-tab"
-        *ngFor="let mainMenuEntry of displayMenuItems$ | async | menuFilter: 'root'; trackBy: trackByMenuEntry"
+        *ngFor="let mainMenuEntry of _menuItems$ | async | menuFilter: 'root'; trackBy: trackByMenuEntry"
       >
         <input
           #mainMenuCheckBox
