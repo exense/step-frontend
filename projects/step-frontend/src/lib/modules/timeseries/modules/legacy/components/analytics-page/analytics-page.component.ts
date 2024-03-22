@@ -23,7 +23,7 @@ import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
   standalone: true,
   imports: [COMMON_IMPORTS, ResolutionPickerComponent, TimeSeriesDashboardComponent],
 })
-export class AnalyticsPageComponent implements OnInit, OnDestroy {
+export class AnalyticsPageComponent implements OnInit {
   private _chartUrlParams = inject(ChartUrlParamsService);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
@@ -31,7 +31,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
-  terminator$ = new Subject<void>();
   refreshEnabled = false;
 
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
@@ -45,13 +44,8 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
   selectedGrouping = this.groupingOptions[0];
 
-  stopInterval$ = new Subject();
-
-  contextualParams: any = {};
-
   compareModeEnabled = false;
   executionHasToBeBuilt = false;
-  migrationInProgress = false;
 
   timeSeriesService = inject(TimeSeriesService);
 
@@ -99,9 +93,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
       filterOptions: this.getDefaultFilters(),
       activeFilters: this.getDefaultFilters(),
     };
-    if (this.refreshEnabled) {
-      this.startInterval(this.selectedRefreshInterval.value);
-    }
   }
 
   handleDashboardTimeRangeChange(range: TimeRange) {
@@ -172,25 +163,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     this.dashboard.setChartsResolution(resolution);
   }
 
-  changeRefreshInterval(newInterval: { label: string; value: number }) {
-    const oldInterval = this.selectedRefreshInterval;
-    this.selectedRefreshInterval = newInterval;
-    if (oldInterval.value === newInterval.value) {
-      return;
-    }
-    this.stopInterval$.next(null);
-    if (newInterval.value) {
-      this.startInterval();
-    }
-  }
-
-  startInterval(delay = 0) {
-    this.stopInterval$.next(null); // make sure to stop it if it's still running
-    timer(delay, this.selectedRefreshInterval.value)
-      .pipe(takeUntil(this.stopInterval$), takeUntil(this.terminator$))
-      .subscribe(() => this.triggerRefresh());
-  }
-
   triggerRefresh() {
     this.dashboard.refresh();
   }
@@ -232,10 +204,5 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
 
   exportRawData() {
     this.dashboard.exportRawData();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 }

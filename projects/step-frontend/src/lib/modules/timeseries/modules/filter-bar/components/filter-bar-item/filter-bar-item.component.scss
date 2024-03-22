@@ -5,6 +5,15 @@ step-form-field:not(.active) {
   color: var.$gray-500;
 }
 
+step-form-field {
+  height: 100% !important;
+}
+
+.has-no-value step-prefix,
+.has-no-value .step-field-container {
+  border: 0.1rem dashed var.$light-gray !important;
+}
+
 .step-field-container {
   min-width: 5rem;
   width: auto !important;
