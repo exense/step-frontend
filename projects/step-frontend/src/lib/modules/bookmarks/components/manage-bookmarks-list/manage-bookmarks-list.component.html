@@ -4,7 +4,9 @@
   <step-custom-columns screen="bookmarkTable" [isSearchDisabled]="false"></step-custom-columns>
   <ng-container matColumnDef="label" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Label</th>
-    <td mat-cell *matCellDef="let element">{{ element.customFields?.label }}</td>
+    <td mat-cell *matCellDef="let element">
+      <a [routerLink]="'/' + element.customFields?.link">{{ element.customFields?.label }}</a>
+    </td>
   </ng-container>
   <ng-container matColumnDef="link" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Link</th>

@@ -9,8 +9,8 @@
           @for (item of navBarRightMenuItems; track item.id) {
             <step-dashlet [itemKey]="item.template" />
           }
-          <a class="icon-star" (click)="addBookmark()">
-            <step-icon name="star" />
+          <a class="icon-bookmark" (click)="addBookmark()">
+            <step-icon name="bookmark" />
           </a>
           <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
             <step-icon name="user" />
