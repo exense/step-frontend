@@ -10,6 +10,6 @@ export class AugmentedQuotaManagerService extends QuotaManagerService {
   private _httpClient = inject(HttpClient);
 
   override getQuotaManagerStatus(): Observable<string> {
-    return this._httpClient.get('/rest/quotamanager/status', { responseType: 'text' });
+    return this._httpClient.get('rest/quotamanager/status', { responseType: 'text' });
   }
 }

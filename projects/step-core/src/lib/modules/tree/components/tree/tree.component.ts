@@ -3,9 +3,14 @@ import {
   Component,
   ContentChild,
   DestroyRef,
+  effect,
+  ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
+  HostListener,
   inject,
+  input,
   Input,
   Output,
   ViewChild,
@@ -22,6 +27,8 @@ import { DragDataService, DropInfo } from '../../../drag-drop';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
+import { TreeFocusStateService } from '../../services/tree-focus-state.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-tree',
@@ -38,10 +45,16 @@ import { TreeFlatNode } from '../../shared/tree-flat-node';
 export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNodeTemplateContainerService {
   private _destroyRef = inject(DestroyRef);
   private _treeActions = inject(TreeActionsService, { optional: true });
+  private _treeFocusState = inject(TreeFocusStateService, { optional: true });
+  private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private _doc = inject(DOCUMENT);
 
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
   readonly contextMenuPosition = { x: 0, y: 0 };
+
+  @HostBinding('class.in-focus')
+  private isTreeInFocus = false;
 
   @ViewChild(DragDataService, { static: true }) private dragData!: DragDataService;
 
@@ -51,11 +64,20 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   @Input() dragDisabled: boolean = false;
 
+  /** @Input() **/
+  readonly forceFocus = input<boolean>(false);
+
   @Output() treeContextAction = new EventEmitter<{ actionId: string; node?: N; multipleNodes?: boolean }>();
 
   @Output() nodeDblClick = new EventEmitter<{ node: N | TreeNode; event: MouseEvent }>();
 
   protected openedMenuNodeId?: string;
+
+  private forceFocusChange = effect(() => {
+    if (this.forceFocus()) {
+      this.setFocus(true);
+    }
+  });
 
   ngAfterViewInit(): void {
     this.dragData.dragData$
@@ -120,5 +142,25 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
       const insertAfterSiblingId = dropAdditionalInfo as string;
       this._treeState.insertSelectedNodesTo(newParentId, { insertAfterSiblingId });
     }
+  }
+
+  private setFocus(isInFocus: boolean) {
+    this.isTreeInFocus = isInFocus;
+    this._treeFocusState?.setTreeFocus(isInFocus);
+  }
+
+  @HostListener('document:click', ['$event'])
+  private handleGlobalClick(event: MouseEvent): void {
+    const isInFocus = this.forceFocus() || this._elRef.nativeElement.contains(event.target as Node);
+    this.setFocus(isInFocus);
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  private handleTab(event: KeyboardEvent): void {
+    if (event.key !== 'Tab' || this.forceFocus()) {
+      return;
+    }
+    const isInFocus = this._elRef.nativeElement.contains(this._doc.activeElement);
+    this.setFocus(isInFocus);
   }
 }

@@ -100,8 +100,15 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   copyExecutionServiceAsCurlToClipboard(): Promise<void> {
     const { location, navigator } = this._document.defaultView as Window;
-    let url = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
-    url = `${url}/rest/executions/start`;
+
+    const hashIndex = location.href.indexOf('#');
+    let url =
+      hashIndex >= 0
+        ? location.href.slice(0, hashIndex)
+        : `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
+
+    url = url.endsWith('/') ? url : `${url}/`;
+    url = `${url}rest/executions/start`;
 
     const payload = this.buildExecutionParams(false);
     const cmd = `curl -X POST ${url} -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`;

@@ -48,6 +48,7 @@ export * from './directives/tree-node-template.directive';
 export * from './services/tree-actions.service';
 export * from './services/tree-node-utils.service';
 export * from './services/tree-state.service';
+export * from './services/tree-focus-state.service';
 export * from './shared/tree-action';
 export * from './shared/tree-flat-node';
 export * from './shared/tree-node';

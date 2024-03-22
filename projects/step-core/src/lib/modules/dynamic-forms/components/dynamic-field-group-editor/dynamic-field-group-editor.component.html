@@ -1,6 +1,6 @@
 <div widthExpanders key="dynamicFields">
   <ng-container [formGroup]="form">
-    <h5 *ngIf="primaryFields.length > 0">{{ primaryFieldsLabel }}</h5>
+    <h5 *ngIf="primaryFieldsLabel">{{ primaryFieldsLabel }}</h5>
     <p *ngIf="primaryFieldsDescription" class="description">{{ primaryFieldsDescription }}</p>
 
     <ng-container *ngFor="let field of primaryFields; trackBy: trackByField">

@@ -56,8 +56,8 @@ export class ArrayFilterAdvancedComponent<T = unknown>
     return control.valueChanges.pipe(map((value) => value as string[]));
   }
 
-  protected override transformFilterValueToControlValue(value: string[]): unknown {
-    return value;
+  protected override transformFilterValueToControlValue(value?: string[]): unknown {
+    return value ?? [];
   }
 
   private setupDisplayItems(

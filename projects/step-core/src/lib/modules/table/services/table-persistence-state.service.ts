@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { TablePersistenceConfig } from '../shared/table-persistence-config';
 import { TableStorageService } from './table-storage.service';
 import { SearchValue } from '../shared/search-value';
@@ -6,12 +6,18 @@ import { FilterConditionFactoryService } from './filter-condition-factory.servic
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
+import { Subject } from 'rxjs';
 
 @Injectable()
-export class TablePersistenceStateService {
+export class TablePersistenceStateService implements OnDestroy {
   protected _config = inject(TablePersistenceConfig, { optional: true });
   protected _filterConditionFactory = inject(FilterConditionFactoryService);
+
+  private externalSearchChangeTrigger$ = new Subject<Record<any, SearchValue>>();
+
   private storage = inject(TableStorageService);
+
+  readonly externalSearchChange$ = this.externalSearchChangeTrigger$.asObservable();
 
   protected get canStoreSearch(): boolean {
     return !!this._config?.tableId && !!this._config?.storeSearch;
@@ -34,6 +40,18 @@ export class TablePersistenceStateService {
 
   private get paginationKey(): string {
     return `${this._config!.tableId!}_PAGE`;
+  }
+
+  protected triggerExternalSearchChange(search: Record<string, SearchValue>): void {
+    if (!this.canStoreSearch) {
+      return;
+    }
+    this.saveSearch(search);
+    this.externalSearchChangeTrigger$.next(search);
+  }
+
+  ngOnDestroy(): void {
+    this.externalSearchChangeTrigger$.complete();
   }
 
   saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
