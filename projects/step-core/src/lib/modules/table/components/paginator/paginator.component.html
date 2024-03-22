@@ -1,13 +1,9 @@
 <div class="sub-section">
   <span>Items per page:</span>
-  <ng-template #labelTemplate></ng-template>
-  <ng-template #itemTemplate let-item>{{ item }}</ng-template>
-  <step-editable-dropdown-label
-    [items]="pageSizeOptions()"
-    [(ngModel)]="pageSize"
-    [labelTemplate]="labelTemplate"
-    [itemTemplate]="itemTemplate"
-  />
+  <step-editable-dropdown-label [items]="pageSizeOptions()" [(ngModel)]="pageSize">
+    <ng-container *stepEditableLabelTemplate />
+    <ng-container *stepEditableListItemTemplate="let item">{{ item }}</ng-container>
+  </step-editable-dropdown-label>
 </div>
 <div>{{ pageLabel() }}</div>
 <div class="sub-section">
