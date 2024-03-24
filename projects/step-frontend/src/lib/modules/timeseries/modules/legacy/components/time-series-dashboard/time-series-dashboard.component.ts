@@ -27,9 +27,17 @@ import { FilterBarComponent } from '../../../filter-bar';
   imports: [COMMON_IMPORTS, FilterBarComponent, ChartsViewComponent],
 })
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
+  @Input()
+  set timeRange(value: TimeRangePickerSelection) {
+    if (value) {
+      this.handleTimeRangeChange({ selection: value, triggerRefresh: true });
+    }
+  }
+
   readonly ONE_HOUR_MS = 3600 * 1000;
 
   @Output() timeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
+  @Output() compareModeChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
@@ -174,6 +182,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       });
     this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
       this.compareModeEnabled = enabled;
+      this.compareModeChange.next(enabled);
       this.compareModeContext = context;
     });
   }

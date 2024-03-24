@@ -2,9 +2,8 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-raised-button>
+        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-icon-button>
           <step-icon name="settings" />
-          Settings
         </button>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>

@@ -1,6 +1,5 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { TimeRange, TimeSeriesService } from '@exense/step-core';
-import { Subject, takeUntil, timer } from 'rxjs';
 import { MatMenuTrigger } from '@angular/material/menu';
 import {
   TimeRangePickerSelection,
@@ -11,9 +10,12 @@ import {
   FilterBarItem,
   COMMON_IMPORTS,
   ResolutionPickerComponent,
+  TimeSeriesContext,
+  TimeRangePickerComponent,
 } from '../../../_common';
 import { TimeSeriesDashboardComponent } from '../time-series-dashboard/time-series-dashboard.component';
 import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
+import { PerformanceViewTimeSelectionComponent } from '../../../filter-bar';
 
 @Component({
   selector: 'step-analytics-page',
@@ -21,13 +23,23 @@ import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
   styleUrls: ['./analytics-page.component.scss'],
   providers: [ChartUrlParamsService],
   standalone: true,
-  imports: [COMMON_IMPORTS, ResolutionPickerComponent, TimeSeriesDashboardComponent],
+  imports: [
+    COMMON_IMPORTS,
+    ResolutionPickerComponent,
+    TimeSeriesDashboardComponent,
+    PerformanceViewTimeSelectionComponent,
+    TimeRangePickerComponent,
+  ],
 })
 export class AnalyticsPageComponent implements OnInit {
   private _chartUrlParams = inject(ChartUrlParamsService);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
+
+  compactView: boolean = false;
+  activeSelection!: TimeRangePickerSelection;
+  timeRange: any;
 
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
@@ -97,6 +109,14 @@ export class AnalyticsPageComponent implements OnInit {
 
   handleDashboardTimeRangeChange(range: TimeRange) {
     this.activeTimeRange = range;
+  }
+
+  compactChange(event: any) {
+    this.compactView = event;
+  }
+
+  handleTimeRangeChange(event: any) {
+    this.timeRange = event;
   }
 
   private getDefaultFilters(): FilterBarItem[] {
