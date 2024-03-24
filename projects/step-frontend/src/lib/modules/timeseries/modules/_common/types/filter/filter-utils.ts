@@ -259,7 +259,6 @@ export class FilterUtils {
   ): FilterBarItem[] {
     const attributesById: Record<string, MetricAttribute> = {};
     attributesDefinition.forEach((a) => (attributesById[a.name] = a));
-    console.log(JSON.stringify(attributesById));
     return filters
       .filter((i) => !!attributesById[i.attribute])
       .map((urlFilter) => {

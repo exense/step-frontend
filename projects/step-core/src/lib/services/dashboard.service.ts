@@ -13,10 +13,8 @@ export class DashboardService {
   generateDashboardLink(parameters: Record<string, any>): string {
     let httpParams = new HttpParams();
     Object.keys(parameters).forEach((key) => {
-      httpParams = httpParams.append(key, parameters[key]);
+      httpParams = httpParams.append('dc_' + key, parameters[key]);
     });
-    httpParams = httpParams.append('tsParams', Object.keys(parameters).join(','));
-
     const currentTenant = this._multipleProjects.currentProject()?.name || '';
     httpParams = httpParams.append('tenant', currentTenant);
 
@@ -25,7 +23,7 @@ export class DashboardService {
 
   getDashboardLink(taskId: string): string {
     const parameters = {
-      taskId,
+      q_taskId: taskId,
       refresh: 1,
       relativeRange: ONE_DAY_MS,
     };
