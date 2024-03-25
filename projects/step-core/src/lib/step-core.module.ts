@@ -69,6 +69,7 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
+import { COLOR_PICKER_EXPORTS } from './modules/color-picker';
 
 @NgModule({
   declarations: [
@@ -138,6 +139,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    COLOR_PICKER_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -202,6 +204,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    COLOR_PICKER_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -327,3 +330,4 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './modules/color-picker';

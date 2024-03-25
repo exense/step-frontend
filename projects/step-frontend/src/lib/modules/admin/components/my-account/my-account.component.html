@@ -5,19 +5,23 @@
       Change password
     </button>
   </mat-card-header>
-  <mat-card-content class="credentials">
+  <mat-card-content class="user">
     <section>
-      <step-form-field alignLabelAddon="near">
-        <step-label>Username</step-label>
-        <step-label-addon>{{ user.username }}</step-label-addon>
-      </step-form-field>
+      <step-avatar-editor [disabled]="!canEdit" [colorPicker]="colorPicker" />
+      <step-color-picker #colorPicker />
     </section>
-    <section>
-      <step-form-field alignLabelAddon="near">
-        <step-label>Role</step-label>
-        <step-label-addon>{{ user.role }}</step-label-addon>
-      </step-form-field>
-    </section>
+    @if (_userState.user$ | async; as user) {
+      <section>
+        <step-form-field alignLabelAddon="near">
+          <step-label>Username</step-label>
+          <step-label-addon>{{ user.username }}</step-label-addon>
+        </step-form-field>
+        <step-form-field alignLabelAddon="near">
+          <step-label>Role</step-label>
+          <step-label-addon>{{ user.role }}</step-label-addon>
+        </step-form-field>
+      </section>
+    }
   </mat-card-content>
 </mat-card>
 <mat-card>
@@ -26,15 +30,14 @@
       <div>Api key</div>
       <step-description-hint
         description="API keys can be used for authentication with the step API (<a href='https://step.exense.ch/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys' target='_blank'>knowledgebase</a>)"
-      >
-      </step-description-hint>
+      />
     </mat-card-title>
     <button
       type="button"
       mat-flat-button
       color="primary"
       (click)="invokeShowGenerateApiKeyDialog()"
-      [disabled]="!canGenerateApiKey"
+      [disabled]="!canEdit"
     >
       Generate new Key
     </button>
@@ -78,22 +81,21 @@
       <div>Preferences</div>
       <step-description-hint
         description="Add key/value pairs of custom preferences (<a href='https://step.exense.ch/knowledgebase/userdocs/userpreferences/#preferences' target='_blank'>knowledgebase</a>)"
-      >
-      </step-description-hint>
+      />
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <step-table [dataSource]="preferences$">
+    <step-table [dataSource]="_userState.preferences$">
       <section class="header" *stepAdditionalHeader="'add-preference'">
-        <button type="button" mat-mini-fab color="primary" (click)="addPreference()">
-          <step-icon name="plus"></step-icon>
+        <button type="button" mat-mini-fab color="primary" (click)="_userState.addPreference()">
+          <step-icon name="plus" />
         </button>
       </section>
       <ng-container matColumnDef="key">
         <th mat-header-cell *matHeaderCellDef>Key</th>
         <td mat-cell *matCellDef="let element">
           <step-form-field>
-            <input [(ngModel)]="element.key" placeholder="Key" (blur)="savePreferences()" />
+            <input [(ngModel)]="element.key" placeholder="Key" (blur)="_userState.savePreferences()" />
           </step-form-field>
         </td>
       </ng-container>
@@ -101,15 +103,15 @@
         <th mat-header-cell *matHeaderCellDef>Value</th>
         <td mat-cell *matCellDef="let element">
           <step-form-field>
-            <input [(ngModel)]="element.value" placeholder="Value" (blur)="savePreferences()" />
+            <input [(ngModel)]="element.value" placeholder="Value" (blur)="_userState.savePreferences()" />
           </step-form-field>
         </td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th class="actions" mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button matTooltip="Delete preference" (click)="removePreference(element)">
-            <step-icon name="trash-2"></step-icon>
+          <button mat-icon-button matTooltip="Delete preference" (click)="_userState.removePreference(element)">
+            <step-icon name="trash-2" />
           </button>
         </td>
       </ng-container>

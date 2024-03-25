@@ -53,6 +53,7 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
+import { AvatarCircleComponent } from './components/avatar-circle/avatar-circle.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -107,6 +108,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     MarkerComponent,
     AlertsContainerComponent,
     ProjectNamePipe,
+    AvatarCircleComponent,
   ],
   exports: [
     CommonModule,
@@ -164,6 +166,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     MarkerComponent,
     AlertsContainerComponent,
     ProjectNamePipe,
+    AvatarCircleComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -242,6 +245,7 @@ export * from './injectables/item-hover-receiver.service';
 export * from './injectables/item-hold-receiver.service';
 export * from './injectables/object-utils.service';
 export * from './injectables/dialogs.service';
+export * from './injectables/avatar-color-preference-key.token';
 export * from './types/bulk-operation-type.enum';
 export * from './types/string-array-regex';
 export * from './injectables/dialog-parent.service';
@@ -261,5 +265,6 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/dialog-route/dialog-route.component';
+export * from './components/avatar-circle/avatar-circle.component';
 export * from './types/mutable';
 export * from './types/date-format.enum';
