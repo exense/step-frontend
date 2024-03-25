@@ -12,6 +12,7 @@ export type DashboardView = {
   name: string;
   description?: string;
   resolution?: number;
+  refreshInterval?: number;
   timeRange: TimeRangeSelection;
   grouping: Array<string>;
   filters: Array<TimeSeriesFilterItem>;
