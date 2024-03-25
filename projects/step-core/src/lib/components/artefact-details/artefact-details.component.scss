@@ -13,6 +13,7 @@ step-artefact-details {
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
+      position: relative;
 
       step-editable-label {
         font-size: 1.8rem;
@@ -36,10 +37,26 @@ step-artefact-details {
   mat-expansion-panel,
   .editor {
     margin-bottom: 2rem !important;
+    position: relative;
   }
 
-  .footer {
-    color: var.$muted;
-    font-size: 85%;
+  .artefact-hint {
+    position: absolute;
+    z-index: 1000;
+    top: 1rem;
+  }
+
+  .artefact-name,
+  #call-name-input {
+    step-editable-label {
+      .editable-label {
+        padding-left: 4rem !important;
+      }
+      .form-field-content {
+        input {
+          padding-left: 4rem !important;
+        }
+      }
+    }
   }
 }
