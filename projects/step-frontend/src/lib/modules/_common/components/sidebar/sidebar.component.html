@@ -45,7 +45,9 @@
           <span><step-icon class="chevron" name="chevron-right"></step-icon></span>
         </label>
         <div class="content">
-          <section *ngFor="let entry of _menuItems$ | async | menuFilter: mainMenuEntry.id; trackBy: trackByMenuEntry">
+          <section
+            *ngFor="let entry of displayMenuItems$ | async | menuFilter: mainMenuEntry.id; trackBy: trackByMenuEntry"
+          >
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
@@ -57,12 +59,14 @@
           </section>
         </div>
       </div>
-      <div *ngIf="!(isOpened$ | async)" class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
-        <label>
-          <step-icon class="visible-when-collapsed" name="home"></step-icon>
-          <span class="sidebar-aligned-text">Home</span>
-        </label>
-      </div>
+      <ng-container *ngIf="!(isOpened$ | async)">
+        <div class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
+          <label>
+            <step-icon class="visible-when-collapsed" name="home"></step-icon>
+            <span class="sidebar-aligned-text">Home</span>
+          </label>
+        </div>
+      </ng-container>
     </div>
   </div>
 

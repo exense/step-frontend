@@ -13,10 +13,18 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { IS_SMALL_SCREEN, MenuEntry, NavigatorService, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import {
+  IS_SMALL_SCREEN,
+  MenuEntry,
+  NavigatorService,
+  ViewRegistryService,
+  ViewStateService,
+  BookmarkService,
+  MENU_ITEMS,
+  AugmentedBookmarksService,
+} from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { MENU_ITEMS } from '../../injectables/menu-items';
-import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 
 const MIDDLE_BUTTON = 1;
@@ -33,6 +41,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
+  private _bookmarkService = inject(BookmarkService);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
@@ -43,6 +52,25 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
+    map(([menuItems, dynamicMenuItems]) =>
+      menuItems.concat(
+        dynamicMenuItems!.map((element) => {
+          const menuEntry = {
+            title: element.customFields!['label'],
+            id: element.customFields!['link'],
+            icon: element.customFields!['icon'],
+            parentId: 'bookmarks-root',
+            weight: 1000 + dynamicMenuItems!.length,
+            isEnabledFct(): boolean {
+              return true;
+            },
+          };
+          return menuEntry;
+        }),
+      ),
+    ),
+  );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
@@ -96,7 +124,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   private initializeMainMenuItemsFromState(): void {
     Object.entries(this._sideBarState.openedMenuItems || {}).forEach(([mainMenuKey, isOpened]) =>
-      this.openMainMenu(mainMenuKey, isOpened)
+      this.openMainMenu(mainMenuKey, isOpened),
     );
   }
 

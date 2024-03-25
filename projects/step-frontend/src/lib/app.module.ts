@@ -22,6 +22,7 @@ import { MainViewComponent } from './components/main-view/main-view.component';
 import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app.routes';
 import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 
 Settings.defaultLocale = 'en';
 
@@ -44,6 +45,7 @@ Settings.defaultLocale = 'en';
     DefaultThemeModule,
     ArtefactsModule,
     ResourcesModule,
+    BookmarksModule,
     RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],
   exports: [RootComponent],
