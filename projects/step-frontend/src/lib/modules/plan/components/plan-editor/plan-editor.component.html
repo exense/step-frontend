@@ -1,6 +1,6 @@
 <step-plan-editor-base
   stepPlanEditorKeyHandler
-  [initialPlan]="plan$ | async"
+  [initialPlanContext]="initialPlanContext$ | async"
   (scheduleTask)="handleTaskSchedule($event)"
 >
   <step-plan-editor-attributes>

@@ -20,11 +20,8 @@ export * from './injectables/plan-interactive-session.service';
 export * from './injectables/plan-open.service';
 export * from './injectables/plan-context-initializer.service';
 
-export * from './types/plan-editor-context.interface';
-export * from './types/plan-action.enum';
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
-export * from './types/base-plan.action';
 export * from './types/plan-context.interface';
 
 export * from './pipes/plan-name.pipe';

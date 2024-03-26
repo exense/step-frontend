@@ -28,10 +28,11 @@ export class PlanEditorComponent implements OnInit {
   private _purePlanContextApi = inject(PurePlanContextApiService);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
 
   readonly _planEditorService = inject(PlanEditorService);
 
-  readonly _initialPlanContext$ = inject(ActivatedRoute).data.pipe(
+  readonly initialPlanContext$ = this._activatedRoute.data.pipe(
     map((data) => data['plan'] as Plan),
     map((plan) => this._purePlanContextApi.createContext(plan)),
   );
