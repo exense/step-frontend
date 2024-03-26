@@ -348,16 +348,6 @@ export class TableComponent<T>
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }
 
-  /* private setupColumns(): void {
-    const allCollDef = this.allCollDef;
-
-    allCollDef.forEach((col) => this.table!.addColumnDef(col));
-
-    setTimeout(() => {
-      this.displayColumns = this.determineDisplayColumns(this.visibleColumns);
-    });
-  } */
-
   private setupDefaultSearch(): void {
     if (!this.defaultSearch) {
       return;
