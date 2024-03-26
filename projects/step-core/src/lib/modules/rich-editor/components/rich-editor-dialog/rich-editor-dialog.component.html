@@ -1,0 +1,21 @@
+<step-modal-window [title]="_data.title">
+  <div step-modal-window-subtitle>
+    <section class="syntax-mode-selector">
+      <step-rich-editor-settings-bar
+        [allowedModes]="_data.allowedModes"
+        [predefinedMode]="_data.predefinedMode"
+        [showAutoFormatBtn]="true"
+        [showChangeStatus]="true"
+        [changStatus]="changeStatus"
+        (modeChanged)="selectedMode = $event"
+      />
+    </section>
+  </div>
+  <div step-modal-window-body>
+    <step-rich-editor [formControl]="textControl" [syntaxMode]="selectedMode" />
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+  </div>
+</step-modal-window>

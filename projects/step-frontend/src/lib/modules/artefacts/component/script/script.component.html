@@ -1,6 +1,11 @@
 <form #form="ngForm">
   <step-form-field>
     <step-label>Script</step-label>
-    <textarea [(ngModel)]="context.artefact!.script" [disabled]="context.readonly" name="script" rows="5"> </textarea>
+    <step-rich-editor
+      [(ngModel)]="context.artefact!.script"
+      [disabled]="context.readonly"
+      name="script"
+      [syntaxMode]="AceMode.GROOVY"
+    />
   </step-form-field>
 </form>

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ArtefactService } from '@exense/step-core';
+import { ArtefactService, RichEditorComponent } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
@@ -59,7 +59,7 @@ import { AssertPerformanceComponent } from './component/assert-performance/asser
     AssertionPlanComponent,
     AssertPerformanceComponent,
   ],
-  imports: [StepCommonModule],
+  imports: [StepCommonModule, RichEditorComponent],
   exports: [
     EchoComponent,
     ThreadGroupComponent,

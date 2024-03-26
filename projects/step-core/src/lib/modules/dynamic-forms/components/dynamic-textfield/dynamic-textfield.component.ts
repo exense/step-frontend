@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DynamicValueInteger, DynamicValueString } from '../../../../client/step-client-module';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { DialogsService } from '../../../basics/step-basics.module';
 import { NUMBER_CHARS_POSITIVE_ONLY, NUMBER_CHARS_WITH_NEGATIVE } from '../../shared/constants';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 
 @Component({
   selector: 'step-dynamic-textfield',
@@ -15,8 +16,12 @@ export class DynamicTextfieldComponent
   extends DynamicValueBaseComponent<DynamicValueString | DynamicValueInteger>
   implements OnChanges
 {
+  private _richEditorDialogs = inject(RichEditorDialogService);
+
   @Input() isNumber = false;
   @Input() isNegativeNumberAllowed = false;
+  @Input() predefinedRichEditorMode?: AceMode;
+  @Input() allowedRichEditorModes?: AceMode[];
 
   protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
@@ -53,10 +58,15 @@ export class DynamicTextfieldComponent
   }
 
   editConstantValue(): void {
-    this._dialogsService.enterValue('Free text editor', this.value.toString(), true).subscribe((value) => {
-      this.value = this.parseValue(value);
-      this.emitChanges();
-    });
+    this._richEditorDialogs
+      .editText(this.value.toString(), {
+        predefinedMode: this.predefinedRichEditorMode,
+        allowedModes: this.allowedRichEditorModes,
+      })
+      .subscribe((value) => {
+        this.value = this.parseValue(value);
+        this.emitChanges();
+      });
   }
 
   private parseValue(value: string): string | number {

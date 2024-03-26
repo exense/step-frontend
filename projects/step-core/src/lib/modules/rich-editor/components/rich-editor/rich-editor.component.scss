@@ -1,0 +1,14 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 20rem;
+  &.is-disabled > div {
+    background: var.$gray-100;
+  }
+}
+
+div {
+  height: 100%;
+}

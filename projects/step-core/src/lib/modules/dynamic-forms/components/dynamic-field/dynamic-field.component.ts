@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { noop } from 'rxjs';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
-import { DialogsService } from '../../../basics/step-basics.module';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
+import { Ace } from 'ace-builds';
 
 type DynamicValue = DynamicValueString | DynamicValueBoolean | DynamicValueInteger;
 
@@ -17,6 +18,8 @@ type OnTouch = () => void;
   encapsulation: ViewEncapsulation.None,
 })
 export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
+  private _richEditorDialogs = inject(RichEditorDialogService);
+
   private onChange: OnChange = noop;
   protected onTouch: OnTouch = noop;
 
@@ -35,6 +38,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   protected forceFocus: boolean = false;
 
   readonly DynamicFieldType = DynamicFieldType;
+  readonly AceMode = AceMode;
 
   @Input() tabIndex?: number;
   @Input() label?: string = '';
@@ -54,10 +58,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() elementRefMapKey?: string;
 
-  constructor(
-    private _dialogService: DialogsService,
-    @Optional() public _ngControl?: NgControl,
-  ) {
+  constructor(@Optional() public _ngControl?: NgControl) {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;
     }
@@ -85,12 +86,18 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     this.onTouch = noop;
   }
 
-  editStringValueInModal(): void {
-    this._dialogService
-      .enterValue('Free text editor', this.value ? this.value.toString() : '', true)
-      .subscribe((value) => {
-        this.valueChange(value);
-      });
+  editValueInModal(predefinedMode?: AceMode): void {
+    const text = this.value?.toString() ?? '';
+    this._richEditorDialogs.editText(text, { predefinedMode }).subscribe((value) => {
+      this.valueChange(value);
+    });
+  }
+
+  editExpressionInModal(): void {
+    const text = this.expression ?? '';
+    this._richEditorDialogs.editText(text, { predefinedMode: AceMode.GROOVY }).subscribe((expression) => {
+      this.expressionChange(expression);
+    });
   }
 
   protected fixLabelFocus($event: MouseEvent): void {
@@ -153,4 +160,6 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
     this.displayEnumExtraValue = !(this.enumItems || []).includes(this.value ? this.value.toString() : '');
   }
+
+  protected readonly Ace = Ace;
 }

@@ -1,7 +1,6 @@
 export * from './plugin-on-init';
 export * from './plugin-lazy-load';
 export * from './utils';
-export * from './ace-mode.enum';
 export * from './script-language.enum';
 export * from './persistence-tokens';
 export * from './function-script-language.interface';
