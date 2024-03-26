@@ -1,3 +1,6 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
 step-icon {
   width: 2rem;
   height: 2rem;
@@ -11,4 +14,20 @@ step-icon {
   step-custom-cell:not(:first-child) {
     margin-left: 1rem;
   }
+}
+
+.col-settings,
+.col-description {
+  z-index: 3;
+}
+
+.col-settings {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  @include core.step-icon-size(1.6rem);
+}
+
+th:hover .col-settings {
+  opacity: 1;
 }

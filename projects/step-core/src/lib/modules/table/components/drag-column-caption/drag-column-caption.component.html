@@ -1,0 +1,12 @@
+<ng-template #content>
+  <ng-content />
+</ng-template>
+@if (_dragAllowed) {
+  <div class="drop-before" [stepDropArea]="_matColDef.name" (dropItem)="handleDropLeft($event)"></div>
+  <div class="drag-pointer" [stepDragItem]="_matColDef.name">
+    <ng-container *ngTemplateOutlet="content" />
+  </div>
+  <div class="drop-after" [stepDropArea]="_matColDef.name" (dropItem)="handleDropRight($event)"></div>
+} @else {
+  <ng-container *ngTemplateOutlet="content" />
+}

@@ -21,7 +21,6 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
-import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -93,7 +92,6 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     RecursiveTabIndexDirective,
     ReferenceArtefactNameComponent,
     PlanNameComponent,
-    InputModelFormatterDirective,
     PredefinedOptionsInputComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
@@ -177,7 +175,6 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     PlanNameComponent,
-    InputModelFormatterDirective,
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     ArtefactDetailsComponent,
@@ -260,7 +257,6 @@ export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
-export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';

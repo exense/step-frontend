@@ -30,6 +30,10 @@ export class TablePersistenceStateService implements OnDestroy {
     return !!this._config?.tableId && !!this._config?.storePagination;
   }
 
+  private get canStoreColumnsOrder(): boolean {
+    return !!this._config?.tableId;
+  }
+
   private get searchKey(): string {
     return `${this._config!.tableId!}_SEARCH`;
   }
@@ -40,6 +44,10 @@ export class TablePersistenceStateService implements OnDestroy {
 
   private get paginationKey(): string {
     return `${this._config!.tableId!}_PAGE`;
+  }
+
+  private get columnsOrderKey(): string {
+    return `${this._config!.tableId}_COLUMN_ORDER`;
   }
 
   protected triggerExternalSearchChange(search: Record<string, SearchValue>): void {
@@ -128,5 +136,23 @@ export class TablePersistenceStateService implements OnDestroy {
       return undefined;
     }
     return JSON.parse(jsonString) as Sort;
+  }
+
+  saveColumnsOrder(columnsOrder: string[]): void {
+    if (!this.canStoreColumnsOrder) {
+      return;
+    }
+    this.storage.setItem(this.columnsOrderKey, JSON.stringify(columnsOrder));
+  }
+
+  getColumnsOrder(): string[] {
+    if (!this.canStoreColumnsOrder) {
+      return [];
+    }
+    const jsonString = this.storage.getItem(this.columnsOrderKey);
+    if (!jsonString) {
+      return [];
+    }
+    return JSON.parse(jsonString) as string[];
   }
 }
