@@ -10,7 +10,14 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { Dashlet, Plan, PlanEditorContext, RepositoryObjectReference, ViewRegistryService } from '@exense/step-core';
+import {
+  Dashlet,
+  ExecutiontTaskParameters,
+  Plan,
+  PlanEditorContext,
+  RepositoryObjectReference,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 
@@ -48,6 +55,7 @@ export class PlanEditorActionsComponent implements OnChanges {
   @Output() reset = new EventEmitter<void>();
   @Output() stop = new EventEmitter<void>();
   @Output() showSource = new EventEmitter<void>();
+  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
 
