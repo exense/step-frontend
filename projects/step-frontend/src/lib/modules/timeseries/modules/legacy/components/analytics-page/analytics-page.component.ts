@@ -83,7 +83,6 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, TimeSeriesConfig.KNOWN_ATTRIBUTES).filter(
       FilterUtils.filterItemIsValid,
     );
-    console.log(urlParams.filters);
     const defaultFilters = this.getDefaultFilters();
 
     this.dashboardSettings = {

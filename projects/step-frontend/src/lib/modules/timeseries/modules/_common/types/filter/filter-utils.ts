@@ -208,7 +208,6 @@ export class FilterUtils {
         break;
     }
     const knownValues = attribute.metadata['knownValues'];
-    console.log(attribute);
     if (knownValues && knownValues.length > 0) {
       item.type = FilterBarItemType.OPTIONS;
       item.textValues = knownValues.map((v: string) => ({ value: v, isSelected: false }));
