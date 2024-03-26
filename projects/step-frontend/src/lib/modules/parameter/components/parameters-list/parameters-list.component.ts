@@ -6,8 +6,11 @@ import {
   tablePersistenceConfigProvider,
   STORE_ALL,
   DialogParentService,
+  DialogsService,
+  AugmentedParametersService,
+  FilterConditionFactoryService,
 } from '@exense/step-core';
-import { ParameterListLogicService } from '../../services/parameter-list-logic.service';
+import { filter, switchMap } from 'rxjs';
 
 @Component({
   selector: 'step-parameters-list',
@@ -16,7 +19,6 @@ import { ParameterListLogicService } from '../../services/parameter-list-logic.s
   providers: [
     tablePersistenceConfigProvider('parametersList', STORE_ALL),
     ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-    ParameterListLogicService,
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => ParametersListComponent),
@@ -24,11 +26,32 @@ import { ParameterListLogicService } from '../../services/parameter-list-logic.s
   ],
 })
 export class ParametersListComponent implements DialogParentService {
-  protected _logic = inject(ParameterListLogicService);
+  private _dialogs = inject(DialogsService);
+  private _parametersService = inject(AugmentedParametersService);
 
-  readonly returnParentUrl = this._logic.ROOT_URL;
+  readonly _filterConditionFactory = inject(FilterConditionFactoryService);
+
+  readonly returnParentUrl = '/parameters';
+
+  readonly dataSource = this._parametersService.createDataSource();
+
+  duplicateParameter(parameter: Parameter): void {
+    this._parametersService.cloneParameter(parameter.id!).subscribe(() => this.dataSource.reload());
+  }
+
+  deleteParameter(id: string, label: string): void {
+    this._dialogs
+      .showDeleteWarning(1, `Parameter "${label}"`)
+      .pipe(
+        filter((result) => result),
+        switchMap(() => this._parametersService.deleteParameter(id)),
+      )
+      .subscribe((result: boolean) => {
+        this.dataSource.reload();
+      });
+  }
 
   dialogSuccessfullyClosed(): void {
-    this._logic.dataSource.reload();
+    this.dataSource.reload();
   }
 }

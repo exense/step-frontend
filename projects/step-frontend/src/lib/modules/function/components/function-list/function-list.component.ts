@@ -10,6 +10,7 @@ import {
   KeywordExecutorService,
   FunctionConfigurationApiService,
   DialogParentService,
+  IsUsedByDialogService,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
@@ -34,16 +35,13 @@ export class FunctionListComponent implements DialogParentService {
   private _functionApiService = inject(AugmentedKeywordsService);
   private _functionActions = inject(FunctionActionsService);
   private _keywordExecutor = inject(KeywordExecutorService);
+  private _isUsedByDialog = inject(IsUsedByDialogService);
 
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
-  readonly returnParentUrl = this._functionActions.baseUrl;
+  readonly returnParentUrl = '/functions';
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
-  }
-
-  addFunction(): void {
-    this._functionActions.addFunction();
   }
 
   editFunction(keyword: Keyword): void {
@@ -66,23 +64,7 @@ export class FunctionListComponent implements DialogParentService {
     });
   }
 
-  exportFunction(id: string): void {
-    this._functionActions.openExportFunctionDialog(id);
-  }
-
-  exportFunctions(): void {
-    this._functionActions.openExportAllFunctionsDialog();
-  }
-
-  importFunctions(): void {
-    this._functionActions.openImportFunctionDialog();
-  }
-
   lookUp(id: string, name: string): void {
-    this._functionActions.openLookUpFunctionDialog(id, name);
-  }
-
-  configureFunction(id: string): void {
-    this._functionActions.configureFunction(id);
+    this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
   }
 }

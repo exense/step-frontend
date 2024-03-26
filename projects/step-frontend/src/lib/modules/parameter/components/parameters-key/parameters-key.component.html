@@ -1,8 +1,8 @@
-<ng-template #link>
-  <a href="#" (click)="editParameter(); (false)">{{ context?.key }}</a>
-</ng-template>
-<ng-container *ngIf="noLink$ | async; else link">
+@if (noLink$ | async) {
   {{ context?.key }}
-</ng-container>
-<step-description-hint *ngIf="!(noDescriptionHint$ | async)" [description]="context?.description">
-</step-description-hint>
+} @else {
+  <a [routerLink]="context | parameterUrl">{{ context?.key }}</a>
+}
+@if (!(noDescriptionHint$ | async)) {
+  <step-description-hint [description]="context?.description" />
+}

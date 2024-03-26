@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedParametersService,
+  checkProjectGuardFactory,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -20,6 +22,7 @@ import { ParameterLastModificationComponent } from './components/parameter-last-
 import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -31,6 +34,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
     ParameterSelectionComponent,
     ParameterLastModificationComponent,
     ParameterEditDialogComponent,
+    ParameterUrlPipe,
   ],
 })
 export class ParameterModule {
@@ -69,13 +73,26 @@ export class ParameterModule {
             dialogRoute({
               path: ':id',
               dialogComponent: ParameterEditDialogComponent,
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'parameter',
+                  getEntity: (id) => inject(AugmentedParametersService).getParameterByIdCached(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).parameterEditorUrl(id),
+                }),
+              ],
               resolve: {
                 entity: (route: ActivatedRouteSnapshot) =>
-                  inject(AugmentedParametersService).getParameterById(route.params['id']),
+                  inject(AugmentedParametersService).getParameterByIdCached(route.params['id']),
               },
               data: {
                 isNew: false,
               },
+              canDeactivate: [
+                () => {
+                  inject(AugmentedParametersService).cleanupCache();
+                  return true;
+                },
+              ],
             }),
           ],
         },

@@ -53,6 +53,7 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   protected override onValueChange(value: T): void {
     super.onValueChange(value);
     this.focusedElement = this.matSelectElementRef!.nativeElement;
+    this.onApply();
   }
 
   protected override onLabelClick(): void {

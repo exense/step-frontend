@@ -1,10 +1,8 @@
 import {
-  AfterContentInit,
   ChangeDetectorRef,
   Component,
   computed,
   contentChild,
-  ContentChild,
   ElementRef,
   EventEmitter,
   HostBinding,
@@ -12,9 +10,7 @@ import {
   inject,
   input,
   Input,
-  OnChanges,
   Output,
-  SimpleChanges,
   TemplateRef,
 } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';

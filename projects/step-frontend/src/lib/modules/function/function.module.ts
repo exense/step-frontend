@@ -16,6 +16,8 @@ import {
   ImportDialogComponent,
   ExportDialogComponent,
   FunctionConfigurationDialogResolver,
+  checkProjectGuardFactory,
+  CommonEntitiesUrlsService,
   NavigatorService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
@@ -79,11 +81,27 @@ export class FunctionModule {
             dialogRoute({
               path: ':id',
               resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'keyword',
+                  getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
+                }),
+              ],
               resolve: {
-                keyword: (route: ActivatedRouteSnapshot) =>
-                  inject(AugmentedKeywordsService).getFunctionById(route.params['id']),
+                keyword: (route: ActivatedRouteSnapshot) => {
+                  const id = route.params['id'];
+                  if (!id) return undefined;
+                  return inject(AugmentedKeywordsService).getFunctionByIdCached(id);
+                },
                 dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
               },
+              canDeactivate: [
+                () => {
+                  inject(AugmentedKeywordsService).cleanupCache();
+                  return true;
+                },
+              ],
             }),
           ],
         },
@@ -144,12 +162,25 @@ export class FunctionModule {
         {
           path: 'editor/:id',
           component: CompositeFunctionEditorComponent,
+          canActivate: [
+            checkProjectGuardFactory({
+              entityType: 'keyword',
+              getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
+              getEditorUrl: (id) => `/composites/editor/${id}`,
+            }),
+          ],
           resolve: {
             compositePlan: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
               return id ? inject(CompositeKeywordPlanContextApiService).loadPlan(id) : undefined;
             },
           },
+          canDeactivate: [
+            () => {
+              inject(AugmentedKeywordsService).cleanupCache();
+              return true;
+            },
+          ],
         },
       ],
     });

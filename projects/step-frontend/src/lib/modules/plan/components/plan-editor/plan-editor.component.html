@@ -1,4 +1,8 @@
-<step-plan-editor-base stepPlanEditorKeyHandler [initialPlanContext]="_initialPlanContext$ | async">
+<step-plan-editor-base
+  stepPlanEditorKeyHandler
+  [initialPlan]="plan$ | async"
+  (scheduleTask)="handleTaskSchedule($event)"
+>
   <step-plan-editor-attributes>
     <step-custom-forms
       stScreen="planTable"
@@ -10,3 +14,4 @@
     />
   </step-plan-editor-attributes>
 </step-plan-editor-base>
+<router-outlet />

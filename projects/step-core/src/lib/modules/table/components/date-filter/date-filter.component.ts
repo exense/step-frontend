@@ -30,15 +30,15 @@ export class DateFilterComponent extends BaseFilterComponent<DateTime | undefine
   }
 
   protected override createControlChangeStream(
-    control: FormControl<DateTime | null>
+    control: FormControl<DateTime | null>,
   ): Observable<DateTime | undefined> {
     return control.valueChanges.pipe(
       debounceTime(200),
-      map((value) => value || undefined)
+      map((value) => value || undefined),
     );
   }
 
-  protected override transformFilterValueToControlValue(value: DateTime | undefined): DateTime | null {
+  protected override transformFilterValueToControlValue(value?: DateTime): DateTime | null {
     return value ?? null;
   }
 

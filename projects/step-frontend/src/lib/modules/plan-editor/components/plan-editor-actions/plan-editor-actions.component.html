@@ -108,7 +108,11 @@
 
 <mat-menu #executionMenu="matMenu">
   <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-    <step-execution-commands [description]="description" [repositoryObjectRef]="repositoryObjectRef" />
+    <step-execution-commands
+      [description]="description"
+      [repositoryObjectRef]="repositoryObjectRef"
+      (scheduleTask)="scheduleTask.emit($event)"
+    />
   </span>
 </mat-menu>
 <mat-menu #interactiveSessionMenu="matMenu">

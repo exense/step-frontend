@@ -1,8 +1,5 @@
-<ng-template #noPackage>
-  <div matTooltip="This keyword is not part of a Keyword package">-</div>
-</ng-template>
-<div *ngIf="functionPackage; else noPackage">
-  <a href="#" (click)="edit(); (false)">
+@if (functionPackage) {
+  <a [routerLink]="functionPackage | packageUrl">
     <step-resource-label [stModel]="functionPackage.packageLocation" stFormat="filename"></step-resource-label>
   </a>
   <step-btn-group>
@@ -14,14 +11,14 @@
     >
       <step-icon name="refresh-cw"></step-icon>
     </button>
-    <button
+    <a
       mat-icon-button
       matTooltip="Edit package"
       [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
-      (click)="edit()"
+      [routerLink]="functionPackage | packageUrl"
     >
       <step-icon name="edit-2">edit</step-icon>
-    </button>
+    </a>
     <button
       mat-icon-button
       matTooltip="Delete package"
@@ -31,4 +28,6 @@
       <step-icon name="trash-2"></step-icon>
     </button>
   </step-btn-group>
-</div>
+} @else {
+  <div matTooltip="This keyword is not part of a Keyword package">-</div>
+}

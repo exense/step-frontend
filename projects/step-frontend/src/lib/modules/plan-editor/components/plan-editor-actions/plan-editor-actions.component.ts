@@ -1,5 +1,10 @@
 import { Component, EventEmitter, inject, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { PlanContext, RepositoryObjectReference, ViewRegistryService } from '@exense/step-core';
+import {
+  PlanContext,
+  RepositoryObjectReference,
+  ViewRegistryService,
+  ExecutiontTaskParameters,
+} from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 
@@ -32,6 +37,7 @@ export class PlanEditorActionsComponent {
   @Output() reset = new EventEmitter<void>();
   @Output() stop = new EventEmitter<void>();
   @Output() showSource = new EventEmitter<void>();
+  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
 
