@@ -11,6 +11,7 @@ import {
   FunctionConfigurationApiService,
   DialogParentService,
   IsUsedByDialogService,
+  CustomCellRegistryService,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
@@ -37,6 +38,7 @@ export class FunctionListComponent implements DialogParentService {
   private _keywordExecutor = inject(KeywordExecutorService);
   private _isUsedByDialog = inject(IsUsedByDialogService);
 
+  readonly _hasPackages = !!inject(CustomCellRegistryService).getItemInfo('functionPackageLink');
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly returnParentUrl = '/functions';
 

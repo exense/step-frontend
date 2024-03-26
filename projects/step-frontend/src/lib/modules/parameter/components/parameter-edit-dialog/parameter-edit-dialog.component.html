@@ -1,6 +1,6 @@
 <step-modal-window [title]="modalTitle">
   <div step-modal-window-body>
-    <ng-container *ngIf="parameter">
+    @if (parameter) {
       <div class="step-form-fields">
         <section class="param-scope">
           <step-form-field class="scope-field">
@@ -9,31 +9,33 @@
               [ngModel]="selectedScope"
               (ngModelChange)="selectScope($event)"
             >
-              <mat-option *ngFor="let item of scopeItems; trackBy: trackByScopeItem" [value]="item">
-                <div class="scope-item">
-                  <step-icon [name]="item.icon" [ngClass]="item.spanCssClass"> </step-icon>
-                  {{ item.label }}
-                </div>
-              </mat-option>
+              @for (item of scopeItems; track item.scope) {
+                <mat-option [value]="item">
+                  <div class="scope-item">
+                    <step-icon [name]="item.icon" [ngClass]="item.spanCssClass" />
+                    {{ item.label }}
+                  </div>
+                </mat-option>
+              }
             </mat-select>
           </step-form-field>
-          <step-standard-custom-form-inputs
-            *ngIf="parameter.scope === 'APPLICATION'"
-            class="scope-entity"
-            stScreen="functionTable"
-            stInputId="attributes.application"
-            [(ngModel)]="parameter.scopeEntity"
-            hint="The name of the application this parameter is restricted to"
-            [hideLabel]="true"
-          >
-          </step-standard-custom-form-inputs>
-          <step-form-field class="scope-entity" *ngIf="parameter.scope === 'FUNCTION'">
-            <input type="text" [(ngModel)]="parameter.scopeEntity" />
-            <step-suffix class="icon-suffix">
-              <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to">
-              </step-icon>
-            </step-suffix>
-          </step-form-field>
+          @if (parameter.scope === 'APPLICATION') {
+            <step-standard-custom-form-inputs
+              class="scope-entity"
+              stScreen="functionTable"
+              stInputId="attributes.application"
+              [(ngModel)]="parameter.scopeEntity"
+              hint="The name of the application this parameter is restricted to"
+              [hideLabel]="true"
+            />
+          } @else if (parameter.scope === 'FUNCTION') {
+            <step-form-field class="scope-entity">
+              <input type="text" [(ngModel)]="parameter.scopeEntity" />
+              <step-suffix class="icon-suffix">
+                <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to" />
+              </step-suffix>
+            </step-form-field>
+          }
         </section>
 
         <step-form-field>
@@ -64,20 +66,29 @@
             <step-icon
               name="help-circle"
               matTooltip="When a parameter is protected, its value will not show in the UI. This is useful to safely store passwords."
-            ></step-icon>
+            />
           </mat-checkbox>
         </step-form-field>
+        <step-form-field>
+          <step-label>Description</step-label>
+          <input type="text" [(ngModel)]="parameter.description" />
+        </step-form-field>
+        <step-form-field>
+          <step-label>Activation script</step-label>
+          <input type="text" [(ngModel)]="parameter.activationExpression!.script!" />
+        </step-form-field>
+        <step-form-field>
+          <step-label>Priority</step-label>
+          <input type="number" [(ngModel)]="parameter.priority" />
+        </step-form-field>
       </div>
-      <step-custom-forms [(stModel)]="parameter" [stExcludeFields]="['value', 'key']" stScreen="parameterDialog">
-      </step-custom-forms>
-
       <section class="last-modification" *ngIf="parameter.lastModificationDate">
         <label>Last modification</label>
         <span
           >{{ parameter.lastModificationDate | date: DateFormat.DATE }} by {{ parameter.lastModificationUser }}</span
         >
       </section>
-    </ng-container>
+    }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, TrackByFunction } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import {
   AugmentedParametersService,
   AugmentedScreenService,
@@ -42,8 +42,6 @@ export class ParameterEditDialogComponent implements OnInit {
 
   readonly modalTitle = `${this.isEditMode ? 'Edit' : 'New'} Parameter`;
 
-  readonly trackByScopeItem: TrackByFunction<ScopeItem> = (_, item) => item.scope;
-
   ngOnInit(): void {
     this.initParameter();
     this.initScopeItems();
@@ -76,6 +74,8 @@ export class ParameterEditDialogComponent implements OnInit {
       this.protectedParameter = !!this.parameter.protectedValue;
     }
     this.selectedScope = this._allScopeItems.find((item) => item.scope === this.parameter.scope);
+    this.parameter.activationExpression = this.parameter.activationExpression ?? {};
+    this.parameter.activationExpression.script = this.parameter.activationExpression.script ?? '';
   }
 
   private initScopeItems(): void {

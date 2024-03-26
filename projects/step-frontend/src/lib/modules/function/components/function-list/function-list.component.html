@@ -1,5 +1,5 @@
 <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-  <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functions"> </step-bulk-operations>
+  <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functions" />
   <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
     <step-btn-group class="import-keyword-button-group">
       <a
@@ -10,7 +10,7 @@
         [disabled]="!('kw-write' | hasRight | async)"
         routerLink="/functions/import"
       >
-        <step-icon name="download"></step-icon>
+        <step-icon name="download" />
       </a>
       <a
         type="button"
@@ -20,7 +20,7 @@
         [disabled]="!('kw-read' | hasRight | async)"
         routerLink="/functions/export/all"
       >
-        <step-icon name="upload"></step-icon>
+        <step-icon name="upload" />
       </a>
     </step-btn-group>
     <step-btn-group class="create-keyword-button-group">
@@ -33,31 +33,43 @@
         [disabled]="!('kw-write' | hasRight | async)"
         [routerLink]="'new' | keywordConfigurerUrl"
       >
-        <step-icon name="plus"></step-icon>
+        <step-icon name="plus" />
       </a>
-      <step-dashlet itemKey="uploadPackageBtn" [context]="dataSource"> </step-dashlet>
+      <step-dashlet itemKey="uploadPackageBtn" [context]="dataSource" />
     </step-btn-group>
   </section>
 
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
     <td mat-cell *matCellDef="let element">
-      <step-entity-selection-di [entity]="element"></step-entity-selection-di>
+      <step-entity-selection-di [entity]="element" />
     </td>
   </ng-container>
-  <step-entity-column-container entityName="functions"></step-entity-column-container>
+  <step-entity-column-container entityName="functions" />
   <step-custom-columns screen="functionTable"></step-custom-columns>
   <ng-container matColumnDef="type" stepSearchCol>
-    <step-function-type-filter *stepSearchCellDef stepFilterConnect [useRegex]="true"> </step-function-type-filter>
+    <step-function-type-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" />
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
     <td mat-cell *matCellDef="let element">{{ element.type | functionTypeLabel }}</td>
   </ng-container>
-  <step-custom-columns screen="functionTableExtensions" [isSearchDisabled]="false"></step-custom-columns>
+  @if (_hasPackages) {
+    <ng-container matColumnDef="customFields.functionPackageId" stepSearchCol>
+      <step-search-custom-cell
+        *stepSearchCellDef
+        itemKey="rest/table/functionPackage/searchIdsBy/attributes.name"
+        stepFilterConnect
+      />
+      <th mat-header-cell *matHeaderCellDef>Package</th>
+      <td mat-cell *matCellDef="let element">
+        <step-custom-cell itemKey="functionPackageLink" [context]="element" />
+      </td>
+    </ng-container>
+  }
   <ng-container matColumnDef="automationPackage" stepSearchCol>
-    <step-automation-package-filter *stepSearchCellDef stepFilterConnect> </step-automation-package-filter>
+    <step-automation-package-filter *stepSearchCellDef stepFilterConnect />
     <th class="automation-package-cell" mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
-      <step-automation-package-ref-icon [entity]="element"> </step-automation-package-ref-icon>
+      <step-automation-package-ref-icon [entity]="element" />
     </td>
   </ng-container>
   <ng-container matColumnDef="actions">
@@ -70,7 +82,7 @@
           [disabled]="!('kw-write' | hasRight | async)"
           (click)="editFunction(element)"
         >
-          <step-icon name="edit-2"></step-icon>
+          <step-icon name="edit-2" />
         </button>
         <button
           mat-icon-button
@@ -78,7 +90,7 @@
           [disabled]="!('kw-execute' | hasRight | async)"
           (click)="executeFunction(element.id)"
         >
-          <step-icon name="play"></step-icon>
+          <step-icon name="play" />
         </button>
         <button
           mat-icon-button
@@ -86,10 +98,10 @@
           [disabled]="!('kw-delete' | hasRight | async)"
           (click)="deleteFunction(element.id, element.attributes.name)"
         >
-          <step-icon name="trash-2"></step-icon>
+          <step-icon name="trash-2" />
         </button>
         <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
-          <step-icon name="more-horizontal"></step-icon>
+          <step-icon name="more-horizontal" />
         </step-entity-menu-button>
       </step-btn-group>
     </td>
@@ -98,12 +110,12 @@
 <step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
     <a mat-menu-item [disabled]="!('kw-write' | hasRight | async)" [routerLink]="element | keywordConfigurerUrl">
-      <step-icon name="tool"></step-icon>
+      <step-icon name="tool" />
       Configure keyword
     </a>
 
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
-      <step-icon name="copy"></step-icon>
+      <step-icon name="copy" />
       Duplicate keyword
     </button>
 
@@ -112,7 +124,7 @@
       [disabled]="!('kw-read' | hasRight | async)"
       [routerLink]="['/', 'functions', 'export', element.id]"
     >
-      <step-icon name="upload"></step-icon>
+      <step-icon name="upload" />
       Export keyword
     </a>
 
@@ -121,9 +133,9 @@
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
     >
-      <step-icon name="search"></step-icon>
+      <step-icon name="search" />
       Find usages
     </button>
   </ng-container>
 </step-entity-menu>
-<router-outlet></router-outlet>
+<router-outlet />
