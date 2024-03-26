@@ -18,6 +18,10 @@
               <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
             </div>
           </mat-menu>
+          <button mat-menu-item (click)="exportRawData()">
+            <step-icon name="download" />
+            <span>Export Raw Measurements</span>
+          </button>
         </mat-menu>
       </div>
       <div class="header-buttons-container">
