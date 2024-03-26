@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Plan, PlansService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
@@ -9,6 +9,8 @@ export class AugmentedPlansService extends PlansService {
   readonly PLANS_TABLE_ID = 'plans';
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _httpClient = inject(HttpClient);
+
+  private cachedPlan?: Plan;
 
   getPlansTableDataSource(): StepDataSource<Plan> {
     return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, {
@@ -21,6 +23,17 @@ export class AugmentedPlansService extends PlansService {
 
   createSelectionDataSource(): StepDataSource<Plan> {
     return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, { name: 'attributes.name' });
+  }
+
+  getPlanByIdCached(id: string): Observable<Plan> {
+    if (this.cachedPlan && this.cachedPlan.id === id) {
+      return of(this.cachedPlan);
+    }
+    return super.getPlanById(id).pipe(tap((plan) => (this.cachedPlan = plan)));
+  }
+
+  cleanupCache(): void {
+    this.cachedPlan = undefined;
   }
 
   override getYamlPlan(id: string): Observable<any> {
