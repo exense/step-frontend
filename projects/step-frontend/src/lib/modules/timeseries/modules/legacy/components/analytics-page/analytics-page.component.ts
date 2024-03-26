@@ -49,18 +49,9 @@ export class AnalyticsPageComponent implements OnInit, OnDestroy {
   refreshIntervals = TimeSeriesConfig.AUTO_REFRESH_INTERVALS;
   selectedRefreshInterval = this.refreshIntervals[this.refreshIntervals.length - 1];
 
-  groupingOptions = TimeSeriesConfig.DEFAULT_GROUPING_OPTIONS;
-  selectedGrouping = this.groupingOptions[0];
-
   stopInterval$ = new Subject();
 
-  contextualParams: any = {};
-
   compareModeEnabled = false;
-  executionHasToBeBuilt = false;
-  migrationInProgress = false;
-
-  timeSeriesService = inject(TimeSeriesService);
   context?: TimeSeriesContext;
 
   ngOnInit(): void {
