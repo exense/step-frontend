@@ -13,7 +13,6 @@ import {
 } from '@exense/step-core';
 import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
 import { BehaviorSubject, of, switchMap } from 'rxjs';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-execution-list',
@@ -27,7 +26,6 @@ import { Router } from '@angular/router';
 })
 export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
-  private _router = inject(Router);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
@@ -60,10 +58,6 @@ export class ExecutionListComponent implements OnDestroy {
   refreshTable(): void {
     this.dataSource.reload({ hideProgress: true });
     this.reloadRunningExecutionsCount$.next();
-  }
-
-  navigateToExecution(id: string): void {
-    this._router.navigate(['executions', id], { queryParamsHandling: 'preserve' });
   }
 
   handleRunningStatusClick(): void {

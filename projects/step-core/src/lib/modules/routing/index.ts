@@ -7,3 +7,4 @@ export * from './injectables/default-page.token';
 export * from './types/routes-priority-sort-predicate';
 export * from './types/sub-route-data.interface';
 export * from './types/sub-router-config.interface';
+export * from './guards/sequence-can-activate.guard';

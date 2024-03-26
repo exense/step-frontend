@@ -1,15 +1,17 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedPlansService,
+  checkProjectGuardFactory,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
   EntityRegistry,
   ExportDialogComponent,
   ImportDialogComponent,
   PlanCreateDialogComponent,
-  PlanDialogsService,
   PlanLinkComponent,
-  PlanLinkDialogService,
+  quickAccessRoute,
+  schedulePlanRoute,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -20,22 +22,13 @@ import { PlanEditorModule } from '../plan-editor/plan-editor.module';
 import { PlanEditorComponent } from './components/plan-editor/plan-editor.component';
 import { PlanSelectionComponent } from './components/plan-selection/plan-selection.component';
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
-import { planResolver } from './guards/plan.resolver';
-import { PlanActionsModule } from '../plan-actions/plan-actions.module';
-import { planDeactivate } from './guards/plan.deactivate';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanActionsModule],
+  imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  providers: [
-    {
-      provide: PlanLinkDialogService,
-      useExisting: PlanDialogsService,
-    },
-  ],
 })
 export class PlanModule {
   constructor(
@@ -109,14 +102,44 @@ export class PlanModule {
             },
           ],
         },
-        {
+        quickAccessRoute('plansEditor', {
           path: 'editor/:id',
           component: PlanEditorComponent,
+          canActivate: [
+            checkProjectGuardFactory({
+              entityType: 'plan',
+              getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
+              getEditorUrl: (id, route) => {
+                const planEditLink = inject(CommonEntitiesUrlsService).planEditorUrl(id);
+                const artefactId = route.queryParams['artefactId'];
+
+                const editLinkParams = !artefactId
+                  ? planEditLink
+                  : {
+                      url: planEditLink,
+                      search: { ['artefactId']: artefactId },
+                    };
+                return editLinkParams;
+              },
+            }),
+          ],
           resolve: {
-            plan: planResolver,
+            plan: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              if (!id) {
+                return undefined;
+              }
+              return inject(AugmentedPlansService).getPlanByIdCached(id);
+            },
           },
-          canDeactivate: [planDeactivate],
-        },
+          canDeactivate: [
+            () => {
+              inject(AugmentedPlansService).cleanupCache();
+              return true;
+            },
+          ],
+          children: [schedulePlanRoute()],
+        }),
       ],
     });
   }

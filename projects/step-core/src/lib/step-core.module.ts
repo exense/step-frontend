@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MAT_LUXON_DATE_ADAPTER_OPTIONS } from '@angular/material-luxon-adapter';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { AngularSplitModule } from 'angular-split';
 import { StepGeneratedClientModule } from './client/generated';
@@ -39,7 +38,6 @@ import { StepMaterialModule } from './modules/step-material/step-material.module
 import { TableModule } from './modules/table/table.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
-import { DashboardLinkPipe } from './pipes/dashboard-link.pipe';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
@@ -50,7 +48,6 @@ import { ResourceInputModule } from './modules/resource-input/resource-input.mod
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
-import { SelectTaskComponent } from './components/select-task/select-task.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
@@ -69,12 +66,13 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
+import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
+import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 
 @NgModule({
   declarations: [
     MatchingAuthenticator,
-    DashboardLinkPipe,
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
@@ -101,13 +99,13 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
     MyAccountButtonComponent,
-    SelectTaskComponent,
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    DashboardNavigationParamsPipe,
   ],
   imports: [
     CommonModule,
@@ -139,6 +137,7 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    EXECUTION_COMMON_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
   ],
   exports: [
@@ -150,7 +149,6 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     StepMaterialModule,
     JsonViewerModule,
     MatchingAuthenticator,
-    DashboardLinkPipe,
     TableModule,
     StepBasicsModule,
     EntityModule,
@@ -190,7 +188,6 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     KeywordsCommonModule,
     AutomationPackageCommonModule,
     MyAccountButtonComponent,
-    SelectTaskComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
     CronModule,
@@ -204,6 +201,8 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    EXECUTION_COMMON_EXPORTS,
+    DashboardNavigationParamsPipe,
     MULTI_LEVEL_SELECT_EXPORTS,
   ],
   providers: [
@@ -251,7 +250,6 @@ export { PlanNameComponent } from './components/plan-name/plan-name.component';
 export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 export * from './components/report-node-status/report-node-status.component';
-export * from './components/select-task/select-task.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
 export * from './components/my-account-button/my-account-button.component';
@@ -271,6 +269,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
+export * from './guards/check-project-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
@@ -293,12 +292,11 @@ export * from './modules/import-export';
 export * from './modules/plan-common';
 export * from './modules/routing';
 export * from './modules/auth';
-export * from './pipes/dashboard-link.pipe';
+export * from './modules/is-used-by';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
 export * from './services/artefact-refresh-notification.service';
-export * from './services/dashboard.service';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
 export * from './services/global-progress-spinner.service';
@@ -316,6 +314,7 @@ export * from './modules/basics/types/api-token.interface';
 export * from './modules/editable-labels';
 export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
+export * from './modules/execution-common';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
@@ -330,4 +329,5 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/multi-level-select';

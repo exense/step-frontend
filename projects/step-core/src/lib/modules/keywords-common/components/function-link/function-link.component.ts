@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Keyword } from '../../../../client/step-client-module';
 import { CustomComponent } from '../../../custom-registeries/shared/custom-component';
 import { BaseFunctionLinkComponent } from './base-function-link.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-function-link',
@@ -9,6 +10,8 @@ import { BaseFunctionLinkComponent } from './base-function-link.component';
   styleUrls: ['./function-link.component.scss'],
 })
 export class FunctionLinkComponent extends BaseFunctionLinkComponent implements CustomComponent {
+  private _router = inject(Router);
+
   override handleLinkClick(): void {
     if (!this.context?.id || !this._functionActions) {
       return;
@@ -17,6 +20,6 @@ export class FunctionLinkComponent extends BaseFunctionLinkComponent implements 
   }
 
   editFunction(keyword: Keyword): void {
-    this._functionActions!.configureFunction(keyword.id!);
+    this._router.navigateByUrl(this._functionActions!.resolveConfigurerUrl(keyword));
   }
 }
