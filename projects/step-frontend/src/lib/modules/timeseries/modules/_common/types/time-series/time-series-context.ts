@@ -63,9 +63,13 @@ export class TimeSeriesContext {
     this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
     const attributes: Record<string, MetricAttribute> =
-      params.attributes?.reduce((acc, el) => {
-        return el;
-      }, {}) || {};
+      params.attributes?.reduce(
+        (acc, el) => {
+          acc[el.name] = el;
+          return acc;
+        },
+        {} as Record<string, MetricAttribute>,
+      ) || {};
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
