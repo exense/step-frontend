@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
 import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
 import { uploadWithProgress } from '../shared/pipe-operators';
@@ -11,6 +11,8 @@ export class AugmentedResourcesService extends ResourcesService {
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+
+  private cachedResource?: Resource;
 
   createDataSource(): StepDataSource<Resource> {
     return this._dataSourceFactory.createDataSource(this.RESOURCES_TABLE_ID, {
@@ -96,5 +98,16 @@ export class AugmentedResourcesService extends ResourcesService {
         aElement.click();
         URL.revokeObjectURL(href);
       });
+  }
+
+  getResourceCached(id: string): Observable<Resource> {
+    if (this.cachedResource && this.cachedResource.id === id) {
+      return of(this.cachedResource);
+    }
+    return super.getResource(id).pipe(tap((resource) => (this.cachedResource = resource)));
+  }
+
+  cleanupCache(): void {
+    this.cachedResource = undefined;
   }
 }

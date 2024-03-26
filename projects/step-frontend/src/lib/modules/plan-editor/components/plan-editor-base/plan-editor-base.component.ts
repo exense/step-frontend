@@ -1,12 +1,14 @@
 import {
   ChangeDetectorRef,
   Component,
+  EventEmitter,
   forwardRef,
   inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
@@ -28,20 +30,22 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   ArtefactService,
-  PlanLinkDialogService,
   FunctionActionsService,
   PlanOpenService,
   PlanSetupService,
   PlanEditorApiService,
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
+  PlanUrlPipe,
+  CommonEntitiesUrlsService,
+  ExecutiontTaskParameters,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
 
@@ -90,7 +94,6 @@ export class PlanEditorBaseComponent
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
   private _functionActions = inject(FunctionActionsService);
-  private _planLinkDialogs = inject(PlanLinkDialogService, { optional: true });
   private _artefactService = inject(ArtefactService);
   public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -98,6 +101,8 @@ export class PlanEditorBaseComponent
   private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
   private _matDialog = inject(MatDialog);
   private _cd = inject(ChangeDetectorRef);
+  private _router = inject(Router);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -111,6 +116,7 @@ export class PlanEditorBaseComponent
   @Input() compositeId?: string;
   @Input() initialPlan?: Plan | null;
   @Input() showExecuteButton = true;
+  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   selectedTab = 'controls';
 
@@ -264,7 +270,7 @@ export class PlanEditorBaseComponent
               return of(undefined);
             }
 
-            return this.openPlan(plan as Plan);
+            return this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan as Plan));
           }),
         )
         .subscribe();
@@ -358,13 +364,6 @@ export class PlanEditorBaseComponent
           this.selectedTab = consoleTab.id;
         }
       });
-  }
-
-  private openPlan(plan: Plan): Observable<unknown> {
-    if (!this._planLinkDialogs) {
-      return of(undefined);
-    }
-    return this._planLinkDialogs.editPlan(plan);
   }
 
   private openFunctionEditor(keyword: Keyword): Observable<unknown> {
