@@ -1,28 +1,42 @@
-import { Directive, HostListener, Inject, Optional } from '@angular/core';
+import { Directive, forwardRef, HostListener, inject } from '@angular/core';
 import {
   AuthService,
   PlanArtefactResolverService,
   PlanEditorService,
   PlanInteractiveSessionService,
+  TreeFocusStateService,
 } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[stepPlanEditorKeyHandler]',
+  providers: [
+    {
+      provide: TreeFocusStateService,
+      useExisting: forwardRef(() => PlanEditorKeyHandlerDirective),
+    },
+  ],
 })
-export class PlanEditorKeyHandlerDirective {
-  constructor(
-    private _authService: AuthService,
-    @Inject(DOCUMENT) private _document: Document,
+export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
+  private _authService = inject(AuthService);
+  private _document = inject(DOCUMENT);
 
-    private _planEditorService: PlanEditorService,
-    @Optional() private _planInteractiveSession?: PlanInteractiveSessionService,
-    @Optional() private _planArtefactResolver?: PlanArtefactResolverService
-  ) {}
+  private _planEditorService = inject(PlanEditorService);
+  private _planInteractiveSession = inject(PlanInteractiveSessionService, { optional: true });
+  private _planArtefactResolver = inject(PlanArtefactResolverService, { optional: true });
+
+  private isTreeInFocus = false;
+
+  setTreeFocus(isInFocus: boolean): void {
+    this.isTreeInFocus = isInFocus;
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
     const isCtrl = event.metaKey || event.ctrlKey;
+
+    // If text selection exits, ignore this handler for ctrl+c & ctrl+v shortcuts, to prevent native event cancellation
+    const hasTextSelection = !!this._document.defaultView?.getSelection()?.toString();
 
     if (isCtrl && event.shiftKey) {
       if (this.checkKey(event, true, ['Up', 'ArrowUp'], 'plan-write')) {
@@ -37,7 +51,7 @@ export class PlanEditorKeyHandlerDirective {
         return;
       }
 
-      if (this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, ['v', 'V'], 'plan-write')) {
         event.preventDefault();
         this._planEditorService.pasteAfter();
         return;
@@ -81,13 +95,13 @@ export class PlanEditorKeyHandlerDirective {
         return;
       }
 
-      if (this.checkKey(event, true, 'c', 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, 'c', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.copy();
         return;
       }
 
-      if (this.checkKey(event, true, 'v', 'plan-write')) {
+      if (!hasTextSelection && this.checkKey(event, true, 'v', 'plan-write')) {
         event.preventDefault();
         this._planEditorService.paste();
         return;
@@ -135,11 +149,9 @@ export class PlanEditorKeyHandlerDirective {
     event: KeyboardEvent,
     isEmitByTreeOnly: boolean,
     keys: string | string[],
-    rights?: string | string[]
+    rights?: string | string[],
   ): boolean {
-    // Check event target to prevent false invocation
-    // When tree will be in focus, event will be captured from document's body
-    if (isEmitByTreeOnly && event.target !== this._document.body) {
+    if (isEmitByTreeOnly && !this.isTreeInFocus) {
       return false;
     }
 

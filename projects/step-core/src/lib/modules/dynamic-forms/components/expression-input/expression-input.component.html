@@ -1,10 +1,17 @@
 <step-form-field
   [class.ng-invalid]="!!_ngControl.invalid || !!isParentInvalid"
   [class.ng-touched]="!!_ngControl.touched || !!isParentTouched"
-  [class.with-tooltip]="tooltip"
   [showRequiredMarker]="showRequiredMarker"
+  alignLabelAddon="near"
 >
-  <step-label *ngIf="label">{{ label }}</step-label>
+  @if (label) {
+    <step-label>{{ label }}</step-label>
+  }
+  @if (tooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+    </step-label-addon>
+  }
 
   <input
     type="text"
@@ -17,10 +24,6 @@
     (blur)="onBlur()"
   />
 
-  <step-suffix *ngIf="tooltip" class="icon-suffix">
-    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"></step-icon>
-  </step-suffix>
-
   <step-suffix class="button-suffix">
     <button
       type="button"
@@ -28,27 +31,26 @@
       [disabled]="isDisabled || !!isParentDisabled"
       (click)="editDynamicExpression()"
     >
-      <step-icon name="edit-2"></step-icon>
+      <step-icon name="edit-2" />
     </button>
   </step-suffix>
 
   <step-suffix class="button-suffix">
-    <ng-template #disabledState>
+    @if (isDisabled || !!isParentDisabled) {
       <button type="button" mat-flat-button color="primary" [disabled]="true">
-        <step-icon name="zap"></step-icon>
+        <step-icon name="zap" />
       </button>
-    </ng-template>
-    <button
-      *ngIf="!isDisabled; else disabledState"
-      type="button"
-      mat-stroked-button
-      [disabled]="isDisabled || !!isParentDisabled"
-      color="primary"
-      matTooltip="Use a constant value to set this attribute"
-      matTooltipPosition="below"
-      (click)="toggleConstantValue.emit()"
-    >
-      <step-icon name="zap"></step-icon>
-    </button>
+    } @else {
+      <button
+        type="button"
+        mat-stroked-button
+        color="primary"
+        matTooltip="Use a constant value to set this attribute"
+        matTooltipPosition="below"
+        (click)="toggleConstantValue.emit()"
+      >
+        <step-icon name="zap" />
+      </button>
+    }
   </step-suffix>
 </step-form-field>

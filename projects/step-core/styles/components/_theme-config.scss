@@ -229,7 +229,7 @@ $light-primary-text: var.$white;
   }
   .btn-sm,
   .btn-auto-size,
-  a:not(.jstree-anchor) {
+  a:not([mat-menu-item]):not([mat-icon-button]):not([mat-mini-fab]) {
     @include step-icon.step-icon(16px);
     step-icon {
       vertical-align: top;
@@ -239,6 +239,10 @@ $light-primary-text: var.$white;
   step-label > step-icon {
     @include step-icon.step-icon-size(18px);
     vertical-align: text-top;
+  }
+
+  a[disabled] {
+    pointer-events: none;
   }
 
   tbody .form-group {

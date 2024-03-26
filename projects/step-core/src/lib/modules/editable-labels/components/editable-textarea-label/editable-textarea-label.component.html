@@ -5,7 +5,7 @@
         <div class="editable-textarea-label-content" [innerHTML]="value"></div>
       } @else {
         <div class="editable-textarea-placeholder">
-          <ng-container *ngTemplateOutlet="labelTemplate" />
+          <ng-container *ngTemplateOutlet="labelTemplate()" />
         </div>
       }
     </div>

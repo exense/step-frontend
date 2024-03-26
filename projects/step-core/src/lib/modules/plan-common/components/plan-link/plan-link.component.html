@@ -22,7 +22,7 @@
 </ng-template>
 
 <ng-template #linkTemplate>
-  <a href="#" (click)="editPlan(); (false)">
+  <a [routerLink]="context | planUrl">
     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
   </a>
 </ng-template>

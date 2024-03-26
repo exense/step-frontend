@@ -1,36 +1,36 @@
-<div class="spinner-container" *ngIf="(tableDataSource?.inProgress$ | async) || inProgress">
-  <mat-spinner></mat-spinner>
-</div>
-<ng-container *ngFor="let additionalHeaderGroup of additionalHeaderGroups">
-  <div class="additional-header" [class.additional-header-flex]="!!additionalHeaderGroup[1]">
-    <ng-container *ngFor="let additionalHeader of additionalHeaderGroup">
-      <ng-container *ngTemplateOutlet="additionalHeader!.template"></ng-container>
-    </ng-container>
+@if ((tableDataSource?.inProgress$ | async) || inProgress) {
+  <div class="spinner-container">
+    <mat-spinner />
   </div>
-</ng-container>
-
+}
+@for (additionalHeaderGroup of additionalHeaderGroups; track additionalHeaderGroup) {
+  <div class="additional-header" [class.additional-header-flex]="!!additionalHeaderGroup[1]">
+    @for (additionalHeader of additionalHeaderGroup; track additionalHeader.headerGroupId) {
+      <ng-container *ngTemplateOutlet="additionalHeader!.template" />
+    }
+  </div>
+}
 <div class="table-container">
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
-    <ng-container
-      *ngFor="let searchCol of searchColumns; trackBy: trackBySearchColumn"
-      [matColumnDef]="searchCol.colName"
-    >
-      <th mat-header-cell *matHeaderCellDef>
-        <ng-template #defaultSearchRender>
-          <ng-container *ngIf="searchCol" [stepSearchColMeta]="searchCol">
-            <step-input-filter stepFilterConnect></step-input-filter>
-          </ng-container>
-        </ng-template>
-        <ng-container *ngIf="searchCol.searchName">
-          <ng-container *ngIf="!!searchCol.template; then searchCol.template!; else defaultSearchRender">
-          </ng-container>
-        </ng-container>
-      </th>
-    </ng-container>
+    @for (searchCol of searchColumns; track searchCol.colName) {
+      <ng-container [matColumnDef]="searchCol.colName">
+        <th mat-header-cell *matHeaderCellDef>
+          @if (searchCol.searchName) {
+            @if (searchCol.template) {
+              <ng-container *ngTemplateOutlet="searchCol.template" />
+            } @else {
+              <ng-container [stepSearchColMeta]="searchCol">
+                <step-input-filter stepFilterConnect />
+              </ng-container>
+            }
+          }
+        </th>
+      </ng-container>
+    }
     <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
-    <ng-container *ngIf="displaySearchColumns.length > 0">
+    @if (displaySearchColumns.length > 0) {
       <tr mat-header-row *matHeaderRowDef="displaySearchColumns"></tr>
-    </ng-container>
+    }
     <tr
       mat-row
       *matRowDef="let row; columns: displayColumns"
@@ -39,16 +39,17 @@
     ></tr>
     <tr class="mat-mdc-row" *matNoDataRow>
       <td class="mat-mdc-cell no-data" [colSpan]="displayColumns.length">
-        <ng-container *ngIf="(tableDataSource?.total$ | async) === 0; then noTotal; else noSearch"></ng-container>
-        <ng-template #noTotal> No data available in table</ng-template>
-        <ng-template #noSearch> No matching records found</ng-template>
+        @if ((tableDataSource?.total$ | async) === 0) {
+          No data available in table
+        } @else {
+          No matching records found
+        }
       </td>
     </tr>
   </table>
 </div>
-<mat-paginator
+<step-paginator
   [disabled]="pageSizeInputDisabled"
   [length]="tableDataSource?.totalFiltered$ | async"
   [pageSizeOptions]="pageSizeOptions"
->
-</mat-paginator>
+/>

@@ -6,11 +6,11 @@ import {
   EventEmitter,
   forwardRef,
   inject,
+  input,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
-  Optional,
   Output,
   QueryList,
   SimpleChanges,
@@ -19,11 +19,23 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  takeUntil,
+  tap,
+  timestamp,
+} from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
@@ -42,9 +54,10 @@ import { TablePersistenceStateService } from '../../services/table-persistence-s
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
 import { TableColumnsMove } from '../../services/table-columns-move';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { TableColumnsReconfigure } from '../../services/table-columns-reconfigure';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -105,6 +118,7 @@ export class TableComponent<T>
     TableColumnsReconfigure
 {
   private _tableState = inject(TablePersistenceStateService);
+  private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
 
   private initRequired: boolean = false;
@@ -116,13 +130,9 @@ export class TableComponent<T>
 
   searchColumns: SearchColumn[] = [];
 
-  pageSizeOptions: Array<number>;
   readonly trackBySearchColumn: TrackByFunction<SearchColumn> = (index, item) => item.colName;
 
   private dataSourceTerminator$?: Subject<void>;
-  private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
-  private filter$ = new BehaviorSubject<string | undefined>(undefined);
-  private tableParams$ = new BehaviorSubject<TableParameters | undefined>(undefined);
 
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
@@ -134,30 +144,14 @@ export class TableComponent<T>
   visibleColumns?: Set<string>;
   @Input() defaultSearch?: Record<string, SearchValue>;
 
-  @Input() set filter(value: string | undefined) {
-    if (value === this.filter) {
-      return;
-    }
-    this.filter$.next(value);
-  }
+  /** @Input() **/
+  filter = input<string | undefined>(undefined);
 
-  get filter(): string | undefined {
-    return this.filter$.value;
-  }
+  /** @Input() **/
+  tableParams = input<TableParameters | undefined>(undefined);
 
-  @Input() set tableParams(value: TableParameters | undefined) {
-    if (value === this.tableParams) {
-      return;
-    }
-    this.tableParams$.next(value);
-  }
-
-  get tableParams(): TableParameters | undefined {
-    return this.tableParams$.value;
-  }
-
-  @ViewChild(MatTable) private _table?: MatTable<any>;
-  @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
+  @ViewChild(MatTable) private table?: MatTable<any>;
+  @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
   additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
@@ -173,10 +167,18 @@ export class TableComponent<T>
       .filter((x) => !x.isSearchDisabled);
   }
 
+  readonly pageSizeOptions = inject(ItemsPerPageService).getItemsPerPage((userPreferredItemsPerPage) =>
+    this.page.pageSize.set(userPreferredItemsPerPage),
+  );
+
   private get orderedColumns(): string[] {
     const configuredColumns = new Set(this.allCollDef.map((col) => col.name));
     return this.columnsOrder.filter((col) => configuredColumns.has(col));
   }
+
+  private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
+  private filter$ = toObservable(this.filter);
+  private tableParams$ = toObservable(this.tableParams);
 
   readonly hasFilter$ = this.search$.pipe(
     map((search) => {
@@ -201,20 +203,10 @@ export class TableComponent<T>
 
   highlightedItem?: unknown;
 
-  constructor(
-    @Optional() private _sort: MatSort,
-    _itemsPerPageService: ItemsPerPageService,
-  ) {
-    this.pageSizeOptions = _itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage: number) =>
-      this.page._changePageSize(userPreferredItemsPerPage),
-    );
-  }
-
   private terminateDatasource(): void {
-    if (this.dataSourceTerminator$) {
-      this.dataSourceTerminator$.next();
-      this.dataSourceTerminator$.complete();
-    }
+    this.dataSourceTerminator$?.next();
+    this.dataSourceTerminator$?.complete();
+    this.dataSourceTerminator$ = undefined;
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -268,11 +260,7 @@ export class TableComponent<T>
       });
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
-      // Unfortunately firstPage method invoking doesn't trigger page change event.
-      // It just updates the page index in component and redraw it.
-      // To trigger the event _changePageSize is invoked
       this.page!.firstPage();
-      this.page!._changePageSize(this.page.pageSize);
     });
   }
 
@@ -302,21 +290,21 @@ export class TableComponent<T>
 
     const statePage = this._tableState.getPage();
     if (statePage) {
-      this.page.pageSize = statePage.pageSize;
-      this.page.pageIndex = statePage.pageIndex;
-      this.page.length = statePage.length;
+      this.page.pageSize.set(statePage.pageSize);
+      this.page.pageIndex.set(statePage.pageIndex);
+      this.page.length.set(statePage.length);
       initialPage = statePage;
     } else {
       this.page.firstPage();
       initialPage = this.createPageInitialValue();
     }
 
-    return this.page.page.pipe(startWith(initialPage));
+    return this.page.page$.pipe(startWith(initialPage));
   }
 
   private createPageInitialValue(): PageEvent {
     return {
-      pageSize: this.page.pageSize || this.pageSizeOptions[0],
+      pageSize: this.page.pageSize() || this.pageSizeOptions[0],
       pageIndex: 0,
       length: 0,
     };
@@ -360,12 +348,28 @@ export class TableComponent<T>
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
   }
 
+  /* private setupColumns(): void {
+    const allCollDef = this.allCollDef;
+
+    allCollDef.forEach((col) => this.table!.addColumnDef(col));
+
+    setTimeout(() => {
+      this.displayColumns = this.determineDisplayColumns(this.visibleColumns);
+    });
+  } */
+
   private setupDefaultSearch(): void {
     if (!this.defaultSearch) {
       return;
     }
     const searchValue = { ...this.defaultSearch, ...this.search$.value };
     this.search$.next(searchValue);
+  }
+
+  private setupExternalSearchChangeHandle(): void {
+    this._tableState.externalSearchChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((externalSearch) => {
+      this.search$.next(externalSearch);
+    });
   }
 
   onSearch(column: string, searchValue: SearchValue): void;
@@ -380,12 +384,12 @@ export class TableComponent<T>
     this.search$.next(search);
   }
 
-  getSearchValue(column: string): SearchValue | undefined {
-    return this.search$.value[column];
+  getSearchValue$(column: string): Observable<SearchValue | undefined> {
+    return this.search$.pipe(map((value) => value[column]));
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
-    const [search, filter, params] = [this.search$.value, this.filter$.value, this.tableParams$.value];
+    const [search, filter, params] = [this.search$.value, this.filter(), this.tableParams()];
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
@@ -422,6 +426,7 @@ export class TableComponent<T>
 
   ngOnInit(): void {
     this.setupDefaultSearch();
+    this.setupExternalSearchChangeHandle();
   }
 
   ngAfterViewInit(): void {
@@ -456,8 +461,6 @@ export class TableComponent<T>
   ngOnDestroy(): void {
     this.terminateDatasource();
     this.search$.complete();
-    this.filter$.complete();
-    this.tableParams$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -474,7 +477,7 @@ export class TableComponent<T>
   private configureColumns(): void {
     const allCollDef = this.allCollDef;
 
-    allCollDef.forEach((col) => this._table!.addColumnDef(col));
+    allCollDef.forEach((col) => this.table!.addColumnDef(col));
     const columnNames = allCollDef.map((col) => col.name);
 
     if (!this.columnsOrder?.length) {
@@ -530,6 +533,6 @@ export class TableComponent<T>
       console.error('No datasource for export');
       return;
     }
-    this.tableDataSource.exportAsCSV(fields, this.tableParams);
+    this.tableDataSource.exportAsCSV(fields, this.tableParams());
   }
 }

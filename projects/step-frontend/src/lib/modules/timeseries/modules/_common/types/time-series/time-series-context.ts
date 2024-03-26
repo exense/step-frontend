@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, skip, Subject } from 'rxjs';
+import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
 import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
@@ -23,24 +23,28 @@ export class TimeSeriesContext {
   activeExecution: Execution | undefined;
   filteringMode: TsFilteringMode = TsFilteringMode.STANDARD;
 
-  compareModeChange$: BehaviorSubject<TsCompareModeSettings> = new BehaviorSubject<TsCompareModeSettings>({
-    enabled: false,
-  });
+  readonly compareModeChange$ = new BehaviorSubject<TsCompareModeSettings>({ enabled: false });
+  readonly editMode$: BehaviorSubject<boolean>;
 
+  /**
+   * General observable which emits when any part of the context has been change.
+   */
+  readonly stateChange$: Observable<void>;
+  private stateChangeInternal$ = new Subject<void>();
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
 
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
-  private readonly fullTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
+  private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private selectedTimeRange: TimeRange; // this is the zooming selection.
-  private readonly selectedTimeRangeChange$: Subject<TimeRange> = new Subject<TimeRange>();
+  private readonly selectedTimeRangeChange$ = new Subject<TimeRange>();
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
   private readonly activeFilters$: BehaviorSubject<FilterBarItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
-  private readonly chartsResolution$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
   public readonly keywordsContext: TimeSeriesKeywordsContext;
@@ -56,10 +60,26 @@ export class TimeSeriesContext {
       oql: '',
       filterItems: params.filters || [],
     });
+    this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(params.attributes || {});
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
+    this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
+
+    // any specific context change will trigger the main stateChange
+    this.stateChange$ = merge(
+      this.compareModeChange$,
+      this.inProgress$,
+      this.fullTimeRangeChange$,
+      this.selectedTimeRangeChange$,
+      this.activeGroupings$,
+      this.activeFilters$,
+      this.filterSettings$,
+      this.chartsResolution$,
+      this.chartsLockedState$,
+      this.stateChangeInternal$,
+    ) as Observable<void>;
   }
 
   destroy(): void {
@@ -70,6 +90,11 @@ export class TimeSeriesContext {
     this.activeFilters$.complete();
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
+    this.stateChangeInternal$.complete();
+  }
+
+  updateEditMode(enabled: boolean) {
+    this.editMode$.next(enabled);
   }
 
   /**
@@ -158,6 +183,8 @@ export class TimeSeriesContext {
     this.fullTimeRange = range;
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
+    } else {
+      this.stateChangeInternal$.next();
     }
   }
 
@@ -165,6 +192,8 @@ export class TimeSeriesContext {
     this.selectedTimeRange = range;
     if (emitEvent) {
       this.selectedTimeRangeChange$.next(range);
+    } else {
+      this.stateChangeInternal$.next();
     }
   }
 

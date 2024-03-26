@@ -1,17 +1,16 @@
 import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
-  ArtefactFilter,
   AugmentedExecutionsService,
   AugmentedScreenService,
-  AuthService,
+  CommonEntitiesUrlsService,
   Execution,
   ExecutionParameters,
+  ExecutionParamsFactoryService,
   ExecutiontTaskParameters,
   RepositoryObjectReference,
-  ScheduledTaskDialogsService,
+  IncludeTestcases,
 } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { Router } from '@angular/router';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 
@@ -22,11 +21,11 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 })
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
+  private _executionParamsFactory = inject(ExecutionParamsFactoryService);
   private _router = inject(Router);
+  private _commonEntitiesUrl = inject(CommonEntitiesUrlsService);
   private _executionService = inject(AugmentedExecutionsService);
   private _screenTemplates = inject(AugmentedScreenService);
-  private _scheduledTaskDialogs = inject(ScheduledTaskDialogsService);
-  private _authService = inject(AuthService);
   private _document = inject(DOCUMENT);
 
   @Input() description?: string;
@@ -36,6 +35,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() execution?: Execution;
 
   @Output() refresh = new EventEmitter<void>();
+  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   executionParameters?: Record<string, string>;
   isExecutionIsolated: boolean = false;
@@ -77,7 +77,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       if (currentEId && this._executionTabManager) {
         this._executionTabManager.handleTabClose(currentEId, false);
       }
-      this._router.navigateByUrl(`/executions/open/${eId}`);
+      this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(eId, false));
     });
   }
 
@@ -91,17 +91,20 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   schedule(): void {
     const task = this.prefillScheduledTask();
-    this._scheduledTaskDialogs.editScheduledTask(task).subscribe((result) => {
-      if (result) {
-        this._router.navigate(['scheduler']);
-      }
-    });
+    this.scheduleTask.emit(task);
   }
 
   copyExecutionServiceAsCurlToClipboard(): Promise<void> {
     const { location, navigator } = this._document.defaultView as Window;
-    let url = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
-    url = `${url}/rest/executions/start`;
+
+    const hashIndex = location.href.indexOf('#');
+    let url =
+      hashIndex >= 0
+        ? location.href.slice(0, hashIndex)
+        : `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
+
+    url = url.endsWith('/') ? url : `${url}/`;
+    url = `${url}rest/executions/start`;
 
     const payload = this.buildExecutionParams(false);
     const cmd = `curl -X POST ${url} -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`;
@@ -128,40 +131,15 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   private buildExecutionParams(simulate: boolean, includeUserId = true): ExecutionParameters {
-    const userID = includeUserId ? this._authService.getUserID() : undefined;
-    const description = this.description;
-    const mode = simulate ? 'SIMULATION' : 'RUN';
-    const repositoryObject = this.repositoryObjectRef;
-    const isolatedExecution = this.isExecutionIsolated;
-
-    let artefactFilter: ArtefactFilter | undefined;
-    if (this.includedTestcases) {
-      if (this.includedTestcases.by === 'id') {
-        (artefactFilter as any) = {
-          class: 'step.artefacts.filters.TestCaseIdFilter',
-          includedIds: this.includedTestcases.list,
-        };
-      } else if (this.includedTestcases.by === 'name') {
-        (artefactFilter as any) = {
-          class: 'step.artefacts.filters.TestCaseFilter',
-          includedNames: this.includedTestcases.list,
-        };
-      } else if (this.includedTestcases.by === 'all') {
-        (artefactFilter as any) = undefined;
-      } else {
-        throw `Unsupported clause ${this.includedTestcases.by}`;
-      }
-    }
-    return {
-      userID,
-      description,
-      mode,
-      repositoryObject,
-      exports: [],
-      isolatedExecution,
-      artefactFilter,
+    return this._executionParamsFactory.create({
+      simulate,
+      includeUserId,
+      description: this.description,
+      repositoryObject: this.repositoryObjectRef,
+      isolatedExecution: this.isExecutionIsolated,
+      includedTestCases: this.includedTestcases ?? undefined,
       customParameters: this.executionParameters,
-    };
+    });
   }
 
   private prefillScheduledTask(): ExecutiontTaskParameters {

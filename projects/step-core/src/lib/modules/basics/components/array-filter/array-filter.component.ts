@@ -54,8 +54,8 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
     return control.valueChanges.pipe(map((value) => arrayToRegex(value as string[])));
   }
 
-  protected override transformFilterValueToControlValue(value: string): unknown {
-    return regexToArray(value);
+  protected override transformFilterValueToControlValue(value?: string): unknown {
+    return !value ? [] : regexToArray(value);
   }
 
   private setupDisplayItems(

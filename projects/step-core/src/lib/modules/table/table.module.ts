@@ -35,6 +35,8 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../routing';
+import { PaginatorComponent } from './components/paginator/paginator.component';
+import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
 import { AUTH_EXPORTS } from '../auth';
 import { DRAG_DROP_EXPORTS } from '../drag-drop';
 import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
@@ -50,6 +52,7 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     EntitiesSelectionModule,
     CustomRegistriesModule,
     AsyncOperationsModule,
+    EDITABLE_LABELS_EXPORTS,
     StepBasicsModule,
     DatePickerModule,
     AUTH_EXPORTS,
@@ -77,6 +80,7 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     DragColumnCaptionComponent,
     CustomColumnEditorDropdownOptionsComponent,
     CustomColumnAddButtonComponent,
+    PaginatorComponent,
   ],
   exports: [
     TableComponent,
@@ -95,6 +99,7 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     DragColumnCaptionComponent,
     CustomColumnEditorDialogComponent,
     CustomColumnAddButtonComponent,
+    PaginatorComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -135,6 +140,7 @@ export * from './components/custom-column-editor-dropdown-options/custom-column-
 export * from './components/drag-column-caption/drag-column-caption.component';
 export * from './components/custom-column-add-button/custom-column-add-button.component';
 export * from './components/base-column-container/base-column-container.component';
+export * from './components/paginator/paginator.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
