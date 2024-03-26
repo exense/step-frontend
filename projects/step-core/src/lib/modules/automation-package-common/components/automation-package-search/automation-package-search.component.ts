@@ -43,7 +43,7 @@ export class AutomationPackageSearchComponent
           map((packageIds) => ({
             packageIds,
             searchPackageName,
-          }))
+          })),
         );
       }),
       map(({ packageIds, searchPackageName }) => {
@@ -59,11 +59,11 @@ export class AutomationPackageSearchComponent
               };
         AutomationPackageSearchComponent.searchValueCache.set(result.value, searchPackageName);
         return result;
-      })
+      }),
     );
   }
 
-  protected override transformFilterValueToControlValue(value: SearchValue): string {
+  protected override transformFilterValueToControlValue(value?: SearchValue): string {
     if (!value || value instanceof FilterCondition) {
       return '';
     }

@@ -14,12 +14,13 @@ const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
 
 export interface DashboardUrlParams {
-  refresh?: string;
+  refreshInterval?: number;
   timeRange?: TimeRangeSelection;
   grouping?: string[];
   filters: UrlFilterAttribute[];
   relativeRange?: string;
   editMode?: boolean;
+  resolution?: number;
 }
 
 export interface UrlFilterAttribute {
@@ -44,10 +45,12 @@ export class DashboardUrlParamsService {
       }, {} as Params);
     const editModeValue = params['edit'];
     return {
+      refreshInterval: params['refreshInterval'] ? parseInt(params['refreshInterval']) : undefined,
       editMode: editModeValue === '1',
       timeRange: this.extractTimeRange(params),
       grouping: params['grouping']?.split(','),
       filters: this.decodeUrlFilters(params),
+      resolution: params['resolution'],
     };
   }
 
@@ -126,14 +129,16 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(context: TimeSeriesContext, timeSelection: TimeRangeSelection) {
+  updateUrlParams(context: TimeSeriesContext, timeSelection: TimeRangeSelection, refreshInterval: number) {
     const params = this.convertContextToUrlParams(context, timeSelection);
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
+    mergedParams['refreshInterval'] = refreshInterval;
     const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
       accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
       return accumulator;
     }, {});
+
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
       queryParams: prefixedParams,
@@ -153,6 +158,10 @@ export class DashboardUrlParamsService {
       params['to'] = timeSelection.absoluteSelection!.to;
     } else if (timeSelection.type === TimeRangeType.RELATIVE) {
       params['relativeRange'] = timeSelection.relativeSelection!.timeInMs;
+    }
+    const customResolution = context.getChartsResolution();
+    if (customResolution > 0) {
+      params['resolution'] = customResolution;
     }
 
     return params;

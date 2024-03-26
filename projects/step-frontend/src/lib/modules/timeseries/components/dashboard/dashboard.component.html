@@ -1,7 +1,25 @@
 @if (dashboard) {
   <div class="page-container">
     <div class="header-container">
-      <div></div>
+      <div class="left-section">
+        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-raised-button>
+          <step-icon name="settings" />
+          Settings
+        </button>
+        <step-autorefresh-toggle
+          [interval]="refreshInterval"
+          (refresh)="triggerRefresh()"
+          (intervalChange)="handleRefreshIntervalChange($event)"
+        />
+        <mat-menu #mainMenu="matMenu">
+          <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
+          <mat-menu #resolutionsMenu="matMenu" class="wide">
+            <div (click)="$event.stopPropagation()" class="resolution-select-container">
+              <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
+            </div>
+          </mat-menu>
+        </mat-menu>
+      </div>
       <div class="header-buttons-container">
         @if (hasWritePermission) {
           @if (editMode) {

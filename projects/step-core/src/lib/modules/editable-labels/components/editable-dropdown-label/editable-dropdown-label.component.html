@@ -3,9 +3,9 @@
     <div class="editable-dropdown-label" [matTooltip]="tooltip" (click)="onLabelClick()">
       <div class="editable-dropdown-template">
         @if (value) {
-          <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: value }" />
+          <ng-container *ngTemplateOutlet="itemTemplate(); context: { $implicit: value }" />
         } @else {
-          <ng-container *ngTemplateOutlet="labelTemplate" />
+          <ng-container *ngTemplateOutlet="labelTemplate()" />
         }
       </div>
 
@@ -19,15 +19,13 @@
       <mat-select [ngModel]="value" (ngModelChange)="onValueChange($event)" (openedChange)="onOpenedChange($event)">
         <ng-container [stepZIndex]="1050">
           @for (item of items; track item) {
-            <mat-option>
-              <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }" />
+            <mat-option [value]="item">
+              <ng-container *ngTemplateOutlet="itemTemplate(); context: { $implicit: item }" />
             </mat-option>
           }
         </ng-container>
       </mat-select>
     </step-form-field>
-
-    <step-editable-actions (cancel)="onCancel()" (apply)="onApply()" />
   }
   @default {}
 }

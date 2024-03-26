@@ -8,27 +8,30 @@ import {
   MetricType,
   TimeRange,
   TimeRangeSelection,
-  TimeSeriesFilterItem,
+  TimeSeriesAPIResponse,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
 import {
-  TimeSeriesConfig,
-  TimeseriesColorsPool,
-  TimeSeriesContext,
-  TimeSeriesContextsFactory,
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
+  FilterUtils,
+  TimeRangePickerSelection,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesContextsFactory,
+  TimeSeriesUtils,
 } from '../../modules/_common';
-
-//@ts-ignore
-import uPlot = require('uplot');
-import { defaultIfEmpty, forkJoin, merge, Observable, Subject, switchMap } from 'rxjs';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { TimeRangePickerSelection, FilterUtils } from '../../modules/_common';
+import { defaultIfEmpty, forkJoin, merge, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatMenuTrigger } from '@angular/material/menu';
+
+//@ts-ignore
+import uPlot = require('uplot');
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -55,6 +58,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
@@ -67,12 +71,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;
+  refreshInProgress = false;
+  refreshSubscription?: Subscription;
+  refreshInterval: number = 0;
 
   context!: TimeSeriesContext;
 
   compareModeEnabled = false;
   timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   timeRangeSelection: TimeRangePickerSelection = this.timeRangeOptions[0];
+  resolution?: number;
 
   editMode = false;
   metricTypes?: MetricType[];
@@ -90,6 +98,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
+        this.refreshInterval = pageParams.refreshInterval || this.dashboard.refreshInterval || 0;
+        this.resolution = pageParams.resolution || this.dashboard.resolution;
+        pageParams.resolution = this.resolution;
         this.context = this.createContext(this.dashboard, pageParams);
         this.updateUrl();
         this.context.stateChange$.subscribe((stateChanged) => {
@@ -106,8 +117,56 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  triggerRefresh() {
+    const refreshRanger = this.timeRangeSelection.type === 'RELATIVE';
+    if (refreshRanger) {
+      const newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection);
+      this.updateFullAndSelectedRange(newTimeRange);
+    }
+    this.refreshAllCharts(refreshRanger);
+  }
+
+  /**
+   * If the current selection is full, this method will preserve the full selection, no matter of the new range.
+   * If there is a custom selection, it will try to be preserved, cropping it if needed.
+   * If the current selection does not fit into the new range, the full selection will be set instead
+   */
+  updateFullAndSelectedRange(fullRange: TimeRange) {
+    const isFullRangeSelected = this.context.isFullRangeSelected();
+    if (isFullRangeSelected) {
+      this.context.updateFullRange(fullRange, false);
+      this.context.updateSelectedRange(fullRange, false);
+    } else {
+      let newSelection = this.context.getSelectedTimeRange();
+      // we crop it
+      const newFrom = Math.max(fullRange.from!, newSelection.from!);
+      const newTo = Math.min(fullRange.to!, newSelection.to!);
+      if (newTo - newFrom < 3) {
+        newSelection = fullRange; // zoom reset when the interval is very small
+      } else {
+        newSelection = { from: newFrom, to: newTo };
+      }
+      this.context.updateFullRange(fullRange, false);
+      this.context.updateSelectedRange(newSelection, false);
+    }
+  }
+
+  handleRefreshIntervalChange(interval: number) {
+    this.refreshInterval = interval;
+    this.updateUrl();
+    this.triggerRefresh();
+  }
+
+  handleResolutionChange(resolution: number) {
+    if (resolution > 0 && resolution < 1000) {
+      // minimum value should be one second
+      return;
+    }
+    this.context.updateChartsResolution(resolution);
+  }
+
   private updateUrl(): void {
-    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection);
+    this._urlParamsService.updateUrlParams(this.context, this.timeRangeSelection, this.refreshInterval);
   }
 
   ngOnDestroy(): void {
@@ -135,12 +194,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
+    this.dashboard.refreshInterval = this.refreshInterval;
+    this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
       this.filterBar?._internalFilters.map((item) => {
         const apiFilter = FilterUtils.convertToApiFilterItem(item);
         apiFilter.removable = false; // make all the fields not removable once saved
         return apiFilter;
       }) || [];
+
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
@@ -259,14 +321,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       attributes: attributesByIds,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
+      resolution: urlParams.resolution,
     });
   }
 
   subscribeForContextChange(): void {
-    merge(this.context.onFilteringChange(), this.context.onGroupingChange())
+    merge(this.context.onFilteringChange(), this.context.onGroupingChange(), this.context.onChartsResolutionChange())
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
-        this.refreshAllCharts().subscribe();
+        this.refreshAllCharts(false, true);
       });
   }
 
@@ -278,19 +341,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const context = this.getContext(compareCharts);
     context
       .onTimeSelectionChange()
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this.refreshAllCharts(false, true));
+  }
+
+  /**
+   * @param refreshRanger. Set true if ranger data has to be updated
+   * @param force. If set to false (default), the refresh will be skipped if there is a refresh in progress.
+   * @private
+   */
+  private refreshAllCharts(refreshRanger = false, force = false): void {
+    if (this.refreshInProgress && !force) {
+      return;
+    }
+    this.refreshSubscription?.unsubscribe();
+    this.refreshInProgress = true;
+    this.refreshSubscription = of(null)
       .pipe(
-        switchMap((newRange) => this.handleSelectionChange(newRange)),
-        takeUntilDestroyed(this._destroyRef),
+        tap(() => (this.refreshInProgress = true)),
+        switchMap(() => {
+          const dashlets$ = this.dashlets?.map((dashlet) => dashlet.refresh());
+          if (refreshRanger) {
+            dashlets$.push(this.refreshRanger());
+          }
+          return forkJoin(dashlets$).pipe(defaultIfEmpty([]));
+        }),
+        tap(() => (this.refreshInProgress = false)),
       )
       .subscribe();
-  }
-
-  private handleSelectionChange(range?: TimeRange): Observable<any[]> {
-    return this.refreshAllCharts();
-  }
-
-  private refreshAllCharts(): Observable<any[]> {
-    return forkJoin(this.dashlets?.map((dashlet) => dashlet.refresh())).pipe(defaultIfEmpty([]));
   }
 
   handleChartDelete(index: number) {
@@ -324,13 +402,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ];
   }
 
+  /**
+   * Handle full range interval changes, not selection changes.
+   */
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
     this.timeRangeSelection = params.selection;
     let range = this.getTimeRangeFromTimeSelection(params.selection);
     this.context.updateFullRange(range, false);
     this.context.updateSelectedRange(range, false);
-    let refreshRanger$ = this.filterBar?.timeSelection?.refreshRanger();
-    forkJoin([this.refreshAllCharts(), refreshRanger$]).subscribe(() => {});
+    this.refreshRanger().subscribe();
+    this.refreshAllCharts(true, true);
+  }
+
+  private refreshRanger(): Observable<TimeSeriesAPIResponse> {
+    return this.filterBar!.timeSelection!.refreshRanger();
   }
 
   collectAllAttributes(): MetricAttribute[] {

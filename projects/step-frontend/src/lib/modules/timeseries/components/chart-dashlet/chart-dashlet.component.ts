@@ -90,8 +90,10 @@ export class ChartDashletComponent implements OnInit {
     return groupingSelection;
   }
 
-  refresh(): Observable<any> {
-    this.chart?.setBlur(true);
+  refresh(blur?: boolean): Observable<any> {
+    if (blur) {
+      this.chart?.setBlur(true);
+    }
     return this.fetchDataAndCreateChart();
   }
 
@@ -102,12 +104,12 @@ export class ChartDashletComponent implements OnInit {
 
   switchAggregate(aggregate: AggregationType) {
     this.selectedAggregate = aggregate;
-    this.refresh().subscribe();
+    this.refresh(true).subscribe();
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
-    this.refresh().subscribe();
+    this.refresh(true).subscribe();
   }
 
   private composeRequestFilter(metricKey: string): string {
@@ -140,7 +142,7 @@ export class ChartDashletComponent implements OnInit {
       .subscribe((updatedItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
-          this.refresh().subscribe();
+          this.refresh(true).subscribe();
         }
       });
   }
@@ -234,9 +236,14 @@ export class ChartDashletComponent implements OnInit {
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
       oqlFilter: this.composeRequestFilter(settings.metricKey!),
-      numberOfBuckets: 100,
       percentiles: this.getRequiredPercentiles(settings.primaryAxes!.aggregation!),
     };
+    const customResolution = this.context.getChartsResolution();
+    if (customResolution) {
+      request.intervalSize = customResolution;
+    } else {
+      request.numberOfBuckets = 100;
+    }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.createChart(response);

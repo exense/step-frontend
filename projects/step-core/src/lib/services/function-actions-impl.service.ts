@@ -2,12 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { AugmentedKeywordsService, Keyword } from '../client/step-client-module';
-import { MultipleProjectsService, DialogsService } from '../modules/basics/step-basics.module';
+import {
+  CommonEntitiesUrlsService,
+  MultipleProjectsService,
+  DialogsService,
+} from '../modules/basics/step-basics.module';
 import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
-import { IsUsedByDialogService } from '../modules/is-used-by';
-
-const ENTITY_TYPE = 'keyword';
-const EDITOR_URL = '/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -16,38 +16,11 @@ export class FunctionActionsImplService implements FunctionActionsService {
   private _multipleProjectService = inject(MultipleProjectsService);
   private _functionApiService = inject(AugmentedKeywordsService);
   private _dialogs = inject(DialogsService);
-  protected _isUsedByDialog = inject(IsUsedByDialogService);
   private _router = inject(Router);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
-  get baseUrl(): string {
-    return EDITOR_URL;
-  }
-
-  addFunction(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/configure/new`);
-  }
-
-  configureFunction(id: string): void {
-    const url = `${this.baseUrl}/configure/${id}`;
-    this.getFunctionById(id)
-      .pipe(
-        switchMap((keyword) => {
-          if (!keyword) {
-            return of(false);
-          }
-          if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
-            return of(true);
-          }
-
-          return this._multipleProjectService.confirmEntityEditInASeparateProject(keyword, url, ENTITY_TYPE);
-        }),
-      )
-      .subscribe((continueEdit) => {
-        if (!continueEdit) {
-          return;
-        }
-        this._router.navigateByUrl(url);
-      });
+  resolveConfigurerUrl(idOrKeyword: string | Keyword): string {
+    return this._commonEntitiesUrls.keywordConfigurerUrl(idOrKeyword);
   }
 
   openDeleteFunctionDialog(id: string, name: string): Observable<boolean> {
@@ -60,32 +33,6 @@ export class FunctionActionsImplService implements FunctionActionsService {
       );
   }
 
-  openLookUpFunctionDialog(id: string, name: string): void {
-    this._isUsedByDialog.displayDialog(`Keyword "${name}" is used by`, 'KEYWORD_ID', id);
-  }
-
-  duplicateFunction(keyword: Keyword): Observable<boolean> {
-    return this.duplicateFunctionById(keyword.id!).pipe(
-      map((result) => !!result),
-      catchError((err) => {
-        console.error(err);
-        return of(false);
-      }),
-    );
-  }
-
-  openExportFunctionDialog(id: string): void {
-    this._router.navigateByUrl(`${this.baseUrl}/export/${id}`);
-  }
-
-  openExportAllFunctionsDialog(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/export/all`);
-  }
-
-  openImportFunctionDialog(): void {
-    this._router.navigateByUrl(`${this.baseUrl}/import`);
-  }
-
   openFunctionEditor(keyword: Keyword): Observable<boolean | undefined> {
     return this.getFunctionEditor(keyword.id!).pipe(
       tap((path) => {
@@ -94,21 +41,12 @@ export class FunctionActionsImplService implements FunctionActionsService {
           throw new Error('No path');
         }
       }),
-      switchMap((editorPath) => {
-        if (this._multipleProjectService.isEntityBelongsToCurrentProject(keyword)) {
-          const continueEdit = true;
-          return of({ continueEdit, editorPath });
+      map((path) => {
+        if (path) {
+          this._router.navigateByUrl(path);
+          return true;
         }
-
-        return this._multipleProjectService
-          .confirmEntityEditInASeparateProject(keyword, editorPath, ENTITY_TYPE)
-          .pipe(map((continueEdit) => ({ continueEdit, editorPath })));
-      }),
-      map((result) => {
-        if (result.continueEdit) {
-          this._router.navigateByUrl(result.editorPath);
-        }
-        return result.continueEdit;
+        return false;
       }),
       catchError((error) => {
         console.error(error);
@@ -119,13 +57,5 @@ export class FunctionActionsImplService implements FunctionActionsService {
 
   protected getFunctionEditor(id: string): Observable<string> {
     return this._functionApiService.getFunctionEditor(id);
-  }
-
-  protected getFunctionById(id: string): Observable<Keyword> {
-    return this._functionApiService.getFunctionById(id);
-  }
-
-  protected duplicateFunctionById(id: string): Observable<Keyword> {
-    return this._functionApiService.cloneFunction(id);
   }
 }

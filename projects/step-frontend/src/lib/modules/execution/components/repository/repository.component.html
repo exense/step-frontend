@@ -35,6 +35,7 @@
               [repositoryObjectRef]="repoRef"
               [isolateExecution]="isolateExecution"
               [includedTestcases]="includedTestcases"
+              (scheduleTask)="handleTaskSchedule($event)"
             />
           </mat-card-content>
         </mat-card>
@@ -48,3 +49,4 @@
     }
   </mat-card-content>
 </mat-card>
+<router-outlet />

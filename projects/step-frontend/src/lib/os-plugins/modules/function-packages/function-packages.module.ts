@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
+  checkProjectGuardFactory,
+  CommonEntitiesUrlsService,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,
@@ -19,6 +21,7 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 import './components/function-package-selection/function-package-selection.component';
 import { UploadPackageBtnComponent } from './components/upload-package-btn/upload-package-btn.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { PackageUrlPipe } from './pipes/package-url.pipe';
 
 @NgModule({
   declarations: [
@@ -28,6 +31,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
     UploadPackageBtnComponent,
+    PackageUrlPipe,
   ],
   imports: [StepCoreModule],
   exports: [
@@ -84,11 +88,24 @@ export class FunctionPackagesModule {
             dialogRoute({
               path: ':id',
               dialogComponent: FunctionPackageConfigurationDialogComponent,
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'keyword package',
+                  getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
+                  getEditorUrl: (id) => `/functionPackages/editor/${id}`,
+                }),
+              ],
               resolve: {
                 functionPackage: (route: ActivatedRouteSnapshot) => {
-                  return inject(AugmentedKeywordPackagesService).getFunctionPackage(route.params['id']);
+                  return inject(AugmentedKeywordPackagesService).getFunctionPackageCached(route.params['id']);
                 },
               },
+              canDeactivate: [
+                () => {
+                  inject(AugmentedKeywordPackagesService).cleanupCache();
+                  return true;
+                },
+              ],
             }),
           ],
         },

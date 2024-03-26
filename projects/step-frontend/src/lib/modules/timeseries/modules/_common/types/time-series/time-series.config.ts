@@ -24,9 +24,8 @@ export class TimeSeriesConfig {
   static readonly RANGER_FILTER_FIELDS = [this.EXECUTION_ID_ATTRIBUTE, this.PLAN_ID_ATTRIBUTE, this.TASK_ID_ATTRIBUTE];
   static readonly RANGER_COLORS = {
     axesStroke: '#bce8f1',
-    seriesStroke: '#d0d5dd',
-    seriesGradientStart: '#eeeeeedd',
-    seriesGradientEnd: '#eeeeee00',
+    series: '#a1d1fa',
+    seriesGradientEnd: '#b3dfff',
   };
   static readonly SERIES_LABEL_EMPTY = '<Empty>';
   static readonly SERIES_LABEL_VALUE = 'Value';
