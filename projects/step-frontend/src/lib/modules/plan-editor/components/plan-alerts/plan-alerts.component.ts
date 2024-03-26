@@ -1,5 +1,5 @@
-import { Component, inject, Input, TrackByFunction } from '@angular/core';
-import { Dashlet, Plan, ViewRegistryService } from '@exense/step-core';
+import { Component, inject, Input } from '@angular/core';
+import { PlanContext, ViewRegistryService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-alerts',
@@ -7,9 +7,7 @@ import { Dashlet, Plan, ViewRegistryService } from '@exense/step-core';
   styleUrls: ['./plan-alerts.component.scss'],
 })
 export class PlanAlertsComponent {
-  @Input() plan?: Plan | null;
-  @Input() compositeId?: string;
+  @Input() planContext?: PlanContext | null;
 
   readonly _planAlerts = inject(ViewRegistryService).getDashlets('plan/alerts');
-  readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;
 }

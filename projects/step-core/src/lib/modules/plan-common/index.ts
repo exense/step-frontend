@@ -14,15 +14,15 @@ export * from './injectables/plan-artefact-resolver.service';
 export * from './injectables/plan-by-id-cache.service';
 export * from './injectables/plan-dialogs.service';
 export * from './injectables/plan-editor.service';
-export * from './injectables/plan-editor-api.service';
+export * from './injectables/plan-context-api.service';
 export * from './injectables/plan-editor-persistence-state.service';
 export * from './injectables/plan-interactive-session.service';
 export * from './injectables/plan-open.service';
-export * from './injectables/plan-setup.service';
+export * from './injectables/plan-context-initializer.service';
 
-export * from './types/plan-editor-context.interface';
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
+export * from './types/plan-context.interface';
 
 export * from './pipes/plan-name.pipe';
 export * from './pipes/plan-url.pipe';

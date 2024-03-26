@@ -1,57 +1,82 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { PlanEditorStrategy } from '../types/plan-editor-strategy';
-import { Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, map, Subject, takeUntil } from 'rxjs';
 import { AbstractArtefact, Plan } from '../../../client/step-client-module';
-import { Mutable } from '../../basics/step-basics.module';
-
-type FieldAccessor = Mutable<Partial<Pick<PlanEditorService, 'hasRedo$' | 'hasUndo$' | 'plan$'>>>;
+import { PlanContext } from '../types/plan-context.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   private strategyChangedInternal$ = new Subject<void>();
+  private strategyTerminator$?: Subject<void>;
 
-  private planInit?: Plan;
+  private planContextInit?: PlanContext;
   private selectedArtefactIdInit?: string;
 
   private strategy?: PlanEditorStrategy;
 
-  readonly hasRedo$: Observable<boolean> = of(false);
+  private planContextInternal$ = new BehaviorSubject<PlanContext | undefined>(undefined);
+  private hasRedoInternal$ = new BehaviorSubject(false);
+  private hasUndoInternal$ = new BehaviorSubject(false);
 
-  readonly hasUndo$: Observable<boolean> = of(false);
+  readonly hasRedo$ = this.hasRedoInternal$.asObservable();
+  readonly hasUndo$ = this.hasUndoInternal$.asObservable();
 
-  readonly plan$: Observable<Plan | undefined> = of(undefined);
+  readonly planContext$ = this.planContextInternal$.asObservable();
+
+  readonly plan$ = this.planContext$.pipe(map((context) => context?.plan));
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
 
+  get planContext(): PlanContext | undefined {
+    return this.strategy?.planContext;
+  }
+
   get plan(): Plan | undefined {
-    return this.strategy?.plan;
+    return this.strategy?.planContext?.plan;
   }
 
   ngOnDestroy(): void {
     this.strategyChangedInternal$.complete();
+    this.terminateStrategySubscriptions();
+    this.hasUndoInternal$.complete();
+    this.hasRedoInternal$.complete();
+    this.planContextInternal$.complete();
   }
 
   useStrategy(strategy: PlanEditorStrategy): void {
+    this.terminateStrategySubscriptions();
+    this.strategyTerminator$ = new Subject<void>();
     this.strategy = strategy;
-    (this as FieldAccessor).hasRedo$ = strategy.hasRedo$;
-    (this as FieldAccessor).hasUndo$ = strategy.hasUndo$;
-    (this as FieldAccessor).plan$ = strategy.plan$;
-    if (this.planInit) {
-      this.strategy.init(this.planInit, this.selectedArtefactIdInit);
-      this.planInit = undefined;
+
+    strategy.hasUndo$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
+      next: (value) => this.hasUndoInternal$.next(value),
+    });
+
+    strategy.hasRedo$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
+      next: (value) => this.hasRedoInternal$.next(value),
+    });
+
+    strategy.planContext$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
+      next: (value) => this.planContextInternal$.next(value),
+    });
+
+    if (this.planContextInit) {
+      this.strategy.init(this.planContextInit, this.selectedArtefactIdInit);
+      this.planContextInit = undefined;
       this.selectedArtefactIdInit = undefined;
     }
     this.strategyChangedInternal$.next();
   }
 
   removeStrategy(): void {
+    this.terminateStrategySubscriptions();
     this.strategy = undefined;
-    (this as FieldAccessor).hasRedo$ = of(false);
-    (this as FieldAccessor).hasUndo$ = of(false);
-    (this as FieldAccessor).plan$ = of(undefined);
     this.strategyChangedInternal$.next();
+    this.hasUndoInternal$.next(false);
+    this.hasRedoInternal$.next(false);
+    this.planContextInternal$.next(undefined);
   }
 
   addControl(artefactTypeId: string): void {
@@ -186,12 +211,18 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategy.toggleSkip(node, forceSkip);
   }
 
-  init(plan: Plan, selectedArtefactId?: string): void {
+  init(context: PlanContext, selectedArtefactId?: string): void {
     if (!this.strategy) {
-      this.planInit = plan;
+      this.planContextInit = context;
       this.selectedArtefactIdInit = selectedArtefactId;
       return;
     }
-    this.strategy.init(plan, selectedArtefactId);
+    this.strategy.init(context, selectedArtefactId);
+  }
+
+  terminateStrategySubscriptions(): void {
+    this.strategyTerminator$?.next();
+    this.strategyTerminator$?.complete();
+    this.strategyTerminator$ = undefined;
   }
 }

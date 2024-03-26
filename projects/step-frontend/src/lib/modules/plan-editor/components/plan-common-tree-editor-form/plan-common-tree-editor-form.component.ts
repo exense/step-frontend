@@ -7,12 +7,12 @@ import {
   COPIED_ARTEFACTS,
   CustomComponent,
   DialogsService,
-  Plan,
   PlanEditorService,
   PlanEditorStrategy,
   PlansService,
   TreeStateService,
-  PlanEditorApiService,
+  PlanContextApiService,
+  PlanContext,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
@@ -29,7 +29,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   private _planEditor = inject(PlanEditorService);
-  private _planEditorApi = inject(PlanEditorApiService);
+  private _planEditorApi = inject(PlanContextApiService);
   private _planApi = inject(PlansService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planHistory = inject(PlanHistoryService);
@@ -39,16 +39,17 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   context?: any;
   private terminator$ = new Subject<void>();
-  private planChange$ = new Subject<Plan>();
+  private planChange$ = new Subject<PlanContext>();
 
   private selectedNode$ = toObservable(this._treeState.selectedNode);
-  private planInternal$ = new BehaviorSubject<Plan | undefined>(undefined);
+  private planContextInternal$ = new BehaviorSubject<PlanContext | undefined>(undefined);
 
-  get plan(): Plan | undefined {
-    return this.planInternal$.value;
+  get planContext(): PlanContext | undefined {
+    return this.planContextInternal$.value;
   }
 
-  readonly plan$ = this.planInternal$.asObservable();
+  readonly planContext$ = this.planContextInternal$.asObservable();
+
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
 
@@ -59,7 +60,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   ngOnDestroy(): void {
     this.planChange$.complete();
-    this.planInternal$.complete();
+    this.planContextInternal$.complete();
     this._planEditor.removeStrategy();
     this.terminator$.next();
     this.terminator$.complete();
@@ -107,18 +108,18 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this._planHistory.discardAll();
   }
 
-  init(plan: Plan, selectedArtefactId?: string): void {
-    this.planInternal$.next(plan);
-    const root = plan.root;
+  init(context: PlanContext, selectedArtefactId?: string): void {
+    this.planContextInternal$.next(context);
+    const root = context!.plan!.root;
     if (root) {
       const selectedId = selectedArtefactId || root.id!;
       this._treeState.init(root, { selectedNodeIds: [selectedId] });
     }
-    this._planHistory.init(plan);
+    this._planHistory.init(context);
   }
 
   handlePlanChange(): void {
-    this.planChange$.next(this.plan!);
+    this.planChange$.next(this.planContext!);
   }
 
   moveOut(node?: AbstractArtefact): void {
@@ -249,37 +250,41 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   private initPlanUpdate(): void {
     const planUpdateByTree$ = this._treeState.treeUpdate$.pipe(
-      map(() => this.plan),
-      filter((plan) => !!plan),
-      tap((plan) => this._planHistory.addToHistory(plan!)),
+      map(() => this.planContext),
+      filter((context) => !!context),
+      tap((context) => this._planHistory.addToHistory(context!)),
     );
 
     const planUpdateByEditor$ = this.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!, { expandAllByDefault: false });
-        this._planHistory.addToHistory(plan);
-        this.planInternal$.next(plan);
+      tap((context) => {
+        this._treeState.init(context!.plan!.root!, { expandAllByDefault: false });
+        this._planHistory.addToHistory(context);
+        this.planContextInternal$.next(context);
       }),
     );
 
-    const planUpdatedByHistory$ = this._planHistory.planChange$.pipe(
-      tap((plan) => {
-        this._treeState.init(plan.root!, { expandAllByDefault: false });
-        this.planInternal$.next(plan);
+    const planUpdatedByHistory$ = this._planHistory.planContextChange$.pipe(
+      tap((context) => {
+        this._treeState.init(context!.plan!.root!, { expandAllByDefault: false });
+        const selectedNodeId = this._treeState.selectedNodeIds()?.[0];
+        if (selectedNodeId && !this._treeState.findNodeById(selectedNodeId)) {
+          this._treeState.selectNode(context!.plan.root!.id!);
+        }
+        this.planContextInternal$.next(context);
       }),
     );
 
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
-        switchMap((plan) => this._planEditorApi.savePlan(plan!)),
+        switchMap((context) => this._planEditorApi.savePlan(context!)),
         takeUntil(this.terminator$),
       )
-      .subscribe(({ plan, forceRefresh }) => {
+      .subscribe((savedContext) => {
+        const forceRefresh = savedContext.forceRefresh;
         if (forceRefresh) {
-          this.selectedNode$.pipe(first()).subscribe((node) => this.init(plan, node?.id));
-        }
-        if (this.planInternal$.value) {
-          this.planInternal$.value.customFields = plan.customFields;
+          this.selectedNode$.pipe(first()).subscribe((node) => this.init(savedContext, node?.id));
+        } else if (this.planContext) {
+          this.planContext.entity.customFields = savedContext.entity.customFields;
         }
       });
   }

@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { Plan, PlanEditorApiService } from '@exense/step-core';
-import { CompositeKeywordPlanApiService } from '../../injectables/composite-keyword-plan-api.service';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Keyword, Plan, PlanContext, PlanContextApiService, PlanEditorService } from '@exense/step-core';
+import { CompositeKeywordPlanContextApiService } from '../../injectables/composite-keyword-plan-context-api.service';
 import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
+import { map, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-composite-function-editor',
@@ -10,14 +11,33 @@ import { map } from 'rxjs';
   styleUrls: ['./composite-function-editor.component.scss'],
   providers: [
     {
-      provide: PlanEditorApiService,
-      useExisting: CompositeKeywordPlanApiService,
+      provide: PlanContextApiService,
+      useExisting: CompositeKeywordPlanContextApiService,
     },
   ],
 })
-export class CompositeFunctionEditorComponent {
-  readonly _compositePlan$ = inject(ActivatedRoute).data.pipe(map((data) => data['compositePlan'] as Plan | undefined));
-  protected _id: string | undefined = inject(ActivatedRoute).snapshot.params['id'];
+export class CompositeFunctionEditorComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
+  private _cd = inject(ChangeDetectorRef);
+  private _activatedRoute = inject(ActivatedRoute);
+  readonly _planEditorService = inject(PlanEditorService);
 
-  readonly _composite$ = inject(CompositeKeywordPlanApiService).keyword$;
+  readonly initialCompositePlanContext$ = this._activatedRoute.data.pipe(
+    map((data) => data['compositePlan'] as PlanContext | undefined),
+  );
+
+  readonly hasFunctionPackage$ = this.initialCompositePlanContext$.pipe(
+    map((context) => context?.entity as unknown as Keyword),
+    map((keyword) => !!keyword?.customFields?.['functionPackageId']),
+  );
+
+  readonly actualKeyword$ = this._planEditorService.planContext$.pipe(
+    map((context) => context?.entity as unknown as Keyword),
+  );
+
+  ngOnInit(): void {
+    this._planEditorService.strategyChanged$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this._cd.detectChanges());
+  }
 }

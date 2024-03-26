@@ -1,6 +1,17 @@
 <step-plan-editor-base
   stepPlanEditorKeyHandler
-  [initialPlan]="plan$ | async"
+  [initialPlanContext]="initialPlanContext$ | async"
   (scheduleTask)="handleTaskSchedule($event)"
-/>
+>
+  <step-plan-editor-attributes>
+    <step-custom-forms
+      stScreen="planTable"
+      [stDisabled]="!('plan-write' | hasRight | async)"
+      [stInline]="true"
+      [stEditableLabelMode]="true"
+      [stModel]="(_planEditorService.plan$ | async)!"
+      (stModelChange)="_planEditorService.handlePlanChange()"
+    />
+  </step-plan-editor-attributes>
+</step-plan-editor-base>
 <router-outlet />
