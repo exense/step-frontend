@@ -1,10 +1,12 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-core/styles/core-variables' as var;
 
-@include core.reportNodeStatuses;
+step-report-node-status {
+  @include core.reportNodeStatuses;
 
-.status {
-  color: var.$white !important;
-  @include core.status-shape();
-  width: 100%;
+  .status {
+    color: var.$white !important;
+    @include core.status-shape();
+    width: 100%;
+  }
 }

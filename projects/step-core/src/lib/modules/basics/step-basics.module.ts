@@ -53,6 +53,7 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
+import { StatusCommonComponent } from './components/status-common/status-common.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -107,6 +108,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     MarkerComponent,
     AlertsContainerComponent,
     ProjectNamePipe,
+    StatusCommonComponent,
   ],
   exports: [
     CommonModule,
@@ -164,6 +166,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     MarkerComponent,
     AlertsContainerComponent,
     ProjectNamePipe,
+    StatusCommonComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -183,6 +186,7 @@ export * from './components/form-field/form-field.component';
 export * from './components/errors-list/errors-list.component';
 export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
+export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';

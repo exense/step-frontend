@@ -3,25 +3,42 @@ import { TableCollectionFilter, TableRequestFilter } from '../../../client/step-
 import { FilterCondition } from './filter-condition';
 import { FilterConditionType } from './filter-condition-type.enum';
 
-export class ArrayFilterCondition extends FilterCondition<Array<string>> {
+interface ArrayFilterConditionSource {
+  items?: string[];
+  fields?: string[];
+}
+
+export class ArrayFilterCondition extends FilterCondition<ArrayFilterConditionSource> {
   readonly filterConditionType = FilterConditionType.ARRAY;
 
-  constructor(searchValue?: Array<string>) {
-    super(searchValue);
+  constructor(source?: ArrayFilterConditionSource) {
+    super(source);
   }
 
   override isEmpty(): boolean {
-    return !this.sourceObject;
+    return !this.sourceObject?.items?.length;
+  }
+
+  override getSearchValue(): unknown {
+    return this.sourceObject?.items;
   }
 
   override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    const valueArray = this.sourceObject || [];
+    const valueArray = this.sourceObject?.items ?? [];
+    const fields = this.sourceObject?.fields ?? [field];
 
-    const children = valueArray.map((value) => ({
-      field,
-      type: CompareCondition.EQUALS,
-      expectedValue: value,
-    }));
+    const children = fields.reduce(
+      (result, field) => {
+        const conditions = valueArray.map((expectedValue) => ({
+          field,
+          type: CompareCondition.EQUALS,
+          expectedValue,
+        }));
+
+        return result.concat(conditions);
+      },
+      [] as { field: string; type: CompareCondition; expectedValue: string }[],
+    );
 
     const arrayFilter: TableCollectionFilter = {
       collectionFilter: {

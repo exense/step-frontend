@@ -1,0 +1,18 @@
+<mat-select
+  [multiple]="true"
+  [ngModel]="selectedItems"
+  (ngModelChange)="handleSelectedItemsChange($event)"
+  (blur)="handleBlur()"
+  [disabled]="isDisabled"
+>
+  @for (plainItem of plainItems(); track plainItem.key) {
+    <mat-option
+      class="step-multi-level-plain-item"
+      [style]="{ '--plain-item-level': plainItem.level }"
+      [value]="plainItem.key"
+      (onSelectionChange)="handleSelectionChange($event, plainItem)"
+    >
+      {{ plainItem.value }}
+    </mat-option>
+  }
+</mat-select>

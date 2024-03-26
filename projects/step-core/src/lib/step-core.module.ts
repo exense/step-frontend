@@ -68,6 +68,7 @@ import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
+import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 
 @NgModule({
   declarations: [
@@ -137,6 +138,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -201,6 +203,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     DRAG_DROP_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -327,3 +330,4 @@ export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
+export * from './modules/multi-level-select';

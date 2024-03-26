@@ -4,11 +4,11 @@
 @mixin status($status, $color) {
   .step-#{$status} {
     background: $color;
-    color: #fff;
+    color: var.$white;
   }
 }
 
-step-status {
+step-execution-status {
   .status {
     @include core.status-shape();
   }

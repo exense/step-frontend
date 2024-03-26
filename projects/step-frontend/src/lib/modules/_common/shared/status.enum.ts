@@ -1,3 +1,5 @@
+import { MultiLevelItem } from '@exense/step-core';
+
 export enum Status {
   UNKNOW = 'UNKNOW',
   ENDED = 'ENDED',
@@ -30,7 +32,22 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
   Status.RUNNING,
   Status.ABORTING,
   Status.EXPORTING,
-  Status.ENDED,
+  Status.FAILED,
+  Status.PASSED,
+  Status.INTERRUPTED,
+  Status.SKIPPED,
+];
+
+export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
+  ...[Status.INITIALIZING, Status.IMPORTING, Status.RUNNING, Status.ABORTING, Status.EXPORTING].map((key) => ({
+    key,
+    value: key,
+  })),
+  {
+    key: Status.ENDED,
+    value: Status.ENDED,
+    children: [Status.FAILED, Status.PASSED, Status.INTERRUPTED, Status.SKIPPED].map((key) => ({ key, value: key })),
+  },
 ];
 
 export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
@@ -42,5 +59,3 @@ export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
   Status.NORUN,
   Status.RUNNING,
 ];
-
-export const TEST_RUN_STATUS = REPORT_NODE_STATUS;

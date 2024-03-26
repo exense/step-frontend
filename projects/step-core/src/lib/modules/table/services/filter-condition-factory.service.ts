@@ -35,8 +35,8 @@ export class FilterConditionFactoryService {
     return new DateRangeFilterCondition({ range, columnsOverride });
   }
 
-  arrayFilterCondition(array?: Array<string>): FilterCondition {
-    return new ArrayFilterCondition(array);
+  arrayFilterCondition(items?: string[], fields?: string[]): FilterCondition {
+    return new ArrayFilterCondition({ items, fields });
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -87,6 +87,8 @@ export class FilterConditionFactoryService {
           filterCondition?.sourceObject?.range,
           filterCondition?.sourceObject?.columnsOverride,
         );
+      case FilterConditionType.ARRAY:
+        return this.arrayFilterCondition(filterCondition?.sourceObject?.items, filterCondition?.sourceObject?.fields);
       case FilterConditionType.BOOLEAN:
         return this.booleanFilterCondition(filterCondition?.sourceObject);
       default:

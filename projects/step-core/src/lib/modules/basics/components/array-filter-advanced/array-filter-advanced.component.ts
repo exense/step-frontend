@@ -1,4 +1,13 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  Component,
+  computed,
+  forwardRef,
+  input,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
@@ -16,61 +25,46 @@ import { map, Observable } from 'rxjs';
     },
   ],
 })
-export class ArrayFilterAdvancedComponent<T = unknown>
-  extends BaseFilterComponent<string[], unknown>
-  implements OnChanges
-{
-  protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
+export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterComponent<string[], unknown> {
+  /** @Input() **/
+  items = input<T[] | ReadonlyArray<T>>([]);
 
-  protected displayItems: KeyValue<unknown, string>[] = [];
+  /** @Input() **/
+  extractor = input<ArrayItemLabelValueExtractor<T, unknown> | undefined>(undefined);
 
-  @Input() items: T[] | ReadonlyArray<T> = [];
+  protected displayItems = computed<KeyValue<unknown, string>[]>(() => {
+    const items = this.items();
+    const extractor = this.extractor();
 
-  @Input() extractor?: ArrayItemLabelValueExtractor<T, unknown>;
+    return (items || []).map((item) => {
+      const key = extractor ? extractor.getValue(item) : item;
+      const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
+      return { key, value };
+    });
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cItems = changes['items'];
-    const cExtractor = changes['extractor'];
-
-    let items: T[] | ReadonlyArray<T> | undefined = undefined;
-    let extractor: ArrayItemLabelValueExtractor<T, unknown> | undefined = undefined;
-
-    if (cItems?.previousValue !== cItems?.currentValue || cItems?.firstChange) {
-      items = cItems.currentValue;
-    }
-
-    if (cExtractor?.previousValue !== cExtractor?.currentValue || cExtractor?.firstChange) {
-      extractor = cExtractor.currentValue;
-    }
-
-    if (items || extractor) {
-      this.setupDisplayItems(items, extractor);
-    }
-  }
+  @Input() remapValues?: Record<string, string>;
 
   protected override createControl(fb: FormBuilder): FormControl<unknown> {
     return fb.nonNullable.control([]);
   }
 
   protected override createControlChangeStream(control: FormControl<unknown>): Observable<string[]> {
-    return control.valueChanges.pipe(map((value) => value as string[]));
+    return control.valueChanges.pipe(
+      map((value) => (value ?? []) as string[]),
+      map((values) => {
+        if (!this.remapValues) {
+          return values;
+        }
+        return values.reduce((res, value) => {
+          const addValues = !!this.remapValues![value] ? [value, this.remapValues![value]] : [value];
+          return res.concat(addValues);
+        }, [] as string[]);
+      }),
+    );
   }
 
   protected override transformFilterValueToControlValue(value?: string[]): unknown {
     return value ?? [];
-  }
-
-  private setupDisplayItems(
-    items?: T[] | ReadonlyArray<T>,
-    extractor?: ArrayItemLabelValueExtractor<T, unknown>,
-  ): void {
-    items = items ?? this.items;
-    extractor = extractor ?? this.extractor;
-
-    this.displayItems = (items || []).map((item) => {
-      const key = extractor ? extractor.getValue(item) : item;
-      const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
-      return { key, value };
-    });
   }
 }

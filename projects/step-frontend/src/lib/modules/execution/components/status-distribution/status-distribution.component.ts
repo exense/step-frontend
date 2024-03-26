@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { ExecutionSummaryDto } from '@exense/step-core';
 
 @Component({
@@ -6,45 +6,47 @@ import { ExecutionSummaryDto } from '@exense/step-core';
   templateUrl: './status-distribution.component.html',
   styleUrls: ['./status-distribution.component.scss'],
 })
-export class StatusDistributionComponent implements OnChanges {
-  @Input() summary?: ExecutionSummaryDto;
-  @Input() isProgress: boolean = false;
+export class StatusDistributionComponent {
+  /*@Input() */
+  summary = input<ExecutionSummaryDto | undefined>(undefined);
 
-  passed: number = 0;
-  failed: number = 0;
-  techError: number = 0;
-  count: number = 0;
+  /*@Input() */
+  isProgress = input(false);
 
-  percentPassed: number = 0;
-  percentFailed: number = 0;
-  percentTechError: number = 0;
-  countPercent: number = 0;
+  readonly distributionState = computed(() => {
+    const summary = this.summary();
+    if (!summary) {
+      return undefined;
+    }
+    const inProgress = this.isProgress();
 
-  tooltipMessage: string = '';
-  tooltipProgressMessage: string = '';
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cSummary = changes['summary'];
-    if (cSummary?.currentValue === cSummary?.previousValue) {
-      return;
+    let [passed, percentPassed] = this.getCountAndPercent(summary, 'PASSED');
+    if (!inProgress && summary.count === 0) {
+      percentPassed = 100; // show a green bar if there have been zero keyword calls on completion
     }
 
-    const summary = cSummary.currentValue as ExecutionSummaryDto;
+    const [failedError, percentFailedError] = this.getCountAndPercent(summary, 'FAILED');
+    const [techError, percentTechError] = this.getCountAndPercent(summary, 'TECHNICAL_ERROR');
+    const failed = failedError + techError;
+    const percentFailed = percentFailedError + percentTechError;
 
-    [this.passed, this.percentPassed] = this.getCountAndPercent(summary, 'PASSED');
-    if (!this.isProgress && summary?.count === 0) {
-      this.percentPassed = 100; // show a green bar if there have been zero keyword calls on completion
-    }
-    [this.failed, this.percentFailed] = this.getCountAndPercent(summary, 'FAILED');
-    [this.techError, this.percentTechError] = this.getCountAndPercent(summary, 'TECHNICAL_ERROR');
-    [this.count, this.countPercent] = this.calcPercent(summary?.count, summary?.countForecast);
+    const [count, countPercent] = this.calcPercent(summary.count, summary.countForecast);
 
-    this.tooltipMessage = `${summary?.label || ''} PASSED: ${this.passed}, FAILED: ${this.failed}, TECHNICAL_ERROR: ${
-      this.techError
-    }`;
+    const tooltipMessage = `${summary.label ?? ''} PASSED: ${passed}, FAILED: ${failed}`;
 
-    this.tooltipProgressMessage = `Progress: ${summary?.count || 0}/${summary?.countForecast || 0}`;
-  }
+    const tooltipProgressMessage = `Progress: ${summary.count ?? 0}/${summary.countForecast ?? 0}`;
+
+    return {
+      passed,
+      percentPassed,
+      failed,
+      percentFailed,
+      count,
+      countPercent,
+      tooltipMessage,
+      tooltipProgressMessage,
+    };
+  });
 
   private calcPercent(count: number, total: number): [number, number] {
     const percent = total ? (count / total) * 100 : 0;
