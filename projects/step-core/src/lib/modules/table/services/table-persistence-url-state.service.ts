@@ -4,7 +4,8 @@ import { SearchValue } from '../shared/search-value';
 import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterCondition } from '../shared/filter-condition';
-import { filter, first } from 'rxjs';
+import { filter, first, map, pairwise, switchMap, timer } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export const TABLE_QUERY_PREFIX = 'tq_';
 
@@ -13,12 +14,43 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
 
+  private isInternalUrlChange = false;
+
+  private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
+
+  private resetInternalUrlChangeFlag = this.navigationEnd$
+    .pipe(
+      switchMap(() => timer(100)),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => (this.isInternalUrlChange = false));
+
+  private byUrlChange = this._activatedRoute.queryParams
+    .pipe(
+      filter(() => this.canStoreSearch),
+      filter(() => !this.isInternalUrlChange),
+      filter((params) => this.hasUrlSearch(params)),
+      map((params) => this.getUrlSearch(params)),
+      takeUntilDestroyed(),
+    )
+    .subscribe((urlSearch) => this.triggerExternalSearchChange(urlSearch));
+
+  private byUrlChangeCleanup = this._activatedRoute.queryParams
+    .pipe(
+      filter(() => this.canStoreSearch),
+      pairwise(),
+      filter(([prevParams, currentParams]) => this.hasUrlSearch(prevParams) && !this.hasUrlSearch(currentParams)),
+      filter(() => !this.isInternalUrlChange),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this.triggerExternalSearchChange({}));
+
   override getSearch(): Record<string, SearchValue> {
     if (!this.canStoreSearch) {
       return {};
     }
-    if (this.hasUrlSearch()) {
-      const urlSearch = this.getUrlSearch();
+    if (this.hasUrlSearch(this._activatedRoute.snapshot.queryParams)) {
+      const urlSearch = this.getUrlSearch(this._activatedRoute.snapshot.queryParams);
       super.saveSearch(urlSearch);
       return urlSearch;
     }
@@ -36,8 +68,7 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     super.saveSearch(search);
   }
 
-  private getUrlSearch(): Record<string, SearchValue> {
-    const queryParams = this._activatedRoute.snapshot.queryParams;
+  private getUrlSearch(queryParams: Params): Record<string, SearchValue> {
     const result = Object.entries(queryParams).reduce(
       (res, [key, value]) => {
         const tableKey = this.getTableKey(key);
@@ -112,8 +143,7 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     return value;
   }
 
-  private hasUrlSearch(): boolean {
-    const queryParams = this._activatedRoute.snapshot.queryParams;
+  private hasUrlSearch(queryParams: Params): boolean {
     const keys = Object.keys(queryParams);
     return keys.some((key) => this.isTableKey(key));
   }
@@ -135,13 +165,10 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
 
   private changeQueryParams(queryParams: Params): void {
     if (this._router.getCurrentNavigation()) {
-      const navigationEnd$ = this._router.events.pipe(
-        filter((event) => event instanceof NavigationEnd),
-        first(),
-      );
-      navigationEnd$.subscribe(() => this.changeQueryParams(queryParams));
+      this.navigationEnd$.pipe(first()).subscribe(() => this.changeQueryParams(queryParams));
       return;
     }
+    this.isInternalUrlChange = true;
     this._router.navigate([], { relativeTo: this._activatedRoute, queryParams });
   }
 }

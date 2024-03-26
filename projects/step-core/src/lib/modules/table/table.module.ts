@@ -36,6 +36,8 @@ import { DateFilterComponent } from './components/date-filter/date-filter.compon
 import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../routing';
 import { HasRightPipe } from '../auth';
+import { PaginatorComponent } from './components/paginator/paginator.component';
+import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
 
 @NgModule({
   imports: [
@@ -45,6 +47,7 @@ import { HasRightPipe } from '../auth';
     EntitiesSelectionModule,
     CustomRegistriesModule,
     AsyncOperationsModule,
+    EDITABLE_LABELS_EXPORTS,
     StepBasicsModule,
     DatePickerModule,
     HasRightPipe,
@@ -67,6 +70,7 @@ import { HasRightPipe } from '../auth';
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    PaginatorComponent,
   ],
   exports: [
     TableComponent,
@@ -82,6 +86,7 @@ import { HasRightPipe } from '../auth';
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    PaginatorComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -118,6 +123,7 @@ export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/base-column-container/base-column-container.component';
+export * from './components/paginator/paginator.component';
 export * from './directives/column.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';

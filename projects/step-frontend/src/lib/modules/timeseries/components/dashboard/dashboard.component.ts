@@ -90,7 +90,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
     this.resolution = pageParams.resolution;
-    this.refreshInterval = pageParams.refreshInterval || 0;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -100,6 +99,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
+        this.refreshInterval = pageParams.refreshInterval || this.dashboard.refreshInterval || 0;
+        this.resolution = pageParams.resolution || this.dashboard.resolution;
+        pageParams.resolution = this.resolution;
         this.context = this.createContext(this.dashboard, pageParams);
         this.updateUrl();
         this.context.stateChange$.subscribe((stateChanged) => {
@@ -157,9 +159,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleResolutionChange(resolution: number) {
-    if (resolution > 1000) {
-      this.context.updateChartsResolution(resolution);
+    if (resolution > 0 && resolution < 1000) {
+      // minimum value should be one second
+      return;
     }
+    this.context.updateChartsResolution(resolution);
   }
 
   private updateUrl(): void {
@@ -191,12 +195,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
+    this.dashboard.refreshInterval = this.refreshInterval;
+    this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
       this.filterBar?._internalFilters.map((item) => {
         const apiFilter = FilterUtils.convertToApiFilterItem(item);
         apiFilter.removable = false; // make all the fields not removable once saved
         return apiFilter;
       }) || [];
+
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
@@ -239,6 +246,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);
     }
+  }
+
+  private convertUrlFilters(
+    urlParams: DashboardUrlParams,
+    attributesDefinition: Record<string, MetricAttribute>,
+  ): FilterBarItem[] {
+    return urlParams.filters
+      .filter((i) => !!attributesDefinition[i.attribute])
+      .map((urlFilter) => {
+        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
+        switch (filterItem.type) {
+          case FilterBarItemType.OPTIONS:
+            urlFilter.values?.forEach((v) => {
+              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
+              if (foundOptions) {
+                foundOptions.isSelected = true;
+              } else {
+                filterItem.textValues?.push({ value: v, isSelected: true });
+              }
+            });
+            filterItem.exactMatch = true;
+            break;
+          case FilterBarItemType.FREE_TEXT:
+            filterItem.freeTextValues = urlFilter.values;
+            break;
+          case FilterBarItemType.EXECUTION:
+          case FilterBarItemType.TASK:
+          case FilterBarItemType.PLAN:
+            filterItem.exactMatch = true;
+            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
+            break;
+          case FilterBarItemType.NUMERIC:
+          case FilterBarItemType.DATE:
+            filterItem.min = urlFilter.min;
+            filterItem.max = urlFilter.max;
+            break;
+        }
+        return filterItem;
+      });
   }
 
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {

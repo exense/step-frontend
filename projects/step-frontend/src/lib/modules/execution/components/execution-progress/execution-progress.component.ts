@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, Inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
+import { Component, forwardRef, inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
 import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
@@ -7,11 +7,14 @@ import {
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
+  ExecutiontTaskParameters,
+  IncludeTestcases,
   IS_SMALL_SCREEN,
   ItemInfo,
   Operation,
   PrivateViewPluginService,
   ReportNode,
+  ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
@@ -33,7 +36,6 @@ import {
   ExecutionTreePagingService,
 } from '../../services/execution-tree-paging.service';
 import { DOCUMENT } from '@angular/common';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
@@ -100,12 +102,11 @@ export class ExecutionProgressComponent
   private _router = inject(Router);
   private _terminator$ = new Subject<void>();
   private _currentExecutionTerminator$?: Subject<void>;
+  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
   private isTreeInitialized = false;
-
-  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly Panels = Panels;
 
@@ -195,6 +196,7 @@ export class ExecutionProgressComponent
 
   ngOnInit(): void {
     this.initExecutionChangeByRouting();
+    this.initSubTabChangeByRouting();
   }
 
   ngOnDestroy(): void {
@@ -234,6 +236,11 @@ export class ExecutionProgressComponent
     this._executionTabManager.handleTabClose(executionId, openList);
   }
 
+  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
+    this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
+  }
+
   private terminateCurrentExecutionChanges(): void {
     this._currentExecutionTerminator$?.next();
     this._currentExecutionTerminator$?.complete();
@@ -256,6 +263,21 @@ export class ExecutionProgressComponent
       this.initRefreshExecution();
       this.initTabs();
     });
+  }
+
+  private initSubTabChangeByRouting(): void {
+    const subTab$ = this._activatedRoute.url.pipe(
+      filter(() => !!this.tabs?.length),
+      map((url) => url[url.length - 1].path),
+      distinctUntilChanged(),
+      filter((subPath) => {
+        const allowedTabs = this.tabs.map((tab) => tab.id);
+        return allowedTabs.includes(subPath) && subPath !== this.activeTabId;
+      }),
+      takeUntil(this._terminator$),
+    );
+
+    subTab$.subscribe((tab) => this.selectTab(tab));
   }
 
   private initRefreshExecution(): void {

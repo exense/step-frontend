@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CustomComponent, Keyword, FunctionPackage, KeywordPackagesService } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../injectables/function-package-actions.service';
 
@@ -8,6 +8,9 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
   styleUrls: ['./function-package-link.component.scss'],
 })
 export class FunctionPackageLinkComponent implements CustomComponent {
+  private _api = inject(KeywordPackagesService);
+  private _functionPackageActionsService = inject(FunctionPackageActionsService);
+
   private innerContext?: Keyword;
 
   get context(): Keyword | undefined {
@@ -30,11 +33,6 @@ export class FunctionPackageLinkComponent implements CustomComponent {
 
   functionPackage?: FunctionPackage;
   isRefreshing: boolean = false;
-
-  constructor(
-    private _api: KeywordPackagesService,
-    private _functionPackageActionsService: FunctionPackageActionsService,
-  ) {}
 
   delete(): void {
     if (!this.functionPackageId) {
@@ -62,13 +60,6 @@ export class FunctionPackageLinkComponent implements CustomComponent {
         this.reload();
       })
       .add(() => (this.isRefreshing = false));
-  }
-
-  edit(): void {
-    if (!this.functionPackage) {
-      return;
-    }
-    this._functionPackageActionsService.editFunctionPackage(this.functionPackage);
   }
 
   reload(): void {

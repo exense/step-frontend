@@ -2,15 +2,20 @@
   [class.ng-invalid]="_ngControl.invalid"
   [class.ng-touched]="_ngControl.touched"
   [showRequiredMarker]="showRequiredMarker"
+  alignLabelAddon="near"
 >
-  <step-label *ngIf="label">
-    {{ label }}
-  </step-label>
+  @if (label) {
+    <step-label>{{ label }}</step-label>
+  }
+  @if (tooltip) {
+    <step-label-addon>
+      <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below" />
+    </step-label-addon>
+  }
   <input type="text" [formControl]="internalControl" (blur)="handleBlur()" />
-  <step-suffix class="icon-suffix" *ngIf="tooltip">
-    <step-icon name="help-circle" [matTooltip]="tooltip" matTooltipPosition="below"> </step-icon>
-  </step-suffix>
-  <step-error *ngIf="_ngControl.touched && _ngControl.errors && errorsDictionary">
-    <step-errors-list [errors]="_ngControl.errors" [keysDictionary]="errorsDictionary"> </step-errors-list>
-  </step-error>
+  @if (_ngControl.touched && _ngControl.errors && errorsDictionary) {
+    <step-error>
+      <step-errors-list [errors]="_ngControl.errors" [keysDictionary]="errorsDictionary" />
+    </step-error>
+  }
 </step-form-field>

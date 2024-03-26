@@ -1,9 +1,22 @@
-import { Component, ElementRef, forwardRef, Input, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  contentChild,
+  ElementRef,
+  forwardRef,
+  input,
+  Input,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { EditableComponent } from '../editable-component/editable.component';
 import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-common-imports.constant';
 import { EditableActionsComponent } from '../editable-actions/editable-actions.component';
+import { EditableListItemTemplateDirective } from '../../directives/editable-list-item-template.directive';
+
+type ItemTemplateRef<T> = TemplateRef<{ $implicit: T }>;
 
 @Component({
   selector: 'step-editable-dropdown-label',
@@ -21,16 +34,26 @@ import { EditableActionsComponent } from '../editable-actions/editable-actions.c
 })
 export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   @Input() items!: T[];
-  @Input() itemTemplate!: TemplateRef<{
-    $implicit: T;
-  }>;
+
+  /** @Input('itemTemplate') **/
+  itemTemplateInput = input<ItemTemplateRef<T> | undefined>(undefined, {
+    alias: 'itemTemplate',
+  });
+
+  /** @ContentChild(EditableListItemTemplateDirective) **/
+  private itemTemplateDirective = contentChild(EditableListItemTemplateDirective);
 
   @ViewChild(MatSelect, { read: ElementRef }) matSelectElementRef?: ElementRef<HTMLElement>;
   @ViewChild(MatSelect) matSelect?: MatSelect;
 
+  readonly itemTemplate = computed(
+    () => (this.itemTemplateDirective()?.templateRef as ItemTemplateRef<T>) ?? this.itemTemplateInput(),
+  );
+
   protected override onValueChange(value: T): void {
     super.onValueChange(value);
     this.focusedElement = this.matSelectElementRef!.nativeElement;
+    this.onApply();
   }
 
   protected override onLabelClick(): void {

@@ -4,7 +4,7 @@
       @if (value) {
         {{ value }}
       } @else {
-        <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+        <ng-container *ngTemplateOutlet="labelTemplate()" />
       }
     </div>
   }
