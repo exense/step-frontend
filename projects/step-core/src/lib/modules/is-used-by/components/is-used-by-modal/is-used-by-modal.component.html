@@ -1,5 +1,5 @@
 <step-modal-window [title]="_data.title" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <step-is-used-by-list (onClose)="_dialogRef.close()" [id]="_data.id" [type]="_data.type"></step-is-used-by-list>
+    <step-is-used-by-list (close)="_dialogRef.close()" [id]="_data.id" [type]="_data.type"></step-is-used-by-list>
   </div>
 </step-modal-window>
