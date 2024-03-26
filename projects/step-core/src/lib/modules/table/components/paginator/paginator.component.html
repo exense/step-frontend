@@ -1,0 +1,30 @@
+<div class="sub-section">
+  <span>Items per page:</span>
+  <step-editable-dropdown-label [items]="pageSizeOptions()" [(ngModel)]="pageSize">
+    <ng-container *stepEditableLabelTemplate />
+    <ng-container *stepEditableListItemTemplate="let item">{{ item }}</ng-container>
+  </step-editable-dropdown-label>
+</div>
+<div>{{ pageLabel() }}</div>
+<div class="sub-section">
+  <button
+    type="button"
+    mat-icon-button
+    [disabled]="isPageDisabled() || !canGoPrev()"
+    matTooltip="Previous page"
+    matTooltipPosition="above"
+    (click)="prev()"
+  >
+    <step-icon name="chevron-left" />
+  </button>
+  <button
+    type="button"
+    mat-icon-button
+    [disabled]="isPageDisabled() || !canGoNext()"
+    matTooltip="Next page"
+    matTooltipPosition="above"
+    (click)="next()"
+  >
+    <step-icon name="chevron-right" />
+  </button>
+</div>

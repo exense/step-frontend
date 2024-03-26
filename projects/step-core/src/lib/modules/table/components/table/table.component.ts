@@ -18,11 +18,23 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  takeUntil,
+  tap,
+  timestamp,
+} from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { TableRemoteDataSource } from '../../shared/table-remote-data-source';
 import { TableLocalDataSource } from '../../shared/table-local-data-source';
@@ -41,6 +53,7 @@ import { TablePersistenceStateService } from '../../services/table-persistence-s
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -108,7 +121,7 @@ export class TableComponent<T>
   tableParams = input<TableParameters | undefined>(undefined);
 
   @ViewChild(MatTable) private table?: MatTable<any>;
-  @ViewChild(MatPaginator, { static: true }) page!: MatPaginator;
+  @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
   additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
@@ -133,7 +146,7 @@ export class TableComponent<T>
   searchColumns: SearchColumn[] = [];
 
   readonly pageSizeOptions = inject(ItemsPerPageService).getItemsPerPage((userPreferredItemsPerPage) =>
-    this.page._changePageSize(userPreferredItemsPerPage),
+    this.page.pageSize.set(userPreferredItemsPerPage),
   );
 
   private dataSourceTerminator$?: Subject<void>;
@@ -222,11 +235,7 @@ export class TableComponent<T>
       });
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
-      // Unfortunately firstPage method invoking doesn't trigger page change event.
-      // It just updates the page index in component and redraw it.
-      // To trigger the event _changePageSize is invoked
       this.page!.firstPage();
-      this.page!._changePageSize(this.page.pageSize);
     });
   }
 
@@ -256,21 +265,21 @@ export class TableComponent<T>
 
     const statePage = this._tableState.getPage();
     if (statePage) {
-      this.page.pageSize = statePage.pageSize;
-      this.page.pageIndex = statePage.pageIndex;
-      this.page.length = statePage.length;
+      this.page.pageSize.set(statePage.pageSize);
+      this.page.pageIndex.set(statePage.pageIndex);
+      this.page.length.set(statePage.length);
       initialPage = statePage;
     } else {
       this.page.firstPage();
       initialPage = this.createPageInitialValue();
     }
 
-    return this.page.page.pipe(startWith(initialPage));
+    return this.page.page$.pipe(startWith(initialPage));
   }
 
   private createPageInitialValue(): PageEvent {
     return {
-      pageSize: this.page.pageSize || this.pageSizeOptions[0],
+      pageSize: this.page.pageSize() || this.pageSizeOptions[0],
       pageIndex: 0,
       length: 0,
     };

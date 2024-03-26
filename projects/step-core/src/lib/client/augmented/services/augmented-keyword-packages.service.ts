@@ -1,6 +1,6 @@
 import { FunctionPackage, KeywordPackagesService } from '../../generated';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
   StepDataSource,
@@ -16,6 +16,8 @@ const FUNCTION_PACKAGE_TABLE_ID = 'functionPackage';
 export class AugmentedKeywordPackagesService extends KeywordPackagesService {
   private _tableRest = inject(TableApiWrapperService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+
+  private functionPackagedCached?: FunctionPackage;
 
   createDataSource(): StepDataSource<FunctionPackage> {
     return this._dataSourceFactory.createDataSource(FUNCTION_PACKAGE_TABLE_ID, {
@@ -47,12 +49,23 @@ export class AugmentedKeywordPackagesService extends KeywordPackagesService {
       .pipe(
         map((response) => response?.data || []),
         map((packages) =>
-          packages.map((functionPackage) => functionPackage.id || '').filter((packageId) => !!packageId)
+          packages.map((functionPackage) => functionPackage.id || '').filter((packageId) => !!packageId),
         ),
         catchError((err) => {
           console.error(err);
           return of([]);
-        })
+        }),
       );
+  }
+
+  getFunctionPackageCached(id: string): Observable<FunctionPackage> {
+    if (this.functionPackagedCached && this.functionPackagedCached.id === id) {
+      return of(this.functionPackagedCached);
+    }
+    return super.getFunctionPackage(id).pipe(tap((functionPackage) => (this.functionPackagedCached = functionPackage)));
+  }
+
+  cleanupCache(): void {
+    this.functionPackagedCached = undefined;
   }
 }

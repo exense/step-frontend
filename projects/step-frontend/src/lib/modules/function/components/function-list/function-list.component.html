@@ -2,39 +2,39 @@
   <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functions"> </step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
     <step-btn-group class="import-keyword-button-group">
-      <button
+      <a
         type="button"
         mat-icon-button
         matTooltip="Import keyword"
         matTooltipPosition="below"
         [disabled]="!('kw-write' | hasRight | async)"
-        (click)="importFunctions()"
+        routerLink="/functions/import"
       >
         <step-icon name="download"></step-icon>
-      </button>
-      <button
+      </a>
+      <a
         type="button"
         mat-icon-button
         matTooltip="Export all keywords"
         matTooltipPosition="below"
         [disabled]="!('kw-read' | hasRight | async)"
-        (click)="exportFunctions()"
+        routerLink="/functions/export/all"
       >
         <step-icon name="upload"></step-icon>
-      </button>
+      </a>
     </step-btn-group>
     <step-btn-group class="create-keyword-button-group">
-      <button
+      <a
         type="button"
         mat-mini-fab
         color="primary"
         matTooltip="New keyword"
         matTooltipPosition="below"
         [disabled]="!('kw-write' | hasRight | async)"
-        (click)="addFunction()"
+        [routerLink]="'new' | keywordConfigurerUrl"
       >
         <step-icon name="plus"></step-icon>
-      </button>
+      </a>
       <step-dashlet itemKey="uploadPackageBtn" [context]="dataSource"> </step-dashlet>
     </step-btn-group>
   </section>
@@ -97,20 +97,24 @@
 </step-table>
 <step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="configureFunction(element.id)">
+    <a mat-menu-item [disabled]="!('kw-write' | hasRight | async)" [routerLink]="element | keywordConfigurerUrl">
       <step-icon name="tool"></step-icon>
       Configure keyword
-    </button>
+    </a>
 
     <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
       <step-icon name="copy"></step-icon>
       Duplicate keyword
     </button>
 
-    <button mat-menu-item [disabled]="!('kw-read' | hasRight | async)" (click)="exportFunction(element.id)">
+    <a
+      mat-menu-item
+      [disabled]="!('kw-read' | hasRight | async)"
+      [routerLink]="['/', 'functions', 'export', element.id]"
+    >
       <step-icon name="upload"></step-icon>
       Export keyword
-    </button>
+    </a>
 
     <button
       mat-menu-item
