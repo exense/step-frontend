@@ -1,7 +1,7 @@
 <form #form="ngForm">
-  <step-time-input
+  <step-dynamic-time-input
     label="Duration"
-    [(ngModel)]="context.artefact!.duration!.value"
+    [(ngModel)]="context.artefact!.duration"
     [disabled]="context.readonly"
     name="duration"
   />
