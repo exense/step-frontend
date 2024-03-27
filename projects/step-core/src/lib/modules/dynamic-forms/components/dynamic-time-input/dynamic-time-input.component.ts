@@ -31,13 +31,6 @@ export class DynamicTimeInputComponent extends DynamicValueBaseComponent<Dynamic
     super(_ngControl);
   }
 
-  editConstantValue(): void {
-    this._dialogsService.enterValue('Free text editor', this.value.toString(), true).subscribe((value) => {
-      this.value = this.parseValue(value);
-      this.emitChanges();
-    });
-  }
-
   protected override defaultConstantValue(): number {
     return 0;
   }
