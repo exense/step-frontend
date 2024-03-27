@@ -2,7 +2,11 @@
   cursor: pointer;
 }
 
-.dashlet-icon {
-  cursor: pointer;
-  transform: rotate(180deg);
+.dashlet-container {
+  display: flex;
+  gap: 0.4rem;
+  step-icon {
+    cursor: pointer;
+    transform: rotate(180deg);
+  }
 }
