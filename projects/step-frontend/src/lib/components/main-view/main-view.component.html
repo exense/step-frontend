@@ -9,8 +9,8 @@
           @for (item of navBarRightMenuItems; track item.id) {
             <step-dashlet [itemKey]="item.template" />
           }
-          <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
-            <step-icon name="user" />
+          <a href="#" class="user" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
+            <step-user-avatar />
             @if (_authService.context$ | async; as ctx) {
               {{ ctx.userID }} [{{ ctx.role }}]
             }

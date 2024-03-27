@@ -1,0 +1,14 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  width: 2em;
+  height: 2em;
+  border-radius: 2em;
+  align-items: center;
+  justify-content: center;
+  & > div {
+    user-select: none;
+    color: var.$white;
+  }
+}

@@ -66,6 +66,7 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
+import { COLOR_PICKER_EXPORTS } from './modules/color-picker';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 
@@ -136,6 +137,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    COLOR_PICKER_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
   ],
   exports: [
@@ -199,6 +201,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    COLOR_PICKER_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
   ],
@@ -326,4 +329,5 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './modules/color-picker';
 export * from './pipes/dashboard-navigation-params.pipe';

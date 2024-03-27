@@ -1,0 +1,29 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  display: grid;
+  grid-template-columns: repeat(10, 4rem);
+  grid-auto-rows: 4rem;
+  gap: 0.1rem;
+
+  &:not(.disabled) .color-item {
+    cursor: pointer;
+  }
+}
+
+.color-item.selected {
+  border: dotted 0.2rem var.$white;
+}
+
+.clear {
+  border: solid 0.2rem var.$muted;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  step-icon {
+    @include core.step-icon-size(6.8rem);
+    stroke-width: 0.5px;
+    color: var.$muted;
+  }
+}

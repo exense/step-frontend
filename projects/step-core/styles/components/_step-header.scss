@@ -37,6 +37,7 @@ $default-color: dc.default-colors();
       margin: 0.6rem 2rem;
       list-style-type: none;
       display: flex;
+      align-items: center;
       gap: 1rem;
 
       a {
