@@ -1,4 +1,5 @@
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
+import { MetricAttribute } from '@exense/step-core';
 
 export class TimeSeriesConfig {
   static readonly MAX_BUCKETS_IN_CHART = 100;
@@ -82,6 +83,24 @@ export class TimeSeriesConfig {
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 3 hours', timeInMs: this.ONE_HOUR_MS * 3 } },
     { type: 'FULL' },
+  ];
+
+  /**
+   * @Deprecated. Has to be removed after legacy dashboard is replaced.
+   */
+  static readonly KNOWN_ATTRIBUTES: MetricAttribute[] = [
+    {
+      displayName: 'Status',
+      name: 'rnStatus',
+      type: 'TEXT',
+      metadata: { knownValues: ['PASSED', 'FAILED', 'TECHNICAL_ERROR', 'INTERRUPTED'] },
+    },
+    { displayName: 'Type', name: 'type', type: 'TEXT', metadata: { knownValues: ['keyword', 'custom'] } },
+    { displayName: 'Origin', name: 'origin', type: 'TEXT', metadata: {} },
+    { displayName: 'Task', name: 'taskId', type: 'TEXT', metadata: { entity: 'task' } },
+    { displayName: 'Execution', name: 'eId', type: 'TEXT', metadata: { entity: 'execution' } },
+    { displayName: 'Plan', name: 'planId', type: 'TEXT', metadata: { entity: 'plan' } },
+    { displayName: 'Name', name: 'name', type: 'TEXT', metadata: {} },
   ];
 
   static readonly AXES_FORMATTING_FUNCTIONS = {
