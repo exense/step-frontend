@@ -12,6 +12,7 @@ import {
   DialogParentService,
   IsUsedByDialogService,
   CustomCellRegistryService,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
@@ -20,6 +21,10 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
   templateUrl: './function-list.component.html',
   styleUrls: ['./function-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
+      entityScreenId: 'functionTable',
+    }),
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

@@ -1,13 +1,17 @@
 @for (col of displayColumns(); track col.input!.id!) {
-  <ng-container [matColumnDef]="col.input!.id!" internal stepSearchCol [isSearchDisabled]="isSearchDisabled">
+  <ng-container
+    [matColumnDef]="col.input!.id!"
+    [stepColumnDefLabel]="col.input!.label!"
+    internal
+    stepSearchCol
+    [isSearchDisabled]="isSearchDisabled"
+  >
     @if (col.input! | customSearchCellComponent; as customSearchCellKey) {
       <step-search-custom-cell *stepSearchCellDef [itemKey]="customSearchCellKey" [context]="col.input!" />
     }
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <step-drag-column-caption>{{ col.input!.label }}</step-drag-column-caption>
-      @if (configurable) {
-        <step-icon class="col-settings" name="settings" (mousedown)="configureColumn(col, $event)" />
-      }
+      <step-column-hide-button />
       @if (col.input!.description) {
         <step-icon class="col-description" [matTooltip]="col.input!.description" name="help-circle" />
       }

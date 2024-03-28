@@ -13,21 +13,14 @@ import {
   SimpleChanges,
   ViewChildren,
 } from '@angular/core';
-import { AugmentedScreenService, ScreenInput } from '../../../../client/step-client-module';
-import { BehaviorSubject, filter, Subject, switchMap } from 'rxjs';
+import { ScreenInput } from '../../../../client/step-client-module';
+import { BehaviorSubject, filter, Subject } from 'rxjs';
 import { MatColumnDef } from '@angular/material/table';
 import { SearchColDirective } from '../../directives/search-col.directive';
 import { CustomColumnOptions } from '../../services/custom-column-options';
 import { CustomColumnsBaseComponent } from './custom-columns-base.component';
-import { MatDialog } from '@angular/material/dialog';
-import {
-  CustomColumnEditorDialogComponent,
-  CustomColumnEditorDialogOperation,
-  CustomColumnEditorDialogResult,
-} from '../custom-column-editor-dialog/custom-column-editor-dialog.component';
-import { ColumnEditorDialogData } from '../../types/column-editor-dialog-data';
-import { TableColumnsReconfigure } from '../../services/table-columns-reconfigure';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
+import { ColumnDefLabelDirective } from '../../directives/column-def-label.directive';
 
 @Component({
   selector: 'step-custom-columns',
@@ -48,9 +41,6 @@ export class CustomColumnsComponent
   implements OnInit, OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent
 {
   private _customColumns = inject(TableCustomColumnsService);
-  private _columnsReconfigure = inject(TableColumnsReconfigure);
-  private _screenApiService = inject(AugmentedScreenService);
-  private _matDialog = inject(MatDialog);
 
   private readonly optionsInternal$ = new BehaviorSubject<string[]>([]);
   private columnsReadyInternal$ = new Subject<boolean>();
@@ -75,10 +65,10 @@ export class CustomColumnsComponent
 
   @Input() isSearchDisabled?: boolean;
   @Input() options?: string | string[];
-  @Input() configurable?: boolean;
 
   @ViewChildren(MatColumnDef) colDef?: QueryList<MatColumnDef>;
   @ViewChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
+  @ViewChildren(ColumnDefLabelDirective) colDefLabel?: QueryList<ColumnDefLabelDirective>;
 
   ngOnInit(): void {
     this.columns = this._customColumns.getScreenColumnsSignal(this.screen);
@@ -102,36 +92,6 @@ export class CustomColumnsComponent
   ngOnDestroy(): void {
     this.optionsInternal$.complete();
     this.columnsReadyInternal$.complete();
-  }
-
-  configureColumn(col: ScreenInput, $event: MouseEvent): void {
-    $event.preventDefault();
-    $event.stopPropagation();
-    $event.stopImmediatePropagation();
-
-    this._matDialog
-      .open<CustomColumnEditorDialogComponent, ColumnEditorDialogData, CustomColumnEditorDialogResult>(
-        CustomColumnEditorDialogComponent,
-        { data: { screenInput: col } },
-      )
-      .afterClosed()
-      .pipe(
-        filter((result) => !!result),
-        switchMap((result) => {
-          switch (result!.operation) {
-            case CustomColumnEditorDialogOperation.SAVE:
-              return this._screenApiService.saveInput(result!.screenInput);
-            case CustomColumnEditorDialogOperation.DELETE:
-              return this._screenApiService.deleteInput(result!.screenInput.id!, this.screen);
-          }
-        }),
-        switchMap(() => this._customColumns.updateColumnsForScreen(this.screen)),
-      )
-      .subscribe(() => {
-        setTimeout(() => {
-          this._columnsReconfigure.reconfigureColumns();
-        });
-      });
   }
 
   private updateOptions(value?: string | string[]): void {

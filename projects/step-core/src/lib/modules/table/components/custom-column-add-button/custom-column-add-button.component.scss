@@ -1,9 +1,0 @@
-@use 'projects/step-core/styles/core-mixins' as core;
-
-:host {
-  z-index: 3;
-}
-step-icon {
-  cursor: pointer;
-  @include core.step-icon-size(1.6rem);
-}

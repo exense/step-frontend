@@ -16,18 +16,6 @@ step-icon {
   }
 }
 
-.col-settings,
 .col-description {
   z-index: 3;
-}
-
-.col-settings {
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s;
-  @include core.step-icon-size(1.6rem);
-}
-
-th:hover .col-settings {
-  opacity: 1;
 }

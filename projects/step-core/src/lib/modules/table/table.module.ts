@@ -40,9 +40,10 @@ import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
 import { AUTH_EXPORTS } from '../auth';
 import { DRAG_DROP_EXPORTS } from '../drag-drop';
 import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
-import { CustomColumnEditorDialogComponent } from './components/custom-column-editor-dialog/custom-column-editor-dialog.component';
-import { CustomColumnEditorDropdownOptionsComponent } from './components/custom-column-editor-dropdown-options/custom-column-editor-dropdown-options.component';
-import { CustomColumnAddButtonComponent } from './components/custom-column-add-button/custom-column-add-button.component';
+import { ColumnAddButtonComponent } from './components/column-add-button/column-add-button.component';
+import { ColumnDefLabelDirective } from './directives/column-def-label.directive';
+import { ColumnHideButtonComponent } from './components/column-hide-button/column-hide-button.component';
+import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
 
 @NgModule({
   imports: [
@@ -63,7 +64,6 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     SearchColDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
-    CustomColumnEditorDialogComponent,
     CustomCellValuePipe,
     ColumnDirective,
     CustomCellComponentsPipe,
@@ -78,9 +78,11 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     RangeFilterComponent,
     DateFilterComponent,
     DragColumnCaptionComponent,
-    CustomColumnEditorDropdownOptionsComponent,
-    CustomColumnAddButtonComponent,
+    ColumnAddButtonComponent,
+    ColumnHideButtonComponent,
     PaginatorComponent,
+    ColumnDefLabelDirective,
+    HeaderCellContainerComponent,
   ],
   exports: [
     TableComponent,
@@ -97,9 +99,11 @@ import { CustomColumnAddButtonComponent } from './components/custom-column-add-b
     RangeFilterComponent,
     DateFilterComponent,
     DragColumnCaptionComponent,
-    CustomColumnEditorDialogComponent,
-    CustomColumnAddButtonComponent,
+    ColumnAddButtonComponent,
+    ColumnHideButtonComponent,
     PaginatorComponent,
+    ColumnDefLabelDirective,
+    HeaderCellContainerComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -135,13 +139,14 @@ export * from './components/custom-search-dropdown/custom-search-checkbox.compon
 export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
-export * from './components/custom-column-editor-dialog/custom-column-editor-dialog.component';
-export * from './components/custom-column-editor-dropdown-options/custom-column-editor-dropdown-options.component';
 export * from './components/drag-column-caption/drag-column-caption.component';
-export * from './components/custom-column-add-button/custom-column-add-button.component';
+export * from './components/column-add-button/column-add-button.component';
+export * from './components/header-cell-container/header-cell-container.component';
+export * from './components/column-hide-button/column-hide-button.component';
 export * from './components/base-column-container/base-column-container.component';
 export * from './components/paginator/paginator.component';
 export * from './directives/column.directive';
+export * from './directives/column-def-label.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
@@ -166,3 +171,4 @@ export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
 export * from './services/table-highlight-item-container.service';
+export * from './services/table-columns-config.provider';

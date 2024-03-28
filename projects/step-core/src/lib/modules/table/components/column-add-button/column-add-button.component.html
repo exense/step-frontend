@@ -1,0 +1,15 @@
+<button
+  type="button"
+  mat-icon-button
+  [disabled]="!canAdd()"
+  [matMenuTriggerFor]="menu"
+  matTooltip="Add new column"
+  matTooltipPosition="below"
+>
+  <step-icon name="plus" />
+</button>
+<mat-menu #menu>
+  @for (column of hiddenColumns(); track column.key) {
+    <button type="button" mat-menu-item (click)="addColumn(column.key)">{{ column.value }}</button>
+  }
+</mat-menu>
