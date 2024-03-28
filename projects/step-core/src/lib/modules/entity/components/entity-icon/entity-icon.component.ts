@@ -21,7 +21,6 @@ export class EntityIconComponent {
 
   private _entityTypeResolver = inject(EntityTypeResolver);
   private entityRegistry = inject(EntityRegistry);
-  private _augmentedPlansService = inject(AugmentedPlansService);
   private _artefactService = inject(ArtefactService);
 
   constructor() {}
@@ -47,7 +46,7 @@ export class EntityIconComponent {
     const entityType = this.entityName ? this.entityRegistry.getEntityByName(this.entityName) : undefined;
     let iconOverride = this._entityTypeResolver.getTypeExtension(this.entity, entityType);
 
-    if (entityType?.type === this._augmentedPlansService.PLANS_TABLE_ID) {
+    if (entityType?.type === AugmentedPlansService.PLANS_TABLE_ID) {
       if (!iconOverride?.icon) {
         const planEntity = this.entity as Plan;
         const planTypeIcon = this._artefactService.getArtefactType(planEntity.root?._class)?.icon;

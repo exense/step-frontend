@@ -9,6 +9,7 @@ import {
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
 
@@ -17,6 +18,10 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
   templateUrl: './plan-list.component.html',
   styleUrls: ['./plan-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedPlansService.PLANS_TABLE_ID,
+      entityScreenId: 'planTable',
+    }),
     tablePersistenceConfigProvider('planList', STORE_ALL),
     ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

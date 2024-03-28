@@ -22,7 +22,7 @@ export class ImportsService {
     entity: string,
     path?: string,
     importAll?: boolean,
-    overwrite?: boolean
+    overwrite?: boolean,
   ): Observable<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',

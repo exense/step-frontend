@@ -10,5 +10,6 @@ export type ScreenInput = {
   screenId?: string;
   position?: number;
   input?: Input;
+  immutable?: boolean;
   id?: string;
 };

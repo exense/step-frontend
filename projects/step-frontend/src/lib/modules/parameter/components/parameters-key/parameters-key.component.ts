@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { CustomColumnOptions, CustomComponent, Parameter } from '@exense/step-core';
 import { map, of } from 'rxjs';
 
@@ -15,5 +15,5 @@ export class ParametersKeyComponent implements CustomComponent {
 
   readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
 
-  context?: Parameter;
+  @Input() context?: Parameter;
 }

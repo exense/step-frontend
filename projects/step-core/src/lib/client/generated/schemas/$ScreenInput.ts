@@ -25,6 +25,9 @@ export const $ScreenInput = {
     input: {
       type: 'Input',
     },
+    immutable: {
+      type: 'boolean',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

@@ -2,7 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { TableRequestData } from '../shared/table-request-data';
 import { TableResponseGeneric } from '../shared/table-response-generic';
 import { map, Observable, pipe, tap } from 'rxjs';
-import { AsyncTasksService, AsyncTaskStatusResource, TablesService } from '../../generated';
+import {
+  AsyncTasksService,
+  AsyncTaskStatusResource,
+  type TableSettings,
+  TableSettingsRequest,
+  TablesService,
+} from '../../generated';
 import { pollAsyncTask, AsyncTaskStatus } from '../../async-task/async-task.module';
 import { HttpClient } from '@angular/common/http';
 import { FileDownloaderService } from '../../../modules/basics/injectables/file-downloader.service';
@@ -27,6 +33,14 @@ export class TableApiWrapperService {
     tap((resource) => this.downloadDatasource(resource.id!, resource.resourceName!)),
     map((resourse) => resourse.id!),
   );
+
+  getTableSettings(tableName: string): Observable<TableSettings> {
+    return this._tables.getTableSettings(tableName);
+  }
+
+  saveTableSettings(tableName: string, tableSettingsRequest: TableSettingsRequest): Observable<TableSettings> {
+    return this._tables.saveTableSettings(tableName, tableSettingsRequest);
+  }
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
     return this._tables.request(tableId, tableRequest) as Observable<TableResponseGeneric<T>>;

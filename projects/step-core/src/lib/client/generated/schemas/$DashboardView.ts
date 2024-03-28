@@ -26,6 +26,10 @@ export const $DashboardView = {
       type: 'number',
       format: 'int64',
     },
+    refreshInterval: {
+      type: 'number',
+      format: 'int64',
+    },
     timeRange: {
       type: 'TimeRangeSelection',
       isRequired: true,

@@ -24,7 +24,7 @@ export class ExportsService {
     entity: string,
     recursively?: boolean,
     filename?: string,
-    additionalEntities?: Array<string>
+    additionalEntities?: Array<string>,
   ): Observable<AsyncTaskStatusResource> {
     return this.httpRequest.request({
       method: 'GET',
@@ -54,7 +54,7 @@ export class ExportsService {
     id: string,
     recursively?: boolean,
     filename?: string,
-    additionalEntities?: Array<string>
+    additionalEntities?: Array<string>,
   ): Observable<AsyncTaskStatusResource> {
     return this.httpRequest.request({
       method: 'GET',

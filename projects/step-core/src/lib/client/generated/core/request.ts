@@ -158,7 +158,7 @@ const getHeaders = (config: OpenAPIConfig, options: ApiRequestOptions): Observab
             ...headers,
             [key]: String(value),
           }),
-          {} as Record<string, string>
+          {} as Record<string, string>,
         );
 
       if (isStringWithValue(token)) {
@@ -183,7 +183,7 @@ const getHeaders = (config: OpenAPIConfig, options: ApiRequestOptions): Observab
       }
 
       return new HttpHeaders(headers);
-    })
+    }),
   );
 };
 
@@ -207,7 +207,7 @@ export const sendRequest = <T>(
   url: string,
   body: any,
   formData: FormData | undefined,
-  headers: HttpHeaders
+  headers: HttpHeaders,
 ): Observable<HttpResponse<T>> => {
   return http.request<T>(options.method, url, {
     headers,
@@ -302,6 +302,6 @@ export const request = <T>(config: OpenAPIConfig, http: HttpClient, options: Api
     }),
     catchError((error: ApiError) => {
       return throwError(error);
-    })
+    }),
   );
 };

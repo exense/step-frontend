@@ -8,7 +8,10 @@ import type { ApiRequestOptions } from './ApiRequestOptions';
 import type { OpenAPIConfig } from './OpenAPI';
 
 export abstract class BaseHttpRequest {
-  constructor(public readonly config: OpenAPIConfig, public readonly http: HttpClient) {}
+  constructor(
+    public readonly config: OpenAPIConfig,
+    public readonly http: HttpClient,
+  ) {}
 
   public abstract request<T>(options: ApiRequestOptions): Observable<T>;
 }

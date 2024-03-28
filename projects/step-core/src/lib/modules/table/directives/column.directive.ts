@@ -1,19 +1,20 @@
-import { Directive, Optional, Self } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import { MatColumnDef } from '@angular/material/table';
 import { Observable, of } from 'rxjs';
 import { SearchColDirective } from './search-col.directive';
 import { CustomColumnsBaseComponent } from '../components/custom-columns/custom-columns-base.component';
+import { ColumnDefLabelDirective } from './column-def-label.directive';
+import { KeyValue } from '@angular/common';
 
 @Directive({
   selector:
     '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container,step-lock-column-container',
 })
 export class ColumnDirective {
-  constructor(
-    @Self() @Optional() private _matColumnDef?: MatColumnDef,
-    @Self() @Optional() private _customColumns?: CustomColumnsBaseComponent,
-    @Self() @Optional() private _searchColumn?: SearchColDirective
-  ) {}
+  private _matColumnDef = inject(MatColumnDef, { self: true, optional: true });
+  private _customColumns = inject(CustomColumnsBaseComponent, { self: true, optional: true });
+  private _searchColumn = inject(SearchColDirective, { self: true, optional: true });
+  private _colLabel = inject(ColumnDefLabelDirective, { self: true, optional: true });
 
   get isCustom(): boolean {
     return !!this._customColumns;
@@ -33,5 +34,12 @@ export class ColumnDirective {
       : this._customColumns!.searchColDef?.map((x) => x) ?? [];
 
     return searchCols.filter((col) => !col.isSearchDisabled);
+  }
+
+  get columnLabels(): KeyValue<string, string | undefined>[] {
+    if (!this.isCustom) {
+      return [this._colLabel?.getColumnIdAndLabel()!].filter((item) => !!item);
+    }
+    return (this._customColumns?.colDefLabel ?? []).map((item) => item.getColumnIdAndLabel()).filter((item) => !!item);
   }
 }

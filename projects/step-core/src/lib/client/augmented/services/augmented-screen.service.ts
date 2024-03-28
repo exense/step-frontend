@@ -7,9 +7,11 @@ import { map, Observable, of, pipe, tap, UnaryFunction } from 'rxjs';
 })
 export class AugmentedScreenService extends ScreensService {
   private screenCache: Record<string, Input[]> = {};
+  private screenInputCache: Record<string, ScreenInput[]> = {};
 
   clearCache(): void {
     this.screenCache = {};
+    this.screenInputCache = {};
   }
 
   override getInputsForScreenPost(id: string, requestBody?: any): Observable<Input[]> {
@@ -20,6 +22,18 @@ export class AugmentedScreenService extends ScreensService {
       tap((inputs) => {
         Object.freeze(inputs);
         this.screenCache[id] = inputs;
+      }),
+    );
+  }
+
+  getScreenInputsByScreenIdWithCache(id: string): Observable<Array<ScreenInput>> {
+    if (!!this.screenInputCache[id]) {
+      return of(this.screenInputCache[id]);
+    }
+    return super.getScreenInputsByScreenId(id).pipe(
+      tap((inputs) => {
+        Object.freeze(inputs);
+        this.screenInputCache[id] = inputs;
       }),
     );
   }
@@ -70,6 +84,9 @@ export class AugmentedScreenService extends ScreensService {
       tap(() => {
         if (screenId && this.screenCache[screenId]) {
           delete this.screenCache[screenId];
+        }
+        if (screenId && this.screenInputCache[screenId]) {
+          delete this.screenInputCache[screenId];
         }
       }),
     );

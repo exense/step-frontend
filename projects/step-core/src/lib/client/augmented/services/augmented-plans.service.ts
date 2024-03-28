@@ -6,14 +6,14 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedPlansService extends PlansService {
-  readonly PLANS_TABLE_ID = 'plans';
+  static readonly PLANS_TABLE_ID = 'plans';
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _httpClient = inject(HttpClient);
 
   private cachedPlan?: Plan;
 
   getPlansTableDataSource(): StepDataSource<Plan> {
-    return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedPlansService.PLANS_TABLE_ID, {
       name: 'attributes.name',
       type: 'root._class',
       automationPackage: 'customFields.automationPackageId',
@@ -22,7 +22,7 @@ export class AugmentedPlansService extends PlansService {
   }
 
   createSelectionDataSource(): StepDataSource<Plan> {
-    return this._dataSourceFactory.createDataSource(this.PLANS_TABLE_ID, { name: 'attributes.name' });
+    return this._dataSourceFactory.createDataSource(AugmentedPlansService.PLANS_TABLE_ID, { name: 'attributes.name' });
   }
 
   getPlanByIdCached(id: string): Observable<Plan> {

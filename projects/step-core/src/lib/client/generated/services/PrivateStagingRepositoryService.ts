@@ -49,7 +49,7 @@ export class PrivateStagingRepositoryService {
   public executeInStagingContext(
     id: string,
     isolate?: boolean,
-    requestBody?: Record<string, string>
+    requestBody?: Record<string, string>,
   ): Observable<string> {
     return this.httpRequest.request({
       method: 'POST',
@@ -75,7 +75,7 @@ export class PrivateStagingRepositoryService {
     id: string,
     formData?: {
       file?: FormDataContentDisposition;
-    }
+    },
   ): Observable<string> {
     return this.httpRequest.request({
       method: 'POST',

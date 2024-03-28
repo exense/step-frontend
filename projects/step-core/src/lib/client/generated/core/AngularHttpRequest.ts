@@ -16,7 +16,7 @@ export class AngularHttpRequest extends BaseHttpRequest {
   constructor(
     @Inject(OpenAPI)
     config: OpenAPIConfig,
-    http: HttpClient
+    http: HttpClient,
   ) {
     super(config, http);
   }

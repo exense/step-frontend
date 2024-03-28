@@ -5,10 +5,10 @@ import { Execution, KeywordsService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
 import { Keyword } from '../shared/keyword';
 
-const FUNCTIONS_TABLE_ID = 'functions';
-
 @Injectable({ providedIn: 'root' })
 export class AugmentedKeywordsService extends KeywordsService {
+  static readonly FUNCTIONS_TABLE_ID = 'functions';
+
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _httpClient = inject(HttpClient);
 
@@ -16,7 +16,7 @@ export class AugmentedKeywordsService extends KeywordsService {
 
   createFilteredTableDataSource(filter?: string[]): StepDataSource<Keyword> {
     return this._dataSourceFactory.createDataSource(
-      FUNCTIONS_TABLE_ID,
+      AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
       {
         name: 'attributes.name',
         type: 'type',
@@ -28,7 +28,10 @@ export class AugmentedKeywordsService extends KeywordsService {
   }
 
   getKeywordSelectionTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(FUNCTIONS_TABLE_ID, { name: 'attributes.name', type: 'type' });
+    return this._dataSourceFactory.createDataSource(AugmentedKeywordsService.FUNCTIONS_TABLE_ID, {
+      name: 'attributes.name',
+      type: 'type',
+    });
   }
 
   override getFunctionEditor(id: string): Observable<string> {

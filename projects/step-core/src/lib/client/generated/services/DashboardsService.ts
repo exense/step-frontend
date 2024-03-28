@@ -24,7 +24,7 @@ export class DashboardsService {
    * @throws ApiError
    */
   public deleteDashboards(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',

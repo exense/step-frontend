@@ -1,0 +1,12 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+:host {
+  z-index: 3;
+  & > button {
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+    step-icon {
+      @include core.step-icon-size(1.6rem);
+    }
+  }
+}

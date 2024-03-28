@@ -48,6 +48,7 @@ import { DurationPipe } from './pipes/duration.pipe';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 import { MarkerComponent } from './components/marker/marker.component';
 import { AlertsContainerComponent } from './components/alerts-container/alerts-container.component';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
@@ -106,6 +107,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     DialogRouteComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
     ProjectNamePipe,
   ],
   exports: [
@@ -163,6 +165,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     ArrayFilterAdvancedComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
     ProjectNamePipe,
   ],
 })
@@ -255,6 +258,7 @@ export * from './types/dialog-route-result';
 export * from './types/quick-access-route';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
+export * from './directives/input-model-formatter.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
@@ -265,5 +269,6 @@ export * from './components/confirmation-dialog/confirmation-dialog.component';
 export * from './components/messages-list-dialog/messages-list-dialog.component';
 export * from './components/message-dialog/message-dialog.component';
 export * from './components/dialog-route/dialog-route.component';
+export * from './types/model-formatters';
 export * from './types/mutable';
 export * from './types/date-format.enum';

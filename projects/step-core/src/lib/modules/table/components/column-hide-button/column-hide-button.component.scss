@@ -1,0 +1,25 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-column-hide-button {
+  display: inline-block;
+  z-index: 3;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+step-column-hide-button > step-icon {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: 1.5rem;
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+  min-width: 1.6rem !important;
+  min-height: 1.6rem !important;
+}
+
+th:hover step-column-hide-button > step-icon {
+  opacity: 1;
+}

@@ -24,7 +24,7 @@ export class ParametersService {
    * @throws ApiError
    */
   public deleteParameters(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',

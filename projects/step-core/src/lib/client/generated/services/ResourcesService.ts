@@ -30,7 +30,7 @@ export class ResourcesService {
     trackingAttribute?: string,
     formData?: {
       file?: FormDataContentDisposition;
-    }
+    },
   ): Observable<ResourceUploadResponse> {
     return this.httpRequest.request({
       method: 'POST',
@@ -119,7 +119,7 @@ export class ResourcesService {
     id: string,
     formData?: {
       file?: FormDataContentDisposition;
-    }
+    },
   ): Observable<ResourceUploadResponse> {
     return this.httpRequest.request({
       method: 'POST',
