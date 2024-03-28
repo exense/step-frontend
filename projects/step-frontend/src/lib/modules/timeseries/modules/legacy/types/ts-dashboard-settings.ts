@@ -12,6 +12,6 @@ export interface TimeSeriesDashboardSettings {
   activeTimeRange: TimeRangePickerSelection;
   filterOptions: FilterBarItem[];
   activeFilters?: FilterBarItem[];
-
+  grouping?: string[];
   execution?: Execution;
 }

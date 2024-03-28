@@ -7,7 +7,7 @@ import { TsFilteringSettings } from '../filter/ts-filtering-settings';
 export interface TimeSeriesContextParams {
   id: string;
   timeRange: TimeRange;
-  attributes?: Record<string, MetricAttribute>;
+  attributes?: MetricAttribute[];
   grouping: string[];
   filters?: FilterBarItem[];
   colorsPool?: TimeseriesColorsPool;
