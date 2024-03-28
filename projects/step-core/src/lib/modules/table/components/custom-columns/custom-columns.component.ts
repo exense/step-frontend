@@ -21,6 +21,7 @@ import { CustomColumnOptions } from '../../services/custom-column-options';
 import { CustomColumnsBaseComponent } from './custom-columns-base.component';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
 import { ColumnDefLabelDirective } from '../../directives/column-def-label.directive';
+import { CustomColumnsScreenInputs } from './custom-columns-screen-inputs';
 
 @Component({
   selector: 'step-custom-columns',
@@ -38,7 +39,7 @@ import { ColumnDefLabelDirective } from '../../directives/column-def-label.direc
   ],
 })
 export class CustomColumnsComponent
-  implements OnInit, OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent
+  implements OnInit, OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent, CustomColumnsScreenInputs
 {
   private _customColumns = inject(TableCustomColumnsService);
 
