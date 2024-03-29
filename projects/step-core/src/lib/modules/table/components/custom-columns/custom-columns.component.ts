@@ -20,7 +20,7 @@ import { SearchColDirective } from '../../directives/search-col.directive';
 import { CustomColumnOptions } from '../../services/custom-column-options';
 import { CustomColumnsBaseComponent } from './custom-columns-base.component';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
-import { ColumnDefLabelDirective } from '../../directives/column-def-label.directive';
+import { ActivityColDirective } from '../../directives/activity-col.directive';
 import { CustomColumnsScreenInputs } from './custom-columns-screen-inputs';
 
 @Component({
@@ -69,7 +69,7 @@ export class CustomColumnsComponent
 
   @ViewChildren(MatColumnDef) colDef?: QueryList<MatColumnDef>;
   @ViewChildren(SearchColDirective) searchColDef?: QueryList<SearchColDirective>;
-  @ViewChildren(ColumnDefLabelDirective) colDefLabel?: QueryList<ColumnDefLabelDirective>;
+  @ViewChildren(ActivityColDirective) colDefLabel?: QueryList<ActivityColDirective>;
 
   ngOnInit(): void {
     this.columns = this._customColumns.getScreenColumnsSignal(this.screen);

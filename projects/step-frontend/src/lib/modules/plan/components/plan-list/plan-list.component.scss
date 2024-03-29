@@ -17,10 +17,4 @@
   width: 6rem;
 }
 
-.cell-actions-header {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 @include core.table-common-cells;

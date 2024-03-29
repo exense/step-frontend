@@ -1,7 +1,7 @@
 @for (col of displayColumns(); track col.input!.id!) {
   <ng-container
     [matColumnDef]="col.input!.id!"
-    [stepColumnDefLabel]="col.input!.label!"
+    [stepActivityCol]="col.input!.label!"
     internal
     stepSearchCol
     [isSearchDisabled]="isSearchDisabled"
@@ -11,7 +11,6 @@
     }
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <step-drag-column-caption>{{ col.input!.label }}</step-drag-column-caption>
-      <step-column-hide-button />
       @if (col.input!.description) {
         <step-icon class="col-description" [matTooltip]="col.input!.description" name="help-circle" />
       }

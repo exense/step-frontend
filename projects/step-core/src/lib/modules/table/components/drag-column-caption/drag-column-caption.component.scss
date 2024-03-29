@@ -4,34 +4,42 @@ step-drag-column-caption {
   display: block;
   position: relative;
   width: fit-content;
+  --item-width: 0;
+  --item-height: 0;
 
   .drop-before,
   .drop-after {
     height: 3rem;
     top: 0;
     position: absolute;
-    &.dragover {
-      background: var.$highlight !important;
-    }
+  }
+
+  @mixin dragover-shadow {
+    content: ' ';
+    display: block;
+    width: var(--item-width);
+    height: var(--item-height);
+    position: fixed;
+    background: var.$gray-750 !important;
+    border: dashed 1px var.$gray-400;
+    opacity: 0.5;
   }
 
   .drop-before {
-    left: -0.8rem;
-    width: 0.8rem;
+    left: -1rem;
+    width: 1rem;
     &.dragover::before {
-      content: ' ';
-      display: block;
-      height: 3rem;
-      width: 3rem;
-      margin-left: -3rem;
-      position: fixed;
-      background: var.$highlight !important;
+      @include dragover-shadow;
+      margin-left: calc(-1 * var(--item-width));
     }
   }
 
   .drop-after {
-    left: 100%;
+    left: calc(100% + 0.8rem);
     right: -100rem;
+    &.dragover::after {
+      @include dragover-shadow;
+    }
   }
 
   .drag-pointer {
@@ -46,9 +54,6 @@ step-drag-column-caption {
         padding: 0 0.5rem;
         margin: 0 -0.6rem;
       }
-    }
-    &.drag-in-progress {
-      background: var.$gray-400;
     }
   }
 }

@@ -5,6 +5,7 @@ import {
   contentChildren,
   ContentChildren,
   DestroyRef,
+  effect,
   EventEmitter,
   forwardRef,
   inject,
@@ -52,6 +53,8 @@ import { CustomColumnsComponent } from '../custom-columns/custom-columns.compone
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
+import { DragColumnCaptionComponent } from '../drag-column-caption/drag-column-caption.component';
+import { ColumnInfo } from '../../types/column-info';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -163,17 +166,9 @@ export class TableComponent<T>
 
   private columns = computed(() => [...this.contentColumns(), ...this.viewColumns()]);
 
-  readonly columnsDictionary = computed(() =>
-    (this.columns() ?? []).reduce(
-      (result, column) => {
-        return column.columnLabels.reduce((res, item) => {
-          res[item.key] = item.value;
-          return res;
-        }, result);
-      },
-      {} as Record<string, string | undefined>,
-    ),
-  );
+  readonly columnsDictionary = computed(() => {
+    return (this.columns() ?? []).reduce((res, column) => res.concat(column.columnInfos), [] as ColumnInfo[]);
+  });
 
   private allCollDef = computed(() => {
     return (this.columns() ?? []).reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[]);
@@ -213,9 +208,12 @@ export class TableComponent<T>
     _columnDefinitions.setup(this.contentColumns, this.customRemoteColumns);
   }
 
+  private loadCompleteInternal$ = new Subject<void>();
   private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
   private filter$ = toObservable(this.filter);
   private tableParams$ = toObservable(this.tableParams);
+
+  readonly loadComplete$ = this.loadCompleteInternal$.asObservable();
 
   readonly hasFilter$ = this.search$.pipe(
     map((search) => {
@@ -298,6 +296,10 @@ export class TableComponent<T>
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
+    });
+
+    tableDataSource.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
+      this.loadCompleteInternal$.next();
     });
   }
 
@@ -462,6 +464,7 @@ export class TableComponent<T>
   ngOnDestroy(): void {
     this.terminateDatasource();
     this.search$.complete();
+    this.loadCompleteInternal$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

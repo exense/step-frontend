@@ -1,0 +1,21 @@
+<button
+  type="button"
+  mat-icon-button
+  [color]="hasChanges() ? 'warn' : null"
+  [matMenuTriggerFor]="menu"
+  [matTooltip]="hasChanges() ? 'Column settings (Unsaved changes)' : 'Column settings'"
+  matTooltipPosition="below"
+>
+  <step-icon name="more-vertical" />
+</button>
+<mat-menu #menu>
+  <button type="button" mat-menu-item [disabled]="!hasChanges()" (click)="saveSettings()">
+    <step-icon name="save" />
+    <span>Save Settings</span>
+  </button>
+  @for (column of columns(); track column.columnId) {
+    <button type="button" mat-menu-item role="menuitemcheckbox" (click)="switchVisibility(column)">
+      <mat-checkbox color="primary" [checked]="column.isVisible">{{ column.caption }}</mat-checkbox>
+    </button>
+  }
+</mat-menu>

@@ -79,4 +79,17 @@ step-table {
       padding-right: 0;
     }
   }
+
+  table {
+    @for $i from 1 to 100 {
+      &.drag-col-#{$i} {
+        tr > th,
+        tr > td {
+          &:nth-child(#{$i}) {
+            background: var.$highlight !important;
+          }
+        }
+      }
+    }
+  }
 }

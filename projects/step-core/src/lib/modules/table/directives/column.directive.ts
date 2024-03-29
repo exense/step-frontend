@@ -3,8 +3,8 @@ import { MatColumnDef } from '@angular/material/table';
 import { Observable, of } from 'rxjs';
 import { SearchColDirective } from './search-col.directive';
 import { CustomColumnsBaseComponent } from '../components/custom-columns/custom-columns-base.component';
-import { ColumnDefLabelDirective } from './column-def-label.directive';
-import { KeyValue } from '@angular/common';
+import { ActivityColDirective } from './activity-col.directive';
+import { ColumnInfo } from '../types/column-info';
 
 @Directive({
   selector:
@@ -14,7 +14,7 @@ export class ColumnDirective {
   private _matColumnDef = inject(MatColumnDef, { self: true, optional: true });
   private _customColumns = inject(CustomColumnsBaseComponent, { self: true, optional: true });
   private _searchColumn = inject(SearchColDirective, { self: true, optional: true });
-  private _colLabel = inject(ColumnDefLabelDirective, { self: true, optional: true });
+  private _colLabel = inject(ActivityColDirective, { self: true, optional: true });
 
   get isCustom(): boolean {
     return !!this._customColumns;
@@ -36,10 +36,10 @@ export class ColumnDirective {
     return searchCols.filter((col) => !col.isSearchDisabled);
   }
 
-  get columnLabels(): KeyValue<string, string | undefined>[] {
+  get columnInfos(): ColumnInfo[] {
     if (!this.isCustom) {
-      return [this._colLabel?.getColumnIdAndLabel()!].filter((item) => !!item);
+      return [this._colLabel?.columnInfo()!].filter((item) => !!item);
     }
-    return (this._customColumns?.colDefLabel ?? []).map((item) => item.getColumnIdAndLabel()).filter((item) => !!item);
+    return (this._customColumns?.colDefLabel ?? []).map((item) => item.columnInfo()).filter((item) => !!item);
   }
 }

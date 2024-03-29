@@ -65,6 +65,7 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
         droppedArea: this.dropArea,
         additionalInfo: this.dropAdditionalInfo,
       });
+      this._dragDataService.dragEnd();
     });
   }
 

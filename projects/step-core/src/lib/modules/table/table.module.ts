@@ -40,9 +40,8 @@ import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
 import { AUTH_EXPORTS } from '../auth';
 import { DRAG_DROP_EXPORTS } from '../drag-drop';
 import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
-import { ColumnAddButtonComponent } from './components/column-add-button/column-add-button.component';
-import { ColumnDefLabelDirective } from './directives/column-def-label.directive';
-import { ColumnHideButtonComponent } from './components/column-hide-button/column-hide-button.component';
+import { ColumnSettingsComponent } from './components/column-settings/column-settings.component';
+import { ActivityColDirective } from './directives/activity-col.directive';
 import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
 
 @NgModule({
@@ -78,10 +77,9 @@ import { HeaderCellContainerComponent } from './components/header-cell-container
     RangeFilterComponent,
     DateFilterComponent,
     DragColumnCaptionComponent,
-    ColumnAddButtonComponent,
-    ColumnHideButtonComponent,
+    ColumnSettingsComponent,
     PaginatorComponent,
-    ColumnDefLabelDirective,
+    ActivityColDirective,
     HeaderCellContainerComponent,
   ],
   exports: [
@@ -99,10 +97,9 @@ import { HeaderCellContainerComponent } from './components/header-cell-container
     RangeFilterComponent,
     DateFilterComponent,
     DragColumnCaptionComponent,
-    ColumnAddButtonComponent,
-    ColumnHideButtonComponent,
+    ColumnSettingsComponent,
     PaginatorComponent,
-    ColumnDefLabelDirective,
+    ActivityColDirective,
     HeaderCellContainerComponent,
   ],
   providers: [
@@ -140,13 +137,12 @@ export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
 export * from './components/drag-column-caption/drag-column-caption.component';
-export * from './components/column-add-button/column-add-button.component';
+export * from './components/column-settings/column-settings.component';
 export * from './components/header-cell-container/header-cell-container.component';
-export * from './components/column-hide-button/column-hide-button.component';
 export * from './components/base-column-container/base-column-container.component';
 export * from './components/paginator/paginator.component';
 export * from './directives/column.directive';
-export * from './directives/column-def-label.directive';
+export * from './directives/activity-col.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
