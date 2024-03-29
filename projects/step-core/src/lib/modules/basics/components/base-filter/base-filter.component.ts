@@ -16,13 +16,13 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestro
     this.filterChange.emit(value);
   }
 
-  protected transformFilterValueToControlValue(value: T): CV {
+  protected transformFilterValueToControlValue(value?: T): CV {
     return value as unknown as CV;
   }
 
   @Output() filterChange = new EventEmitter<T>();
 
-  assignValue(value: T): void {
+  assignValue(value?: T): void {
     const controlValue = this.transformFilterValueToControlValue(value);
     this.filterControl.setValue(controlValue, { emitEvent: false });
     this._cd.detectChanges();

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { map, startWith } from 'rxjs';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { filter, map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../../table/table.module';
 import { StepBasicsModule, IsUsedBySearchType, ProjectNamePipe } from '../../../basics/step-basics.module';
@@ -7,6 +7,8 @@ import { TableModule } from '../../../table/table.module';
 import { PlanLinkComponent } from '../../../plan-common';
 import { EntityModule } from '../../../entity/entity.module';
 import { KeywordsCommonModule } from '../../../keywords-common/keywords-common.module';
+import { NavigationStart, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface FindReferenceWithLinkContext extends FindReferencesResponse {
   linkContext?: {
@@ -28,11 +30,13 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
 export class IsUsedByListComponent implements OnInit {
   private _referencesService = inject(ReferencesService);
   private _projectName = inject(ProjectNamePipe);
+  private _destroyRef = inject(DestroyRef);
+  private _router = inject(Router);
 
   @Input() type?: IsUsedBySearchType;
   @Input() id: string = '';
 
-  @Output() onClose = new EventEmitter<any>();
+  @Output() close = new EventEmitter<any>();
 
   currentProjectName: string = '';
   entityType: string = '';
@@ -58,10 +62,11 @@ export class IsUsedByListComponent implements OnInit {
 
   ngOnInit(): void {
     this.determineEntityType();
+    this.setupCloseOnNavigation();
   }
 
   closeDialog(): void {
-    this.onClose.emit({});
+    this.close.emit({});
   }
 
   private createReferenceWithLinkContext(ref: FindReferencesResponse): FindReferenceWithLinkContext {
@@ -99,5 +104,14 @@ export class IsUsedByListComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  private setupCloseOnNavigation(): void {
+    this._router.events
+      .pipe(
+        filter((event) => event instanceof NavigationStart),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => this.close.emit());
   }
 }

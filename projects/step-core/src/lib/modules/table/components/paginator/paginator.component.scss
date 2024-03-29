@@ -1,0 +1,21 @@
+step-paginator {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  padding: 0.8rem;
+  font-size: 1.2rem;
+
+  .sub-section {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  mat-select {
+    min-width: 6.8rem !important;
+    width: auto !important;
+  }
+}

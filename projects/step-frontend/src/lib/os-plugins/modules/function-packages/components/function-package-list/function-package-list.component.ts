@@ -30,18 +30,10 @@ export class FunctionPackageListComponent implements DialogParentService {
 
   isRefreshing: boolean = false;
 
-  readonly returnParentUrl = this._actions.rootUrl;
+  readonly returnParentUrl = '/functionPackages';
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
-  }
-
-  add(): void {
-    this._actions.newFunctionPackage();
-  }
-
-  edit(functionPackage: FunctionPackage): void {
-    this._actions.editFunctionPackage(functionPackage);
   }
 
   refresh(id: string): void {

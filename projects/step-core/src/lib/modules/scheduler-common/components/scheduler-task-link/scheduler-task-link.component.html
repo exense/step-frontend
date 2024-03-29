@@ -1,23 +1,17 @@
-<ng-template #descriptionTemplate>
-  {{ context?.attributes?.['name'] }}
-</ng-template>
-
-<ng-template #iconTemplate>
-  <step-icon name="clock" matTooltip="Edit task" matTooltipPosition="below"> </step-icon>
-</ng-template>
-
-<a href="#" (click)="editParameter(); (false)">
-  <div class="link-content" [ngSwitch]="linkDisplayType">
-    <ng-container *ngSwitchCase="LinkDisplayType.ICON_ONLY">
-      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
-    </ng-container>
-    <ng-container *ngSwitchCase="LinkDisplayType.TEXT_ONLY">
-      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-      <ng-container *ngTemplateOutlet="iconTemplate"></ng-container>
-      <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
-    </ng-container>
+<a href="#" [routerLink]="context | taskUrl">
+  <div class="link-content">
+    @switch (linkDisplayType) {
+      @case (LinkDisplayType.ICON_ONLY) {
+        <step-icon name="clock" matTooltip="Edit task" matTooltipPosition="below" />
+      }
+      @case (LinkDisplayType.TEXT_ONLY) {
+        {{ context?.attributes?.['name'] }}
+      }
+      @default {
+        <step-icon name="clock" matTooltip="Edit task" matTooltipPosition="below" />
+        {{ context?.attributes?.['name'] }}
+      }
+    }
   </div>
 </a>
-<step-description-hint [description]="context?.attributes?.['description']"> </step-description-hint>
+<step-description-hint [description]="context?.attributes?.['description']" />

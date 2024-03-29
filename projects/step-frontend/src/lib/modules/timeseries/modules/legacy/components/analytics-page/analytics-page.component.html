@@ -1,6 +1,5 @@
 <div class="relative" #container>
   <div class="header-container">
-    <div></div>
     <div class="header-buttons">
       <step-autorefresh-toggle
         [interval]="refreshEnabled ? selectedRefreshInterval.value : 0"
@@ -41,6 +40,7 @@
     [settings]="dashboardSettings"
     [timeRange]="timeRange"
     (compareModeChange)="compactChange($event)"
+    (contextInitialized)="dashboardContextInitialized($event)"
     (timeRangeChange)="handleDashboardTimeRangeChange($event)"
   ></step-timeseries-dashboard>
 </div>

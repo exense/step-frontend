@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NavigatorQueryParamsCleanupService } from '@exense/step-core';
 import { Params } from '@angular/router';
-import { TS_PARAMS_KEY } from './chart-url-params.service';
+import { TS_PARAMS_PREFIX } from './chart-url-params.service';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 
 @Injectable()

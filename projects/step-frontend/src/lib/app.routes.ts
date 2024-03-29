@@ -1,7 +1,7 @@
 import { Router, Routes } from '@angular/router';
 import { LoginComponent } from './modules/_common/step-common.module';
 import { APP_INITIALIZER, FactoryProvider, inject } from '@angular/core';
-import { authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step-core';
+import { AdditionalInitializationService, authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step-core';
 import { map, take } from 'rxjs';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { Location } from '@angular/common';
@@ -22,7 +22,7 @@ export const APP_ROUTES: Routes = [
         path: '',
         component: MainViewComponent,
         children: [],
-        canActivate: [authGuard],
+        canActivate: [authGuard, () => inject(AdditionalInitializationService).initialize().pipe(take(1))],
         runGuardsAndResolvers: 'always',
       },
       {

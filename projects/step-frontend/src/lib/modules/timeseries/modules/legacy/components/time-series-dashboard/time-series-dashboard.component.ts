@@ -38,6 +38,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
 
   @Output() timeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
   @Output() compareModeChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() contextInitialized: EventEmitter<TimeSeriesContext> = new EventEmitter<TimeSeriesContext>();
 
   @Input() settings!: TimeSeriesDashboardSettings;
   @ViewChild(ChartsViewComponent) chartsView!: ChartsViewComponent;
@@ -91,13 +92,14 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       id: this.settings.contextId,
       timeRange: this.settings.timeRange,
       filters: this.filterItems,
-      grouping: ['name'],
+      grouping: this.settings.grouping || ['name'],
     };
     this.context = this._contextsFactory.createContext(contextParams);
 
     this.performanceViewSettings = this.settings;
     this.performanceViewSettings.displayTooltipLinks = !this.settings.execution; // we're on analytics
     this.subscribeForContextChange();
+    this.contextInitialized.next(this.context);
   }
 
   private mergeContextualParamsWithActiveFilters(

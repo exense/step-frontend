@@ -5,6 +5,11 @@
         <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-icon-button>
           <step-icon name="settings" />
         </button>
+        <step-autorefresh-toggle
+          [interval]="refreshInterval"
+          (refresh)="triggerRefresh()"
+          (intervalChange)="handleRefreshIntervalChange($event)"
+        />
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -12,6 +17,10 @@
               <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
             </div>
           </mat-menu>
+          <button mat-menu-item (click)="exportRawData()">
+            <step-icon name="download" />
+            <span>Export Raw Measurements</span>
+          </button>
         </mat-menu>
       </div>
       <div class="header-buttons-container">

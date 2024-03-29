@@ -24,11 +24,11 @@ export class SingleItemArrayFilterComponent extends ArrayFilterComponent {
     return control.valueChanges.pipe(
       map((value: unknown) => {
         return (value as string) ?? '';
-      })
+      }),
     );
   }
 
-  protected override transformFilterValueToControlValue(value: string): unknown {
+  protected override transformFilterValueToControlValue(value?: string): unknown {
     return value;
   }
 }
