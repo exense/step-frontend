@@ -18,10 +18,6 @@ export class ColumnSettingsComponent {
 
   readonly hasChanges = this._tableColumns.hasChanges;
 
-  eff = effect(() => {
-    console.log('DICT', this._tableColumnsDictionary.columnsDictionary());
-  });
-
   readonly columns = computed(() => {
     const visibleColumns = new Set(this._tableColumns.visibleColumns());
     const columns = this._tableColumnsDictionary.columnsDictionary();
