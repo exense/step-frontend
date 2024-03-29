@@ -1,7 +1,7 @@
 import { Params } from '@angular/router';
 import { NavigatorQueryParamsCleanupService } from '@exense/step-core';
 import { Injectable } from '@angular/core';
-import { TS_PARAMS_KEY } from './modules/_common';
+import { TS_PARAMS_PREFIX } from './modules/_common';
 
 /**
  * @Deprecated
@@ -9,12 +9,12 @@ import { TS_PARAMS_KEY } from './modules/_common';
 @Injectable()
 export class TsNavigatorQueryParamsCleanupService implements NavigatorQueryParamsCleanupService {
   isCleanUpRequired(queryParams: Params): boolean {
-    return !!queryParams?.[TS_PARAMS_KEY];
+    return Object.keys(queryParams).some((key) => key.startsWith(TS_PARAMS_PREFIX));
   }
   cleanup(queryParams: Params): Params {
-    const clear = (queryParams?.[TS_PARAMS_KEY] ?? '').split(',');
-    clear.forEach((value: string) => delete queryParams[value]);
-    delete queryParams[TS_PARAMS_KEY];
+    Object.keys(queryParams)
+      .filter((key) => key.startsWith(TS_PARAMS_PREFIX))
+      .forEach((key) => delete queryParams[key]);
     return queryParams;
   }
 }

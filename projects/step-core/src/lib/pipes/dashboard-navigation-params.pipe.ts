@@ -20,9 +20,10 @@ export class DashboardNavigationParamsPipe implements PipeTransform {
       const taskId = typeof params === 'string' ? params : params.id!;
 
       parameters = {
-        taskId,
-        refresh: 1,
-        relativeRange: ONE_DAY_MS,
+        dc_q_taskId: taskId,
+        dc_refreshInterval: 5000,
+        dc_rangeType: 'RELATIVE',
+        dc_relativeRange: ONE_DAY_MS,
       };
     }
 
