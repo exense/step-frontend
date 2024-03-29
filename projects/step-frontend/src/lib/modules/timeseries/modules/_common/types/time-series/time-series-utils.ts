@@ -41,23 +41,21 @@ export class TimeSeriesUtils {
     execution: Execution,
     timeRangeSelection: TimeRangePickerSelection,
   ): TimeRange {
-    const now = new Date().getTime();
-    let selection: TimeRange;
-    let newFullRange: TimeRange;
+    const startTime = execution.startTime!;
+    const endTime = execution.endTime ?? new Date().getTime();
+
     switch (timeRangeSelection.type) {
       case 'FULL':
-        newFullRange = { from: execution.startTime!, to: (execution.endTime || now) - 5000 };
-        selection = newFullRange;
-        break;
+        const fullRange = { from: startTime, to: endTime - 5000 };
+        if (fullRange.to - fullRange.from < 0) {
+          fullRange.to = endTime;
+        }
+        return fullRange;
       case 'ABSOLUTE':
-        newFullRange = timeRangeSelection.absoluteSelection!;
-        break;
+        return timeRangeSelection.absoluteSelection!;
       case 'RELATIVE':
-        const end = execution.endTime || now;
-        newFullRange = { from: end - timeRangeSelection.relativeSelection!.timeInMs!, to: end };
-        break;
+        return { from: endTime - timeRangeSelection.relativeSelection!.timeInMs!, to: endTime };
     }
-    return newFullRange;
   }
 
   static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TimeRange {

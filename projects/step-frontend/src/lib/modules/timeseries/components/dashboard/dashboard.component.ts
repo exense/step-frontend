@@ -90,6 +90,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
+    this.resolution = pageParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     this._route.paramMap.subscribe((params) => {
@@ -306,11 +307,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
-    const attributesByIds: Record<string, MetricAttribute> = {};
-    this.dashboard.dashlets.forEach((d) =>
-      d.chartSettings?.attributes?.forEach((attr) => (attributesByIds[attr.name] = attr)),
+    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap(
+      (d) => d.chartSettings?.attributes || [],
     );
-    const urlFilters = this.convertUrlFilters(urlParams, attributesByIds).filter(FilterUtils.filterItemIsValid);
+    const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
+      FilterUtils.filterItemIsValid,
+    );
 
     // url filters are excluded from the dashboard filters
     const dashboardFilters = dashboard.filters
@@ -319,7 +321,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       timeRange: timeRange,
-      attributes: attributesByIds,
+      attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
       resolution: urlParams.resolution,
