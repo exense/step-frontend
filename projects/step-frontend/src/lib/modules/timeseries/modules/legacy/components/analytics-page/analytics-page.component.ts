@@ -13,7 +13,6 @@ import {
   TimeSeriesContext,
   TimeRangePickerComponent,
   ChartUrlParams,
-  TimeSeriesContext,
   FilterUtils,
 } from '../../../_common';
 import { TimeSeriesDashboardComponent } from '../time-series-dashboard/time-series-dashboard.component';
@@ -23,6 +22,7 @@ import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../../_common/injectables/dashboard-url-params.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'step-analytics-page',

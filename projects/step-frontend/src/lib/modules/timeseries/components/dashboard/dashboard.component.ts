@@ -59,7 +59,6 @@ const EDIT_PARAM_NAME = 'edit';
     ResolutionPickerComponent,
     TimeRangePickerComponent,
   ],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
