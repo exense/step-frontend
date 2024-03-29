@@ -2,39 +2,39 @@
   <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="plans"></step-bulk-operations>
   <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
     <step-btn-group class="import-export">
-      <button
+      <a
         type="button"
         mat-icon-button
         matTooltip="Import plan"
         matTooltipPosition="below"
         [disabled]="!('plan-write' | hasRight | async)"
-        (click)="importPlans()"
+        routerLink="/plans/list/import"
       >
         <step-icon name="download"></step-icon>
-      </button>
-      <button
+      </a>
+      <a
         type="button"
         mat-icon-button
         matTooltip="Export all plans"
         matTooltipPosition="below"
         [disabled]="!('plan-read' | hasRight | async)"
-        (click)="exportPlans()"
+        routerLink="/plans/export/all"
       >
         <step-icon name="upload"></step-icon>
-      </button>
+      </a>
     </step-btn-group>
     <step-btn-group>
-      <button
+      <a
         type="button"
         mat-mini-fab
         color="primary"
         matTooltip="Add plan"
         matTooltipPosition="below"
         [disabled]="!('plan-write' | hasRight | async)"
-        (click)="addPlan()"
+        routerLink="/plans/list/new"
       >
         <step-icon name="plus"></step-icon>
-      </button>
+      </a>
     </step-btn-group>
   </section>
   <ng-container matColumnDef="bulkSelection">
@@ -61,14 +61,15 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button
+        <a
           mat-icon-button
           matTooltip="Execute plan"
           [disabled]="!('plan-execute' | hasRight | async)"
-          (click)="executePlan(element.id)"
+          routerLink="/repository"
+          [queryParams]="{ repositoryId: 'local', planid: element.id }"
         >
           <step-icon name="play-circle"></step-icon>
-        </button>
+        </a>
         <button
           mat-icon-button
           matTooltip="Duplicate plan"
@@ -94,14 +95,18 @@
 </step-table>
 <step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <button mat-menu-item [disabled]="!('plan-write' | hasRight | async)" (click)="editPlan(element)">
+    <a mat-menu-item [disabled]="!('plan-write' | hasRight | async)" [routerLink]="element | planUrl">
       <step-icon name="edit-2"></step-icon>
       Edit plan
-    </button>
-    <button mat-menu-item [disabled]="!('plan-read' | hasRight | async)" (click)="exportPlan(element.id)">
+    </a>
+    <a
+      mat-menu-item
+      [disabled]="!('plan-read' | hasRight | async)"
+      [routerLink]="['/', 'plans', 'list', 'export', element.id]"
+    >
       <step-icon name="upload"></step-icon>
       Export plan
-    </button>
+    </a>
     <button
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"

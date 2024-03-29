@@ -7,11 +7,14 @@ import {
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
+  ExecutiontTaskParameters,
+  IncludeTestcases,
   IS_SMALL_SCREEN,
   ItemInfo,
   Operation,
   PrivateViewPluginService,
   ReportNode,
+  ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
@@ -33,7 +36,6 @@ import {
   ExecutionTreePagingService,
 } from '../../services/execution-tree-paging.service';
 import { DOCUMENT } from '@angular/common';
-import { IncludeTestcases } from '../../shared/include-testcases.interface';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
@@ -100,12 +102,11 @@ export class ExecutionProgressComponent
   private _router = inject(Router);
   private _terminator$ = new Subject<void>();
   private _currentExecutionTerminator$?: Subject<void>;
+  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isFirstUpdate = true;
   private isTreeInitialized = false;
-
-  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly Panels = Panels;
 
@@ -233,6 +234,11 @@ export class ExecutionProgressComponent
   closeExecution(openList: boolean = true): void {
     const executionId = this.executionId!;
     this._executionTabManager.handleTabClose(executionId, openList);
+  }
+
+  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
+    this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
   }
 
   private terminateCurrentExecutionChanges(): void {

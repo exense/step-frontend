@@ -7,6 +7,7 @@ import { SUB_ROUTE_DATA } from '../types/constants';
 import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predicate';
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
+import { QuickAccessRouteService } from '../../basics/step-basics.module';
 
 export interface CustomView {
   template: string;
@@ -38,6 +39,7 @@ export interface Dashlet {
 })
 export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
+  private _quickAccessRoute = inject(QuickAccessRouteService);
   private _router = inject(Router);
 
   private temporaryRouteChildren = new Map<string, Routes>();
@@ -216,6 +218,7 @@ export class ViewRegistryService implements OnDestroy {
   }
 
   registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
+    this._quickAccessRoute.registerQuickAccessRoutes(route);
     const root = this.getRootRoute();
     if (!root?.children) {
       return;

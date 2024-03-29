@@ -13,6 +13,7 @@ import { EntityModule, EntityRegistry } from '../entity/entity.module';
 import { CustomRegistriesModule } from '../custom-registeries/custom-registries.module';
 import { FunctionBulkOperationsRegisterService } from './injectables/function-bulk-operations-register.service';
 import { FunctionLinkEditorComponent } from './components/function-link/function-link-editor.component';
+import { KeywordConfigurerUrlPipe } from './pipes/keyword-configurer-url.pipe';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { FunctionLinkEditorComponent } from './components/function-link/function
     AgentTokenSelectionCriteriaComponent,
     FunctionTypeLabelPipe,
     FunctionSelectionTableComponent,
+    KeywordConfigurerUrlPipe,
   ],
   imports: [
     CommonModule,
@@ -39,6 +41,7 @@ import { FunctionLinkEditorComponent } from './components/function-link/function
     AgentTokenSelectionCriteriaComponent,
     FunctionTypeLabelPipe,
     FunctionSelectionTableComponent,
+    KeywordConfigurerUrlPipe,
   ],
 })
 export class KeywordsCommonModule {
@@ -75,3 +78,4 @@ export * from './types/agent-token-selection-criteria.form';
 export * from './types/function-type.enum';
 export * from './types/function-type-form-component-context.interface';
 export * from './pipes/function-type-label.pipe';
+export * from './pipes/keyword-configurer-url.pipe';
