@@ -1,12 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MultipleProjectsStrategy, Project } from '../types/multiple-projects-strategy';
+import { MultipleProjectsStrategy, Project, SwitchStatus } from '../types/multiple-projects-strategy';
 import { ProjectSwitchDialogComponent } from '../components/project-switch-dialog/project-switch-dialog.component';
 import { ProjectSwitchDialogData } from '../types/project-switch-dialog-data.interface';
 import { ProjectSwitchDialogResult } from '../types/project-switch-dialog-result.enum';
 import { filter, map, Observable, of } from 'rxjs';
 
 const DEFAULT_STRATEGY: MultipleProjectsStrategy = {
+  get currentSwitchStatus() {
+    return SwitchStatus.NONE;
+  },
   availableProjects: () => [],
   currentProject: () => undefined,
   getEntityProject: <T extends { attributes?: Record<string, string> }>(entity: T) => undefined,
@@ -20,6 +23,10 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
   private _matDialog = inject(MatDialog);
 
   private strategy = DEFAULT_STRATEGY;
+
+  get currentSwitchStatus(): SwitchStatus {
+    return this.strategy.currentSwitchStatus;
+  }
 
   availableProjects(): Project[] {
     return this.strategy.availableProjects();
@@ -52,6 +59,10 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     entityEditLink: string | { url: string; search?: Record<string, any> },
     entityType: string = 'entity',
   ): Observable<boolean> {
+    if (this.currentSwitchStatus === SwitchStatus.RUNNING) {
+      return of(true);
+    }
+
     const targetProject = this.getEntityProject(entity);
     if (!targetProject) {
       console.error(`Project not found for ${entityType}`, entity);

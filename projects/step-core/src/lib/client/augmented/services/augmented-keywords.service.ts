@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { Execution, KeywordsService } from '../../generated';
 import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
 import { Keyword } from '../shared/keyword';
@@ -12,6 +12,8 @@ export class AugmentedKeywordsService extends KeywordsService {
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _httpClient = inject(HttpClient);
 
+  private cachedKeyword?: Keyword;
+
   createFilteredTableDataSource(filter?: string[]): StepDataSource<Keyword> {
     return this._dataSourceFactory.createDataSource(
       FUNCTIONS_TABLE_ID,
@@ -21,7 +23,7 @@ export class AugmentedKeywordsService extends KeywordsService {
         automationPackage: 'customFields.automationPackageId',
         actions: '',
       },
-      filter ? { type: filter } : undefined
+      filter ? { type: filter } : undefined,
     );
   }
 
@@ -33,5 +35,16 @@ export class AugmentedKeywordsService extends KeywordsService {
     return this._httpClient.request('GET', `rest/functions/${id}/editor`, {
       responseType: 'text',
     });
+  }
+
+  getFunctionByIdCached(id: string): Observable<Keyword> {
+    if (this.cachedKeyword && this.cachedKeyword.id === id) {
+      return of(this.cachedKeyword);
+    }
+    return super.getFunctionById(id).pipe(tap((keyword) => (this.cachedKeyword = keyword)));
+  }
+
+  cleanupCache(): void {
+    this.cachedKeyword = undefined;
   }
 }

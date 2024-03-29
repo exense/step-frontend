@@ -3,13 +3,14 @@ import {
   AugmentedPlansService,
   AutoDeselectStrategy,
   DialogParentService,
+  DialogsService,
   Plan,
-  PlanDialogsService,
+  IsUsedByDialogService,
   selectionCollectionProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { pipe, tap } from 'rxjs';
+import { map, of, pipe, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'step-plan-list',
@@ -25,7 +26,9 @@ import { pipe, tap } from 'rxjs';
   ],
 })
 export class PlanListComponent implements DialogParentService {
-  private _planDialogs = inject(PlanDialogsService);
+  private _isUsedByDialogs = inject(IsUsedByDialogService);
+  private _dialogs = inject(DialogsService);
+
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -42,39 +45,30 @@ export class PlanListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
-  addPlan(): void {
-    this._planDialogs.createPlan();
-  }
-
-  editPlan(plan: Plan): void {
-    this._planDialogs.editPlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
-  }
-
-  executePlan(id: string): void {
-    this._planDialogs.executePlan(id);
-  }
-
   duplicatePlan(id: string): void {
-    this._planDialogs.duplicatePlan(id).pipe(this.updateDataSourceAfterChange).subscribe();
+    this._plansApiService
+      .clonePlan(id)
+      .pipe(
+        switchMap((clone) => this._plansApiService.savePlan(clone)),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
   }
 
   deletePlan(plan: Plan): void {
-    this._planDialogs.deletePlan(plan).pipe(this.updateDataSourceAfterChange).subscribe();
-  }
-
-  importPlans(): void {
-    this._planDialogs.importPlans();
-  }
-
-  exportPlans(): void {
-    this._planDialogs.exportPlans();
-  }
-
-  exportPlan(id: string): void {
-    this._planDialogs.exportPlan(id);
+    const name = plan.attributes?.['name'];
+    this._dialogs
+      .showDeleteWarning(1, `Plan "${name}"`)
+      .pipe(
+        switchMap((isDeleteConfirmed) =>
+          isDeleteConfirmed ? this._plansApiService.deletePlan(plan.id!).pipe(map(() => true)) : of(false),
+        ),
+        this.updateDataSourceAfterChange,
+      )
+      .subscribe();
   }
 
   lookUp(id: string, name: string): void {
-    this._planDialogs.lookUp(id, name);
+    this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
   }
 }

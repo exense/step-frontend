@@ -90,8 +90,10 @@ export class ChartDashletComponent implements OnInit {
     return groupingSelection;
   }
 
-  refresh(): Observable<any> {
-    this.chart?.setBlur(true);
+  refresh(blur?: boolean): Observable<any> {
+    if (blur) {
+      this.chart?.setBlur(true);
+    }
     return this.fetchDataAndCreateChart();
   }
 
@@ -102,12 +104,12 @@ export class ChartDashletComponent implements OnInit {
 
   switchAggregate(aggregate: AggregationType) {
     this.selectedAggregate = aggregate;
-    this.refresh().subscribe();
+    this.refresh(true).subscribe();
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
-    this.refresh().subscribe();
+    this.refresh(true).subscribe();
   }
 
   private composeRequestFilter(metricKey: string): string {
@@ -140,7 +142,7 @@ export class ChartDashletComponent implements OnInit {
       .subscribe((updatedItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
-          this.refresh().subscribe();
+          this.refresh(true).subscribe();
         }
       });
   }

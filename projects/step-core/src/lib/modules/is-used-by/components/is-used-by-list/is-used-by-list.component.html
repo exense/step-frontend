@@ -3,11 +3,7 @@
   <ng-container matColumnDef="name" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Used by</th>
     <td mat-cell *matCellDef="let element">
-      <step-plan-link
-        *ngIf="element.type === 'PLAN'"
-        (edit)="closeDialog()"
-        [context]="element.linkContext"
-      ></step-plan-link>
+      <step-plan-link *ngIf="element.type === 'PLAN'" [context]="element.linkContext"></step-plan-link>
       <step-function-link-editor
         *ngIf="element.type === 'KEYWORD'"
         (edit)="closeDialog()"

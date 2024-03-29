@@ -9,7 +9,7 @@ import {
   Plan,
 } from '../../../../client/step-client-module';
 import { CronEditorTab, CronService } from '../../../cron/cron.module';
-import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.consant';
+import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.constant';
 import { CustomFormComponent } from '../../../custom-forms';
 import { DialogRouteResult } from '../../../basics/step-basics.module';
 import { SelectPlanComponent } from '../../../plan-common';
@@ -157,7 +157,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     if (!this.task.attributes) {
       this.task.attributes = {};
     }
-    this.isNew = !this.task.attributes!['id'];
+    this.isNew = !this.task.attributes!['name'];
     if (!this.task.executionsParameters) {
       this.task.executionsParameters = {};
     }

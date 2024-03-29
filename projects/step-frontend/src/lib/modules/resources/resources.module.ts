@@ -1,6 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedResourcesService,
+  checkProjectGuardFactory,
+  CommonEntitiesUrlsService,
   dialogRoute,
   EntityRegistry,
   SimpleOutletComponent,
@@ -12,10 +14,16 @@ import './components/resource-selection/resource-selection.component';
 import { ResourceSelectionComponent } from './components/resource-selection/resource-selection.component';
 import { ResourcesListComponent } from './components/resources-list/resources-list.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 
 @NgModule({
   imports: [StepCoreModule],
-  declarations: [ResourceSelectionComponent, ResourcesListComponent, ResourceConfigurationDialogComponent],
+  declarations: [
+    ResourceSelectionComponent,
+    ResourcesListComponent,
+    ResourceConfigurationDialogComponent,
+    ResourceUrlPipe,
+  ],
   exports: [ResourceSelectionComponent, ResourcesListComponent, ResourceConfigurationDialogComponent],
 })
 export class ResourcesModule {
@@ -51,10 +59,23 @@ export class ResourcesModule {
             dialogRoute({
               path: ':id',
               dialogComponent: ResourceConfigurationDialogComponent,
+              canActivate: [
+                checkProjectGuardFactory({
+                  entityType: 'resource',
+                  getEntity: (id) => inject(AugmentedResourcesService).getResource(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).resourceEditorUrl(id),
+                }),
+              ],
               resolve: {
                 resource: (route: ActivatedRouteSnapshot) =>
-                  inject(AugmentedResourcesService).getResource(route.params['id']),
+                  inject(AugmentedResourcesService).getResourceCached(route.params['id']),
               },
+              canDeactivate: [
+                () => {
+                  inject(AugmentedResourcesService).cleanupCache();
+                  return true;
+                },
+              ],
             }),
           ],
         },
