@@ -1,8 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
-import { Plan, PlanEditorApiService } from '@exense/step-core';
+import {
+  ExecutiontTaskParameters,
+  Plan,
+  PlanEditorApiService,
+  ScheduledTaskTemporaryStorageService,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-editor',
@@ -16,5 +21,14 @@ import { Plan, PlanEditorApiService } from '@exense/step-core';
   ],
 })
 export class PlanEditorComponent {
-  readonly _plan$ = inject(ActivatedRoute).data.pipe(map((data) => data['plan'] as Plan | undefined));
+  private _activatedRoute = inject(ActivatedRoute);
+  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
+  private _router = inject(Router);
+
+  readonly plan$ = this._activatedRoute.data.pipe(map((data) => data['plan'] as Plan | undefined));
+
+  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
+    this._router.navigate(['.', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
+  }
 }
