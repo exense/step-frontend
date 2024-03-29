@@ -17,15 +17,14 @@
             <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" name="metricKey" />
           </step-form-field>
         </div>
-
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
             <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
               <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
+              <mat-option [value]="ChartAggregation.PERCENTILE">{{ ChartAggregation.PERCENTILE }}</mat-option>
             </mat-select>
           </step-form-field>
-
           <step-form-field>
             <step-label>Unit</step-label>
             <input
@@ -34,6 +33,19 @@
               [(ngModel)]="item.chartSettings!.primaryAxes.unit"
             />
           </step-form-field>
+        </div>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Secondary Axes Aggregation</step-label>
+            <mat-select
+              [value]="item.chartSettings!.secondaryAxes?.aggregation"
+              (valueChange)="onSecondaryAggregateSelect($event)"
+            >
+              <mat-option [value]="undefined">-</mat-option>
+              <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }} </mat-option>
+            </mat-select>
+          </step-form-field>
+          <div></div>
         </div>
 
         <div class="section">

@@ -1,9 +1,10 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem, MetricAttribute } from '@exense/step-core';
+import { AggregatorType, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import { COMMON_IMPORTS, FilterBarItem, FilterBarItemType, FilterUtils } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
+import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -19,17 +20,27 @@ export interface ChartDashletSettingsData {
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
+  private _timeSeriesService = inject(TimeSeriesService);
 
   _attributesByKey: Record<string, MetricAttribute> = {};
 
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly AGGREGATE_TYPES = ['SUM', 'AVG', 'MAX', 'MIN', 'COUNT', 'RATE', 'MEDIAN', 'PERCENTILE'];
+  readonly AGGREGATE_TYPES: ChartAggregation[] = [
+    ChartAggregation.SUM,
+    ChartAggregation.AVG,
+    ChartAggregation.MAX,
+    ChartAggregation.MIN,
+    ChartAggregation.COUNT,
+    ChartAggregation.RATE,
+    ChartAggregation.MEDIAN,
+  ];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
+  metricTypes: MetricType[] = [];
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -37,6 +48,23 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.filterItems = this.item.chartSettings!.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
+    this.fetchMetricTypes();
+  }
+
+  private fetchMetricTypes() {
+    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+  }
+
+  onSecondaryAggregateSelect(aggregation: ChartAggregation) {
+    if (!aggregation) {
+      this.item.chartSettings!.secondaryAxes = undefined;
+    } else {
+      this.item.chartSettings!.secondaryAxes = {
+        aggregation: aggregation,
+        unit: '/h',
+        displayType: 'BAR_CHART',
+      };
+    }
   }
 
   addFilterItem(attribute: MetricAttribute) {
@@ -65,5 +93,13 @@ export class ChartDashletSettingsComponent implements OnInit {
       .map(FilterUtils.convertToApiFilterItem);
     this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
+  }
+
+  switchAggregate(aggregate: ChartAggregation) {
+    this.item.chartSettings!.primaryAxes.aggregation = aggregate;
+  }
+
+  get ChartAggregation() {
+    return ChartAggregation;
   }
 }
