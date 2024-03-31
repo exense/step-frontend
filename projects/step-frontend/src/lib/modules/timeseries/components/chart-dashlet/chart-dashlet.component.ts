@@ -70,8 +70,9 @@ export class ChartDashletComponent implements OnInit {
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
 
+  readonly ChartAggregation = ChartAggregation;
   readonly PCL_VALUES = [80, 90, 99];
-  selectedPclValue: number | undefined;
+  selectedPclValue?: number;
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
 
@@ -457,9 +458,5 @@ export class ChartDashletComponent implements OnInit {
 
   private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
     return groupDimensions.map((field) => attributes?.[field]);
-  }
-
-  get ChartAggregation() {
-    return ChartAggregation;
   }
 }

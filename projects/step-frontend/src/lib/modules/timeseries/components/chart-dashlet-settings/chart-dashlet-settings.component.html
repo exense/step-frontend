@@ -42,7 +42,9 @@
               (valueChange)="onSecondaryAggregateSelect($event)"
             >
               <mat-option [value]="undefined">-</mat-option>
-              <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }} </mat-option>
+              @for (attr of AGGREGATE_TYPES; track attr) {
+                <mat-option [value]="attr">{{ attr }}</mat-option>
+              }
             </mat-select>
           </step-form-field>
           <div></div>

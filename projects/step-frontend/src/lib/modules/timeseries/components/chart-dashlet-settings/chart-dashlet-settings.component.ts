@@ -22,6 +22,8 @@ export class ChartDashletSettingsComponent implements OnInit {
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
 
+  readonly ChartAggregation = ChartAggregation;
+
   _attributesByKey: Record<string, MetricAttribute> = {};
 
   @ViewChild('formContainer', { static: true })
@@ -97,9 +99,5 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   switchAggregate(aggregate: ChartAggregation) {
     this.item.chartSettings!.primaryAxes.aggregation = aggregate;
-  }
-
-  get ChartAggregation() {
-    return ChartAggregation;
   }
 }
