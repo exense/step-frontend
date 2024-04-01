@@ -36,6 +36,8 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
+import { ChartDashletComponent } from '../timeseries/components/chart-dashlet/chart-dashlet.component';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 
 @NgModule({
   declarations: [
@@ -67,7 +69,14 @@ import { ExecutionRunningStatusHeaderComponent } from './components/execution-ru
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ChartDashletComponent,
+    TimeSeriesChartComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

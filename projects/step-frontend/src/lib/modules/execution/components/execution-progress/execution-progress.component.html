@@ -76,6 +76,16 @@
         <as-split-area [size]="25">
           <div class="split-area-content">
             <ng-container *ngTemplateOutlet="executionParameters"></ng-container>
+            <mat-accordion>
+              <mat-expansion-panel [expanded]="true" togglePosition="before">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Response times</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div *ngIf="chartContext && chartItem">
+                  <step-chart-dashlet [context]="chartContext!" [height]="260" [item]="chartItem!" />
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
           </div>
         </as-split-area>
       </as-split>

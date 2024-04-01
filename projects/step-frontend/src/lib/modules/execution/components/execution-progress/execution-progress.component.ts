@@ -3,6 +3,7 @@ import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
+  DashboardItem,
   Dashlet,
   Execution,
   ExecutionCloseHandleService,
@@ -39,6 +40,8 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
+import { TSChartSettings } from '../../../timeseries/modules/chart';
+import { TimeSeriesContext } from '../../../timeseries/modules/_common';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -127,6 +130,9 @@ export class ExecutionProgressComponent
   selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
 
   showAutoRefreshButton = false;
+
+  chartContext?: TimeSeriesContext;
+  chartItem?: DashboardItem;
 
   readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this._testCasesSelection.selected$.pipe(
     map((ids) => {
@@ -297,6 +303,65 @@ export class ExecutionProgressComponent
         updateSelection: this.isFirstUpdate ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW,
       });
       this.isFirstUpdate = false;
+
+      /**
+       * The following objects have to be defined in order to have a working "dashlet-chart".
+       * The dashlet chart is a wrapper over chart component. The big difference is the API in the fact that the dashlet
+       * item will fetch its data automatically, while the chart component waits for the data to be fed with.
+       *
+       * Context - this is the brain of a dashboard. every event goes through it, and it is responsible for syncing all the
+       * charts, filters, etc
+       *
+       * Dashlet item - these are the settings of a chart. Many settings and outputs does not make sense when using one
+       * single chart only (since it expects to be part of a dashboard with multiple dashlets).
+       * A few would be: shifting/delete outputs, edit mode, inheritGlobal... flags.
+       *
+       *
+       * Now that I see it implemented 'alone', ideally we would make a few improvements to be more easy and natural to use
+       * the chart as a 'standalone' item.
+       * A new component would be ideal, which would be a wrapper over the timeseries-chart core component. We could make
+       * this independent of any context, and react only via simple inputs. The component would look like this:
+       *
+       * <step-standalone-chart
+       *  [range]="{start: execution.startTime, end: execution.endTime}"
+       *  [metricKey]="response-time" -- the current dashlet will have the attributes coming from db, while on this we need to fetch the metric first
+       *  [grouping]="[name]"
+       *  [filters]="...."
+       *  [aggregation]="AVG"
+       *  [unit]="ms"
+       *  [displayType]="line"
+       *  [renderingSettings]="..."
+       * />
+       *
+       */
+
+      this.chartContext = new TimeSeriesContext({
+        id: '123',
+        grouping: ['name'],
+        timeRange: { from: this.execution.startTime!, to: this.execution.endTime! },
+      });
+
+      this.chartItem = {
+        name: 'Test chart with response times',
+        type: 'CHART',
+        size: 100,
+        chartSettings: {
+          metricKey: 'response-time',
+          inheritGlobalFilters: false,
+          inheritGlobalGrouping: false,
+          readonlyAggregate: false,
+          readonlyGrouping: false,
+          grouping: ['name'],
+          filters: [{ type: 'EXECUTION', exactMatch: true, textValues: [this.executionId!], attribute: 'eId' }],
+          attributes: [],
+          primaryAxes: {
+            aggregation: 'AVG',
+            unit: 'ms',
+            displayType: 'LINE',
+            renderingSettings: {},
+          },
+        },
+      };
     });
   }
 
