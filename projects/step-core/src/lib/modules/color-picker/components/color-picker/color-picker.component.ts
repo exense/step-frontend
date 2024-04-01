@@ -3,6 +3,7 @@ import { ColorFieldContainerService } from '../../injectables/color-field-contai
 import { PopoverOverlayService } from '../../../basics/step-basics.module';
 import { ColorField } from '../../types/color-field';
 import { ColorPickerContentComponent } from '../color-picker-content/color-picker-content.component';
+import { ColorPickerSettings } from '../../types/color-picker-settings';
 
 @Component({
   selector: 'step-color-picker',
@@ -24,9 +25,14 @@ export class ColorPickerComponent {
     this._fieldContainer.registerField(field);
   }
 
-  open(): void {
+  open(settings?: ColorPickerSettings): void {
     const xPosition = this.xPosition;
     const yPosition = this.yPosition;
+
+    if (settings) {
+      this._fieldContainer.setup(settings);
+    }
+
     this._popoverOverlay
       .setPositions({ xPosition, yPosition })
       .open(ColorPickerContentComponent, this._fieldContainer.getConnectedOverlayOrigin()?.nativeElement);

@@ -57,6 +57,13 @@ step-execution-list {
     justify-content: center;
     white-space: nowrap;
   }
+
+  .user-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
 }
 
 step-popover-content > .execution-duration-description {

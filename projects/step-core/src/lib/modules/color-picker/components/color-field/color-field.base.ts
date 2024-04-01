@@ -1,6 +1,7 @@
 import { ColorField } from '../../types/color-field';
 import { Directive, effect, ElementRef, inject, input, Signal } from '@angular/core';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
+import { ColorPickerSettings } from '../../types/color-picker-settings';
 
 @Directive({})
 export abstract class ColorFieldBase implements ColorField {
@@ -20,10 +21,10 @@ export abstract class ColorFieldBase implements ColorField {
   abstract setModel(value?: string): void;
   abstract isDisabled(): boolean;
 
-  chooseColor(): void {
+  chooseColor(settings?: ColorPickerSettings): void {
     if (this.isDisabled()) {
       return;
     }
-    this.colorPicker()?.open();
+    this.colorPicker()?.open(settings);
   }
 }

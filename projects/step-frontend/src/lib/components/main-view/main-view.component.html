@@ -10,7 +10,7 @@
             <step-dashlet [itemKey]="item.template" />
           }
           <a href="#" class="user" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
-            <step-user-avatar />
+            <step-current-user-avatar />
             @if (_authService.context$ | async; as ctx) {
               {{ ctx.userID }} [{{ ctx.role }}]
             }

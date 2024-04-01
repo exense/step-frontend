@@ -39,6 +39,9 @@ export class AvatarEditorComponent extends ColorFieldBase {
 
   @HostListener('click')
   private handleClick(): void {
-    this.chooseColor();
+    this.chooseColor({
+      title: 'Select Avatar Color',
+      showClearColor: false,
+    });
   }
 }

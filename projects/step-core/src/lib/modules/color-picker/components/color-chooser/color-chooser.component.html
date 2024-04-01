@@ -1,4 +1,4 @@
-@for (color of _colors; track color) {
+@for (color of colors(); track color) {
   @if (!color) {
     <div class="clear" matTooltip="Clear color" (click)="selectColor('')">
       <step-icon name="x" />

@@ -1,9 +1,18 @@
 import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { ColorField } from '../types/color-field';
+import { ColorPickerSettings } from '../types/color-picker-settings';
 
 @Injectable()
 export class ColorFieldContainerService implements ColorField, OnDestroy {
   private field?: ColorField;
+  private settings: ColorPickerSettings = {
+    showClearColor: true,
+  };
+
+  setup(settings: ColorPickerSettings): this {
+    this.settings = settings;
+    return this;
+  }
 
   registerField(field?: ColorField): void {
     this.field = field;
@@ -27,5 +36,9 @@ export class ColorFieldContainerService implements ColorField, OnDestroy {
 
   ngOnDestroy(): void {
     this.field = undefined;
+  }
+
+  getSettings(): ColorPickerSettings {
+    return this.settings;
   }
 }

@@ -7,6 +7,7 @@ export * from './injectables/auth.service';
 export * from './injectables/additional-right-rule.service';
 export * from './injectables/credentials.service';
 export * from './injectables/logout-cleanup.token';
+export * from './injectables/users.service';
 
 export * from './pipes/has-right.pipe';
 

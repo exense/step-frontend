@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, HostBinding, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, HostBinding, inject, input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { COLORS } from '../../injectables/colors.token';
@@ -22,7 +22,11 @@ type OnTouch = () => void;
   ],
 })
 export class ColorChooserComponent implements ControlValueAccessor {
-  protected readonly _colors = [...inject(COLORS), ''];
+  private _colors = inject(COLORS);
+
+  showClearColor = input.required<boolean>();
+
+  protected colors = computed(() => (this.showClearColor() ? [...this._colors, ''] : this._colors));
 
   protected selectedColor?: string;
 

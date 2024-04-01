@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { map, of, switchMap } from 'rxjs';
-import { AuthService, AVATAR_COLOR_PREFERENCE_KEY } from '@exense/step-core';
-import { UserStateService } from '../../injectables/user-state.service';
-
-const ANONYMOUS_COLOR = '#0082cb';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { AuthService, AVATAR_COLOR_PREFERENCE_KEY, UsersService } from '@exense/step-core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { map, switchMap } from 'rxjs';
+import { ANONYMOUS_COLOR } from '../../types/constants';
 
 @Component({
   selector: 'step-user-avatar',
@@ -13,17 +12,24 @@ const ANONYMOUS_COLOR = '#0082cb';
 })
 export class UserAvatarComponent {
   private _auth = inject(AuthService);
-  private _userState = inject(UserStateService);
+  private _users = inject(UsersService);
   private _avatarColorPreferenceKey = inject(AVATAR_COLOR_PREFERENCE_KEY);
 
-  readonly userName$ = this._userState.user$.pipe(map((user) => user.username));
+  userId = input.required<string>();
 
-  readonly color$ = this._auth.initialize$.pipe(
-    switchMap((user) => {
+  private user$ = toObservable(this.userId).pipe(
+    switchMap((userId) => this._users.getUserById(userId)),
+    takeUntilDestroyed(),
+  );
+
+  protected userName$ = this.user$.pipe(map((user) => user?.username ?? this.userId()));
+
+  protected color$ = this.user$.pipe(
+    map((user) => {
       if (!this._auth.getConf()?.authentication) {
-        return of(ANONYMOUS_COLOR);
+        return ANONYMOUS_COLOR;
       }
-      return this._userState.getPreference$(this._avatarColorPreferenceKey);
+      return user?.preferences?.preferences?.[this._avatarColorPreferenceKey];
     }),
   );
 }

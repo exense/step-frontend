@@ -14,14 +14,16 @@ import { CdkTrapFocus } from '@angular/cdk/a11y';
   encapsulation: ViewEncapsulation.None,
 })
 export class ColorPickerContentComponent {
-  private _field = inject(ColorFieldContainerService);
+  private _fieldContainer = inject(ColorFieldContainerService);
 
-  protected color = model(this._field.getModel());
+  protected settings = this._fieldContainer.getSettings();
+
+  protected color = model(this._fieldContainer.getModel());
 
   private effectColorChange = effect(() => {
     const color = this.color();
-    if (color !== this._field.getModel()) {
-      this._field.setModel(color);
+    if (color !== this._fieldContainer.getModel()) {
+      this._fieldContainer.setModel(color);
     }
   });
 }
