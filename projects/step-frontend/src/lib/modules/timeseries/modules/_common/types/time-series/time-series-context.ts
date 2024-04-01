@@ -62,22 +62,30 @@ export class TimeSeriesContext {
     });
     this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
-    this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(params.attributes || {});
+    const attributes: Record<string, MetricAttribute> =
+      params.attributes?.reduce(
+        (acc, el) => {
+          acc[el.name] = el;
+          return acc;
+        },
+        {} as Record<string, MetricAttribute>,
+      ) || {};
+    this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
 
     // any specific context change will trigger the main stateChange
     this.stateChange$ = merge(
-      this.compareModeChange$,
-      this.inProgress$,
+      this.compareModeChange$.pipe(skip(1)),
+      this.inProgress$.pipe(skip(1)),
+      this.activeGroupings$.pipe(skip(1)),
+      this.activeFilters$.pipe(skip(1)),
+      this.filterSettings$.pipe(skip(1)),
+      this.chartsResolution$.pipe(skip(1)),
+      this.chartsLockedState$.pipe(skip(1)),
       this.fullTimeRangeChange$,
       this.selectedTimeRangeChange$,
-      this.activeGroupings$,
-      this.activeFilters$,
-      this.filterSettings$,
-      this.chartsResolution$,
-      this.chartsLockedState$,
       this.stateChangeInternal$,
     ) as Observable<void>;
   }
