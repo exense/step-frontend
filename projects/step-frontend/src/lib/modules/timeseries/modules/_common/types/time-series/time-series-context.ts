@@ -47,6 +47,9 @@ export class TimeSeriesContext {
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
+  /**
+   * @Deprecated
+   */
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
@@ -99,6 +102,10 @@ export class TimeSeriesContext {
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
     this.stateChangeInternal$.complete();
+  }
+
+  getColor(key: string): string {
+    return this.colorsPool.getColor(key);
   }
 
   updateEditMode(enabled: boolean) {

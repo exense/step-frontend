@@ -14,6 +14,9 @@ export const $DashboardItem = {
     chartSettings: {
       type: 'ChartSettings',
     },
+    tableSettings: {
+      type: 'TableSettings',
+    },
     size: {
       type: 'number',
       isRequired: true,

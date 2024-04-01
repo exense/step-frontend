@@ -29,6 +29,7 @@ import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-d
 import { Axis } from 'uplot';
 import { ChartGenerators } from '../../modules/legacy/injectables/chart-generators';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 
 declare const uPlot: any;
 
@@ -43,7 +44,7 @@ interface MetricAttributeSelection extends MetricAttribute {
   standalone: true,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
-export class ChartDashletComponent implements OnInit {
+export class ChartDashletComponent implements ChartDashlet, OnInit {
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -105,7 +106,7 @@ export class ChartDashletComponent implements OnInit {
     return groupingSelection;
   }
 
-  refresh(blur?: boolean): Observable<any> {
+  public refresh(blur?: boolean): Observable<any> {
     if (blur) {
       this.chart?.setBlur(true);
     }

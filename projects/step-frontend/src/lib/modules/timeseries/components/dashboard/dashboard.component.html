@@ -67,15 +67,26 @@
     <div class="dashlet-container">
       @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
         <div class="dashlet" [class.size-full]="dashlet.size === 2">
-          <step-chart-dashlet
-            [editMode]="editMode"
-            [item]="dashlet"
-            [context]="context"
-            [height]="DASHLET_HEIGHT"
-            (remove)="handleChartDelete(i)"
-            (shiftLeft)="handleChartShiftLeft(i)"
-            (shiftRight)="handleChartShiftRight(i)"
-          />
+          @if (dashlet.type === 'CHART') {
+            <step-chart-dashlet
+              [editMode]="editMode"
+              [item]="dashlet"
+              [context]="context"
+              [height]="DASHLET_HEIGHT"
+              (remove)="handleChartDelete(i)"
+              (shiftLeft)="handleChartShiftLeft(i)"
+              (shiftRight)="handleChartShiftRight(i)"
+            />
+          } @else if (dashlet.type === 'TABLE') {
+            <step-table-dashlet
+              [settings]="dashlet.tableSettings!"
+              [context]="context"
+              [editMode]="editMode"
+              (remove)="handleChartDelete(i)"
+              (shiftLeft)="handleChartShiftLeft(i)"
+              (shiftRight)="handleChartShiftRight(i)"
+            />
+          }
         </div>
       }
       @if (!editMode && !dashboard.dashlets.length) {
@@ -83,14 +94,18 @@
       }
       @if (editMode && metricTypes) {
         <div class="add-dashlet-container size-full" [style.height.px]="DASHLET_HEIGHT">
-          <div [matMenuTriggerFor]="menu">
+          <div [matMenuTriggerFor]="dashletsMenu">
             <button mat-raised-button color="primary">
               <step-icon name="plus" />
-              Add Chart
+              Add Dashlet
             </button>
-            <mat-menu #menu="matMenu">
+            <mat-menu #dashletsMenu="matMenu">
+              <button mat-menu-item [matMenuTriggerFor]="chartsMenu">Chart</button>
+              <button mat-menu-item (click)="addTableDashlet()">Table</button>
+            </mat-menu>
+            <mat-menu #chartsMenu="matMenu">
               @for (metric of metricTypes; track metric.name) {
-                <button mat-menu-item (click)="addDashlet(metric)">
+                <button mat-menu-item (click)="addChartDashlet(metric)">
                   {{ metric.displayName }}
                 </button>
               }

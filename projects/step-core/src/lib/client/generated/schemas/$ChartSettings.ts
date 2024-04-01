@@ -18,6 +18,9 @@ export const $ChartSettings = {
       type: 'AxesSettings',
       isRequired: true,
     },
+    secondaryAxes: {
+      type: 'AxesSettings',
+    },
     filters: {
       type: 'array',
       contains: {

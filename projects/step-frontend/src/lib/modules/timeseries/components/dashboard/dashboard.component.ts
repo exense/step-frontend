@@ -36,6 +36,8 @@ import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
+import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
+import { TableColumnType } from '../../modules/_common/types/table-column-type';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -51,7 +53,7 @@ const EDIT_PARAM_NAME = 'edit';
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
   providers: [DashboardUrlParamsService],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
+  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, TableDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
@@ -207,7 +209,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
-  addDashlet(metric: MetricType) {
+  addTableDashlet() {
+    this.dashboard.dashlets.push({
+      type: 'TABLE',
+      name: 'Table dashlet',
+      size: 2,
+      tableSettings: {
+        attributes: [],
+        metricKey: 'response-time',
+        columns: [
+          { column: TableColumnType.COUNT, selected: true },
+          { column: TableColumnType.SUM, selected: true },
+          { column: TableColumnType.AVG, selected: true },
+          { column: TableColumnType.MIN, selected: true },
+          { column: TableColumnType.MAX, selected: true },
+          { column: TableColumnType.PCL_80, selected: true },
+          { column: TableColumnType.PCL_90, selected: true },
+          { column: TableColumnType.PCL_99, selected: true },
+          { column: TableColumnType.TPS, selected: true },
+          { column: TableColumnType.TPH, selected: true },
+        ],
+        filters: [],
+      },
+    });
+  }
+
+  addChartDashlet(metric: MetricType) {
     const newDashlet: DashboardItem = {
       name: metric.displayName!,
       type: 'CHART',

@@ -24,7 +24,7 @@ export class SchedulerService {
    * @throws ApiError
    */
   public deleteExecutionTasks(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -57,7 +57,7 @@ export class SchedulerService {
    * @throws ApiError
    */
   public cloneExecutionTasks(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -185,7 +185,7 @@ export class SchedulerService {
    * @throws ApiError
    */
   public findExecutionTasksByAttributes(
-    requestBody?: Record<string, string>
+    requestBody?: Record<string, string>,
   ): Observable<Array<ExecutiontTaskParameters>> {
     return this.httpRequest.request({
       method: 'POST',

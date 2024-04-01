@@ -24,7 +24,7 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public deleteDockerRegistrys(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -57,7 +57,7 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public cloneDockerRegistrys(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -121,7 +121,7 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public findDockerRegistrysByAttributes(
-    requestBody?: Record<string, string>
+    requestBody?: Record<string, string>,
   ): Observable<Array<DockerRegistryConfiguration>> {
     return this.httpRequest.request({
       method: 'POST',
