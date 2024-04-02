@@ -1,4 +1,15 @@
-import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
 import { ChartsViewComponent } from '../charts-view/charts-view.component';
@@ -26,13 +37,8 @@ import { FilterBarComponent } from '../../../filter-bar';
   standalone: true,
   imports: [COMMON_IMPORTS, FilterBarComponent, ChartsViewComponent],
 })
-export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
-  @Input()
-  set timeRange(value: TimeRangePickerSelection) {
-    if (value) {
-      this.handleTimeRangeChange({ selection: value, triggerRefresh: true });
-    }
-  }
+export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() timeRange: TimeRangePickerSelection | undefined;
 
   readonly ONE_HOUR_MS = 3600 * 1000;
 
@@ -100,6 +106,12 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.performanceViewSettings.displayTooltipLinks = !this.settings.execution; // we're on analytics
     this.subscribeForContextChange();
     this.contextInitialized.next(this.context);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['timeRange']?.currentValue) {
+      this.handleTimeRangeChange({ selection: changes['timeRange'].currentValue, triggerRefresh: true });
+    }
   }
 
   private mergeContextualParamsWithActiveFilters(
