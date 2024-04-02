@@ -2,7 +2,6 @@ import { Component, computed, effect, input, model, output } from '@angular/core
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AceMode } from '../../types/ace-mode.enum';
 import { KeyValue } from '@angular/common';
-import { RichEditorChangeStatus } from '../../types/rich-editor-change-status.enum';
 
 const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
   (result, readableKey) => {
@@ -31,13 +30,7 @@ export class RichEditorSettingsBarComponent {
   showAutoFormatBtn = input(false);
 
   /** @Input() **/
-  showChangeStatus = input(false);
-
-  /** @Input() **/
   showSaveBtn = input(false);
-
-  /** @Input() **/
-  changStatus = input(RichEditorChangeStatus.NO_CHANGES);
 
   /** @Input() **/
   saveBtnTooltip = input('Save');
@@ -50,8 +43,6 @@ export class RichEditorSettingsBarComponent {
 
   /** @Output() **/
   autoFormat = output();
-
-  readonly RichEditorChangeStatus = RichEditorChangeStatus;
 
   protected displayModes = computed<KeyValue<AceMode, string>[]>(() => {
     const predefinedMode = this.predefinedMode();

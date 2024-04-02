@@ -24,27 +24,4 @@
       <mat-option [value]="mode.key">{{ mode.value }}</mat-option>
     }
   </mat-select>
-  @if (showChangeStatus()) {
-    <step-suffix>
-      <span
-        [ngClass]="{
-          'status-no-changes': changStatus() === RichEditorChangeStatus.NO_CHANGES,
-          'status-pending-changes': changStatus() === RichEditorChangeStatus.PENDING_CHANGES,
-          'status-saved': changStatus() === RichEditorChangeStatus.SAVED
-        }"
-      >
-        @switch (changStatus()) {
-          @case (RichEditorChangeStatus.NO_CHANGES) {
-            No changes
-          }
-          @case (RichEditorChangeStatus.PENDING_CHANGES) {
-            Pending changes
-          }
-          @case (RichEditorChangeStatus.SAVED) {
-            Saved
-          }
-        }
-      </span>
-    </step-suffix>
-  }
 </step-form-field>

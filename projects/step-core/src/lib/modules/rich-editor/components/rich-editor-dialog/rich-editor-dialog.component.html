@@ -1,15 +1,14 @@
-<step-modal-window [title]="_data.title">
-  <div step-modal-window-subtitle>
-    <section class="syntax-mode-selector">
-      <step-rich-editor-settings-bar
-        [allowedModes]="_data.allowedModes"
-        [predefinedMode]="_data.predefinedMode"
-        [showAutoFormatBtn]="true"
-        [showChangeStatus]="true"
-        [changStatus]="changeStatus"
-        (modeChanged)="selectedMode = $event"
-      />
+<step-modal-window>
+  <div class="rich-header" step-modal-window-title>
+    <section>
+      <div>{{ _data.title }}</div>
+      <step-rich-editor-change-status [changStatus]="changeStatus" />
     </section>
+    <step-rich-editor-settings-bar
+      [allowedModes]="_data.allowedModes"
+      [predefinedMode]="_data.predefinedMode"
+      (modeChanged)="selectedMode = $event"
+    />
   </div>
   <div step-modal-window-body>
     <step-rich-editor [formControl]="textControl" [syntaxMode]="selectedMode" />

@@ -3,8 +3,20 @@ step-rich-editor {
   display: block;
 }
 
-.syntax-mode-selector {
-  position: absolute;
-  top: 1.5rem;
-  right: 2rem;
+.rich-header,
+.rich-header > section {
+  display: flex;
+  gap: 4rem;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.rich-header {
+  justify-content: space-between;
+}
+
+step-rich-editor-change-status,
+step-rich-editor-settings-bar {
+  font-size: 1.5rem;
+  font-weight: normal;
 }

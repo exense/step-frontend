@@ -6,8 +6,9 @@ import { RichEditorComponent } from '../rich-editor/rich-editor.component';
 import { AceMode } from '../../types/ace-mode.enum';
 import { RichEditorSettingsBarComponent } from '../rich-editor-settings-bar/rich-editor-settings-bar.component';
 import { RichEditorChangeStatus } from '../../types/rich-editor-change-status.enum';
-import { debounceTime, map, tap } from 'rxjs';
+import { debounceTime, map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RichEditorChangeStatusComponent } from '../rich-editor-change-status/rich-editor-change-status.component';
 
 export interface RichEditorDialogData {
   title: string;
@@ -21,7 +22,7 @@ type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;
 @Component({
   selector: 'step-rich-editor-dialog',
   standalone: true,
-  imports: [StepBasicsModule, RichEditorComponent, RichEditorSettingsBarComponent],
+  imports: [StepBasicsModule, RichEditorComponent, RichEditorSettingsBarComponent, RichEditorChangeStatusComponent],
   templateUrl: './rich-editor-dialog.component.html',
   styleUrl: './rich-editor-dialog.component.scss',
 })

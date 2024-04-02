@@ -9,6 +9,18 @@ mat-card {
   height: 100%;
   border: none;
 
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    flex-wrap: nowrap;
+
+    step-rich-editor-change-status {
+      font-size: 1.5rem;
+      font-weight: normal;
+    }
+  }
+
   mat-card-content {
     height: 100%;
   }

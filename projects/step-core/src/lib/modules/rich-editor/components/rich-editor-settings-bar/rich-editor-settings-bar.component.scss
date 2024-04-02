@@ -1,9 +1,0 @@
-@use 'projects/step-core/styles/core-variables' as var;
-
-.status-saved {
-  color: var.$green-650;
-}
-
-.status-pending-changes {
-  color: var.$orange;
-}
