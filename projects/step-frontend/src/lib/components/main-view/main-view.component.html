@@ -11,9 +11,6 @@
           }
           <a href="#" class="user" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
             <step-current-user-avatar />
-            @if (_authService.context$ | async; as ctx) {
-              {{ ctx.userID }} [{{ ctx.role }}]
-            }
           </a>
         </div>
       </section>

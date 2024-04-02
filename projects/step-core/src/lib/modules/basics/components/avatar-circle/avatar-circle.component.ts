@@ -18,6 +18,10 @@ export class AvatarCircleComponent {
     transform: (value: string | undefined | null) => value ?? '',
   });
 
+  tooltip = input<string | undefined | null>(undefined);
+
+  protected displayTooltip = computed(() => this.tooltip() ?? this.name());
+
   protected initials = computed(() => {
     const name = this.name().trim();
     if (!name) {

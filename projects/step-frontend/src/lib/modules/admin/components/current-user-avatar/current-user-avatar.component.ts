@@ -17,6 +17,15 @@ export class CurrentUserAvatarComponent {
 
   readonly userName$ = this._userState.user$.pipe(map((user) => user.username));
 
+  readonly tooltip$ = this._auth.context$.pipe(
+    map((ctx) => {
+      if (!ctx) {
+        return undefined;
+      }
+      return `${ctx.userID} [${ctx.role}]`;
+    }),
+  );
+
   readonly color$ = this._auth.initialize$.pipe(
     switchMap((user) => {
       if (!this._auth.getConf()?.authentication) {
