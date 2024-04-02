@@ -5,14 +5,14 @@ import { Observable, of, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedParametersService extends ParametersService {
-  private readonly PARAMETERS_TABLE_ID = 'parameters';
+  static readonly PARAMETERS_TABLE_ID = 'parameters';
 
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
   private cachedParameter?: Parameter;
 
   createDataSource(): StepDataSource<Parameter> {
-    return this._dataSourceFactory.createDataSource(this.PARAMETERS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedParametersService.PARAMETERS_TABLE_ID, {
       scope: 'scope',
       key: 'key',
       value: 'value',
@@ -22,7 +22,7 @@ export class AugmentedParametersService extends ParametersService {
   }
 
   createSelectionDataSource(): StepDataSource<Parameter> {
-    return this._dataSourceFactory.createDataSource(this.PARAMETERS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedParametersService.PARAMETERS_TABLE_ID, {
       scope: 'scope',
     });
   }

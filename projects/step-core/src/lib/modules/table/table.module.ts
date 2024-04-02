@@ -14,6 +14,7 @@ import { ColumnDirective } from './directives/column.directive';
 import {
   CustomRegistriesModule,
   CustomSearchCellRegistryService,
+  DashletRegistryService,
 } from '../custom-registeries/custom-registries.module';
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 import { AdditionalHeaderDirective } from './directives/additional-header.directive';
@@ -43,6 +44,7 @@ import { DragColumnCaptionComponent } from './components/drag-column-caption/dra
 import { ColumnSettingsComponent } from './components/column-settings/column-settings.component';
 import { ActivityColDirective } from './directives/activity-col.directive';
 import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
+import { ColumnSettingsSaveDashletComponent } from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 
 @NgModule({
   imports: [
@@ -81,6 +83,7 @@ import { HeaderCellContainerComponent } from './components/header-cell-container
     PaginatorComponent,
     ActivityColDirective,
     HeaderCellContainerComponent,
+    ColumnSettingsSaveDashletComponent,
   ],
   exports: [
     TableComponent,
@@ -101,6 +104,7 @@ import { HeaderCellContainerComponent } from './components/header-cell-container
     PaginatorComponent,
     ActivityColDirective,
     HeaderCellContainerComponent,
+    ColumnSettingsSaveDashletComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -141,6 +145,7 @@ export * from './components/column-settings/column-settings.component';
 export * from './components/header-cell-container/header-cell-container.component';
 export * from './components/base-column-container/base-column-container.component';
 export * from './components/paginator/paginator.component';
+export * from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 export * from './directives/column.directive';
 export * from './directives/activity-col.directive';
 export * from './shared/search-value';
@@ -168,3 +173,4 @@ export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
 export * from './services/table-highlight-item-container.service';
 export * from './services/table-columns-config.provider';
+export * from './services/table-columns.service';

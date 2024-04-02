@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
@@ -15,8 +15,6 @@ interface Column extends Omit<ColumnInfo, 'canHide'> {
 export class ColumnSettingsComponent {
   private _tableColumns = inject(TableColumnsService);
   private _tableColumnsDictionary = inject(TableColumnsDictionaryService);
-
-  readonly hasChanges = this._tableColumns.hasChanges;
 
   readonly columns = computed(() => {
     const visibleColumns = new Set(this._tableColumns.visibleColumns());
@@ -39,9 +37,5 @@ export class ColumnSettingsComponent {
     } else {
       this._tableColumns.showColumn(column.columnId);
     }
-  }
-
-  saveSettings(): void {
-    this._tableColumns.saveSettingsForScope();
   }
 }

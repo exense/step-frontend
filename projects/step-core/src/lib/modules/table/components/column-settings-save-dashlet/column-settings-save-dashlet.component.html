@@ -1,0 +1,20 @@
+<button
+  type="button"
+  mat-icon-button
+  [color]="_tableColumns.hasChanges() ? 'warn' : null"
+  [matMenuTriggerFor]="menu"
+  [matTooltip]="_tableColumns.hasChanges() ? 'Unsaved changes' : ''"
+  matTooltipPosition="below"
+>
+  <step-icon name="save" />
+</button>
+<mat-menu #menu>
+  <button
+    type="button"
+    mat-menu-item
+    [disabled]="!_tableColumns.hasChanges()"
+    (click)="_tableColumns.saveSettingsForScope()"
+  >
+    Save Settings
+  </button>
+</mat-menu>

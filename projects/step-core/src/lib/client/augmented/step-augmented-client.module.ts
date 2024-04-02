@@ -29,5 +29,6 @@ export { AugmentedUserService } from './services/augmented-user.service';
 export { AugmentedQuotaManagerService } from './services/augmented-quota-manager.service';
 export { AugmentedAutomationPackagesService } from './services/augmented-automation-packages.service';
 export { AugmentedTimeSeriesService } from './services/augmented-time-series.service';
+export { AugmentedDashboardsService } from './services/augmented-dashboards.service';
 export * from './shared/pipe-operators';
 export * from './shared/keyword';

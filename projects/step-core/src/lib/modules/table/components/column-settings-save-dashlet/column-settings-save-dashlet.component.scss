@@ -1,9 +1,7 @@
 :host {
-  z-index: 3;
-  display: flex;
+  display: block;
+  width: 1.6rem;
   height: 1.6rem;
-  margin-left: 1rem;
-  gap: 1rem;
   & > button {
     width: 1.6rem !important;
     height: 1.6rem !important;

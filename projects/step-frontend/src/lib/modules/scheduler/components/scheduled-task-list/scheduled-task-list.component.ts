@@ -14,6 +14,7 @@ import {
   CommonEntitiesUrlsService,
   DialogRouteResult,
   DialogsService,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -26,6 +27,9 @@ type StatusItem = KeyValue<string, string>;
   templateUrl: './scheduled-task-list.component.html',
   styleUrls: ['./scheduled-task-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedSchedulerService.TASKS_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

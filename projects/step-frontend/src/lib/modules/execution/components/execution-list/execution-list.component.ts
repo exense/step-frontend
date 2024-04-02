@@ -9,6 +9,7 @@ import {
   FilterConditionFactoryService,
   selectionCollectionProvider,
   STORE_ALL,
+  tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { EXECUTION_RESULT, EXECUTION_STATUS, Status } from '../../../_common/shared/status.enum';
@@ -19,6 +20,9 @@ import { BehaviorSubject, of, switchMap } from 'rxjs';
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
