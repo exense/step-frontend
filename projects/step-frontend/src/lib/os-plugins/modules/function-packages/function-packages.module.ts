@@ -92,7 +92,7 @@ export class FunctionPackagesModule {
                 checkProjectGuardFactory({
                   entityType: 'keyword package',
                   getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
-                  getEditorUrl: (id) => `/functionPackages/editor/${id}`,
+                  getEditorUrl: (id) => `/function-packages/editor/${id}`,
                 }),
               ],
               resolve: {
