@@ -11,4 +11,5 @@ export type DashboardItem = {
   chartSettings?: ChartSettings;
   tableSettings?: TableSettings;
   size: number;
+  syncKey?: string;
 };

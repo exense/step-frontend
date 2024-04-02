@@ -10,6 +10,7 @@ import { ChartSkeletonComponent } from '../../modules/chart';
 import {
   BucketAttributes,
   BucketResponse,
+  DashboardItem,
   FetchBucketsRequest,
   MarkerType,
   TableDataSource,
@@ -51,7 +52,7 @@ interface TableEntry {
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe],
 })
 export class TableDashletComponent implements ChartDashlet, OnInit {
-  @Input() settings!: TableSettings;
+  @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
 
@@ -65,6 +66,8 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   tableDataSource: TableDataSource<TableEntry> | undefined;
   tableIsLoading = true;
 
+  settings!: TableSettings;
+
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];
 
@@ -74,9 +77,10 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   readonly TableColumnType = TableColumnType;
 
   ngOnInit(): void {
-    if (!this.settings) {
-      throw new Error('Settings input cannot be undefined');
+    if (!this.item) {
+      throw new Error('Dashlet item cannot be undefined');
     }
+    this.settings = this.item.tableSettings!;
     this.columnsDefinition = this.settings.columns!.map((column) => {
       return {
         id: column.column!,
@@ -97,9 +101,9 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   }
 
   onColumnVisibilityChange(column: TableColumn): void {
+    const newVisible = !column.isVisible;
     // update the chart settings
-    this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = !column.isVisible));
-    console.log(this.settings);
+    this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
   }
 
   private fetchDataAndCreateTable(): Observable<TimeSeriesAPIResponse> {
@@ -168,7 +172,15 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
 
   onAllSeriesCheckboxClick() {}
 
-  onKeywordToggle(entry: TableEntry) {}
+  onKeywordToggle(entry: TableEntry, selected: boolean) {
+    if (this.item.syncKey) {
+      if (selected) {
+        this.context.getSyncGroup(this.item.syncKey).showSeries([entry.name]);
+      } else {
+        this.context.getSyncGroup(this.item.syncKey).hideSeries([entry.name]);
+      }
+    }
+  }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {
     return TableLocalDataSource.configBuilder<TableEntry>()

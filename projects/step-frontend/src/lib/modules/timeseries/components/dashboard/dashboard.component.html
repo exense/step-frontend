@@ -79,7 +79,7 @@
             />
           } @else if (dashlet.type === 'TABLE') {
             <step-table-dashlet
-              [settings]="dashlet.tableSettings!"
+              [item]="dashlet"
               [context]="context"
               [editMode]="editMode"
               (remove)="handleChartDelete(i)"

@@ -38,6 +38,7 @@ import {
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
+import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 
 type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
 
@@ -194,6 +195,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   saveEditChanges() {
+    this.dashboard.dashlets.forEach((d) => (d.syncKey = '1'));
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
@@ -314,7 +316,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  prepareSyncGroups(items: DashboardItem[]): TimeSeriesSyncGroup[] {
+    const groupIds = new Set<string>();
+    items.filter((i) => i.syncKey).forEach((i) => groupIds.add(i.syncKey!));
+    return Array.from(groupIds).map((id) => new TimeSeriesSyncGroup(id));
+  }
+
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
+    let syncGroups = this.prepareSyncGroups(dashboard.dashlets);
     const timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
     if (timeRangeSelection.type === 'RELATIVE') {
@@ -351,6 +360,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
       resolution: urlParams.resolution,
+      syncGroups: syncGroups,
     });
   }
 

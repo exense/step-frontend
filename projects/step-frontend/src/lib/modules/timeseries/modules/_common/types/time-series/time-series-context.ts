@@ -9,6 +9,7 @@ import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { FilterUtils } from '../filter/filter-utils';
 import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
+import { TimeSeriesSyncGroup } from './time-series-sync-group';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -53,8 +54,11 @@ export class TimeSeriesContext {
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
+  private syncGroups: Record<string, TimeSeriesSyncGroup> = {};
+
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
+    params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
     this.activeFilters$ = new BehaviorSubject(params.filters || []);
@@ -106,6 +110,14 @@ export class TimeSeriesContext {
 
   getColor(key: string): string {
     return this.colorsPool.getColor(key);
+  }
+
+  getSyncGroup(key: string): TimeSeriesSyncGroup {
+    const syncGroup = this.syncGroups[key];
+    if (!syncGroup) {
+      throw new Error('Sync group not found: ' + key);
+    }
+    return syncGroup;
   }
 
   updateEditMode(enabled: boolean) {

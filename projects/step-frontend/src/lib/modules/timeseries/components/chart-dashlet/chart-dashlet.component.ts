@@ -91,6 +91,17 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
       this.selectedPclValue = this.PCL_VALUES[0];
     }
     this.fetchDataAndCreateChart().subscribe();
+    if (this.item.syncKey) {
+      const syncGroup = this.context.getSyncGroup(this.item.syncKey);
+      syncGroup.onSeriesHide().subscribe((series) => {
+        console.log('series hide');
+        series.forEach((s) => this.chart!.hideSeries(s));
+      });
+      syncGroup.onSeriesShow().subscribe((series) => {
+        console.log('series show');
+        series.forEach((s) => this.chart!.showSeries(s));
+      });
+    }
   }
 
   private prepareGroupingAttributes(): MetricAttributeSelection[] {

@@ -60,7 +60,11 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <div class="color-cell">
-          <mat-checkbox color="primary" [ngModel]="element.isSelected" (ngModelChange)="onKeywordToggle(element)">
+          <mat-checkbox
+            color="primary"
+            [ngModel]="element.isSelected"
+            (ngModelChange)="onKeywordToggle(element, $event)"
+          >
             <div class="element-name">
               <span>{{ element.name }}</span>
               <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />

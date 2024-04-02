@@ -1,21 +1,42 @@
 import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 export class TimeSeriesSyncGroup {
-  private id: string;
+  readonly id: string;
 
   seriesVisibility: Record<string, boolean> = {};
 
-  seriesShow$ = new Subject();
-  seriesHide$ = new Subject();
+  seriesShow$ = new Subject<string[]>();
+  seriesHide$ = new Subject<string[]>();
 
-  addSeries(series: string[], visible: boolean) {}
+  constructor(id: string) {
+    this.id = id;
+  }
 
-  onSeriesShow() {
+  addSeries(series: string[], visible: boolean) {
+    series.forEach((s) => {
+      let existingSeries = this.seriesVisibility[s];
+      if (!existingSeries) {
+        this.seriesVisibility[s] = true;
+      }
+    });
+  }
+
+  showSeries(series: string[]) {
+    series.forEach((s) => (this.seriesVisibility[s] = true));
+    this.seriesShow$.next(series);
+  }
+
+  hideSeries(series: string[]) {
+    series.forEach((s) => (this.seriesVisibility[s] = false));
+    this.seriesHide$.next(series);
+  }
+
+  onSeriesShow(): Observable<string[]> {
     return this.seriesShow$.asObservable();
   }
 
-  onSeriesHide() {
+  onSeriesHide(): Observable<string[]> {
     return this.seriesHide$.asObservable();
   }
 }
