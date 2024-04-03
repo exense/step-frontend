@@ -4,7 +4,7 @@ import { MatColumnDef } from '@angular/material/table';
 import { TableColumnsConfig } from './table-columns-config.provider';
 import { TableApiWrapperService } from '../../../client/table/step-table-client.module';
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
-import { map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { ColumnInfo } from '../types/column-info';
 
 enum VisibilityState {
@@ -102,10 +102,9 @@ export class TableColumnsService {
     if (!this._columnsConfig?.entityTableRemoteId) {
       return of(this.getDefaultTableSettings());
     }
-    return this._tableApi.getTableSettings(this._columnsConfig.entityTableRemoteId).pipe(
-      map((settings) => this.mergeSettings(settings, this.getDefaultTableSettings())),
-      tap((settings) => console.log('SETTINGS', settings)),
-    );
+    return this._tableApi
+      .getTableSettings(this._columnsConfig.entityTableRemoteId)
+      .pipe(map((settings) => this.mergeSettings(settings, this.getDefaultTableSettings())));
   }
 
   private getDefaultTableSettings(): TableSettings {
