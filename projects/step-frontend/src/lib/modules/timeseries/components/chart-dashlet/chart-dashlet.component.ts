@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   BucketAttributes,
   BucketResponse,
@@ -43,7 +53,7 @@ interface MetricAttributeSelection extends MetricAttribute {
   standalone: true,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
-export class ChartDashletComponent implements OnInit {
+export class ChartDashletComponent implements OnInit, OnChanges {
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -83,17 +93,29 @@ export class ChartDashletComponent implements OnInit {
     if (!this.item || !this.context || !this.height) {
       throw new Error('Missing input values');
     }
-    this.item.chartSettings!.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
-    this.groupingSelection = this.prepareGroupingAttributes();
-    this.selectedAggregate = this.item.chartSettings!.primaryAxes!.aggregation as ChartAggregation;
-    if (this.selectedAggregate === ChartAggregation.PERCENTILE) {
-      this.selectedPclValue = this.PCL_VALUES[0];
-    }
+    this.prepareState(this.item);
     this.fetchDataAndCreateChart().subscribe();
   }
 
-  private prepareGroupingAttributes(): MetricAttributeSelection[] {
-    const settings = this.item.chartSettings!;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['item']) {
+      this.prepareState(this.item);
+      this.refresh(true).subscribe();
+    }
+  }
+
+  private prepareState(item: DashboardItem) {
+    item.chartSettings!.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
+    this.groupingSelection = this.prepareGroupingAttributes(item);
+    this.selectedAggregate = item.chartSettings!.primaryAxes!.aggregation as ChartAggregation;
+    this.selectedPclValue = item.chartSettings!.primaryAxes!.pclValue;
+    if (this.selectedAggregate === ChartAggregation.PERCENTILE && !this.selectedPclValue) {
+      this.selectedPclValue = this.PCL_VALUES[0];
+    }
+  }
+
+  private prepareGroupingAttributes(item: DashboardItem): MetricAttributeSelection[] {
+    const settings = item.chartSettings!;
     const groupingSelection: MetricAttributeSelection[] =
       settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
     settings.grouping?.forEach((a) => {
@@ -158,6 +180,7 @@ export class ChartDashletComponent implements OnInit {
       .subscribe((updatedItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
+          this.prepareState(this.item);
           this.refresh(true).subscribe();
         }
       });
@@ -243,7 +266,7 @@ export class ChartDashletComponent implements OnInit {
     }
 
     this._internalSettings = {
-      title: `${this.item.name} (${primaryAggregation}${this.selectedPclValue ? ' ' + this.selectedPclValue : ''})`,
+      title: this.getChartTitle(),
       xValues: xLabels,
       series: series,
       tooltipOptions: {
@@ -286,6 +309,15 @@ export class ChartDashletComponent implements OnInit {
           break;
       }
     });
+  }
+
+  private getChartTitle(): string {
+    let title = this.item.name;
+    let aggregationValue: string = this.selectedAggregate as string;
+    if (aggregationValue === (ChartAggregation.PERCENTILE as string)) {
+      aggregationValue += ` ${this.selectedPclValue}`;
+    }
+    return `${title} (${aggregationValue})`;
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {

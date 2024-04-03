@@ -37,7 +37,9 @@ export class ChartDashletSettingsComponent implements OnInit {
     ChartAggregation.COUNT,
     ChartAggregation.RATE,
     ChartAggregation.MEDIAN,
+    ChartAggregation.PERCENTILE,
   ];
+  readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
@@ -57,14 +59,19 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
+  setPclValue(pclValue: number) {
+    this.item.chartSettings!.primaryAxes!.pclValue = pclValue;
+  }
+
   onSecondaryAggregateSelect(aggregation: ChartAggregation) {
     if (!aggregation) {
       this.item.chartSettings!.secondaryAxes = undefined;
     } else {
       this.item.chartSettings!.secondaryAxes = {
         aggregation: aggregation,
-        unit: '/h',
+        unit: '',
         displayType: 'BAR_CHART',
+        pclValue: this.PCL_VALUES[0],
       };
     }
   }

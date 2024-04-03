@@ -176,7 +176,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   enableEditMode() {
-    this.dashboardBackup = { ...this.dashboard, dashlets: [...this.dashboard.dashlets.map((item) => ({ ...item }))] };
+    this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
     if (!this.metricTypes) {
       this.fetchMetricTypes();
