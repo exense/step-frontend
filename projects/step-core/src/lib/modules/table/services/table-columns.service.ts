@@ -1,10 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { ColumnSettings, ScreenInputColumnSettings, TableSettings } from '../../../client/generated';
+import { ColumnSettings, ScreenInput, ScreenInputColumnSettings, TableSettings } from '../../../client/generated';
 import { MatColumnDef } from '@angular/material/table';
 import { TableColumnsConfig } from './table-columns-config.provider';
 import { TableApiWrapperService } from '../../../client/table/step-table-client.module';
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
 import { map, Observable, of, tap } from 'rxjs';
+import { ColumnInfo } from '../types/column-info';
 
 enum VisibilityState {
   HIDDEN,
@@ -108,31 +109,68 @@ export class TableColumnsService {
   }
 
   private getDefaultTableSettings(): TableSettings {
-    const standardColumns = (this._columnsDefinition.contentColumns?.() ?? [])
-      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
-      .map(
-        (col, i) =>
-          ({
-            columnId: col.name,
-            position: i,
-            visible: true,
-            type: 'step.plugins.table.settings.ColumnSettings',
-          }) as ColumnSettings,
+    const infoDictionary = (this._columnsDefinition.contentColumns?.() ?? [])
+      .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
+      .reduce(
+        (res, item) => {
+          res[item.columnId] = item;
+          return res;
+        },
+        {} as Record<string, ColumnInfo>,
       );
 
-    const remoteColumns = (this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? []).map(
-      (screenInput, i) =>
-        ({
-          columnId: screenInput.input!.id,
-          position: standardColumns.length + i,
-          visible: false,
-          type: 'step.plugins.table.settings.ScreenInputColumnSettings',
-          screenInput,
-        }) as ScreenInputColumnSettings,
+    const mainColumnsDefinitions = (this._columnsDefinition.contentColumns?.() ?? []).filter(
+      (col) => !col.isActionColumn,
     );
 
+    const actionColumnsDefinitions = (this._columnsDefinition.contentColumns?.() ?? []).filter(
+      (col) => col.isActionColumn,
+    );
+
+    const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
+
+    let columnSettingList = mainColumnsDefinitions
+      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
+      .map((col, i) => this.createStandardColumnSettings(col, i, infoDictionary));
+
+    const remoteColumns = remoteColumnsDefinitions.map((screenInput, i) =>
+      this.createScreenInputColumnSettings(screenInput, columnSettingList.length + i),
+    );
+
+    columnSettingList = [...columnSettingList, ...remoteColumns];
+
+    const actionsColumns = actionColumnsDefinitions
+      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
+      .map((col, i) => this.createStandardColumnSettings(col, columnSettingList.length + i, infoDictionary));
+
+    columnSettingList = [...columnSettingList, ...actionsColumns];
+
+    return { columnSettingList };
+  }
+
+  private createStandardColumnSettings(
+    matColDef: MatColumnDef,
+    position: number,
+    infoDictionary?: Record<string, ColumnInfo>,
+  ): ColumnSettings {
+    const info = infoDictionary?.[matColDef.name];
+    const columnId = info?.columnId ?? matColDef.name;
+    const visible = info ? !info.isHiddenByDefault : true;
     return {
-      columnSettingList: standardColumns.concat(remoteColumns),
+      columnId,
+      position,
+      visible,
+      type: 'step.plugins.table.settings.ColumnSettings',
+    };
+  }
+
+  private createScreenInputColumnSettings(screenInput: ScreenInput, position: number): ScreenInputColumnSettings {
+    return {
+      columnId: screenInput.input!.id,
+      position,
+      visible: false,
+      type: 'step.plugins.table.settings.ScreenInputColumnSettings',
+      screenInput,
     };
   }
 

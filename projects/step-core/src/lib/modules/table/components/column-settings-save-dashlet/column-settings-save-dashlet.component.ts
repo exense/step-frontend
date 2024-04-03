@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { TableColumnsService } from '../../services/table-columns.service';
 import { CustomComponent } from '../../../custom-registeries/shared/custom-component';
 
@@ -6,6 +6,7 @@ import { CustomComponent } from '../../../custom-registeries/shared/custom-compo
   selector: 'step-column-settings-save-dashlet',
   templateUrl: './column-settings-save-dashlet.component.html',
   styleUrl: './column-settings-save-dashlet.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ColumnSettingsSaveDashletComponent implements CustomComponent {
   context?: any;

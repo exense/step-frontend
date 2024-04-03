@@ -17,6 +17,7 @@ export class AugmentedParametersService extends ParametersService {
       key: 'key',
       value: 'value',
       activationExpressionScript: 'activationExpression.script',
+      lastModificationDate: 'lastModificationDate',
       priority: 'priority',
     });
   }

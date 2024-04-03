@@ -35,6 +35,22 @@
   }
 }
 
+@mixin table-settings-buttons-container {
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+  & > button.mat-mdc-icon-button {
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+    .mat-mdc-button-touch-target {
+      top: 0;
+      left: 0;
+      width: 1.6rem !important;
+      height: 1.6rem !important;
+    }
+  }
+}
+
 step-table {
   tr.row-highlight,
   tr.content-row:hover {
@@ -87,6 +103,22 @@ step-table {
         tr > td {
           &:nth-child(#{$i}) {
             background: var.$highlight !important;
+          }
+        }
+      }
+      &.drag-over-col-left-#{$i} {
+        tr > th,
+        tr > td {
+          &:nth-child(#{$i}) {
+            border-left: solid 0.2rem var.$dark-blue !important;
+          }
+        }
+      }
+      &.drag-over-col-right-#{$i} {
+        tr > th,
+        tr > td {
+          &:nth-child(#{$i}) {
+            border-right: solid 0.2rem var.$dark-blue !important;
           }
         }
       }

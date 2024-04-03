@@ -23,30 +23,35 @@ import { TableReload } from '../../services/table-reload';
 })
 export class DragColumnCaptionComponent implements AfterViewInit {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private _cd = inject(ChangeDetectorRef);
   private _render = inject(Renderer2);
   private _dragService = inject(DragDataService, { optional: true });
   private _tableColumns = inject(TableColumnsService);
   private _destroyRef = inject(DestroyRef);
-  private _tableReload = inject(TableReload);
   readonly _matColDef = inject(MatColumnDef);
 
   readonly dragAllowed = !!this._dragService;
 
   private tableRef?: HTMLTableElement | null;
   private dragColumnClass?: string;
-
-  protected tableHeight?: string;
-  protected readonly cellWidth = '10rem';
+  private dragOverColumnLeftClass?: string;
+  private dragOverColumnRightClass?: string;
 
   ngAfterViewInit(): void {
     this.determineTableRef();
-    this.determineDragColumnClass();
+    this.determineDragDropColumnClasses();
     this.setupDragBehavior();
-    this.setupMeasurementsRecalculation();
-    setTimeout(() => {
-      this.recalculateMeasures();
-    }, 100);
+  }
+
+  handleDragOverLeft(): void {
+    if (this.tableRef && this.dragOverColumnLeftClass) {
+      this._render.addClass(this.tableRef, this.dragOverColumnLeftClass);
+    }
+  }
+
+  handleDragLeaveLeft(): void {
+    if (this.tableRef && this.dragOverColumnLeftClass) {
+      this._render.removeClass(this.tableRef, this.dragOverColumnLeftClass);
+    }
   }
 
   handleDropLeft(dropInfo: DropInfo): void {
@@ -55,6 +60,18 @@ export class DragColumnCaptionComponent implements AfterViewInit {
       dropInfo.droppedArea as string,
       PlacePosition.LEFT,
     );
+  }
+
+  handleDragOverRight(): void {
+    if (this.tableRef && this.dragOverColumnRightClass) {
+      this._render.addClass(this.tableRef, this.dragOverColumnRightClass);
+    }
+  }
+
+  handleDragLeaveRight(): void {
+    if (this.tableRef && this.dragOverColumnRightClass) {
+      this._render.removeClass(this.tableRef, this.dragOverColumnRightClass);
+    }
   }
 
   handleDropRight(dropInfo: DropInfo): void {
@@ -73,22 +90,15 @@ export class DragColumnCaptionComponent implements AfterViewInit {
     return this._elRef.nativeElement.closest('th') ?? this._elRef.nativeElement.closest('td');
   }
 
-  private determineDragColumnClass(): void {
+  private determineDragDropColumnClasses(): void {
     const cell = this.getCell();
     if (!cell) {
       return;
     }
 
     this.dragColumnClass = `drag-col-${cell.cellIndex + 1}`;
-  }
-
-  private recalculateMeasures(): void {
-    const cell = this.getCell();
-    if (!this.tableRef || !cell) {
-      return;
-    }
-    this.tableHeight = this.tableRef?.getBoundingClientRect()?.height + 'px';
-    this._cd.detectChanges();
+    this.dragOverColumnLeftClass = `drag-over-col-left-${cell.cellIndex + 1}`;
+    this.dragOverColumnRightClass = `drag-over-col-right-${cell.cellIndex + 1}`;
   }
 
   private setupDragBehavior(): void {
@@ -103,18 +113,19 @@ export class DragColumnCaptionComponent implements AfterViewInit {
 
     this._dragService?.dragEnd$
       .pipe(
-        filter(() => !!this.tableRef && !!this.dragColumnClass),
+        filter(() => !!this.tableRef),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe(() => this._render.removeClass(this.tableRef, this.dragColumnClass!));
-  }
-
-  private setupMeasurementsRecalculation(): void {
-    this._tableReload.loadComplete$
-      .pipe(
-        switchMap(() => timer(100)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => this.recalculateMeasures());
+      .subscribe(() => {
+        if (this.dragColumnClass) {
+          this._render.removeClass(this.tableRef, this.dragColumnClass);
+        }
+        if (this.dragOverColumnLeftClass) {
+          this._render.removeClass(this.tableRef, this.dragOverColumnLeftClass);
+        }
+        if (this.dragOverColumnRightClass) {
+          this._render.removeClass(this.tableRef, this.dragOverColumnRightClass);
+        }
+      });
   }
 }

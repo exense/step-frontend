@@ -45,6 +45,7 @@ import { ColumnSettingsComponent } from './components/column-settings/column-set
 import { ActivityColDirective } from './directives/activity-col.directive';
 import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
 import { ColumnSettingsSaveDashletComponent } from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
+import { ActionColDirective } from './directives/action-col.directive';
 
 @NgModule({
   imports: [
@@ -82,6 +83,7 @@ import { ColumnSettingsSaveDashletComponent } from './components/column-settings
     ColumnSettingsComponent,
     PaginatorComponent,
     ActivityColDirective,
+    ActionColDirective,
     HeaderCellContainerComponent,
     ColumnSettingsSaveDashletComponent,
   ],
@@ -103,6 +105,7 @@ import { ColumnSettingsSaveDashletComponent } from './components/column-settings
     ColumnSettingsComponent,
     PaginatorComponent,
     ActivityColDirective,
+    ActionColDirective,
     HeaderCellContainerComponent,
     ColumnSettingsSaveDashletComponent,
   ],
@@ -148,6 +151,7 @@ export * from './components/paginator/paginator.component';
 export * from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 export * from './directives/column.directive';
 export * from './directives/activity-col.directive';
+export * from './directives/action-col.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';

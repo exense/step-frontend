@@ -96,7 +96,19 @@
       </th>
       <td mat-cell *matCellDef="let element">{{ element.priority }}</td>
     </ng-container>
-    <ng-container matColumnDef="actions">
+    <ng-container
+      matColumnDef="lastModificationDate"
+      stepActivityCol="Last modification date"
+      [isHiddenByDefault]="true"
+    >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>Last modification date</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <step-parameter-last-modification [context]="element" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions" stepActionCol>
       <th mat-header-cell *matHeaderCellDef>
         Actions
         <step-column-settings />

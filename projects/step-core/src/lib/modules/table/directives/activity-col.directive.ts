@@ -10,12 +10,14 @@ export class ActivityColDirective {
 
   caption = input('', { alias: 'stepActivityCol' });
   canHide = input(true);
+  isHiddenByDefault = input(false);
 
   columnInfo(): ColumnInfo {
     return {
       columnId: this.matColumnDef?.name,
       caption: this.caption() ?? this.matColumnDef?.name,
       canHide: this.canHide(),
+      isHiddenByDefault: this.canHide() && this.isHiddenByDefault(),
     };
   }
 }

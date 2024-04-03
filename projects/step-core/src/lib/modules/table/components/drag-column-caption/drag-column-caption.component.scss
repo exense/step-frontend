@@ -4,8 +4,6 @@ step-drag-column-caption {
   display: block;
   position: relative;
   width: fit-content;
-  --item-width: 0;
-  --item-height: 0;
 
   .drop-before,
   .drop-after {
@@ -14,32 +12,14 @@ step-drag-column-caption {
     position: absolute;
   }
 
-  @mixin dragover-shadow {
-    content: ' ';
-    display: block;
-    width: var(--item-width);
-    height: var(--item-height);
-    position: fixed;
-    background: var.$gray-750 !important;
-    border: dashed 1px var.$gray-400;
-    opacity: 0.5;
-  }
-
   .drop-before {
     left: -1rem;
     width: 1rem;
-    &.dragover::before {
-      @include dragover-shadow;
-      margin-left: calc(-1 * var(--item-width));
-    }
   }
 
   .drop-after {
     left: calc(100% + 0.8rem);
     right: -100rem;
-    &.dragover::after {
-      @include dragover-shadow;
-    }
   }
 
   .drag-pointer {

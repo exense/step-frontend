@@ -5,6 +5,7 @@ import { SearchColDirective } from './search-col.directive';
 import { CustomColumnsBaseComponent } from '../components/custom-columns/custom-columns-base.component';
 import { ActivityColDirective } from './activity-col.directive';
 import { ColumnInfo } from '../types/column-info';
+import { ActionColDirective } from './action-col.directive';
 
 @Directive({
   selector:
@@ -15,9 +16,14 @@ export class ColumnDirective {
   private _customColumns = inject(CustomColumnsBaseComponent, { self: true, optional: true });
   private _searchColumn = inject(SearchColDirective, { self: true, optional: true });
   private _colLabel = inject(ActivityColDirective, { self: true, optional: true });
+  private _actionCol = inject(ActionColDirective, { self: true, optional: true });
 
   get isCustom(): boolean {
     return !!this._customColumns;
+  }
+
+  get isActionColumn(): boolean {
+    return !!this._actionCol;
   }
 
   get ready$(): Observable<unknown> {

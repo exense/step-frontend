@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ViewEncapsulation } from '@angular/core';
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
@@ -11,6 +11,7 @@ interface Column extends Omit<ColumnInfo, 'canHide'> {
   selector: 'step-column-settings',
   templateUrl: './column-settings.component.html',
   styleUrl: './column-settings.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ColumnSettingsComponent {
   private _tableColumns = inject(TableColumnsService);

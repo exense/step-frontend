@@ -4,9 +4,9 @@
 @if (dragAllowed) {
   <div
     class="drop-before"
-    [style.--item-height]="tableHeight"
-    [style.--item-width]="cellWidth"
     [stepDropArea]="_matColDef.name"
+    (dragOver)="handleDragOverLeft()"
+    (dragLeave)="handleDragLeaveLeft()"
     (dropItem)="handleDropLeft($event)"
   ></div>
   <div class="drag-pointer" [stepDragItem]="_matColDef.name">
@@ -14,9 +14,9 @@
   </div>
   <div
     class="drop-after"
-    [style.--item-height]="tableHeight"
-    [style.--item-width]="cellWidth"
     [stepDropArea]="_matColDef.name"
+    (dragOver)="handleDragOverRight()"
+    (dragLeave)="handleDragLeaveRight()"
     (dropItem)="handleDropRight($event)"
   ></div>
 } @else {

@@ -1,11 +1,10 @@
-:host {
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-column-settings {
+  @include core.table-settings-buttons-container;
   z-index: 3;
   display: flex;
-  height: 1.6rem;
+  width: auto;
   margin-left: 1rem;
-  gap: 1rem;
-  & > button {
-    width: 1.6rem !important;
-    height: 1.6rem !important;
-  }
+  gap: 1.5rem;
 }
