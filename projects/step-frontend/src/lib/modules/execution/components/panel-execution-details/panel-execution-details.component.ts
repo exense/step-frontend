@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ExecutionStateService } from '../../services/execution-state.service';
 import { Panels } from '../../shared/panels.enum';
 
@@ -8,9 +8,6 @@ import { Panels } from '../../shared/panels.enum';
   styleUrls: ['./panel-execution-details.component.scss'],
 })
 export class PanelExecutionDetailsComponent {
+  readonly _state = inject(ExecutionStateService);
   readonly Panels = Panels;
-
-  constructor(public _state: ExecutionStateService) {
-    console.log(_state?.execution?.executionParameters?.['isolatedExecution']);
-  }
 }

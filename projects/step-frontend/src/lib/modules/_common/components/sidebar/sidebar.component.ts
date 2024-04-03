@@ -13,11 +13,19 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { IS_SMALL_SCREEN, MenuEntry, NavigatorService, ViewRegistryService, ViewStateService } from '@exense/step-core';
+import {
+  CustomMenuEntriesService,
+  IS_SMALL_SCREEN,
+  MenuEntry,
+  NavigatorService,
+  ViewRegistryService,
+  ViewStateService,
+} from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { MENU_ITEMS } from '../../injectables/menu-items';
-import { Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { SubscriptionLike, combineLatest, map } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MIDDLE_BUTTON = 1;
 
@@ -37,11 +45,16 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
 
-  private terminator$ = new Subject<void>();
   private locationStateSubscription: SubscriptionLike;
 
   private _sideBarState = inject(SidebarStateService);
-  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+  private _customMenuEntries = inject(CustomMenuEntriesService);
+  private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
+
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._customMenuEntries.customMenuEntries$]).pipe(
+    map(([items, customItems]) => [...items, ...customItems]),
+  );
+
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   readonly isOpened$ = this._sideBarState.isOpened$;
@@ -71,8 +84,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.locationStateSubscription.unsubscribe();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   private openMainMenuBasedOnActualView(): void {
@@ -96,7 +107,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   private initializeMainMenuItemsFromState(): void {
     Object.entries(this._sideBarState.openedMenuItems || {}).forEach(([mainMenuKey, isOpened]) =>
-      this.openMainMenu(mainMenuKey, isOpened)
+      this.openMainMenu(mainMenuKey, isOpened),
     );
   }
 
@@ -123,6 +134,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         this._navigator.navigate(viewId, isOpenInSeparateTab);
         break;
     }
+  }
+
+  removeCustomEntry(id: string, $event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
+    this._customMenuEntries.remove(id);
   }
 
   toggleOpenClose() {

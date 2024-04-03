@@ -36,6 +36,7 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
+import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +67,7 @@ import { ExecutionRunningStatusHeaderComponent } from './components/execution-ru
     ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
+    AltExecutionsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -181,6 +183,31 @@ export class ExecutionModule {
         {
           matcher: (url) => {
             if (url[0].path === 'list' || url[0].path === 'open') {
+              return null;
+            }
+            return { consumed: url };
+          },
+          component: ExecutionProgressComponent,
+          children: [schedulePlanRoute('modal')],
+        },
+      ],
+    });
+
+    this._viewRegistry.registerRoute({
+      path: 'alt-executions',
+      component: AltExecutionsComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: ExecutionListComponent,
+        },
+        {
+          matcher: (url) => {
+            if (url[0].path === 'list') {
               return null;
             }
             return { consumed: url };

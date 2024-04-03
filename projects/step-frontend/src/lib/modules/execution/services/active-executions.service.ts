@@ -19,7 +19,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   constructor(
     readonly executionId: string,
     readonly autoRefreshModel: AutoRefreshModel,
-    private loadExecution: (eId: string) => Observable<Execution>
+    private loadExecution: (eId: string) => Observable<Execution>,
   ) {
     this.setupExecutionRefresh();
   }
@@ -37,7 +37,7 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
-        concatMap(() => this.loadExecution(this.executionId))
+        concatMap(() => this.loadExecution(this.executionId)),
       )
       .subscribe((execution) => {
         this.executionInternal$.next(execution);
@@ -80,6 +80,18 @@ export class ActiveExecutionsService implements OnDestroy {
     this.executions.delete(executionId);
   }
 
+  hasExecution(executionId: string): boolean {
+    return this.executions.has(executionId);
+  }
+
+  activeExecutionIds(): string[] {
+    return Array.from(this.executions.keys());
+  }
+
+  size(): number {
+    return this.executions.size;
+  }
+
   ngOnDestroy(): void {
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
@@ -88,7 +100,7 @@ export class ActiveExecutionsService implements OnDestroy {
   private createActiveExecution(executionId: string): ActiveExecution {
     const autoRefreshModel = this._autoRefreshFactory.create();
     return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) =>
-      this._executionService.getExecutionById(executionId)
+      this._executionService.getExecutionById(executionId),
     );
   }
 }
