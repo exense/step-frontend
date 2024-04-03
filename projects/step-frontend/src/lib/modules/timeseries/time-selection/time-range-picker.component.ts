@@ -183,7 +183,9 @@ export class TimeRangePickerComponent implements OnInit {
     if (!date) {
       return;
     }
-    this.toDateString = TimeSeriesUtils.formatInputDate(date.toJSDate());
+    let jsDate = date.toJSDate();
+    jsDate.setHours(23, 59, 59);
+    this.toDateString = TimeSeriesUtils.formatInputDate(jsDate);
   }
 
   formatTimeValue(value: number) {
