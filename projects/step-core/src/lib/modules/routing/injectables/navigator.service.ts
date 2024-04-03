@@ -86,7 +86,12 @@ export class NavigatorService {
     const queryParams = this.prepareQueryParams();
     const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
     const segments = link.split('/');
-    this._router.navigate(segments, { queryParams, queryParamsHandling });
+    const hasFilters = segments.some((el) => el.includes('?'));
+    if (hasFilters) {
+      this._router.navigateByUrl(link);
+    } else {
+      this._router.navigate(segments, { queryParams, queryParamsHandling });
+    }
   }
 
   private prepareQueryParams(): Params | null {

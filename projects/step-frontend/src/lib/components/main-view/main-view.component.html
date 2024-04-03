@@ -10,7 +10,7 @@
             <step-dashlet [itemKey]="item.template" />
           }
           <a class="icon-bookmark" (click)="addBookmark()">
-            <step-icon name="bookmark" />
+            <step-icon [matTooltip]="'Bookmark this view'" name="bookmark" />
           </a>
           <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
             <step-icon name="user" />

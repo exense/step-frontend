@@ -39,7 +39,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
     });
     const tenant = this._multipleProjects.currentProject()?.name;
     const slashIndex = this._router.url.indexOf('/');
-    const link = this._router.url.slice(slashIndex + 1).split('?')[0];
+    const link = this._router.url.slice(slashIndex + 1);
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
       label: this._data?.label ?? '',
@@ -73,8 +73,14 @@ export class BookmarkCreateDialogComponent implements OnInit {
   }
 
   private getIconAndPage(link: string): Bookmark | undefined {
-    const firstDashIndex = link.indexOf('/');
-    const prefix = link.slice(0, firstDashIndex === -1 ? undefined : firstDashIndex);
+    let firstDashIndex: undefined | number = link.indexOf('/');
+    let questionMarkIndex: number | undefined = link.indexOf('?');
+
+    firstDashIndex = firstDashIndex === -1 ? undefined : firstDashIndex;
+    questionMarkIndex = questionMarkIndex === -1 ? undefined : questionMarkIndex;
+
+    const prefix = link.slice(0, firstDashIndex ? firstDashIndex : questionMarkIndex);
+
     let iconAndPage;
     this._menuItems$.pipe(take(1)).subscribe((items) => {
       const item = items.find((el) => el.id === prefix);
