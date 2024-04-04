@@ -17,14 +17,27 @@
             <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" name="metricKey" />
           </step-form-field>
         </div>
+        <mat-divider />
+        <div>
+          <step-label>Primary Axes</step-label>
+        </div>
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
             <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
               <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
-              <mat-option [value]="ChartAggregation.PERCENTILE">{{ ChartAggregation.PERCENTILE }}</mat-option>
             </mat-select>
           </step-form-field>
+          @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
+            <step-form-field>
+              <step-label>Pcl. value</step-label>
+              <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">
+                @for (v of PCL_VALUES; track v) {
+                  <mat-option [value]="v">{{ v }}th</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          }
           <step-form-field>
             <step-label>Unit</step-label>
             <input
@@ -34,9 +47,13 @@
             />
           </step-form-field>
         </div>
+        <mat-divider />
+        <div>
+          <step-label>Secondary Axes</step-label>
+        </div>
         <div class="form-row">
           <step-form-field>
-            <step-label>Secondary Axes Aggregation</step-label>
+            <step-label>Aggregate</step-label>
             <mat-select
               [value]="item.chartSettings!.secondaryAxes?.aggregation"
               (valueChange)="onSecondaryAggregateSelect($event)"
@@ -47,8 +64,20 @@
               }
             </mat-select>
           </step-form-field>
-          <div></div>
+          @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
+            <step-form-field>
+              <step-label>Pcl. value</step-label>
+              <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
+                @for (v of PCL_VALUES; track v) {
+                  <mat-option [value]="v">{{ v }}th</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          } @else {
+            <div></div>
+          }
         </div>
+        <mat-divider />
 
         <div class="section">
           <div class="title">Filters</div>

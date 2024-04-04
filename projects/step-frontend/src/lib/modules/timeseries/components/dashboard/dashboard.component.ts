@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
+  AugmentedTimeSeriesService,
   AuthService,
   DashboardItem,
   DashboardsService,
@@ -9,8 +10,6 @@ import {
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
-  TimeSeriesService,
-  TimeUnit,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
@@ -63,7 +62,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
@@ -71,6 +70,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
+
+  private exportInProgress = false;
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;
@@ -178,7 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   enableEditMode() {
-    this.dashboardBackup = { ...this.dashboard, dashlets: [...this.dashboard.dashlets.map((item) => ({ ...item }))] };
+    this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
     if (!this.metricTypes) {
       this.fetchMetricTypes();
@@ -474,6 +475,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       replaceUrl: true,
       queryParams: currentParams,
       queryParamsHandling: 'merge',
+    });
+  }
+
+  exportRawData(): void {
+    if (this.exportInProgress || !this.context) {
+      return;
+    }
+    this.exportInProgress = true;
+    const oqlFilter = this.context.buildActiveOQL(true, true);
+    this._timeSeriesService.exportRawMeasurementsAsCSV(oqlFilter).subscribe({
+      complete: () => (this.exportInProgress = false),
     });
   }
 }
