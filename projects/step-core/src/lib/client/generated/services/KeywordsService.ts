@@ -65,7 +65,7 @@ export class KeywordsService {
   public callFunctionById(
     id: string,
     functionId: string,
-    requestBody?: FunctionInputJsonObject
+    requestBody?: FunctionInputJsonObject,
   ): Observable<OutputJsonObject> {
     return this.httpRequest.request({
       method: 'POST',

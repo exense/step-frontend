@@ -14,6 +14,31 @@
 @if (execution) {
   <section [class.small-screen]="_isSmallScreen$ | async">
     <ng-template #executionTabs>
+      @if (
+        autoscalingStatus?.statusDescription ||
+        autoscalingStatus?.tokenCountStarted ||
+        autoscalingStatus?.tokenCountStarted
+      ) {
+        <step-alert [type]="AlertType.INFO" class="auto-scaling-status">
+          <div>Auto scaling status</div>
+          <div>{{ autoscalingStatus?.statusDescription }}</div>
+          @if (autoscalingStatus?.tokenCountStarted) {
+            <div>Token count started</div>
+            <div>{{ autoscalingStatus?.tokenCountStarted }}</div>
+          }
+          @if (autoscalingStatus?.tokenCountTarget) {
+            <div>Token count target</div>
+            <div>{{ autoscalingStatus?.tokenCountTarget }}</div>
+          }
+        </step-alert>
+      }
+      @if (execution.lifecycleErrors; as errors) {
+        @for (error of errors; track error.msg) {
+          <step-alert [type]="AlertType.DANGER">
+            {{ error.msg }}
+          </step-alert>
+        }
+      }
       <div class="tab-panel">
         <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)" />
         <step-btn-group>

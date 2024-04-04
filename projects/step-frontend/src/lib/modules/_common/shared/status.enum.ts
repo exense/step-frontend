@@ -12,6 +12,9 @@ export enum Status {
   TECHNICAL_ERROR = 'TECHNICAL_ERROR',
   INTERRUPTED = 'INTERRUPTED',
   EXPORTING = 'EXPORTING',
+  ESTIMATING = 'ESTIMATING',
+  PROVISIONING = 'PROVISIONING',
+  DEPROVISIONING = 'DEPROVISIONING',
 }
 
 export const EXECUTION_RESULT: ReadonlyArray<Status> = [
@@ -31,6 +34,9 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
   Status.ABORTING,
   Status.EXPORTING,
   Status.ENDED,
+  Status.ESTIMATING,
+  Status.PROVISIONING,
+  Status.DEPROVISIONING,
 ];
 
 export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [

@@ -1,5 +1,6 @@
-import { Component, forwardRef, inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
+import { Component, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
+  AlertType,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
@@ -10,7 +11,6 @@ import {
   ExecutiontTaskParameters,
   IncludeTestcases,
   IS_SMALL_SCREEN,
-  ItemInfo,
   Operation,
   PrivateViewPluginService,
   ReportNode,
@@ -18,6 +18,7 @@ import {
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
+  TokenProvisioningStatus,
   TreeNodeUtilsService,
   TreeStateService,
   ViewRegistryService,
@@ -39,6 +40,7 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
+import { catchError } from 'rxjs/operators';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -109,6 +111,7 @@ export class ExecutionProgressComponent
   private isTreeInitialized = false;
 
   readonly Panels = Panels;
+  readonly AlertType = AlertType;
 
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
@@ -118,6 +121,7 @@ export class ExecutionProgressComponent
   showTestCaseCurrentOperation: boolean = true;
   keywordSearch?: string;
 
+  autoscalingStatus?: TokenProvisioningStatus;
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
   errorDistribution?: { errorCount: number; count: number };
@@ -445,6 +449,10 @@ export class ExecutionProgressComponent
         errorCode: key,
         errorCodeCount: value,
       }));
+
+      this._executionService
+        .getAutoscalingStatus(executionId!)
+        .subscribe((status) => (this.autoscalingStatus = status));
     });
 
     this.selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;
