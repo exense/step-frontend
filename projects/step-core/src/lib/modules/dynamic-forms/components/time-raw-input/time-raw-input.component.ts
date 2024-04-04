@@ -13,7 +13,6 @@ export class TimeRawInputComponent extends TimeInputComponent {
   @Input() parentControl?: NgControl;
   @Input() placeholder?: string;
 
-  @Output() editConstantValue = new EventEmitter<void>();
   @Output() toggleDynamicExpression = new EventEmitter<void>();
 
   readonly allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
