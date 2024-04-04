@@ -98,8 +98,9 @@ export class ChartDashletComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['item']) {
-      this.prepareState(this.item);
+    const cItem = changes['item'];
+    if (cItem?.previousValue !== cItem?.currentValue || cItem.firstChange)
+      this.prepareState(cItem.currentValue);
       this.refresh(true).subscribe();
     }
   }
