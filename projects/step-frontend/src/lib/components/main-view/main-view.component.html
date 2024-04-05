@@ -9,6 +9,9 @@
           @for (item of navBarRightMenuItems; track item.id) {
             <step-dashlet [itemKey]="item.template" />
           }
+          <a class="icon-bookmark" (click)="addBookmark()">
+            <step-icon [matTooltip]="'Bookmark this view'" name="bookmark" />
+          </a>
           <a href="#" (click)="(false)" [matMenuTriggerFor]="sessionMenu">
             <step-icon name="user" />
             @if (_authService.context$ | async; as ctx) {
