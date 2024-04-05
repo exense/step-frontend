@@ -22,13 +22,11 @@
         <step-alert [type]="AlertType.INFO" class="auto-scaling-status">
           <div>Auto scaling status</div>
           <div>{{ autoscalingStatus?.statusDescription }}</div>
-          @if (autoscalingStatus?.tokenCountStarted) {
-            <div>Token count started</div>
-            <div>{{ autoscalingStatus?.tokenCountStarted }}</div>
-          }
-          @if (autoscalingStatus?.tokenCountTarget) {
-            <div>Token count target</div>
-            <div>{{ autoscalingStatus?.tokenCountTarget }}</div>
+          @if (autoscalingStatus?.tokenCountStarted || autoscalingStatus?.tokenCountTarget) {
+            <div>Progress:</div>
+            <div>
+              {{ autoscalingStatus?.tokenCountStarted }} / {{ autoscalingStatus?.tokenCountTarget }} agent token started
+            </div>
           }
         </step-alert>
       }
