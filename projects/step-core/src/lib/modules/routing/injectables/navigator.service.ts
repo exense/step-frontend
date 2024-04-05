@@ -83,11 +83,11 @@ export class NavigatorService {
   }
 
   private navigateInCurrentView(link: string): void {
-    const segments = link.split('/');
     const hasInlineQueryParameters = link.includes('?');
     if (hasInlineQueryParameters) {
       this._router.navigateByUrl(link);
     } else {
+      const segments = link.split('/');
       const queryParams = this.prepareQueryParams();
       const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
       this._router.navigate(segments, { queryParams, queryParamsHandling });
