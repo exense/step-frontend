@@ -18,6 +18,7 @@
     [ngModel]="displayValue"
     (ngModelChange)="handleDisplayValueChange($event)"
     (blur)="handleBlur()"
+    [disabled]="!!isDisabled"
   />
   @if (separator) {
     <step-suffix>{{ separator }}</step-suffix>
@@ -27,6 +28,7 @@
       [ngModel]="internalDisplayMeasure"
       (ngModelChange)="handleDisplayMeasureChange($event)"
       (blur)="handleBlur()"
+      [disabled]="!!isDisabled"
     >
       @for (item of measureItems; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>
