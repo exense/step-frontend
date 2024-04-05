@@ -83,13 +83,13 @@ export class NavigatorService {
   }
 
   private navigateInCurrentView(link: string): void {
-    const queryParams = this.prepareQueryParams();
-    const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
     const segments = link.split('/');
-    const hasFilters = segments.some((el) => el.includes('?'));
-    if (hasFilters) {
+    const hasInlineQueryParameters = link.includes('?');
+    if (hasInlineQueryParameters) {
       this._router.navigateByUrl(link);
     } else {
+      const queryParams = this.prepareQueryParams();
+      const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
       this._router.navigate(segments, { queryParams, queryParamsHandling });
     }
   }
