@@ -73,7 +73,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
   }
 
   private getIconAndPage(link: string): Bookmark | undefined {
-    let firstDashIndex: undefined | number = link.indexOf('/');
+    let firstDashIndex: number | undefined = link.indexOf('/');
     let questionMarkIndex: number | undefined = link.indexOf('?');
 
     firstDashIndex = firstDashIndex === -1 ? undefined : firstDashIndex;
