@@ -1,6 +1,13 @@
 step-array-input {
   display: block;
 
+  input {
+    border: none;
+    padding: 0 !important;
+    margin: 0;
+    width: 100%;
+  }
+
   .mat-mdc-chip-list-wrapper {
     overflow: hidden;
     input.mat-mdc-input-element {
