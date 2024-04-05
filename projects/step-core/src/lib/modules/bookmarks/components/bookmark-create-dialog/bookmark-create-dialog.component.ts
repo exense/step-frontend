@@ -79,7 +79,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
     firstDashIndex = firstDashIndex === -1 ? undefined : firstDashIndex;
     questionMarkIndex = questionMarkIndex === -1 ? undefined : questionMarkIndex;
 
-    const prefix = link.slice(0, firstDashIndex ? firstDashIndex : questionMarkIndex);
+    const prefix = link.slice(0, firstDashIndex ?? questionMarkIndex);
 
     let iconAndPage;
     this._menuItems$.pipe(take(1)).subscribe((items) => {
