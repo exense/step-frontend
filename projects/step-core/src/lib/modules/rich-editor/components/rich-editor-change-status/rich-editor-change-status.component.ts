@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 })
 export class RichEditorChangeStatusComponent {
   /** @Input() **/
-  changStatus = input(RichEditorChangeStatus.NO_CHANGES);
+  changeStatus = input(RichEditorChangeStatus.NO_CHANGES);
 
   protected readonly RichEditorChangeStatus = RichEditorChangeStatus;
 }

@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DynamicFieldType } from '../shared/dynamic-field-type';
 
-const DENY_EXPRESSION_EDITOR_FOR = [
+const DENIED_FIELD_TYPES = [
   DynamicFieldType.NUMBER,
   DynamicFieldType.BOOLEAN,
   DynamicFieldType.ARRAY,
@@ -14,6 +14,6 @@ const DENY_EXPRESSION_EDITOR_FOR = [
 })
 export class DynamicFieldIsExpressionEditorAllowedPipe implements PipeTransform {
   transform(fieldType: DynamicFieldType): boolean {
-    return !DENY_EXPRESSION_EDITOR_FOR.includes(fieldType);
+    return !DENIED_FIELD_TYPES.includes(fieldType);
   }
 }
