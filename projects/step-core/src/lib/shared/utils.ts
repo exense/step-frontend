@@ -44,7 +44,7 @@ export const breadthFirstSearch = <T>({
 };
 
 export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
-  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
+  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage.toUpperCase()];
 };
 
 export const dynamicValueFactory = () => ({
