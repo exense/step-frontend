@@ -109,8 +109,9 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChange
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['timeRange']?.currentValue) {
-      this.handleTimeRangeChange({ selection: changes['timeRange'].currentValue, triggerRefresh: true });
+    const cTimeRange = changes['timeRange'];
+    if (!!cTimeRange?.currentValue && (cTimeRange?.currentValue !== cTimeRange?.previousValue || cTimeRange?.firstChange)) {
+      this.handleTimeRangeChange({ selection: cTimeRange.currentValue, triggerRefresh: true });
     }
   }
 
