@@ -16,6 +16,13 @@
             <step-label>Metric</step-label>
             <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" name="metricKey" />
           </step-form-field>
+          <step-form-field>
+            <step-label>Master Chart</step-label>
+            <mat-select [value]="masterDashlet" (valueChange)="handleMasterDashletChange($event)">
+              <mat-option [value]="undefined">-</mat-option>
+              <mat-option *ngFor="let dashlet of tableDashlets" [value]="dashlet.id">{{ dashlet.name }}</mat-option>
+            </mat-select>
+          </step-form-field>
         </div>
         <mat-divider />
         <div>
@@ -79,8 +86,8 @@
         </div>
         <mat-divider />
 
-        <div class="section">
-          <div class="title">Filters</div>
+        <div>
+          <step-label>Filters and grouping</step-label>
           <div class="filters-container">
             <step-ts-filter-bar-item
               *ngFor="let item of filterItems; let i = index"
@@ -105,7 +112,7 @@
           </mat-menu>
         </div>
 
-        <div class="form-row section">
+        <div class="form-row">
           <div>
             <step-form-field>
               <mat-checkbox
@@ -172,7 +179,8 @@
             </mat-option>
           </mat-select>
         </step-form-field>
-
+        <mat-divider />
+        <step-label>Visual settings</step-label>
         <div class="form-row">
           <step-form-field>
             <step-label>Chart width</step-label>

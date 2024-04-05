@@ -173,13 +173,13 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   onAllSeriesCheckboxClick() {}
 
   onKeywordToggle(entry: TableEntry, selected: boolean) {
-    if (this.item.syncKey) {
-      if (selected) {
-        this.context.getSyncGroup(this.item.syncKey).showSeries([entry.name]);
-      } else {
-        this.context.getSyncGroup(this.item.syncKey).hideSeries([entry.name]);
-      }
-    }
+    // if (this.item.syncKey) {
+    //   if (selected) {
+    //     this.context.getSyncGroup(this.item.syncKey).showSeries([entry.name]);
+    //   } else {
+    //     this.context.getSyncGroup(this.item.syncKey).hideSeries([entry.name]);
+    //   }
+    // }
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {
@@ -228,6 +228,10 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
       .map((x) => (x ? x : '<empty>'))
       .join(' | ');
   }
+
+  hideSeries(key: string): void {}
+
+  showSeries(key: string): void {}
 }
 
 interface TableColumn {

@@ -2,12 +2,19 @@ import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/cor
 import { AggregatorType, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
-import { COMMON_IMPORTS, FilterBarItem, FilterBarItemType, FilterUtils } from '../../modules/_common';
+import {
+  COMMON_IMPORTS,
+  FilterBarItem,
+  FilterBarItemType,
+  FilterUtils,
+  TimeSeriesContext,
+} from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
+  context: TimeSeriesContext;
 }
 
 @Component({
@@ -46,13 +53,25 @@ export class ChartDashletSettingsComponent implements OnInit {
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
 
+  tableDashlets: DashboardItem[] = [];
+  masterDashlet?: DashboardItem;
+
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
+    this.tableDashlets = this._inputData.context.getDashlets().filter((i) => i.type === 'TABLE');
+    if (this.item.masterChartId) {
+      this.masterDashlet = this.tableDashlets.find((d) => d.id === this.item.masterChartId);
+    }
     this.item.chartSettings!.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
     this.filterItems = this.item.chartSettings!.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
+  }
+
+  handleMasterDashletChange(dashlet: DashboardItem) {
+    this.item.masterChartId = dashlet?.id;
+    this.masterDashlet = dashlet;
   }
 
   private fetchMetricTypes() {
@@ -93,6 +112,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
+    console.log(this.item);
     if (this.formContainer.invalid) {
       this.formContainer.form.markAllAsTouched();
       return;

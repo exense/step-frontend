@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 div[step-modal-window-body] > form {
   @include core.common-dialog-content;
@@ -15,8 +16,8 @@ div[step-modal-window-body] > form {
 }
 
 .help-icon {
-  margin-left: 0.2rem;
-  transform: scale(0.9);
+  margin-left: 0.4rem;
+  transform: scale(0.8);
 }
 
 .option-with-icon {
@@ -52,4 +53,6 @@ div[step-modal-window-body] > form {
   display: flex;
   flex-direction: row;
   gap: 1rem;
+  margin-top: 1rem;
+  background: var.$gray-50;
 }

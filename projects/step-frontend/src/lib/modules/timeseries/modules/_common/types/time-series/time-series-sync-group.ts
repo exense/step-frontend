@@ -2,7 +2,7 @@ import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { Observable, Subject } from 'rxjs';
 
 export class TimeSeriesSyncGroup {
-  readonly id: string;
+  readonly id: string; // usually the id of the master chart
 
   seriesVisibility: Record<string, boolean> = {};
 

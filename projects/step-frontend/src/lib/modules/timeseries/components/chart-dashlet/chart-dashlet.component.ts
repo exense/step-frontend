@@ -55,6 +55,13 @@ interface MetricAttributeSelection extends MetricAttribute {
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class ChartDashletComponent implements ChartDashlet, OnInit {
+  showSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+  hideSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -96,22 +103,22 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
     }
     this.prepareState(this.item);
     this.fetchDataAndCreateChart().subscribe();
-    if (this.item.syncKey) {
-      const syncGroup = this.context.getSyncGroup(this.item.syncKey);
-      syncGroup.onSeriesHide().subscribe((series) => {
-        console.log('series hide');
-        series.forEach((s) => this.chart!.hideSeries(s));
-      });
-      syncGroup.onSeriesShow().subscribe((series) => {
-        console.log('series show');
-        series.forEach((s) => this.chart!.showSeries(s));
-      });
-    }
+    // if (this.item.syncKey) {
+    //   const syncGroup = this.context.getSyncGroup(this.item.syncKey);
+    //   syncGroup.onSeriesHide().subscribe((series) => {
+    //     console.log('series hide');
+    //     series.forEach((s) => this.chart!.hideSeries(s));
+    //   });
+    //   syncGroup.onSeriesShow().subscribe((series) => {
+    //     console.log('series show');
+    //     series.forEach((s) => this.chart!.showSeries(s));
+    //   });
+    // }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue || cItem.firstChange) {
+    if (cItem?.previousValue !== cItem?.currentValue || cItem?.firstChange) {
       this.prepareState(cItem.currentValue);
       this.refresh(true).subscribe();
     }
@@ -188,7 +195,7 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
 
   openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item } })
+      .open(ChartDashletSettingsComponent, { data: { item: this.item, context: this.context } })
       .afterClosed()
       .subscribe((updatedItem) => {
         if (updatedItem) {

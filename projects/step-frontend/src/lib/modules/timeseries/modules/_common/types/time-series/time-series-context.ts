@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
-import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
+import { DashboardItem, Execution, MetricAttribute, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';
@@ -54,10 +54,13 @@ export class TimeSeriesContext {
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
-  private syncGroups: Record<string, TimeSeriesSyncGroup> = {};
+  private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
+
+  private dashlets: DashboardItem[];
 
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
+    this.dashlets = params.dashlets;
     params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
@@ -97,6 +100,10 @@ export class TimeSeriesContext {
     ) as Observable<void>;
   }
 
+  getDashlets(): DashboardItem[] {
+    return this.dashlets;
+  }
+
   destroy(): void {
     this.inProgress$.complete();
     this.fullTimeRangeChange$.complete();
@@ -113,9 +120,10 @@ export class TimeSeriesContext {
   }
 
   getSyncGroup(key: string): TimeSeriesSyncGroup {
-    const syncGroup = this.syncGroups[key];
+    let syncGroup = this.syncGroups[key];
     if (!syncGroup) {
-      throw new Error('Sync group not found: ' + key);
+      this.syncGroups[key] = syncGroup = new TimeSeriesSyncGroup(key);
+      // throw new Error('Sync group not found: ' + key);
     }
     return syncGroup;
   }

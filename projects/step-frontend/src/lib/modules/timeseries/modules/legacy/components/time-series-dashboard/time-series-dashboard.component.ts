@@ -82,6 +82,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.filterOptions = this.prepareFilterOptions(this.filterItems, this.settings);
     const contextParams: TimeSeriesContextParams = {
       id: this.settings.contextId,
+      dashlets: [],
       timeRange: this.settings.timeRange,
       filters: this.filterItems,
       grouping: this.settings.grouping || ['name'],
@@ -298,6 +299,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.compareModeFilterItems = this.prepareFiltersForCompareMode();
     const timeRange = JSON.parse(JSON.stringify(this.context.getFullTimeRange()));
     const compareContext = this._contextsFactory.createContext({
+      dashlets: [],
       timeRange: timeRange,
       id: new Date().getTime().toString(),
       grouping: this.context.getGroupDimensions(),

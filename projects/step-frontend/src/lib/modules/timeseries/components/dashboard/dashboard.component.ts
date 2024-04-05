@@ -7,6 +7,7 @@ import {
   DashboardView,
   MetricAttribute,
   MetricType,
+  TableSettings,
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
@@ -91,6 +92,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   hasWritePermission = false;
 
+  tableDashlets: Record<string, DashboardItem> = {}; // used for master references
+
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
     this.resolution = pageParams.resolution;
@@ -103,6 +106,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
+        this.tableDashlets = {};
+        this.dashboard.dashlets.filter((i) => i.type === 'TABLE').forEach((i) => (this.tableDashlets[i.id] = i));
         this.refreshInterval = pageParams.refreshInterval || this.dashboard.refreshInterval || 0;
         this.resolution = pageParams.resolution || this.dashboard.resolution;
         pageParams.resolution = this.resolution;
@@ -196,7 +201,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   saveEditChanges() {
-    this.dashboard.dashlets.forEach((d) => (d.syncKey = '1'));
     this.editMode = false;
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
@@ -213,7 +217,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addTableDashlet() {
-    this.dashboard.dashlets.push({
+    let tableItem = {
+      id: 'table-' + new Date().getTime(),
       type: 'TABLE',
       name: 'Table dashlet',
       size: 2,
@@ -234,11 +239,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ],
         filters: [],
       },
-    });
+    } as DashboardItem;
+    this.tableDashlets[tableItem.id] = tableItem;
+    this.dashboard.dashlets.push(tableItem);
   }
 
   addChartDashlet(metric: MetricType) {
     const newDashlet: DashboardItem = {
+      id: 'chart-' + new Date().getTime(),
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
@@ -278,53 +286,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private convertUrlFilters(
-    urlParams: DashboardUrlParams,
-    attributesDefinition: Record<string, MetricAttribute>,
-  ): FilterBarItem[] {
-    return urlParams.filters
-      .filter((i) => !!attributesDefinition[i.attribute])
-      .map((urlFilter) => {
-        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
-        switch (filterItem.type) {
-          case FilterBarItemType.OPTIONS:
-            urlFilter.values?.forEach((v) => {
-              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
-              if (foundOptions) {
-                foundOptions.isSelected = true;
-              } else {
-                filterItem.textValues?.push({ value: v, isSelected: true });
-              }
-            });
-            filterItem.exactMatch = true;
-            break;
-          case FilterBarItemType.FREE_TEXT:
-            filterItem.freeTextValues = urlFilter.values;
-            break;
-          case FilterBarItemType.EXECUTION:
-          case FilterBarItemType.TASK:
-          case FilterBarItemType.PLAN:
-            filterItem.exactMatch = true;
-            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
-            break;
-          case FilterBarItemType.NUMERIC:
-          case FilterBarItemType.DATE:
-            filterItem.min = urlFilter.min;
-            filterItem.max = urlFilter.max;
-            break;
-        }
-        return filterItem;
-      });
-  }
-
-  prepareSyncGroups(items: DashboardItem[]): TimeSeriesSyncGroup[] {
-    const groupIds = new Set<string>();
-    items.filter((i) => i.syncKey).forEach((i) => groupIds.add(i.syncKey!));
-    return Array.from(groupIds).map((id) => new TimeSeriesSyncGroup(id));
-  }
-
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
-    let syncGroups = this.prepareSyncGroups(dashboard.dashlets);
     const timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
     if (timeRangeSelection.type === 'RELATIVE') {
@@ -356,12 +318,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
+      dashlets: this.dashboard.dashlets,
       timeRange: timeRange,
       attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filters: [...urlFilters, ...dashboardFilters],
       resolution: urlParams.resolution,
-      syncGroups: syncGroups,
     });
   }
 
@@ -412,7 +374,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleChartDelete(index: number) {
+    const itemToDelete = this.dashboard.dashlets[index];
     this.dashboard.dashlets.splice(index, 1);
+    delete this.tableDashlets[itemToDelete.id];
     this.context.updateAttributes(this.collectAllAttributes());
   }
 
