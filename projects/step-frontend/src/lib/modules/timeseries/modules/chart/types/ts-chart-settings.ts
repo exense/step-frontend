@@ -8,7 +8,6 @@ export interface TSChartSettings {
   cursor?: Cursor; // cursor related settings and events
   showExecutionsLinks?: boolean;
   series: TSChartSeries[];
-  scales?: Scale[];
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
   tooltipOptions: TsTooltipOptions;

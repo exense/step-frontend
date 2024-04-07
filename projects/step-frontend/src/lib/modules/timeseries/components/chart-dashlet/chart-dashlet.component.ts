@@ -240,7 +240,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
-        scale: '2',
+        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
         side: 1,
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
@@ -253,10 +253,8 @@ export class ChartDashletComponent implements OnInit, OnChanges {
         grid: { show: false },
       });
       series.unshift({
-        scale: '2',
-        label: 'Total',
+        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
         labelItems: ['Total'],
-        legendName: 'Total',
         id: 'total',
         data: secondaryAxesData,
         value: (x, v: number) => Math.trunc(v) + ' total',
@@ -272,6 +270,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
       series: series,
       tooltipOptions: {
         enabled: true,
+        zAxisLabel: this.getSecondAxesLabel(),
         yAxisUnit: yAxesUnit,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
@@ -310,6 +309,18 @@ export class ChartDashletComponent implements OnInit, OnChanges {
           break;
       }
     });
+  }
+
+  private getSecondAxesLabel(): string | undefined {
+    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
+    switch (aggregation) {
+      case ChartAggregation.RATE:
+        return 'Total Hits/h';
+      case ChartAggregation.PERCENTILE:
+        return 'Total PCL ' + this.item.chartSettings!.secondaryAxes!.pclValue;
+      default:
+        return 'Total ' + aggregation;
+    }
   }
 
   private getChartTitle(): string {
