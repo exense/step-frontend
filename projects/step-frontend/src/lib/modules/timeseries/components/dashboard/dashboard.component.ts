@@ -250,11 +250,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       name: metric.displayName!,
       type: 'CHART',
       size: 1,
+      metricKey: metric.name!,
       chartSettings: {
         filters: [],
-        metricKey: metric.name!,
-        inheritGlobalFilters: true,
-        inheritGlobalGrouping: true,
         grouping: metric.defaultGroupingAttributes || [],
         attributes: metric.attributes || [],
         readonlyAggregate: false,

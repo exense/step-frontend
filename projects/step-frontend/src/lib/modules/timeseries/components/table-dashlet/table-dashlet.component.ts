@@ -24,6 +24,9 @@ import { TsComparePercentagePipe } from '../../modules/legacy/pipes/ts-compare-p
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
+import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
+import { MatDialog } from '@angular/material/dialog';
+import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 
 interface TableEntry {
   name: string;
@@ -61,6 +64,7 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   @Output() shiftRight = new EventEmitter();
 
   private _timeSeriesService = inject(TimeSeriesService);
+  private _matDialog = inject(MatDialog);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableDataSource<TableEntry> | undefined;
@@ -180,6 +184,18 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
     //     this.context.getSyncGroup(this.item.syncKey).hideSeries([entry.name]);
     //   }
     // }
+  }
+
+  openSettings(): void {
+    this._matDialog
+      .open(TableDashletSettingsComponent, { data: { item: this.item, context: this.context } })
+      .afterClosed()
+      .subscribe((updatedItem) => {
+        if (updatedItem) {
+          Object.assign(this.item, updatedItem);
+          this.refresh(true).subscribe();
+        }
+      });
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {

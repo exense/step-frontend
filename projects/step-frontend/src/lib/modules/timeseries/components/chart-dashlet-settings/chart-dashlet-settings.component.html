@@ -1,117 +1,64 @@
 <step-modal-window title="Chart settings" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <form #formContainer="ngForm">
-      <ng-container *ngIf="item">
+    <form #formContainer="ngForm" *ngIf="item">
+      <div class="form-row">
         <step-form-field [showRequiredMarker]="true">
           <step-label>Name</step-label>
           <input placeholder="Dashlet name" [(ngModel)]="item.name" name="name" required />
         </step-form-field>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Type</step-label>
-            <input disabled placeholder="Type" [value]="item.type" name="type" />
-          </step-form-field>
+        <step-form-field>
+          <step-label
+            >Master Chart
+            <step-icon
+              class="help-icon"
+              matTooltip="The chart will inherit filters, grouping and will stay in sync with the master chart."
+              name="help-circle"
+            ></step-icon>
+          </step-label>
+          <mat-select [(ngModel)]="item.masterChartId" name="masterChartId">
+            <mat-option [value]="undefined">-</mat-option>
+            <mat-option *ngFor="let dashlet of tableDashlets" [value]="dashlet.id">{{ dashlet.name }}</mat-option>
+          </mat-select>
+        </step-form-field>
+      </div>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Type</step-label>
+          <input disabled placeholder="Type" [value]="item.type" name="type" />
+        </step-form-field>
 
-          <step-form-field>
-            <step-label>Metric</step-label>
-            <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" name="metricKey" />
-          </step-form-field>
-          <step-form-field>
-            <step-label>Master Chart</step-label>
-            <mat-select [value]="masterDashlet" (valueChange)="handleMasterDashletChange($event)">
-              <mat-option [value]="undefined">-</mat-option>
-              <mat-option *ngFor="let dashlet of tableDashlets" [value]="dashlet.id">{{ dashlet.name }}</mat-option>
-            </mat-select>
-          </step-form-field>
+        <step-form-field>
+          <step-label>Metric</step-label>
+          <input disabled placeholder="Metric" [value]="item.chartSettings!.metricKey" name="metricKey" />
+        </step-form-field>
+      </div>
+      <mat-divider />
+      <div>
+        <step-label>Filters and grouping</step-label>
+      </div>
+      @if (!item?.masterChartId) {
+        <div class="filters-container">
+          <step-ts-filter-bar-item
+            *ngFor="let item of filterItems; let i = index"
+            [item]="item"
+            (removeItem)="filterItems.splice(i, 1)"
+            [removable]="true"
+            [updateTimeRangeOption]="false"
+          ></step-ts-filter-bar-item>
+          <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
         </div>
-        <mat-divider />
-        <div>
-          <step-label>Primary Axes</step-label>
-        </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Aggregate</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
-              <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
-            </mat-select>
-          </step-form-field>
-          @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          }
-          <step-form-field>
-            <step-label>Unit</step-label>
-            <input
-              placeholder="Series units, like 'ms', 'hrs', '%'"
-              name="unit"
-              [(ngModel)]="item.chartSettings!.primaryAxes.unit"
-            />
-          </step-form-field>
-        </div>
-        <mat-divider />
-        <div>
-          <step-label>Secondary Axes</step-label>
-        </div>
-        <div class="form-row">
-          <step-form-field>
-            <step-label>Aggregate</step-label>
-            <mat-select
-              [value]="item.chartSettings!.secondaryAxes?.aggregation"
-              (valueChange)="onSecondaryAggregateSelect($event)"
-            >
-              <mat-option [value]="undefined">-</mat-option>
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
-              }
-            </mat-select>
-          </step-form-field>
-          @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          } @else {
-            <div></div>
-          }
-        </div>
-        <mat-divider />
-
-        <div>
-          <step-label>Filters and grouping</step-label>
-          <div class="filters-container">
-            <step-ts-filter-bar-item
-              *ngFor="let item of filterItems; let i = index"
-              [item]="item"
-              (removeItem)="filterItems.splice(i, 1)"
-              [removable]="true"
-              [updateTimeRangeOption]="false"
-            ></step-ts-filter-bar-item>
-            <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
-          </div>
-          <mat-menu #typesMenu="matMenu">
-            <button
-              mat-menu-item
-              *ngFor="let attribute of item.chartSettings!.attributes"
-              (click)="addFilterItem(attribute)"
-            >
-              {{ attribute.displayName }}
-            </button>
-            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
-            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
-            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
-          </mat-menu>
-        </div>
-
+        <mat-menu #typesMenu="matMenu">
+          <button
+            mat-menu-item
+            *ngFor="let attribute of item.chartSettings!.attributes"
+            (click)="addFilterItem(attribute)"
+          >
+            {{ attribute.displayName }}
+          </button>
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
+        </mat-menu>
         <div class="form-row">
           <div>
             <step-form-field>
@@ -179,35 +126,97 @@
             </mat-option>
           </mat-select>
         </step-form-field>
-        <mat-divider />
-        <step-label>Visual settings</step-label>
-        <div class="form-row">
+      } @else {
+        <div class="info-txt">Settings inherited from the master chart</div>
+      }
+      <mat-divider />
+      <div>
+        <step-label>Primary Axes</step-label>
+      </div>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Aggregate</step-label>
+          <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
+            <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
+          </mat-select>
+        </step-form-field>
+        @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
           <step-form-field>
-            <step-label>Chart width</step-label>
-            <mat-select [(ngModel)]="item.size" name="size">
-              <mat-option [value]="1">50%</mat-option>
-              <mat-option [value]="2">100%</mat-option>
+            <step-label>Pcl. value</step-label>
+            <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">
+              @for (v of PCL_VALUES; track v) {
+                <mat-option [value]="v">{{ v }}th</mat-option>
+              }
             </mat-select>
           </step-form-field>
+        }
+        <step-form-field>
+          <step-label>Unit</step-label>
+          <input
+            placeholder="Series units, like 'ms', 'hrs', '%'"
+            name="unit"
+            [(ngModel)]="item.chartSettings!.primaryAxes.unit"
+          />
+        </step-form-field>
+      </div>
+      <mat-divider />
+      <div>
+        <step-label>Secondary Axes</step-label>
+      </div>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Aggregate</step-label>
+          <mat-select
+            [value]="item.chartSettings!.secondaryAxes?.aggregation"
+            (valueChange)="onSecondaryAggregateSelect($event)"
+          >
+            <mat-option [value]="undefined">-</mat-option>
+            @for (attr of AGGREGATE_TYPES; track attr) {
+              <mat-option [value]="attr">{{ attr }}</mat-option>
+            }
+          </mat-select>
+        </step-form-field>
+        @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
           <step-form-field>
-            <step-label>Chart display</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
-              <mat-option [value]="'LINE'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="trending-up"></step-icon>
-                  <span>Line chart</span>
-                </div>
-              </mat-option>
-              <mat-option [disabled]="true" [value]="'BAR_CHART'" class="option-with-icon">
-                <div class="inner">
-                  <step-icon name="bar-chart-2"></step-icon>
-                  <span>Bar chart</span>
-                </div>
-              </mat-option>
+            <step-label>Pcl. value</step-label>
+            <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
+              @for (v of PCL_VALUES; track v) {
+                <mat-option [value]="v">{{ v }}th</mat-option>
+              }
             </mat-select>
           </step-form-field>
-        </div>
-      </ng-container>
+        } @else {
+          <div></div>
+        }
+      </div>
+      <mat-divider />
+      <step-label>Visual settings</step-label>
+      <div class="form-row">
+        <step-form-field>
+          <step-label>Chart width</step-label>
+          <mat-select [(ngModel)]="item.size" name="size">
+            <mat-option [value]="1">50%</mat-option>
+            <mat-option [value]="2">100%</mat-option>
+          </mat-select>
+        </step-form-field>
+        <step-form-field>
+          <step-label>Chart display</step-label>
+          <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.displayType" name="displayType">
+            <mat-option [value]="'LINE'" class="option-with-icon">
+              <div class="inner">
+                <step-icon name="trending-up"></step-icon>
+                <span>Line chart</span>
+              </div>
+            </mat-option>
+            <mat-option [disabled]="true" [value]="'BAR_CHART'" class="option-with-icon">
+              <div class="inner">
+                <step-icon name="bar-chart-2"></step-icon>
+                <span>Bar chart</span>
+              </div>
+            </mat-option>
+          </mat-select>
+        </step-form-field>
+      </div>
     </form>
   </div>
 

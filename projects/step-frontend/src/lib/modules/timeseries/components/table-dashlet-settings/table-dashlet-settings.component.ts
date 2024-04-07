@@ -18,13 +18,13 @@ export interface ChartDashletSettingsData {
 }
 
 @Component({
-  selector: 'step-chart-dashlet-settings',
-  templateUrl: './chart-dashlet-settings.component.html',
-  styleUrls: ['./chart-dashlet-settings.component.scss'],
+  selector: 'step-table-dashlet-settings',
+  templateUrl: './table-dashlet-settings.component.html',
+  styleUrls: ['./table-dashlet-settings.component.scss'],
   standalone: true,
   imports: [COMMON_IMPORTS, FilterBarItemComponent],
 })
-export class ChartDashletSettingsComponent implements OnInit {
+export class TableDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
@@ -113,9 +113,5 @@ export class ChartDashletSettingsComponent implements OnInit {
       .map(FilterUtils.convertToApiFilterItem);
     this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
-  }
-
-  switchAggregate(aggregate: ChartAggregation) {
-    this.item.chartSettings!.primaryAxes.aggregation = aggregate;
   }
 }

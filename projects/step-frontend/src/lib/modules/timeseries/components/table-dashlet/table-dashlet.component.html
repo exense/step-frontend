@@ -7,7 +7,7 @@
       <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
         <step-icon name="chevron-right"></step-icon>
       </button>
-      <button mat-icon-button matTooltip="Columns" [matMenuTriggerFor]="columnsMenu">
+      <button mat-icon-button matTooltip="Columns" (click)="openSettings()">
         <step-icon name="edit"></step-icon>
       </button>
       <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
