@@ -251,12 +251,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       type: 'CHART',
       size: 1,
       metricKey: metric.name!,
+      filters: [],
+      grouping: metric.defaultGroupingAttributes || [],
+      attributes: metric.attributes || [],
+      readonlyAggregate: false,
+      readonlyGrouping: false,
+      inheritGlobalFilters: true,
+      inheritGlobalGrouping: false,
       chartSettings: {
-        filters: [],
-        grouping: metric.defaultGroupingAttributes || [],
-        attributes: metric.attributes || [],
-        readonlyAggregate: false,
-        readonlyGrouping: false,
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
           unit: metric.unit!,
@@ -266,7 +268,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
     };
     this.filterBar!.addUniqueFilterItems(
-      newDashlet.chartSettings!.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
+      newDashlet.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
     );
     this.dashboard.dashlets.push(newDashlet);
     this.context.updateAttributes(this.collectAllAttributes());
@@ -303,9 +305,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
-    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap(
-      (d) => d.chartSettings?.attributes || [],
-    );
+    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
@@ -421,7 +421,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   collectAllAttributes(): MetricAttribute[] {
-    return this.dashboard.dashlets.flatMap((d) => d.chartSettings!.attributes);
+    return this.dashboard.dashlets.flatMap((d) => d.attributes);
   }
 
   removeOneTimeUrlParams() {

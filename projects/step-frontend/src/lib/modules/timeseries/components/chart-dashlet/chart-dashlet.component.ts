@@ -103,17 +103,6 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
     }
     this.prepareState(this.item);
     this.fetchDataAndCreateChart().subscribe();
-    // if (this.item.syncKey) {
-    //   const syncGroup = this.context.getSyncGroup(this.item.syncKey);
-    //   syncGroup.onSeriesHide().subscribe((series) => {
-    //     console.log('series hide');
-    //     series.forEach((s) => this.chart!.hideSeries(s));
-    //   });
-    //   syncGroup.onSeriesShow().subscribe((series) => {
-    //     console.log('series show');
-    //     series.forEach((s) => this.chart!.showSeries(s));
-    //   });
-    // }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -125,7 +114,7 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
   }
 
   private prepareState(item: DashboardItem) {
-    item.chartSettings!.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
+    item.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
     this.groupingSelection = this.prepareGroupingAttributes(item);
     this.selectedAggregate = item.chartSettings!.primaryAxes!.aggregation as ChartAggregation;
     this.selectedPclValue = item.chartSettings!.primaryAxes!.pclValue;
@@ -135,10 +124,9 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
   }
 
   private prepareGroupingAttributes(item: DashboardItem): MetricAttributeSelection[] {
-    const settings = item.chartSettings!;
     const groupingSelection: MetricAttributeSelection[] =
-      settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-    settings.grouping?.forEach((a) => {
+      item.attributes?.map((a) => ({ ...a, selected: false })) || [];
+    item.grouping?.forEach((a) => {
       const foundAttribute = groupingSelection.find((attr) => attr.name === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
@@ -181,12 +169,12 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
       },
     ];
 
-    if (this.item.chartSettings!.inheritGlobalFilters) {
+    if (this.item.inheritGlobalFilters) {
       filterItems = [
         ...filterItems,
         ...FilterUtils.combineGlobalWithChartFilters(
           this.context.getFilteringSettings().filterItems,
-          this.item.chartSettings!.filters,
+          this.item.filters,
         ),
       ];
     }
@@ -341,13 +329,12 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
-    const settings = this.item.chartSettings!;
     const groupDimensions = this.getChartGrouping();
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: this.composeRequestFilter(settings.metricKey!),
+      oqlFilter: this.composeRequestFilter(this.item.metricKey!),
       percentiles: this.getRequiredPercentiles(),
     };
     const customResolution = this.context.getChartsResolution();
@@ -429,7 +416,7 @@ export class ChartDashletComponent implements ChartDashlet, OnInit {
   }
 
   private getChartGrouping(): string[] {
-    if (this.item!.chartSettings!.inheritGlobalGrouping) {
+    if (this.item!.inheritGlobalGrouping) {
       return this.context.getGroupDimensions();
     } else {
       return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
