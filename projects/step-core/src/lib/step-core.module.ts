@@ -65,6 +65,7 @@ import { PLAN_COMMON_EXPORTS } from './modules/plan-common';
 import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
+import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 
@@ -134,6 +135,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
   ],
   exports: [
@@ -196,6 +198,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     PLAN_COMMON_EXPORTS,
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
   ],
@@ -296,7 +299,6 @@ export * from './services/global-progress-spinner.service';
 export * from './services/http-interceptor-bridge.service';
 export * from './services/invoke-run.service';
 export * from './services/link-processor.service';
-export * from './services/menu-items-override-config.service';
 export * from './services/task-by-id-cache.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/artefact.service';
@@ -317,6 +319,7 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './modules/bookmarks';
 export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
