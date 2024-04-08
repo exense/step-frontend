@@ -20,10 +20,12 @@ import {
   NavigatorService,
   ViewRegistryService,
   ViewStateService,
+  BookmarkService,
+  MENU_ITEMS,
+  AugmentedBookmarksService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { MENU_ITEMS } from '../../injectables/menu-items';
-import { SubscriptionLike, combineLatest, map } from 'rxjs';
+import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -41,6 +43,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
+  private _bookmarkService = inject(BookmarkService);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
@@ -56,6 +59,25 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   );
 
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
+    map(([menuItems, dynamicMenuItems]) =>
+      menuItems.concat(
+        dynamicMenuItems!.map((element) => {
+          const menuEntry = {
+            title: element.customFields!['label'],
+            id: element.customFields!['link'],
+            icon: element.customFields!['icon'],
+            parentId: 'bookmarks-root',
+            weight: 1000 + dynamicMenuItems!.length,
+            isEnabledFct(): boolean {
+              return true;
+            },
+          };
+          return menuEntry;
+        }),
+      ),
+    ),
+  );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;

@@ -178,18 +178,16 @@ export class TimeRangePickerComponent implements OnInit {
     if (!date) {
       return;
     }
-    const utcDate = new Date(date?.toMillis()); // this is 00:00:00 in GMT
-    const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.fromDateString = TimeSeriesUtils.formatInputDate(localDate);
+    this.fromDateString = TimeSeriesUtils.formatInputDate(date.toJSDate());
   }
 
   setToDate(date?: DateTime | null) {
     if (!date) {
       return;
     }
-    const utcDate = new Date(date?.toMillis());
-    const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), 0, 0, 0);
-    this.toDateString = TimeSeriesUtils.formatInputDate(localDate);
+    let jsDate = date.toJSDate();
+    jsDate.setHours(23, 59, 59);
+    this.toDateString = TimeSeriesUtils.formatInputDate(jsDate);
   }
 
   formatTimeValue(value: number) {
