@@ -27,13 +27,7 @@
     </button>
   </div>
   <button
-    *ngIf="
-      !editMode &&
-      !(
-        (item.chartSettings?.readonlyGrouping || item.chartSettings?.inheritGlobalGrouping) &&
-        item.chartSettings?.readonlyAggregate
-      )
-    "
+    *ngIf="!editMode && !((item.readonlyGrouping || item.inheritGlobalGrouping) && item.readonlyAggregate)"
     mat-icon-button
     matTooltip="Settings"
     [matMenuTriggerFor]="settingsMenu"
@@ -43,15 +37,13 @@
 
   <mat-menu #settingsMenu="matMenu">
     <button
-      *ngIf="!item.chartSettings?.readonlyGrouping && !item.chartSettings?.inheritGlobalGrouping"
+      *ngIf="!item.readonlyGrouping && !item.inheritGlobalGrouping"
       mat-menu-item
       [matMenuTriggerFor]="groupingMenu"
     >
       Grouping
     </button>
-    <button *ngIf="!item.chartSettings?.readonlyAggregate" mat-menu-item [matMenuTriggerFor]="aggregateMenu">
-      Aggregate
-    </button>
+    <button *ngIf="!item.readonlyAggregate" mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
   </mat-menu>
 
   <mat-menu #groupingMenu="matMenu">

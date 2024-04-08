@@ -92,7 +92,7 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
         isVisible: column.selected,
         isCompareColumn: false,
         mapValue: ColumnsValueFunctions[column.column!],
-      };
+      } as TableColumn;
     });
     this.collectVisibleColumns();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
@@ -132,14 +132,14 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
       attributeName: 'metricType',
       type: FilterBarItemType.FREE_TEXT,
       exactMatch: true,
-      freeTextValues: [`"${this.settings.metricKey}"`],
+      freeTextValues: [`"${this.item.metricKey}"`],
       searchEntities: [],
     };
     return [metricItem, ...this.context.getFilteringSettings().filterItems];
   }
 
   refresh(blur?: boolean): Observable<any> {
-    throw new Error('Method not implemented.');
+    return this.fetchDataAndCreateTable();
   }
 
   private createTable(response: TimeSeriesAPIResponse) {

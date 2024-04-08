@@ -5,6 +5,7 @@ export const $ColumnSelection = {
   properties: {
     column: {
       type: 'Enum',
+      isRequired: true,
     },
     selected: {
       type: 'boolean',

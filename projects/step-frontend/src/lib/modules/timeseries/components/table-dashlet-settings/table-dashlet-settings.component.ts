@@ -62,8 +62,8 @@ export class TableDashletSettingsComponent implements OnInit {
     if (this.item.masterChartId) {
       this.masterDashlet = this.tableDashlets.find((d) => d.id === this.item.masterChartId);
     }
-    this.item.chartSettings!.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
-    this.filterItems = this.item.chartSettings!.filters.map((item) => {
+    this.item.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
+    this.filterItems = this.item.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
@@ -108,10 +108,8 @@ export class TableDashletSettingsComponent implements OnInit {
       this.formContainer.form.markAllAsTouched();
       return;
     }
-    this.item.chartSettings!.filters = this.filterItems
-      .filter(FilterUtils.filterItemIsValid)
-      .map(FilterUtils.convertToApiFilterItem);
-    this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
+    this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
+    this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }
 }

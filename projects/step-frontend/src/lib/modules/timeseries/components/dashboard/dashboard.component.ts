@@ -217,14 +217,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   addTableDashlet() {
-    let tableItem = {
+    let tableItem: DashboardItem = {
       id: 'table-' + new Date().getTime(),
       type: 'TABLE',
       name: 'Table dashlet',
+      attributes: [],
+      grouping: [],
+      metricKey: 'response-time',
+      filters: [],
       size: 2,
+      inheritGlobalGrouping: false,
+      inheritGlobalFilters: false,
+      readonlyAggregate: true,
+      readonlyGrouping: true,
       tableSettings: {
-        attributes: [],
-        metricKey: 'response-time',
         columns: [
           { column: TableColumnType.COUNT, selected: true },
           { column: TableColumnType.SUM, selected: true },
@@ -237,9 +243,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           { column: TableColumnType.TPS, selected: true },
           { column: TableColumnType.TPH, selected: true },
         ],
-        filters: [],
       },
-    } as DashboardItem;
+    };
     this.tableDashlets[tableItem.id] = tableItem;
     this.dashboard.dashlets.push(tableItem);
   }
