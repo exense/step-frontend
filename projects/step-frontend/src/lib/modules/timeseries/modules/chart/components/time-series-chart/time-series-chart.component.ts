@@ -138,8 +138,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       };
     }
 
-    settings.axes.forEach((a) => console.log(a.scale));
-
     if (settings.axes.length > 1) {
       this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
     } else {

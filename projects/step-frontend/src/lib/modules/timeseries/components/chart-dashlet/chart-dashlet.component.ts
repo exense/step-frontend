@@ -99,7 +99,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue || cItem.firstChange) {
+    if (cItem?.previousValue !== cItem?.currentValue || cItem?.firstChange) {
       this.prepareState(cItem.currentValue);
       this.refresh(true).subscribe();
     }
@@ -316,10 +316,8 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     switch (aggregation) {
       case ChartAggregation.RATE:
         return 'Total Hits/h';
-      case ChartAggregation.PERCENTILE:
-        return 'Total PCL ' + this.item.chartSettings!.secondaryAxes!.pclValue;
       default:
-        return 'Total ' + aggregation;
+        return 'Overall ' + aggregation;
     }
   }
 

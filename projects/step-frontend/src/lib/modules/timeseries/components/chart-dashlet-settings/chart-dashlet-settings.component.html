@@ -59,9 +59,8 @@
               (valueChange)="onSecondaryAggregateSelect($event)"
             >
               <mat-option [value]="undefined">-</mat-option>
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
-              }
+              <mat-option [value]="ChartAggregation.RATE">RATE</mat-option>
+              <mat-option [value]="ChartAggregation.COUNT">COUNT</mat-option>
             </mat-select>
           </step-form-field>
           @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
