@@ -29,6 +29,9 @@ type StatusItem = KeyValue<string, string>;
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedSchedulerService.TASKS_TABLE_ID,
+      /*
+      entityScreenId: 'executionParameters'
+*/
     }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
