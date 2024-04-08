@@ -54,7 +54,7 @@ interface MetricAttributeSelection extends MetricAttribute {
   standalone: true,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
-export class ChartDashletComponent implements ChartDashlet, OnInit {
+export class ChartDashletComponent extends ChartDashlet implements OnInit {
   showSeries(key: string): void {
     throw new Error('Method not implemented.');
   }

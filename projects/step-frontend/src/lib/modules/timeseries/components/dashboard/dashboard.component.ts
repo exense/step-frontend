@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import {
   AugmentedTimeSeriesService,
   AuthService,
@@ -38,28 +38,27 @@ import {
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
-
-type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-
-interface MetricAttributeSelection extends MetricAttribute {
-  selected: boolean;
-}
-
-const EDIT_PARAM_NAME = 'edit';
+import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 
 @Component({
   selector: 'step-dashboard-page',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  providers: [DashboardUrlParamsService],
+  providers: [
+    DashboardUrlParamsService,
+    {
+      provide: ChartDashlet,
+      useExisting: [ChartDashletComponent, TableDashletComponent],
+      multi: true,
+    },
+  ],
   imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, TableDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
-  @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
+  @ViewChildren(ChartDashlet) dashlets!: QueryList<ChartDashlet>;
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
@@ -366,6 +365,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         tap(() => (this.refreshInProgress = true)),
         switchMap(() => {
           const dashlets$ = this.dashlets?.map((dashlet) => dashlet.refresh());
+          console.log(this.dashlets);
           if (refreshRanger) {
             dashlets$.push(this.refreshRanger());
           }

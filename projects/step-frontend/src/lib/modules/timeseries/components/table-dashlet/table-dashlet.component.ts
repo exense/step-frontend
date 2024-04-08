@@ -4,6 +4,7 @@ import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
+  TimeSeriesConfig,
   TimeSeriesContext,
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
@@ -54,7 +55,7 @@ interface TableEntry {
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe],
 })
-export class TableDashletComponent implements ChartDashlet, OnInit {
+export class TableDashletComponent extends ChartDashlet implements OnInit {
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
@@ -111,7 +112,7 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   }
 
   private fetchDataAndCreateTable(): Observable<TimeSeriesAPIResponse> {
-    const groupDimensions = this.context.getGroupDimensions();
+    const groupDimensions = this.item.inheritGlobalGrouping ? this.context.getGroupDimensions() : this.item.grouping;
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
@@ -139,6 +140,7 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
   }
 
   refresh(blur?: boolean): Observable<any> {
+    console.log('refresh');
     return this.fetchDataAndCreateTable();
   }
 
@@ -236,12 +238,12 @@ export class TableDashletComponent implements ChartDashlet, OnInit {
 
   private getSeriesKey(attributes: BucketAttributes) {
     if (Object.keys(attributes).length === 0) {
-      return '<empty>';
+      return TimeSeriesConfig.SERIES_LABEL_EMPTY;
     }
     return this.context
       .getGroupDimensions()
       .map((field) => attributes[field])
-      .map((x) => (x ? x : '<empty>'))
+      .map((x) => (x ? x : TimeSeriesConfig.SERIES_LABEL_EMPTY))
       .join(' | ');
   }
 

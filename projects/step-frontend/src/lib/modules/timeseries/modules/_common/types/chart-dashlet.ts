@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 
-export interface ChartDashlet {
-  refresh(blur?: boolean): Observable<any>;
+export abstract class ChartDashlet {
+  abstract refresh(blur?: boolean): Observable<any>;
 
-  showSeries(key: string): void;
+  abstract showSeries(key: string): void;
 
-  hideSeries(key: string): void;
+  abstract hideSeries(key: string): void;
 }
