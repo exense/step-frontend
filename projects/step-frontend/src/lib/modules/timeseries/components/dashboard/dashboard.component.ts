@@ -194,7 +194,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   saveEditChanges() {
     this.editMode = false;
-    console.log(this.dashboard);
     this.dashboard.grouping = this.context.getGroupDimensions();
     this.dashboard.timeRange = this.timeRangeSelection;
     this.dashboard.refreshInterval = this.refreshInterval;
