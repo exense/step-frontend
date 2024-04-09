@@ -54,6 +54,7 @@ import { ConfirmationDialogComponent } from './components/confirmation-dialog/co
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
+import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -109,6 +110,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     AlertsContainerComponent,
     InputModelFormatterDirective,
     ProjectNamePipe,
+    GetObjectFieldPipe,
   ],
   exports: [
     CommonModule,
@@ -167,6 +169,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
     AlertsContainerComponent,
     InputModelFormatterDirective,
     ProjectNamePipe,
+    GetObjectFieldPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -262,6 +265,7 @@ export * from './directives/input-model-formatter.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
+export * from './pipes/get-object-field.pipe';
 export * from './pipes/project-name.pipe';
 export * from './components/description-hint/description-hint.component';
 export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';

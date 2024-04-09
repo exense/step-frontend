@@ -6,6 +6,7 @@ import { TableApiWrapperService } from '../../../client/table/step-table-client.
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
 import { map, Observable, of } from 'rxjs';
 import { ColumnInfo } from '../types/column-info';
+import { CustomCellApplySubPathPipe } from '../pipe/custom-cell-apply-sub-path.pipe';
 
 enum VisibilityState {
   HIDDEN,
@@ -25,6 +26,7 @@ export class TableColumnsService {
 
   readonly hasConfig = !!this._columnsConfig;
   readonly remoteColumnsScreenId = this._columnsConfig?.entityScreenId;
+  readonly entityScreenSubPath = this._columnsConfig?.entityScreenSubPath;
 
   private hasChangesInternal = signal(false);
 
@@ -165,7 +167,7 @@ export class TableColumnsService {
 
   private createScreenInputColumnSettings(screenInput: ScreenInput, position: number): ScreenInputColumnSettings {
     return {
-      columnId: screenInput.input!.id,
+      columnId: CustomCellApplySubPathPipe.transform(screenInput.input!.id!, this.entityScreenSubPath),
       position,
       visible: false,
       type: 'step.plugins.table.settings.ScreenInputColumnSettings',

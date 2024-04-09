@@ -22,9 +22,8 @@ import { BehaviorSubject, of, switchMap } from 'rxjs';
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
-      /*
-      entityScreenId: 'executionParameters'
-*/
+      entityScreenId: 'executionParameters',
+      entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),

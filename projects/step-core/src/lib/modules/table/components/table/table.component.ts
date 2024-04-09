@@ -52,7 +52,6 @@ import { CustomColumnsComponent } from '../custom-columns/custom-columns.compone
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
-import { DragColumnCaptionComponent } from '../drag-column-caption/drag-column-caption.component';
 import { ColumnInfo } from '../../types/column-info';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;

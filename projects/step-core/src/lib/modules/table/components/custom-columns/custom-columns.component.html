@@ -1,13 +1,17 @@
 @for (col of displayColumns(); track col.input!.id!) {
   <ng-container
-    [matColumnDef]="col.input!.id!"
+    [matColumnDef]="col.input!.id! | customCellApplySubPath: entitySubPath"
     [stepActivityCol]="col.input!.label!"
     internal
     stepSearchCol
     [isSearchDisabled]="isSearchDisabled"
   >
     @if (col.input! | customSearchCellComponent; as customSearchCellKey) {
-      <step-search-custom-cell *stepSearchCellDef [itemKey]="customSearchCellKey" [context]="col.input!" />
+      <step-search-custom-cell
+        *stepSearchCellDef
+        [itemKey]="customSearchCellKey"
+        [context]="col.input! | customCellColInput: entitySubPath"
+      />
     }
     <th mat-header-cell *matHeaderCellDef mat-sort-header>
       <step-drag-column-caption>{{ col.input!.label }}</step-drag-column-caption>
@@ -19,11 +23,11 @@
       @if (col.input! | customCellComponents; as customCellKeys) {
         <div class="custom-cell-container">
           @for (cellKey of customCellKeys; track cellKey) {
-            <step-custom-cell [itemKey]="cellKey" [context]="element" />
+            <step-custom-cell [itemKey]="cellKey" [context]="element | getObjectField: entitySubPath" />
           }
         </div>
       } @else {
-        {{ element | customCellValue: col.input!.id! }}
+        {{ $any(element | getObjectField: entitySubPath) | getObjectField: col.input!.id! }}
       }
     </td>
   </ng-container>

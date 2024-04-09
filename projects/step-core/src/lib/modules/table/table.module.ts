@@ -9,12 +9,10 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '../../client/table/step-table-client.module';
 import { CustomColumnsComponent } from './components/custom-columns/custom-columns.component';
-import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
 import {
   CustomRegistriesModule,
   CustomSearchCellRegistryService,
-  DashletRegistryService,
 } from '../custom-registeries/custom-registries.module';
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 import { AdditionalHeaderDirective } from './directives/additional-header.directive';
@@ -46,6 +44,8 @@ import { ActivityColDirective } from './directives/activity-col.directive';
 import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
 import { ColumnSettingsSaveDashletComponent } from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 import { ActionColDirective } from './directives/action-col.directive';
+import { CustomCellColInputPipe } from './pipe/custom-cell-col-input.pipe';
+import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pipe';
 
 @NgModule({
   imports: [
@@ -66,7 +66,6 @@ import { ActionColDirective } from './directives/action-col.directive';
     SearchColDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
-    CustomCellValuePipe,
     ColumnDirective,
     CustomCellComponentsPipe,
     AdditionalHeaderDirective,
@@ -86,6 +85,8 @@ import { ActionColDirective } from './directives/action-col.directive';
     ActionColDirective,
     HeaderCellContainerComponent,
     ColumnSettingsSaveDashletComponent,
+    CustomCellColInputPipe,
+    CustomCellApplySubPathPipe,
   ],
   exports: [
     TableComponent,

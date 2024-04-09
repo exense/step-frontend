@@ -70,12 +70,6 @@
       </th>
       <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
     </ng-container>
-    <ng-container matColumnDef="executionParameters.customParameters.env" stepActivityCol="Environment" stepSearchCol>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <step-drag-column-caption>Environment</step-drag-column-caption>
-      </th>
-      <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.customParameters?.['env'] }}</td>
-    </ng-container>
     <ng-container matColumnDef="status" stepActivityCol="Status" stepSearchCol>
       <step-array-filter-advanced
         *stepSearchCellDef

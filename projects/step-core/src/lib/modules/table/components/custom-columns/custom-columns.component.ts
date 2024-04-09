@@ -50,6 +50,8 @@ export class CustomColumnsComponent
   readonly columnsReady$ = this.columnsReadyInternal$.asObservable();
 
   @Input({ required: true }) screen!: string;
+  @Input() entitySubPath?: string;
+
   private columns?: Signal<ScreenInput[]>;
 
   /* @Input() */

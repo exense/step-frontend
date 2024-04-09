@@ -47,12 +47,6 @@
         <step-scheduler-task-link [context]="element" />
       </td>
     </ng-container>
-    <ng-container matColumnDef="executionsParameters.customParameters.env" stepActivityCol="Environment" stepSearchCol>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <step-drag-column-caption>Environment</step-drag-column-caption>
-      </th>
-      <td mat-cell *matCellDef="let element">{{ element?.executionsParameters?.customParameters?.['env'] }}</td>
-    </ng-container>
     <ng-container matColumnDef="cronExpression" stepActivityCol="CronExpression" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>CronExpression</step-drag-column-caption>
