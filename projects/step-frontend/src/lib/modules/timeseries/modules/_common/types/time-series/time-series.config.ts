@@ -8,13 +8,15 @@ export class TimeSeriesConfig {
   static readonly DASHBOARD_URL_PARAMS_PREFIX = 'dc_';
   static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
 
+  static readonly SECONDARY_AXES_KEY = 'total';
+
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
   static readonly ATTRIBUTES_PREFIX = 'attributes';
   static readonly TIMESTAMP_ATTRIBUTE = 'begin';
   static readonly CHART_LEGEND_SIZE = 65;
-  static readonly TOTAL_BARS_COLOR = '#7689c0';
-  static readonly OVERVIEW_COLORS = ['#80C1E5', '#A4D5F6'];
+  static readonly TOTAL_BARS_COLOR = '#d3d9ee';
+  static readonly OVERVIEW_COLORS = ['#cedbe3', '#c9e3f8'];
   static readonly METRIC_TYPE_KEY = 'metricType';
   static readonly METRIC_TYPE_RESPONSE_TIME = 'response-time'; // this is for normal measurements
   static readonly METRIC_TYPE_SAMPLER = 'sampler'; // this is for thread groups measurements

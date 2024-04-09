@@ -81,6 +81,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
     this.registerMenuEntry('Reporting', 'execute-root', 'file-check-03', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
+    this.registerMenuEntry('Bookmarks', 'bookmarks-root', 'bookmark', { weight: 80 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
@@ -101,6 +102,8 @@ export class ViewRegistryService implements OnDestroy {
       parentId: 'status-root',
     });
     this.registerMenuEntry('Quota Manager', 'grid-quota-manager', 'sidebar', { weight: 50, parentId: 'status-root' });
+    // Sub Menus Bookmarks
+    this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
