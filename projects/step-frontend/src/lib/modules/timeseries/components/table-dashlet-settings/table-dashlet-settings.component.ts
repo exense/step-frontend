@@ -29,23 +29,11 @@ export class TableDashletSettingsComponent implements OnInit {
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
 
-  readonly ChartAggregation = ChartAggregation;
-
   _attributesByKey: Record<string, MetricAttribute> = {};
 
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly AGGREGATE_TYPES: ChartAggregation[] = [
-    ChartAggregation.SUM,
-    ChartAggregation.AVG,
-    ChartAggregation.MAX,
-    ChartAggregation.MIN,
-    ChartAggregation.COUNT,
-    ChartAggregation.RATE,
-    ChartAggregation.MEDIAN,
-    ChartAggregation.PERCENTILE,
-  ];
   readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
@@ -53,15 +41,8 @@ export class TableDashletSettingsComponent implements OnInit {
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
 
-  tableDashlets: DashboardItem[] = [];
-  masterDashlet?: DashboardItem;
-
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
-    this.tableDashlets = this._inputData.context.getDashlets().filter((i) => i.type === 'TABLE');
-    if (this.item.masterChartId) {
-      this.masterDashlet = this.tableDashlets.find((d) => d.id === this.item.masterChartId);
-    }
     this.item.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
     this.filterItems = this.item.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
@@ -71,19 +52,6 @@ export class TableDashletSettingsComponent implements OnInit {
 
   private fetchMetricTypes() {
     this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
-  }
-
-  onSecondaryAggregateSelect(aggregation: ChartAggregation) {
-    if (!aggregation) {
-      this.item.chartSettings!.secondaryAxes = undefined;
-    } else {
-      this.item.chartSettings!.secondaryAxes = {
-        aggregation: aggregation,
-        unit: '',
-        displayType: 'BAR_CHART',
-        pclValue: this.PCL_VALUES[0],
-      };
-    }
   }
 
   addFilterItem(attribute: MetricAttribute) {
@@ -103,13 +71,12 @@ export class TableDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
-    console.log(this.item);
     if (this.formContainer.invalid) {
       this.formContainer.form.markAllAsTouched();
       return;
     }
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
-    this._dialogRef.close({ ...this.item });
+    this._dialogRef.close(this.item);
   }
 }

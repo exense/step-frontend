@@ -91,10 +91,23 @@
         <step-form-field *ngIf="!item.inheritGlobalGrouping">
           <step-label>Grouping</step-label>
           <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
-            <mat-option *ngFor="let attr of item.attributes" [value]="attr.name">{{ attr.displayName }} </mat-option>
+            <mat-option *ngFor="let attr of item.attributes" [value]="attr.name">{{ attr.displayName }}</mat-option>
           </mat-select>
         </step-form-field>
         <mat-divider />
+        <step-label>Columns</step-label>
+        <div class="columns-container">
+          @for (column of item.tableSettings!.columns; track column.column) {
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="column.selected"
+              [ngModelOptions]="{ standalone: true }"
+              class="item"
+            >
+              <span>{{ column.column }}</span>
+            </mat-checkbox>
+          }
+        </div>
         <mat-divider />
       </ng-container>
     </form>

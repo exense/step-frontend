@@ -2,20 +2,31 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-table-dashlet {
-  .settings-container {
-    position: absolute;
-    right: 0.8rem;
-    top: 0.4rem;
-    z-index: 10;
-    transform: scale(0.9);
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    position: relative;
 
-    .edit-buttons {
-      background-color: var.$yellow-5;
+    .title {
+      font-size: 1.4rem;
+      line-height: 2rem;
+      font-weight: 600;
+      width: 100%;
+      text-align: center;
+      color: var.$gray-550;
     }
-  }
 
-  .table-container {
-    margin-top: 2rem;
+    .settings-container {
+      position: absolute;
+      right: 0.6rem;
+      transform: scale(0.9);
+      z-index: 10;
+
+      .edit-buttons {
+        background-color: var.$yellow-5;
+      }
+    }
   }
 
   .element-name {

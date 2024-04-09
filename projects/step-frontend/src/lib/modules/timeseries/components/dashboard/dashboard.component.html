@@ -35,7 +35,7 @@
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
             <step-form-field>
-              <input type="text" [(ngModel)]="dashboard.name" />
+              <input type="text" class="name-input" [(ngModel)]="dashboard.name" />
             </step-form-field>
           } @else {
             <button
@@ -73,6 +73,7 @@
         <div class="dashlet" [class.size-full]="dashlet.size === 2">
           @if (dashlet.type === 'CHART') {
             <step-chart-dashlet
+              #chart
               [editMode]="editMode"
               [item]="dashlet"
               [context]="context"
@@ -83,6 +84,7 @@
             />
           } @else if (dashlet.type === 'TABLE') {
             <step-table-dashlet
+              #chart
               [item]="dashlet"
               [context]="context"
               [editMode]="editMode"

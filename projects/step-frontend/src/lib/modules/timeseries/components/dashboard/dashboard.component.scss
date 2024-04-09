@@ -69,6 +69,11 @@
   flex-direction: row;
   gap: 1.4rem;
   align-items: center;
+  justify-content: flex-end;
+}
+
+.name-input {
+  width: 20rem !important;
 }
 
 .dashboard-name {

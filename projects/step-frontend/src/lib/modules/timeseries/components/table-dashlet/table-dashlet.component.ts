@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
@@ -55,7 +65,7 @@ interface TableEntry {
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe],
 })
-export class TableDashletComponent extends ChartDashlet implements OnInit {
+export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
@@ -86,7 +96,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit {
       throw new Error('Dashlet item cannot be undefined');
     }
     this.settings = this.item.tableSettings!;
-    this.columnsDefinition = this.settings.columns!.map((column) => {
+    this.prepareState(this.settings);
+    this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
+    this.fetchDataAndCreateTable().subscribe();
+  }
+
+  private prepareState(settings: TableSettings) {
+    console.log('PREPARE STATE', settings.columns);
+    this.columnsDefinition = settings.columns!.map((column) => {
       return {
         id: column.column!,
         label: ColumnsLabels[column.column],
@@ -96,8 +113,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit {
       } as TableColumn;
     });
     this.collectVisibleColumns();
-    this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.fetchDataAndCreateTable().subscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const cItem = changes['item'];
+    if (cItem?.previousValue !== cItem?.currentValue || cItem?.firstChange) {
+      this.prepareState(this.item.tableSettings!);
+      this.refresh(true).subscribe();
+    }
   }
 
   collectVisibleColumns(): void {
@@ -192,9 +215,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit {
     this._matDialog
       .open(TableDashletSettingsComponent, { data: { item: this.item, context: this.context } })
       .afterClosed()
-      .subscribe((updatedItem) => {
+      .subscribe((updatedItem: DashboardItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
+          this.prepareState(this.item.tableSettings!);
           this.refresh(true).subscribe();
         }
       });

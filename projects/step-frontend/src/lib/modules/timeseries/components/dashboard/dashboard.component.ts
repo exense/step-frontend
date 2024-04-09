@@ -58,7 +58,7 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
-  @ViewChildren(ChartDashlet) dashlets!: QueryList<ChartDashlet>;
+  @ViewChildren('chart') dashlets!: QueryList<ChartDashlet>;
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
@@ -251,7 +251,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   addChartDashlet(metric: MetricType) {
     const newDashlet: DashboardItem = {
       id: 'chart-' + new Date().getTime(),
-      name: metric.displayName!,
+      name: `Table stats (${metric.displayName!})`,
       type: 'CHART',
       size: 1,
       metricKey: metric.name!,

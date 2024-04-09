@@ -1,45 +1,54 @@
-<div class="settings-container">
-  @if (editMode) {
-    <div class="edit-buttons">
-      <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
-        <step-icon name="chevron-left"></step-icon>
-      </button>
-      <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
-        <step-icon name="chevron-right"></step-icon>
-      </button>
-      <button mat-icon-button matTooltip="Columns" (click)="openSettings()">
-        <step-icon name="edit"></step-icon>
-      </button>
-      <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
-        <step-icon name="x"></step-icon>
-      </button>
-    </div>
-  }
-  @if (!editMode) {
-    <button mat-icon-button matTooltip="Table Settings" [matMenuTriggerFor]="settingsMenu">
-      <step-icon name="settings" />
-    </button>
-    <mat-menu #settingsMenu="matMenu">
-      <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
-    </mat-menu>
-  }
-  <mat-menu #columnsMenu="matMenu">
-    @for (column of columnsDefinition; track column) {
-      <button
-        mat-menu-item
-        (click)="column.isVisible = !column.isVisible; collectVisibleColumns(); $event.stopPropagation()"
-      >
-        <div class="flex flex-row" style="gap: 12px; align-items: center">
-          <mat-checkbox color="primary" [ngModel]="column.isVisible" (ngModelChange)="onColumnVisibilityChange(column)">
-            <span>{{ column.label }}</span>
-          </mat-checkbox>
-        </div>
-      </button>
+<div class="header-container">
+  <span class="uplot title">
+    {{ item.name }}
+  </span>
+  <div class="settings-container">
+    @if (editMode) {
+      <div class="edit-buttons">
+        <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
+          <step-icon name="chevron-left"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
+          <step-icon name="chevron-right"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Edit settings" (click)="openSettings()">
+          <step-icon name="edit"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
+          <step-icon name="x"></step-icon>
+        </button>
+      </div>
     }
-  </mat-menu>
+    @if (!editMode) {
+      <button mat-icon-button matTooltip="Table Settings" [matMenuTriggerFor]="settingsMenu">
+        <step-icon name="settings" />
+      </button>
+      <mat-menu #settingsMenu="matMenu">
+        <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+      </mat-menu>
+    }
+    <mat-menu #columnsMenu="matMenu">
+      @for (column of columnsDefinition; track column) {
+        <button
+          mat-menu-item
+          (click)="column.isVisible = !column.isVisible; collectVisibleColumns(); $event.stopPropagation()"
+        >
+          <div class="flex flex-row" style="gap: 12px; align-items: center">
+            <mat-checkbox
+              color="primary"
+              [ngModel]="column.isVisible"
+              (ngModelChange)="onColumnVisibilityChange(column)"
+            >
+              <span>{{ column.label }}</span>
+            </mat-checkbox>
+          </div>
+        </button>
+      }
+    </mat-menu>
+  </div>
 </div>
 
-<div class="table-container">
+<div>
   <step-table
     [dataSource]="tableDataSource"
     [inProgress]="tableIsLoading"
