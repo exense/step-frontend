@@ -1,11 +1,19 @@
 import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
-import { AugmentedPlansService } from '@exense/step-core';
+import { AugmentedPlansService, tableColumnsConfigProvider } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-otherplan-list',
   templateUrl: './plan-otherplan-list.component.html',
   styleUrls: ['./plan-otherplan-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: 'planEditorOtherPlanTable',
+      entityScreenId: 'planTable',
+      entityScreenDefaultVisibleFields: ['attributes.name'],
+      customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
+    }),
+  ],
 })
 export class PlanOtherplanListComponent {
   @Output() onSelection = new EventEmitter<string>();

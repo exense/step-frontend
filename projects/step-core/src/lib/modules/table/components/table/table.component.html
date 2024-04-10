@@ -11,7 +11,11 @@
   </div>
 }
 @if (_tableColumns.remoteColumnsScreenId; as screen) {
-  <step-custom-columns [screen]="screen" [entitySubPath]="_tableColumns.entityScreenSubPath" />
+  <step-custom-columns
+    [screen]="screen"
+    [entitySubPath]="_tableColumns.entityScreenSubPath"
+    [options]="_tableColumns.customColumnOptions"
+  />
 }
 <div class="table-container">
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">

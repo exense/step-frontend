@@ -14,8 +14,8 @@ interface Column extends Omit<ColumnInfo, 'canHide'> {
   encapsulation: ViewEncapsulation.None,
 })
 export class ColumnSettingsComponent {
-  private _tableColumns = inject(TableColumnsService);
   private _tableColumnsDictionary = inject(TableColumnsDictionaryService);
+  readonly _tableColumns = inject(TableColumnsService);
 
   readonly columns = computed(() => {
     const visibleColumns = new Set(this._tableColumns.visibleColumns());

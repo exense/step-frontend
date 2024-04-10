@@ -18,15 +18,25 @@ export enum PlacePosition {
   RIGHT = 'right',
 }
 
+interface DefaultSettings {
+  tableSettings: TableSettings;
+  actionColumnsIds: string[];
+}
+
 @Injectable()
 export class TableColumnsService {
   private _tableApi = inject(TableApiWrapperService);
   private _columnsConfig = inject(TableColumnsConfig, { optional: true });
   private _columnsDefinition = inject(TableColumnsDefinitionService);
 
+  private defaultVisibleScreenColumns?: Set<string> = !!this._columnsConfig?.entityScreenDefaultVisibleFields
+    ? new Set(this._columnsConfig?.entityScreenDefaultVisibleFields)
+    : undefined;
+
   readonly hasConfig = !!this._columnsConfig;
   readonly remoteColumnsScreenId = this._columnsConfig?.entityScreenId;
   readonly entityScreenSubPath = this._columnsConfig?.entityScreenSubPath;
+  readonly customColumnOptions = this._columnsConfig?.customColumnOptions;
 
   private hasChangesInternal = signal(false);
 
@@ -101,15 +111,20 @@ export class TableColumnsService {
   }
 
   private getTableSettings(): Observable<TableSettings> {
+    const defaultSettings = this.getDefaultSettings();
     if (!this._columnsConfig?.entityTableRemoteId) {
-      return of(this.getDefaultTableSettings());
+      return of(defaultSettings.tableSettings);
     }
     return this._tableApi
       .getTableSettings(this._columnsConfig.entityTableRemoteId)
-      .pipe(map((settings) => this.mergeSettings(settings, this.getDefaultTableSettings())));
+      .pipe(
+        map((settings) =>
+          this.mergeSettings(settings, defaultSettings.tableSettings, defaultSettings.actionColumnsIds),
+        ),
+      );
   }
 
-  private getDefaultTableSettings(): TableSettings {
+  private getDefaultSettings(): DefaultSettings {
     const infoDictionary = (this._columnsDefinition.contentColumns?.() ?? [])
       .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
       .reduce(
@@ -146,7 +161,10 @@ export class TableColumnsService {
 
     columnSettingList = [...columnSettingList, ...actionsColumns];
 
-    return { columnSettingList };
+    const tableSettings: TableSettings = { columnSettingList };
+    const actionColumnsIds = actionsColumns.map((col) => col.columnId!);
+
+    return { tableSettings, actionColumnsIds };
   }
 
   private createStandardColumnSettings(
@@ -169,7 +187,7 @@ export class TableColumnsService {
     return {
       columnId: CustomCellApplySubPathPipe.transform(screenInput.input!.id!, this.entityScreenSubPath),
       position,
-      visible: false,
+      visible: !!this.defaultVisibleScreenColumns?.has(screenInput.input!.id!),
       type: 'step.plugins.table.settings.ScreenInputColumnSettings',
       screenInput,
     };
@@ -195,24 +213,33 @@ export class TableColumnsService {
     this.hasChangesInternal.set(true);
   }
 
-  private mergeSettings(remoteSettings: TableSettings | undefined, defaultSettings: TableSettings): TableSettings {
-    if (!remoteSettings) {
-      return defaultSettings;
+  private mergeSettings(
+    remoteTableSettings: TableSettings | undefined,
+    defaultTableSettings: TableSettings,
+    actionColumnIds: string[],
+  ): TableSettings {
+    if (!remoteTableSettings) {
+      return defaultTableSettings;
     }
 
-    const defaultColumnKeys = new Set((defaultSettings.columnSettingList ?? []).map((col) => col.columnId));
+    const defaultColumnKeys = new Set((defaultTableSettings.columnSettingList ?? []).map((col) => col.columnId));
+    const actionColumnKeys = new Set(actionColumnIds);
 
     // Remove columns from settings, that was deleted
-    remoteSettings.columnSettingList = (remoteSettings.columnSettingList ?? []).filter((col) =>
-      defaultColumnKeys.has(col.columnId),
+    // Also remove action columns from remote settings, because remote settings position might be wrong
+    // in case if new custom columns have been added
+    remoteTableSettings.columnSettingList = (remoteTableSettings.columnSettingList ?? []).filter(
+      (col) => defaultColumnKeys.has(col.columnId) && !actionColumnKeys.has(col.columnId!),
     );
 
     // Add new columns
-    const removeColumnsKey = new Set(remoteSettings.columnSettingList.map((col) => col.columnId));
-    const columnsToAdd = (defaultSettings.columnSettingList ?? []).filter((col) => !removeColumnsKey.has(col.columnId));
+    const removeColumnsKey = new Set(remoteTableSettings.columnSettingList.map((col) => col.columnId));
+    const columnsToAdd = (defaultTableSettings.columnSettingList ?? []).filter(
+      (col) => !removeColumnsKey.has(col.columnId),
+    );
 
-    remoteSettings.columnSettingList = remoteSettings.columnSettingList.concat(columnsToAdd);
+    remoteTableSettings.columnSettingList = remoteTableSettings.columnSettingList.concat(columnsToAdd);
 
-    return remoteSettings;
+    return remoteTableSettings;
   }
 }

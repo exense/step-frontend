@@ -11,5 +11,8 @@ step-plan-otherplan-list {
     tbody > tr > td:first-child {
       padding-right: 0.8rem !important;
     }
+    thead > tr:first-child > th:last-child .header-cell-container {
+      justify-content: flex-end;
+    }
   }
 }
