@@ -37,7 +37,7 @@
 
   <mat-menu #settingsMenu="matMenu">
     <button
-      *ngIf="!item.readonlyGrouping && !item.inheritGlobalGrouping"
+      *ngIf="!item.masterChartId && !item.readonlyGrouping && !item.inheritGlobalGrouping"
       mat-menu-item
       [matMenuTriggerFor]="groupingMenu"
     >

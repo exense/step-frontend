@@ -102,7 +102,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private prepareState(settings: TableSettings) {
-    console.log('PREPARE STATE', settings.columns);
     this.columnsDefinition = settings.columns!.map((column) => {
       return {
         id: column.column!,
@@ -168,6 +167,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private createTable(response: TimeSeriesAPIResponse) {
+    const syncGroup = this.context.getSyncGroup(this.item.id);
     const keywords: string[] = [];
     const bucketsByIds: Record<string, BucketResponse> = {};
     const data: TableEntry[] = [];
@@ -192,23 +192,28 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         name: seriesKey,
         base: series[0],
         color: this.context.getColor(seriesKey),
-        isSelected: true,
+        isSelected: syncGroup.seriesShouldBeVisible(seriesKey),
       });
     });
     this.tableData$.next(data);
     this.tableIsLoading = false;
   }
 
-  onAllSeriesCheckboxClick() {}
+  onAllSeriesCheckboxClick(checked: boolean) {
+    this.context.getSyncGroup(this.item.id).setAllSeriesChecked(checked);
+
+    this.tableData$.getValue().forEach((entry) => {
+      entry.isSelected = checked;
+    });
+  }
 
   onKeywordToggle(entry: TableEntry, selected: boolean) {
-    // if (this.item.syncKey) {
-    //   if (selected) {
-    //     this.context.getSyncGroup(this.item.syncKey).showSeries([entry.name]);
-    //   } else {
-    //     this.context.getSyncGroup(this.item.syncKey).hideSeries([entry.name]);
-    //   }
-    // }
+    let syncGroup = this.context.getSyncGroup(this.item.id);
+    if (selected) {
+      syncGroup.showSeries(entry.name);
+    } else {
+      syncGroup.hideSeries(entry.name);
+    }
   }
 
   openSettings(): void {

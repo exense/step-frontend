@@ -106,12 +106,19 @@
               Add Dashlet
             </button>
             <mat-menu #dashletsMenu="matMenu">
-              <button mat-menu-item [matMenuTriggerFor]="chartsMenu">Chart</button>
-              <button mat-menu-item (click)="addTableDashlet()">Table</button>
+              <button mat-menu-item [matMenuTriggerFor]="chartMetrics">Chart</button>
+              <button mat-menu-item [matMenuTriggerFor]="tableMetrics">Table</button>
             </mat-menu>
-            <mat-menu #chartsMenu="matMenu">
+            <mat-menu #chartMetrics="matMenu">
               @for (metric of metricTypes; track metric.name) {
                 <button mat-menu-item (click)="addChartDashlet(metric)">
+                  {{ metric.displayName }}
+                </button>
+              }
+            </mat-menu>
+            <mat-menu #tableMetrics="matMenu">
+              @for (metric of metricTypes; track metric.name) {
+                <button mat-menu-item (click)="addTableDashlet(metric)">
                   {{ metric.displayName }}
                 </button>
               }

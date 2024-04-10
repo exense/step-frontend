@@ -104,6 +104,14 @@ export class TimeSeriesContext {
     return this.dashlets;
   }
 
+  updateDashlets(dashlets: DashboardItem[]): void {
+    this.dashlets = dashlets;
+  }
+
+  getDashlet(id: string): DashboardItem | undefined {
+    return this.dashlets.find((i) => i.id === id);
+  }
+
   destroy(): void {
     this.inProgress$.complete();
     this.fullTimeRangeChange$.complete();

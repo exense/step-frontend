@@ -91,8 +91,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   hasWritePermission = false;
 
-  tableDashlets: Record<string, DashboardItem> = {}; // used for master references
-
   ngOnInit(): void {
     const pageParams = this._urlParamsService.collectUrlParams();
     this.resolution = pageParams.resolution;
@@ -105,8 +103,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
-        this.tableDashlets = {};
-        this.dashboard.dashlets.filter((i) => i.type === 'TABLE').forEach((i) => (this.tableDashlets[i.id] = i));
         this.refreshInterval = pageParams.refreshInterval || this.dashboard.refreshInterval || 0;
         this.resolution = pageParams.resolution || this.dashboard.resolution;
         pageParams.resolution = this.resolution;
@@ -215,14 +211,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
   }
 
-  addTableDashlet() {
+  addTableDashlet(metric: MetricType) {
     let tableItem: DashboardItem = {
       id: 'table-' + new Date().getTime(),
       type: 'TABLE',
-      name: 'Table dashlet',
-      attributes: [],
-      grouping: [],
-      metricKey: 'response-time',
+      name: `Table dashlet (${metric.name})`,
+      attributes: metric.attributes || [],
+      grouping: metric.defaultGroupingAttributes || [],
+      metricKey: metric.name!,
       filters: [],
       size: 2,
       inheritGlobalGrouping: false,
@@ -230,22 +226,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       readonlyAggregate: true,
       readonlyGrouping: true,
       tableSettings: {
-        columns: [
-          { column: TableColumnType.COUNT, selected: true },
-          { column: TableColumnType.SUM, selected: true },
-          { column: TableColumnType.AVG, selected: true },
-          { column: TableColumnType.MIN, selected: true },
-          { column: TableColumnType.MAX, selected: true },
-          { column: TableColumnType.PCL_80, selected: true },
-          { column: TableColumnType.PCL_90, selected: true },
-          { column: TableColumnType.PCL_99, selected: true },
-          { column: TableColumnType.TPS, selected: true },
-          { column: TableColumnType.TPH, selected: true },
-        ],
+        columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
       },
     };
-    this.tableDashlets[tableItem.id] = tableItem;
     this.dashboard.dashlets.push(tableItem);
+    this.context.updateDashlets(this.dashboard.dashlets);
   }
 
   addChartDashlet(metric: MetricType) {
@@ -379,8 +364,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   handleChartDelete(index: number) {
     const itemToDelete = this.dashboard.dashlets[index];
     this.dashboard.dashlets.splice(index, 1);
-    delete this.tableDashlets[itemToDelete.id];
     this.context.updateAttributes(this.collectAllAttributes());
+    if (itemToDelete.type === 'TABLE') {
+      this.dashboard.dashlets
+        .filter((d) => d.masterChartId === itemToDelete.id)
+        .forEach((i) => (i.masterChartId = undefined));
+    }
+    this.context.updateDashlets(this.dashboard.dashlets);
   }
 
   handleChartShiftLeft(index: number) {

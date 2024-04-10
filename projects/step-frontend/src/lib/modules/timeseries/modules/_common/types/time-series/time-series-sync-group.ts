@@ -6,11 +6,37 @@ export class TimeSeriesSyncGroup {
 
   seriesVisibility: Record<string, boolean> = {};
 
-  seriesShow$ = new Subject<string[]>();
-  seriesHide$ = new Subject<string[]>();
+  allSeriesShow$ = new Subject<void>();
+  allSeriesHide$ = new Subject<void>();
+
+  seriesShow$ = new Subject<string>();
+  seriesHide$ = new Subject<string>();
+
+  allSeriesChecked = false;
+  allSeriesUnchecked = false;
 
   constructor(id: string) {
     this.id = id;
+  }
+
+  seriesShouldBeVisible(series: string) {
+    if (this.allSeriesChecked) {
+      return true;
+    }
+    if (this.allSeriesUnchecked) {
+      return false;
+    }
+    return this.seriesVisibility[series] !== false;
+  }
+
+  setAllSeriesChecked(checked: boolean) {
+    this.allSeriesChecked = checked;
+    this.allSeriesUnchecked = !checked;
+    if (checked) {
+      this.allSeriesShow$.next();
+    } else {
+      this.allSeriesHide$.next();
+    }
   }
 
   addSeries(series: string[], visible: boolean) {
@@ -22,21 +48,29 @@ export class TimeSeriesSyncGroup {
     });
   }
 
-  showSeries(series: string[]) {
-    series.forEach((s) => (this.seriesVisibility[s] = true));
-    this.seriesShow$.next(series);
+  showSeries(s: string) {
+    this.seriesVisibility[s] = true;
+    this.seriesShow$.next(s);
   }
 
-  hideSeries(series: string[]) {
-    series.forEach((s) => (this.seriesVisibility[s] = false));
-    this.seriesHide$.next(series);
+  hideSeries(s: string) {
+    this.seriesVisibility[s] = false;
+    this.seriesHide$.next(s);
   }
 
-  onSeriesShow(): Observable<string[]> {
+  onAllSeriesShow(): Observable<void> {
+    return this.allSeriesShow$.asObservable();
+  }
+
+  onAllSeriesHide(): Observable<void> {
+    return this.allSeriesHide$.asObservable();
+  }
+
+  onSeriesShow(): Observable<string> {
     return this.seriesShow$.asObservable();
   }
 
-  onSeriesHide(): Observable<string[]> {
+  onSeriesHide(): Observable<string> {
     return this.seriesHide$.asObservable();
   }
 }

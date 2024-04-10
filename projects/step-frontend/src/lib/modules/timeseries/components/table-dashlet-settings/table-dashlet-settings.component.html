@@ -64,28 +64,7 @@
               </mat-checkbox>
             </step-form-field>
           </div>
-          <div>
-            <step-form-field>
-              <mat-checkbox color="primary" [(ngModel)]="item.readonlyGrouping" name="readonlyGrouping">
-                <span>Readonly grouping</span>
-                <step-icon
-                  class="help-icon"
-                  matTooltip="The users will not be able to change the grouping of this dashlet"
-                  name="help-circle"
-                ></step-icon>
-              </mat-checkbox>
-            </step-form-field>
-            <step-form-field>
-              <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
-                <span>Readonly aggregate</span>
-                <step-icon
-                  class="help-icon"
-                  matTooltip="The users will not be able to change the aggregate of this dashlet"
-                  name="help-circle"
-                ></step-icon>
-              </mat-checkbox>
-            </step-form-field>
-          </div>
+          <div></div>
         </div>
 
         <step-form-field *ngIf="!item.inheritGlobalGrouping">
