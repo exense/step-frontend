@@ -717,7 +717,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
                   { offset: 0, color: TimeSeriesConfig.OVERVIEW_COLORS[0] },
                   { offset: 1, color: TimeSeriesConfig.OVERVIEW_COLORS[1] },
                 ]),
-              paths: this._chartsGenerator.barsFunction({ size: [0.5, 100], radius: 0.2 }),
+              paths: ChartGenerators.barsFunction({ size: [0.5, 100], radius: 0.2 }),
               points: { show: false },
             },
             ...throughputSeries,
