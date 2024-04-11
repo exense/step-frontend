@@ -44,6 +44,10 @@ export class PurePlanEditApiService implements PlanEditorApiService {
     return this._exportDialogs.displayExportDialog('Plans export', `plans`, fileName, id);
   }
 
+  lookupPlan(id: string, artefactId: string): Observable<Plan> {
+    return this._planApi.lookupPlan(id, artefactId);
+  }
+
   getPlanHistory(id: string): Observable<History[]> {
     return this._planApi.getPlanVersions(id);
   }
