@@ -284,6 +284,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         },
       },
     ];
+
+    this.fetchLegendEntities(groupDimensions, series);
+
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
@@ -323,6 +326,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: axes,
     };
+  }
+
+  private fetchLegendEntities(groupDimensions: string[], series: TSChartSeries[]) {
     groupDimensions.forEach((attributeKey, i) => {
       const attribute = this._attributesByIds[attributeKey];
       const entityName = attribute?.metadata['entity'];
