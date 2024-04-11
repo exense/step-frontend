@@ -96,6 +96,12 @@ step-table {
     }
   }
 
+  th.actions-column-settings-container .header-cell-container {
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-right: 2rem;
+  }
+
   table {
     @for $i from 1 to 100 {
       &.drag-col-#{$i} {

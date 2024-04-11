@@ -7,7 +7,9 @@
 >
   <step-icon name="more-vertical" />
 </button>
-<step-dashlet itemKey="columnSettingsSave" />
+@if (_tableColumns.hasChanges()) {
+  <step-dashlet itemKey="columnSettingsSave" />
+}
 <mat-menu #menu>
   @for (column of columns(); track column.columnId) {
     <button type="button" mat-menu-item role="menuitemcheckbox" (click)="switchVisibility(column)">

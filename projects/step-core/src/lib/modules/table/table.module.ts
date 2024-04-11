@@ -46,6 +46,7 @@ import { ColumnSettingsSaveDashletComponent } from './components/column-settings
 import { ActionColDirective } from './directives/action-col.directive';
 import { CustomCellColInputPipe } from './pipe/custom-cell-col-input.pipe';
 import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pipe';
+import { SettingsInsideActionColDirective } from './directives/settings-inside-action-col.directive';
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pi
     ColumnSettingsSaveDashletComponent,
     CustomCellColInputPipe,
     CustomCellApplySubPathPipe,
+    SettingsInsideActionColDirective,
   ],
   exports: [
     TableComponent,
@@ -109,6 +111,7 @@ import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pi
     ActionColDirective,
     HeaderCellContainerComponent,
     ColumnSettingsSaveDashletComponent,
+    SettingsInsideActionColDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -165,6 +168,7 @@ export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
 export * from './directives/highlight-table-row.directive';
+export * from './directives/settings-inside-action-col.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';

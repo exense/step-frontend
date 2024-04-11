@@ -1,14 +1,13 @@
-@if (_tableColumns.hasChanges()) {
-  <button
-    type="button"
-    mat-icon-button
-    [matMenuTriggerFor]="menu"
-    matTooltip="Save column settings"
-    matTooltipPosition="below"
-  >
-    <step-icon name="save" />
-  </button>
-}
+<button
+  type="button"
+  mat-icon-button
+  color="warn"
+  [matMenuTriggerFor]="menu"
+  matTooltip="Save column settings"
+  matTooltipPosition="below"
+>
+  <step-icon name="save" />
+</button>
 <mat-menu #menu>
   <button type="button" mat-menu-item (click)="_tableColumns.saveSettingsForScope()">Save Settings</button>
 </mat-menu>
