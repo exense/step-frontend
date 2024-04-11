@@ -49,11 +49,13 @@ export class TimeSeriesSyncGroup {
   }
 
   showSeries(s: string) {
+    this.allSeriesUnchecked = false;
     this.seriesVisibility[s] = true;
     this.seriesShow$.next(s);
   }
 
   hideSeries(s: string) {
+    this.allSeriesChecked = false;
     this.seriesVisibility[s] = false;
     this.seriesHide$.next(s);
   }

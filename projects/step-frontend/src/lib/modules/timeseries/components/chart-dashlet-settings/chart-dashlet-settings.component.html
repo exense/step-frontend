@@ -12,7 +12,7 @@
               >Master Dashlet
               <step-icon
                 class="help-icon"
-                matTooltip="The chart will inherit filters, grouping and will stay in sync with the master dashlet."
+                matTooltip="The chart will inherit metric, filters, grouping and will stay in sync with the master dashlet."
                 name="help-circle"
               ></step-icon>
             </step-label>
@@ -30,7 +30,12 @@
 
           <step-form-field>
             <step-label>Metric</step-label>
-            <input disabled placeholder="Metric" [value]="item.metricKey" name="metricKey" />
+            <input
+              disabled
+              placeholder="Metric"
+              [value]="item.masterChartId ? ' - inherited -' : item.metricKey"
+              name="metricKey"
+            />
           </step-form-field>
         </div>
         <mat-divider />

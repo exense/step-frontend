@@ -209,6 +209,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }) || [];
 
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
+    this.refreshAllCharts(false, true);
   }
 
   addTableDashlet(metric: MetricType) {
@@ -350,7 +351,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         tap(() => (this.refreshInProgress = true)),
         switchMap(() => {
           const dashlets$ = this.dashlets?.map((dashlet) => dashlet.refresh());
-          console.log(this.dashlets);
           if (refreshRanger) {
             dashlets$.push(this.refreshRanger());
           }

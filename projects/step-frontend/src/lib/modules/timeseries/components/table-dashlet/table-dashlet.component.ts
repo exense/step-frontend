@@ -116,7 +116,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue || cItem?.firstChange) {
+    if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
       this.prepareState(this.item.tableSettings!);
       this.refresh(true).subscribe();
     }
@@ -133,12 +133,15 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
   }
 
+  private getGroupDimensions(): string[] {
+    return this.item.inheritGlobalGrouping ? this.context.getGroupDimensions() : this.item.grouping;
+  }
+
   private fetchDataAndCreateTable(): Observable<TimeSeriesAPIResponse> {
-    const groupDimensions = this.item.inheritGlobalGrouping ? this.context.getGroupDimensions() : this.item.grouping;
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
-      groupDimensions: groupDimensions,
+      groupDimensions: this.getGroupDimensions(),
       oqlFilter: FilterUtils.filtersToOQL(this.getFilterItems(), 'attributes'),
       numberOfBuckets: 1,
       percentiles: [80, 90, 99],
@@ -162,7 +165,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   refresh(blur?: boolean): Observable<any> {
-    console.log('refresh');
     return this.fetchDataAndCreateTable();
   }
 
@@ -212,6 +214,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (selected) {
       syncGroup.showSeries(entry.name);
     } else {
+      this.allSeriesChecked = false;
       syncGroup.hideSeries(entry.name);
     }
   }
@@ -269,8 +272,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (Object.keys(attributes).length === 0) {
       return TimeSeriesConfig.SERIES_LABEL_EMPTY;
     }
-    return this.context
-      .getGroupDimensions()
+    return this.getGroupDimensions()
       .map((field) => attributes[field])
       .map((x) => (x ? x : TimeSeriesConfig.SERIES_LABEL_EMPTY))
       .join(' | ');

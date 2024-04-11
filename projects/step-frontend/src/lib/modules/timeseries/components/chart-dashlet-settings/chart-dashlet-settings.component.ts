@@ -103,7 +103,6 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   @HostListener('keydown.enter')
   save(): void {
-    console.log(this.item);
     if (this.formContainer.invalid) {
       this.formContainer.form.markAllAsTouched();
       return;
