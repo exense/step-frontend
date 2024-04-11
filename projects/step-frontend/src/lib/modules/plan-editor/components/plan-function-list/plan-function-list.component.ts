@@ -9,7 +9,7 @@ import { AugmentedKeywordsService, tableColumnsConfigProvider } from '@exense/st
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: 'planEditorFunctionTable',
-      entityScreenId: 'functionTable',
+      entityScreenId: 'keyword',
       entityScreenDefaultVisibleFields: ['attributes.name'],
       customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
     }),

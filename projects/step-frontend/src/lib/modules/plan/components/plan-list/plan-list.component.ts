@@ -20,7 +20,7 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedPlansService.PLANS_TABLE_ID,
-      entityScreenId: 'planTable',
+      entityScreenId: 'plan',
     }),
     tablePersistenceConfigProvider('planList', STORE_ALL),
     ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),

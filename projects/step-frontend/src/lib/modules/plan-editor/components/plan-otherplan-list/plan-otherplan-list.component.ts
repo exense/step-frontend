@@ -9,7 +9,7 @@ import { AugmentedPlansService, tableColumnsConfigProvider } from '@exense/step-
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: 'planEditorOtherPlanTable',
-      entityScreenId: 'planTable',
+      entityScreenId: 'plan',
       entityScreenDefaultVisibleFields: ['attributes.name'],
       customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
     }),

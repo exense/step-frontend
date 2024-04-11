@@ -82,7 +82,7 @@ export class ParameterEditDialogComponent implements OnInit {
     const scopeItems$ = of(this._allScopeItems);
     const hasGlobal$ = of(this._authService.hasRight('param-global-write'));
     const isApplicationScopeEnabled$ = this._screenApi
-      .getInputForScreen('functionTable', 'attributes.application')
+      .getInputForScreen('keyword', 'attributes.application')
       .pipe(map((input) => !!input));
 
     combineLatest([scopeItems$, hasGlobal$, isApplicationScopeEnabled$])

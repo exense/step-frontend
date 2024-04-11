@@ -23,7 +23,7 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
-      entityScreenId: 'functionTable',
+      entityScreenId: 'keyword',
     }),
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
