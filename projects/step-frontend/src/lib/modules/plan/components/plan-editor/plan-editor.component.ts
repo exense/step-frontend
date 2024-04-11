@@ -1,13 +1,15 @@
-import { Component, inject } from '@angular/core';
-import { PurePlanEditApiService } from '../../injectables/pure-plan-edit-api.service';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { PurePlanContextApiService } from '../../injectables/pure-plan-context-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import {
-  ExecutiontTaskParameters,
   Plan,
-  PlanEditorApiService,
+  PlanContextApiService,
+  PlanEditorService,
+  ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-plan-editor',
@@ -15,17 +17,31 @@ import {
   styleUrls: ['./plan-editor.component.scss'],
   providers: [
     {
-      provide: PlanEditorApiService,
-      useClass: PurePlanEditApiService,
+      provide: PlanContextApiService,
+      useExisting: PurePlanContextApiService,
     },
   ],
 })
-export class PlanEditorComponent {
-  private _activatedRoute = inject(ActivatedRoute);
+export class PlanEditorComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
+  private _cd = inject(ChangeDetectorRef);
+  private _purePlanContextApi = inject(PurePlanContextApiService);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _router = inject(Router);
+  private _activatedRoute = inject(ActivatedRoute);
 
-  readonly plan$ = this._activatedRoute.data.pipe(map((data) => data['plan'] as Plan | undefined));
+  readonly _planEditorService = inject(PlanEditorService);
+
+  readonly initialPlanContext$ = this._activatedRoute.data.pipe(
+    map((data) => data['plan'] as Plan),
+    map((plan) => this._purePlanContextApi.createContext(plan)),
+  );
+
+  ngOnInit(): void {
+    this._planEditorService.strategyChanged$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this._cd.detectChanges());
+  }
 
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
