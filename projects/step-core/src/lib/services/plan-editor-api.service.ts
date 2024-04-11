@@ -7,6 +7,7 @@ export abstract class PlanEditorApiService {
   abstract renamePlan(plan: Plan, name: string): Observable<{ id: string; plan: Plan }>;
   abstract clonePlan(id: string): Observable<Plan>;
   abstract exportPlan(id: string, fileName: string): Observable<boolean>;
+  abstract lookupPlan(id: string, artefactId: string): Observable<Plan>;
 
   abstract getPlanHistory(id: string): Observable<History[]>;
   abstract restorePlanVersion(id: string, versionId: string): Observable<Plan>;

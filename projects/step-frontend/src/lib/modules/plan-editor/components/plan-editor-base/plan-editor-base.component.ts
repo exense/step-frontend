@@ -229,7 +229,7 @@ export class PlanEditorBaseComponent
     const NO_DATA = 'NO_DATA';
 
     if (isPlan) {
-      this._planApi
+      this._planEditorApi
         .lookupPlan(this.currentPlanId!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),

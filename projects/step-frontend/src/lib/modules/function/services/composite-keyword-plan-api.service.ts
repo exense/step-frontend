@@ -67,6 +67,10 @@ export class CompositeKeywordPlanApiService implements PlanEditorApiService, OnD
     return this._exportDialogs.displayExportDialog('Composite Keyword export', 'functions', fileName, id);
   }
 
+  lookupPlan(id: string, artefactId: string): Observable<Plan> {
+    return this._compositeApi.lookupPlan1(id, artefactId);
+  }
+
   getPlanHistory(id: string): Observable<History[]> {
     return this.keyword$.pipe(
       map((keyword) => keyword!),
