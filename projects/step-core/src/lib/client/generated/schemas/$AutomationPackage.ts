@@ -15,6 +15,9 @@ export const $AutomationPackage = {
         type: 'string',
       },
     },
+    status: {
+      type: 'Enum',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
