@@ -24,6 +24,7 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
       entityScreenId: 'keyword',
+      entityScreenDefaultVisibleFields: ['attributes.name'],
     }),
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
