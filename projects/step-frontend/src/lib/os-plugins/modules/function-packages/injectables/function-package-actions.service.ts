@@ -5,7 +5,7 @@ import { filter, Observable, switchMap } from 'rxjs';
 import { FunctionPackageConfigurationDialogComponent } from '../components/function-package-configuration-dialog/function-package-configuration-dialog.component';
 import { FunctionPackageConfigurationDialogData } from '../types/function-package-configuration-dialog-data.interface';
 
-const ROOT_URL = '/functionPackages';
+const ROOT_URL = '/function-packages';
 
 @Injectable({
   providedIn: 'root',

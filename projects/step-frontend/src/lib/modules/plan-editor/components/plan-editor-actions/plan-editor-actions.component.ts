@@ -1,22 +1,9 @@
+import { Component, EventEmitter, inject, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
-import {
-  Dashlet,
-  ExecutiontTaskParameters,
-  Plan,
-  PlanEditorContext,
+  PlanContext,
   RepositoryObjectReference,
   ViewRegistryService,
+  ExecutiontTaskParameters,
 } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -27,24 +14,19 @@ import { MatMenuTrigger } from '@angular/material/menu';
   styleUrls: ['./plan-editor-actions.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class PlanEditorActionsComponent implements OnChanges {
+export class PlanEditorActionsComponent {
   protected _interactiveSession = inject(InteractiveSessionService);
 
   readonly _planActions = inject(ViewRegistryService).getDashlets('plan/editorActions');
-  readonly trackByDashlet: TrackByFunction<Dashlet> = (index, item) => item.id;
 
-  protected planEditorContext: PlanEditorContext = {};
-
-  @Input() currentPlanId?: string;
-  @Input() plan?: Plan | null;
-  @Input() compositeId?: string;
-
+  @Input() planContext?: PlanContext | null;
   @Input() hasUndo?: boolean | null;
   @Input() hasRedo?: boolean | null;
   @Input() isInteractiveSessionActive?: boolean | null;
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
   @Input() showExecuteButton?: boolean;
+  @Input() showExportSourceButton?: boolean;
 
   @Output() discardAll = new EventEmitter<void>();
   @Output() undo = new EventEmitter<void>();
@@ -73,31 +55,6 @@ export class PlanEditorActionsComponent implements OnChanges {
     stopInteractive: 'Stop interactive mode',
   };
 
-  ngOnChanges(changes: SimpleChanges): void {
-    let currentPlanId: string | undefined;
-    let plan: Plan | undefined;
-    let compositeId: string | undefined;
-
-    const cCurrentPlanId = changes['currentPlanId'];
-    if (cCurrentPlanId?.previousValue !== cCurrentPlanId?.currentValue || cCurrentPlanId?.firstChange) {
-      currentPlanId = cCurrentPlanId?.currentValue;
-    }
-
-    const cPlan = changes['plan'];
-    if (cPlan?.previousValue !== cPlan?.currentValue || cPlan?.firstChange) {
-      plan = cPlan?.currentValue;
-    }
-
-    const cCompositeId = changes['compositeId'];
-    if (cCompositeId?.previousValue !== cCompositeId?.currentValue || cCompositeId?.firstChange) {
-      compositeId = cCompositeId?.currentValue;
-    }
-
-    if (currentPlanId || plan || compositeId) {
-      this.setupContext(currentPlanId, plan, compositeId);
-    }
-  }
-
   protected startInteractiveSession(): void {
     this.interactiveSessionTrigger?.closeMenu();
     this.startInteractive.emit();
@@ -115,17 +72,5 @@ export class PlanEditorActionsComponent implements OnChanges {
     }
 
     this.startInteractive.emit();
-  }
-
-  private setupContext(currentPlanId?: string, plan?: Plan, compositeId?: string): void {
-    currentPlanId = currentPlanId ?? this.currentPlanId;
-    plan = plan ?? this.plan ?? undefined;
-    compositeId = compositeId ?? this.compositeId;
-
-    this.planEditorContext = {
-      currentPlanId,
-      plan,
-      compositeId,
-    };
   }
 }

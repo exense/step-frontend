@@ -34,7 +34,7 @@ export class FunctionPackageListComponent implements DialogParentService {
 
   isRefreshing: boolean = false;
 
-  readonly returnParentUrl = '/functionPackages';
+  readonly returnParentUrl = '/function-packages';
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
