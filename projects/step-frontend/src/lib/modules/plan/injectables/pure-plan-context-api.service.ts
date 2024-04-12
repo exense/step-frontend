@@ -62,6 +62,10 @@ export class PurePlanContextApiService implements PlanContextApiService {
     return this._planApi.getPlanById(id).pipe(this.mapToContext());
   }
 
+  lookupPlan(id: string, artefactId: string): Observable<Plan> {
+    return this._planApi.lookupPlan(id, artefactId);
+  }
+
   restorePlanVersion(id: string, versionId: string): Observable<PlanContext> {
     const plan$ = !!versionId ? this._planApi.restorePlanVersion(id, versionId) : this._planApi.getPlanById(id);
 
