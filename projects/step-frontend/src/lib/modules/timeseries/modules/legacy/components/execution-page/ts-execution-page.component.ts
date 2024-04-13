@@ -22,6 +22,7 @@ import {
   FilterBarItemType,
   COMMON_IMPORTS,
   ResolutionPickerComponent,
+  TimeRangePickerComponent,
 } from '../../../_common';
 import { TimeSeriesDashboardComponent } from '../time-series-dashboard/time-series-dashboard.component';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
@@ -33,7 +34,7 @@ import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
   styleUrls: ['./ts-execution-page.component.scss'],
   providers: [ChartUrlParamsService],
   standalone: true,
-  imports: [COMMON_IMPORTS, ResolutionPickerComponent, TimeSeriesDashboardComponent],
+  imports: [COMMON_IMPORTS, ResolutionPickerComponent, TimeSeriesDashboardComponent, TimeRangePickerComponent],
 })
 export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChanges {
   private _chartUrlParams = inject(ChartUrlParamsService);
@@ -48,7 +49,10 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
+  compactView: boolean = false;
+
   timeRangeSelection: TimeRangePickerSelection = { type: 'FULL' };
+  timeRangeOptions!: TimeRangePickerSelection[];
 
   performanceViewSettings: PerformanceViewSettings | undefined;
 
@@ -121,6 +125,12 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       activeFilters: this.createBaseFilters(),
       filterOptions: this.createBaseFilters(),
     };
+    this.timeRangeSelection = this.dashboardSettings.activeTimeRange;
+    this.timeRangeOptions = this.dashboardSettings.timeRangeOptions;
+  }
+
+  compactChange(event: any) {
+    this.compactView = event;
   }
 
   private createBaseFilters(): FilterBarItem[] {
