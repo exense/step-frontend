@@ -44,7 +44,7 @@
 
     <div class="filers-row" [class.oql-mode]="activeMode === TsFilteringMode.OQL" [class.compact-view]="compactView">
       @if (activeMode === TsFilteringMode.OQL) {
-        <step-form-field [matTooltip]="oqlValue" class="ng-touched" [class.ng-invalid]="invalidOql">
+        <step-form-field [matTooltip]="oqlValue" class="ng-touched oql-input" [class.ng-invalid]="invalidOql">
           <input type="text" [(ngModel)]="oqlValue" (ngModelChange)="handleOqlChange($event)" />
           <step-suffix class="icon-suffix">
             <step-icon

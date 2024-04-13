@@ -51,6 +51,10 @@ step-ts-filter-bar {
     overflow-y: hidden;
     padding: 0.2rem 0;
 
+    .oql-input {
+      width: 100%;
+    }
+
     &.oql-mode {
       overflow: unset;
     }
