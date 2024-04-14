@@ -1,0 +1,40 @@
+<section class="header">
+  <div class="title">
+    @if (execution$ | async; as execution) {
+      <h3>{{ execution?.description }}</h3>
+      <h5>{{ executionTime$ | async }}</h5>
+    }
+  </div>
+  <div class="controls">
+    @if (isExecutionCompleted$ | async) {
+      @if (activeExecution$ | async; as activeExecution) {
+        <step-btn-group class="with-borders">
+          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+        </step-btn-group>
+      }
+    }
+    @if (execution$ | async; as execution) {
+      <step-btn-group class="with-borders">
+        <button type="button" mat-stroked-button [matMenuTriggerFor]="executionMenu">
+          <step-icon name="play-circle" />
+        </button>
+      </step-btn-group>
+      <mat-menu #executionMenu="matMenu">
+        <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+          <step-execution-commands
+            [description]="execution.description"
+            [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+            [execution]="execution"
+            (refresh)="manualRefresh()"
+            (scheduleTask)="handleTaskSchedule($event)"
+          />
+          <!--todo includedTestCases-->
+        </span>
+      </mat-menu>
+    }
+  </div>
+</section>
+<section class="main">
+  <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
+  <router-outlet />
+</section>

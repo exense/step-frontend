@@ -1,0 +1,30 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      {{ title() }}
+    </mat-card-title>
+    <section class="filter-bar">
+      <step-form-field>
+        <input type="text" [(ngModel)]="search" placeholder="Search" />
+      </step-form-field>
+      <step-form-field>
+        <step-prefix>Status</step-prefix>
+        <mat-select [(ngModel)]="selectedStatuses" [multiple]="true">
+          @for (status of statuses(); track status) {
+            <mat-option [value]="status">{{ status }}</mat-option>
+          }
+        </mat-select>
+      </step-form-field>
+    </section>
+  </mat-card-header>
+  <mat-card-content>
+    <section class="report-nodes">
+      @for (keyword of reportNodes(); track keyword.id) {
+        <div>
+          <step-alt-status [status]="keyword.status" />
+          <div>{{ keyword.name }}</div>
+        </div>
+      }
+    </section>
+  </mat-card-content>
+</mat-card>

@@ -96,8 +96,20 @@ $statuses: (
   'VETOED': #cc0099,
 );
 
+$alt-statuses: (
+  'RUNNING': rgba(51, 122, 183, 0.5),
+  'IMPORT_ERROR': #ffe2e2,
+  'TECHNICAL_ERROR': #c2c2c2,
+  'FAILED': #ffe2e2,
+  'INTERRUPTED': #ffe9b0,
+  'PASSED': #eeffee,
+  'SKIPPED': #1a1a1a,
+  'NORUN': #1a1a1a,
+  'VETOED': #ffb2e9,
+);
+
 $tokenstates: (
-  'IN_USE': #337ab7,
+  'IN_USE': #65a9e0,
   'ERROR': black,
   'FREE': #5cb85c,
   'MAINTENANCE_REQUESTED': #749dc0,

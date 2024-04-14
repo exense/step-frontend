@@ -1,0 +1,14 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+@include core.altStatuses;
+
+div {
+  height: 2.2rem;
+  min-width: 12rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  line-height: 1.8;
+  font-weight: 500;
+}

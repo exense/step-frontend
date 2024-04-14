@@ -1,0 +1,64 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+step-alt-execution-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: 0 3.2rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+
+      h3,
+      h5 {
+        margin: 0;
+      }
+      h3 {
+        font-size: 3rem;
+        line-height: 3.8rem;
+      }
+      h5 {
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+        color: var.$gray-500;
+      }
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      align-content: flex-end;
+      gap: 2rem;
+    }
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+
+    step-tabs {
+      nav.mat-mdc-tab-header {
+        border-bottom: none;
+      }
+
+      .mat-mdc-tab-list {
+        width: 100%;
+      }
+      .mat-mdc-tab-links {
+        margin: 0;
+      }
+    }
+  }
+}
+
+@include common.executions-menu;

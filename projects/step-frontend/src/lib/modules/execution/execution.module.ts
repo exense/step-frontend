@@ -37,6 +37,12 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
+import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
+import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
+import { AltReportNodeSummaryComponent } from './components/alt-keywords-summary/alt-report-node-summary.component';
+import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
+import { AltStatusComponent } from './components/alt-status/alt-status.component';
 
 @NgModule({
   declarations: [
@@ -68,6 +74,13 @@ import { AltExecutionsComponent } from './components/alt-executions/alt-executio
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     AltExecutionsComponent,
+    AltExecutionsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionAnalyticsComponent,
+    AltReportNodeSummaryComponent,
+    AltReportNodeListComponent,
+    AltStatusComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -82,6 +95,10 @@ import { AltExecutionsComponent } from './components/alt-executions/alt-executio
     RepositoryComponent,
     ExecutionSelectionTableComponent,
     StatusComponent,
+    AltExecutionsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionAnalyticsComponent,
   ],
 })
 export class ExecutionModule {
@@ -206,6 +223,29 @@ export class ExecutionModule {
           component: ExecutionListComponent,
         },
         {
+          path: ':id',
+          component: AltExecutionProgressComponent,
+          children: [
+            {
+              path: '',
+              redirectTo: 'report',
+            },
+            {
+              path: 'report',
+              component: AltExecutionReportComponent,
+            },
+            {
+              path: 'tree',
+              component: ExecutionTreeComponent,
+            },
+            {
+              path: 'analytics',
+              component: AltExecutionAnalyticsComponent,
+            },
+          ],
+        },
+        /*
+        {
           matcher: (url) => {
             if (url[0].path === 'list') {
               return null;
@@ -215,6 +255,7 @@ export class ExecutionModule {
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
+*/
       ],
     });
   }
