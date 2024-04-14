@@ -204,6 +204,13 @@
               </mat-option>
             </mat-select>
           </step-form-field>
+          <step-form-field>
+            <step-label>Colorization</step-label>
+            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes!.colorizationType" name="size">
+              <mat-option [value]="'STROKE'">Stroke only</mat-option>
+              <mat-option [value]="'FILL'">Stroke + Fill</mat-option>
+            </mat-select>
+          </step-form-field>
         </div>
       </ng-container>
     </form>
