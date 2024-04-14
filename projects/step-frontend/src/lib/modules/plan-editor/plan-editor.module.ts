@@ -11,6 +11,7 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-source-dialog.component';
+import { PlanEditorAttributesDirective } from './directives/plan-editor-attributes.directive';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-
     PlanEditorKeyHandlerDirective,
     PlanAlertsComponent,
     PlanSourceDialogComponent,
+    PlanEditorAttributesDirective,
   ],
   imports: [StepCommonModule, ExecutionModule],
   exports: [
@@ -30,6 +32,7 @@ import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-
     PlanCommonTreeEditorFormComponent,
     PlanEditorKeyHandlerDirective,
     PlanSourceDialogComponent,
+    PlanEditorAttributesDirective,
   ],
 })
 export class PlanEditorModule {

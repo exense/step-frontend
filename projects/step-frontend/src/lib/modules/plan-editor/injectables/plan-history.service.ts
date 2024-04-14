@@ -1,19 +1,21 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, map, Subject } from 'rxjs';
-import { Plan } from '@exense/step-core';
+import { PlanContext, PlanContextApiService } from '@exense/step-core';
 
 @Injectable()
 export class PlanHistoryService implements OnDestroy {
+  private _planEditorApi = inject(PlanContextApiService);
+
   private undoStackEntityId?: string;
 
-  private redoStack$ = new BehaviorSubject<Plan[]>([]);
-  private undoStack$ = new BehaviorSubject<Plan[]>([]);
+  private redoStack$ = new BehaviorSubject<PlanContext[]>([]);
+  private undoStack$ = new BehaviorSubject<PlanContext[]>([]);
 
   readonly hasRedo$ = this.redoStack$.pipe(map((history) => history.length > 0));
   readonly hasUndo$ = this.undoStack$.pipe(map((history) => history.length > 1));
 
-  private planChangeInternal$ = new Subject<Plan>();
-  readonly planChange$ = this.planChangeInternal$.asObservable();
+  private planContextChangeInternal$ = new Subject<PlanContext>();
+  readonly planContextChange$ = this.planContextChangeInternal$.asObservable();
 
   get hasRedo(): boolean {
     return this.redoStack$.value.length > 0;
@@ -26,17 +28,17 @@ export class PlanHistoryService implements OnDestroy {
   ngOnDestroy(): void {
     this.redoStack$.complete();
     this.undoStack$.complete();
-    this.planChangeInternal$.complete();
+    this.planContextChangeInternal$.complete();
   }
 
-  init(plan: Plan): void {
-    if (this.undoStackEntityId !== plan.id) {
-      this.undoStackEntityId = plan.id;
+  init(contex: PlanContext): void {
+    if (this.undoStackEntityId !== contex.id) {
+      this.undoStackEntityId = contex.id;
       this.redoStack$.next([]);
       this.undoStack$.next([]);
     }
     if (this.undoStack$.value.length === 0) {
-      this.addToHistory(plan);
+      this.addToHistory(contex);
     }
   }
 
@@ -51,7 +53,7 @@ export class PlanHistoryService implements OnDestroy {
     this.undoStack$.next(history);
     this.redoStack$.next([...this.redoStack$.value, toRedo]);
     this.addToHistory(result, true);
-    this.planChangeInternal$.next(result);
+    this.planContextChangeInternal$.next(result);
   }
 
   redo(): void {
@@ -62,7 +64,7 @@ export class PlanHistoryService implements OnDestroy {
     const result = redoHistory.pop()!;
     this.redoStack$.next(redoHistory);
     this.addToHistory(result, true);
-    this.planChangeInternal$.next(result);
+    this.planContextChangeInternal$.next(result);
   }
 
   discardAll(): void {
@@ -75,19 +77,15 @@ export class PlanHistoryService implements OnDestroy {
     otherHistory.reverse();
     this.redoStack$.next([...this.redoStack$.value, ...otherHistory]);
     this.addToHistory(result, true);
-    this.planChangeInternal$.next(result);
+    this.planContextChangeInternal$.next(result);
   }
 
-  addToHistory(plan: Plan, keepRedoStack: boolean = false): void {
-    const backupPlan = this.copyPlan(plan);
-    const history = [...this.undoStack$.value, backupPlan];
+  addToHistory(context: PlanContext, keepRedoStack: boolean = false): void {
+    const backupContext = this._planEditorApi.createContextDuplicate(context);
+    const history = [...this.undoStack$.value, backupContext];
     this.undoStack$.next(history);
     if (!keepRedoStack) {
       this.redoStack$.next([]);
     }
-  }
-
-  private copyPlan(plan: Plan): Plan {
-    return JSON.parse(JSON.stringify(plan)) as Plan;
   }
 }
