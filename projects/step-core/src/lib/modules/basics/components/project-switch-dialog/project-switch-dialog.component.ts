@@ -20,6 +20,9 @@ export class ProjectSwitchDialogComponent {
   }
 
   openInTarget(): void {
+    if (!this._data.targetProject) {
+      return;
+    }
     this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_TARGET);
   }
 }
