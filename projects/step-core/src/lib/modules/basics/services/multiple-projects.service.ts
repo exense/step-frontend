@@ -58,7 +58,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
 
     const message = !!targetProject
       ? `Selected ${entityType} belongs to the project "${targetProject?.name}", do you want to switch?`
-      : `Selected ${entityType} belongs to the project, which you don't have access to. Do you want to open it in current project?`;
+      : `Selected ${entityType} belongs to another global project, which you don't have access to. Do you want to open it in current project?`;
 
     return this._matDialog
       .open<ProjectSwitchDialogComponent, ProjectSwitchDialogData, ProjectSwitchDialogResult>(
