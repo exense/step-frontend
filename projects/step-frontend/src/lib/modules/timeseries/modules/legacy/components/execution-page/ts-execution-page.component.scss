@@ -52,6 +52,10 @@
   @include core.button-round;
 }
 
+.running {
+  margin-right: 4rem;
+}
+
 .active {
   color: var.$orange;
 }
