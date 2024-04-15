@@ -161,7 +161,18 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       freeTextValues: [`"${this.item.metricKey}"`],
       searchEntities: [],
     };
-    return [metricItem, ...this.context.getFilteringSettings().filterItems];
+    let filterItems = [];
+    if (this.item.inheritGlobalFilters) {
+      filterItems = FilterUtils.combineGlobalWithChartFilters(
+        this.context.getFilteringSettings().filterItems,
+        this.item.filters,
+      );
+    } else {
+      filterItems = this.item.filters.map(FilterUtils.convertApiFilterItem);
+    }
+
+    filterItems.push(metricItem);
+    return filterItems;
   }
 
   refresh(blur?: boolean): Observable<any> {

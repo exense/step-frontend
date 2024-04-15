@@ -194,26 +194,29 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private composeRequestFilter(): string {
-    let configItem = this.getMasterChart() || this.item;
-    let filterItems: FilterBarItem[] = [
-      {
-        attributeName: 'metricType',
-        type: FilterBarItemType.FREE_TEXT,
-        exactMatch: true,
-        freeTextValues: [`"${configItem.metricKey}"`],
-        searchEntities: [],
-      },
-    ];
+    const masterChart = this.getMasterChart();
+    const metric = masterChart?.metricKey || this.item.metricKey;
+    let metricFilterItem = {
+      attributeName: 'metricType',
+      type: FilterBarItemType.FREE_TEXT,
+      exactMatch: true,
+      freeTextValues: [`"${metric}"`],
+      searchEntities: [],
+    };
+    let filterItems: FilterBarItem[] = [];
 
-    if (configItem.inheritGlobalFilters) {
-      filterItems = [
-        ...filterItems,
-        ...FilterUtils.combineGlobalWithChartFilters(
-          this.context.getFilteringSettings().filterItems,
-          configItem.filters,
-        ),
-      ];
+    const itemToInheritSettingsFrom = masterChart || this.item;
+    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
+      filterItems = FilterUtils.combineGlobalWithChartFilters(
+        this.context.getFilteringSettings().filterItems,
+        itemToInheritSettingsFrom.filters,
+      );
+    } else {
+      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
     }
+
+    filterItems.push(metricFilterItem);
+
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
   }
 

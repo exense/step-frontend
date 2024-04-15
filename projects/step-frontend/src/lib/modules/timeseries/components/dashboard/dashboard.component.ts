@@ -222,8 +222,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       metricKey: metric.name!,
       filters: [],
       size: 2,
-      inheritGlobalGrouping: false,
-      inheritGlobalFilters: false,
+      inheritGlobalGrouping: true,
+      inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
       tableSettings: {
@@ -247,7 +247,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       readonlyAggregate: false,
       readonlyGrouping: false,
       inheritGlobalFilters: true,
-      inheritGlobalGrouping: false,
+      inheritGlobalGrouping: true,
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,

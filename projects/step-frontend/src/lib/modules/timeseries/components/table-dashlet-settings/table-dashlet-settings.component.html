@@ -88,6 +88,17 @@
           }
         </div>
         <mat-divider />
+        <step-label>Visual settings</step-label>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Chart width</step-label>
+            <mat-select [(ngModel)]="item.size" name="size">
+              <mat-option [value]="1">50%</mat-option>
+              <mat-option [value]="2">100%</mat-option>
+            </mat-select>
+          </step-form-field>
+          <div></div>
+        </div>
       </ng-container>
     </form>
   </div>
