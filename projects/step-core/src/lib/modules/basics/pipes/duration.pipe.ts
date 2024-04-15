@@ -5,12 +5,14 @@ import { DateTime, Duration } from 'luxon';
   name: 'duration',
 })
 export class DurationPipe implements PipeTransform {
-  transform(end?: number | Date | DateTime, start?: number | Date | DateTime, displayFull = false): string {
+  transform(end?: number | Date | DateTime, start: number | Date | DateTime = 0, displayFull = false): string {
     const endMs = this.getMs(end);
-    const startMs = this.getMs(start);
-    if (!endMs || !startMs) {
+
+    if (!endMs) {
       return '';
     }
+
+    const startMs = start !== undefined ? this.getMs(start)! : 0;
     const duration = Duration.fromMillis(endMs - startMs).rescale();
     const day = this.addSuffix(duration.get('days'), 'd');
     const hour = this.addSuffix(duration.get('hours'), 'h');
