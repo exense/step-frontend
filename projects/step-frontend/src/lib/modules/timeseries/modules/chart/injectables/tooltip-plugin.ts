@@ -16,8 +16,13 @@ export class TooltipPlugin {
   private win = this._doc.defaultView!;
   private _executionsService = inject(ExecutionsService);
 
+  /**
+   * The tooltip will be displayed while the user will hover the chart.
+   * An execution is optional to display. It can be configured via settings and via chart metadata (where the actual
+   * data is taken from)
+   */
   createPlugin(ref: TooltipParentContainer): uPlot.Plugin {
-    const showExecutionsLinks = ref.settings.showExecutionsLinks;
+    const showExecutionsLinks = ref.settings.tooltipOptions.useExecutionLinks;
     let chart: uPlot;
     let over: HTMLDivElement;
     let bound: Element;
@@ -162,6 +167,8 @@ export class TooltipPlugin {
 
           bound = over;
 
+          // since the charts are synchronized, the events are called in each chart, so it's difficult to know if we're
+          // hovering on one or on the other, so the following events keep track of the active chart.
           over.onclick = () => {
             // @ts-ignore
             const lockState = u.cursor._lock;
@@ -189,6 +196,7 @@ export class TooltipPlugin {
         setSize: (u: uPlot) => {
           syncBounds();
         },
+        // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
           // this is called for all linked charts
           if (chartIsLocked()) {
@@ -214,12 +222,13 @@ export class TooltipPlugin {
           const hoveredValue = u.posToVal(top, 'y');
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
+          // first series is x axis (time)
           for (let i = 1; i < u.series.length; i++) {
             const series = u.series[i];
             const bucketValue = u.data[i][idx];
-            if (series.scale === 'y' && series.show) {
+            if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY && series.show) {
               if (bucketValue != undefined) {
-                const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
+                const executionIds = ref.chartMetadata[i]?.[idx]?.[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
                 yPoints.push({
                   value: bucketValue,
                   name: series.label || '',
@@ -230,7 +239,7 @@ export class TooltipPlugin {
               }
               continue;
             }
-            if (series.scale === 'total' && bucketValue != null) {
+            if (series.scale === TimeSeriesConfig.SECONDARY_AXES_KEY && bucketValue != null) {
               summaryRow = {
                 value: bucketValue,
                 color: TimeSeriesConfig.TOTAL_BARS_COLOR,

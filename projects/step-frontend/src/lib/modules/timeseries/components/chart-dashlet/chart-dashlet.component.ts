@@ -189,7 +189,8 @@ export class ChartDashletComponent implements OnInit, OnChanges {
 
   private createChart(response: TimeSeriesAPIResponse): void {
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
-    let secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
+    const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
     const groupDimensions = this.getChartGrouping();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
@@ -198,18 +199,23 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     const series: TSChartSeries[] = response.matrix.map((series: BucketResponse[], i: number) => {
       const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
       const seriesKey = labelItems.join(' | ');
+      const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       const color =
         primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
 
-      if (hasSecondaryAxes)
+      if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
-          if (secondaryAxesData[j] == undefined) {
-            secondaryAxesData[j] = bucketValue;
-          } else if (bucketValue) {
-            secondaryAxesData[j]! += bucketValue;
+          metadata.push(b?.attributes);
+          if (hasSecondaryAxes) {
+            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
+            if (secondaryAxesData[j] == undefined) {
+              secondaryAxesData[j] = bucketValue;
+            } else if (bucketValue) {
+              secondaryAxesData[j]! += bucketValue;
+            }
           }
         });
+      }
 
       return {
         id: seriesKey,
@@ -218,6 +224,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
         labelItems: labelItems,
         legendName: seriesKey,
         data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
+        metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
         fill: (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color),
@@ -271,6 +278,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
       tooltipOptions: {
         enabled: true,
         zAxisLabel: this.getSecondAxesLabel(),
+        useExecutionLinks: !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE],
         yAxisUnit: yAxesUnit,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
@@ -345,6 +353,11 @@ export class ChartDashletComponent implements OnInit, OnChanges {
       request.intervalSize = customResolution;
     } else {
       request.numberOfBuckets = 100;
+    }
+    if (!!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+      // has execution attribute
+      request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+      request.collectAttributesValuesLimit = 10;
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {

@@ -6,7 +6,6 @@ export interface TSChartSettings {
   title: string;
   xValues: number[]; // in milliseconds
   cursor?: Cursor; // cursor related settings and events
-  showExecutionsLinks?: boolean;
   series: TSChartSeries[];
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
