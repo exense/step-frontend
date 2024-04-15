@@ -19,7 +19,7 @@ import {
   styleUrls: ['./resources-list.component.scss'],
   providers: [
     tableColumnsConfigProvider({
-      entityTableRemoteId: AugmentedParametersService.PARAMETERS_TABLE_ID,
+      entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
     }),
     tablePersistenceConfigProvider('resourceList', STORE_ALL),
     ...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
