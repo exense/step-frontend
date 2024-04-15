@@ -165,11 +165,33 @@ export class TableComponent<T>
   private columns = computed(() => [...this.contentColumns(), ...this.viewColumns()]);
 
   readonly columnsDictionary = computed(() => {
-    return (this.columns() ?? []).reduce((res, column) => res.concat(column.columnInfos), [] as ColumnInfo[]);
+    const alreadyUsed = new Set<string>();
+    return (this.columns() ?? []).reduce((res, column) => {
+      const infos: ColumnInfo[] = [];
+      for (let info of column.columnInfos) {
+        if (!alreadyUsed.has(info.columnId)) {
+          infos.push(info);
+          alreadyUsed.add(info.columnId);
+        }
+      }
+
+      return res.concat(infos);
+    }, [] as ColumnInfo[]);
   });
 
   private allCollDef = computed(() => {
-    return (this.columns() ?? []).reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[]);
+    const alreadyUsed = new Set<string>();
+    return (this.columns() ?? []).reduce((res, col) => {
+      const definitions: MatColumnDef[] = [];
+      for (let def of col.columnDefinitions) {
+        if (!alreadyUsed.has(def.name)) {
+          definitions.push(def);
+          alreadyUsed.add(def.name);
+        }
+      }
+
+      return res.concat(definitions);
+    }, [] as MatColumnDef[]);
   });
 
   private allSearchColDef = computed(() => {
