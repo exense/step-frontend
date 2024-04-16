@@ -39,6 +39,7 @@
     *ngIf="dashboardSettings"
     [settings]="dashboardSettings"
     [timeRange]="timeRange"
+    [hasTimePicker]="false"
     (compareModeChange)="compactChange($event)"
     (contextInitialized)="dashboardContextInitialized($event)"
     (timeRangeChange)="handleDashboardTimeRangeChange($event)"

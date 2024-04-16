@@ -39,6 +39,7 @@ import { FilterBarComponent } from '../../../filter-bar';
 })
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() timeRange: TimeRangePickerSelection | undefined;
+  @Input() hasTimePicker = true;
 
   readonly ONE_HOUR_MS = 3600 * 1000;
 
@@ -110,7 +111,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChange
 
   ngOnChanges(changes: SimpleChanges) {
     const cTimeRange = changes['timeRange'];
-    if (!!cTimeRange?.currentValue && (cTimeRange?.currentValue !== cTimeRange?.previousValue || cTimeRange?.firstChange)) {
+    if (
+      !!cTimeRange?.currentValue &&
+      (cTimeRange?.currentValue !== cTimeRange?.previousValue || cTimeRange?.firstChange)
+    ) {
       this.handleTimeRangeChange({ selection: cTimeRange.currentValue, triggerRefresh: true });
     }
   }

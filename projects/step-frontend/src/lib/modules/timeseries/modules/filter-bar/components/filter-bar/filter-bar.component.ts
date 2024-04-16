@@ -78,6 +78,7 @@ export class FilterBarComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
+  @Input() hasTimePicker = true;
 
   @Input() filterOptions: FilterBarItem[] = [];
   _unusedFilterOptions: FilterBarItem[] = [];

@@ -2,12 +2,14 @@
   <div class="ranger-section">
     <step-execution-time-selection [context]="context" />
   </div>
-  <step-time-range-picker
-    (selectionChange)="handleTimeRangeChange($event)"
-    [selectOptions]="timeRangeOptions"
-    [activeSelection]="activeTimeRange"
-    [compact]="compactView"
-  />
+  @if (hasTimePicker) {
+    <step-time-range-picker
+      (selectionChange)="handleTimeRangeChange($event)"
+      [selectOptions]="timeRangeOptions"
+      [activeSelection]="activeTimeRange"
+      [compact]="compactView"
+    />
+  }
 </div>
 
 <div class="filters-section">
@@ -20,6 +22,7 @@
   @if (compactView) {
     <div class="settings-section">
       <step-tabs
+        [disablePagination]="true"
         [tabs]="modes"
         [shrink]="true"
         [activeTabId]="activeMode"
