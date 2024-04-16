@@ -25,6 +25,11 @@ mat-card-title {
   step-form-field {
     flex: 1;
   }
+
+  .search-input {
+    border-left: none;
+    padding-left: 0;
+  }
 }
 
 mat-card {

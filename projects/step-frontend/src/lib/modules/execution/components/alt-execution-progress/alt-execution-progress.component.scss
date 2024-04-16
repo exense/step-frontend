@@ -18,18 +18,22 @@ step-alt-execution-progress {
       flex-direction: column;
       gap: 0.4rem;
 
-      h3,
-      h5 {
-        margin: 0;
+      .sub-title {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.4rem;
       }
+
       h3 {
+        margin: 0;
         font-size: 3rem;
         line-height: 3.8rem;
       }
-      h5 {
-        font-size: 1.6rem;
-        line-height: 2.4rem;
-        color: var.$gray-500;
+
+      .user {
+        font-weight: 400;
+        color: var.$gray-550;
       }
     }
 

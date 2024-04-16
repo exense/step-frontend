@@ -43,6 +43,7 @@ import { AltExecutionAnalyticsComponent } from './components/alt-execution-analy
 import { AltReportNodeSummaryComponent } from './components/alt-keywords-summary/alt-report-node-summary.component';
 import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
 import { AltStatusComponent } from './components/alt-status/alt-status.component';
+import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { AltStatusComponent } from './components/alt-status/alt-status.component
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
     AltReportNodeListComponent,
+    AltExecutionTimeComponent,
     AltStatusComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],

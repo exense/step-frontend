@@ -5,18 +5,14 @@ import { filter, map, of, shareReplay, switchMap, combineLatest } from 'rxjs';
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
-  DateFormat,
-  DurationPipe,
   Execution,
   ExecutiontTaskParameters,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
   Tab,
-  TableApiWrapperService,
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
-import { DatePipe } from '@angular/common';
 import {
   EXECUTION_TREE_PAGING_SETTINGS,
   ExecutionTreePagingService,
@@ -34,8 +30,6 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [
-    DatePipe,
-    DurationPipe,
     {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
@@ -54,8 +48,6 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, AltExecutionStateService {
-  private _datePipe = inject(DatePipe);
-  private _durationPipe = inject(DurationPipe);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -80,19 +72,6 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   );
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
-
-  readonly executionTime$ = this.execution$.pipe(
-    filter((execution) => !!execution),
-    map((execution) => {
-      const date = this._datePipe.transform(execution.startTime, DateFormat.DATE_SHORT);
-      const today = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
-      let dateTitle = date === today ? 'Today' : date;
-      if (execution.endTime) {
-        dateTitle = `${dateTitle} (${this._durationPipe.transform(execution.endTime, execution.startTime)})`;
-      }
-      return dateTitle;
-    }),
-  );
 
   readonly testCases$ = this.execution$.pipe(
     switchMap((execution) =>

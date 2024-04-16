@@ -2,7 +2,10 @@
   <div class="title">
     @if (execution$ | async; as execution) {
       <h3>{{ execution?.description }}</h3>
-      <h5>{{ executionTime$ | async }}</h5>
+      <div class="sub-title">
+        <step-alt-execution-time [execution]="execution" />
+        <div class="user">{{ execution.executionParameters?.userID }}</div>
+      </div>
     }
   </div>
   <div class="controls">
