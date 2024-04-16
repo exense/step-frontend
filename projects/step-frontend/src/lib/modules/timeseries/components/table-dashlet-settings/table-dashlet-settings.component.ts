@@ -10,7 +10,6 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
-import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;

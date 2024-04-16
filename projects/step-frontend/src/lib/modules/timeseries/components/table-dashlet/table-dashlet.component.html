@@ -75,7 +75,7 @@
             (ngModelChange)="onKeywordToggle(element, $event)"
           >
             <div class="element-name">
-              <span>{{ element.name }}</span>
+              <span>{{ element | tableEntryFormat }}</span>
               <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />
             </div>
           </mat-checkbox>
