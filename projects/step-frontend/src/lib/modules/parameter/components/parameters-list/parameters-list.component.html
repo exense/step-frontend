@@ -79,6 +79,12 @@
       </th>
       <td mat-cell *matCellDef="let element">{{ element.value }}</td>
     </ng-container>
+    <ng-container matColumnDef="description" stepActivityCol="Description" stepSearchCol [isHiddenByDefault]="true">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>Description</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">{{ element.description }}</td>
+    </ng-container>
     <ng-container matColumnDef="activationExpression.script" stepActivityCol="Activation script" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Activation script</step-drag-column-caption>

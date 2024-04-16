@@ -28,6 +28,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
   getExecutionsTableDataSource(): StepDataSource<Execution> {
     return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
       description: 'description',
+      executionTime: 'startTime',
       startTime: 'startTime',
       endTime: 'endTime',
       user: 'executionParameters.userID',

@@ -16,6 +16,7 @@ export class AugmentedParametersService extends ParametersService {
       scope: 'scope',
       key: 'key',
       value: 'value',
+      description: 'description',
       activationExpressionScript: 'activationExpression.script',
       lastModificationDate: 'lastModificationDate',
       priority: 'priority',
