@@ -6,7 +6,7 @@
         [presets]="refreshIntervals"
         (refresh)="triggerRefresh()"
       ></step-autorefresh-toggle>
-      <button mat-icon-button [matMenuTriggerFor]="menu">
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="grey-border">
         <step-icon name="settings"></step-icon>
       </button>
       <mat-menu #menu="matMenu">

@@ -2,7 +2,12 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-icon-button>
+        <button
+          class="menu-btn grey-border"
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="mainMenu"
+          mat-icon-button
+        >
           <step-icon name="settings" />
         </button>
         <step-autorefresh-toggle
