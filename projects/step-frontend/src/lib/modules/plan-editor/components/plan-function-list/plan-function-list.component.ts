@@ -1,18 +1,36 @@
-import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
-import { AugmentedKeywordsService } from '@exense/step-core';
+import { Component, inject, output, ViewEncapsulation } from '@angular/core';
+import {
+  AugmentedKeywordsService,
+  AutoDeselectStrategy,
+  Keyword,
+  selectionCollectionProvider,
+  SelectionCollector,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-function-list',
   templateUrl: './plan-function-list.component.html',
   styleUrls: ['./plan-function-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  providers: [...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.KEEP_SELECTION)],
 })
 export class PlanFunctionListComponent {
+  private _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);
   readonly dataSource = inject(AugmentedKeywordsService).createFilteredTableDataSource();
 
-  @Output() onSelection = new EventEmitter<string>();
+  /** @Output **/
+  addKeywords = output<string[]>();
 
-  addFunction(id: string): void {
-    this.onSelection.emit(id);
+  addKeyword(id: string): void {
+    this.addKeywords.emit([id]);
+  }
+
+  addSelectedKeywords(): void {
+    const ids = [...this._selectionCollector.selected];
+    if (!ids.length) {
+      return;
+    }
+    this._selectionCollector.clear();
+    this.addKeywords.emit(ids);
   }
 }

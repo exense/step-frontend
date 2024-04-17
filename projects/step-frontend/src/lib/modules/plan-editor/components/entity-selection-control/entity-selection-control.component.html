@@ -1,0 +1,5 @@
+<step-bulk-selection-di [(selectionType)]="selectionType" [showLabel]="false" />
+<button mat-icon-button [matTooltip]="addButtonHint()" (click)="add.emit()">
+  <step-icon name="plus-circle" />
+</button>
+<step-bulk-selection-label [(selectionType)]="selectionType" [selectionCollector]="_selectionCollector" />
