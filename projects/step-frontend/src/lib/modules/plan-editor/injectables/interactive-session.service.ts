@@ -4,7 +4,7 @@ import {
   AugmentedScreenService,
   ExecutionParameters,
   RepositoryObjectReference,
-  PlanEditorApiService,
+  PlanContextApiService,
 } from '@exense/step-core';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { KeywordParameters, TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../execution/execution.module';
@@ -19,12 +19,12 @@ export class InteractiveSessionService implements OnDestroy {
   readonly isActive$ = this.interactiveSessionId$.pipe(map((value) => !!value));
 
   readonly keywordParameters$: Observable<KeywordParameters> = this.interactiveSessionId$.pipe(
-    map((eid) => ({ eid, type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS }))
+    map((eid) => ({ eid, type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS })),
   );
 
   private _screenTemplates = inject(AugmentedScreenService);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
-  private _planEditorApi = inject(PlanEditorApiService);
+  private _planEditorApi = inject(PlanContextApiService);
 
   init(): void {
     this._screenTemplates

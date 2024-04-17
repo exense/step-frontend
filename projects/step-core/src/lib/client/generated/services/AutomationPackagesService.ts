@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AutomationPackage } from '../models/AutomationPackage';
+import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
 import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 
@@ -15,14 +16,23 @@ export class AutomationPackagesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
+   * @param async
    * @param formData
    * @returns any default response
    * @throws ApiError
    */
-  public createOrUpdateAutomationPackage(formData?: { file?: FormDataContentDisposition }): Observable<any> {
+  public createOrUpdateAutomationPackage(
+    async?: boolean,
+    formData?: {
+      file?: FormDataContentDisposition;
+    },
+  ): Observable<any> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/automation-packages',
+      query: {
+        async: async,
+      },
       formData: formData,
       mediaType: 'multipart/form-data',
     });
@@ -59,21 +69,26 @@ export class AutomationPackagesService {
 
   /**
    * @param id
+   * @param async
    * @param formData
-   * @returns any default response
+   * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
    */
   public updateAutomationPackageById(
     id: string,
+    async?: boolean,
     formData?: {
       file?: FormDataContentDisposition;
     },
-  ): Observable<any> {
+  ): Observable<AutomationPackageUpdateResult> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/automation-packages/{id}',
       path: {
         id: id,
+      },
+      query: {
+        async: async,
       },
       formData: formData,
       mediaType: 'multipart/form-data',

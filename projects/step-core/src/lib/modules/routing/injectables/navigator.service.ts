@@ -18,6 +18,8 @@ export class NavigatorService {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _queryParamsCleanups = inject(NAVIGATOR_QUERY_PARAMS_CLEANUP);
 
+  private forcedActivatedViewId?: string;
+
   readonly activeUrl$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     map(() => this._router.url),
@@ -28,7 +30,7 @@ export class NavigatorService {
     const viewLink = `/${viewId}`;
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      map((url) => url.startsWith(viewLink)),
+      map((url) => (this.forcedActivatedViewId ? viewId === this.forcedActivatedViewId : url.startsWith(viewLink))),
     );
   }
 
@@ -67,6 +69,16 @@ export class NavigatorService {
     this._router.navigateByUrl(url, { skipLocationChange: true });
   }
 
+  forceActivateView(viewId: string): string {
+    this.forcedActivatedViewId = viewId;
+    return viewId;
+  }
+
+  cleanupActivateView(): boolean {
+    this.forcedActivatedViewId = undefined;
+    return true;
+  }
+
   private navigateInternal(link: string, isOpenInSeparateTab?: boolean): void {
     if (isOpenInSeparateTab) {
       this.navigateToSeparateTab(link);
@@ -83,10 +95,15 @@ export class NavigatorService {
   }
 
   private navigateInCurrentView(link: string): void {
-    const queryParams = this.prepareQueryParams();
-    const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
-    const segments = link.split('/');
-    this._router.navigate(segments, { queryParams, queryParamsHandling });
+    const hasInlineQueryParameters = link.includes('?');
+    if (hasInlineQueryParameters) {
+      this._router.navigateByUrl(link);
+    } else {
+      const segments = link.split('/');
+      const queryParams = this.prepareQueryParams();
+      const queryParamsHandling: QueryParamsHandling = !queryParams ? 'preserve' : '';
+      this._router.navigate(segments, { queryParams, queryParamsHandling });
+    }
   }
 
   private prepareQueryParams(): Params | null {

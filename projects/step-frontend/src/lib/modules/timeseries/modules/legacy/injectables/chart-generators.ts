@@ -16,7 +16,7 @@ export class ChartGenerators {
   private _byStatusChartGenerator = inject(ByStatusChartGenerator);
   private _threadGroupChartGenerator = inject(ThreadGroupChartGenerator);
 
-  readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+  public static readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
   generateChart(
     type: TsChartType,
@@ -72,7 +72,7 @@ export class ChartGenerators {
               { offset: 0, color: TimeSeriesConfig.OVERVIEW_COLORS[0] },
               { offset: 1, color: TimeSeriesConfig.OVERVIEW_COLORS[1] },
             ]),
-          paths: this.barsFunction({ size: [0.5, 100], radius: 0.2 }),
+          paths: ChartGenerators.barsFunction({ size: [0.5, 100], radius: 0.2 }),
           points: { show: false },
           show: true,
         },

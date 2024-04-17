@@ -30,7 +30,7 @@ export class AutomationPackageRefIconComponent<T extends AutomationPackageChildE
     if (!automationPackageFileName) {
       return;
     }
-    this._router.navigate(['root', 'automationPackage', 'list'], {
+    this._router.navigate(['root', 'automation-package', 'list'], {
       queryParams: { automationPackageFileName },
       queryParamsHandling: 'merge',
     });
