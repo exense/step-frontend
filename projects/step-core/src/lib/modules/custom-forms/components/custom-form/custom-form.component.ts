@@ -29,6 +29,7 @@ export class CustomFormComponent implements OnInit {
   @HostBinding('class.inline') @Input() stInline: boolean = false;
   @Input() stExcludeFields: string[] = [];
   @Input() required: boolean = false;
+  @Input() fillWholeSpace: boolean = false;
 
   @Output() stModelChange = new EventEmitter<Record<string, unknown>>();
   @Output() customInputTouch = new EventEmitter<void>();
