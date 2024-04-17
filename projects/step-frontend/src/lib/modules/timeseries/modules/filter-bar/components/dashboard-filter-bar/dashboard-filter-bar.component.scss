@@ -9,12 +9,14 @@ step-ts-dashboard-filter-bar {
 
   .ranger-section {
     margin: 0 4rem;
+    flex-grow: 1;
   }
 
   .time-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1.6rem;
+    justify-content: space-between;
 
     step-time-range-picker {
       align-self: flex-end;
@@ -126,5 +128,5 @@ button {
 }
 
 .grey-border {
-  border: 1px solid rgb(208, 213, 221);
+  border: 1px solid rgb(208, 213, 221) !important;
 }
