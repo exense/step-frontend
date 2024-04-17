@@ -1,13 +1,13 @@
 import { Observable } from 'rxjs';
-import { AbstractArtefact, Plan } from '../../../client/step-client-module';
+import { AbstractArtefact } from '../../../client/step-client-module';
+import { PlanContext } from './plan-context.interface';
 
 export abstract class PlanEditorStrategy {
   abstract hasRedo$: Observable<boolean>;
   abstract hasUndo$: Observable<boolean>;
 
-  abstract readonly plan?: Plan;
-
-  abstract readonly plan$: Observable<Plan | undefined>;
+  abstract readonly planContext?: PlanContext;
+  abstract readonly planContext$: Observable<PlanContext | undefined>;
 
   abstract addControl(artefactTypeId: string): void;
   abstract addFunction(keywordId: string): void;
@@ -40,7 +40,5 @@ export abstract class PlanEditorStrategy {
 
   abstract toggleSkip(node?: AbstractArtefact, forceSkip?: boolean): void;
 
-  //abstract initPlanUpdate(): void;
-
-  abstract init(plan: Plan, selectedArtefactId?: string): void;
+  abstract init(context: PlanContext, selectedArtefactId?: string): void;
 }

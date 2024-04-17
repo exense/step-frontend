@@ -81,6 +81,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Design', 'automation-root', 'edit', { weight: 10 });
     this.registerMenuEntry('Reporting', 'execute-root', 'file-check-03', { weight: 20 });
     this.registerMenuEntry('Status', 'status-root', 'check-square', { weight: 50 });
+    this.registerMenuEntry('Bookmarks', 'bookmarks-root', 'bookmark', { weight: 80 });
     this.registerMenuEntry('Support', 'support-root', 'life-buoy', { weight: 100 });
 
     // Sub Menus Automation
@@ -94,13 +95,15 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
-    this.registerMenuEntry('Agents', 'gridagents', 'agent', { weight: 20, parentId: 'status-root' });
-    this.registerMenuEntry('Agent tokens', 'gridtokens', 'agent-token', { weight: 30, parentId: 'status-root' });
-    this.registerMenuEntry('Token Groups', 'gridtokengroups', 'agent-token-group', {
+    this.registerMenuEntry('Agents', 'grid-agents', 'agent', { weight: 20, parentId: 'status-root' });
+    this.registerMenuEntry('Agent tokens', 'grid-tokens', 'agent-token', { weight: 30, parentId: 'status-root' });
+    this.registerMenuEntry('Token Groups', 'grid-token-groups', 'agent-token-group', {
       weight: 40,
       parentId: 'status-root',
     });
-    this.registerMenuEntry('Quota Manager', 'gridquotamanager', 'sidebar', { weight: 50, parentId: 'status-root' });
+    this.registerMenuEntry('Quota Manager', 'grid-quota-manager', 'sidebar', { weight: 50, parentId: 'status-root' });
+    // Sub Menus Bookmarks
+    this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
