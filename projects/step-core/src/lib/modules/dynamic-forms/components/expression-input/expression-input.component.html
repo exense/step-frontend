@@ -28,6 +28,8 @@
     <button
       type="button"
       mat-stroked-button
+      matTooltip="Open texteditor"
+      matTooltipPosition="below"
       [disabled]="isDisabled || !!isParentDisabled"
       (click)="editDynamicExpression()"
     >
