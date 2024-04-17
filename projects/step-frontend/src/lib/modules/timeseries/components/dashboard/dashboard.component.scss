@@ -18,6 +18,10 @@
     flex-direction: row;
     gap: 1.2rem;
   }
+
+  > div {
+    display: flex;
+  }
 }
 
 .edit-alert {
@@ -79,10 +83,6 @@
   white-space: nowrap;
   text-align: center;
   align-self: center;
-}
-
-.flex {
-  display: flex;
 }
 
 .no-charts-message {
