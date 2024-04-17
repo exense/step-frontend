@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, viewChild } from '@angular/core';
 import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder } from '@angular/forms';
@@ -32,6 +32,8 @@ export class RichEditorDialogComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
   private _dialogs = inject(DialogsService);
 
+  private richEditor = viewChild(RichEditorComponent);
+
   protected _data = inject<RichEditorDialogData>(MAT_DIALOG_DATA);
   protected textControl = this._fb.control(this._data.text);
 
@@ -49,6 +51,10 @@ export class RichEditorDialogComponent implements OnInit {
       .subscribe((hasChanges) => {
         this.changeStatus = hasChanges ? RichEditorChangeStatus.PENDING_CHANGES : RichEditorChangeStatus.NO_CHANGES;
       });
+  }
+
+  focusEditor(): void {
+    this.richEditor()?.focusOnText();
   }
 
   cancel(): void {
