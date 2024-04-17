@@ -10,6 +10,8 @@ import {
   History,
   PlanContextApiService,
   PlanContext,
+  Plan,
+  CompositesService,
 } from '@exense/step-core';
 import { Router } from '@angular/router';
 
@@ -21,6 +23,7 @@ export class CompositeKeywordPlanContextApiService implements PlanContextApiServ
   private _router = inject(Router);
   private _interactiveApi = inject(AugmentedInteractivePlanExecutionService);
   private _exportDialogs = inject(ExportDialogsService);
+  private _compositeApi = inject(CompositesService);
 
   private mapToContext = (overrideId?: string) =>
     pipe(map((keyword: Keyword) => this.createContext(keyword, overrideId)));
@@ -84,6 +87,10 @@ export class CompositeKeywordPlanContextApiService implements PlanContextApiServ
     const keyword = context.entity as unknown as Keyword;
     keyword.attributes!['name'] = name;
     return this._keywordApi.saveFunction(keyword).pipe(this.mapToContext());
+  }
+
+  lookupPlan(id: string, artefactId: string): Observable<Plan> {
+    return this._compositeApi.lookupPlan1(id, artefactId);
   }
 
   private createContext(keyword: Keyword, overrideId?: string): PlanContext {
