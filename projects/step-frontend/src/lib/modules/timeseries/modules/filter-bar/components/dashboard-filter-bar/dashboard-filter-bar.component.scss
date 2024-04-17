@@ -8,7 +8,7 @@ step-ts-dashboard-filter-bar {
   gap: 2.4rem;
 
   .ranger-section {
-    margin: 0 4rem;
+    margin: 0 1rem 0 4rem;
     flex-grow: 1;
   }
 
@@ -19,7 +19,9 @@ step-ts-dashboard-filter-bar {
     justify-content: space-between;
 
     step-time-range-picker {
-      align-self: flex-end;
+      button {
+        margin-top: 2rem;
+      }
     }
   }
 

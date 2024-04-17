@@ -39,7 +39,6 @@ import { FilterBarComponent } from '../../../filter-bar';
 })
 export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() timeRange: TimeRangePickerSelection | undefined;
-  @Input() hasTimePicker = true;
 
   readonly ONE_HOUR_MS = 3600 * 1000;
 

@@ -2,14 +2,14 @@
   <div class="ranger-section">
     <step-execution-time-selection [context]="context" />
   </div>
-  @if (hasTimePicker) {
+  <div>
     <step-time-range-picker
       (selectionChange)="handleTimeRangeChange($event)"
       [selectOptions]="timeRangeOptions"
       [activeSelection]="activeTimeRange"
       [compact]="compactView"
     />
-  }
+  </div>
 </div>
 
 <div class="filters-section">
