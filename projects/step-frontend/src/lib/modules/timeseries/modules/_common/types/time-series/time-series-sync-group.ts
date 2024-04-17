@@ -19,14 +19,23 @@ export class TimeSeriesSyncGroup {
     this.id = id;
   }
 
-  seriesShouldBeVisible(series: string) {
+  seriesShouldBeVisible(series: string): boolean {
+    let shouldBeVisible: boolean;
     if (this.allSeriesChecked) {
-      return true;
+      shouldBeVisible = true;
+    } else if (this.allSeriesUnchecked) {
+      shouldBeVisible = false;
+    } else {
+      const currentVisibility = this.seriesVisibility[series];
+      if (currentVisibility != undefined) {
+        shouldBeVisible = currentVisibility;
+      } else {
+        // series not found
+        shouldBeVisible = true;
+      }
     }
-    if (this.allSeriesUnchecked) {
-      return false;
-    }
-    return this.seriesVisibility[series] !== false;
+    this.seriesVisibility[series] = shouldBeVisible;
+    return shouldBeVisible;
   }
 
   setAllSeriesChecked(checked: boolean) {

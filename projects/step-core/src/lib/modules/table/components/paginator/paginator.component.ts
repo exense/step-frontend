@@ -33,9 +33,7 @@ export class PaginatorComponent {
   // Synchronize input with signal value
   private effectLengthInput = effect(
     () => {
-      if (!this.length()) {
-        this.length.set(this.lengthInput());
-      }
+      this.length.set(this.lengthInput());
     },
     { allowSignalWrites: true },
   );
