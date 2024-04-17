@@ -7,7 +7,7 @@ import {
   PlansService,
   SchedulerService,
 } from '@exense/step-core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,15 +17,31 @@ export class TimeSeriesUtilityService {
   private _planService = inject(PlansService);
   private _schedulerService = inject(SchedulerService);
 
-  getExecutionByIds(ids: string[]): Observable<Execution[]> {
-    return this._executionService.getExecutionsByIds(ids);
+  getEntitiesByIds(ids: string[], entityType: string): Observable<Record<string, string>> {
+    if (!ids || ids.length === 0) {
+      return of({});
+    }
+    switch (entityType) {
+      case 'execution':
+        return this.getExecutionNames(ids);
+      case 'plan':
+        return this.getPlansNames(ids);
+      case 'task':
+        return this.getTasksNames(ids);
+      default:
+        throw new Error('Unhandled entity type: ' + entityType);
+    }
   }
 
-  getTasksByIds(ids: string[]): Observable<ExecutiontTaskParameters[]> {
-    return this._schedulerService.findExecutionTasksByIds(ids);
+  getExecutionNames(ids: string[]): Observable<Record<string, string>> {
+    return this._executionService.getExecutionsNamesByIds(ids);
   }
 
-  getPlansByIds(ids: string[]): Observable<Plan[]> {
-    return this._planService.findPlansByIds(ids);
+  getTasksNames(ids: string[]): Observable<Record<string, string>> {
+    return this._schedulerService.findExecutionTaskNamesByIds(ids);
+  }
+
+  getPlansNames(ids: string[]): Observable<Record<string, string>> {
+    return this._planService.findPlanNamesByIds(ids);
   }
 }

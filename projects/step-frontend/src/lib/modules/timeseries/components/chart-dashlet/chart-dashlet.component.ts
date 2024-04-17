@@ -33,7 +33,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { Observable, Subscription, tap } from 'rxjs';
+import { forkJoin, Observable, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -41,6 +41,7 @@ import { ChartGenerators } from '../../modules/legacy/injectables/chart-generato
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
+import { TableEntry } from '../table-dashlet/table-dashlet.component';
 
 declare const uPlot: any;
 
@@ -249,13 +250,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
     let secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
-    const groupDimensions = this.getChartGrouping();
+    const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
     const primaryAggregation = this.selectedAggregate!;
     const secondaryAxesData: (number | undefined)[] = [];
     const series: TSChartSeries[] = response.matrix.map((series: BucketResponse[], i: number) => {
-      const labelItems = this.getGroupingLabels(response.matrixKeys[i], groupDimensions);
+      const labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
       const seriesKey = this.mergeLabelItems(labelItems);
       const color =
         primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
@@ -297,7 +298,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       },
     ];
 
-    this.fetchLegendEntities(groupDimensions, series);
+    this.fetchLegendEntities(series).subscribe();
 
     if (hasSecondaryAxes) {
       axes.push({
@@ -347,42 +348,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
-  private fetchLegendEntities(groupDimensions: string[], series: TSChartSeries[]) {
-    groupDimensions.forEach((attributeKey, i) => {
-      const attribute = this._attributesByIds[attributeKey];
-      const entityName = attribute?.metadata['entity'];
-      if (!entityName) {
-        return;
-      }
-      switch (entityName) {
-        case 'execution':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getExecutionByIds(ids),
-            (e: Execution) => e.description!,
-          );
-          break;
-        case 'plan':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getPlansByIds(ids),
-            (plan: Plan) => plan.attributes?.['name'],
-          );
-          break;
-        case 'task':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getTasksByIds(ids),
-            (task: ExecutiontTaskParameters) => task.attributes?.['name'],
-          );
-          break;
-      }
-    });
-  }
-
   private getSecondAxesLabel(): string | undefined {
     const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
     switch (aggregation) {
@@ -403,7 +368,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
-    const groupDimensions = this.getChartGrouping();
+    const groupDimensions = this.getGroupDimensions();
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
@@ -422,6 +387,37 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         this.createChart(response);
       }),
     );
+  }
+
+  private fetchLegendEntities(series: TSChartSeries[]): Observable<any> {
+    const groupDimensions = this.getGroupDimensions();
+    const requests$ = groupDimensions
+      .map((attributeKey, i) => {
+        const attribute = this._attributesByIds[attributeKey];
+        const entityName = attribute?.metadata['entity'];
+        if (!entityName) {
+          return undefined;
+        }
+        const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        return this._timeSeriesUtilityService.getEntitiesByIds(Array.from(entityIds.values()), entityName).pipe(
+          tap((response) => {
+            series.forEach((s, j) => {
+              const labelId = s.labelItems[i];
+              if (labelId) {
+                let newLabel;
+                if (response[labelId]) {
+                  newLabel = response[labelId];
+                } else {
+                  newLabel = labelId + ' (unresolved)';
+                }
+                this.chart.setLabelItem(s.id, i, newLabel);
+              }
+            });
+          }),
+        );
+      })
+      .filter((x) => !!x);
+    return forkJoin(requests$);
   }
 
   /**
@@ -489,7 +485,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return label + ' (unresolved)';
   }
 
-  private getChartGrouping(): string[] {
+  private getGroupDimensions(): string[] {
     const masterChart = this.getMasterChart();
     if (masterChart) {
       if (masterChart.inheritGlobalGrouping) {
@@ -576,9 +572,5 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
-  }
-
-  private getGroupingLabels(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
-    return groupDimensions.map((field) => attributes?.[field]);
   }
 }
