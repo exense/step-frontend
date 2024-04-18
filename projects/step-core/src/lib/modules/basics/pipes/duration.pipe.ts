@@ -14,6 +14,8 @@ export class DurationPipe implements PipeTransform {
 
     const startMs = start !== undefined ? this.getMs(start)! : 0;
     const duration = Duration.fromMillis(endMs - startMs).rescale();
+    const year = this.addSuffix(duration.get('years'), 'y');
+    const month = this.addSuffix(duration.get('months'), 'mo');
     const day = this.addSuffix(duration.get('days'), 'd');
     const hour = this.addSuffix(duration.get('hours'), 'h');
     const minute = this.addSuffix(duration.get('minutes'), 'm');
@@ -21,7 +23,7 @@ export class DurationPipe implements PipeTransform {
 
     const ms = duration.get('millisecond');
 
-    let partsToDisplay = [day, hour, minute, second].filter((item) => !!item);
+    let partsToDisplay = [year, month, day, hour, minute, second].filter((item) => !!item);
     if (partsToDisplay.length === 0 && ms > 0) {
       return '< 1s';
     }
