@@ -1,8 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
-  checkProjectGuardFactory,
-  CommonEntitiesUrlsService,
+  checkEntityGuardFactory,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,
@@ -89,7 +88,7 @@ export class FunctionPackagesModule {
               path: ':id',
               dialogComponent: FunctionPackageConfigurationDialogComponent,
               canActivate: [
-                checkProjectGuardFactory({
+                checkEntityGuardFactory({
                   entityType: 'keyword package',
                   getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
                   getEditorUrl: (id) => `/function-packages/editor/${id}`,

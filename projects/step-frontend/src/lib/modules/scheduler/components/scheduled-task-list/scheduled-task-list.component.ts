@@ -10,7 +10,6 @@ import {
   DialogParentService,
   AuthService,
   AugmentedSchedulerService,
-  EditSchedulerTaskDialogUtilsService,
   CommonEntitiesUrlsService,
   DialogRouteResult,
   DialogsService,
@@ -38,7 +37,6 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
   private _auth = inject(AuthService);
   private _dialogs = inject(DialogsService);
   private _schedulerService = inject(AugmentedSchedulerService);
-  private _scheduledTaskDialogs = inject(EditSchedulerTaskDialogUtilsService);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 

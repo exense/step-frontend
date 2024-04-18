@@ -18,9 +18,14 @@ export class DurationPipe implements PipeTransform {
     const hour = this.addSuffix(duration.get('hours'), 'h');
     const minute = this.addSuffix(duration.get('minutes'), 'm');
     const second = this.addSuffix(duration.get('seconds'), 's');
-    const ms = this.addSuffix(duration.get('milliseconds'), 'ms');
 
-    let partsToDisplay = [day, hour, minute, second, ms].filter((item) => !!item);
+    const ms = duration.get('millisecond');
+
+    let partsToDisplay = [day, hour, minute, second].filter((item) => !!item);
+    if (partsToDisplay.length === 0 && ms > 0) {
+      return '< 1s';
+    }
+
     if (!displayFull) {
       partsToDisplay = partsToDisplay.slice(0, 2);
     }

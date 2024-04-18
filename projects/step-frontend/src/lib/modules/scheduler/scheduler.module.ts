@@ -12,6 +12,8 @@ import {
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
+  ImportDialogComponent,
+  ExportDialogComponent,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -22,6 +24,7 @@ import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
 import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
 import { map } from 'rxjs';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule],
@@ -81,6 +84,50 @@ export class SchedulerModule {
             editScheduledTaskRoute({
               path: ':id',
               getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
+            }),
+          ],
+        },
+        dialogRoute({
+          path: 'import',
+          dialogComponent: ImportDialogComponent,
+          data: {
+            title: 'Schedule import',
+            entity: 'tasks',
+            overwrite: false,
+            importAll: false,
+          },
+        }),
+        {
+          path: 'export',
+          component: SimpleOutletComponent,
+          children: [
+            dialogRoute({
+              path: 'all',
+              dialogComponent: ExportDialogComponent,
+              data: {
+                title: 'Schedules export',
+                entity: 'tasks',
+                filename: 'allSchedules.sta',
+              },
+            }),
+            dialogRoute({
+              path: ':id',
+              dialogComponent: ExportDialogComponent,
+              resolve: {
+                id: (route: ActivatedRouteSnapshot) => route.params['id'],
+                filename: (route: ActivatedRouteSnapshot) => {
+                  const api = inject(AugmentedSchedulerService);
+                  const id = route.params['id'];
+                  return api.getExecutionTaskById(id).pipe(
+                    map((task) => task.attributes!['name']),
+                    map((name) => `${name}.sta`),
+                  );
+                },
+              },
+              data: {
+                title: 'Schedules export',
+                entity: 'tasks',
+              },
             }),
           ],
         },
