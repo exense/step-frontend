@@ -25,7 +25,7 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
   setup(
     selectionKeyProperty: string,
     autoDeselectStrategy: AutoDeselectStrategy,
-    registrationStrategy: RegistrationStrategy
+    registrationStrategy: RegistrationStrategy,
   ): void {
     this.selectionKeyProperty = selectionKeyProperty;
     this.autoDeselectStrategy = autoDeselectStrategy;
@@ -35,7 +35,7 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
         filter((x) => !!x),
         bufferTime(100),
         map((items) => items.filter((x) => this.isSelected(x!)) as ENTITY[]),
-        filter((items) => items.length > 0)
+        filter((items) => items.length > 0),
       )
       .subscribe((items) => this.deselect(...items));
   }
@@ -112,8 +112,15 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
   }
 
   selectById(...ids: KEY[]): void {
+    const existed = new Set(this._selected$.value);
+
     // use Set to exclude duplicates
-    const allKeys = Array.from(new Set([...ids, ...this._selected$.value]));
+    const idsToInsert = ids.filter((id) => !existed.has(id));
+    if (!idsToInsert.length) {
+      return;
+    }
+
+    const allKeys = [...this._selected$.value, ...idsToInsert];
     this._selected$.next(allKeys);
   }
 
