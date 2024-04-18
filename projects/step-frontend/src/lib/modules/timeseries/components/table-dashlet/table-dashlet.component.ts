@@ -270,7 +270,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           return undefined;
         }
         const entityIds = new Set<string>(data.map((entry) => entry.groupingLabels[i]).filter((v) => !!v));
-        return this._timeSeriesUtilityService.getEntitiesByIds(Array.from(entityIds.values()), entityName).pipe(
+        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             data.forEach((entry, j) => {
               const labelId = entry.groupingLabels[i];

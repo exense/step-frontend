@@ -17,7 +17,7 @@ export class TimeSeriesUtilityService {
   private _planService = inject(PlansService);
   private _schedulerService = inject(SchedulerService);
 
-  getEntitiesByIds(ids: string[], entityType: string): Observable<Record<string, string>> {
+  getEntitiesNamesByIds(ids: string[], entityType: string): Observable<Record<string, string>> {
     if (!ids || ids.length === 0) {
       return of({});
     }
@@ -33,15 +33,15 @@ export class TimeSeriesUtilityService {
     }
   }
 
-  getExecutionNames(ids: string[]): Observable<Record<string, string>> {
+  private getExecutionNames(ids: string[]): Observable<Record<string, string>> {
     return this._executionService.getExecutionsNamesByIds(ids);
   }
 
-  getTasksNames(ids: string[]): Observable<Record<string, string>> {
+  private getTasksNames(ids: string[]): Observable<Record<string, string>> {
     return this._schedulerService.findExecutionTaskNamesByIds(ids);
   }
 
-  getPlansNames(ids: string[]): Observable<Record<string, string>> {
+  private getPlansNames(ids: string[]): Observable<Record<string, string>> {
     return this._planService.findPlanNamesByIds(ids);
   }
 }

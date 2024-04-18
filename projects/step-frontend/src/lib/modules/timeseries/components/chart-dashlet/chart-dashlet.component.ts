@@ -399,7 +399,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           return undefined;
         }
         const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
-        return this._timeSeriesUtilityService.getEntitiesByIds(Array.from(entityIds.values()), entityName).pipe(
+        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
