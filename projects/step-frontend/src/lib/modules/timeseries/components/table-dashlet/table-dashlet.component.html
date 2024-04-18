@@ -61,8 +61,8 @@
         <mat-checkbox
           color="primary"
           (click)="$event.stopPropagation()"
-          [ngModel]="allSeriesChecked"
-          (ngModelChange)="onAllSeriesCheckboxClick($event)"
+          [(ngModel)]="allSeriesChecked"
+          (change)="onAllSeriesCheckboxClick($event.checked)"
         >
           <span>Name</span>
         </mat-checkbox>
