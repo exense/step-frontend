@@ -269,7 +269,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
-export * from './guards/check-project-guard.factory';
+export * from './guards/check-entity-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
