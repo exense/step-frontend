@@ -12,7 +12,6 @@ import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-hand
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-source-dialog.component';
 import { PlanEditorAttributesDirective } from './directives/plan-editor-attributes.directive';
-import { EntitySelectionControlComponent } from './components/entity-selection-control/entity-selection-control.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +25,6 @@ import { EntitySelectionControlComponent } from './components/entity-selection-c
     PlanAlertsComponent,
     PlanSourceDialogComponent,
     PlanEditorAttributesDirective,
-    EntitySelectionControlComponent,
   ],
   imports: [StepCommonModule, ExecutionModule],
   exports: [

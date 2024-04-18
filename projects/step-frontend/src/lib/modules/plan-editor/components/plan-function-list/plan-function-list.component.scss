@@ -10,11 +10,19 @@ step-plan-function-list {
     thead > tr > th:first-child,
     tbody > tr > td:first-child {
       padding-left: 0.8rem !important;
+      padding-right: 0;
+      width: 0;
     }
   }
 
   .additional-header {
     padding-left: 0.8rem !important;
     padding-right: 0;
+  }
+
+  .selection-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 }
