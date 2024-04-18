@@ -65,8 +65,12 @@ step-plan-editor-base {
     flex: 1;
     margin-right: 2rem;
 
-    step-plan-editor-attributes {
+    step-plan-editor-attributes:has(step-form-field) {
       flex: 1;
+    }
+
+    step-dynamic-label-custom-form-inputs:has(step-form-field) {
+      flex-grow: 100 !important;
     }
   }
 }
