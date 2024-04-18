@@ -1,7 +1,7 @@
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { dialogRoute } from '../../basics/types/dialog-route';
 import { EditSchedulerTaskDialogComponent } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
-import { checkProjectGuardFactory } from '../../../guards/check-project-guard.factory';
+import { checkEntityGuardFactory } from '../../../guards/check-entity-guard.factory';
 import { inject } from '@angular/core';
 import { AugmentedSchedulerService } from '../../../client/augmented/services/augmented-scheduler.service';
 import { EditSchedulerTaskDialogUtilsService } from '../injectables/edit-scheduler-task-dialog-utils.service';
@@ -18,7 +18,7 @@ export const editScheduledTaskRoute = ({
     path,
     dialogComponent: EditSchedulerTaskDialogComponent,
     canActivate: [
-      checkProjectGuardFactory({
+      checkEntityGuardFactory({
         entityType: 'task',
         getEntity: (id) => inject(AugmentedSchedulerService).getExecutionTaskByIdCached(id),
         getEditorUrl,

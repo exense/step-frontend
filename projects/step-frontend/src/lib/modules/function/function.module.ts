@@ -16,7 +16,7 @@ import {
   ImportDialogComponent,
   ExportDialogComponent,
   FunctionConfigurationDialogResolver,
-  checkProjectGuardFactory,
+  checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   NavigatorService,
 } from '@exense/step-core';
@@ -82,7 +82,7 @@ export class FunctionModule {
               path: ':id',
               resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
               canActivate: [
-                checkProjectGuardFactory({
+                checkEntityGuardFactory({
                   entityType: 'keyword',
                   getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
@@ -163,7 +163,7 @@ export class FunctionModule {
           path: 'editor/:id',
           component: CompositeFunctionEditorComponent,
           canActivate: [
-            checkProjectGuardFactory({
+            checkEntityGuardFactory({
               entityType: 'keyword',
               getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
               getEditorUrl: (id) => `/composites/editor/${id}`,
