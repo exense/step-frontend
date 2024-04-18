@@ -8,9 +8,11 @@
 >
   <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
     <step-bulk-selection-di />
-    <button mat-icon-button matTooltip="Add selected plans" (click)="addAllPlans()">
-      <step-icon name="plus-circle" />
-    </button>
+    @if (hasSelection$ | async) {
+      <button mat-icon-button matTooltip="Add selected plans" (click)="addAllPlans()">
+        <step-icon name="plus-circle" />
+      </button>
+    }
   </div>
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>

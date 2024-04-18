@@ -7,6 +7,7 @@ import {
   selectionCollectionProvider,
   SelectionCollector,
 } from '@exense/step-core';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-plan-otherplan-list',
@@ -19,6 +20,8 @@ export class PlanOtherplanListComponent {
   private _selectionCollector = inject<SelectionCollector<string, Plan>>(SelectionCollector);
 
   readonly dataSource = inject(AugmentedPlansService).getPlansTableDataSource();
+
+  readonly hasSelection$ = this._selectionCollector.length$.pipe(map((length) => length > 0));
 
   /** @Output **/
   addPlans = output<string[]>();

@@ -6,6 +6,7 @@ import {
   selectionCollectionProvider,
   SelectionCollector,
 } from '@exense/step-core';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-plan-function-list',
@@ -17,6 +18,8 @@ import {
 export class PlanFunctionListComponent {
   private _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);
   readonly dataSource = inject(AugmentedKeywordsService).createFilteredTableDataSource();
+
+  readonly hasSelection$ = this._selectionCollector.length$.pipe(map((length) => length > 0));
 
   /** @Output **/
   addKeywords = output<string[]>();
