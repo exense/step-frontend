@@ -23,5 +23,11 @@ export const $TableRequest = {
     sort: {
       type: 'Sort',
     },
+    performEnrichment: {
+      type: 'boolean',
+    },
+    calculateCounts: {
+      type: 'boolean',
+    },
   },
 } as const;
