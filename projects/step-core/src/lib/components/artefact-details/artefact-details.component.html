@@ -31,8 +31,8 @@
       </section>
     }
     @if (!!artefactMeta?.component) {
-      <section class="editor">
-        @if (artefactMeta!.label === 'CallPlan' || artefactMeta!.label === 'CallKeyword') {
+      @if (artefactMeta!.label === 'CallPlan' || artefactMeta!.label === 'CallKeyword') {
+        <section class="editor plan-or-keyword" [ngClass]="{ 'call-plan': artefactMeta!.label === 'CallPlan' }">
           <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
           <step-custom-item-render
             id="call-name-input"
@@ -40,14 +40,16 @@
             [component]="artefactMeta!.component"
             [context]="editorContext"
           />
-        } @else {
+        </section>
+      } @else {
+        <section class="editor no-plan-or-keyword">
           <step-custom-item-render
             [artefactId]="artefact.id"
             [component]="artefactMeta!.component"
             [context]="editorContext"
           />
-        }
-      </section>
+        </section>
+      }
     }
     <mat-expansion-panel [(expanded)]="showAttributes">
       <mat-expansion-panel-header>

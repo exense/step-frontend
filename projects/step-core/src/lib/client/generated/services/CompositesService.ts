@@ -27,4 +27,22 @@ export class CompositesService {
       },
     });
   }
+
+  /**
+   * Returns the plan referenced by the given artifact within the given composite.
+   * @param id
+   * @param artefactid
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public lookupPlan1(id: string, artefactid: string): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/composites/{id}/artefacts/{artefactid}/lookup/plan',
+      path: {
+        id: id,
+        artefactid: artefactid,
+      },
+    });
+  }
 }
