@@ -21,6 +21,9 @@ export class ProjectSwitchDialogComponent {
 
   @HostListener('keydown.enter')
   openInTarget(): void {
+    if (!this._data.targetProject) {
+      return;
+    }
     this._dialogRef.close(ProjectSwitchDialogResult.OPEN_IN_TARGET);
   }
 }

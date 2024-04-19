@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { DialogsService } from '../../../basics/step-basics.module';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 
 type OnChange = (expression?: string) => void;
 type OnTouch = () => void;
@@ -23,7 +23,7 @@ export class ExpressionInputComponent implements ControlValueAccessor {
   @Output() toggleConstantValue = new EventEmitter<void>();
   @Output() blur = new EventEmitter<void>();
 
-  private _dialogsService = inject(DialogsService);
+  private _richEditorDialogs = inject(RichEditorDialogService);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -62,9 +62,11 @@ export class ExpressionInputComponent implements ControlValueAccessor {
   }
 
   protected editDynamicExpression(): void {
-    this._dialogsService.enterValue('Free text editor', this.expression, true).subscribe((expression) => {
-      this.expression = expression;
-      this.onChange?.(expression);
-    });
+    this._richEditorDialogs
+      .editText(this.expression, { predefinedMode: AceMode.GROOVY, title: 'Free text editor' })
+      .subscribe((expression) => {
+        this.expression = expression;
+        this.onChange?.(expression);
+      });
   }
 }

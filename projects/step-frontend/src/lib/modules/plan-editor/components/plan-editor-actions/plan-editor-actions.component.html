@@ -18,7 +18,7 @@
     matTooltipPosition="below"
     (click)="undo.emit()"
   >
-    <step-icon class="icon-flipped" name="rotate-cw"></step-icon>
+    <step-icon class="icon-flipped" name="rotate-cw" />
   </button>
 
   <button
@@ -29,14 +29,11 @@
     matTooltipPosition="below"
     (click)="redo.emit()"
   >
-    <step-icon name="rotate-cw"></step-icon>
+    <step-icon name="rotate-cw" />
   </button>
-  <step-dashlet
-    *ngFor="let editorAction of _planActions; trackBy: trackByDashlet"
-    [itemKey]="editorAction.template"
-    [context]="planEditorContext"
-  >
-  </step-dashlet>
+  @for (editorAction of _planActions; track editorAction.id) {
+    <step-dashlet [itemKey]="editorAction.template" [context]="planContext" />
+  }
   <button
     type="button"
     mat-stroked-button
@@ -44,7 +41,7 @@
     [matTooltip]="captions.duplicate"
     matTooltipPosition="below"
   >
-    <step-icon name="copy"></step-icon>
+    <step-icon name="copy" />
   </button>
 
   <button
@@ -54,17 +51,19 @@
     [matTooltip]="captions.export"
     matTooltipPosition="below"
   >
-    <step-icon name="upload"></step-icon>
+    <step-icon name="upload" />
   </button>
-  <button
-    type="button"
-    mat-stroked-button
-    (click)="showSource.emit()"
-    [matTooltip]="captions.showSource"
-    matTooltipPosition="below"
-  >
-    <step-icon name="code"></step-icon>
-  </button>
+  @if (showExportSourceButton) {
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="showSource.emit()"
+      [matTooltip]="captions.showSource"
+      matTooltipPosition="below"
+    >
+      <step-icon name="code" />
+    </button>
+  }
 </step-btn-group>
 <step-btn-group class="with-borders">
   <button
@@ -75,35 +74,37 @@
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
     matTooltipPosition="below"
   >
-    <step-icon name="bug-01"></step-icon>
+    <step-icon name="bug-01" />
   </button>
 
-  <button
-    *ngIf="isInteractiveSessionActive"
-    type="button"
-    mat-stroked-button
-    (click)="reset.emit()"
-    [matTooltip]="captions.resetInteractive"
-    matTooltipPosition="below"
-  >
-    <step-icon name="refresh-cw"></step-icon>
-  </button>
+  @if (isInteractiveSessionActive) {
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="reset.emit()"
+      [matTooltip]="captions.resetInteractive"
+      matTooltipPosition="below"
+    >
+      <step-icon name="refresh-cw" />
+    </button>
+  }
   <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
 </step-btn-group>
 
-<step-btn-group class="with-borders">
-  <button
-    *ngIf="showExecuteButton"
-    type="button"
-    mat-stroked-button
-    color="primary"
-    [matMenuTriggerFor]="executionMenu"
-    [matTooltip]="captions.start"
-    matTooltipPosition="below"
-  >
-    <step-icon name="play-circle"></step-icon>
-  </button>
-</step-btn-group>
+@if (showExecuteButton) {
+  <step-btn-group class="with-borders">
+    <button
+      type="button"
+      mat-stroked-button
+      color="primary"
+      [matMenuTriggerFor]="executionMenu"
+      [matTooltip]="captions.start"
+      matTooltipPosition="below"
+    >
+      <step-icon name="play-circle" />
+    </button>
+  </step-btn-group>
+}
 
 <mat-menu #executionMenu="matMenu">
   <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
@@ -117,12 +118,9 @@
 <mat-menu #interactiveSessionMenu="matMenu">
   <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
-      <step-custom-forms
-        *ngIf="_interactiveSession.executionParameters"
-        [stModel]="_interactiveSession.executionParameters"
-        stScreen="executionParameters"
-      >
-      </step-custom-forms>
+      @if (_interactiveSession.executionParameters) {
+        <step-custom-forms [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters" />
+      }
       <step-btn-group>
         <button
           type="button"

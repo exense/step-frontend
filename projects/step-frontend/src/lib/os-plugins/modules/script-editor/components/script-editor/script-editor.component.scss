@@ -8,7 +8,18 @@
 mat-card {
   height: 100%;
   border: none;
-  height: 100%;
+
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    flex-wrap: nowrap;
+
+    step-rich-editor-change-status {
+      font-size: 1.5rem;
+      font-weight: normal;
+    }
+  }
 
   mat-card-content {
     height: 100%;
@@ -22,26 +33,17 @@ mat-card {
 
     .editor-buttons {
       padding-bottom: 1rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
     }
 
-    .left-btn-group {
-      margin-right: 2rem;
-    }
-
-    .status-saved {
-      color: var.$green-650;
-    }
-
-    .status-no-changes {
-      color: #000;
-    }
-
-    .status-has-changes {
-      color: var.$orange;
+    .btn-execute {
+      height: 3.4rem;
     }
   }
 }
 
-.editor {
+step-rich-editor {
   height: 100%;
 }

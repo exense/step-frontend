@@ -64,12 +64,12 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     }
 
     const targetProject = this.getEntityProject(entity);
-    if (!targetProject) {
-      console.error(`Project not found for ${entityType}`, entity);
-      return of(false);
-    }
 
-    const title = `Selected ${entityType} belongs to the project "${targetProject?.name}", do you want to switch?`;
+    const title = !!targetProject ? 'Switch to another project' : `Open ${entityType} in current project`;
+
+    const message = !!targetProject
+      ? `Selected ${entityType} belongs to the project "${targetProject?.name}", do you want to switch?`
+      : `Selected ${entityType} belongs to another global project, which you don't have access to. Do you want to open it in current project?`;
 
     return this._matDialog
       .open<ProjectSwitchDialogComponent, ProjectSwitchDialogData, ProjectSwitchDialogResult>(
@@ -77,6 +77,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
         {
           data: {
             title,
+            message,
             targetProject,
           },
           width: '80rem',
@@ -85,7 +86,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
       .afterClosed()
       .pipe(
         filter((result) => {
-          if (result === ProjectSwitchDialogResult.OPEN_IN_TARGET) {
+          if (result === ProjectSwitchDialogResult.OPEN_IN_TARGET && targetProject) {
             const editParams = typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink;
             this.switchToProject(targetProject, editParams);
             return false;

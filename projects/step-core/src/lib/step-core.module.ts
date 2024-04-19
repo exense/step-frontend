@@ -67,8 +67,10 @@ import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { COLOR_PICKER_EXPORTS } from './modules/color-picker';
+import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
+import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 
 @NgModule({
   declarations: [
@@ -138,7 +140,9 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
     COLOR_PICKER_EXPORTS,
+    BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
+    RICH_EDITOR_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -202,8 +206,10 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     IMPORT_EXPORT_EXPORTS,
     DRAG_DROP_EXPORTS,
     COLOR_PICKER_EXPORTS,
+    BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
+    RICH_EDITOR_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -269,7 +275,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
-export * from './guards/check-project-guard.factory';
+export * from './guards/check-entity-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
@@ -303,7 +309,6 @@ export * from './services/global-progress-spinner.service';
 export * from './services/http-interceptor-bridge.service';
 export * from './services/invoke-run.service';
 export * from './services/link-processor.service';
-export * from './services/menu-items-override-config.service';
 export * from './services/task-by-id-cache.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/artefact.service';
@@ -324,6 +329,7 @@ export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
 export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
+export * from './modules/bookmarks';
 export * from './services/auto-refresh-model-factory.service';
 export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
@@ -331,3 +337,4 @@ export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './modules/color-picker';
 export * from './pipes/dashboard-navigation-params.pipe';
+export * from './modules/rich-editor';

@@ -10,6 +10,6 @@ export class PackageUrlPipe implements PipeTransform {
       return '';
     }
     const id = typeof idOrPackage === 'string' ? idOrPackage : idOrPackage.id;
-    return `/functionPackages/editor/${id}`;
+    return `/function-packages/editor/${id}`;
   }
 }
