@@ -51,8 +51,15 @@
     }
     @if (!isNumber) {
       <step-suffix class="button-suffix">
-        <button type="button" mat-stroked-button (click)="editConstantValue()" [disabled]="isDisabled">
-          <step-icon name="edit-2" />
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Open texteditor"
+          matTooltipPosition="below"
+          (click)="editConstantValue()"
+          [disabled]="isDisabled"
+        >
+          <step-icon name="edit" />
         </button>
       </step-suffix>
     }

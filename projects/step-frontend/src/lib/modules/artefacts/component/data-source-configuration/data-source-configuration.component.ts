@@ -1,9 +1,10 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, TrackByFunction, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { map } from 'rxjs';
 import { DataSourceType } from '../../shared/data-source-type.enum';
 import {
+  AceMode,
   ArtefactContext,
   ArtefactFormChangeHelperService,
   BaseArtefactComponent,
@@ -48,8 +49,6 @@ export class DataSourceConfigurationComponent
     createDataSourceTypeItem(DataSourceType.GSHEET, 'Google Sheet v4'),
   ];
 
-  readonly trackByDataSourceType: TrackByFunction<DataSourceTypeItem> = (index, item) => item.key;
-
   protected handleDataSourceTypeChange(dataSourceType?: DataSourceType): void {
     if (!this.context.artefact || dataSourceType === this.context.artefact.dataSourceType) {
       return;
@@ -75,4 +74,6 @@ export class DataSourceConfigurationComponent
       this.contextChange();
     }
   }
+
+  protected readonly AceMode = AceMode;
 }
