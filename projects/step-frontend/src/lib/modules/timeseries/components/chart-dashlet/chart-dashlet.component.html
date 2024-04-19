@@ -73,11 +73,16 @@
       *ngFor="let aggregate of AGGREGATES"
       (click)="switchAggregate(aggregate)"
       mat-menu-item
+      class="selected-menu-item"
       [class.selected-menu-item]="aggregate === selectedAggregate"
     >
       {{ aggregate }}
     </button>
-    <button mat-menu-item [matMenuTriggerFor]="pclMenu" [class.selected-menu-item]="selectedAggregate === 'PERCENTILE'">
+    <button
+      mat-menu-item
+      [matMenuTriggerFor]="pclMenu"
+      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE"
+    >
       PERCENTILE
     </button>
   </mat-menu>
@@ -85,8 +90,8 @@
   <mat-menu #pclMenu="matMenu">
     <button
       *ngFor="let pcl of PCL_VALUES"
-      (click)="selectedPclValue = pcl; switchAggregate('PERCENTILE')"
-      [class.selected-menu-item]="selectedAggregate === 'PERCENTILE' && selectedPclValue === pcl"
+      (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl)"
+      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && selectedPclValue === pcl"
       mat-menu-item
     >
       {{ pcl }}th

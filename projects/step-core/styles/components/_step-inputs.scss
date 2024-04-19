@@ -66,6 +66,37 @@ $border-radius: 8px;
     line-height: 1;
     gap: 0.4rem;
 
+    mat-select,
+    mat-radio-group,
+    mat-date-range-input,
+    .step-checkbox-container,
+    .step-field-container,
+    input,
+    pre,
+    step-array-input,
+    step-autocomplete-input,
+    step-rich-editor,
+    textarea {
+      border-color: $border-color;
+      font-weight: 400;
+      padding: 8px 14px;
+      line-height: 18px;
+      margin-top: 0;
+      margin-bottom: 0;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    mat-radio-group {
+      padding: 7px 14px 4px 14px;
+      display: flex;
+      gap: 1rem;
+    }
+
+    mat-date-range-input .mat-date-range-input-container input {
+      padding: 0;
+    }
+
     & > .label-container {
       display: flex;
       justify-content: flex-start;
@@ -137,6 +168,7 @@ $border-radius: 8px;
         & > step-array-input,
         & > step-autocomplete-input,
         & > textarea,
+        step-rich-editor,
         & > step-suffix,
         & > step-prefix {
           border-color: $primary-color;
@@ -152,6 +184,17 @@ $border-radius: 8px;
     }
 
     &.ng-invalid.ng-touched {
+      mat-select,
+      input,
+      pre,
+      step-array-input,
+      step-autocomplete-input,
+      mat-date-range-input,
+      step-rich-editor,
+      textarea {
+        border-color: $error-color;
+      }
+
       & > .label-container {
         & > label,
         & > .required-marker-container {
@@ -229,6 +272,7 @@ $border-radius: 8px;
       pre,
       step-array-input,
       step-autocomplete-input,
+      step-rich-editor,
       textarea {
         @include border-base;
         @include right-border;

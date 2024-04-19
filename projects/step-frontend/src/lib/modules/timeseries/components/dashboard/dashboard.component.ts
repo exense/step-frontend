@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
 import {
+  AugmentedTimeSeriesService,
   AuthService,
   DashboardItem,
   DashboardsService,
@@ -9,8 +10,6 @@ import {
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
-  TimeSeriesService,
-  TimeUnit,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
@@ -60,7 +59,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
@@ -68,6 +67,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
+
+  private exportInProgress = false;
 
   dashboard!: DashboardView;
   dashboardBackup!: DashboardView;
@@ -175,7 +176,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   enableEditMode() {
-    this.dashboardBackup = { ...this.dashboard, dashlets: [...this.dashboard.dashlets.map((item) => ({ ...item }))] };
+    this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
     if (!this.metricTypes) {
       this.fetchMetricTypes();
@@ -246,45 +247,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);
     }
-  }
-
-  private convertUrlFilters(
-    urlParams: DashboardUrlParams,
-    attributesDefinition: Record<string, MetricAttribute>,
-  ): FilterBarItem[] {
-    return urlParams.filters
-      .filter((i) => !!attributesDefinition[i.attribute])
-      .map((urlFilter) => {
-        const filterItem = FilterUtils.createFilterItemFromAttribute(attributesDefinition[urlFilter.attribute]);
-        switch (filterItem.type) {
-          case FilterBarItemType.OPTIONS:
-            urlFilter.values?.forEach((v) => {
-              let foundOptions = filterItem.textValues?.find((textValue) => textValue.value === v);
-              if (foundOptions) {
-                foundOptions.isSelected = true;
-              } else {
-                filterItem.textValues?.push({ value: v, isSelected: true });
-              }
-            });
-            filterItem.exactMatch = true;
-            break;
-          case FilterBarItemType.FREE_TEXT:
-            filterItem.freeTextValues = urlFilter.values;
-            break;
-          case FilterBarItemType.EXECUTION:
-          case FilterBarItemType.TASK:
-          case FilterBarItemType.PLAN:
-            filterItem.exactMatch = true;
-            filterItem.searchEntities = urlFilter.values?.map((v) => ({ searchValue: v, entity: undefined })) || [];
-            break;
-          case FilterBarItemType.NUMERIC:
-          case FilterBarItemType.DATE:
-            filterItem.min = urlFilter.min;
-            filterItem.max = urlFilter.max;
-            break;
-        }
-        return filterItem;
-      });
   }
 
   createContext(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeSeriesContext {
@@ -437,6 +399,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       replaceUrl: true,
       queryParams: currentParams,
       queryParamsHandling: 'merge',
+    });
+  }
+
+  exportRawData(): void {
+    if (this.exportInProgress || !this.context) {
+      return;
+    }
+    this.exportInProgress = true;
+    const oqlFilter = this.context.buildActiveOQL(true, true);
+    this._timeSeriesService.exportRawMeasurementsAsCSV(oqlFilter).subscribe({
+      complete: () => (this.exportInProgress = false),
     });
   }
 }

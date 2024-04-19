@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { AbstractArtefact, ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
+import { AbstractArtefact, AceMode, ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
 interface ScriptArtefact extends AbstractArtefact {
@@ -15,4 +15,6 @@ interface ScriptArtefact extends AbstractArtefact {
 export class ScriptComponent extends BaseArtefactComponent<ScriptArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
+
+  readonly AceMode = AceMode;
 }

@@ -3,6 +3,13 @@
   display: block;
 }
 
+.header-title {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding-left: 0.5rem;
+  width: 100%;
+}
+
 .spinner-container {
   position: absolute;
   inset: 0;
