@@ -3,7 +3,7 @@ import { SpecialLinksStrategy } from '../shared/special-links-strategy';
 
 const DEFAULT_STRATEGY: SpecialLinksStrategy = {
   settings: () => '/settings',
-  myAccount: () => '/settings/myaccount',
+  myAccount: () => '/settings/my-account',
 };
 
 @Injectable({

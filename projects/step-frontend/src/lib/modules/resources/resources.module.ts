@@ -1,7 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedResourcesService,
-  checkProjectGuardFactory,
+  checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   dialogRoute,
   EntityRegistry,
@@ -60,7 +60,7 @@ export class ResourcesModule {
               path: ':id',
               dialogComponent: ResourceConfigurationDialogComponent,
               canActivate: [
-                checkProjectGuardFactory({
+                checkEntityGuardFactory({
                   entityType: 'resource',
                   getEntity: (id) => inject(AugmentedResourcesService).getResource(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).resourceEditorUrl(id),

@@ -15,7 +15,7 @@ import {
 import { AlignedData } from 'uplot';
 import { TooltipPlugin } from '../../injectables/tooltip-plugin';
 import { MarkerType, TimeRange } from '@exense/step-core';
-import { COMMON_IMPORTS, UPlot } from '../../../_common';
+import { COMMON_IMPORTS, TimeSeriesConfig, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
 import { TSChartSettings } from '../../types/ts-chart-settings';
 import { TooltipParentContainer } from '../../types/tooltip-parent-container';
@@ -140,6 +140,8 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
     if (settings.axes.length > 1) {
       this.legendSettings.zAxisLabel = this.settings.tooltipOptions.zAxisLabel || 'Total';
+    } else {
+      this.legendSettings.zAxisLabel = undefined;
     }
     settings.series.forEach((series, i) => {
       if (series.id) {
@@ -327,9 +329,9 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   private mergeLabelItems(items: (string | undefined)[]): string {
     if (items.length === 0) {
-      return 'Value';
+      return TimeSeriesConfig.SERIES_LABEL_VALUE;
     }
-    return items.map((i) => i ?? '<Empty>').join(' | ');
+    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
   setSeriesLabel(id: string, label: string): void {
