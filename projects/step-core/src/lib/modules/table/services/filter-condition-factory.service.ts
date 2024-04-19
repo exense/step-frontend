@@ -16,51 +16,54 @@ import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
 import { DateRange } from '../../date-picker/date-picker.module';
 import { ArrayFilterCondition } from '../shared/array-filter-condition';
+import { FilterConditionConfigurerService } from './filter-condition-configurer.service';
+import { REQUEST_FILTERS_INTERCEPTORS } from './request-filter-interceptors.token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FilterConditionFactoryService {
   private _parameters = inject(REPOSITORY_PARAMETERS);
+  private _interceptors = inject(REQUEST_FILTERS_INTERCEPTORS, { optional: true });
 
   basicFilterCondition(filters: TableRequestFilter[]): FilterCondition {
-    return new BasicFilterCondition(filters);
+    return this.configureCondition(new BasicFilterCondition(filters));
   }
 
   singleDateFilterCondition(date?: DateTime): FilterCondition {
-    return new SingleDateFilterCondition(date);
+    return this.configureCondition(new SingleDateFilterCondition(date));
   }
 
   dateRangeFilterCondition(range?: DateRange, columnsOverride?: { start?: string; end?: string }): FilterCondition {
-    return new DateRangeFilterCondition({ range, columnsOverride });
+    return this.configureCondition(new DateRangeFilterCondition({ range, columnsOverride }));
   }
 
-  arrayFilterCondition(items?: string[], fields?: string[]): FilterCondition {
-    return new ArrayFilterCondition({ items, fields });
+  arrayFilterCondition(items?: string[]): FilterCondition {
+    return this.configureCondition(new ArrayFilterCondition(items));
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
-    return new ScopeFilterCondition(value);
+    return this.configureCondition(new ScopeFilterCondition(value));
   }
 
   reportNodeFilterCondition(value?: string, attributes?: string[]): FilterCondition {
-    return new ReportNodeFilterCondition(value, attributes);
+    return this.configureCondition(new ReportNodeFilterCondition(value, attributes));
   }
 
   numberFilterCondition(value?: string): FilterCondition {
-    return new NumberFilterCondition(value);
+    return this.configureCondition(new NumberFilterCondition(value));
   }
 
   booleanFilterCondition(value?: string): FilterCondition {
-    return new BooleanFilterCondition(value);
+    return this.configureCondition(new BooleanFilterCondition(value));
   }
 
   dynamicValueFilterCondition(value?: string): FilterCondition {
-    return new DynamicValueFilterCondition(value);
+    return this.configureCondition(new DynamicValueFilterCondition(value));
   }
 
   parametersFilterCondition(value?: string): FilterCondition {
-    return new ParametersFilterCondition(this._parameters, value);
+    return this.configureCondition(new ParametersFilterCondition(this._parameters, value));
   }
 
   create(filterCondition?: FilterConditionJson): FilterCondition | undefined {
@@ -88,11 +91,17 @@ export class FilterConditionFactoryService {
           filterCondition?.sourceObject?.columnsOverride,
         );
       case FilterConditionType.ARRAY:
-        return this.arrayFilterCondition(filterCondition?.sourceObject?.items, filterCondition?.sourceObject?.fields);
+        return this.arrayFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.BOOLEAN:
         return this.booleanFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }
+  }
+
+  private configureCondition(filterCondition: FilterCondition): FilterCondition {
+    console.log('INTERCEPTORS', this._interceptors);
+    filterCondition.assignRequestFilterInterceptors(this._interceptors);
+    return filterCondition;
   }
 }

@@ -21,7 +21,7 @@ export class ParametersFilterCondition extends FilterCondition<{
     return !this.sourceObject?.searchValue;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     if (!this.sourceObject?.searchValue || !this.sourceObject?.availableParameters.length) {
       return [];
     }
@@ -36,7 +36,7 @@ export class ParametersFilterCondition extends FilterCondition<{
               field: `${field}.${parameter}`,
               expression: this.sourceObject?.searchValue,
               caseSensitive: false,
-            } as RegexFilter)
+            }) as RegexFilter,
         ),
       },
     };

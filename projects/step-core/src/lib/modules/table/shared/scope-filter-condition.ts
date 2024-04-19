@@ -14,7 +14,7 @@ export class ScopeFilterCondition extends FilterCondition<string> {
     return !this.sourceObject;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     if (!this.sourceObject) {
       return [];
     }

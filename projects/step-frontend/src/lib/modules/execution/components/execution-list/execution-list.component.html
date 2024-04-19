@@ -70,7 +70,6 @@
       #statusFilter
       stepFilterConnect
       [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
-      [conditionFnAdditionalParams]="statusColumns"
       [remapValues]="remapStatuses"
       [items]="(statusItemsTree$ | async)!"
     />

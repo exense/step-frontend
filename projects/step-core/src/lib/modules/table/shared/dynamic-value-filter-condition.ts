@@ -10,7 +10,7 @@ export class DynamicValueFilterCondition extends FilterCondition<string> {
     super(searchValue);
   }
 
-  toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     if (!this.sourceObject) {
       return [];
     }
