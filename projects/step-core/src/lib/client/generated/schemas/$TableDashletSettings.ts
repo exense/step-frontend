@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $TableSettings = {
+export const $TableDashletSettings = {
   properties: {
     columns: {
       type: 'array',

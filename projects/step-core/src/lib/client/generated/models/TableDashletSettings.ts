@@ -4,6 +4,6 @@
 
 import type { ColumnSelection } from './ColumnSelection';
 
-export type TableSettings = {
+export type TableDashletSettings = {
   columns: Array<ColumnSelection>;
 };

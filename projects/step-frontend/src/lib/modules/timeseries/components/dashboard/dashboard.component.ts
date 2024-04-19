@@ -7,15 +7,12 @@ import {
   DashboardView,
   MetricAttribute,
   MetricType,
-  TableSettings,
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
   FilterUtils,
   TimeRangePickerSelection,
   TimeSeriesConfig,

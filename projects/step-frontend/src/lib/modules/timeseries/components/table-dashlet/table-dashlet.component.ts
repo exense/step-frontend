@@ -18,21 +18,16 @@ import {
   TimeSeriesContext,
   TimeSeriesUtilityService,
 } from '../../modules/_common';
-import { ChartSkeletonComponent, TSChartSeries } from '../../modules/chart';
+import { ChartSkeletonComponent } from '../../modules/chart';
 import {
-  BucketAttributes,
   BucketResponse,
   DashboardItem,
-  Execution,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
   MarkerType,
   MetricAttribute,
-  Plan,
-  TableDataSource,
+  TableDashletSettings,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
-  TableSettings,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -88,7 +83,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
   tableIsLoading = true;
 
-  settings!: TableSettings;
+  settings!: TableDashletSettings;
 
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];

@@ -1,12 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  Execution,
-  ExecutionsService,
-  ExecutiontTaskParameters,
-  Plan,
-  PlansService,
-  SchedulerService,
-} from '@exense/step-core';
+import { ExecutionsService, PlansService, SchedulerService } from '@exense/step-core';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
