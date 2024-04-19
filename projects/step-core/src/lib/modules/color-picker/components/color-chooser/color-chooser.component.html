@@ -1,0 +1,14 @@
+@for (color of colors(); track color) {
+  @if (!color) {
+    <div class="clear" matTooltip="Clear color" (click)="selectColor('')">
+      <step-icon name="x" />
+    </div>
+  } @else {
+    <div
+      class="color-item"
+      [style.background-color]="color"
+      [class.selected]="color === selectedColor"
+      (click)="selectColor(color)"
+    ></div>
+  }
+}

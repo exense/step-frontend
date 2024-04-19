@@ -6,11 +6,13 @@ import {
   ViewRegistryService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
+import { UserStateService } from '../../modules/admin/admin.module';
 
 @Component({
   selector: 'step-main-view',
   templateUrl: './main-view.component.html',
   styleUrls: ['./main-view.component.scss'],
+  providers: [UserStateService],
 })
 export class MainViewComponent {
   private _viewRegistry = inject(ViewRegistryService);

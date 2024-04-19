@@ -36,6 +36,7 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
+import { AdminModule } from '../admin/admin.module';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,7 @@ import { ExecutionRunningStatusHeaderComponent } from './components/execution-ru
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
+  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, AdminModule],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

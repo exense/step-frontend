@@ -18,6 +18,9 @@ import { RenderOptionsPipe } from './pipes/render-options.pipe';
 import { UserSelectionComponent } from './components/user-selection/user-selection.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
+import { CurrentUserAvatarComponent } from './components/current-user-avatar/current-user-avatar.component';
+import { AvatarEditorComponent } from './components/avatar-editor/avatar-editor.component';
+import { UserAvatarComponent } from './components/user-avatar/user-avatar.component';
 
 @NgModule({
   declarations: [
@@ -27,12 +30,18 @@ import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
     ScreenInputDropdownOptionsComponent,
     RenderOptionsPipe,
     UserSelectionComponent,
+    CurrentUserAvatarComponent,
+    UserAvatarComponent,
+    AvatarEditorComponent,
   ],
   exports: [
     MyAccountComponent,
     ScreenConfigurationListComponent,
     ScreenInputEditDialogComponent,
     UserSelectionComponent,
+    AvatarEditorComponent,
+    CurrentUserAvatarComponent,
+    UserAvatarComponent,
   ],
   imports: [StepCoreModule, StepCommonModule],
   providers: [RenderOptionsPipe],
@@ -123,3 +132,5 @@ export class AdminModule {
     );
   }
 }
+
+export * from './injectables/user-state.service';

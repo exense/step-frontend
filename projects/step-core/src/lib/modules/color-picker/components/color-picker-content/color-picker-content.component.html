@@ -1,0 +1,12 @@
+<div cdkTrapFocus role="dialog" [attr.aria-modal]="true">
+  <mat-card>
+    @if (settings.title) {
+      <mat-card-header>
+        <mat-card-title>{{ settings.title }}</mat-card-title>
+      </mat-card-header>
+    }
+    <mat-card-content>
+      <step-color-chooser [(ngModel)]="color" [showClearColor]="!!settings.showClearColor" />
+    </mat-card-content>
+  </mat-card>
+</div>

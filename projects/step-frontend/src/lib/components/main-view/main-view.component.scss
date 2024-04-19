@@ -2,6 +2,16 @@
   height: 100%;
 }
 
+.user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  step-current-user-avatar {
+    font-size: 1.2rem;
+  }
+}
+
 .icon-bookmark {
   cursor: pointer;
 }
