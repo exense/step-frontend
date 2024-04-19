@@ -4,6 +4,7 @@
   </a>
   <step-btn-group>
     <button
+      class="pkg-button"
       mat-icon-button
       matTooltip="Refresh package"
       [disabled]="!('kw-read' | hasRight | async) || isRefreshing"
@@ -12,6 +13,7 @@
       <step-icon name="refresh-cw"></step-icon>
     </button>
     <a
+      class="pkg-button"
       mat-icon-button
       matTooltip="Edit package"
       [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
@@ -20,6 +22,7 @@
       <step-icon name="edit-2">edit</step-icon>
     </a>
     <button
+      class="pkg-button"
       mat-icon-button
       matTooltip="Delete package"
       [disabled]="!('kw-write' | hasRight | async) || isRefreshing"
