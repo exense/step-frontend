@@ -28,7 +28,7 @@
       </mat-menu>
     }
     <mat-menu #columnsMenu="matMenu">
-      @for (column of columnsDefinition; track column) {
+      @for (column of columnsDefinition; track column.id) {
         <button
           mat-menu-item
           (click)="column.isVisible = !column.isVisible; collectVisibleColumns(); $event.stopPropagation()"

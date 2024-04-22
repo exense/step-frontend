@@ -1,7 +1,7 @@
 <step-modal-window title="Chart settings" [stepZIndex]="1000">
   <div step-modal-window-body>
     <form #formContainer="ngForm">
-      <ng-container *ngIf="item">
+      @if (item) {
         <div class="form-row">
           <step-form-field [showRequiredMarker]="true">
             <step-label>Name</step-label>
@@ -18,7 +18,9 @@
             </step-label>
             <mat-select [(ngModel)]="item.masterChartId" name="masterChartId">
               <mat-option [value]="undefined">-</mat-option>
-              <mat-option *ngFor="let dashlet of tableDashlets" [value]="dashlet.id">{{ dashlet.name }}</mat-option>
+              @for (dashlet of tableDashlets; track dashlet.id) {
+                <mat-option [value]="dashlet.id">{{ dashlet.name }}</mat-option>
+              }
             </mat-select>
           </step-form-field>
         </div>
@@ -44,19 +46,22 @@
         </div>
         @if (!item?.masterChartId) {
           <div class="filters-container">
-            <step-ts-filter-bar-item
-              *ngFor="let item of filterItems; let i = index"
-              [item]="item"
-              (removeItem)="filterItems.splice(i, 1)"
-              [removable]="true"
-              [updateTimeRangeOption]="false"
-            ></step-ts-filter-bar-item>
+            @for (item of filterItems; track item; let i = $index) {
+              <step-ts-filter-bar-item
+                [item]="item"
+                (removeItem)="filterItems.splice(i, 1)"
+                [removable]="true"
+                [updateTimeRangeOption]="false"
+              />
+            }
             <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
           </div>
           <mat-menu #typesMenu="matMenu">
-            <button mat-menu-item *ngFor="let attribute of item.attributes" (click)="addFilterItem(attribute)">
-              {{ attribute.displayName }}
-            </button>
+            @for (attribute of item.attributes; track attribute) {
+              <button mat-menu-item (click)="addFilterItem(attribute)">
+                {{ attribute.displayName }}
+              </button>
+            }
             <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
             <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
             <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
@@ -107,13 +112,16 @@
               </step-form-field>
             </div>
           </div>
-
-          <step-form-field *ngIf="!item.inheritGlobalGrouping">
-            <step-label>Grouping</step-label>
-            <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
-              <mat-option *ngFor="let attr of item.attributes" [value]="attr.name">{{ attr.displayName }} </mat-option>
-            </mat-select>
-          </step-form-field>
+          @if (!item.inheritGlobalGrouping) {
+            <step-form-field>
+              <step-label>Grouping</step-label>
+              <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+                @for (attr of item.attributes; track attr) {
+                  <mat-option [value]="attr.name">{{ attr.displayName }} </mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          }
         } @else {
           <div class="info-txt">Settings inherited from the master dashlet</div>
         }
@@ -125,7 +133,9 @@
           <step-form-field>
             <step-label>Aggregate</step-label>
             <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
-              <mat-option *ngFor="let attr of AGGREGATE_TYPES" [value]="attr">{{ attr }}</mat-option>
+              @for (attr of AGGREGATE_TYPES; track attr) {
+                <mat-option [value]="attr">{{ attr }}</mat-option>
+              }
             </mat-select>
           </step-form-field>
           @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
@@ -205,7 +215,7 @@
             </mat-select>
           </step-form-field>
         </div>
-      </ng-container>
+      }
     </form>
   </div>
 

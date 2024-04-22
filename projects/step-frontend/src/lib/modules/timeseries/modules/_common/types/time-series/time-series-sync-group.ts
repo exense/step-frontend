@@ -6,8 +6,8 @@ export class TimeSeriesSyncGroup {
 
   seriesVisibility: Record<string, boolean> = {};
 
-  allSeriesShow$ = new Subject<void>();
-  allSeriesHide$ = new Subject<void>();
+  private allSeriesShow$ = new Subject<void>();
+  private allSeriesHide$ = new Subject<void>();
 
   seriesShow$ = new Subject<string>();
   seriesHide$ = new Subject<string>();
