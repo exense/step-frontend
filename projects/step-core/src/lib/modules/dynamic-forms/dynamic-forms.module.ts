@@ -18,6 +18,7 @@ import { AddFieldSchemaButtonComponent } from './components/add-field-schema-but
 import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
 import { TimeRawInputComponent } from './components/time-raw-input/time-raw-input.component';
 import { DynamicTimeInputComponent } from './components/dynamic-time-input/dynamic-time-input.component';
+import { DynamicFieldIsExpressionEditorAllowedPipe } from './pipes/dynamic-field-is-expression-allowed.pipe';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { DynamicTimeInputComponent } from './components/dynamic-time-input/dynam
     StepIconsModule,
     ReactiveFormsModule,
     ResourceInputModule,
+    DynamicFieldIsExpressionEditorAllowedPipe,
   ],
   exports: [
     AddFieldButtonComponent,

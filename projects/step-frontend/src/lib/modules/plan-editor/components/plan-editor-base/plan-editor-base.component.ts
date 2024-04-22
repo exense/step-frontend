@@ -1,5 +1,4 @@
 import {
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   forwardRef,
@@ -32,13 +31,14 @@ import {
   ArtefactService,
   FunctionActionsService,
   PlanOpenService,
-  PlanSetupService,
-  PlanEditorApiService,
+  PlanContextInitializerService,
+  PlanContextApiService,
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   PlanUrlPipe,
   CommonEntitiesUrlsService,
   ExecutiontTaskParameters,
+  PlanContext,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -51,6 +51,11 @@ import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dia
 
 const PLAN_SIZE = 'PLAN_SIZE';
 const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
+
+export interface ActionsConfig {
+  showExecuteButton?: boolean;
+  showExportSourceButton?: boolean;
+}
 
 @Component({
   selector: 'step-plan-editor-base',
@@ -79,17 +84,23 @@ const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
       useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
     {
-      provide: PlanSetupService,
+      provide: PlanContextInitializerService,
       useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
   ],
 })
 export class PlanEditorBaseComponent
-  implements OnInit, OnChanges, OnDestroy, PlanInteractiveSessionService, PlanArtefactResolverService, PlanSetupService
+  implements
+    OnInit,
+    OnChanges,
+    OnDestroy,
+    PlanInteractiveSessionService,
+    PlanArtefactResolverService,
+    PlanContextInitializerService
 {
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
-  private _planEditorApi = inject(PlanEditorApiService);
+  private _planEditorApi = inject(PlanContextApiService);
   private _planApi = inject(AugmentedPlansService);
   private _keywordCallsApi = inject(KeywordsService);
   private _dialogsService = inject(DialogsService);
@@ -100,7 +111,6 @@ export class PlanEditorBaseComponent
   private _planOpen = inject(PlanOpenService);
   private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
   private _matDialog = inject(MatDialog);
-  private _cd = inject(ChangeDetectorRef);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
@@ -110,12 +120,14 @@ export class PlanEditorBaseComponent
   }
 
   private get currentPlanId(): string | undefined {
-    return this.compositeId ?? this.initialPlan?.id;
+    return this.initialPlanContext?.id;
   }
 
-  @Input() compositeId?: string;
-  @Input() initialPlan?: Plan | null;
-  @Input() showExecuteButton = true;
+  @Input() initialPlanContext?: PlanContext | null;
+  @Input() actionsConfig?: ActionsConfig = {
+    showExecuteButton: true,
+    showExportSourceButton: true,
+  };
   @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
 
   selectedTab = 'controls';
@@ -151,14 +163,15 @@ export class PlanEditorBaseComponent
     this._interactiveSession.init();
     this.initConsoleTabToggle();
     this.initPlanTypeChanges();
-    this._planEditService.strategyChanged$.pipe(takeUntil(this.terminator$)).subscribe(() => this._cd.detectChanges());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const cPlan = changes['initialPlan'];
-    if (cPlan?.previousValue !== cPlan?.currentValue || cPlan?.firstChange) {
-      this.setupPlan(cPlan?.currentValue, true);
-      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference((cPlan?.currentValue as Plan)?.id);
+    const cPlanCtx = changes['initialPlanContext'];
+    if (cPlanCtx?.previousValue !== cPlanCtx?.currentValue || cPlanCtx?.firstChange) {
+      this.initializeContext(cPlanCtx?.currentValue, true);
+      this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(
+        (cPlanCtx?.currentValue as PlanContext)?.id,
+      );
     }
   }
 
@@ -192,7 +205,7 @@ export class PlanEditorBaseComponent
       return;
     }
     this._planEditorApi
-      .exportPlan(this.currentPlanId, `${this._planEditService.plan!.attributes!['name']}.sta`)
+      .exportPlan(this.currentPlanId, `${this._planEditService.planContext!.entity!.attributes!['name']}.sta`)
       .subscribe();
   }
 
@@ -201,23 +214,22 @@ export class PlanEditorBaseComponent
       return;
     }
 
-    const name = this._planEditService.plan!.attributes!['name'];
+    const name = this._planEditService.planContext!.entity!.attributes!['name'];
 
     this._dialogsService
       .enterValue('Clone plan as', `${name}_Copy`)
       .pipe(
-        switchMap((value) =>
-          this._planEditorApi.clonePlan(this.currentPlanId!).pipe(
-            switchMap((plan) => this._planEditorApi.renamePlan(plan, value)),
-            map(({ plan }) => plan.id),
-          ),
+        switchMap((newName) =>
+          this._planEditorApi
+            .clonePlan(this.currentPlanId!)
+            .pipe(switchMap((context) => this._planEditorApi.renamePlan(context, newName))),
         ),
       )
-      .subscribe((id) => {
-        if (!id) {
+      .subscribe((context) => {
+        if (!context?.id) {
           return;
         }
-        this._planEditorApi.navigateToPlan(id!, true);
+        this._planEditorApi.navigateToPlan(context.id);
       });
   }
 
@@ -251,8 +263,8 @@ export class PlanEditorBaseComponent
     const NO_DATA = 'NO_DATA';
 
     if (isPlan) {
-      this._planApi
-        .lookupPlan(this.currentPlanId!, artefact!.id!)
+      this._planEditorApi
+        .lookupPlan(this._planEditService.planContext!.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -316,27 +328,27 @@ export class PlanEditorBaseComponent
     });
   }
 
-  setupPlan(plan?: Plan, preselectArtefact?: boolean): void {
-    if (!plan) {
+  initializeContext(context?: PlanContext, preselectArtefact?: boolean): void {
+    if (!context?.plan) {
       return;
     }
 
-    if (plan.root) {
-      this.synchronizeDynamicName(plan.root);
+    if (context.plan.root) {
+      this.synchronizeDynamicName(context.plan.root);
     }
 
-    this.planClass = plan._class;
+    this.planClass = context.plan._class;
     this.planTypeControl.setValue(
       {
-        planType: plan.root!._class,
-        icon: this._artefactService.getArtefactType(plan.root!._class)!.icon,
+        planType: context!.plan!.root!._class,
+        icon: this._artefactService.getArtefactType(context.plan.root!._class)!.icon,
       },
       { emitEvent: false },
     );
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
     const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
-    this._planEditService.init(plan, artefactId);
+    this._planEditService.init(context!, artefactId);
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
@@ -382,25 +394,20 @@ export class PlanEditorBaseComponent
       .pipe(
         takeUntil(this.terminator$),
         map((item) => {
-          const plan = this._planEditService.plan;
-          return { item, plan };
+          const context = this._planEditService.planContext;
+          return { item, context };
         }),
-        filter(({ item, plan }) => !!item && !!plan),
-        map(
-          ({ item, plan }) =>
-            ({
-              ...plan,
-              root: {
-                ...plan!.root,
-                _class: item!.planType,
-              },
-            }) as Plan,
-        ),
-        switchMap((plan) => this._planEditorApi.savePlan(plan)),
+        filter(({ item, context }) => !!item && !!context),
+        map(({ item, context }) => {
+          const contextCopy = this._planEditorApi.createContextDuplicate(context!);
+          contextCopy.plan.root!._class = item!.planType;
+          return contextCopy;
+        }),
+        switchMap((context) => this._planEditorApi.savePlan(context)),
       )
-      .subscribe(({ plan }) => {
-        this.planClass = plan._class;
-        this._planEditService.init(plan);
+      .subscribe((context) => {
+        this.planClass = context!.plan!._class;
+        this._planEditService.init(context);
       });
   }
 }

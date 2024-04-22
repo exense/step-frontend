@@ -36,16 +36,6 @@
     <button
       type="button"
       mat-stroked-button
-      (click)="editConstantValue.emit()"
-      [disabled]="!!isDisabled || !!parentControl?.disabled"
-    >
-      <step-icon name="edit-2" />
-    </button>
-  </step-suffix>
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-stroked-button
       matTooltip="Use a dynamic expression to set this attribute"
       matTooltipPosition="below"
       (click)="toggleDynamicExpression.emit()"

@@ -16,8 +16,9 @@ import {
   ImportDialogComponent,
   ExportDialogComponent,
   FunctionConfigurationDialogResolver,
-  checkProjectGuardFactory,
+  checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  NavigatorService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -27,7 +28,7 @@ import { FunctionListComponent } from './components/function-list/function-list.
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
 import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { CompositeKeywordPlanApiService } from './injectables/composite-keyword-plan-api.service';
+import { CompositeKeywordPlanContextApiService } from './injectables/composite-keyword-plan-context-api.service';
 import { map } from 'rxjs';
 import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
 
@@ -81,7 +82,7 @@ export class FunctionModule {
               path: ':id',
               resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
               canActivate: [
-                checkProjectGuardFactory({
+                checkEntityGuardFactory({
                   entityType: 'keyword',
                   getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
@@ -153,12 +154,16 @@ export class FunctionModule {
     this._viewRegistry.registerRoute({
       path: 'composites',
       component: SimpleOutletComponent,
+      resolve: {
+        activatedViewId: () => inject(NavigatorService).forceActivateView('functions'),
+      },
+      canDeactivate: [() => inject(NavigatorService).cleanupActivateView()],
       children: [
         {
           path: 'editor/:id',
           component: CompositeFunctionEditorComponent,
           canActivate: [
-            checkProjectGuardFactory({
+            checkEntityGuardFactory({
               entityType: 'keyword',
               getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
               getEditorUrl: (id) => `/composites/editor/${id}`,
@@ -167,7 +172,7 @@ export class FunctionModule {
           resolve: {
             compositePlan: (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
-              return id ? inject(CompositeKeywordPlanApiService).loadPlan(id) : undefined;
+              return id ? inject(CompositeKeywordPlanContextApiService).loadPlan(id) : undefined;
             },
           },
           canDeactivate: [

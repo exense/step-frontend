@@ -1,7 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedPlansService,
-  checkProjectGuardFactory,
+  checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
@@ -106,7 +106,7 @@ export class PlanModule {
           path: 'editor/:id',
           component: PlanEditorComponent,
           canActivate: [
-            checkProjectGuardFactory({
+            checkEntityGuardFactory({
               entityType: 'plan',
               getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
               getEditorUrl: (id, route) => {
