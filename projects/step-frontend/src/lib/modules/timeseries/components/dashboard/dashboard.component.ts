@@ -51,6 +51,7 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
     ChartDashletComponent,
     ResolutionPickerComponent,
     TimeRangePickerComponent,
+    TableDashletComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
