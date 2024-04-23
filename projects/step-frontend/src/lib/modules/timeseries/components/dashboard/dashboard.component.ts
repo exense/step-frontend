@@ -16,6 +16,8 @@ import {
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
+  ResolutionPickerComponent,
+  TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
@@ -50,7 +52,13 @@ const EDIT_PARAM_NAME = 'edit';
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
   providers: [DashboardUrlParamsService],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent],
+  imports: [
+    COMMON_IMPORTS,
+    DashboardFilterBarComponent,
+    ChartDashletComponent,
+    ResolutionPickerComponent,
+    TimeRangePickerComponent,
+  ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
@@ -173,6 +181,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
+  }
+
+  selectionChange(event: any) {
+    this.handleTimeRangeChange({ selection: event, triggerRefresh: true });
   }
 
   enableEditMode() {

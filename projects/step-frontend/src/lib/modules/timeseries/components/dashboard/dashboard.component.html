@@ -1,16 +1,8 @@
 @if (dashboard) {
   <div class="page-container">
     <div class="header-container">
-      <div class="left-section">
-        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-raised-button>
-          <step-icon name="settings" />
-          Settings
-        </button>
-        <step-autorefresh-toggle
-          [interval]="refreshInterval"
-          (refresh)="triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
+      <div>
+        <div class="dashboard-name">{{ dashboard.name }}</div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -25,6 +17,19 @@
         </mat-menu>
       </div>
       <div class="header-buttons-container">
+        <button
+          class="menu-btn grey-border"
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="mainMenu"
+          mat-icon-button
+        >
+          <step-icon name="settings" />
+        </button>
+        <step-autorefresh-toggle
+          [interval]="refreshInterval"
+          (refresh)="triggerRefresh()"
+          (intervalChange)="handleRefreshIntervalChange($event)"
+        />
         @if (hasWritePermission) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
@@ -47,10 +52,7 @@
             >
               Edit
             </button>
-            <span class="dashboard-name">{{ dashboard.name }}</span>
           }
-        } @else {
-          <span class="dashboard-name">{{ dashboard.name }}</span>
         }
       </div>
     </div>
