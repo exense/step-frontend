@@ -32,10 +32,6 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
   Status.RUNNING,
   Status.ABORTING,
   Status.EXPORTING,
-  Status.FAILED,
-  Status.PASSED,
-  Status.INTERRUPTED,
-  Status.SKIPPED,
 ];
 
 export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [

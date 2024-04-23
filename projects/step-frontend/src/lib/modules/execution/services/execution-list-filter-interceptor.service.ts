@@ -19,6 +19,7 @@ const STATUS_FIELD_MAP = {
   [Status.EXPORTING]: FIELD_STATUS,
 
   [Status.FAILED]: FIELD_RESULT,
+  [Status.TECHNICAL_ERROR]: FIELD_RESULT,
   [Status.PASSED]: FIELD_RESULT,
   [Status.INTERRUPTED]: FIELD_RESULT,
   [Status.SKIPPED]: FIELD_RESULT,
@@ -29,7 +30,7 @@ type FieldValue = keyof typeof STATUS_FIELD_MAP;
 @Injectable()
 export class ExecutionListFilterInterceptorService implements RequestFilterInterceptor {
   intercept(filterConditionType: FilterConditionType, requestFilters: TableRequestFilter[]): TableRequestFilter[] {
-    if (filterConditionType === FilterConditionType.ARRAY) {
+    if (filterConditionType === FilterConditionType.ARRAY && requestFilters.length > 0) {
       return this.proceedArray(requestFilters);
     }
     return requestFilters;

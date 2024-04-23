@@ -100,7 +100,6 @@ export class FilterConditionFactoryService {
   }
 
   private configureCondition(filterCondition: FilterCondition): FilterCondition {
-    console.log('INTERCEPTORS', this._interceptors);
     filterCondition.assignRequestFilterInterceptors(this._interceptors);
     return filterCondition;
   }
