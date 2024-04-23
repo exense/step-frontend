@@ -82,7 +82,7 @@
         </div>
       </td>
     </ng-container>
-    <ng-container *ngFor="let column of columnsDefinition">
+    @for (column of columnsDefinition; track column.id) {
       <!--    Base Column-->
       <ng-container [matColumnDef]="column.id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -99,6 +99,6 @@
           </div>
         </td>
       </ng-container>
-    </ng-container>
+    }
   </step-table>
 </div>

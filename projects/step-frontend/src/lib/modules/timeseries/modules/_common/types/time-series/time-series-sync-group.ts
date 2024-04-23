@@ -1,22 +1,28 @@
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { Observable, Subject } from 'rxjs';
 
 export class TimeSeriesSyncGroup {
   readonly id: string; // usually the id of the master chart
 
-  seriesVisibility: Record<string, boolean> = {};
+  private seriesVisibility: Record<string, boolean> = {};
 
   private allSeriesShow$ = new Subject<void>();
   private allSeriesHide$ = new Subject<void>();
 
-  seriesShow$ = new Subject<string>();
-  seriesHide$ = new Subject<string>();
+  private seriesShow$ = new Subject<string>();
+  private seriesHide$ = new Subject<string>();
 
-  allSeriesChecked = false;
-  allSeriesUnchecked = false;
+  private allSeriesChecked = false;
+  private allSeriesUnchecked = false;
 
   constructor(id: string) {
     this.id = id;
+  }
+
+  destroy() {
+    this.allSeriesShow$?.complete();
+    this.allSeriesHide$?.complete();
+    this.seriesShow$?.complete();
+    this.seriesHide$?.complete();
   }
 
   seriesShouldBeVisible(series: string): boolean {
@@ -46,15 +52,6 @@ export class TimeSeriesSyncGroup {
     } else {
       this.allSeriesHide$.next();
     }
-  }
-
-  addSeries(series: string[], visible: boolean) {
-    series.forEach((s) => {
-      let existingSeries = this.seriesVisibility[s];
-      if (!existingSeries) {
-        this.seriesVisibility[s] = true;
-      }
-    });
   }
 
   showSeries(s: string) {
