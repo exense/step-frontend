@@ -14,6 +14,8 @@ import {
 import {
   COMMON_IMPORTS,
   FilterUtils,
+  ResolutionPickerComponent,
+  TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
@@ -42,15 +44,14 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  providers: [
-    DashboardUrlParamsService,
-    {
-      provide: ChartDashlet,
-      useExisting: [ChartDashletComponent, TableDashletComponent],
-      multi: true,
-    },
+  providers: [DashboardUrlParamsService],
+  imports: [
+    COMMON_IMPORTS,
+    DashboardFilterBarComponent,
+    ChartDashletComponent,
+    ResolutionPickerComponent,
+    TimeRangePickerComponent,
   ],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, TableDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
@@ -173,6 +174,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
+  }
+
+  selectionChange(event: any) {
+    this.handleTimeRangeChange({ selection: event, triggerRefresh: true });
   }
 
   enableEditMode() {

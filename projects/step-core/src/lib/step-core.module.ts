@@ -69,6 +69,7 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
+import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 
 @NgModule({
   declarations: [
@@ -139,6 +140,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     DRAG_DROP_EXPORTS,
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
+    RICH_EDITOR_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -204,6 +206,7 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
+    RICH_EDITOR_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -330,3 +333,4 @@ export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
+export * from './modules/rich-editor';
