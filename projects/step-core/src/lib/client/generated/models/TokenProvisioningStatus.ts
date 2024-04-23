@@ -6,4 +6,5 @@ export type TokenProvisioningStatus = {
   statusDescription?: string;
   tokenCountStarted?: number;
   tokenCountTarget?: number;
+  completed?: boolean;
 };

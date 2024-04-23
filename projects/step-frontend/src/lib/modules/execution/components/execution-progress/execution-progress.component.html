@@ -15,9 +15,10 @@
   <section [class.small-screen]="_isSmallScreen$ | async">
     <ng-template #executionTabs>
       @if (
-        autoscalingStatus?.statusDescription ||
-        autoscalingStatus?.tokenCountStarted ||
-        autoscalingStatus?.tokenCountStarted
+        (autoscalingStatus?.statusDescription ||
+          autoscalingStatus?.tokenCountStarted ||
+          autoscalingStatus?.tokenCountStarted) &&
+        !autoscalingStatus?.completed
       ) {
         <step-alert [type]="AlertType.INFO" class="auto-scaling-status">
           <div>Auto scaling status</div>
