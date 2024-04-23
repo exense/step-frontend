@@ -1,4 +1,15 @@
-import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { filter, forkJoin, merge, Subject, Subscription, switchMap, takeUntil, tap, throttle } from 'rxjs';
 import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
 import { ChartsViewComponent } from '../charts-view/charts-view.component';
@@ -26,10 +37,13 @@ import { FilterBarComponent } from '../../../filter-bar';
   standalone: true,
   imports: [COMMON_IMPORTS, FilterBarComponent, ChartsViewComponent],
 })
-export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
+export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChanges {
+  @Input() timeRange: TimeRangePickerSelection | undefined;
+
   readonly ONE_HOUR_MS = 3600 * 1000;
 
   @Output() timeRangeChange: EventEmitter<TimeRange> = new EventEmitter<TimeRange>();
+  @Output() compareModeChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() contextInitialized: EventEmitter<TimeSeriesContext> = new EventEmitter<TimeSeriesContext>();
 
   @Input() settings!: TimeSeriesDashboardSettings;
@@ -94,6 +108,16 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
     this.contextInitialized.next(this.context);
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    const cTimeRange = changes['timeRange'];
+    if (
+      !!cTimeRange?.currentValue &&
+      (cTimeRange?.currentValue !== cTimeRange?.previousValue || cTimeRange?.firstChange)
+    ) {
+      this.handleTimeRangeChange({ selection: cTimeRange.currentValue, triggerRefresh: true });
+    }
+  }
+
   private mergeContextualParamsWithActiveFilters(
     contextualParams: Partial<Record<string, string>>,
     activeFilters: FilterBarItem[],
@@ -112,7 +136,8 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       return filterBarItem;
     });
     let notContextualFilters = activeFilters.filter((item) => !contextualParams[item.attributeName]);
-    return [...contextualFilters, ...notContextualFilters];
+    const filteredItems = ['Origin', 'Plan'];
+    return [...contextualFilters, ...notContextualFilters].filter((el) => !filteredItems.includes(el.label!));
   }
 
   /**
@@ -175,6 +200,7 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy {
       });
     this.context.onCompareModeChange().subscribe(({ enabled, context }) => {
       this.compareModeEnabled = enabled;
+      this.compareModeChange.next(enabled);
       this.compareModeContext = context;
     });
   }

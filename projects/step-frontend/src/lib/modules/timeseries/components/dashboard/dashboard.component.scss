@@ -18,6 +18,10 @@
     flex-direction: row;
     gap: 1.2rem;
   }
+
+  > div {
+    display: flex;
+  }
 }
 
 .edit-alert {
@@ -78,6 +82,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
+  align-self: center;
 }
 
 .no-charts-message {
@@ -86,4 +91,12 @@
   margin: 3rem 25%;
   text-align: center;
   padding: 2rem 0;
+}
+
+step-time-range-picker {
+  margin-top: 0.2rem;
+}
+
+.grey-border {
+  border: 1px solid rgb(208, 213, 221);
 }
