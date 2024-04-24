@@ -16,6 +16,15 @@ export class TooltipPlugin {
   private win = this._doc.defaultView!;
   private _executionsService = inject(ExecutionsService);
 
+  private createTooltipElement() {
+    const tooltip = this.createElementWithClass('div', 'ts-tooltip');
+    tooltip.id = 'tooltip';
+    tooltip.classList.add('ts-tooltip');
+    tooltip.style.display = 'none';
+    tooltip.style.position = 'absolute';
+    return tooltip;
+  }
+
   /**
    * The tooltip will be displayed while the user will hover the chart.
    * An execution is optional to display. It can be configured via settings and via chart metadata (where the actual
@@ -44,11 +53,84 @@ export class TooltipPlugin {
       tooltip.style.display = 'block';
     };
 
+  private createTooltipElement() {
     const tooltip = this.createElementWithClass('div', 'ts-tooltip');
     tooltip.id = 'tooltip';
     tooltip.classList.add('ts-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
+    return tooltip;
+  }
+
+  private createExecutionsMenu = (event: MouseEvent, tooltipContainer: HTMLElement, executionIds: string[]) => {
+    const menu = this.createElementWithClass('div', 'tooltip-menu');
+    menu.innerText = 'Loading...';
+    const tooltipBounds = tooltipContainer.getBoundingClientRect();
+    let computedLeft = event.clientX - tooltipBounds.left + 16;
+    const computedTop = event.clientY - tooltipBounds.top + 4;
+    const estimatedWidthOfExecutionLabel = 150;
+    if (event.clientX + 16 + estimatedWidthOfExecutionLabel > this.win.innerWidth) {
+      computedLeft -= estimatedWidthOfExecutionLabel;
+    }
+    menu.style.left = computedLeft + 'px';
+    menu.style.top = computedTop + 'px';
+    this._executionsService.getExecutionsByIds(executionIds).subscribe((executions) => {
+      menu.innerText = '';
+      executions.forEach((ex) => {
+        const row = this.createElementWithClass('div', 'link-row');
+        row.setAttribute('title', 'Show executions');
+        row.innerText = `${ex.description!} (${new Date(ex.startTime!).toLocaleString()})`;
+        row.addEventListener('click', () => {
+          this.win.open(getExecutionLink(ex.id!));
+        });
+        menu.appendChild(row);
+      });
+      let menuRightBound = menu.getBoundingClientRect().right;
+      if (menuRightBound > this.win.innerWidth) {
+        menu.style.left = computedLeft - (menuRightBound - this.win.innerWidth) - 16 + 'px';
+      }
+    });
+
+    return menu;
+  };
+
+  private createRowLeftSection(row: TooltipRowEntry) {
+    const leftContainer = this.createElementWithClass('div', 'left');
+    const nameDiv = this.createElementWithClass('div', 'name');
+    nameDiv.textContent = `${row.name} `;
+    if (row.color) {
+      const colorDiv = this.createElementWithClass('div', 'color');
+      colorDiv.style.backgroundColor = row.color;
+      leftContainer.appendChild(colorDiv);
+    }
+    leftContainer.appendChild(nameDiv);
+    return leftContainer;
+  }
+
+  createPlugin(ref: TooltipParentContainer): uPlot.Plugin {
+    const showExecutionsLinks = ref.settings.showExecutionsLinks;
+    let chart: uPlot;
+    let over: HTMLDivElement;
+    let bound: Element;
+    let bLeft: number;
+    let bTop: number;
+    let cursorIsOnChartArea = false; // will be changed by onmouseleave and onmouseenter events
+
+    function syncBounds(): void {
+      const bbox = over.getBoundingClientRect();
+      bLeft = bbox.left;
+      bTop = bbox.top;
+    }
+
+    const hideTooltip = () => {
+      tooltip.style.display = 'none';
+    };
+
+    const showTooltip = () => {
+      tooltip.style.display = 'block';
+    };
+
+    const tooltip = this.createTooltipElement();
     this._doc.body.appendChild(tooltip);
 
     let openMenu: Element | undefined;
@@ -56,51 +138,6 @@ export class TooltipPlugin {
     tooltip.addEventListener('click', () => {
       openMenu?.remove();
     });
-
-    const createExecutionsMenu = (event: MouseEvent, tooltipContainer: HTMLElement, executionIds: string[]) => {
-      const menu = this.createElementWithClass('div', 'tooltip-menu');
-      menu.innerText = 'Loading...';
-      const tooltipBounds = tooltipContainer.getBoundingClientRect();
-      let computedLeft = event.clientX - tooltipBounds.left + 16;
-      const computedTop = event.clientY - tooltipBounds.top + 4;
-      const estimatedWidthOfExecutionLabel = 150;
-      if (event.clientX + 16 + estimatedWidthOfExecutionLabel > this.win.innerWidth) {
-        computedLeft -= estimatedWidthOfExecutionLabel;
-      }
-      menu.style.left = computedLeft + 'px';
-      menu.style.top = computedTop + 'px';
-      this._executionsService.getExecutionsByIds(executionIds).subscribe((executions) => {
-        menu.innerText = '';
-        executions.forEach((ex) => {
-          const row = this.createElementWithClass('div', 'link-row');
-          row.setAttribute('title', 'Show executions');
-          row.innerText = `${ex.description!} (${new Date(ex.startTime!).toLocaleString()})`;
-          row.addEventListener('click', () => {
-            this.win.open(getExecutionLink(ex.id!));
-          });
-          menu.appendChild(row);
-        });
-        let menuRightBound = menu.getBoundingClientRect().right;
-        if (menuRightBound > this.win.innerWidth) {
-          menu.style.left = computedLeft - (menuRightBound - this.win.innerWidth) - 16 + 'px';
-        }
-      });
-
-      return menu;
-    };
-
-    const createRowLeftSection = (row: TooltipRowEntry) => {
-      const leftContainer = this.createElementWithClass('div', 'left');
-      const nameDiv = this.createElementWithClass('div', 'name');
-      nameDiv.textContent = `${row.name} `;
-      if (row.color) {
-        const colorDiv = this.createElementWithClass('div', 'color');
-        colorDiv.style.backgroundColor = row.color;
-        leftContainer.appendChild(colorDiv);
-      }
-      leftContainer.appendChild(nameDiv);
-      return leftContainer;
-    };
 
     const createRowRightSection = (row: TooltipRowEntry, yScaleUnit?: string) => {
       const rightContainer = this.createElementWithClass('div', 'right');
@@ -121,7 +158,7 @@ export class TooltipPlugin {
             openMenu.remove();
             openMenu = undefined;
           }
-          openMenu = createExecutionsMenu(event, tooltip, row.executions!);
+          openMenu = this.createExecutionsMenu(event, tooltip, row.executions!);
           tooltip.appendChild(openMenu);
         });
       }
@@ -134,20 +171,13 @@ export class TooltipPlugin {
       if (row.bold) {
         rowElement.setAttribute('style', 'font-weight: bold');
       }
-      const leftContainer = createRowLeftSection(row);
+      const leftContainer = this.createRowLeftSection(row);
       const rightContainer = createRowRightSection(row, yScaleUnit);
 
       rowElement.appendChild(leftContainer);
       rowElement.appendChild(rightContainer);
 
       return rowElement;
-    };
-
-    const createDotsSeparator = () => {
-      const dots = this._doc.createElement('div');
-      dots.classList.add('dots');
-      dots.textContent = '...';
-      return dots;
     };
 
     const chartIsLocked = () => {
@@ -206,7 +236,7 @@ export class TooltipPlugin {
               // the cursor is moving on another chart
               hideTooltip();
             } else {
-              tooltip.style.display = 'block';
+              showTooltip();
             }
           }
           if (!cursorIsOnChartArea) {
@@ -280,10 +310,10 @@ export class TooltipPlugin {
           });
           if (yPoints.length < allSeriesLength) {
             if (elipsisBefore) {
-              tooltip.prepend(createDotsSeparator());
+              tooltip.prepend(this.createDotsSeparator());
             }
             if (elipsisAfter) {
-              tooltip.appendChild(createDotsSeparator());
+              tooltip.appendChild(this.createDotsSeparator());
             }
           }
           if (summaryRow) {
@@ -363,6 +393,13 @@ export class TooltipPlugin {
     const dom = this._doc.createElement(element);
     dom.classList.add(className);
     return dom;
+  }
+
+  private createDotsSeparator() {
+    const dots = this._doc.createElement('div');
+    dots.classList.add('dots');
+    dots.textContent = '...';
+    return dots;
   }
 }
 

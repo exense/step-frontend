@@ -7,6 +7,10 @@ export const $AxesSettings = {
       type: 'Enum',
       isRequired: true,
     },
+    pclValue: {
+      type: 'number',
+      format: 'int32',
+    },
     displayType: {
       type: 'Enum',
       isRequired: true,

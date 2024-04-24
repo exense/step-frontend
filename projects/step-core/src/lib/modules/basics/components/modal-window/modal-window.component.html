@@ -1,27 +1,36 @@
-<div class="spinner-container" *ngIf="showSpinner">
-  <mat-spinner></mat-spinner>
-</div>
+@if (showSpinner) {
+  <div class="spinner-container">
+    <mat-spinner />
+  </div>
+}
 
 <h1 mat-dialog-title>
-  {{ title }}
+  <section class="header-title">
+    {{ title }}
+    <div #titleContent [class.without-chidlren]="!titleContent.children.length">
+      <ng-content select="[step-modal-window-title]" />
+    </div>
+  </section>
   <section #subtitle [class.without-chidlren]="!subtitle.children.length">
-    <ng-content select="[step-modal-window-subtitle]"></ng-content>
+    <ng-content select="[step-modal-window-subtitle]" />
   </section>
 </h1>
 
 <div mat-dialog-content>
   <input type="text" class="track-focus" #trackFocus />
-  <ng-content select="[step-modal-window-body]"></ng-content>
+  <ng-content select="[step-modal-window-body]" />
 </div>
 
-<div mat-dialog-actions *ngIf="!hideButtonsSection">
-  <step-btn-group>
-    <section #customButtons [class.without-children]="!customButtons.children.length">
-      <ng-content select="[step-modal-window-buttons]"></ng-content>
-    </section>
+@if (!hideButtonsSection) {
+  <div mat-dialog-actions>
+    <step-btn-group>
+      <section #customButtons [class.without-children]="!customButtons.children.length">
+        <ng-content select="[step-modal-window-buttons]" />
+      </section>
 
-    <button *ngIf="!customButtons.children.length" type="button" mat-stroked-button (click)="_dialogRef.close(false)">
-      Close
-    </button>
-  </step-btn-group>
-</div>
+      @if (!customButtons.children.length) {
+        <button type="button" mat-stroked-button (click)="_dialogRef.close(false)">Close</button>
+      }
+    </step-btn-group>
+  </div>
+}
