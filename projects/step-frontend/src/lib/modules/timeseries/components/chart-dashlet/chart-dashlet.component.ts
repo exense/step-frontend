@@ -201,9 +201,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     } else {
       filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
     }
-
-    filterItems.push(metricFilterItem);
-
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
   }
 
@@ -256,7 +253,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           }
         });
 
-      return {
+      const s: TSChartSeries = {
         id: seriesKey,
         scale: '1',
         label: seriesKey,
@@ -265,10 +262,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
-        fill: (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color),
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      if (primaryAxes.colorizationType === 'FILL') {
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+      }
+      return s;
     });
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
