@@ -256,6 +256,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           aggregation: metric.defaultAggregation!,
           unit: metric.unit!,
           displayType: 'LINE',
+          colorizationType: 'STROKE',
           renderingSettings: metric.renderingSettings,
         },
       },

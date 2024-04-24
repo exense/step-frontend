@@ -137,19 +137,6 @@ export class TimeSeriesContext {
     return syncGroup;
   }
 
-  getColor(key: string): string {
-    return this.colorsPool.getColor(key);
-  }
-
-  getSyncGroup(key: string): TimeSeriesSyncGroup {
-    let syncGroup = this.syncGroups[key];
-    if (!syncGroup) {
-      this.syncGroups[key] = syncGroup = new TimeSeriesSyncGroup(key);
-      // throw new Error('Sync group not found: ' + key);
-    }
-    return syncGroup;
-  }
-
   updateEditMode(enabled: boolean) {
     this.editMode$.next(enabled);
   }
