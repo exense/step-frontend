@@ -1,6 +1,6 @@
 <step-form-field [matMenuTriggerFor]="groupingMenu" #matTrigger="matMenuTrigger">
   <mat-select #sel ngModel="selected" (click)="sel.close()">
-    <mat-option value="selected"> Grouping: {{ label }} </mat-option>
+    <mat-option value="selected"> Grouping: {{ selectedGroupingInternal.label }} </mat-option>
   </mat-select>
 </step-form-field>
 <mat-menu #groupingMenu="matMenu">

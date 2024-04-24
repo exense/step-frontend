@@ -1,32 +1,47 @@
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { Observable, Subject } from 'rxjs';
 
 export class TimeSeriesSyncGroup {
   readonly id: string; // usually the id of the master chart
 
-  seriesVisibility: Record<string, boolean> = {};
+  private seriesVisibility: Record<string, boolean> = {};
 
-  allSeriesShow$ = new Subject<void>();
-  allSeriesHide$ = new Subject<void>();
+  private allSeriesShow$ = new Subject<void>();
+  private allSeriesHide$ = new Subject<void>();
 
-  seriesShow$ = new Subject<string>();
-  seriesHide$ = new Subject<string>();
+  private seriesShow$ = new Subject<string>();
+  private seriesHide$ = new Subject<string>();
 
-  allSeriesChecked = false;
-  allSeriesUnchecked = false;
+  private allSeriesChecked = false;
+  private allSeriesUnchecked = false;
 
   constructor(id: string) {
     this.id = id;
   }
 
-  seriesShouldBeVisible(series: string) {
+  destroy() {
+    this.allSeriesShow$?.complete();
+    this.allSeriesHide$?.complete();
+    this.seriesShow$?.complete();
+    this.seriesHide$?.complete();
+  }
+
+  seriesShouldBeVisible(series: string): boolean {
+    let shouldBeVisible: boolean;
     if (this.allSeriesChecked) {
-      return true;
+      shouldBeVisible = true;
+    } else if (this.allSeriesUnchecked) {
+      shouldBeVisible = false;
+    } else {
+      const currentVisibility = this.seriesVisibility[series];
+      if (currentVisibility != undefined) {
+        shouldBeVisible = currentVisibility;
+      } else {
+        // series not found
+        shouldBeVisible = true;
+      }
     }
-    if (this.allSeriesUnchecked) {
-      return false;
-    }
-    return this.seriesVisibility[series] !== false;
+    this.seriesVisibility[series] = shouldBeVisible;
+    return shouldBeVisible;
   }
 
   setAllSeriesChecked(checked: boolean) {
@@ -37,15 +52,6 @@ export class TimeSeriesSyncGroup {
     } else {
       this.allSeriesHide$.next();
     }
-  }
-
-  addSeries(series: string[], visible: boolean) {
-    series.forEach((s) => {
-      let existingSeries = this.seriesVisibility[s];
-      if (!existingSeries) {
-        this.seriesVisibility[s] = true;
-      }
-    });
   }
 
   showSeries(s: string) {

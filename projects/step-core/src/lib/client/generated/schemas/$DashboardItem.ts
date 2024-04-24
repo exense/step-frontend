@@ -66,7 +66,7 @@ export const $DashboardItem = {
       type: 'ChartSettings',
     },
     tableSettings: {
-      type: 'TableSettings',
+      type: 'TableDashletSettings',
     },
     size: {
       type: 'number',

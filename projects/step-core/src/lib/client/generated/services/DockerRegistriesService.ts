@@ -132,6 +132,21 @@ export class DockerRegistriesService {
   }
 
   /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findDockerRegistryNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/docker/registry/find/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Retrieves all the entities
    * @returns DockerRegistryConfiguration default response
    * @throws ApiError

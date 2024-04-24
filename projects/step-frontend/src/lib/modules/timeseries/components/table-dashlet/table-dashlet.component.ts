@@ -16,31 +16,32 @@ import {
   FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
+  TimeSeriesUtilityService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
-  BucketAttributes,
   BucketResponse,
   DashboardItem,
   FetchBucketsRequest,
   MarkerType,
-  TableDataSource,
+  MetricAttribute,
+  TableDashletSettings,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
-  TableSettings,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from '../../modules/legacy/pipes/ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
-import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
+import { TableEntryFormatPipe } from './table-entry-format.pipe';
 
-interface TableEntry {
-  name: string;
+export interface TableEntry {
+  name: string; // series id
+  groupingLabels: string[]; // each grouping attribute will have a label
   base?: BucketResponse;
   compare?: BucketResponse;
   color: string;
@@ -63,7 +64,7 @@ interface TableEntry {
   styleUrls: ['./table-dashlet.component.scss'],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe],
+  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe],
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   @Input() item!: DashboardItem;
@@ -76,15 +77,17 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
+  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
-  tableDataSource: TableDataSource<TableEntry> | undefined;
+  tableDataSource: TableLocalDataSource<TableEntry> | undefined;
   tableIsLoading = true;
 
-  settings!: TableSettings;
+  settings!: TableDashletSettings;
 
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];
+  attributesByIds: Record<string, MetricAttribute> = {};
 
   allSeriesChecked: boolean = true;
 
@@ -95,14 +98,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (!this.item) {
       throw new Error('Dashlet item cannot be undefined');
     }
-    this.settings = this.item.tableSettings!;
-    this.prepareState(this.settings);
+    this.prepareState(this.item);
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
     this.fetchDataAndCreateTable().subscribe();
   }
 
-  private prepareState(settings: TableSettings) {
-    this.columnsDefinition = settings.columns!.map((column) => {
+  private prepareState(item: DashboardItem) {
+    item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
+    this.columnsDefinition = item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
         label: ColumnsLabels[column.column],
@@ -117,7 +120,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
     if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
-      this.prepareState(this.item.tableSettings!);
+      this.prepareState(this.item);
       this.refresh(true).subscribe();
     }
   }
@@ -161,7 +164,18 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       freeTextValues: [`"${this.item.metricKey}"`],
       searchEntities: [],
     };
-    return [metricItem, ...this.context.getFilteringSettings().filterItems];
+    let filterItems = [];
+    if (this.item.inheritGlobalFilters) {
+      filterItems = FilterUtils.combineGlobalWithChartFilters(
+        this.context.getFilteringSettings().filterItems,
+        this.item.filters,
+      );
+    } else {
+      filterItems = this.item.filters.map(FilterUtils.convertApiFilterItem);
+    }
+
+    filterItems.push(metricItem);
+    return filterItems;
   }
 
   refresh(blur?: boolean): Observable<any> {
@@ -170,8 +184,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private createTable(response: TimeSeriesAPIResponse) {
     const syncGroup = this.context.getSyncGroup(this.item.id);
-    const keywords: string[] = [];
-    const bucketsByIds: Record<string, BucketResponse> = {};
     const data: TableEntry[] = [];
     response.matrix.forEach((series, i) => {
       if (series.length != 1) {
@@ -181,23 +193,22 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       const seriesAttributes = response.matrixKeys[i];
       const bucket = series[0];
       bucket.attributes = seriesAttributes;
-      const seriesKey = this.getSeriesKey(seriesAttributes);
-      bucket.attributes['_id'] = seriesKey;
+      const groupingLabels = this.getGroupDimensions().map((field) => seriesAttributes[field]);
+      const seriesKey = this.mergeLabelItems(groupingLabels);
+      bucket.attributes['_id'] = groupingLabels;
       bucket.attributes['avg'] = (bucket.sum / bucket.count).toFixed(0);
       bucket.attributes['tps'] = Math.trunc(bucket.count / ((response.end! - response.start!) / 1000));
       bucket.attributes['tph'] = Math.trunc((bucket.count / ((response.end! - response.start!) / 1000)) * 3600);
-      // const keywordSelection = context.keywordsContext.getKeywordSelection(seriesKey);
-      // bucket.attributes['isSelected'] = keywordSelection ? keywordSelection.isSelected : true; // true because it has not been loaded yet
-      keywords.push(seriesKey);
-      bucketsByIds[seriesKey] = bucket;
       data.push({
         name: seriesKey,
+        groupingLabels: groupingLabels,
         base: series[0],
         color: this.context.getColor(seriesKey),
         isSelected: syncGroup.seriesShouldBeVisible(seriesKey),
       });
     });
     this.tableData$.next(data);
+    this.fetchLegendEntities(data).subscribe(() => this.tableDataSource?.reload());
     this.tableIsLoading = false;
   }
 
@@ -226,10 +237,52 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .subscribe((updatedItem: DashboardItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
-          this.prepareState(this.item.tableSettings!);
+          this.prepareState(this.item);
           this.refresh(true).subscribe();
         }
       });
+  }
+
+  private mergeLabelItems(items: (string | undefined)[]): string {
+    if (items.length === 0) {
+      // there was no grouping
+      return TimeSeriesConfig.SERIES_LABEL_VALUE;
+    }
+    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
+  }
+
+  hideSeries(key: string): void {}
+
+  showSeries(key: string): void {}
+
+  private fetchLegendEntities(data: TableEntry[]): Observable<any> {
+    const groupDimensions = this.getGroupDimensions();
+    const requests$ = groupDimensions
+      .map((attributeKey, i) => {
+        const attribute = this.attributesByIds[attributeKey];
+        const entityName = attribute?.metadata['entity'];
+        if (!entityName) {
+          return undefined;
+        }
+        const entityIds = new Set<string>(data.map((entry) => entry.groupingLabels[i]).filter((v) => !!v));
+        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+          tap((response) => {
+            data.forEach((entry, j) => {
+              const labelId = entry.groupingLabels[i];
+              if (labelId) {
+                if (response[labelId]) {
+                  entry.groupingLabels[i] = response[labelId];
+                } else {
+                  entry.groupingLabels[i] = labelId + ' (unresolved)';
+                }
+                data[j] = { ...entry };
+              }
+            });
+          }),
+        );
+      })
+      .filter((x) => !!x);
+    return forkJoin(requests$);
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {
@@ -267,20 +320,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('TPH_diff', (item) => item.tphDiff)
       .build();
   }
-
-  private getSeriesKey(attributes: BucketAttributes) {
-    if (Object.keys(attributes).length === 0) {
-      return TimeSeriesConfig.SERIES_LABEL_EMPTY;
-    }
-    return this.getGroupDimensions()
-      .map((field) => attributes[field])
-      .map((x) => (x ? x : TimeSeriesConfig.SERIES_LABEL_EMPTY))
-      .join(' | ');
-  }
-
-  hideSeries(key: string): void {}
-
-  showSeries(key: string): void {}
 }
 
 interface TableColumn {

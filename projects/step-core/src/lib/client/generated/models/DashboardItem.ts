@@ -4,7 +4,7 @@
 
 import type { ChartSettings } from './ChartSettings';
 import type { MetricAttribute } from './MetricAttribute';
-import type { TableSettings } from './TableSettings';
+import type { TableDashletSettings } from './TableDashletSettings';
 import type { TimeSeriesFilterItem } from './TimeSeriesFilterItem';
 
 export type DashboardItem = {
@@ -22,6 +22,6 @@ export type DashboardItem = {
   readonlyGrouping: boolean;
   readonlyAggregate: boolean;
   chartSettings?: ChartSettings;
-  tableSettings?: TableSettings;
+  tableSettings?: TableDashletSettings;
   size: number;
 };

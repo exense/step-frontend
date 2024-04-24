@@ -121,6 +121,20 @@ export class TimeSeriesContext {
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
     this.stateChangeInternal$.complete();
+    Object.keys(this.syncGroups).forEach((key) => this.syncGroups[key]?.destroy());
+  }
+
+  getColor(key: string): string {
+    return this.colorsPool.getColor(key);
+  }
+
+  getSyncGroup(key: string): TimeSeriesSyncGroup {
+    let syncGroup = this.syncGroups[key];
+    if (!syncGroup) {
+      this.syncGroups[key] = syncGroup = new TimeSeriesSyncGroup(key);
+      // throw new Error('Sync group not found: ' + key);
+    }
+    return syncGroup;
   }
 
   getColor(key: string): string {

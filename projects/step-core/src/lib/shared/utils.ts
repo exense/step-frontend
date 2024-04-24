@@ -1,8 +1,8 @@
 import { DynamicValueInteger, DynamicValueString } from '../client/generated';
-import { AceMode } from './ace-mode.enum';
 import { Collection } from './collection.interface';
 import { ScriptLanguage } from './script-language.enum';
 import { KeyValue } from '@angular/common';
+import { AceMode } from '../modules/rich-editor';
 
 /**
  * The time complexity of a Breadth-First Search (BFS) algorithm is O(|V| + |E|),
@@ -44,7 +44,7 @@ export const breadthFirstSearch = <T>({
 };
 
 export const convertScriptLanguageToAce = (scriptLanguage?: ScriptLanguage): AceMode | undefined => {
-  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage];
+  return !scriptLanguage ? undefined : (AceMode as any)[scriptLanguage.toUpperCase()];
 };
 
 export const dynamicValueFactory = () => ({

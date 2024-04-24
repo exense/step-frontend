@@ -28,7 +28,7 @@
       </mat-menu>
     }
     <mat-menu #columnsMenu="matMenu">
-      @for (column of columnsDefinition; track column) {
+      @for (column of columnsDefinition; track column.id) {
         <button
           mat-menu-item
           (click)="column.isVisible = !column.isVisible; collectVisibleColumns(); $event.stopPropagation()"
@@ -61,8 +61,8 @@
         <mat-checkbox
           color="primary"
           (click)="$event.stopPropagation()"
-          [ngModel]="allSeriesChecked"
-          (ngModelChange)="onAllSeriesCheckboxClick($event)"
+          [(ngModel)]="allSeriesChecked"
+          (change)="onAllSeriesCheckboxClick($event.checked)"
         >
           <span>Name</span>
         </mat-checkbox>
@@ -75,14 +75,14 @@
             (ngModelChange)="onKeywordToggle(element, $event)"
           >
             <div class="element-name">
-              <span>{{ element.name }}</span>
+              <span>{{ element | tableEntryFormat }}</span>
               <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />
             </div>
           </mat-checkbox>
         </div>
       </td>
     </ng-container>
-    <ng-container *ngFor="let column of columnsDefinition">
+    @for (column of columnsDefinition; track column.id) {
       <!--    Base Column-->
       <ng-container [matColumnDef]="column.id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -99,6 +99,6 @@
           </div>
         </td>
       </ng-container>
-    </ng-container>
+    }
   </step-table>
 </div>

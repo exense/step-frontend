@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { AggregatorType, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import { DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -10,7 +10,6 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
-import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;

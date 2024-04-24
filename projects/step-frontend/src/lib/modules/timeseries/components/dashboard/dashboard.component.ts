@@ -7,16 +7,15 @@ import {
   DashboardView,
   MetricAttribute,
   MetricType,
-  TableSettings,
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
   FilterUtils,
+  ResolutionPickerComponent,
+  TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
@@ -45,15 +44,15 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  providers: [
-    DashboardUrlParamsService,
-    {
-      provide: ChartDashlet,
-      useExisting: [ChartDashletComponent, TableDashletComponent],
-      multi: true,
-    },
+  providers: [DashboardUrlParamsService],
+  imports: [
+    COMMON_IMPORTS,
+    DashboardFilterBarComponent,
+    ChartDashletComponent,
+    ResolutionPickerComponent,
+    TimeRangePickerComponent,
+    TableDashletComponent,
   ],
-  imports: [COMMON_IMPORTS, DashboardFilterBarComponent, ChartDashletComponent, TableDashletComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
@@ -178,6 +177,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this._timeSeriesContextFactory?.destroyContext(this.context?.id);
   }
 
+  selectionChange(event: any) {
+    this.handleTimeRangeChange({ selection: event, triggerRefresh: true });
+  }
+
   enableEditMode() {
     this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
@@ -222,8 +225,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       metricKey: metric.name!,
       filters: [],
       size: 2,
-      inheritGlobalGrouping: false,
-      inheritGlobalFilters: false,
+      inheritGlobalGrouping: true,
+      inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
       tableSettings: {
@@ -247,14 +250,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       readonlyAggregate: false,
       readonlyGrouping: false,
       inheritGlobalFilters: true,
-      inheritGlobalGrouping: false,
+      inheritGlobalGrouping: true,
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
           unit: metric.unit!,
           displayType: 'LINE',
           renderingSettings: metric.renderingSettings,
-          colorizationType: 'STROKE',
         },
       },
     };

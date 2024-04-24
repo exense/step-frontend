@@ -1,7 +1,7 @@
 import { inject, NgModule } from '@angular/core';
 import {
   AugmentedParametersService,
-  checkProjectGuardFactory,
+  checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
@@ -74,7 +74,7 @@ export class ParameterModule {
               path: ':id',
               dialogComponent: ParameterEditDialogComponent,
               canActivate: [
-                checkProjectGuardFactory({
+                checkEntityGuardFactory({
                   entityType: 'parameter',
                   getEntity: (id) => inject(AugmentedParametersService).getParameterByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).parameterEditorUrl(id),

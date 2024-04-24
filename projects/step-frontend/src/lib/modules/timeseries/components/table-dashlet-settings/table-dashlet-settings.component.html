@@ -1,7 +1,7 @@
 <step-modal-window title="Chart settings" [stepZIndex]="1000">
   <div step-modal-window-body>
     <form #formContainer="ngForm">
-      <ng-container *ngIf="item">
+      @if (item) {
         <div class="form-row">
           <step-form-field [showRequiredMarker]="true">
             <step-label>Name</step-label>
@@ -24,19 +24,22 @@
           <step-label>Filters and grouping</step-label>
         </div>
         <div class="filters-container">
-          <step-ts-filter-bar-item
-            *ngFor="let item of filterItems; let i = index"
-            [item]="item"
-            (removeItem)="filterItems.splice(i, 1)"
-            [removable]="true"
-            [updateTimeRangeOption]="false"
-          ></step-ts-filter-bar-item>
+          @for (item of filterItems; track item; let i = $index) {
+            <step-ts-filter-bar-item
+              [item]="item"
+              (removeItem)="filterItems.splice(i, 1)"
+              [removable]="true"
+              [updateTimeRangeOption]="false"
+            />
+          }
           <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
         </div>
         <mat-menu #typesMenu="matMenu">
-          <button mat-menu-item *ngFor="let attribute of item.attributes" (click)="addFilterItem(attribute)">
-            {{ attribute.displayName }}
-          </button>
+          @for (attribute of item.attributes; track attribute.name) {
+            <button mat-menu-item (click)="addFilterItem(attribute)">
+              {{ attribute.displayName }}
+            </button>
+          }
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
           <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
@@ -67,12 +70,16 @@
           <div></div>
         </div>
 
-        <step-form-field *ngIf="!item.inheritGlobalGrouping">
-          <step-label>Grouping</step-label>
-          <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
-            <mat-option *ngFor="let attr of item.attributes" [value]="attr.name">{{ attr.displayName }}</mat-option>
-          </mat-select>
-        </step-form-field>
+        @if (!item.inheritGlobalGrouping) {
+          <step-form-field>
+            <step-label>Grouping</step-label>
+            <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+              @for (attr of item.attributes; track attr.name) {
+                <mat-option [value]="attr.name">{{ attr.displayName }}</mat-option>
+              }
+            </mat-select>
+          </step-form-field>
+        }
         <mat-divider />
         <step-label>Columns</step-label>
         <div class="columns-container">
@@ -88,7 +95,18 @@
           }
         </div>
         <mat-divider />
-      </ng-container>
+        <step-label>Visual settings</step-label>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Chart width</step-label>
+            <mat-select [(ngModel)]="item.size" name="size">
+              <mat-option [value]="1">50%</mat-option>
+              <mat-option [value]="2">100%</mat-option>
+            </mat-select>
+          </step-form-field>
+          <div></div>
+        </div>
+      }
     </form>
   </div>
 

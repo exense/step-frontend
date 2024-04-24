@@ -172,7 +172,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._timeSeriesUtilityService.getExecutionByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getExecutionNames(entitiesIds),
             (e: Execution) => e.description!,
           );
           break;
@@ -180,7 +180,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._timeSeriesUtilityService.getTasksByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getTasksNames(entitiesIds),
             (task: ExecutiontTaskParameters) => task.attributes?.['name'],
           );
           break;
@@ -188,7 +188,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           this.fetchAndSetLabels(
             series,
             i,
-            (entitiesIds) => this._timeSeriesUtilityService.getPlansByIds(entitiesIds),
+            (entitiesIds) => this._timeSeriesUtilityService.getPlansNames(entitiesIds),
             (plan: Plan) => plan.attributes?.['name'],
           );
           break;
