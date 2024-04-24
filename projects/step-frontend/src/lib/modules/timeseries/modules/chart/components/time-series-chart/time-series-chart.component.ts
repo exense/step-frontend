@@ -159,7 +159,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         });
       }
     });
-    console.log(this.chartMetadata);
     this.sortLegend();
     let noData = true;
     for (let series of settings.series) {

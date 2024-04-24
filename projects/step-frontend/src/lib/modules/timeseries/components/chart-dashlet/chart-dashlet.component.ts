@@ -233,7 +233,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
     const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
-    const groupDimensions = this.getChartGrouping();
+    const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
     const primaryAggregation = this.selectedAggregate!;
@@ -326,7 +326,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       tooltipOptions: {
         enabled: true,
         zAxisLabel: this.getSecondAxesLabel(),
-        useExecutionLinks: !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE],
+        useExecutionLinks: hasExecutionLinks,
         yAxisUnit: yAxesUnit,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
