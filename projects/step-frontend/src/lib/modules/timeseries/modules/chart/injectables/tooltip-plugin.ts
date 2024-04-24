@@ -23,7 +23,6 @@ export class TooltipPlugin {
    */
   createPlugin(ref: TooltipParentContainer): uPlot.Plugin {
     const showExecutionsLinks = ref.settings.tooltipOptions?.useExecutionLinks;
-    console.log(ref.settings);
     let chart: uPlot;
     let over: HTMLDivElement;
     let bound: Element;
@@ -164,7 +163,7 @@ export class TooltipPlugin {
             // some weird uPlot behaviour. it happens to be -10 many times
             return;
           }
-          const hoveredValue = u.posToVal(top, 'y');
+          const hoveredValue = u.posToVal(top, '1');
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
           // first series is x axis (time)
@@ -349,6 +348,7 @@ export class TooltipPlugin {
     let index = 0;
     for (let val = 0; val < arr.length; val++) {
       let newdiff = Math.abs(num - arr[val].value);
+
       if (newdiff < diff) {
         diff = newdiff;
         curr = arr[val];
