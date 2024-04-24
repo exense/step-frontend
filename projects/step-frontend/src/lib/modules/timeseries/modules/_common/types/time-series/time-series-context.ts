@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
-import { Execution, MetricAttribute, TimeRange } from '@exense/step-core';
+import { DashboardItem, Execution, MetricAttribute, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';
@@ -9,6 +9,7 @@ import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { FilterUtils } from '../filter/filter-utils';
 import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
+import { TimeSeriesSyncGroup } from './time-series-sync-group';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -47,11 +48,20 @@ export class TimeSeriesContext {
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
+  /**
+   * @Deprecated
+   */
   public readonly keywordsContext: TimeSeriesKeywordsContext;
   private readonly colorsPool: TimeseriesColorsPool;
 
+  private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
+
+  private dashlets: DashboardItem[];
+
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
+    this.dashlets = params.dashlets;
+    params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
     this.activeFilters$ = new BehaviorSubject(params.filters || []);
@@ -90,6 +100,18 @@ export class TimeSeriesContext {
     ) as Observable<void>;
   }
 
+  getDashlets(): DashboardItem[] {
+    return this.dashlets;
+  }
+
+  updateDashlets(dashlets: DashboardItem[]): void {
+    this.dashlets = dashlets;
+  }
+
+  getDashlet(id: string): DashboardItem | undefined {
+    return this.dashlets.find((i) => i.id === id);
+  }
+
   destroy(): void {
     this.inProgress$.complete();
     this.fullTimeRangeChange$.complete();
@@ -99,6 +121,20 @@ export class TimeSeriesContext {
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
     this.stateChangeInternal$.complete();
+    Object.keys(this.syncGroups).forEach((key) => this.syncGroups[key]?.destroy());
+  }
+
+  getColor(key: string): string {
+    return this.colorsPool.getColor(key);
+  }
+
+  getSyncGroup(key: string): TimeSeriesSyncGroup {
+    let syncGroup = this.syncGroups[key];
+    if (!syncGroup) {
+      this.syncGroups[key] = syncGroup = new TimeSeriesSyncGroup(key);
+      // throw new Error('Sync group not found: ' + key);
+    }
+    return syncGroup;
   }
 
   updateEditMode(enabled: boolean) {

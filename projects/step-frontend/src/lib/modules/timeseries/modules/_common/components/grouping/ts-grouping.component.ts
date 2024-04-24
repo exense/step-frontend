@@ -26,22 +26,23 @@ export class TsGroupingComponent implements OnInit, OnChanges {
   @Input() dimensions: string[] = [];
   @Input() groupingOptions!: { label: string; attributes: string[] }[];
 
-  label: string = EMPTY_DIMENSIONS_LABEL;
-
   customGroupingString = '';
 
   attributesLabelMappings: { [key: string]: string } = {
     name: 'Name',
     rnStatus: 'Status',
+    eId: 'Execution',
+    planId: 'Plan',
+    taskId: 'Task',
   };
 
   ngOnInit(): void {
-    this.label = this.formatDimensions(this.dimensions);
+    this.selectedGroupingInternal = { label: this.formatDimensions(this.dimensions), attributes: this.dimensions };
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['dimensions']) {
-      this.label = this.formatDimensions(this.dimensions);
+      this.selectedGroupingInternal = { label: this.formatDimensions(this.dimensions), attributes: this.dimensions };
     }
   }
 

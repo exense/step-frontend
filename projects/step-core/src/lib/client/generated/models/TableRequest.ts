@@ -12,4 +12,6 @@ export type TableRequest = {
   skip?: number;
   limit?: number;
   sort?: Sort;
+  performEnrichment?: boolean;
+  calculateCounts?: boolean;
 };
