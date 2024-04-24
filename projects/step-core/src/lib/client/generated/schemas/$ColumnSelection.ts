@@ -1,14 +1,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $ChartSettings = {
+export const $ColumnSelection = {
   properties: {
-    primaryAxes: {
-      type: 'AxesSettings',
+    column: {
+      type: 'Enum',
       isRequired: true,
     },
-    secondaryAxes: {
-      type: 'AxesSettings',
+    selected: {
+      type: 'boolean',
     },
   },
 } as const;

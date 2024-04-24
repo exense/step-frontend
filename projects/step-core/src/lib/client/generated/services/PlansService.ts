@@ -190,6 +190,21 @@ export class PlansService {
   }
 
   /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findPlanNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/find/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns all the plans.
    * @param skip
    * @param limit

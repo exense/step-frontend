@@ -14,19 +14,17 @@ import { OpenAPI } from './core/OpenAPI';
   providers: [
     {
       provide: OpenAPI,
-      useFactory: () => {
-        return {
-          BASE: OpenAPI?.BASE ?? 'rest',
-          VERSION: OpenAPI?.VERSION ?? '3.24.3',
-          WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
-          CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',
-          TOKEN: OpenAPI?.TOKEN,
-          USERNAME: OpenAPI?.USERNAME,
-          PASSWORD: OpenAPI?.PASSWORD,
-          HEADERS: OpenAPI?.HEADERS,
-          ENCODE_PATH: OpenAPI?.ENCODE_PATH,
-        } as OpenAPIConfig;
-      },
+      useValue: {
+        BASE: OpenAPI?.BASE ?? 'rest',
+        VERSION: OpenAPI?.VERSION ?? '3.25.0',
+        WITH_CREDENTIALS: OpenAPI?.WITH_CREDENTIALS ?? false,
+        CREDENTIALS: OpenAPI?.CREDENTIALS ?? 'include',
+        TOKEN: OpenAPI?.TOKEN,
+        USERNAME: OpenAPI?.USERNAME,
+        PASSWORD: OpenAPI?.PASSWORD,
+        HEADERS: OpenAPI?.HEADERS,
+        ENCODE_PATH: OpenAPI?.ENCODE_PATH,
+      } as OpenAPIConfig,
     },
     {
       provide: BaseHttpRequest,

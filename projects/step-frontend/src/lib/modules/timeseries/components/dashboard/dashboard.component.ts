@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewChild, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import {
   AugmentedTimeSeriesService,
   AuthService,
@@ -13,8 +13,6 @@ import {
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
   FilterUtils,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
@@ -37,14 +35,9 @@ import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
-
-type AggregationType = 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-
-interface MetricAttributeSelection extends MetricAttribute {
-  selected: boolean;
-}
-
-const EDIT_PARAM_NAME = 'edit';
+import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
+import { TableColumnType } from '../../modules/_common/types/table-column-type';
+import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 
 @Component({
   selector: 'step-dashboard-page',
@@ -58,12 +51,13 @@ const EDIT_PARAM_NAME = 'edit';
     ChartDashletComponent,
     ResolutionPickerComponent,
     TimeRangePickerComponent,
+    TableDashletComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   readonly DASHLET_HEIGHT = 300;
 
-  @ViewChildren(ChartDashletComponent) dashlets: ChartDashletComponent[] = [];
+  @ViewChildren('chart') dashlets!: QueryList<ChartDashlet>;
   @ViewChild(DashboardFilterBarComponent) filterBar?: DashboardFilterBarComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
@@ -218,22 +212,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }) || [];
 
     this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
+    this.refreshAllCharts(false, true);
   }
 
-  addDashlet(metric: MetricType) {
+  addTableDashlet(metric: MetricType) {
+    let tableItem: DashboardItem = {
+      id: 'table-' + new Date().getTime(),
+      type: 'TABLE',
+      name: `Table dashlet (${metric.name})`,
+      attributes: metric.attributes || [],
+      grouping: metric.defaultGroupingAttributes || [],
+      metricKey: metric.name!,
+      filters: [],
+      size: 2,
+      inheritGlobalGrouping: true,
+      inheritGlobalFilters: true,
+      readonlyAggregate: true,
+      readonlyGrouping: true,
+      tableSettings: {
+        columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
+      },
+    };
+    this.dashboard.dashlets.push(tableItem);
+    this.context.updateDashlets(this.dashboard.dashlets);
+  }
+
+  addChartDashlet(metric: MetricType) {
     const newDashlet: DashboardItem = {
-      name: metric.displayName!,
+      id: 'chart-' + new Date().getTime(),
+      name: `Table stats (${metric.displayName!})`,
       type: 'CHART',
       size: 1,
+      metricKey: metric.name!,
+      filters: [],
+      grouping: metric.defaultGroupingAttributes || [],
+      attributes: metric.attributes || [],
+      readonlyAggregate: false,
+      readonlyGrouping: false,
+      inheritGlobalFilters: true,
+      inheritGlobalGrouping: true,
       chartSettings: {
-        filters: [],
-        metricKey: metric.name!,
-        inheritGlobalFilters: true,
-        inheritGlobalGrouping: true,
-        grouping: metric.defaultGroupingAttributes || [],
-        attributes: metric.attributes || [],
-        readonlyAggregate: false,
-        readonlyGrouping: false,
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
           unit: metric.unit!,
@@ -243,7 +261,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
     };
     this.filterBar!.addUniqueFilterItems(
-      newDashlet.chartSettings!.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
+      newDashlet.attributes.map((item) => FilterUtils.createFilterItemFromAttribute(item)),
     );
     this.dashboard.dashlets.push(newDashlet);
     this.context.updateAttributes(this.collectAllAttributes());
@@ -280,9 +298,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // absolute
       this.timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
     }
-    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap(
-      (d) => d.chartSettings?.attributes || [],
-    );
+    const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
@@ -293,6 +309,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
+      dashlets: this.dashboard.dashlets,
       timeRange: timeRange,
       attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
@@ -348,8 +365,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleChartDelete(index: number) {
+    const itemToDelete = this.dashboard.dashlets[index];
     this.dashboard.dashlets.splice(index, 1);
     this.context.updateAttributes(this.collectAllAttributes());
+    if (itemToDelete.type === 'TABLE') {
+      this.dashboard.dashlets
+        .filter((d) => d.masterChartId === itemToDelete.id)
+        .forEach((i) => (i.masterChartId = undefined));
+    }
+    this.context.updateDashlets(this.dashboard.dashlets);
   }
 
   handleChartShiftLeft(index: number) {
@@ -395,7 +419,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   collectAllAttributes(): MetricAttribute[] {
-    return this.dashboard.dashlets.flatMap((d) => d.chartSettings!.attributes);
+    return this.dashboard.dashlets.flatMap((d) => d.attributes);
   }
 
   removeOneTimeUrlParams() {

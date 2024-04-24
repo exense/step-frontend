@@ -24,7 +24,7 @@ export class SchedulerService {
    * @throws ApiError
    */
   public deleteExecutionTasks(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -57,7 +57,7 @@ export class SchedulerService {
    * @throws ApiError
    */
   public cloneExecutionTasks(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -185,11 +185,26 @@ export class SchedulerService {
    * @throws ApiError
    */
   public findExecutionTasksByAttributes(
-    requestBody?: Record<string, string>
+    requestBody?: Record<string, string>,
   ): Observable<Array<ExecutiontTaskParameters>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/scheduler/task/find',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findExecutionTaskNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/find/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
     });

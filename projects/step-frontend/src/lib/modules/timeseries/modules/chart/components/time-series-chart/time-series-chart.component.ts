@@ -240,7 +240,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: true });
-    let foundItem = this.legendSettings.items.find((item) => item.label === id);
+    let foundItem = this.legendSettings.items.find((item) => item.seriesId === id);
     if (foundItem) {
       foundItem.isVisible = true;
     }
@@ -250,7 +250,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     let index = this.seriesIndexesByIds[id];
     if (index == undefined) return;
     this.uplot.setSeries(index, { show: false });
-    let foundItem = this.legendSettings.items.find((item) => item.label === id);
+    let foundItem = this.legendSettings.items.find((item) => item.seriesId === id);
     if (foundItem) {
       foundItem.isVisible = false;
     }
