@@ -102,7 +102,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
       this._dashboardService.getDashboardById(id).subscribe((dashboard) => {
         this.dashboard = dashboard;
-        this.refreshInterval = pageParams.refreshInterval || this.dashboard.refreshInterval || 0;
+        this.refreshInterval =
+          (pageParams.refreshInterval !== undefined ? pageParams.refreshInterval : this.dashboard.refreshInterval) || 0;
         this.resolution = pageParams.resolution || this.dashboard.resolution;
         pageParams.resolution = this.resolution;
         this.context = this.createContext(this.dashboard, pageParams);
@@ -127,7 +128,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(this.timeRangeSelection);
       this.updateFullAndSelectedRange(newTimeRange);
     }
-    this.refreshAllCharts(refreshRanger);
+    this.refreshAllCharts(refreshRanger, false);
   }
 
   /**
@@ -345,7 +346,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * @private
    */
   private refreshAllCharts(refreshRanger = false, force = false): void {
-    if (this.refreshInProgress && !force) {
+    if ((this.refreshInProgress || this.context.getChartsLockedState()) && !force) {
       return;
     }
     this.refreshSubscription?.unsubscribe();
