@@ -9,8 +9,4 @@
   &:not(.inline) {
     flex-direction: column;
   }
-
-  .inline.fill-whole-space {
-    flex: 1;
-  }
 }

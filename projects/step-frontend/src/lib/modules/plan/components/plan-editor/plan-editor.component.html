@@ -10,7 +10,6 @@
       [stInline]="true"
       [stEditableLabelMode]="true"
       [stModel]="(_planEditorService.plan$ | async)!"
-      [fillWholeSpace]="true"
       (stModelChange)="_planEditorService.handlePlanChange()"
     />
   </step-plan-editor-attributes>

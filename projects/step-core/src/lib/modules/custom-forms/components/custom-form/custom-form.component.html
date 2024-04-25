@@ -2,7 +2,6 @@
 <ng-template #editableLabels>
   <step-dynamic-label-custom-form-inputs
     *ngFor="let input of inputs"
-    [class.fill-whole-space]="fillWholeSpace"
     [stInput]="input"
     [disabled]="stDisabled"
     [required]="required"

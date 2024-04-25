@@ -20,8 +20,10 @@ export class DynamicInputWidthDirective implements OnInit {
 
   private resizeInput(value?: string): void {
     const length = value?.length;
-    if (length && length > 10) {
+    if (length && length > 20) {
       this.el.nativeElement.style.width = `${length + 2}ch`;
+    } else {
+      this.el.nativeElement.style.width = `20ch`;
     }
   }
 }

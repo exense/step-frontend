@@ -8,5 +8,5 @@
   }
 }
 <step-form-field [class.hidden]="!isEditMode()">
-  <input #inputElement type="text" (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
+  <input #inputElement dynamicInputWidth type="text" (blur)="submitNameChange()" (keydown.enter)="submitNameChange()" />
 </step-form-field>
