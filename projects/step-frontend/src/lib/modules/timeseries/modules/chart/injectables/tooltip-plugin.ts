@@ -17,9 +17,7 @@ export class TooltipPlugin {
   private _executionsService = inject(ExecutionsService);
 
   /**
-   * The tooltip will be displayed while the user will hover the chart.
-   * An execution is optional to display. It can be configured via settings and via chart metadata (where the actual
-   * data is taken from)
+   * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
    */
   createPlugin(ref: TooltipParentContainer): uPlot.Plugin {
     const showExecutionsLinks = ref.settings.tooltipOptions?.useExecutionLinks;
