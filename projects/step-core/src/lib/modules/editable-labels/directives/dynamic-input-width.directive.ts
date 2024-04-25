@@ -6,6 +6,7 @@ import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/cor
 })
 export class DynamicInputWidthDirective implements OnInit {
   @Input() text: string | undefined;
+  @Input() minWidth = 20;
 
   constructor(private el: ElementRef<HTMLInputElement>) {}
 
@@ -23,7 +24,7 @@ export class DynamicInputWidthDirective implements OnInit {
     if (length && length > 20) {
       this.el.nativeElement.style.width = `${length + 2}ch`;
     } else {
-      this.el.nativeElement.style.width = `20ch`;
+      this.el.nativeElement.style.width = `${this.minWidth}ch`;
     }
   }
 }
