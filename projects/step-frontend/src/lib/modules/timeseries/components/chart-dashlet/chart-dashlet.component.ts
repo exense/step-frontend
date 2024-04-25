@@ -201,7 +201,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     } else {
       filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
     }
+    filterItems.unshift(metricFilterItem);
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
+  }
+
+  handleLockStateChange(locked: boolean) {
+    this.context.setChartsLockedState(locked);
   }
 
   openChartSettings(): void {
