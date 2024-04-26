@@ -15,7 +15,7 @@ export class BooleanFilterCondition extends FilterCondition<string> {
     return !this.sourceObject;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     const value = (this.sourceObject || '').toLowerCase();
     if (value !== true.toString() && value !== false.toString()) {
       return [];

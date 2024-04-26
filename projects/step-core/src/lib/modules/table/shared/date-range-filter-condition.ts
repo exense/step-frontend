@@ -21,7 +21,7 @@ export class DateRangeFilterCondition extends FilterCondition<DateRangFilterCond
     return !this.sourceObject;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     const range = this.getRange();
     if (!range) {
       return [];
