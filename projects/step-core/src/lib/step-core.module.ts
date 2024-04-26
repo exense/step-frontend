@@ -68,6 +68,8 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
+import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
+import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 
 @NgModule({
   declarations: [
@@ -137,6 +139,8 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     DRAG_DROP_EXPORTS,
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
+    RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -201,6 +205,8 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
+    RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -265,7 +271,7 @@ export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.dir
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
-export * from './guards/check-project-guard.factory';
+export * from './guards/check-entity-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
@@ -326,3 +332,5 @@ export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
+export * from './modules/rich-editor';
+export * from './modules/multi-level-select';

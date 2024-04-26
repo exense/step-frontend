@@ -1,12 +1,15 @@
 <step-form-field
   [class.active]="active"
+  [class.has-no-value]="!formattedValue"
   [matMenuTriggerFor]="menu"
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
   [matTooltip]="formattedValue ?? ''"
 >
   <step-prefix>{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
-  <div class="step-field-container">{{ formattedValue || '-' }}</div>
+  @if (formattedValue) {
+    <div class="step-field-container">{{ formattedValue }}</div>
+  }
   @if (removable) {
     <step-suffix class="icon-suffix">
       <step-icon class="remove-btn" name="x" (click)="removeItem.emit()" />

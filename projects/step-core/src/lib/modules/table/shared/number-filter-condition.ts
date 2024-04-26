@@ -14,7 +14,7 @@ export class NumberFilterCondition extends FilterCondition<string> {
     return !this.sourceObject;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     const expectedValue = parseInt(this.sourceObject || '');
     if (isNaN(expectedValue)) {
       return [];

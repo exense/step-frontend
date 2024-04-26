@@ -6,6 +6,7 @@
     (zoomReset)="handleZoomReset()"
     [syncKey]="context.id"
     [settings]="_internalSettings!"
+    (lockStateChange)="handleLockStateChange($event)"
     [height]="height"
   >
   </step-timeseries-chart>
@@ -26,58 +27,47 @@
       <step-icon name="x"></step-icon>
     </button>
   </div>
-  <button
-    *ngIf="
-      !editMode &&
-      !(
-        (item.chartSettings?.readonlyGrouping || item.chartSettings?.inheritGlobalGrouping) &&
-        item.chartSettings?.readonlyAggregate
-      )
-    "
-    mat-icon-button
-    matTooltip="Settings"
-    [matMenuTriggerFor]="settingsMenu"
-  >
-    <step-icon name="settings"></step-icon>
-  </button>
+  @if (!editMode && !((item.readonlyGrouping || item.inheritGlobalGrouping) && item.readonlyAggregate)) {
+    <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+      <step-icon name="settings"></step-icon>
+    </button>
+  }
 
   <mat-menu #settingsMenu="matMenu">
-    <button
-      *ngIf="!item.chartSettings?.readonlyGrouping && !item.chartSettings?.inheritGlobalGrouping"
-      mat-menu-item
-      [matMenuTriggerFor]="groupingMenu"
-    >
-      Grouping
-    </button>
-    <button *ngIf="!item.chartSettings?.readonlyAggregate" mat-menu-item [matMenuTriggerFor]="aggregateMenu">
-      Aggregate
-    </button>
+    @if (!item.masterChartId && !item.readonlyGrouping && !item.inheritGlobalGrouping) {
+      <button mat-menu-item [matMenuTriggerFor]="groupingMenu">Grouping</button>
+    }
+    @if (!item.readonlyAggregate) {
+      <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
+    }
   </mat-menu>
 
   <mat-menu #groupingMenu="matMenu">
-    <button
-      *ngFor="let attribute of groupingSelection"
-      (click)="toggleGroupingAttribute(attribute); $event.stopPropagation()"
-      mat-menu-item
-      [class.selected-menu-item]="attribute.selected"
-    >
-      <div class="flex flex-row checkbox-row">
-        <input type="checkbox" class="checkbox" [ngModel]="attribute.selected" />
-        <span>{{ attribute.displayName }}</span>
-      </div>
-    </button>
+    @for (attribute of groupingSelection; track attribute) {
+      <button
+        (click)="toggleGroupingAttribute(attribute); $event.stopPropagation()"
+        mat-menu-item
+        [class.selected-menu-item]="attribute.selected"
+      >
+        <div class="flex flex-row checkbox-row">
+          <input type="checkbox" class="checkbox" [ngModel]="attribute.selected" />
+          <span>{{ attribute.displayName }}</span>
+        </div>
+      </button>
+    }
   </mat-menu>
 
   <mat-menu #aggregateMenu="matMenu">
-    <button
-      *ngFor="let aggregate of AGGREGATES"
-      (click)="switchAggregate(aggregate)"
-      mat-menu-item
-      class="selected-menu-item"
-      [class.selected-menu-item]="aggregate === selectedAggregate"
-    >
-      {{ aggregate }}
-    </button>
+    @for (aggregate of AGGREGATES; track aggregate) {
+      <button
+        (click)="switchAggregate(aggregate)"
+        mat-menu-item
+        class="selected-menu-item"
+        [class.selected-menu-item]="aggregate === selectedAggregate"
+      >
+        {{ aggregate }}
+      </button>
+    }
     <button
       mat-menu-item
       [matMenuTriggerFor]="pclMenu"
@@ -88,13 +78,14 @@
   </mat-menu>
 
   <mat-menu #pclMenu="matMenu">
-    <button
-      *ngFor="let pcl of PCL_VALUES"
-      (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl)"
-      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && selectedPclValue === pcl"
-      mat-menu-item
-    >
-      {{ pcl }}th
-    </button>
+    @for (pcl of PCL_VALUES; track pcl) {
+      <button
+        (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl)"
+        [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && selectedPclValue === pcl"
+        mat-menu-item
+      >
+        {{ pcl }}th
+      </button>
+    }
   </mat-menu>
 </div>

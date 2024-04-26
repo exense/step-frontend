@@ -8,179 +8,161 @@
       [disabled]="context.readonly"
     >
       <mat-option [value]="undefined"></mat-option>
-      <mat-option *ngFor="let item of dataSourceTypes; trackBy: trackByDataSourceType" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
+      @for (item of dataSourceTypes; track item.key) {
+        <mat-option [value]="item.key">{{ item.value }}</mat-option>
+      }
     </mat-select>
   </step-form-field>
-  <ng-container *ngIf="context.artefact!.dataSource">
-    <ng-container [ngSwitch]="context.artefact!.dataSourceType">
-      <ng-container *ngSwitchCase="DataSourceType.EXCEL">
+  @if (context.artefact!.dataSource) {
+    @switch (context.artefact!.dataSourceType) {
+      @case (DataSourceType.EXCEL) {
         <step-dynamic-resource
           label="Exel file"
           type="datasource"
           [(ngModel)]="context.artefact!.dataSource!.file"
           [disabled]="context.readonly"
           name="file"
-        >
-        </step-dynamic-resource>
+        />
         <step-dynamic-textfield
           label="Worksheet"
           [(ngModel)]="context.artefact!.dataSource!.worksheet"
           [disabled]="context.readonly"
           name="worksheet"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-checkbox
           label="Headers"
           [(ngModel)]="context.artefact!.dataSource!.headers"
           [disabled]="context.readonly"
           name="headers"
-        >
-        </step-dynamic-checkbox>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.CSV">
+        />
+      }
+      @case (DataSourceType.CSV) {
         <step-dynamic-resource
           label="CSV file"
           type="datasource"
           [(ngModel)]="context.artefact!.dataSource!.file"
           [disabled]="context.readonly"
           name="file"
-        >
-        </step-dynamic-resource>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.SQL">
+        />
+      }
+      @case (DataSourceType.SQL) {
         <step-dynamic-textfield
           label="Connection string"
           [(ngModel)]="context.artefact!.dataSource!.connectionString"
           [disabled]="context.readonly"
           name="connectionString"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Driver class"
           [(ngModel)]="context.artefact!.dataSource!.driverClass"
           [disabled]="context.readonly"
           name="driverClass"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Query"
           [(ngModel)]="context.artefact!.dataSource!.query"
           [disabled]="context.readonly"
           name="query"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="User"
           [(ngModel)]="context.artefact!.dataSource!.user"
           [disabled]="context.readonly"
           name="user"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Password"
           [(ngModel)]="context.artefact!.dataSource!.password"
           [disabled]="context.readonly"
           name="password"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Primary write key"
           [(ngModel)]="context.artefact!.dataSource!.writePKey"
           [disabled]="context.readonly"
           name="writePKey"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.GSHEET">
+        />
+      }
+      @case (DataSourceType.GSHEET) {
         <step-dynamic-resource
           label="Service Account Key File"
           type="secret"
           [(ngModel)]="context.artefact!.dataSource!.serviceAccountKey"
           [disabled]="context.readonly"
           name="serviceAccountKey"
-        >
-        </step-dynamic-resource>
+        />
         <step-dynamic-textfield
           label="File Id"
           [(ngModel)]="context.artefact!.dataSource!.fileId"
           [disabled]="context.readonly"
           name="fileId"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Tab Name"
           [(ngModel)]="context.artefact!.dataSource!.tabName"
           [disabled]="context.readonly"
           name="tabName"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.SEQUENCE">
+        />
+      }
+      @case (DataSourceType.SEQUENCE) {
         <step-dynamic-textfield
           label="Start"
           [isNumber]="true"
           [(ngModel)]="context.artefact!.dataSource!.start"
           [disabled]="context.readonly"
           name="start"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="End"
           [isNumber]="true"
           [(ngModel)]="context.artefact!.dataSource!.end"
           [disabled]="context.readonly"
           name="end"
-        >
-        </step-dynamic-textfield>
+        />
         <step-dynamic-textfield
           label="Inc"
           [isNumber]="true"
           [(ngModel)]="context.artefact!.dataSource!.inc"
           [disabled]="context.readonly"
           name="inc"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.JSON_ARRAY">
+        />
+      }
+      @case (DataSourceType.JSON_ARRAY) {
         <step-dynamic-textfield
           label="Json"
           [(ngModel)]="context.artefact!.dataSource!.json"
           [disabled]="context.readonly"
           name="json"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.JSON">
+          [predefinedRichEditorMode]="AceMode.JSON"
+        />
+      }
+      @case (DataSourceType.JSON) {
         <step-dynamic-textfield
           label="Json string"
           [(ngModel)]="context.artefact!.dataSource!.json"
           [disabled]="context.readonly"
+          [predefinedRichEditorMode]="AceMode.JSON"
           name="json"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.FILE">
+        />
+      }
+      @case (DataSourceType.FILE) {
         <step-dynamic-resource
           label="Flat file"
           type="datasource"
           [(ngModel)]="context.artefact!.dataSource!.file"
           [disabled]="context.readonly"
           name="file"
-        >
-        </step-dynamic-resource>
-      </ng-container>
-      <ng-container *ngSwitchCase="DataSourceType.FOLDER">
+        />
+      }
+      @case (DataSourceType.FOLDER) {
         <step-dynamic-textfield
           label="Directory"
           [(ngModel)]="context.artefact!.dataSource!.folder"
           [disabled]="context.readonly"
           name="folder"
-        >
-        </step-dynamic-textfield>
-      </ng-container>
-      <ng-container *ngSwitchDefault> </ng-container>
-    </ng-container>
-  </ng-container>
+        />
+      }
+      @default {}
+    }
+  }
 </form>

@@ -44,6 +44,34 @@ step-artefact-details {
     position: absolute;
     z-index: 1000;
     top: 1rem;
+    left: 0;
+  }
+
+  .artefact-hint {
+    position: absolute !important;
+    z-index: 1000 !important;
+  }
+
+  .call-plan {
+    .artefact-hint {
+      top: 3rem;
+      left: 1rem;
+    }
+
+    input {
+      padding-left: 3.5rem;
+    }
+  }
+
+  .no-plan-or-keyword {
+    .artefact-hint {
+      top: 1rem;
+    }
+  }
+
+  .editor:has(step-plan-name) .artefact-hint {
+    top: 1rem !important;
+    left: 0 !important;
   }
 
   .artefact-name,

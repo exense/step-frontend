@@ -1,13 +1,17 @@
 :host {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  &:hover .pkg-button {
+    opacity: 1;
+  }
 }
 
 div:hover button {
   opacity: 1;
 }
 
-button {
+.pkg-button {
   opacity: 0;
   height: 20px;
   width: 28px;

@@ -1,0 +1,104 @@
+<div class="header-container">
+  <span class="uplot title">
+    {{ item.name }}
+  </span>
+  <div class="settings-container">
+    @if (editMode) {
+      <div class="edit-buttons">
+        <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
+          <step-icon name="chevron-left"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
+          <step-icon name="chevron-right"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Edit settings" (click)="openSettings()">
+          <step-icon name="edit"></step-icon>
+        </button>
+        <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
+          <step-icon name="x"></step-icon>
+        </button>
+      </div>
+    }
+    @if (!editMode) {
+      <button mat-icon-button matTooltip="Table Settings" [matMenuTriggerFor]="settingsMenu">
+        <step-icon name="settings" />
+      </button>
+      <mat-menu #settingsMenu="matMenu">
+        <button mat-menu-item [matMenuTriggerFor]="columnsMenu">Columns</button>
+      </mat-menu>
+    }
+    <mat-menu #columnsMenu="matMenu">
+      @for (column of columnsDefinition; track column.id) {
+        <button
+          mat-menu-item
+          (click)="column.isVisible = !column.isVisible; collectVisibleColumns(); $event.stopPropagation()"
+        >
+          <div class="flex flex-row" style="gap: 12px; align-items: center">
+            <mat-checkbox
+              color="primary"
+              [ngModel]="column.isVisible"
+              (ngModelChange)="onColumnVisibilityChange(column)"
+            >
+              <span>{{ column.label }}</span>
+            </mat-checkbox>
+          </div>
+        </button>
+      }
+    </mat-menu>
+  </div>
+</div>
+
+<div>
+  <step-table
+    [dataSource]="tableDataSource"
+    [inProgress]="tableIsLoading"
+    matSort
+    class="ts-table"
+    [visibleColumns]="visibleColumnsIds"
+  >
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <mat-checkbox
+          color="primary"
+          (click)="$event.stopPropagation()"
+          [(ngModel)]="allSeriesChecked"
+          (change)="onAllSeriesCheckboxClick($event.checked)"
+        >
+          <span>Name</span>
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <div class="color-cell">
+          <mat-checkbox
+            color="primary"
+            [(ngModel)]="element.isSelected"
+            (ngModelChange)="onKeywordToggle(element, $event)"
+          >
+            <div class="element-name">
+              <span>{{ element | tableEntryFormat }}</span>
+              <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />
+            </div>
+          </mat-checkbox>
+        </div>
+      </td>
+    </ng-container>
+    @for (column of columnsDefinition; track column.id) {
+      <!--    Base Column-->
+      <ng-container [matColumnDef]="column.id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div>
+            <div>{{ column.label }}</div>
+            <div *ngIf="false" class="subtitle"></div>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <div class="flex justify-between">
+            <div>
+              {{ column.mapValue(element.base) }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+    }
+  </step-table>
+</div>

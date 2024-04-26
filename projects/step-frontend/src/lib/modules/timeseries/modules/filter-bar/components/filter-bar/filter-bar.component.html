@@ -2,12 +2,14 @@
   <div class="ranger-section">
     <step-execution-time-selection [context]="context" />
   </div>
-  <step-time-range-picker
-    (selectionChange)="handleTimeRangeChange($event)"
-    [selectOptions]="timeRangeOptions"
-    [activeSelection]="activeTimeRange"
-    [compact]="compactView"
-  />
+  <div>
+    <step-time-range-picker
+      (selectionChange)="handleTimeRangeChange($event)"
+      [selectOptions]="timeRangeOptions"
+      [activeSelection]="activeTimeRange"
+      [compact]="compactView"
+    />
+  </div>
 </div>
 
 <div class="filters-section">
@@ -20,6 +22,7 @@
   @if (compactView) {
     <div class="settings-section">
       <step-tabs
+        [disablePagination]="true"
         [tabs]="modes"
         [shrink]="true"
         [activeTabId]="activeMode"
@@ -50,7 +53,7 @@
 
     <div class="filers-row" [class.oql-mode]="activeMode === TsFilteringMode.OQL" [class.compact-view]="compactView">
       @if (activeMode === TsFilteringMode.OQL) {
-        <step-form-field [matTooltip]="oqlValue" class="ng-touched" [class.ng-invalid]="invalidOql">
+        <step-form-field [matTooltip]="oqlValue" class="ng-touched oql-input" [class.ng-invalid]="invalidOql">
           <input type="text" [(ngModel)]="oqlValue" (ngModelChange)="handleOqlChange($event)" />
           <step-suffix class="icon-suffix">
             <step-icon
@@ -75,9 +78,9 @@
             (filterChange)="handleFilterChange(i, $event)"
           />
         }
-        <button type="button" class="more-btn" mat-raised-button [matMenuTriggerFor]="addFilterMenu">
+        <button type="button" class="more-btn grey-border" mat-raised-button [matMenuTriggerFor]="addFilterMenu">
           <step-icon name="plus" />
-          <span>More</span>
+          <span>Filters</span>
         </button>
       }
       @if (activeMode === TsFilteringMode.STANDARD && rawMeasurementsModeActive) {

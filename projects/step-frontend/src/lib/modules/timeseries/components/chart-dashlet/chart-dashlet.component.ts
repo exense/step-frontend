@@ -1,23 +1,9 @@
+import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
-import {
-  BucketAttributes,
   BucketResponse,
   DashboardItem,
-  Execution,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
   MetricAttribute,
-  Plan,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -33,12 +19,14 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { Observable, tap } from 'rxjs';
+import { forkJoin, Observable, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
 import { ChartGenerators } from '../../modules/legacy/injectables/chart-generators';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
+import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 
 declare const uPlot: any;
 
@@ -53,7 +41,14 @@ interface MetricAttributeSelection extends MetricAttribute {
   standalone: true,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
-export class ChartDashletComponent implements OnInit, OnChanges {
+export class ChartDashletComponent extends ChartDashlet implements OnInit {
+  showSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+  hideSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -89,6 +84,8 @@ export class ChartDashletComponent implements OnInit, OnChanges {
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
+  syncGroupSubscription?: Subscription;
+
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
       throw new Error('Missing input values');
@@ -99,27 +96,55 @@ export class ChartDashletComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
-    if (cItem?.previousValue !== cItem?.currentValue || cItem?.firstChange) {
+    if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
       this.prepareState(cItem.currentValue);
       this.refresh(true).subscribe();
     }
   }
 
+  private subscribeToMasterDashletChanges() {
+    this.syncGroupSubscription?.unsubscribe();
+    this.syncGroupSubscription = new Subscription();
+    if (this.item.masterChartId) {
+      let syncGroup = this.context.getSyncGroup(this.item.masterChartId);
+      this.syncGroupSubscription.add(
+        syncGroup.onSeriesShow().subscribe((s) => {
+          this.chart.showSeries(s);
+        }),
+      );
+      this.syncGroupSubscription.add(
+        syncGroup.onSeriesHide().subscribe((s) => {
+          this.chart.hideSeries(s);
+        }),
+      );
+      this.syncGroupSubscription.add(
+        syncGroup.onAllSeriesShow().subscribe(() => {
+          this.chart.showAllSeries();
+        }),
+      );
+      this.syncGroupSubscription.add(
+        syncGroup.onAllSeriesHide().subscribe(() => {
+          this.chart.hideAllSeries();
+        }),
+      );
+    }
+  }
+
   private prepareState(item: DashboardItem) {
-    item.chartSettings!.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
+    item.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
     this.groupingSelection = this.prepareGroupingAttributes(item);
     this.selectedAggregate = item.chartSettings!.primaryAxes!.aggregation as ChartAggregation;
     this.selectedPclValue = item.chartSettings!.primaryAxes!.pclValue;
     if (this.selectedAggregate === ChartAggregation.PERCENTILE && !this.selectedPclValue) {
       this.selectedPclValue = this.PCL_VALUES[0];
     }
+    this.subscribeToMasterDashletChanges();
   }
 
   private prepareGroupingAttributes(item: DashboardItem): MetricAttributeSelection[] {
-    const settings = item.chartSettings!;
     const groupingSelection: MetricAttributeSelection[] =
-      settings.attributes?.map((a) => ({ ...a, selected: false })) || [];
-    settings.grouping?.forEach((a) => {
+      item.attributes?.map((a) => ({ ...a, selected: false })) || [];
+    item.grouping?.forEach((a) => {
       const foundAttribute = groupingSelection.find((attr) => attr.name === a);
       if (foundAttribute) {
         foundAttribute.selected = true;
@@ -128,7 +153,7 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     return groupingSelection;
   }
 
-  refresh(blur?: boolean): Observable<any> {
+  public refresh(blur?: boolean): Observable<any> {
     if (blur) {
       this.chart?.setBlur(true);
     }
@@ -151,79 +176,111 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     this.refresh(true).subscribe();
   }
 
-  private composeRequestFilter(metricKey: string): string {
-    let filterItems: FilterBarItem[] = [
-      {
-        attributeName: 'metricType',
-        type: FilterBarItemType.FREE_TEXT,
-        exactMatch: true,
-        freeTextValues: [`"${metricKey}"`],
-        searchEntities: [],
-      },
-    ];
+  private getMasterChart(): DashboardItem | undefined {
+    return this.item.masterChartId ? this.context.getDashlet(this.item.masterChartId) : undefined;
+  }
 
-    if (this.item.chartSettings!.inheritGlobalFilters) {
-      filterItems = [
-        ...filterItems,
-        ...FilterUtils.combineGlobalWithChartFilters(
-          this.context.getFilteringSettings().filterItems,
-          this.item.chartSettings!.filters,
-        ),
-      ];
+  private composeRequestFilter(): string {
+    const masterChart = this.getMasterChart();
+    const metric = masterChart?.metricKey || this.item.metricKey;
+    let metricFilterItem = {
+      attributeName: 'metricType',
+      type: FilterBarItemType.FREE_TEXT,
+      exactMatch: true,
+      freeTextValues: [`"${metric}"`],
+      searchEntities: [],
+    };
+    let filterItems: FilterBarItem[] = [];
+
+    const itemToInheritSettingsFrom = masterChart || this.item;
+    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
+      filterItems = FilterUtils.combineGlobalWithChartFilters(
+        this.context.getFilteringSettings().filterItems,
+        itemToInheritSettingsFrom.filters,
+      );
+    } else {
+      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
     }
+    filterItems.unshift(metricFilterItem);
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
+  }
+
+  handleLockStateChange(locked: boolean) {
+    this.context.setChartsLockedState(locked);
   }
 
   openChartSettings(): void {
     this._matDialog
-      .open(ChartDashletSettingsComponent, { data: { item: this.item } })
+      .open(ChartDashletSettingsComponent, { data: { item: this.item, context: this.context } })
       .afterClosed()
       .subscribe((updatedItem) => {
-        if (updatedItem) {
-          Object.assign(this.item, updatedItem);
-          this.prepareState(this.item);
-          this.refresh(true).subscribe();
-        }
+        this.handleChartUpdate(updatedItem);
       });
   }
 
+  private handleChartUpdate(updatedItem: DashboardItem) {
+    if (updatedItem) {
+      Object.assign(this.item, updatedItem);
+      this.prepareState(this.item);
+      this.refresh(true).subscribe();
+    }
+  }
+
+  /**
+   * When there is no grouping, the key and label will be 'Value'.
+   * If there are grouping, all empty elements will be replaced with an empty label
+   */
   private createChart(response: TimeSeriesAPIResponse): void {
+    let syncGroup: TimeSeriesSyncGroup | undefined;
+    if (this.item.masterChartId) {
+      syncGroup = this.context.getSyncGroup(this.item.masterChartId);
+    }
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
-    let secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
-    const groupDimensions = this.getChartGrouping();
+    const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
+    const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
     const primaryAggregation = this.selectedAggregate!;
     const secondaryAxesData: (number | undefined)[] = [];
     const series: TSChartSeries[] = response.matrix.map((series: BucketResponse[], i: number) => {
-      const labelItems = this.getSeriesKeys(response.matrixKeys[i], groupDimensions);
-      const seriesKey = labelItems.join(' | ');
+      const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
+      const labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
+      const seriesKey = this.mergeLabelItems(labelItems);
       const color =
         primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
 
-      if (hasSecondaryAxes)
+      if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
-          if (secondaryAxesData[j] == undefined) {
-            secondaryAxesData[j] = bucketValue;
-          } else if (bucketValue) {
-            secondaryAxesData[j]! += bucketValue;
+          metadata.push(b?.attributes);
+          if (hasSecondaryAxes) {
+            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
+            if (secondaryAxesData[j] == undefined) {
+              secondaryAxesData[j] = bucketValue;
+            } else if (bucketValue) {
+              secondaryAxesData[j]! += bucketValue;
+            }
           }
         });
+      }
 
-      return {
+      const s: TSChartSeries = {
         id: seriesKey,
         scale: '1',
         label: seriesKey,
         labelItems: labelItems,
         legendName: seriesKey,
         data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
+        metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
-        fill: (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color),
         points: { show: false },
-        show: true,
+        show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      if (primaryAxes.colorizationType === 'FILL') {
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+      }
+      return s;
     });
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
@@ -237,6 +294,9 @@ export class ChartDashletComponent implements OnInit, OnChanges {
         },
       },
     ];
+
+    this.fetchLegendEntities(series).subscribe();
+
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
@@ -271,44 +331,19 @@ export class ChartDashletComponent implements OnInit, OnChanges {
       tooltipOptions: {
         enabled: true,
         zAxisLabel: this.getSecondAxesLabel(),
+        useExecutionLinks: hasExecutionLinks,
         yAxisUnit: yAxesUnit,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: axes,
     };
-    groupDimensions.forEach((attributeKey, i) => {
-      const attribute = this._attributesByIds[attributeKey];
-      const entityName = attribute?.metadata['entity'];
-      if (!entityName) {
-        return;
-      }
-      switch (entityName) {
-        case 'execution':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getExecutionByIds(ids),
-            (e: Execution) => e.description!,
-          );
-          break;
-        case 'plan':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getPlansByIds(ids),
-            (plan: Plan) => plan.attributes?.['name'],
-          );
-          break;
-        case 'task':
-          this.fetchAndSetLabels(
-            series,
-            i,
-            (ids) => this._timeSeriesUtilityService.getTasksByIds(ids),
-            (task: ExecutiontTaskParameters) => task.attributes?.['name'],
-          );
-          break;
-      }
-    });
+  }
+
+  private mergeLabelItems(items: (string | undefined)[]): string {
+    if (items.length === 0) {
+      return TimeSeriesConfig.SERIES_LABEL_VALUE;
+    }
+    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
   private getSecondAxesLabel(): string | undefined {
@@ -331,13 +366,12 @@ export class ChartDashletComponent implements OnInit, OnChanges {
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
-    const settings = this.item.chartSettings!;
-    const groupDimensions = this.getChartGrouping();
+    const groupDimensions = this.getGroupDimensions();
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: this.composeRequestFilter(settings.metricKey!),
+      oqlFilter: this.composeRequestFilter(),
       percentiles: this.getRequiredPercentiles(),
     };
     const customResolution = this.context.getChartsResolution();
@@ -346,11 +380,47 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     } else {
       request.numberOfBuckets = 100;
     }
+    if (!!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+      // has execution attribute
+      request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+      request.collectAttributesValuesLimit = 10;
+    }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.createChart(response);
       }),
     );
+  }
+
+  private fetchLegendEntities(series: TSChartSeries[]): Observable<any> {
+    const groupDimensions = this.getGroupDimensions();
+    const requests$ = groupDimensions
+      .map((attributeKey, i) => {
+        const attribute = this._attributesByIds[attributeKey];
+        const entityName = attribute?.metadata['entity'];
+        if (!entityName) {
+          return undefined;
+        }
+        const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+          tap((response) => {
+            series.forEach((s, j) => {
+              const labelId = s.labelItems[i];
+              if (labelId) {
+                let newLabel;
+                if (response[labelId]) {
+                  newLabel = response[labelId];
+                } else {
+                  newLabel = labelId + ' (unresolved)';
+                }
+                this.chart.setLabelItem(s.id, i, newLabel);
+              }
+            });
+          }),
+        );
+      })
+      .filter((x) => !!x);
+    return forkJoin(requests$);
   }
 
   /**
@@ -418,11 +488,20 @@ export class ChartDashletComponent implements OnInit, OnChanges {
     return label + ' (unresolved)';
   }
 
-  private getChartGrouping(): string[] {
-    if (this.item!.chartSettings!.inheritGlobalGrouping) {
-      return this.context.getGroupDimensions();
+  private getGroupDimensions(): string[] {
+    const masterChart = this.getMasterChart();
+    if (masterChart) {
+      if (masterChart.inheritGlobalGrouping) {
+        return this.context.getGroupDimensions();
+      } else {
+        return masterChart.grouping;
+      }
     } else {
-      return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
+      if (this.item.inheritGlobalGrouping) {
+        return this.context.getGroupDimensions();
+      } else {
+        return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
+      }
     }
   }
 
@@ -496,9 +575,5 @@ export class ChartDashletComponent implements OnInit, OnChanges {
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
-  }
-
-  private getSeriesKeys(attributes: BucketAttributes, groupDimensions: string[]): (string | undefined)[] {
-    return groupDimensions.map((field) => attributes?.[field]);
   }
 }

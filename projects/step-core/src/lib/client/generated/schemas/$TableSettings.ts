@@ -28,5 +28,12 @@ export const $TableSettings = {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
     },
+    columns: {
+      type: 'array',
+      contains: {
+        type: 'ColumnSelection',
+      },
+      isRequired: true,
+    },
   },
 } as const;

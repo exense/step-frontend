@@ -7,13 +7,16 @@ import {
   DateFormat,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  REQUEST_FILTERS_INTERCEPTORS,
+  RequestFilterInterceptor,
   selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { EXECUTION_RESULT, EXECUTION_STATUS, Status } from '../../../_common/shared/status.enum';
+import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
 import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 
 @Component({
   selector: 'step-execution-list',
@@ -27,6 +30,12 @@ import { BehaviorSubject, of, switchMap } from 'rxjs';
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    {
+      provide: REQUEST_FILTERS_INTERCEPTORS,
+      useClass: ExecutionListFilterInterceptorService,
+      multi: true,
+    },
+    FilterConditionFactoryService,
   ],
   encapsulation: ViewEncapsulation.None,
 })
@@ -36,11 +45,12 @@ export class ExecutionListComponent implements OnDestroy {
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
-  readonly resultItems$ = of(EXECUTION_RESULT);
-  readonly statusItems$ = of(EXECUTION_STATUS);
+  readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
+
+  readonly remapStatuses = { [Status.FAILED]: Status.TECHNICAL_ERROR };
 
   autoRefreshDisabled: boolean = false;
 

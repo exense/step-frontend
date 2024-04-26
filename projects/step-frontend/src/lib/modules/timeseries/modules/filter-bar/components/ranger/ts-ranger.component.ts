@@ -43,7 +43,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   private _doc = inject(DOCUMENT);
   private _utils = inject(UPlotUtilsService);
 
-  private readonly CHART_HEIGHT = 130;
+  private readonly CHART_HEIGHT = 104;
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
