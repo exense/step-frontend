@@ -82,6 +82,7 @@ export class ChartDashletSettingsComponent implements OnInit {
         unit: '',
         displayType: 'BAR_CHART',
         pclValue: this.PCL_VALUES[0],
+        colorizationType: 'STROKE',
       };
     }
   }

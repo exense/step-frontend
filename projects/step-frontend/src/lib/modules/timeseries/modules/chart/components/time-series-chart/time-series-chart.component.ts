@@ -117,7 +117,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
-      lock: settings.showExecutionsLinks,
+      lock: settings.tooltipOptions.useExecutionLinks,
       y: false,
       bind: {
         dblclick: (self: uPlot, target: HTMLElement, handler: MouseListener) => {
@@ -213,7 +213,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         ],
       },
     };
-
     let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
     if (this.uplot) {
       this.uplot.destroy();
