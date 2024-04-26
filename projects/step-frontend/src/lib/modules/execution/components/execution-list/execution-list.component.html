@@ -96,7 +96,7 @@
       </th>
       <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
     </ng-container>
-    <ng-container matColumnDef="status" stepSearchCol>
+    <ng-container matColumnDef="status" stepActivityCol="Status" stepSearchCol>
       <step-multi-level-array-filter
         *stepSearchCellDef
         #statusFilter
@@ -105,14 +105,17 @@
         [remapValues]="remapStatuses"
         [items]="(statusItemsTree$ | async)!"
       />
-      <step-drag-column-caption>
-        <step-execution-running-status-header
-          [runningExecutionsCount]="runningExecutionsCount$ | async"
-          (statusBadgeClick)="handleRunningStatusClick()"
-        >
-          Status
-        </step-execution-running-status-header>
-      </step-drag-column-caption>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>
+          <step-execution-running-status-header
+            [runningExecutionsCount]="runningExecutionsCount$ | async"
+            (statusBadgeClick)="handleRunningStatusClick()"
+          >
+            Status
+          </step-execution-running-status-header>
+        </step-drag-column-caption>
+      </th>
+
       <td mat-cell *matCellDef="let element">
         <step-execution-status [execution]="element" />
       </td>
