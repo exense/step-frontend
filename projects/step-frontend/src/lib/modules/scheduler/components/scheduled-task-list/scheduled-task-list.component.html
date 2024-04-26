@@ -9,6 +9,28 @@
   >
     <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-new'" entity="tasks" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
+      <step-btn-group class="import-export">
+        <a
+          type="button"
+          mat-icon-button
+          matTooltip="Import schedule"
+          matTooltipPosition="below"
+          [disabled]="!('task-write' | hasRight | async)"
+          routerLink="/scheduler/import"
+        >
+          <step-icon name="download" />
+        </a>
+        <a
+          type="button"
+          mat-icon-button
+          matTooltip="Export all schedules"
+          matTooltipPosition="below"
+          [disabled]="!('task-read' | hasRight | async)"
+          routerLink="/scheduler/export/all"
+        >
+          <step-icon name="upload" />
+        </a>
+      </step-btn-group>
       <step-btn-group>
         <a
           mat-mini-fab
@@ -144,5 +166,16 @@
     </ng-container>
   </step-table>
 </step-drag-drop-container>
-<step-entity-menu #entityMenu entity="tasks" (entityOperationSuccess)="table.reload()" />
+<step-entity-menu #entityMenu entity="tasks" (entityOperationSuccess)="table.reload()">
+  <ng-container *stepEntityMenuContent="let element">
+    <a
+      mat-menu-item
+      [disabled]="!('task-write' | hasRight | async)"
+      [routerLink]="['/', 'scheduler', 'export', element.id]"
+    >
+      <step-icon name="upload" />
+      Export schedule
+    </a>
+  </ng-container>
+</step-entity-menu>
 <router-outlet />
