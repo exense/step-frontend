@@ -3,19 +3,19 @@ import { TableCollectionFilter, TableRequestFilter } from '../../../client/step-
 import { FilterCondition } from './filter-condition';
 import { FilterConditionType } from './filter-condition-type.enum';
 
-export class ArrayFilterCondition extends FilterCondition<Array<string>> {
+export class ArrayFilterCondition extends FilterCondition<string[]> {
   readonly filterConditionType = FilterConditionType.ARRAY;
 
-  constructor(searchValue?: Array<string>) {
-    super(searchValue);
+  constructor(source?: string[]) {
+    super(source);
   }
 
   override isEmpty(): boolean {
-    return !this.sourceObject;
+    return !this.sourceObject?.length;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
-    const valueArray = this.sourceObject || [];
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
+    const valueArray = this.sourceObject ?? [];
 
     const children = valueArray.map((value) => ({
       field,

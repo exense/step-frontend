@@ -16,7 +16,7 @@ export class ReportNodeFilterCondition extends FilterCondition<{ searchValue?: s
     return !this.sourceObject?.searchValue;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     if (!this.sourceObject?.searchValue) {
       return [];
     }

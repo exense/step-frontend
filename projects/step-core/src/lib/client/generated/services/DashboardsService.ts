@@ -24,7 +24,7 @@ export class DashboardsService {
    * @throws ApiError
    */
   public deleteDashboards(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -122,6 +122,21 @@ export class DashboardsService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/dashboards/find',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findDashboardNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/dashboards/find/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
     });

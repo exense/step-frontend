@@ -24,7 +24,7 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public deleteDockerRegistrys(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -57,7 +57,7 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public cloneDockerRegistrys(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -121,11 +121,26 @@ export class DockerRegistriesService {
    * @throws ApiError
    */
   public findDockerRegistrysByAttributes(
-    requestBody?: Record<string, string>
+    requestBody?: Record<string, string>,
   ): Observable<Array<DockerRegistryConfiguration>> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/docker/registry/find',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findDockerRegistryNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/docker/registry/find/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
     });
