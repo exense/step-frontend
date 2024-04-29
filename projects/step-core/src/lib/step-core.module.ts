@@ -70,6 +70,7 @@ import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
+import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 
 @NgModule({
   declarations: [
@@ -141,6 +142,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -207,6 +209,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -334,3 +337,4 @@ export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
+export * from './modules/multi-level-select';

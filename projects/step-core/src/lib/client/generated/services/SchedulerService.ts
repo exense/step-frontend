@@ -196,6 +196,21 @@ export class SchedulerService {
   }
 
   /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findExecutionTaskNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/scheduler/task/find/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns all the scheduled tasks.
    * @returns ExecutiontTaskParameters default response
    * @throws ApiError

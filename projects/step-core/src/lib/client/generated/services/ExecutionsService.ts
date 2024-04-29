@@ -194,6 +194,21 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns a map of execution ID to names by the provided ids.
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getExecutionsNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/search/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the list of report nodes with contributing errors for the given execution
    * @param id
    * @param skip

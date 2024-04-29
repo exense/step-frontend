@@ -66,37 +66,6 @@ $border-radius: 8px;
     line-height: 1;
     gap: 0.4rem;
 
-    mat-select,
-    mat-radio-group,
-    mat-date-range-input,
-    .step-checkbox-container,
-    .step-field-container,
-    input,
-    pre,
-    step-array-input,
-    step-autocomplete-input,
-    step-rich-editor,
-    textarea {
-      border-color: $border-color;
-      font-weight: 400;
-      padding: 8px 14px;
-      line-height: 18px;
-      margin-top: 0;
-      margin-bottom: 0;
-      box-sizing: border-box;
-      outline: none;
-    }
-
-    mat-radio-group {
-      padding: 7px 14px 4px 14px;
-      display: flex;
-      gap: 1rem;
-    }
-
-    mat-date-range-input .mat-date-range-input-container input {
-      padding: 0;
-    }
-
     & > .label-container {
       display: flex;
       justify-content: flex-start;
@@ -157,16 +126,17 @@ $border-radius: 8px;
         }
       }
       & > .form-field-content {
-        mat-select,
-        mat-radio-group,
-        mat-date-range-input,
-        .step-checkbox-container,
-        .step-field-container,
-        input,
-        pre,
-        step-array-input,
-        step-autocomplete-input,
-        textarea,
+        & > mat-select,
+        & > step-multi-level-select,
+        & > mat-radio-group,
+        & > mat-date-range-input,
+        & > .step-checkbox-container,
+        & > .step-field-container,
+        & > input,
+        & > pre,
+        & > step-array-input,
+        & > step-autocomplete-input,
+        & > textarea,
         step-rich-editor,
         & > step-suffix,
         & > step-prefix {
@@ -202,6 +172,17 @@ $border-radius: 8px;
       }
 
       & > .form-field-content {
+        & > mat-select,
+        & > step-multi-level-select,
+        & > input,
+        & > pre,
+        & > step-array-input,
+        & > step-autocomplete-input,
+        & > mat-date-range-input,
+        & > textarea {
+          border-color: $error-color;
+        }
+
         & > step-suffix,
         & > step-prefix {
           border-color: $error-color;
@@ -220,6 +201,38 @@ $border-radius: 8px;
       width: 100%;
 
       & > mat-select,
+      & > step-multi-level-select,
+      & > mat-radio-group,
+      & > mat-date-range-input,
+      & > .step-checkbox-container,
+      & > .step-field-container,
+      & > input,
+      & > pre,
+      & > step-array-input,
+      & > step-autocomplete-input,
+      & > textarea {
+        border-color: $border-color;
+        font-weight: 400;
+        padding: 0.8rem 1.4rem;
+        line-height: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 0;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      & > mat-radio-group {
+        padding: 0.7rem 1.4rem 0.4rem 1.4rem;
+        display: flex;
+        gap: 1rem;
+      }
+
+      & > mat-date-range-input .mat-date-range-input-container input {
+        padding: 0;
+      }
+
+      & > mat-select,
+      & > step-multi-level-select,
       & > mat-radio-group,
       & > mat-date-range-input,
       & > .step-checkbox-container,

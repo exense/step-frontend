@@ -3,7 +3,7 @@
   [style.height.px]="height"
   [style.minHeight.px]="height"
   [style.maxHeight.px]="height"
-  [class.pointer]="!!settings.showExecutionsLinks"
+  [class.pointer]="!!settings.tooltipOptions.useExecutionLinks"
   (stepElementResize)="resize()"
 >
   <div #chart></div>
