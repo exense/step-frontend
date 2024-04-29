@@ -36,11 +36,11 @@ export const $FormDataBodyPart = {
     value: {
       type: 'string',
     },
-    simple: {
-      type: 'boolean',
-    },
     formDataContentDisposition: {
       type: 'FormDataContentDisposition',
+    },
+    simple: {
+      type: 'boolean',
     },
     parameterizedHeaders: {
       type: 'dictionary',

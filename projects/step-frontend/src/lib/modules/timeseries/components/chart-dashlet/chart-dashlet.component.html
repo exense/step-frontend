@@ -1,14 +1,15 @@
 <div>
-  <step-chart-skeleton *ngIf="!_internalSettings"></step-chart-skeleton>
-  <step-timeseries-chart
-    #chart
-    *ngIf="_internalSettings"
-    (zoomReset)="handleZoomReset()"
-    [syncKey]="context.id"
-    [settings]="_internalSettings!"
-    [height]="height"
-  >
-  </step-timeseries-chart>
+  @if (!_internalSettings) {
+    <step-chart-skeleton></step-chart-skeleton>
+  } @else {
+    <step-timeseries-chart
+      #chart
+      (zoomReset)="handleZoomReset()"
+      [syncKey]="context.id"
+      [settings]="_internalSettings!"
+      [height]="height"
+    />
+  }
 </div>
 
 <div class="settings-container">

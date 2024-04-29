@@ -22,5 +22,8 @@ export const $AxesSettings = {
     renderingSettings: {
       type: 'MetricRenderingSettings',
     },
+    colorizationType: {
+      type: 'Enum',
+    },
   },
 } as const;

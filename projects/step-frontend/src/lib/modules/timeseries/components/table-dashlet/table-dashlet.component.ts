@@ -33,7 +33,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from '../../modules/legacy/pipes/ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, forkJoin, Observable, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, Observable, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -42,8 +42,8 @@ import { TableEntryFormatPipe } from './table-entry-format.pipe';
 export interface TableEntry {
   name: string; // series id
   groupingLabels: string[]; // each grouping attribute will have a label
-  base?: BucketResponse;
-  compare?: BucketResponse;
+  base?: ProcessedBucket;
+  compare?: ProcessedBucket;
   color: string;
   isSelected?: boolean;
   countDiff?: number;
@@ -58,6 +58,15 @@ export interface TableEntry {
   tphDiff?: number;
 }
 
+interface ProcessedBucket extends BucketResponse {
+  seriesKey: string;
+  color: string;
+  avg: number;
+  tps: number;
+  tph: number;
+  selected: boolean;
+}
+
 @Component({
   selector: 'step-table-dashlet',
   templateUrl: './table-dashlet.component.html',
@@ -67,6 +76,9 @@ export interface TableEntry {
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe],
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
+  readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
+  readonly DIFF_COLUMN_ID_SUFFIX = '_diff';
+
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
@@ -91,43 +103,87 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   allSeriesChecked: boolean = true;
 
+  compareModeEnabled: boolean = false;
+  compareContext: TimeSeriesContext | undefined;
+  baseBuckets: ProcessedBucket[] = []; // for caching
+  compareBuckets: ProcessedBucket[] = []; // for caching
+
   readonly MarkerType = MarkerType;
-  readonly TableColumnType = TableColumnType;
 
   ngOnInit(): void {
     if (!this.item) {
       throw new Error('Dashlet item cannot be undefined');
     }
-    this.prepareState(this.item);
+    this.prepareState();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.fetchDataAndCreateTable().subscribe();
+    this.fetchBaseData().subscribe();
   }
 
-  private prepareState(item: DashboardItem) {
-    item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    this.columnsDefinition = item.tableSettings!.columns!.map((column) => {
+  refresh(blur?: boolean): Observable<any> {
+    return this.fetchBaseData();
+  }
+
+  refreshCompareData(): Observable<any> {
+    const context = this.compareContext!;
+    return this.fetchData(context).pipe(
+      tap((response) => {
+        this.compareBuckets = response;
+        this.updateTableData();
+      }),
+    );
+  }
+
+  private prepareState() {
+    this.item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
+    this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
         label: ColumnsLabels[column.column],
         isVisible: column.selected,
-        isCompareColumn: false,
         mapValue: ColumnsValueFunctions[column.column!],
+        mapDiffValue: ColumnsDiffFunctions[column.column!],
       } as TableColumn;
     });
-    this.collectVisibleColumns();
+    this.updateVisibleColumns();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItem = changes['item'];
     if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
-      this.prepareState(this.item);
+      this.prepareState();
       this.refresh(true).subscribe();
     }
   }
 
-  collectVisibleColumns(): void {
-    let visibleColumns = this.columnsDefinition.filter((col) => col.isVisible).map((col) => col.id);
-    this.visibleColumnsIds = ['name', ...visibleColumns];
+  enableCompareMode(context: TimeSeriesContext) {
+    this.compareModeEnabled = true;
+    this.compareContext = context;
+    this.compareBuckets = this.baseBuckets;
+    this.updateVisibleColumns();
+    this.updateTableData();
+  }
+
+  disableCompareMode() {
+    this.compareModeEnabled = false;
+    this.compareContext = undefined;
+    this.compareBuckets = [];
+    this.updateVisibleColumns();
+    this.updateTableData();
+  }
+
+  updateVisibleColumns(): void {
+    let visibleColumns = this.columnsDefinition
+      .filter((col) => col.isVisible)
+      .map((col) => {
+        if (this.compareModeEnabled) {
+          return [col.id, col.id + this.COMPARE_COLUMN_ID_SUFFIX, col.id + this.DIFF_COLUMN_ID_SUFFIX];
+        } else {
+          return [col.id];
+        }
+      })
+      .flat();
+    visibleColumns.unshift('name');
+    this.visibleColumnsIds = visibleColumns;
   }
 
   onColumnVisibilityChange(column: TableColumn): void {
@@ -136,27 +192,43 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
   }
 
-  private getGroupDimensions(): string[] {
-    return this.item.inheritGlobalGrouping ? this.context.getGroupDimensions() : this.item.grouping;
+  private getGroupDimensions(context: TimeSeriesContext): string[] {
+    return this.item.inheritGlobalGrouping ? context.getGroupDimensions() : this.item.grouping;
   }
 
-  private fetchDataAndCreateTable(): Observable<TimeSeriesAPIResponse> {
+  private fetchData(context: TimeSeriesContext) {
     const request: FetchBucketsRequest = {
-      start: this.context.getSelectedTimeRange().from,
-      end: this.context.getSelectedTimeRange().to,
-      groupDimensions: this.getGroupDimensions(),
-      oqlFilter: FilterUtils.filtersToOQL(this.getFilterItems(), 'attributes'),
+      start: context.getSelectedTimeRange().from,
+      end: context.getSelectedTimeRange().to,
+      groupDimensions: this.getGroupDimensions(context),
+      oqlFilter: FilterUtils.filtersToOQL(this.getFilterItems(context), 'attributes'),
       numberOfBuckets: 1,
       percentiles: [80, 90, 99],
     };
-    return this._timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService
+      .getTimeSeries(request)
+      .pipe(map((response) => this.processResponse(response, context)));
+  }
+
+  private fetchBaseData(): Observable<ProcessedBucket[]> {
+    const context = this.context;
+    return this.fetchData(context).pipe(
       tap((response) => {
-        this.createTable(response);
+        this.baseBuckets = response;
+        this.updateTableData();
       }),
     );
   }
 
-  private getFilterItems(): FilterBarItem[] {
+  updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
+    this.tableIsLoading = false;
+    // const baseData = this.processResponse(this.baseResponse!, this.executionContext);
+    // const compareData = this.processResponse(response, compareContext);
+    // const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
+    // this.updateDataSourceAndKeywords(mergedData);
+  }
+
+  private getFilterItems(context: TimeSeriesContext): FilterBarItem[] {
     const metricItem = {
       attributeName: 'metricType',
       type: FilterBarItemType.FREE_TEXT,
@@ -167,7 +239,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     let filterItems = [];
     if (this.item.inheritGlobalFilters) {
       filterItems = FilterUtils.combineGlobalWithChartFilters(
-        this.context.getFilteringSettings().filterItems,
+        context.getFilteringSettings().filterItems,
         this.item.filters,
       );
     } else {
@@ -178,38 +250,88 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return filterItems;
   }
 
-  refresh(blur?: boolean): Observable<any> {
-    return this.fetchDataAndCreateTable();
+  private mergeBaseAndCompareData(): TableEntry[] {
+    const baseBuckets = this.baseBuckets;
+    const compareBuckets = this.compareBuckets;
+    const baseBucketsByIds: Record<string, ProcessedBucket> = baseBuckets.reduce(
+      (obj, current) => {
+        obj[current.seriesKey] = current;
+        return obj;
+      },
+      {} as Record<string, ProcessedBucket>,
+    );
+    const compareBucketsByIds: Record<string, ProcessedBucket> = compareBuckets.reduce(
+      (obj, current) => {
+        obj[current.seriesKey] = current;
+        return obj;
+      },
+      {} as Record<string, ProcessedBucket>,
+    );
+    let allSeriesIds: string[] = [
+      ...new Set([...Object.keys(baseBucketsByIds), ...(compareBuckets ? Object.keys(compareBucketsByIds) : [])]),
+    ];
+    allSeriesIds = allSeriesIds.sort();
+    const entries: TableEntry[] = allSeriesIds.map((keyword) => {
+      const baseBucket: ProcessedBucket = baseBucketsByIds[keyword];
+      const compareBucket: ProcessedBucket = compareBucketsByIds[keyword];
+      const hasOnlyCompareData = !!compareBucket && !baseBucket;
+      const labelItems = this.getGroupDimensions(hasOnlyCompareData ? this.compareContext! : this.context).map(
+        (a) => (baseBucket || compareBucket).attributes[a],
+      );
+      return {
+        name: keyword,
+        base: baseBucket,
+        compare: compareBucket,
+        groupingLabels: labelItems,
+        // can use the same sync group because it is shared
+        isSelected: this.context
+          .getSyncGroup(this.item.id)
+          .seriesShouldBeVisible(baseBucket?.seriesKey || compareBucket?.seriesKey),
+        color: baseBucketsByIds[keyword]?.color || compareBucketsByIds[keyword]?.color,
+        countDiff: this.percentageBetween(baseBucket?.count, compareBucket?.count),
+        sumDiff: this.percentageBetween(baseBucket?.sum, compareBucket?.sum),
+        avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
+        minDiff: this.percentageBetween(baseBucket?.min, compareBucket?.min),
+        maxDiff: this.percentageBetween(baseBucket?.max, compareBucket?.max),
+        pcl80Diff: this.percentageBetween(baseBucket?.pclValues?.[80], compareBucket?.pclValues?.[80]),
+        pcl90Diff: this.percentageBetween(baseBucket?.pclValues?.[90], compareBucket?.pclValues?.[90]),
+        pcl99Diff: this.percentageBetween(baseBucket?.pclValues?.[99], compareBucket?.pclValues?.[99]),
+        tpsDiff: this.percentageBetween(baseBucket?.tps, compareBucket?.tps),
+        tphDiff: this.percentageBetween(baseBucket?.tph, compareBucket?.tph),
+      };
+    });
+    return entries;
   }
 
-  private createTable(response: TimeSeriesAPIResponse) {
-    const syncGroup = this.context.getSyncGroup(this.item.id);
-    const data: TableEntry[] = [];
-    response.matrix.forEach((series, i) => {
+  private updateTableData() {
+    const tableEntries = this.mergeBaseAndCompareData();
+    this.fetchLegendEntities(tableEntries).subscribe();
+    this.tableData$.next(tableEntries);
+    this.tableIsLoading = false;
+  }
+
+  private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucket[] {
+    const syncGroup = context.getSyncGroup(this.item.id);
+    return response.matrix.map((series, i) => {
       if (series.length != 1) {
         // we should have just one bucket
         throw new Error('Something went wrong');
       }
       const seriesAttributes = response.matrixKeys[i];
-      const bucket = series[0];
-      bucket.attributes = seriesAttributes;
-      const groupingLabels = this.getGroupDimensions().map((field) => seriesAttributes[field]);
+      const responseBucket = series[0];
+      responseBucket.attributes = seriesAttributes;
+      const groupingLabels = this.getGroupDimensions(context).map((field) => seriesAttributes[field]);
       const seriesKey = this.mergeLabelItems(groupingLabels);
-      bucket.attributes['_id'] = groupingLabels;
-      bucket.attributes['avg'] = (bucket.sum / bucket.count).toFixed(0);
-      bucket.attributes['tps'] = Math.trunc(bucket.count / ((response.end! - response.start!) / 1000));
-      bucket.attributes['tph'] = Math.trunc((bucket.count / ((response.end! - response.start!) / 1000)) * 3600);
-      data.push({
-        name: seriesKey,
-        groupingLabels: groupingLabels,
-        base: series[0],
-        color: this.context.getColor(seriesKey),
-        isSelected: syncGroup.seriesShouldBeVisible(seriesKey),
-      });
+      return {
+        ...responseBucket,
+        seriesKey: seriesKey,
+        color: context.getColor(seriesKey),
+        avg: Math.trunc(responseBucket.sum / responseBucket.count),
+        tps: Math.trunc(responseBucket.count / ((response.end! - response.start!) / 1000)),
+        tph: Math.trunc((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),
+        selected: syncGroup.seriesShouldBeVisible(seriesKey),
+      } as ProcessedBucket;
     });
-    this.tableData$.next(data);
-    this.fetchLegendEntities(data).subscribe(() => this.tableDataSource?.reload());
-    this.tableIsLoading = false;
   }
 
   onAllSeriesCheckboxClick(checked: boolean) {
@@ -237,7 +359,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .subscribe((updatedItem: DashboardItem) => {
         if (updatedItem) {
           Object.assign(this.item, updatedItem);
-          this.prepareState(this.item);
+          this.prepareState();
           this.refresh(true).subscribe();
         }
       });
@@ -256,7 +378,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   showSeries(key: string): void {}
 
   private fetchLegendEntities(data: TableEntry[]): Observable<any> {
-    const groupDimensions = this.getGroupDimensions();
+    const groupDimensions = this.getGroupDimensions(this.context);
     const requests$ = groupDimensions
       .map((attributeKey, i) => {
         const attribute = this.attributesByIds[attributeKey];
@@ -312,13 +434,25 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[99])
       .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[99])
       .addSortNumberPredicate('PCL_99_diff', (item) => item.pcl99Diff)
-      .addSortNumberPredicate('TPS', (item) => item.base?.attributes['tps'])
-      .addSortNumberPredicate('TPS_comp', (item) => item.compare?.attributes['tps'])
+      .addSortNumberPredicate('TPS', (item) => item.base?.tps)
+      .addSortNumberPredicate('TPS_comp', (item) => item.compare?.tps)
       .addSortNumberPredicate('TPS_diff', (item) => item.tpsDiff)
-      .addSortNumberPredicate('TPH', (item) => item.base?.attributes['tph'])
-      .addSortNumberPredicate('TPH_comp', (item) => item.compare?.attributes['tph'])
+      .addSortNumberPredicate('TPH', (item) => item.base?.tph)
+      .addSortNumberPredicate('TPH_comp', (item) => item.compare?.tph)
       .addSortNumberPredicate('TPH_diff', (item) => item.tphDiff)
       .build();
+  }
+
+  percentageBetween(x: number | undefined, y: number | undefined) {
+    if (x && y) {
+      return ((y - x) / x) * 100;
+    } else {
+      return undefined;
+    }
+  }
+
+  getType(): 'TABLE' | 'CHART' {
+    return 'TABLE';
   }
 }
 
@@ -328,22 +462,34 @@ interface TableColumn {
   label: string;
   subLabel?: string;
   mapValue: (bucket: BucketResponse) => any;
-  // mapDiffValue: (entry: TableEntry) => number | undefined;
-  isCompareColumn: boolean;
+  mapDiffValue: (entry: TableEntry) => number | undefined;
   isVisible: boolean;
 }
 
 const ColumnsValueFunctions = {
-  [TableColumnType.COUNT]: (b: BucketResponse) => b?.count,
-  [TableColumnType.SUM]: (b: BucketResponse) => b?.sum,
-  [TableColumnType.AVG]: (b: BucketResponse) => b?.attributes?.['avg'],
-  [TableColumnType.MIN]: (b: BucketResponse) => b?.min,
-  [TableColumnType.MAX]: (b: BucketResponse) => b?.max,
-  [TableColumnType.PCL_80]: (b: BucketResponse) => b?.pclValues?.[80],
-  [TableColumnType.PCL_90]: (b: BucketResponse) => b?.pclValues?.[90],
-  [TableColumnType.PCL_99]: (b: BucketResponse) => b?.pclValues?.[99],
-  [TableColumnType.TPS]: (b: BucketResponse) => b?.attributes?.['tps'],
-  [TableColumnType.TPH]: (b: BucketResponse) => b?.attributes?.['tph'],
+  [TableColumnType.COUNT]: (b: ProcessedBucket) => b?.count,
+  [TableColumnType.SUM]: (b: ProcessedBucket) => b?.sum,
+  [TableColumnType.AVG]: (b: ProcessedBucket) => b?.avg,
+  [TableColumnType.MIN]: (b: ProcessedBucket) => b?.min,
+  [TableColumnType.MAX]: (b: ProcessedBucket) => b?.max,
+  [TableColumnType.PCL_80]: (b: ProcessedBucket) => b?.pclValues?.[80],
+  [TableColumnType.PCL_90]: (b: ProcessedBucket) => b?.pclValues?.[90],
+  [TableColumnType.PCL_99]: (b: ProcessedBucket) => b?.pclValues?.[99],
+  [TableColumnType.TPS]: (b: ProcessedBucket) => b?.tps,
+  [TableColumnType.TPH]: (b: ProcessedBucket) => b?.tph,
+};
+
+const ColumnsDiffFunctions: Record<TableColumnType, (entry: TableEntry) => number | undefined> = {
+  [TableColumnType.COUNT]: (entry: TableEntry) => entry.countDiff,
+  [TableColumnType.SUM]: (entry: TableEntry) => entry.sumDiff,
+  [TableColumnType.AVG]: (entry: TableEntry) => entry.avgDiff,
+  [TableColumnType.MIN]: (entry: TableEntry) => entry.minDiff,
+  [TableColumnType.MAX]: (entry: TableEntry) => entry.maxDiff,
+  [TableColumnType.PCL_80]: (entry: TableEntry) => entry.pcl80Diff,
+  [TableColumnType.PCL_90]: (entry: TableEntry) => entry.pcl90Diff,
+  [TableColumnType.PCL_99]: (entry: TableEntry) => entry.pcl99Diff,
+  [TableColumnType.TPS]: (entry: TableEntry) => entry.tpsDiff,
+  [TableColumnType.TPH]: (entry: TableEntry) => entry.tphDiff,
 };
 
 const ColumnsLabels = {

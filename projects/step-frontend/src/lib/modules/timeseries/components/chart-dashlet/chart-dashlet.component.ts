@@ -42,13 +42,6 @@ interface MetricAttributeSelection extends MetricAttribute {
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
-  }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
-  }
-
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -557,5 +550,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
+  }
+
+  getType(): 'TABLE' | 'CHART' {
+    return 'CHART';
+  }
+
+  showSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+  hideSeries(key: string): void {
+    throw new Error('Method not implemented.');
   }
 }

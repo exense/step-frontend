@@ -40,7 +40,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   ngOnInit(): void {
     if (!this.context) {
-      throw new Error('Settings input is required');
+      throw new Error('Context input is required');
     }
     this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
     this.context

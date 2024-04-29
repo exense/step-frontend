@@ -72,7 +72,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   getSize = () => {
     return {
-      width: this._element.nativeElement.parentElement.offsetWidth - 32,
+      width: this._element.nativeElement.parentElement.offsetWidth - 12,
       height: this.height - this.HEADER_HEIGHT - this.LEGEND_HEIGHT,
     };
   };
