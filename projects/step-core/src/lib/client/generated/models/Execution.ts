@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { Error } from './Error';
 import type { ExecutionParameters } from './ExecutionParameters';
 import type { ExecutiontTaskParameters } from './ExecutiontTaskParameters';
 import type { ImportResult } from './ImportResult';
@@ -14,7 +15,17 @@ export type Execution = {
   endTime?: number;
   description?: string;
   executionType?: string;
-  status?: 'INITIALIZING' | 'IMPORTING' | 'RUNNING' | 'ABORTING' | 'FORCING_ABORT' | 'EXPORTING' | 'ENDED';
+  status?:
+    | 'INITIALIZING'
+    | 'IMPORTING'
+    | 'ESTIMATING'
+    | 'PROVISIONING'
+    | 'RUNNING'
+    | 'ABORTING'
+    | 'FORCING_ABORT'
+    | 'DEPROVISIONING'
+    | 'EXPORTING'
+    | 'ENDED';
   result?:
     | 'VETOED'
     | 'IMPORT_ERROR'
@@ -25,6 +36,7 @@ export type Execution = {
     | 'SKIPPED'
     | 'NORUN'
     | 'RUNNING';
+  lifecycleErrors?: Array<Error>;
   planId?: string;
   importResult?: ImportResult;
   reportExports?: Array<ReportExport>;
