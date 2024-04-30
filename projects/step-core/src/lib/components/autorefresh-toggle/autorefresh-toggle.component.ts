@@ -30,7 +30,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   private _autoRefreshModelFactory = inject(AutoRefreshModelFactoryService);
   @Input() model = this._autoRefreshModelFactory.create();
 
-  readonly presets: ReadonlyArray<AutorefreshPreset> = [
+  @Input() presets: ReadonlyArray<AutorefreshPreset> = [
     { label: 'OFF', value: 0 },
     { label: '5 seconds', value: 5000 },
     { label: '10 seconds', value: 10000 },

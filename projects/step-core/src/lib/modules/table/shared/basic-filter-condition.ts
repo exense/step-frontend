@@ -8,7 +8,7 @@ export class BasicFilterCondition extends FilterCondition<TableRequestFilter[] |
   constructor(filters?: TableRequestFilter[]) {
     super(filters);
   }
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     return this.sourceObject || [];
   }
 

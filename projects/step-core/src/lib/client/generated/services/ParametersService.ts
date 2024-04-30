@@ -24,7 +24,7 @@ export class ParametersService {
    * @throws ApiError
    */
   public deleteParameters(
-    requestBody?: TableBulkOperationRequest
+    requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
     return this.httpRequest.request({
       method: 'POST',
@@ -122,6 +122,21 @@ export class ParametersService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/parameters/find',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findParameterNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/parameters/find/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
     });

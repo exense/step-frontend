@@ -34,8 +34,11 @@ export class FilterUtils {
   /**
    * Method to convert API filters to a valid OQL. Local items take precedence.
    */
-  static combineGlobalWithChartFilters(globalFilters: FilterBarItem[], items: TimeSeriesFilterItem[]): FilterBarItem[] {
-    const convertedItems: FilterBarItem[] = items.map((item) => this.convertApiFilterItem(item));
+  static combineGlobalWithChartFilters(
+    globalFilters: FilterBarItem[],
+    localFilters: TimeSeriesFilterItem[],
+  ): FilterBarItem[] {
+    const convertedItems: FilterBarItem[] = localFilters.map((item) => this.convertApiFilterItem(item));
     const localItemsIdsMap: Record<string, boolean> = {};
     convertedItems.forEach((item) => {
       localItemsIdsMap[item.attributeName!] = true;

@@ -31,6 +31,9 @@ interface TableEntry {
   tphDiff?: number;
 }
 
+/**
+ * @Deprecated
+ */
 @Component({
   selector: 'step-timeseries-table',
   templateUrl: './timeseries-table.component.html',

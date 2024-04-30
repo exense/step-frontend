@@ -1,0 +1,9 @@
+step-multi-level-select {
+  display: block;
+}
+
+.mat-mdc-option.step-multi-level-plain-item {
+  --plain-item-level: 0;
+  padding-left: calc(1.6rem + 3.2rem * var(--plain-item-level));
+  padding-right: 1.6rem;
+}

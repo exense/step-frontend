@@ -1,0 +1,5 @@
+export enum SelectionState {
+  SELECTED = 'SELECTED',
+  NOT_SELECTED = 'NOT_SELECTED',
+  CHILD_SELECTED = 'CHILD_SELECTED',
+}
