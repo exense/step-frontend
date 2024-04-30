@@ -94,6 +94,9 @@ $statuses: (
   'INTERRUPTED': #f9c038,
   'IMPORT_ERROR': #d9534f,
   'VETOED': #cc0099,
+  'ESTIMATING': orange,
+  'PROVISIONING': orange,
+  'DEPROVISIONING': orange,
 );
 
 $tokenstates: (

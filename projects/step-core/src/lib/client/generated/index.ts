@@ -133,6 +133,7 @@ export type { TimeSeriesRebuildRequest } from './models/TimeSeriesRebuildRequest
 export type { Token } from './models/Token';
 export type { TokenGroupCapacity } from './models/TokenGroupCapacity';
 export type { TokenHealth } from './models/TokenHealth';
+export type { TokenProvisioningStatus } from './models/TokenProvisioningStatus';
 export type { TokenWrapper } from './models/TokenWrapper';
 export type { TokenWrapperOwner } from './models/TokenWrapperOwner';
 export type { True } from './models/True';
@@ -271,6 +272,7 @@ export { $TimeSeriesRebuildRequest } from './schemas/$TimeSeriesRebuildRequest';
 export { $Token } from './schemas/$Token';
 export { $TokenGroupCapacity } from './schemas/$TokenGroupCapacity';
 export { $TokenHealth } from './schemas/$TokenHealth';
+export { $TokenProvisioningStatus } from './schemas/$TokenProvisioningStatus';
 export { $TokenWrapper } from './schemas/$TokenWrapper';
 export { $TokenWrapperOwner } from './schemas/$TokenWrapperOwner';
 export { $True } from './schemas/$True';
