@@ -40,7 +40,6 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
-import { catchError } from 'rxjs/operators';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -121,7 +120,8 @@ export class ExecutionProgressComponent
   showTestCaseCurrentOperation: boolean = true;
   keywordSearch?: string;
 
-  autoscalingStatus?: TokenProvisioningStatus;
+  readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
+
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
   errorDistribution?: { errorCount: number; count: number };
@@ -152,8 +152,6 @@ export class ExecutionProgressComponent
   executionId?: string;
   activeExecution?: ActiveExecution;
   protected activeTabId?: string;
-
-  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   showNodeInTree(nodeId: string): void {
     this._controllerService
@@ -449,10 +447,6 @@ export class ExecutionProgressComponent
         errorCode: key,
         errorCodeCount: value,
       }));
-
-      this._executionService
-        .getAutoscalingStatus(executionId!)
-        .subscribe((status) => (this.autoscalingStatus = status));
     });
 
     this.selectedErrorDistributionToggle = ErrorDistributionStatus.MESSAGE;

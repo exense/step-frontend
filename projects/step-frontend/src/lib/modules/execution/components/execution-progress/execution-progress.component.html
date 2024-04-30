@@ -14,22 +14,8 @@
 @if (execution) {
   <section [class.small-screen]="_isSmallScreen$ | async">
     <ng-template #executionTabs>
-      @if (
-        (autoscalingStatus?.statusDescription ||
-          autoscalingStatus?.tokenCountStarted ||
-          autoscalingStatus?.tokenCountStarted) &&
-        !autoscalingStatus?.completed
-      ) {
-        <step-alert [type]="AlertType.INFO" class="auto-scaling-status">
-          <div>Auto scaling status</div>
-          <div>{{ autoscalingStatus?.statusDescription }}</div>
-          @if (autoscalingStatus?.tokenCountStarted || autoscalingStatus?.tokenCountTarget) {
-            <div>Progress:</div>
-            <div>
-              {{ autoscalingStatus?.tokenCountStarted }} / {{ autoscalingStatus?.tokenCountTarget }} agent token started
-            </div>
-          }
-        </step-alert>
+      @for (messages of _executionMessages; track messages.id) {
+        <step-dashlet [itemKey]="messages.template" [context]="execution" />
       }
       @if (execution.lifecycleErrors; as errors) {
         @for (error of errors; track error.msg) {
