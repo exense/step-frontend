@@ -147,7 +147,6 @@ class DashboardStateEngine {
         tap(() => (state.refreshInProgress = true)),
         switchMap(() => {
           const dashlets$ = state.getDashlets().map((dashlet) => dashlet.refresh());
-          console.log('refreshing', dashlets$.length);
           if (refreshRanger) {
             dashlets$.push(this.refreshRanger());
           }

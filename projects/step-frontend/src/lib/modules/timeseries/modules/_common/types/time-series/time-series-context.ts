@@ -52,7 +52,7 @@ export class TimeSeriesContext {
    * @Deprecated
    */
   public readonly keywordsContext: TimeSeriesKeywordsContext;
-  private readonly colorsPool: TimeseriesColorsPool;
+  public readonly colorsPool: TimeseriesColorsPool;
 
   private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
 

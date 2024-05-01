@@ -194,10 +194,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     } else {
       filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
     }
-
-    filterItems.push(metricFilterItem);
-
+    filterItems.unshift(metricFilterItem);
     return FilterUtils.filtersToOQL(filterItems, 'attributes');
+  }
+
+  handleLockStateChange(locked: boolean) {
+    this.context.setChartsLockedState(locked);
   }
 
   openChartSettings(): void {
@@ -227,41 +229,51 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       syncGroup = this.context.getSyncGroup(this.item.masterChartId);
     }
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
-    let secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
+    const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
     const primaryAggregation = this.selectedAggregate!;
     const secondaryAxesData: (number | undefined)[] = [];
     const series: TSChartSeries[] = response.matrix.map((series: BucketResponse[], i: number) => {
+      const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       const labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
       const seriesKey = this.mergeLabelItems(labelItems);
       const color =
         primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.keywordsContext.getColor(seriesKey);
 
-      if (hasSecondaryAxes)
+      if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
-          if (secondaryAxesData[j] == undefined) {
-            secondaryAxesData[j] = bucketValue;
-          } else if (bucketValue) {
-            secondaryAxesData[j]! += bucketValue;
+          metadata.push(b?.attributes);
+          if (hasSecondaryAxes) {
+            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
+            if (secondaryAxesData[j] == undefined) {
+              secondaryAxesData[j] = bucketValue;
+            } else if (bucketValue) {
+              secondaryAxesData[j]! += bucketValue;
+            }
           }
         });
+      }
 
-      return {
+      const s: TSChartSeries = {
         id: seriesKey,
-        scale: '1',
+        scale: 'y',
         label: seriesKey,
         labelItems: labelItems,
         legendName: seriesKey,
         data: series.map((b) => this.getBucketValue(b, primaryAggregation!)),
+        metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
-        fill: (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color),
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      if (primaryAxes.colorizationType === 'FILL') {
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+      }
+      return s;
     });
     const primaryUnit = primaryAxes.unit!;
     const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
@@ -269,7 +281,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        scale: '1',
+        scale: 'y',
         values: (u, vals) => {
           return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
         },
@@ -313,6 +325,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         enabled: true,
         zAxisLabel: this.getSecondAxesLabel(),
         yAxisUnit: yAxesUnit,
+        useExecutionLinks: hasExecutionLinks,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: axes,
@@ -359,6 +372,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       request.intervalSize = customResolution;
     } else {
       request.numberOfBuckets = 100;
+    }
+    if (!!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]) {
+      // has execution attribute
+      request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+      request.collectAttributesValuesLimit = 10;
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {

@@ -33,7 +33,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from '../../modules/legacy/pipes/ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, forkJoin, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -116,11 +116,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
     this.prepareState();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.fetchBaseData().subscribe();
+    this.fetchBaseData().subscribe(() => this.updateTableData());
   }
 
   refresh(blur?: boolean): Observable<any> {
-    return this.fetchBaseData();
+    return this.fetchBaseData().pipe(tap(() => this.updateTableData()));
   }
 
   refreshCompareData(): Observable<any> {
@@ -215,7 +215,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return this.fetchData(context).pipe(
       tap((response) => {
         this.baseBuckets = response;
-        this.updateTableData();
       }),
     );
   }
@@ -305,9 +304,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private updateTableData() {
     const tableEntries = this.mergeBaseAndCompareData();
-    this.fetchLegendEntities(tableEntries).subscribe();
-    this.tableData$.next(tableEntries);
-    this.tableIsLoading = false;
+    this.fetchLegendEntities(tableEntries).subscribe((updatedData) => {
+      this.tableData$.next(updatedData);
+      this.tableIsLoading = false;
+    });
   }
 
   private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucket[] {
@@ -377,34 +377,84 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   showSeries(key: string): void {}
 
-  private fetchLegendEntities(data: TableEntry[]): Observable<any> {
-    const groupDimensions = this.getGroupDimensions(this.context);
-    const requests$ = groupDimensions
-      .map((attributeKey, i) => {
-        const attribute = this.attributesByIds[attributeKey];
+  private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
+    const baseDimensions = this.getGroupDimensions(this.context);
+    const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
+    const entitiesByTypes: Record<string, Set<string>> = {};
+    data.forEach((entry) => {
+      let useCompareContext = entry.compare && !entry.base;
+      const dimensions = useCompareContext ? compareDimensions : baseDimensions;
+      dimensions.forEach((key, i) => {
+        const attribute = this.attributesByIds[key];
         const entityName = attribute?.metadata['entity'];
         if (!entityName) {
-          return undefined;
+          return;
         }
-        const entityIds = new Set<string>(data.map((entry) => entry.groupingLabels[i]).filter((v) => !!v));
-        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
-          tap((response) => {
-            data.forEach((entry, j) => {
-              const labelId = entry.groupingLabels[i];
-              if (labelId) {
-                if (response[labelId]) {
-                  entry.groupingLabels[i] = response[labelId];
-                } else {
-                  entry.groupingLabels[i] = labelId + ' (unresolved)';
-                }
-                data[j] = { ...entry };
-              }
-            });
-          }),
-        );
-      })
-      .filter((x) => !!x);
-    return forkJoin(requests$);
+        const entityId = entry.groupingLabels[i];
+        const entitiesSet = entitiesByTypes[entityName] || new Set();
+        entitiesSet.add(entityId);
+        entitiesByTypes[entityName] = entitiesSet;
+      });
+    });
+    const requestTypes = Object.keys(entitiesByTypes);
+    const requestTypesIndexes: Record<string, number> = {}; // used for fast access of responses
+    requestTypes.forEach((type, i) => (requestTypesIndexes[type] = i));
+    const requests$ = requestTypes.map((entityType) =>
+      this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entitiesByTypes[entityType]), entityType),
+    );
+    if (requests$.length === 0) {
+      return of(data);
+    }
+    return forkJoin(requests$).pipe(
+      map((responses: Record<string, string>[]) => {
+        return data.map((entry) => {
+          const useCompareContext = entry.compare && !entry.base;
+          const dimensions = useCompareContext ? compareDimensions : baseDimensions;
+          dimensions.forEach((key, i) => {
+            const attribute = this.attributesByIds[key];
+            const entityType = attribute?.metadata['entity'];
+            if (!entityType) {
+              return;
+            }
+            const entityId = entry.groupingLabels[i];
+
+            const entityName = responses[requestTypesIndexes[entityType]][entityId];
+            entry.groupingLabels[i] = entityName ? entityName : entry.groupingLabels[i] + ' (unresolved)';
+            entry.name = this.mergeLabelItems(entry.groupingLabels);
+          });
+          return entry;
+        });
+        // this.tableData$.next([...data]);
+      }),
+    );
+
+    // const groupDimensions = this.getGroupDimensions(this.context);
+    // const requests$ = groupDimensions
+    //   .map((attributeKey, i) => {
+    //     const attribute = this.attributesByIds[attributeKey];
+    //     const entityName = attribute?.metadata['entity'];
+    //     if (!entityName) {
+    //       return undefined;
+    //     }
+    //     const entityIds = new Set<string>(data.map((entry) => entry.groupingLabels[i]).filter((v) => !!v));
+    //     return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+    //       tap((response) => {
+    //         data.forEach((entry, j) => {
+    //           const labelId = entry.groupingLabels[i];
+    //           if (labelId) {
+    //             if (response[labelId]) {
+    //               entry.groupingLabels[i] = response[labelId];
+    //             } else {
+    //               entry.groupingLabels[i] = labelId + ' (unresolved)';
+    //             }
+    //             data[j] = { ...entry };
+    //           }
+    //         });
+    //       }),
+    //     );
+    //   })
+    //   .filter((x) => !!x);
+    // return forkJoin(requests$);
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {
