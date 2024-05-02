@@ -27,20 +27,20 @@ export class StatusDistributionComponent {
 
     const [failedError, percentFailedError] = this.getCountAndPercent(summary, 'FAILED');
     const [techError, percentTechError] = this.getCountAndPercent(summary, 'TECHNICAL_ERROR');
-    const failed = failedError + techError;
-    const percentFailed = percentFailedError + percentTechError;
 
     const [count, countPercent] = this.calcPercent(summary.count, summary.countForecast);
 
-    const tooltipMessage = `${summary.label ?? ''} PASSED: ${passed}, FAILED: ${failed}`;
+    const tooltipMessage = `${summary.label ?? ''} PASSED: ${passed}, FAILED: ${failedError},  TECHNICAL_ERROR: ${techError}`;
 
     const tooltipProgressMessage = `Progress: ${summary.count ?? 0}/${summary.countForecast ?? 0}`;
 
     return {
       passed,
       percentPassed,
-      failed,
-      percentFailed,
+      failedError,
+      techError,
+      percentFailedError,
+      percentTechError,
       count,
       countPercent,
       tooltipMessage,

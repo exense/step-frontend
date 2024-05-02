@@ -49,7 +49,10 @@ export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
   {
     key: Status.ENDED,
     value: Status.ENDED,
-    children: [Status.FAILED, Status.PASSED, Status.INTERRUPTED, Status.SKIPPED].map((key) => ({ key, value: key })),
+    children: [Status.TECHNICAL_ERROR, Status.FAILED, Status.PASSED, Status.INTERRUPTED, Status.SKIPPED].map((key) => ({
+      key,
+      value: key,
+    })),
   },
 ];
 

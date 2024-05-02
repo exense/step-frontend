@@ -50,8 +50,6 @@ export class ExecutionListComponent implements OnDestroy {
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
-  readonly remapStatuses = { [Status.FAILED]: Status.TECHNICAL_ERROR };
-
   autoRefreshDisabled: boolean = false;
 
   @ViewChild('statusFilter')
