@@ -19,6 +19,6 @@ export class ExecutionStatusComponent {
     if (status !== 'ENDED') {
       return status;
     }
-    return result === 'TECHNICAL_ERROR' ? 'FAILED' : result;
+    return result;
   });
 }

@@ -102,7 +102,6 @@
         #statusFilter
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
-        [remapValues]="remapStatuses"
         [items]="(statusItemsTree$ | async)!"
       />
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
