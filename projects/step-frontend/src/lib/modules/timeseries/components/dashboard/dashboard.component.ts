@@ -327,7 +327,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     let tableItem: DashboardItem = {
       id: 'table-' + new Date().getTime(),
       type: 'TABLE',
-      name: `Table dashlet (${metric.name})`,
+      name: metric.displayName,
       attributes: metric.attributes || [],
       grouping: metric.defaultGroupingAttributes || [],
       metricKey: metric.name!,
@@ -348,7 +348,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   addChartDashlet(metric: MetricType) {
     const newDashlet: DashboardItem = {
       id: 'chart-' + new Date().getTime(),
-      name: `Table stats (${metric.displayName!})`,
+      name: metric.displayName,
       type: 'CHART',
       size: 1,
       metricKey: metric.name!,
