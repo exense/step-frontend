@@ -12,18 +12,18 @@ import { HttpClient } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 
-const AUTOMATION_PACKAGE_TABLE_ID = 'automationPackages';
-
 @Injectable({
   providedIn: 'root',
 })
 export class AugmentedAutomationPackagesService extends AutomationPackagesService {
+  static readonly AUTOMATION_PACKAGE_TABLE_ID = 'automationPackages';
+
   private _http = inject(HttpClient);
   private _tableRest = inject(TableApiWrapperService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
   createDataSource(): StepDataSource<AutomationPackage> {
-    return this._dataSourceFactory.createDataSource(AUTOMATION_PACKAGE_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
       name: 'attributes.name',
       fileName: 'customFields.automationPackageFileName',
       actions: '',
@@ -43,13 +43,15 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     };
 
     return this._tableRest
-      .requestTable<ExecutiontTaskParameters>(AUTOMATION_PACKAGE_TABLE_ID, { filters: [idsFilter] })
+      .requestTable<ExecutiontTaskParameters>(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
+        filters: [idsFilter],
+      })
       .pipe(map((response) => response.data));
   }
 
   searchPackageIDsByName(packageName: string): Observable<string[]> {
     return this._tableRest
-      .requestTable<AutomationPackage>(AUTOMATION_PACKAGE_TABLE_ID, {
+      .requestTable<AutomationPackage>(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
         filters: [
           {
             field: 'attributes.name',

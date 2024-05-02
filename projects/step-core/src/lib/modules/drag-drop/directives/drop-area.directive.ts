@@ -31,6 +31,8 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   @Input('stepDropArea') dropArea?: unknown;
   @Input() dropAdditionalInfo?: unknown;
   @Output() dropItem = new EventEmitter<DropInfo>();
+  @Output() dragOver = new EventEmitter<void>();
+  @Output() dragLeave = new EventEmitter<void>();
 
   ngAfterViewInit(): void {
     this.initListeners();
@@ -40,7 +42,7 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
     this.destroyListeners();
   }
 
-  private dragOver(event: DragEvent): void {
+  private handleDragOver(event: DragEvent): void {
     if (
       !this._dragDataService.isDragStarted ||
       this._elRef.nativeElement.classList.contains(this._classNames.DRAG_IN_PROGRESS) ||
@@ -51,13 +53,15 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
     event.preventDefault();
     event.dataTransfer!.dropEffect = 'move';
     this._elRef.nativeElement.classList.add(this._classNames.DRAG_OVER);
+    this.dragOver.emit();
   }
 
-  private dragLeave(event: DragEvent): void {
+  private handleDragLeave(event: DragEvent): void {
     this._elRef.nativeElement.classList.remove(this._classNames.DRAG_OVER);
+    this.dragLeave.emit();
   }
 
-  private drop(event: DragEvent): void {
+  private handleDrop(event: DragEvent): void {
     event.preventDefault();
     this._zone.run(() => {
       this.dropItem.emit({
@@ -65,14 +69,15 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
         droppedArea: this.dropArea,
         additionalInfo: this.dropAdditionalInfo,
       });
+      this._dragDataService.dragEnd();
     });
   }
 
   private initListeners(): void {
     this._zone.runOutsideAngular(() => {
-      this.dragOverListener = (event) => this.dragOver(event);
-      this.dragLeaveListener = (event) => this.dragLeave(event);
-      this.dropListener = (event) => this.drop(event);
+      this.dragOverListener = (event) => this.handleDragOver(event);
+      this.dragLeaveListener = (event) => this.handleDragLeave(event);
+      this.dropListener = (event) => this.handleDrop(event);
       this._elRef.nativeElement.addEventListener('dragover', this.dragOverListener);
       this._elRef.nativeElement.addEventListener('dragleave', this.dragLeaveListener);
       this._elRef.nativeElement.addEventListener('drop', this.dropListener);

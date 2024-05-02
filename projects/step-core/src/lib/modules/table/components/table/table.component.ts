@@ -1,6 +1,8 @@
 import {
   AfterViewInit,
   Component,
+  computed,
+  contentChildren,
   ContentChildren,
   DestroyRef,
   EventEmitter,
@@ -14,23 +16,14 @@ import {
   Output,
   QueryList,
   SimpleChanges,
+  TemplateRef,
   TrackByFunction,
+  viewChild,
   ViewChild,
+  viewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  filter,
-  map,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  takeUntil,
-  tap,
-  timestamp,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -53,7 +46,13 @@ import { TablePersistenceStateService } from '../../services/table-persistence-s
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { CustomColumnsComponent } from '../custom-columns/custom-columns.component';
+import { TableColumnsService } from '../../services/table-columns.service';
+import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
+import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
+import { ColumnInfo } from '../../types/column-info';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -87,6 +86,14 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: TablePersistenceStateService,
       useClass: TablePersistenceUrlStateService,
     },
+    {
+      provide: TableColumnsDictionaryService,
+      useExisting: forwardRef(() => TableComponent),
+    },
+    TablePersistenceStateService,
+    TableColumnsDefinitionService,
+    TableCustomColumnsService,
+    TableColumnsService,
   ],
 })
 export class TableComponent<T>
@@ -99,19 +106,38 @@ export class TableComponent<T>
     TableFilter,
     TableReload,
     HasFilter,
-    TableHighlightItemContainer
+    TableHighlightItemContainer,
+    TableColumnsDictionaryService
 {
   private _tableState = inject(TablePersistenceStateService);
   private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
+  readonly _tableColumns = inject(TableColumnsService);
+
+  private initRequired: boolean = false;
+  private hasCustom: boolean = false;
+
+  searchColumns: SearchColumn[] = [];
+
+  private dataSourceTerminator$?: Subject<void>;
 
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
-  @Input() inProgress?: boolean;
+
+  /** @Input() **/
+  inProgress = input(false);
+
   tableDataSource?: TableDataSource<T>;
-  @Input() pageSizeInputDisabled?: boolean;
-  @Input() visibleColumns?: string[];
+
+  /** @Input() **/
+  pageSizeInputDisabled = input(false);
+
+  /** @Input() **/
+  visibleColumns = input(undefined, {
+    transform: (source?: string[]) => (!!source ? new Set<string>(source) : undefined),
+  });
+
   @Input() defaultSearch?: Record<string, SearchValue>;
 
   /** @Input() **/
@@ -125,31 +151,82 @@ export class TableComponent<T>
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
   additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
-  @ContentChildren(ColumnDirective) columns?: QueryList<ColumnDirective>;
 
-  private get allCollDef(): MatColumnDef[] {
-    return (this.columns || []).reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[]);
-  }
+  /**
+   * @ContentChildrent(ColumnDirective)
+   * **/
+  private contentColumns = contentChildren(ColumnDirective);
 
-  private get allSearchColDef(): SearchColDirective[] {
-    return (this.columns || [])
+  /**
+   * @ViewChildren(ColumnDirective)
+   * **/
+  private viewColumns = viewChildren(ColumnDirective);
+
+  private columns = computed(() => [...this.contentColumns(), ...this.viewColumns()]);
+
+  readonly columnsDictionary = computed(() => {
+    const alreadyUsed = new Set<string>();
+    return (this.columns() ?? []).reduce((res, column) => {
+      const infos: ColumnInfo[] = [];
+      for (let info of column.columnInfos) {
+        if (!alreadyUsed.has(info.columnId)) {
+          infos.push(info);
+          alreadyUsed.add(info.columnId);
+        }
+      }
+
+      return res.concat(infos);
+    }, [] as ColumnInfo[]);
+  });
+
+  private allCollDef = computed(() => {
+    const alreadyUsed = new Set<string>();
+    return (this.columns() ?? []).reduce((res, col) => {
+      const definitions: MatColumnDef[] = [];
+      for (let def of col.columnDefinitions) {
+        if (!alreadyUsed.has(def.name)) {
+          definitions.push(def);
+          alreadyUsed.add(def.name);
+        }
+      }
+
+      return res.concat(definitions);
+    }, [] as MatColumnDef[]);
+  });
+
+  private allSearchColDef = computed(() => {
+    return (this.columns() ?? [])
       .reduce((res, col) => [...res, ...col.searchColumnDefinitions], [] as SearchColDirective[])
       .filter((x) => !x.isSearchDisabled);
-  }
+  });
 
-  private initRequired: boolean = false;
-  private hasCustom: boolean = false;
-
-  displayColumns: string[] = [];
-  displaySearchColumns: string[] = [];
-
-  searchColumns: SearchColumn[] = [];
+  /**
+   * @ViewChildren(CustomColumns)
+   * **/
+  private customRemoteColumns = viewChild(CustomColumnsComponent);
 
   readonly pageSizeOptions = inject(ItemsPerPageService).getItemsPerPage((userPreferredItemsPerPage) =>
     this.page.pageSize.set(userPreferredItemsPerPage),
   );
 
-  private dataSourceTerminator$?: Subject<void>;
+  readonly displayColumns = computed(() => {
+    const visibleColumnsByConfig = this._tableColumns.visibleColumns();
+    const visibleColumnsByInput = this.visibleColumns();
+    if (!visibleColumnsByInput) {
+      return visibleColumnsByConfig;
+    }
+    return visibleColumnsByConfig.filter((col) => visibleColumnsByInput.has(col));
+  });
+
+  readonly displaySearchColumns = computed(() => {
+    const searchColumnNames = this.displayColumns().map((col) => `search-${col}`);
+    const configuredSearchColumnNames = new Set(this.searchColumns.map((col) => col.colName));
+    return searchColumnNames.filter((col) => configuredSearchColumnNames.has(col));
+  });
+
+  constructor(_columnDefinitions: TableColumnsDefinitionService) {
+    _columnDefinitions.setup(this.contentColumns, this.customRemoteColumns);
+  }
 
   private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
   private filter$ = toObservable(this.filter);
@@ -287,41 +364,18 @@ export class TableComponent<T>
 
   private addCustomColumnsDefinitionsToRemoteDatasource(): void {
     if (this.dataSource instanceof TableRemoteDataSource && this.hasCustom) {
-      this.columns!.reduce((res, col) => {
-        if (!col.isCustom) {
-          return res;
-        }
-        const names = col.columnDefinitions.map((x) => x.name);
-        return [...res, ...names];
-      }, [] as string[]).forEach((name) => {
-        (this.dataSource as TableRemoteDataSource<T>).setColumnMap(name, name);
-      });
+      this.columns()!
+        .reduce((res, col) => {
+          if (!col.isCustom) {
+            return res;
+          }
+          const names = col.columnDefinitions.map((x) => x.name);
+          return [...res, ...names];
+        }, [] as string[])
+        .forEach((name) => {
+          (this.dataSource as TableRemoteDataSource<T>).setColumnMap(name, name);
+        });
     }
-  }
-
-  private setupSearchColumns(): void {
-    const searchColDef = this.allSearchColDef;
-
-    if (!searchColDef?.length) {
-      this.searchColumns = [];
-      this.displaySearchColumns = [];
-      return;
-    }
-
-    const allColumns = this.allCollDef.map((x) => x.name);
-    const searchColumns = searchColDef.map((x) => {
-      const searchName = x.searchColumnName;
-      const template = x?.searchCell?.template;
-      return { searchName, template };
-    });
-
-    this.searchColumns = allColumns.map((col) => {
-      const colName = `search-${col}`;
-      const { searchName, template } = searchColumns.find((x) => x.searchName === col) || {};
-      return { colName, searchName, template };
-    });
-
-    this.displaySearchColumns = this.searchColumns.map((c) => c.colName);
   }
 
   /**
@@ -346,16 +400,6 @@ export class TableComponent<T>
     );
 
     this.additionalHeaderGroups = Object.values(headerGroupIdToHeaders);
-  }
-
-  private setupColumns(): void {
-    const allCollDef = this.allCollDef;
-
-    allCollDef.forEach((col) => this.table!.addColumnDef(col));
-
-    setTimeout(() => {
-      this.displayColumns = this.determineDisplayColumns(this.visibleColumns);
-    });
   }
 
   private setupDefaultSearch(): void {
@@ -406,8 +450,9 @@ export class TableComponent<T>
   ngAfterViewInit(): void {
     const setup = () => {
       this.setupAdditionalsHeaderGroups();
-      this.setupColumns();
-      this.setupSearchColumns();
+      this.configureColumns();
+      this.configureSearchColumns();
+      this._tableColumns.initialize();
 
       if (this.initRequired) {
         this.setupDatasource(this.dataSource);
@@ -416,7 +461,7 @@ export class TableComponent<T>
       this.addCustomColumnsDefinitionsToRemoteDatasource();
     };
 
-    const customCols = this.columns?.filter((col) => col.isCustom) || [];
+    const customCols = this.columns()?.filter((col) => col.isCustom) || [];
 
     if (!customCols?.length) {
       // Invoke setup in next CD cycle to prevent
@@ -439,19 +484,33 @@ export class TableComponent<T>
     if (cDatasource?.previousValue !== cDatasource?.currentValue) {
       this.setupDatasource(cDatasource.currentValue);
     }
-    const visibleColumns = changes['visibleColumns'];
-    if (visibleColumns?.previousValue !== visibleColumns?.currentValue) {
-      this.displayColumns = this.determineDisplayColumns(visibleColumns.currentValue);
-    }
   }
 
-  private determineDisplayColumns(visibleColumns?: string[]): string[] {
-    if (!visibleColumns) {
-      return this.allCollDef.map((x) => x.name);
+  private configureColumns(): void {
+    const allCollDef = this.allCollDef();
+    allCollDef.forEach((col) => this.table!.addColumnDef(col));
+  }
+
+  private configureSearchColumns(): void {
+    const searchColDef = this.allSearchColDef();
+
+    if (!searchColDef?.length) {
+      this.searchColumns = [];
+      return;
     }
-    const visibleColumnsMap = new Map<string, boolean>(); // save columns for low complexity access
-    visibleColumns?.forEach((col: string) => visibleColumnsMap.set(col, true));
-    return this.allCollDef.map((x) => x.name).filter((colName) => visibleColumnsMap.get(colName));
+
+    const searchColumns = searchColDef.reduce((res, x) => {
+      const searchName = x.searchColumnName;
+      const template = x?.searchCell?.template;
+      res.set(searchName, { searchName, template });
+      return res;
+    }, new Map<string, { searchName?: string; template?: TemplateRef<any> }>());
+
+    this.searchColumns = this.allCollDef().map((col) => {
+      const colName = `search-${col.name}`;
+      const { searchName, template } = searchColumns.get(col.name) ?? {};
+      return { colName, searchName, template };
+    });
   }
 
   exportAsCSV(fields: string[]): void {

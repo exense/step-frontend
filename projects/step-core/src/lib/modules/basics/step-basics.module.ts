@@ -48,11 +48,13 @@ import { DurationPipe } from './pipes/duration.pipe';
 import { DialogRouteComponent } from './components/dialog-route/dialog-route.component';
 import { MarkerComponent } from './components/marker/marker.component';
 import { AlertsContainerComponent } from './components/alerts-container/alerts-container.component';
+import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { EnterTextValueDialogComponent } from './components/enter-text-value-dialog/enter-text-value-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 import { MessagesListDialogComponent } from './components/messages-list-dialog/messages-list-dialog.component';
 import { MessageDialogComponent } from './components/message-dialog/message-dialog.component';
 import { ProjectNamePipe } from './pipes/project-name.pipe';
+import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
 
 @NgModule({
@@ -107,7 +109,9 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     DialogRouteComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
     ProjectNamePipe,
+    GetObjectFieldPipe,
     StatusCommonComponent,
   ],
   exports: [
@@ -165,7 +169,9 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ArrayFilterAdvancedComponent,
     MarkerComponent,
     AlertsContainerComponent,
+    InputModelFormatterDirective,
     ProjectNamePipe,
+    GetObjectFieldPipe,
     StatusCommonComponent,
   ],
 })
@@ -259,9 +265,11 @@ export * from './types/dialog-route-result';
 export * from './types/quick-access-route';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
+export * from './directives/input-model-formatter.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
+export * from './pipes/get-object-field.pipe';
 export * from './pipes/project-name.pipe';
 export * from './components/description-hint/description-hint.component';
 export * from './components/enter-text-value-dialog/enter-text-value-dialog.component';

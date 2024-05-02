@@ -2,8 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ColumnSelection } from './ColumnSelection';
+import type { ColumnSettings } from './ColumnSettings';
 
 export type TableSettings = {
-  columns: Array<ColumnSelection>;
+  customFields?: Record<string, any>;
+  settingId?: string;
+  scope?: Record<string, string>;
+  columnSettingList?: Array<ColumnSettings>;
+  id?: string;
 };
