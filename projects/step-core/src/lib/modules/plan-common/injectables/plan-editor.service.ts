@@ -85,11 +85,11 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     }
     this.strategy.addControl(artefactTypeId);
   }
-  addFunction(keywordId: string): void {
+  addKeywords(keywordIds: string[]): void {
     if (!this.strategy) {
       return;
     }
-    this.strategy.addFunction(keywordId);
+    this.strategy.addKeywords(keywordIds);
   }
 
   moveOut(node?: AbstractArtefact) {
@@ -134,11 +134,11 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategy.handlePlanChange();
   }
 
-  addPlan(planId: string): void {
+  addPlans(planIds: string[]): void {
     if (!this.strategy) {
       return;
     }
-    this.strategy.addPlan(planId);
+    this.strategy.addPlans(planIds);
   }
 
   undo(): void {

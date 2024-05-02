@@ -7,6 +7,20 @@
     matSortDirection="asc"
     [matSortDisableClear]="true"
   >
+    <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
+      <step-bulk-selection-di />
+      @if (hasSelection$ | async) {
+        <button mat-icon-button matTooltip="Add selected keywords" (click)="addSelectedKeywords()">
+          <step-icon name="plus-circle" />
+        </button>
+      }
+    </div>
+    <ng-container matColumnDef="bulkSelection">
+      <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
+      <td mat-cell *matCellDef="let element" class="bulk-selection-cell">
+        <step-entity-selection-di [entity]="element" />
+      </td>
+    </ng-container>
     <step-entity-column-container entityName="functions" />
     <ng-container matColumnDef="actions" stepActionCol>
       <th mat-header-cell *matHeaderCellDef>
@@ -15,8 +29,8 @@
       <td mat-cell *matCellDef="let element">
         <div class="actions">
           <step-description-hint [description]="element.description" yPosition="below" />
-          <button mat-icon-button matTooltip="Add function" (click)="addFunction(element.id)">
-            <step-icon name="plus-circle"></step-icon>
+          <button mat-icon-button matTooltip="Add function" (click)="addKeyword(element.id)">
+            <step-icon name="plus-circle" />
           </button>
         </div>
       </td>
