@@ -13,6 +13,7 @@ import {
   CommonEntitiesUrlsService,
   DialogRouteResult,
   DialogsService,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -25,6 +26,11 @@ type StatusItem = KeyValue<string, string>;
   templateUrl: './scheduled-task-list.component.html',
   styleUrls: ['./scheduled-task-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedSchedulerService.TASKS_TABLE_ID,
+      entityScreenId: 'executionParameters',
+      entityScreenSubPath: 'executionsParameters.customParameters',
+    }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
@@ -50,7 +56,6 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
 
   readonly STATUS_ACTIVE_STRING = 'On';
   readonly STATUS_INACTIVE_STRING = 'Off';
-  readonly STATUS: ReadonlyArray<string> = [this.STATUS_ACTIVE_STRING, this.STATUS_INACTIVE_STRING];
 
   readonly dataSource = this._schedulerService.createSelectionDataSource();
   readonly returnParentUrl = '/scheduler';

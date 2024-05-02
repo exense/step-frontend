@@ -13,9 +13,6 @@ step-table {
       border-collapse: separate;
 
       thead tr {
-        position: sticky;
-        z-index: 1;
-
         &:nth-child(1) {
           top: 0;
         }

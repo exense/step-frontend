@@ -1,4 +1,4 @@
-@if ((tableDataSource?.inProgress$ | async) || inProgress) {
+@if ((tableDataSource?.inProgress$ | async) || inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
@@ -9,6 +9,13 @@
       <ng-container *ngTemplateOutlet="additionalHeader!.template" />
     }
   </div>
+}
+@if (_tableColumns.remoteColumnsScreenId; as screen) {
+  <step-custom-columns
+    [screen]="screen"
+    [entitySubPath]="_tableColumns.entityScreenSubPath"
+    [options]="_tableColumns.customColumnOptions"
+  />
 }
 <div class="table-container">
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
@@ -27,18 +34,18 @@
         </th>
       </ng-container>
     }
-    <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
-    @if (displaySearchColumns.length > 0) {
-      <tr mat-header-row *matHeaderRowDef="displaySearchColumns"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayColumns()"></tr>
+    @if (displaySearchColumns().length > 0) {
+      <tr mat-header-row *matHeaderRowDef="displaySearchColumns()"></tr>
     }
     <tr
       mat-row
-      *matRowDef="let row; columns: displayColumns"
+      *matRowDef="let row; columns: displayColumns()"
       class="content-row"
       [class.row-highlight]="row === highlightedItem"
     ></tr>
     <tr class="mat-mdc-row" *matNoDataRow>
-      <td class="mat-mdc-cell no-data" [colSpan]="displayColumns.length">
+      <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
         @if ((tableDataSource?.total$ | async) === 0) {
           No data available in table
         } @else {
@@ -49,7 +56,7 @@
   </table>
 </div>
 <step-paginator
-  [disabled]="pageSizeInputDisabled"
+  [disabled]="pageSizeInputDisabled()"
   [length]="tableDataSource?.totalFiltered$ | async"
   [pageSizeOptions]="pageSizeOptions"
 />

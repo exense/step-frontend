@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Input as ColInput } from '../../../client/generated';
 import { CustomSearchCellRegistryService } from '../../custom-registeries/services/custom-search-cell-registry.service';
 
@@ -8,7 +8,7 @@ const RENDER_COL_TYPES: Array<ColInput['type']> = ['DROPDOWN', 'CHECKBOX'];
   name: 'customSearchCellComponent',
 })
 export class CustomSearchCellComponentsPipe implements PipeTransform {
-  constructor(protected _customSearchCells: CustomSearchCellRegistryService) {}
+  private _customSearchCells = inject(CustomSearchCellRegistryService);
 
   transform(col: ColInput): string | undefined {
     const componentKeys = this._customSearchCells.filterKeys(col?.searchMapperService ? [col.searchMapperService] : []);

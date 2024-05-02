@@ -1,0 +1,19 @@
+<button
+  type="button"
+  mat-icon-button
+  [matMenuTriggerFor]="menu"
+  matTooltip="Column settings"
+  matTooltipPosition="below"
+>
+  <step-icon name="more-vertical" />
+</button>
+@if (_tableColumns.hasChanges()) {
+  <step-dashlet itemKey="columnSettingsSave" />
+}
+<mat-menu #menu>
+  @for (column of columns(); track column.columnId) {
+    <button type="button" mat-menu-item role="menuitemcheckbox" (click)="switchVisibility(column)">
+      <mat-checkbox color="primary" [checked]="column.isVisible">{{ column.caption }}</mat-checkbox>
+    </button>
+  }
+</mat-menu>

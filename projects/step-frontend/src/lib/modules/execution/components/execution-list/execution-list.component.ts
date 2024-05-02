@@ -11,6 +11,7 @@ import {
   RequestFilterInterceptor,
   selectionCollectionProvider,
   STORE_ALL,
+  tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
@@ -22,6 +23,11 @@ import { ExecutionListFilterInterceptorService } from '../../services/execution-
   templateUrl: './execution-list.component.html',
   styleUrls: ['./execution-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      entityScreenId: 'executionParameters',
+      entityScreenSubPath: 'executionParameters.customParameters',
+    }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

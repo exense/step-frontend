@@ -1,6 +1,7 @@
 import { Component, inject, output, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedKeywordsService,
+  tableColumnsConfigProvider,
   AutoDeselectStrategy,
   Keyword,
   selectionCollectionProvider,
@@ -13,7 +14,15 @@ import { map } from 'rxjs';
   templateUrl: './plan-function-list.component.html',
   styleUrls: ['./plan-function-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.KEEP_SELECTION)],
+  providers: [
+    ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.KEEP_SELECTION),
+    tableColumnsConfigProvider({
+      entityTableRemoteId: 'planEditorFunctionTable',
+      entityScreenId: 'keyword',
+      entityScreenDefaultVisibleFields: ['attributes.name'],
+      customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
+    }),
+  ],
 })
 export class PlanFunctionListComponent {
   private _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);

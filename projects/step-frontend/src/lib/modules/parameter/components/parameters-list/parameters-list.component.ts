@@ -9,6 +9,7 @@ import {
   DialogsService,
   AugmentedParametersService,
   FilterConditionFactoryService,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { filter, switchMap } from 'rxjs';
 
@@ -17,6 +18,9 @@ import { filter, switchMap } from 'rxjs';
   templateUrl: './parameters-list.component.html',
   styleUrls: ['./parameters-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedParametersService.PARAMETERS_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('parametersList', STORE_ALL),
     ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

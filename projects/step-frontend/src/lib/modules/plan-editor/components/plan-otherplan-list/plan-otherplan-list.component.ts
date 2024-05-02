@@ -1,8 +1,8 @@
-import { Component, EventEmitter, inject, output, Output, ViewEncapsulation } from '@angular/core';
+import { Component, inject, output, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedPlansService,
+  tableColumnsConfigProvider,
   AutoDeselectStrategy,
-  Keyword,
   Plan,
   selectionCollectionProvider,
   SelectionCollector,
@@ -14,7 +14,15 @@ import { map } from 'rxjs';
   templateUrl: './plan-otherplan-list.component.html',
   styleUrls: ['./plan-otherplan-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.KEEP_SELECTION)],
+  providers: [
+    ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.KEEP_SELECTION),
+    tableColumnsConfigProvider({
+      entityTableRemoteId: 'planEditorOtherPlanTable',
+      entityScreenId: 'plan',
+      entityScreenDefaultVisibleFields: ['attributes.name'],
+      customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
+    }),
+  ],
 })
 export class PlanOtherplanListComponent {
   private _selectionCollector = inject<SelectionCollector<string, Plan>>(SelectionCollector);
