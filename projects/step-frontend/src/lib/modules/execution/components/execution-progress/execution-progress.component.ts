@@ -1,5 +1,6 @@
-import { Component, forwardRef, inject, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
+import { Component, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
+  AlertType,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
@@ -10,7 +11,6 @@ import {
   ExecutiontTaskParameters,
   IncludeTestcases,
   IS_SMALL_SCREEN,
-  ItemInfo,
   Operation,
   PrivateViewPluginService,
   ReportNode,
@@ -18,6 +18,7 @@ import {
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
+  TokenProvisioningStatus,
   TreeNodeUtilsService,
   TreeStateService,
   ViewRegistryService,
@@ -109,6 +110,7 @@ export class ExecutionProgressComponent
   private isTreeInitialized = false;
 
   readonly Panels = Panels;
+  readonly AlertType = AlertType;
 
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
@@ -117,6 +119,8 @@ export class ExecutionProgressComponent
   testCases?: ReportNode[];
   showTestCaseCurrentOperation: boolean = true;
   keywordSearch?: string;
+
+  readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   progress?: ExecutionSummaryDto;
   testCasesProgress?: ExecutionSummaryDto;
@@ -148,8 +152,6 @@ export class ExecutionProgressComponent
   executionId?: string;
   activeExecution?: ActiveExecution;
   protected activeTabId?: string;
-
-  throughputchart: any | { series: any[]; data: any[][] } = {};
 
   showNodeInTree(nodeId: string): void {
     this._controllerService
