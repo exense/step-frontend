@@ -116,12 +116,8 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
 
     // use Set to exclude duplicates
     const idsToInsert = ids.filter((id) => !existed.has(id));
-    if (!idsToInsert.length) {
-      return;
-    }
 
-    const allKeys = [...this._selected$.value, ...idsToInsert];
-    this._selected$.next(allKeys);
+    this._selected$.next([...this._selected$.value, ...idsToInsert]);
   }
 
   toggleSelection(item: ENTITY): void {
