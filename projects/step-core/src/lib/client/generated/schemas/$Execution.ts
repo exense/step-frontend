@@ -35,6 +35,12 @@ export const $Execution = {
     result: {
       type: 'Enum',
     },
+    lifecycleErrors: {
+      type: 'array',
+      contains: {
+        type: 'Error',
+      },
+    },
     planId: {
       type: 'string',
     },
