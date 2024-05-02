@@ -343,12 +343,13 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   onKeywordToggle(entry: TableEntry, selected: boolean) {
+    const seriesKey = (entry.base?.seriesKey || entry.compare?.seriesKey)!;
     let syncGroup = this.context.getSyncGroup(this.item.id);
     if (selected) {
-      syncGroup.showSeries(entry.name);
+      syncGroup.showSeries(seriesKey);
     } else {
       this.allSeriesChecked = false;
-      syncGroup.hideSeries(entry.name);
+      syncGroup.hideSeries(seriesKey);
     }
   }
 
