@@ -13,6 +13,7 @@ import {
 import { DragDataService } from '../injectables/drag-data.service';
 import { DRAG_DROP_CLASS_NAMES } from '../injectables/drag-drop-class-names.token';
 import { DragDropListener } from '../types/drag-drop-listener';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[stepDragItem]',
@@ -30,9 +31,18 @@ export class DragItemDirective implements AfterViewInit, OnDestroy {
   private dragEndListener?: DragDropListener;
   private dragImage?: HTMLElement;
 
-  @Input('stepDragItem') dragNodeData?: unknown;
+  private cleanupDragImage = this._dragDataService.dragEnd$
+    .pipe(takeUntilDestroyed())
+    .subscribe(() => (this.dragImage = undefined));
 
+  /** @Input() **/
+  dragNodeData = input<unknown>(undefined, { alias: 'stepDragItem' });
+
+  /** @Input() **/
   dragDisabled = input(false);
+
+  /** @Input() **/
+  dragExternalImage = input<HTMLElement | undefined>(undefined, { alias: 'dragImage' });
 
   ngAfterViewInit(): void {
     effect(
@@ -55,7 +65,9 @@ export class DragItemDirective implements AfterViewInit, OnDestroy {
     }
     // DOM manipulation inside the dragstart event, may cause
     // immediate firing of dragend event. To prevent it dragimage is created in mousedown handler
-    this.dragImage = this._dragDataService.createDragImageForElement(this._elRef.nativeElement);
+    this.dragImage = this._dragDataService.createDragImageForElement(
+      this.dragExternalImage() ?? this._elRef.nativeElement,
+    );
   }
 
   private dragStart(event: DragEvent): void {
@@ -68,7 +80,7 @@ export class DragItemDirective implements AfterViewInit, OnDestroy {
     }
     this._elRef.nativeElement.classList.add(this._classNames.DRAG_IN_PROGRESS);
     this._zone.run(() => {
-      this._dragDataService.dragStart(this.dragNodeData);
+      this._dragDataService.dragStart(this.dragNodeData());
     });
   }
 

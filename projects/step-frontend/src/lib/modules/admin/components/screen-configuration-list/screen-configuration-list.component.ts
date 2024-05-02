@@ -114,7 +114,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
       .showDeleteWarning(1, `Screen "${label}"`)
       .pipe(
         filter((result) => result),
-        switchMap(() => this._screenApi.deleteInput(dbId)),
+        switchMap(() => this._screenApi.deleteInput(dbId, this.currentlySelectedScreenChoice)),
       )
       .subscribe(() => this.searchableScreens.reload());
   }

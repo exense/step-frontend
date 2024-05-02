@@ -6,6 +6,7 @@ import {
   FunctionPackage,
   selectionCollectionProvider,
   STORE_ALL,
+  tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { FunctionPackageActionsService } from '../../injectables/function-package-actions.service';
@@ -15,6 +16,9 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
   templateUrl: './function-package-list.component.html',
   styleUrls: ['./function-package-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedKeywordPackagesService.FUNCTION_PACKAGE_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
     ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

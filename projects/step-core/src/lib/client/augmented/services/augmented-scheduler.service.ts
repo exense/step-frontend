@@ -17,7 +17,7 @@ import { map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedSchedulerService extends SchedulerService {
-  private readonly TASKS_TABLE_ID = 'tasks';
+  static readonly TASKS_TABLE_ID = 'tasks';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
@@ -26,7 +26,7 @@ export class AugmentedSchedulerService extends SchedulerService {
   private cachedTask?: ExecutiontTaskParameters;
 
   createSelectionDataSource(): StepDataSource<ExecutiontTaskParameters> {
-    return this._dataSourceFactory.createDataSource(this.TASKS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedSchedulerService.TASKS_TABLE_ID, {
       'attributes.name': 'attributes.name',
       'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
       cronExpression: 'cronExpression',
@@ -64,7 +64,7 @@ export class AugmentedSchedulerService extends SchedulerService {
     };
 
     return this._tableApiWrapper
-      .requestTable<ExecutiontTaskParameters>(this.TASKS_TABLE_ID, { filters: [idsFilter] })
+      .requestTable<ExecutiontTaskParameters>(AugmentedSchedulerService.TASKS_TABLE_ID, { filters: [idsFilter] })
       .pipe(map((response) => response.data));
   }
 

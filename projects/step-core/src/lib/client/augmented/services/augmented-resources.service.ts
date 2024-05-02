@@ -7,7 +7,7 @@ import { uploadWithProgress } from '../shared/pipe-operators';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService {
-  private readonly RESOURCES_TABLE_ID = 'resources';
+  static readonly RESOURCES_TABLE_ID = 'resources';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
@@ -15,7 +15,7 @@ export class AugmentedResourcesService extends ResourcesService {
   private cachedResource?: Resource;
 
   createDataSource(): StepDataSource<Resource> {
-    return this._dataSourceFactory.createDataSource(this.RESOURCES_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedResourcesService.RESOURCES_TABLE_ID, {
       name: 'attributes.name',
       resourceType: 'resourceType',
       id: 'id',
@@ -24,7 +24,7 @@ export class AugmentedResourcesService extends ResourcesService {
   }
 
   createSelectionDataSource(): StepDataSource<Resource> {
-    return this._dataSourceFactory.createDataSource(this.RESOURCES_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedResourcesService.RESOURCES_TABLE_ID, {
       id: 'id',
       resourceName: 'resourceName',
       resourceType: 'resourceType',
