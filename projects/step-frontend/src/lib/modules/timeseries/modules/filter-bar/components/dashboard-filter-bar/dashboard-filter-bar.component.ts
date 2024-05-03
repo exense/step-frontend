@@ -280,7 +280,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
       this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
-      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
+      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: true });
     }
     this.emitFilterChange$.next();
   }
@@ -288,7 +288,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private getExecutionsTimeRange(item: FilterBarItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
-    let max = new Date().getTime();
+    let max = 0;
     item.searchEntities.forEach((entity) => {
       const execution = entity.entity as Execution;
       if (execution) {
@@ -297,6 +297,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
         }
         if (execution.endTime && max < execution.endTime) {
           max = execution.endTime;
+        } else {
+          max = new Date().getTime();
         }
       } else {
         allExecutionsAreKnown = false;
