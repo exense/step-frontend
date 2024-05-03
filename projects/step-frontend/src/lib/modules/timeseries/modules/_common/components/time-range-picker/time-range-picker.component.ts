@@ -33,6 +33,7 @@ export class TimeRangePickerComponent implements OnInit {
 
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
+  readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   constructor(private _snackBar: MatSnackBar) {}
 

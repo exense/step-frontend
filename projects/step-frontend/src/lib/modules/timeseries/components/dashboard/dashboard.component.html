@@ -142,7 +142,7 @@
         <div class="no-charts-message size-full">Dashboard has no charts.</div>
       }
       @if (editMode && metricTypes) {
-        <div class="add-dashlet-container size-full" [style.height.px]="DASHLET_HEIGHT">
+        <div class="add-dashlet-container" [style.height.px]="DASHLET_HEIGHT">
           <div [matMenuTriggerFor]="dashletsMenu">
             <button mat-raised-button color="primary">
               <step-icon name="plus" />
