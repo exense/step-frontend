@@ -1,11 +1,12 @@
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, inject, NgModule } from '@angular/core';
 import {
   DashletRegistryService,
   EntityColumnComponent,
   LOGOUT_CLEANUP,
   StepCoreModule,
   LockColumnComponent,
+  ColumnSettingsSaveDashletComponent,
 } from '@exense/step-core';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
@@ -68,14 +69,20 @@ import { ConnectionErrorInterceptor } from './interceptors/connection-error.inte
       useExisting: SidebarStateService,
       multi: true,
     },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        const dashletRegistryService = inject(DashletRegistryService);
+        dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
+        dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
+        dashletRegistryService.registerDashlet('columnSettingsSave', ColumnSettingsSaveDashletComponent);
+        return () => true;
+      },
+      multi: true,
+    },
   ],
 })
-export class StepCommonModule {
-  constructor(dashletRegistryService: DashletRegistryService) {
-    dashletRegistryService.registerDashlet('entityColumn', EntityColumnComponent);
-    dashletRegistryService.registerDashlet('entityLock', LockColumnComponent);
-  }
-}
+export class StepCommonModule {}
 
 export * from './shared/status.enum';
 export * from './components/login/login.component';

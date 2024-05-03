@@ -1,13 +1,12 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
-  DashboardsService,
+  AugmentedDashboardsService,
   DashboardView,
   DialogParentService,
   DialogsService,
-  StepDataSource,
   STORE_ALL,
+  tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
-  TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { catchError, filter, map, of, switchMap } from 'rxjs';
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../modules/_common';
@@ -20,6 +19,9 @@ import { Params } from '@angular/router';
   standalone: true,
   imports: [COMMON_IMPORTS],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedDashboardsService.TABLE_ID,
+    }),
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
     {
       provide: DialogParentService,
@@ -28,15 +30,9 @@ import { Params } from '@angular/router';
   ],
 })
 export class DashboardListComponent implements DialogParentService {
-  private readonly TABLE_ID = 'dashboards';
   private readonly _dialogs = inject(DialogsService);
-  private readonly _dashboardsService = inject(DashboardsService);
-  private readonly _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
-  readonly dataSource: StepDataSource<DashboardView> = this._dataSourceFactory.createDataSource(this.TABLE_ID, {
-    name: 'name',
-    description: 'description',
-    actions: '',
-  });
+  private readonly _dashboardsService = inject(AugmentedDashboardsService);
+  readonly dataSource = this._dashboardsService.createDataSource();
 
   readonly editModeParams: Params = {
     [`${TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX}edit`]: '1',

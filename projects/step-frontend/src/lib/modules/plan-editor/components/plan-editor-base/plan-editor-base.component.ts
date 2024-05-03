@@ -192,12 +192,12 @@ export class PlanEditorBaseComponent
     this._planEditService.addControl(artefactTypeId);
   }
 
-  addFunction(keywordId: string): void {
-    this._planEditService.addFunction(keywordId);
+  addKeywords(keywordIds: string[]): void {
+    this._planEditService.addKeywords(keywordIds);
   }
 
-  addPlan(planId: string): void {
-    this._planEditService.addPlan(planId);
+  addPlans(planIds: string[]): void {
+    this._planEditService.addPlans(planIds);
   }
 
   exportPlan(): void {

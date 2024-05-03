@@ -7,8 +7,11 @@
       @if (ds.percentPassed > 0 && ds.passed > 0) {
         <div class="bar-PASSED" [style.width.%]="ds.percentPassed">{{ ds.passed }}</div>
       }
-      @if (ds.percentFailed > 0) {
-        <div class="bar-FAILED" [style.width.%]="ds.percentFailed">{{ ds.failed }}</div>
+      @if (ds.percentFailedError > 0) {
+        <div class="bar-FAILED" [style.width.%]="ds.percentFailedError">{{ ds.failedError }}</div>
+      }
+      @if (ds.percentTechError > 0) {
+        <div class="bar-TECHNICAL_ERROR" [style.width.%]="ds.percentTechError">{{ ds.techError }}</div>
       }
     </div>
   } @else {

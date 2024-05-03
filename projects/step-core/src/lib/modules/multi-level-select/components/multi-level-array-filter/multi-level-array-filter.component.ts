@@ -25,23 +25,6 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
   /** @Input() **/
   items = input<MultiLevelItem<T>[]>([]);
 
-  /** @Input() **/
-  remapValues = input<Record<string, string> | undefined>(undefined);
-
-  private reverseRemap = computed(() => {
-    const remap = this.remapValues();
-    if (!remap) {
-      return undefined;
-    }
-    return Object.entries(remap).reduce(
-      (res, [key, value]) => {
-        res[value] = key;
-        return res;
-      },
-      {} as Record<string, string>,
-    );
-  });
-
   protected createControl(fb: FormBuilder): FormControl<T[]> {
     return fb.nonNullable.control([]);
   }
@@ -50,23 +33,17 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
     return control.valueChanges.pipe(
       map((value) => value as string[]),
       map((values) => {
-        const remapValues = this.remapValues();
-        if (!remapValues || !values) {
+        if (!values) {
           return values;
         }
         return values.reduce((res, value) => {
-          const addValues = !!remapValues![value] ? [value, remapValues![value]] : [value];
-          return res.concat(addValues);
+          return res.concat([value]);
         }, [] as string[]);
       }),
     );
   }
 
   protected override transformFilterValueToControlValue(value: string[]): T[] {
-    const reverseRemap = this.reverseRemap();
-    if (!reverseRemap || !value) {
-      return value as T[];
-    }
-    return [...new Set(value.map((item) => reverseRemap[item] ?? item))] as T[];
+    return [...new Set(value.map((item) => item))] as T[];
   }
 }

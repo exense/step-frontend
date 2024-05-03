@@ -4,6 +4,7 @@ import { MatColumnDef } from '@angular/material/table';
 import { ColumnContainer } from '../../types/column-container';
 import { CustomColumnsBaseComponent } from '../custom-columns/custom-columns-base.component';
 import { SearchColDirective } from '../../directives/search-col.directive';
+import { ActivityColDirective } from '../../directives/activity-col.directive';
 
 @Component({
   template: '',
@@ -13,6 +14,7 @@ export abstract class BaseColumnContainerComponent implements ColumnContainer, C
 
   colDef?: QueryList<MatColumnDef>;
   searchColDef?: QueryList<SearchColDirective>;
+  colDefLabel?: QueryList<ActivityColDirective>;
 
   readonly columnsReady$: Observable<boolean> = this.columnsReadyInternal$.asObservable();
 

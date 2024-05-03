@@ -1,0 +1,5 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-column-settings-save-dashlet {
+  @include core.table-settings-buttons-container;
+}

@@ -17,6 +17,7 @@ import {
   IsDragDataPipe,
   DragPreviewDirective,
 } from '../drag-drop';
+import { DynamicInputWidthDirective } from '../editable-labels/directives/dynamic-input-width.directive';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import {
     DropAreaDirective,
     DragPreviewDirective,
     IsDragDataPipe,
+    DynamicInputWidthDirective,
   ],
   exports: [TreeComponent, TreeNodeTemplateDirective],
 })

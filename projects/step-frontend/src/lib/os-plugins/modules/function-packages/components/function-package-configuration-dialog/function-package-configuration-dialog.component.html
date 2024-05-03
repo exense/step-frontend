@@ -36,7 +36,7 @@
           &nbsp;
           <step-icon
             name="help-circle"
-            matTooltip="Custom attributes applied to all keywords and derived from the functionTable screenInput"
+            matTooltip="Custom attributes applied to all keywords and derived from the keyword screenInput"
           ></step-icon>
         </mat-panel-title>
       </mat-expansion-panel-header>
@@ -44,7 +44,7 @@
         #customAttributesForm
         [stModel]="customAttributes"
         (stModelChange)="saveCustomAttributes($event)"
-        stScreen="functionTable"
+        stScreen="keyword"
         [stExcludeFields]="['attributes.name']"
       >
       </step-custom-forms>

@@ -9,7 +9,25 @@ step-plan-otherplan-list {
   table {
     thead > tr > th:first-child,
     tbody > tr > td:first-child {
-      padding-right: 0.8rem !important;
+      padding-left: 0.8rem !important;
+      padding-right: 0;
+      width: 0;
     }
+    thead > tr:first-child > th:last-child .header-cell-container {
+      justify-content: flex-end;
+      padding-right: 1.2rem;
+    }
+  }
+
+  .additional-header {
+    padding-left: 0.8rem !important;
+    padding-right: 0;
+  }
+
+  .selection-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4rem;
   }
 }

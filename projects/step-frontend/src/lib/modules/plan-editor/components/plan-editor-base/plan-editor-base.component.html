@@ -63,10 +63,10 @@
             <step-plan-artefact-list (onSelection)="addControl($event)" />
           }
           @case ('keywords') {
-            <step-plan-function-list (onSelection)="addFunction($event)" />
+            <step-plan-function-list (addKeywords)="addKeywords($event)" />
           }
           @case ('other') {
-            <step-plan-otherplan-list (onSelection)="addPlan($event)" />
+            <step-plan-otherplan-list (addPlans)="addPlans($event)" />
           }
           @case ('console') {
             <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
