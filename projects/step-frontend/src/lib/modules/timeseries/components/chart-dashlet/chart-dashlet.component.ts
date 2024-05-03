@@ -199,6 +199,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   handleLockStateChange(locked: boolean) {
+    console.log('LOCK STATE');
     this.context.setChartsLockedState(locked);
   }
 

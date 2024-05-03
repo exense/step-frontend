@@ -33,7 +33,7 @@
           [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
           [buttonDisabled]="compareModeEnabled"
           [interval]="refreshInterval"
-          (refresh)="mainEngine.triggerRefresh(true)"
+          (refresh)="mainEngine.triggerRefresh()"
           (intervalChange)="handleRefreshIntervalChange($event)"
         />
         @if (hasWritePermission) {

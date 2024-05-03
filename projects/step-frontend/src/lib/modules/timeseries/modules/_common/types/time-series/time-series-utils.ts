@@ -8,8 +8,6 @@ export class TimeSeriesUtils {
     for (let i = 0; i < intervals; i++) {
       result[i] = start + i * interval; //
     }
-    console.log('start/end', start, end, interval);
-    console.log(result[result.length - 1]);
     // result[intervals] = result[intervals - 1] + TimeSeriesConfig.RESOLUTION; // we add one second as a small padding
 
     return result;
