@@ -3,11 +3,13 @@ import { TimeRangePickerSelection } from './../time-selection/time-range-picker-
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
-    let intervals = Math.ceil((end - start) / interval);
+    const intervals = Math.ceil((end - start) / interval) + 1;
     const result = Array(intervals);
     for (let i = 0; i < intervals; i++) {
       result[i] = start + i * interval; //
     }
+    console.log('start/end', start, end, interval);
+    console.log(result[result.length - 1]);
     // result[intervals] = result[intervals - 1] + TimeSeriesConfig.RESOLUTION; // we add one second as a small padding
 
     return result;

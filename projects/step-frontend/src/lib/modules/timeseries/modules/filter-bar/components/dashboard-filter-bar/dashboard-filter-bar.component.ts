@@ -288,7 +288,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private getExecutionsTimeRange(item: FilterBarItem): TimeRange {
     let allExecutionsAreKnown = true;
     let min = Number.MAX_VALUE;
-    let max = 0;
+    let max = new Date().getTime();
     item.searchEntities.forEach((entity) => {
       const execution = entity.entity as Execution;
       if (execution) {

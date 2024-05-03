@@ -219,14 +219,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     );
   }
 
-  updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
-    this.tableIsLoading = false;
-    // const baseData = this.processResponse(this.baseResponse!, this.executionContext);
-    // const compareData = this.processResponse(response, compareContext);
-    // const mergedData = this.mergeBaseAndCompareData(baseData, compareData);
-    // this.updateDataSourceAndKeywords(mergedData);
-  }
-
   private getFilterItems(context: TimeSeriesContext): FilterBarItem[] {
     const metricItem = {
       attributeName: 'metricType',
@@ -315,7 +307,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return response.matrix.map((series, i) => {
       if (series.length != 1) {
         // we should have just one bucket
-        throw new Error('Something went wrong');
+        throw new Error('More than one bucket was provided');
       }
       const seriesAttributes = response.matrixKeys[i];
       const responseBucket = series[0];
@@ -392,6 +384,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           return;
         }
         const entityId = entry.groupingLabels[i];
+        if (!entityId) {
+          return;
+        }
         const entitiesSet = entitiesByTypes[entityName] || new Set();
         entitiesSet.add(entityId);
         entitiesByTypes[entityName] = entitiesSet;
@@ -425,37 +420,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           });
           return entry;
         });
-        // this.tableData$.next([...data]);
       }),
     );
-
-    // const groupDimensions = this.getGroupDimensions(this.context);
-    // const requests$ = groupDimensions
-    //   .map((attributeKey, i) => {
-    //     const attribute = this.attributesByIds[attributeKey];
-    //     const entityName = attribute?.metadata['entity'];
-    //     if (!entityName) {
-    //       return undefined;
-    //     }
-    //     const entityIds = new Set<string>(data.map((entry) => entry.groupingLabels[i]).filter((v) => !!v));
-    //     return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
-    //       tap((response) => {
-    //         data.forEach((entry, j) => {
-    //           const labelId = entry.groupingLabels[i];
-    //           if (labelId) {
-    //             if (response[labelId]) {
-    //               entry.groupingLabels[i] = response[labelId];
-    //             } else {
-    //               entry.groupingLabels[i] = labelId + ' (unresolved)';
-    //             }
-    //             data[j] = { ...entry };
-    //           }
-    //         });
-    //       }),
-    //     );
-    //   })
-    //   .filter((x) => !!x);
-    // return forkJoin(requests$);
   }
 
   getDatasourceConfig(): TableLocalDataSourceConfig<TableEntry> {
@@ -495,10 +461,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   percentageBetween(x: number | undefined, y: number | undefined) {
-    if (x && y) {
-      return ((y - x) / x) * 100;
-    } else {
+    if (x === undefined || y === undefined || x === 0) {
       return undefined;
+    } else {
+      return ((y - x) / x) * 100;
     }
   }
 

@@ -26,7 +26,6 @@ import { defaultIfEmpty, forkJoin, merge, Observable, of, Subscription, switchMa
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatMenuTrigger } from '@angular/material/menu';
 
 //@ts-ignore

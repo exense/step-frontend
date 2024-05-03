@@ -87,6 +87,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     if (this.syncKey) {
       uPlot.sync(this.syncKey);
     }
+    console.log('settings', this.settings);
     this.init(this.settings);
   }
 
@@ -113,6 +114,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   init(settings: TSRangerSettings) {
     this.start = settings.xValues[0];
     this.end = settings.xValues[this.settings.xValues.length - 1];
+    console.log(this.start, this.end);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -374,6 +376,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
     const min = u.posToVal(u.select.left, 'x');
     const max = u.posToVal(u.select.left + u.select.width, 'x');
+    console.log(this.previousRange, min, max);
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       const currentRange = { from: min, to: max };
       this.previousRange = currentRange;

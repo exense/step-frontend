@@ -66,10 +66,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       });
   }
 
-  updateFullTimeRange(range: TimeRange) {
-    // this.settings.timeRange = range;
-  }
-
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
     const selection = this.context.getSelectedTimeRange();
     return this.createRanger(
@@ -79,6 +75,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
   }
 
   createRanger(fullTimeRange: TimeRange, selection?: TimeRange): Observable<TimeSeriesAPIResponse> {
+    console.log('full range', fullTimeRange);
     const request = new FindBucketsRequestBuilder()
       .withRange(fullTimeRange)
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)

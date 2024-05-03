@@ -10,5 +10,5 @@ export type AxesSettings = {
   displayType: 'LINE' | 'BAR_CHART';
   unit: string;
   renderingSettings?: MetricRenderingSettings;
-  colorizationType?: 'STROKE' | 'FILL';
+  colorizationType: 'STROKE' | 'FILL';
 };
