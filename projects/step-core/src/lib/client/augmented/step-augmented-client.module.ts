@@ -31,5 +31,8 @@ export { AugmentedAutomationPackagesService } from './services/augmented-automat
 export { AugmentedBookmarksService } from './services/augmented-bookmarks.service';
 export { AugmentedTimeSeriesService } from './services/augmented-time-series.service';
 export { AugmentedDashboardsService } from './services/augmented-dashboards.service';
+export { StepHttpRequestService } from './services/step-http-request.service';
+export * from './services/http-override-response-interceptor.service';
 export * from './shared/pipe-operators';
 export * from './shared/keyword';
+export * from './shared/http-override-response-interceptor';
