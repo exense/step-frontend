@@ -1,14 +1,35 @@
 import { inject, Injectable } from '@angular/core';
-import { ExecutionsService, PlansService, SchedulerService } from '@exense/step-core';
+import {
+  AugmentedExecutionsService,
+  EntityDialogsService,
+  Execution,
+  ExecutionsService,
+  ExecutiontTaskParameters,
+  Plan,
+  PlansService,
+  SchedulerService,
+} from '@exense/step-core';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TimeSeriesUtilityService {
-  private _executionService = inject(ExecutionsService);
+  private _executionService = inject(AugmentedExecutionsService);
   private _planService = inject(PlansService);
   private _schedulerService = inject(SchedulerService);
+
+  getExecutions(ids: string[]): Observable<Execution[]> {
+    return this._executionService.getExecutionsByIds(ids);
+  }
+
+  getPlans(ids: string[]): Observable<Plan[]> {
+    return this._planService.findPlansByIds(ids);
+  }
+
+  getTasks(ids: string[]): Observable<ExecutiontTaskParameters[]> {
+    return this._schedulerService.findExecutionTasksByIds(ids);
+  }
 
   getEntitiesNamesByIds(ids: string[], entityType: string): Observable<Record<string, string>> {
     if (!ids || ids.length === 0) {

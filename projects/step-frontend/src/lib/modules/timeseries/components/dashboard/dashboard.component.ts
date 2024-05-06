@@ -5,14 +5,18 @@ import {
   DashboardItem,
   DashboardsService,
   DashboardView,
+  Execution,
+  ExecutiontTaskParameters,
   MetricAttribute,
   MetricType,
+  Plan,
   TimeRange,
   TimeRangeSelection,
   TimeSeriesAPIResponse,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
+  FilterBarItem,
   FilterUtils,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
@@ -20,6 +24,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  TimeSeriesUtilityService,
 } from '../../modules/_common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -36,6 +41,7 @@ import { TableDashletComponent } from '../table-dashlet/table-dashlet.component'
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'step-dashboard-page',
@@ -62,6 +68,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
+  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
@@ -287,15 +294,92 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const dashboardFilters = dashboard.filters
       ?.map(FilterUtils.convertApiFilterItem)
       .filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attributeName));
+    const combinedFilters = [...urlFilters, ...dashboardFilters];
+    this.fetchFilterEntities(combinedFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       dashlets: this.dashboard.dashlets,
       timeRange: timeRange,
       attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
-      filters: [...urlFilters, ...dashboardFilters],
+      filters: combinedFilters,
       resolution: urlParams.resolution,
     });
+  }
+
+  private fetchFilterEntities(items: FilterBarItem[]): void {
+    const entitiesByAttributes: Record<string, string[]> = {};
+    const entityFilterItems = items.filter((item) => item.searchEntities?.length);
+    entityFilterItems.forEach((item) => {
+      item.searchEntities.forEach((entity) => {
+        if (entity.searchValue && !entity.entity) {
+          const existingEntitiesForAttribute = entitiesByAttributes[item.attributeName] || [];
+          existingEntitiesForAttribute.push(entity.searchValue);
+          entitiesByAttributes[item.attributeName] = existingEntitiesForAttribute;
+        }
+      });
+    });
+    this.fetchAllEntities(entitiesByAttributes).subscribe((indexedEntities) => {
+      entityFilterItems.forEach((item) => {
+        const entitiesByType = indexedEntities[item.attributeName];
+        item.searchEntities.forEach((entity) => {
+          if (entity.searchValue && !entity.entity) {
+            entity.entity = entitiesByType[entity.searchValue];
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * This method will grab all the entities using different requests for each required type. the result is merged and grouped into
+   * an indexed object: first level by entity type (exec/plan/task), and then each entity by its id.
+   */
+  private fetchAllEntities(
+    entitiesByAttributes: Record<string, string[]>,
+  ): Observable<Record<string, Record<string, Execution | Plan | ExecutiontTaskParameters>>> {
+    const requests$: Observable<(Execution | Plan | ExecutiontTaskParameters)[]>[] = [];
+    const requestsAttributes: string[] = [];
+    Object.keys(entitiesByAttributes).forEach((attribute) => {
+      requestsAttributes.push(attribute);
+      switch (attribute) {
+        case TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE:
+          requests$.push(
+            this._timeSeriesUtilityService.getExecutions(entitiesByAttributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]),
+          );
+          break;
+        case TimeSeriesConfig.PLAN_ID_ATTRIBUTE:
+          requests$.push(
+            this._timeSeriesUtilityService.getPlans(entitiesByAttributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]),
+          );
+          break;
+        case TimeSeriesConfig.TASK_ID_ATTRIBUTE:
+          requests$.push(
+            this._timeSeriesUtilityService.getTasks(entitiesByAttributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]),
+          );
+          break;
+        default:
+          throw new Error('Unhandled entities by attribute: ' + attribute);
+      }
+    });
+    return forkJoin(requests$).pipe(
+      map((responses) => {
+        const indexedEntities: Record<string, Record<string, Execution | Plan | ExecutiontTaskParameters>> = {};
+        requestsAttributes.forEach((entity, i) => {
+          // indexed by entity type, then by id
+
+          const response = responses[i];
+          indexedEntities[entity] = response.reduce(
+            (obj: Record<string, any>, current: Execution | Plan | ExecutiontTaskParameters) => {
+              obj[current.id!] = current;
+              return obj;
+            },
+            {} as Record<string, any>,
+          );
+        });
+        return indexedEntities;
+      }),
+    );
   }
 
   handleChartDelete(index: number) {

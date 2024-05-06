@@ -297,10 +297,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
         }
         if (execution.endTime && max < execution.endTime) {
           max = execution.endTime;
-        } else {
-          max = new Date().getTime();
         }
       } else {
+        console.error('Execution entities not found in the filters');
         allExecutionsAreKnown = false;
       }
     });
@@ -309,6 +308,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       let fullTimeRange = this.context.getFullTimeRange();
       min = Math.min(fullTimeRange.from!, min);
       max = Math.max(fullTimeRange.to!, max);
+    }
+    if (!max) {
+      max = new Date().getTime();
     }
     return { from: min, to: max };
   }
