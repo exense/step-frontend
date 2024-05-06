@@ -37,7 +37,6 @@ export class DashboardStateEngine {
       // refresh is not enabled on compare mode
       return;
     }
-    console.log(state.context.getChartsLockedState(), force);
     if ((state.refreshInProgress || state.context.getChartsLockedState()) && !force) {
       return;
     }
