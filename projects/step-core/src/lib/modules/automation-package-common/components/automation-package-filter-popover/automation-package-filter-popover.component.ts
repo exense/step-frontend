@@ -5,13 +5,14 @@ import {
   AutoDeselectStrategy,
   SelectionCollector,
 } from '../../../entities-selection/entities-selection.module';
-import { tablePersistenceConfigProvider } from '../../../table/services/table-persistence-config.provider';
+import { tablePersistenceConfigProvider, tableColumnsConfigProvider } from '../../../table/table.module';
 
 @Component({
   selector: 'step-automation-package-filter-popover',
   templateUrl: './automation-package-filter-popover.component.html',
   styleUrls: ['./automation-package-filter-popover.component.scss'],
   providers: [
+    tableColumnsConfigProvider(null),
     tablePersistenceConfigProvider('automationPackageFilter', {
       storePagination: false,
       storeSort: false,

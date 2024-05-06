@@ -11,6 +11,8 @@ import {
   FunctionConfigurationApiService,
   DialogParentService,
   IsUsedByDialogService,
+  CustomCellRegistryService,
+  tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
@@ -19,6 +21,11 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
   templateUrl: './function-list.component.html',
   styleUrls: ['./function-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
+      entityScreenId: 'keyword',
+      entityScreenDefaultVisibleFields: ['attributes.name'],
+    }),
     tablePersistenceConfigProvider('functionList', STORE_ALL),
     ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
@@ -37,6 +44,7 @@ export class FunctionListComponent implements DialogParentService {
   private _keywordExecutor = inject(KeywordExecutorService);
   private _isUsedByDialog = inject(IsUsedByDialogService);
 
+  readonly _hasPackages = !!inject(CustomCellRegistryService).getItemInfo('functionPackageLink');
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly returnParentUrl = '/functions';
 

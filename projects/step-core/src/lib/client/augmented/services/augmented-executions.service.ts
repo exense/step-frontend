@@ -19,15 +19,16 @@ import { CompareCondition } from '../../../modules/basics/types/compare-conditio
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService {
-  private readonly EXECUTIONS_TABLE_ID = 'executions';
+  static readonly EXECUTIONS_TABLE_ID = 'executions';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _tableApiWrapper = inject(TableApiWrapperService);
 
   getExecutionsTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(this.EXECUTIONS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
       description: 'description',
+      executionTime: 'startTime',
       startTime: 'startTime',
       endTime: 'endTime',
       user: 'executionParameters.userID',
@@ -37,7 +38,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(this.EXECUTIONS_TABLE_ID, {
+    return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
       description: 'description',
       startTime: 'startTime',
       user: 'executionParameters.userID',
@@ -78,7 +79,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
     };
 
     return this._tableApiWrapper
-      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [idsFilter] })
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [idsFilter] })
       .pipe(map((response) => response.data));
   }
 
@@ -89,7 +90,7 @@ export class AugmentedExecutionsService extends ExecutionsService {
       value: `^${status}$`,
     };
     return this._tableApiWrapper
-      .requestTable<Execution>(this.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
       .pipe(map((response) => response.recordsFiltered));
   }
 }

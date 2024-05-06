@@ -1,5 +1,6 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
+  AugmentedParametersService,
   AugmentedResourcesService,
   AutoDeselectStrategy,
   DialogParentService,
@@ -8,6 +9,7 @@ import {
   ResourceInputBridgeService,
   selectionCollectionProvider,
   STORE_ALL,
+  tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 
@@ -16,6 +18,9 @@ import {
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('resourceList', STORE_ALL),
     ...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

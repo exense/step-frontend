@@ -1,3 +1,6 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
 step-icon {
   width: 2rem;
   height: 2rem;
@@ -11,4 +14,8 @@ step-icon {
   step-custom-cell:not(:first-child) {
     margin-left: 1rem;
   }
+}
+
+.col-description {
+  z-index: 3;
 }

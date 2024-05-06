@@ -9,6 +9,10 @@ step-execution-list {
     @include core.table-header;
   }
 
+  th.actions-column-settings-container .header-cell-container {
+    justify-content: flex-end !important;
+  }
+
   step-report-node-icon.is-importing {
     visibility: hidden;
   }
