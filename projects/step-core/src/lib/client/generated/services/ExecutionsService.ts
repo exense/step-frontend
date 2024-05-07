@@ -283,19 +283,4 @@ export class ExecutionsService {
       mediaType: 'application/json',
     });
   }
-
-  /**
-   * @param executionId
-   * @returns TokenProvisioningStatus default response
-   * @throws ApiError
-   */
-  public getAutoscalingStatus(executionId: string): Observable<TokenProvisioningStatus> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/executions/{executionId}/provisioning/status',
-      path: {
-        executionId: executionId,
-      },
-    });
-  }
 }
