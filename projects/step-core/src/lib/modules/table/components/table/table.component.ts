@@ -90,7 +90,6 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: TableColumnsDictionaryService,
       useExisting: forwardRef(() => TableComponent),
     },
-    TablePersistenceStateService,
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
