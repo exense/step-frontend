@@ -33,6 +33,7 @@ export { AugmentedTimeSeriesService } from './services/augmented-time-series.ser
 export { AugmentedDashboardsService } from './services/augmented-dashboards.service';
 export { StepHttpRequestService } from './services/step-http-request.service';
 export * from './services/http-override-response-interceptor.service';
+export * from './services/http-request-context-holder.service';
 export * from './shared/pipe-operators';
 export * from './shared/keyword';
 export * from './shared/http-override-response-interceptor';

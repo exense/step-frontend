@@ -11,9 +11,16 @@ export class HttpRequestContextHolderService {
     this.requestContext = context;
   }
 
-  decorateRequestOptions<T extends Record<string, any> & { context?: HttpContext }>(options: T): T {
-    options = { ...options, context: this.requestContext };
+  decorateRequestOptions<T extends (Record<string, any> & { context?: HttpContext }) | undefined = undefined>(
+    options?: T,
+  ): T {
+    const context = this.requestContext;
     this.requestContext = undefined;
-    return options;
+
+    if (context) {
+      options = !options ? ({ context } as T) : { ...options, context };
+    }
+
+    return options!;
   }
 }

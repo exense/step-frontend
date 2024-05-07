@@ -7,8 +7,8 @@ import {
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { map, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { map, Observable, OperatorFunction } from 'rxjs';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -16,14 +16,24 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '../../table/step-table-client.module';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 
 @Injectable({ providedIn: 'root' })
-export class AugmentedExecutionsService extends ExecutionsService {
+export class AugmentedExecutionsService extends ExecutionsService implements HttpOverrideResponseInterceptor {
   static readonly EXECUTIONS_TABLE_ID = 'executions';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _tableApiWrapper = inject(TableApiWrapperService);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
+  }
 
   getExecutionsTableDataSource(): StepDataSource<Execution> {
     return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
@@ -46,7 +56,11 @@ export class AugmentedExecutionsService extends ExecutionsService {
   }
 
   override execute(requestBody?: ExecutionParameters): Observable<string> {
-    return this._httpClient.post('rest/executions/start', requestBody, { responseType: 'text' });
+    return this._httpClient.post(
+      'rest/executions/start',
+      requestBody,
+      this._requestContextHolder.decorateRequestOptions({ responseType: 'text' }),
+    );
   }
 
   /**
@@ -58,12 +72,14 @@ export class AugmentedExecutionsService extends ExecutionsService {
   public deleteExecutions(
     requestBody?: TableBulkOperationRequest,
   ): Observable<AsyncTaskStatusTableBulkOperationReport> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/housekeeping/executions/bulk',
-      body: requestBody,
-      mediaType: 'application/json',
-    });
+    return this.httpRequest.request(
+      this._requestContextHolder.decorateRequestOptions({
+        method: 'DELETE',
+        url: '/housekeeping/executions/bulk',
+        body: requestBody,
+        mediaType: 'application/json',
+      }),
+    );
   }
 
   searchByIds(executionIds: string[]): Observable<Execution[]> {
