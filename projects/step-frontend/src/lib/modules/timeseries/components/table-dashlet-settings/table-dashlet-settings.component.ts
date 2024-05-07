@@ -33,7 +33,6 @@ export class TableDashletSettingsComponent implements OnInit {
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;

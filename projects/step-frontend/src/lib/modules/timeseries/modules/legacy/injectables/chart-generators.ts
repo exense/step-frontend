@@ -102,7 +102,7 @@ export class ChartGenerators {
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'total',
+          scale: 'z',
           values: (u: unknown, vals: number[]) =>
             vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h'),
           grid: { show: false },

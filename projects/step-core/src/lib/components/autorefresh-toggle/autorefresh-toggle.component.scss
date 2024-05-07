@@ -15,6 +15,10 @@
     background: var(--main-header-bg-color, #293e50);
     color: white;
     border-radius: 6px;
+
+    &.disabled {
+      background: var.$gray-400;
+    }
   }
 }
 

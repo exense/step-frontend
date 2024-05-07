@@ -19,7 +19,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { forkJoin, Observable, Subscription, tap } from 'rxjs';
+import { forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -42,13 +42,6 @@ interface MetricAttributeSelection extends MetricAttribute {
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
-  }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
-  }
-
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
@@ -266,7 +259,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
       const s: TSChartSeries = {
         id: seriesKey,
-        scale: '1',
+        scale: 'y',
         label: seriesKey,
         labelItems: labelItems,
         legendName: seriesKey,
@@ -288,7 +281,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-        scale: '1',
+        scale: 'y',
         values: (u, vals) => {
           return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
         },
@@ -331,8 +324,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       tooltipOptions: {
         enabled: true,
         zAxisLabel: this.getSecondAxesLabel(),
-        useExecutionLinks: hasExecutionLinks,
         yAxisUnit: yAxesUnit,
+        useExecutionLinks: hasExecutionLinks,
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: axes,
@@ -402,6 +395,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           return undefined;
         }
         const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        if (entityIds.size === 0) {
+          of(undefined);
+        }
         return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             series.forEach((s, j) => {
@@ -575,5 +571,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
+  }
+
+  getType(): 'TABLE' | 'CHART' {
+    return 'CHART';
+  }
+
+  showSeries(key: string): void {
+    throw new Error('Method not implemented.');
+  }
+  hideSeries(key: string): void {
+    throw new Error('Method not implemented.');
   }
 }
