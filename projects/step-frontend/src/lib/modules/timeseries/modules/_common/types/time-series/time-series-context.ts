@@ -52,7 +52,7 @@ export class TimeSeriesContext {
    * @Deprecated
    */
   public readonly keywordsContext: TimeSeriesKeywordsContext;
-  private readonly colorsPool: TimeseriesColorsPool;
+  public readonly colorsPool: TimeseriesColorsPool;
 
   private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
 
@@ -98,6 +98,10 @@ export class TimeSeriesContext {
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
     ) as Observable<void>;
+  }
+
+  getSyncGroups(): TimeSeriesSyncGroup[] {
+    return Object.values(this.syncGroups);
   }
 
   getDashlets(): DashboardItem[] {
@@ -180,6 +184,7 @@ export class TimeSeriesContext {
   }
 
   disableCompareMode() {
+    this.compareModeChange$.getValue()?.context?.destroy();
     this.compareModeChange$.next({ enabled: false });
   }
 

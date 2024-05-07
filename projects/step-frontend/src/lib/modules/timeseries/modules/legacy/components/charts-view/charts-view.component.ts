@@ -705,7 +705,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
           },
           series: [
             {
-              scale: 'total',
+              scale: 'z',
               label: 'Total',
               labelItems: ['Total'],
               legendName: 'Total',
@@ -736,7 +736,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               side: 1,
               size: this.CHART_LEGEND_SIZE,
-              scale: 'total',
+              scale: 'z',
               values: (u, vals: number[]) =>
                 vals.map((v) =>
                   this.compareModeEnabled
