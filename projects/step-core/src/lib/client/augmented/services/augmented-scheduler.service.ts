@@ -53,12 +53,9 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
    * @throws ApiError
    */
   override executeTask(id: string): Observable<string> {
-    //@ts-ignore
-    return this._httpClient.post<any>(
-      'rest/scheduler/task/' + id + '/execute',
-      null,
-      this._requestContextHolder.decorateRequestOptions({ responseType: 'text' }),
-    );
+    const options = this._requestContextHolder.decorateRequestOptions({ responseType: 'text' })!;
+    // @ts-ignore
+    return this._httpClient.post<any>('rest/scheduler/task/' + id + '/execute', null, options);
   }
 
   isSchedulerEnabled(): Observable<boolean> {
