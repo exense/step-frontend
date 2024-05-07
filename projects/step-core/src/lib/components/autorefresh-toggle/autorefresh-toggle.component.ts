@@ -43,6 +43,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   @Input() autoIncreaseTo?: number;
   @Input() interval: number = 0;
   @Input() disabled: boolean = false;
+  @Input() buttonDisabled = false;
 
   @Output() disabledChange = new EventEmitter<boolean>();
   @Output() intervalChange = new EventEmitter<number>();

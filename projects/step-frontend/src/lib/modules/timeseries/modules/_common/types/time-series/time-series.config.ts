@@ -8,7 +8,7 @@ export class TimeSeriesConfig {
   static readonly DASHBOARD_URL_PARAMS_PREFIX = 'dc_';
   static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
 
-  static readonly SECONDARY_AXES_KEY = 'total';
+  static readonly SECONDARY_AXES_KEY = 'z';
 
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';

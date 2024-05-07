@@ -11,11 +11,19 @@ step-timeseries-chart {
     height: 400px;
   }
 
+  .u-hz {
+    width: 100%;
+  }
+
   .u-title {
     font-size: 1.4rem;
-    line-height: 2rem;
     font-weight: 600;
     color: #475467;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4rem;
+    margin-bottom: -1rem;
   }
 
   .u-legend {

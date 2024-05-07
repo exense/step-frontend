@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeRangePickerSelection } from '../../types/time-selection/time-range-picker-selection';
 import { ExecutionTimeSelection } from '../../types/time-selection/execution-time-selection';
@@ -6,6 +6,7 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
+import { TimeRange } from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -18,7 +19,7 @@ import { COMMON_IMPORTS } from '../../types/common-imports.constant';
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
-export class TimeRangePickerComponent implements OnInit {
+export class TimeRangePickerComponent implements OnInit, OnChanges {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Input() activeSelection!: TimeRangePickerSelection;
@@ -33,6 +34,7 @@ export class TimeRangePickerComponent implements OnInit {
 
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
+  readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   constructor(private _snackBar: MatSnackBar) {}
 
@@ -47,11 +49,25 @@ export class TimeRangePickerComponent implements OnInit {
         this.activeSelection = this.selectOptions[0];
       } else {
         if (this.activeSelection.type === 'ABSOLUTE') {
-          let from = this.activeSelection.absoluteSelection!.from!;
-          let to = this.activeSelection.absoluteSelection!.to!;
-          this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
-          this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
+          this.formatAbsoluteValues(this.activeSelection.absoluteSelection!);
         }
+      }
+    }
+  }
+
+  private formatAbsoluteValues(range: TimeRange) {
+    if (range) {
+      this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(range.from));
+      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(range.to));
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const selectionChange = changes['activeSelection'];
+    if (selectionChange?.previousValue !== selectionChange?.currentValue) {
+      const selection: TimeRangePickerSelection = selectionChange.currentValue;
+      if (selection.type === 'ABSOLUTE') {
+        this.formatAbsoluteValues(selection.absoluteSelection!);
       }
     }
   }
