@@ -42,8 +42,4 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
       }),
     );
   }
-
-  protected override transformFilterValueToControlValue(value: string[]): T[] {
-    return [...new Set(value.map((item) => item))] as T[];
-  }
 }
