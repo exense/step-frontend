@@ -21,6 +21,7 @@ import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { SidebarStateService } from './injectables/sidebar-state.service';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 import { ConnectionErrorInterceptor } from './interceptors/connection-error.interceptor';
+import { HttpErrorOverrideInterceptor } from './interceptors/http-error-override.interceptor';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,11 @@ import { ConnectionErrorInterceptor } from './interceptors/connection-error.inte
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorOverrideInterceptor,
       multi: true,
     },
     {

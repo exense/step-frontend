@@ -11,7 +11,6 @@ import type { FindByCriteraParam } from '../models/FindByCriteraParam';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
-import type { TokenProvisioningStatus } from '../models/TokenProvisioningStatus';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 

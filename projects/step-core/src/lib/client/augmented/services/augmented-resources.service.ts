@@ -1,18 +1,29 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
 import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
 import { uploadWithProgress } from '../shared/pipe-operators';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 
 @Injectable({ providedIn: 'root' })
-export class AugmentedResourcesService extends ResourcesService {
+export class AugmentedResourcesService extends ResourcesService implements HttpOverrideResponseInterceptor {
   static readonly RESOURCES_TABLE_ID = 'resources';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
 
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
+
   private cachedResource?: Resource;
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
+  }
 
   createDataSource(): StepDataSource<Resource> {
     return this._dataSourceFactory.createDataSource(AugmentedResourcesService.RESOURCES_TABLE_ID, {
@@ -55,20 +66,24 @@ export class AugmentedResourcesService extends ResourcesService {
 
     formData.set('file', file);
 
-    const request$ = this._httpClient.request('POST', `rest/resources${resourceId ? `/${resourceId}` : ''}/content`, {
-      body: formData,
-      params: {
-        type,
-        duplicateCheck,
-        directory,
-      },
-      headers: {
-        enctype: 'multipart/form-data',
-      },
-      observe: 'events',
-      responseType: 'arraybuffer',
-      reportProgress: true,
-    });
+    const request$ = this._httpClient.request(
+      'POST',
+      `rest/resources${resourceId ? `/${resourceId}` : ''}/content`,
+      this._requestContextHolder.decorateRequestOptions({
+        body: formData,
+        params: {
+          type,
+          duplicateCheck,
+          directory,
+        },
+        headers: {
+          enctype: 'multipart/form-data',
+        },
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
 
     const { progress$, response$: responseString$ } = uploadWithProgress(request$);
     const response$ = responseString$.pipe(
