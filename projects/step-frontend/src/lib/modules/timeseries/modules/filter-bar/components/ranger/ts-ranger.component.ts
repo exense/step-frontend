@@ -43,7 +43,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   private _doc = inject(DOCUMENT);
   private _utils = inject(UPlotUtilsService);
 
-  private readonly CHART_HEIGHT = 130;
+  private readonly CHART_HEIGHT = 104;
 
   @ViewChild('chart') private chartElement!: ElementRef;
 
@@ -95,7 +95,19 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   resizeChart() {
+    const chartPadding = 50; // this is the way uplot works
+    const fullWidth = this.uplot.width - chartPadding;
+    const leftSelect = this.uplot.select.left;
+    const width = this.uplot.select.width;
+    const rightSelect = leftSelect + width;
+    const leftPercent = (100 * leftSelect) / fullWidth;
+    const rightPercent = (100 * rightSelect) / fullWidth;
     this.uplot.setSize(this.getSize());
+    let newChartWidth = this.uplot.width - chartPadding;
+
+    const newLeft = (leftPercent / 100) * newChartWidth;
+    const newRight = (rightPercent / 100) * newChartWidth;
+    this.uplot.setSelect({ left: newLeft, width: newRight - newLeft, top: 0, height: this.CHART_HEIGHT }, false);
   }
 
   init(settings: TSRangerSettings) {

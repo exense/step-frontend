@@ -484,7 +484,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
     if (compareChart) {
       this.compareChartsSettings[type] = newChartSettings;
     } else {
-      newChartSettings.showExecutionsLinks = this.settings.displayTooltipLinks;
+      newChartSettings.tooltipOptions.useExecutionLinks = this.settings.displayTooltipLinks;
       this.currentChartsSettings[type] = newChartSettings;
     }
   }
@@ -698,14 +698,14 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const throughputChartSettings: TSChartSettings = {
           title: 'Throughput',
           xValues: timeLabels,
-          showExecutionsLinks: this.settings.displayTooltipLinks,
           tooltipOptions: {
             enabled: true,
+            useExecutionLinks: this.settings.displayTooltipLinks,
             zAxisLabel: throughputMetric.tooltipZAxisLabel,
           },
           series: [
             {
-              scale: 'total',
+              scale: 'z',
               label: 'Total',
               labelItems: ['Total'],
               legendName: 'Total',
@@ -736,7 +736,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
             {
               side: 1,
               size: this.CHART_LEGEND_SIZE,
-              scale: 'total',
+              scale: 'z',
               values: (u, vals: number[]) =>
                 vals.map((v) =>
                   this.compareModeEnabled
@@ -750,10 +750,10 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
           xValues: timeLabels,
-          showExecutionsLinks: this.settings.displayTooltipLinks,
           series: responseTimeSeries,
           tooltipOptions: {
             enabled: true,
+            useExecutionLinks: this.settings.displayTooltipLinks,
             yAxisUnit: ' ms',
           },
           axes: [

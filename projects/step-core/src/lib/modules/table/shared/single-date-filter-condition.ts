@@ -15,7 +15,7 @@ export class SingleDateFilterCondition extends FilterCondition<DateTime> {
     return !this.sourceObject;
   }
 
-  override toRequestFilter(field: string): Array<TableRequestFilter | undefined> {
+  override toRequestFilterInternal(field: string): Array<TableRequestFilter | undefined> {
     if (!this.sourceObject) {
       return [];
     }

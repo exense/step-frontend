@@ -41,7 +41,7 @@ export class ArtefactsFactoryService {
         );
       }),
       switchMap(({ artefact, keyword }) => {
-        const inputs$ = this._screenTemplates.getInputsForScreenPost('functionTable');
+        const inputs$ = this._screenTemplates.getInputsForScreenPost('keyword');
         return inputs$.pipe(
           map((inputs) => {
             const functionAttributes = inputs.reduce(

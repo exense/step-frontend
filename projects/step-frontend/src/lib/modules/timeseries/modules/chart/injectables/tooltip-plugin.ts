@@ -16,8 +16,11 @@ export class TooltipPlugin {
   private win = this._doc.defaultView!;
   private _executionsService = inject(ExecutionsService);
 
+  /**
+   * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
+   */
   createPlugin(ref: TooltipParentContainer): uPlot.Plugin {
-    const showExecutionsLinks = ref.settings.showExecutionsLinks;
+    const showExecutionsLinks = ref.settings.tooltipOptions?.useExecutionLinks;
     let chart: uPlot;
     let over: HTMLDivElement;
     let bound: Element;
@@ -39,11 +42,7 @@ export class TooltipPlugin {
       tooltip.style.display = 'block';
     };
 
-    const tooltip = this.createElementWithClass('div', 'ts-tooltip');
-    tooltip.id = 'tooltip';
-    tooltip.classList.add('ts-tooltip');
-    tooltip.style.display = 'none';
-    tooltip.style.position = 'absolute';
+    const tooltip = this.createTooltipElement();
     this._doc.body.appendChild(tooltip);
 
     let openMenu: Element | undefined;
@@ -51,51 +50,6 @@ export class TooltipPlugin {
     tooltip.addEventListener('click', () => {
       openMenu?.remove();
     });
-
-    const createExecutionsMenu = (event: MouseEvent, tooltipContainer: HTMLElement, executionIds: string[]) => {
-      const menu = this.createElementWithClass('div', 'tooltip-menu');
-      menu.innerText = 'Loading...';
-      const tooltipBounds = tooltipContainer.getBoundingClientRect();
-      let computedLeft = event.clientX - tooltipBounds.left + 16;
-      const computedTop = event.clientY - tooltipBounds.top + 4;
-      const estimatedWidthOfExecutionLabel = 150;
-      if (event.clientX + 16 + estimatedWidthOfExecutionLabel > this.win.innerWidth) {
-        computedLeft -= estimatedWidthOfExecutionLabel;
-      }
-      menu.style.left = computedLeft + 'px';
-      menu.style.top = computedTop + 'px';
-      this._executionsService.getExecutionsByIds(executionIds).subscribe((executions) => {
-        menu.innerText = '';
-        executions.forEach((ex) => {
-          const row = this.createElementWithClass('div', 'link-row');
-          row.setAttribute('title', 'Show executions');
-          row.innerText = `${ex.description!} (${new Date(ex.startTime!).toLocaleString()})`;
-          row.addEventListener('click', () => {
-            this.win.open(getExecutionLink(ex.id!));
-          });
-          menu.appendChild(row);
-        });
-        let menuRightBound = menu.getBoundingClientRect().right;
-        if (menuRightBound > this.win.innerWidth) {
-          menu.style.left = computedLeft - (menuRightBound - this.win.innerWidth) - 16 + 'px';
-        }
-      });
-
-      return menu;
-    };
-
-    const createRowLeftSection = (row: TooltipRowEntry) => {
-      const leftContainer = this.createElementWithClass('div', 'left');
-      const nameDiv = this.createElementWithClass('div', 'name');
-      nameDiv.textContent = `${row.name} `;
-      if (row.color) {
-        const colorDiv = this.createElementWithClass('div', 'color');
-        colorDiv.style.backgroundColor = row.color;
-        leftContainer.appendChild(colorDiv);
-      }
-      leftContainer.appendChild(nameDiv);
-      return leftContainer;
-    };
 
     const createRowRightSection = (row: TooltipRowEntry, yScaleUnit?: string) => {
       const rightContainer = this.createElementWithClass('div', 'right');
@@ -116,7 +70,7 @@ export class TooltipPlugin {
             openMenu.remove();
             openMenu = undefined;
           }
-          openMenu = createExecutionsMenu(event, tooltip, row.executions!);
+          openMenu = this.createExecutionsMenu(event, tooltip, row.executions!);
           tooltip.appendChild(openMenu);
         });
       }
@@ -129,20 +83,13 @@ export class TooltipPlugin {
       if (row.bold) {
         rowElement.setAttribute('style', 'font-weight: bold');
       }
-      const leftContainer = createRowLeftSection(row);
+      const leftContainer = this.createRowLeftSection(row);
       const rightContainer = createRowRightSection(row, yScaleUnit);
 
       rowElement.appendChild(leftContainer);
       rowElement.appendChild(rightContainer);
 
       return rowElement;
-    };
-
-    const createDotsSeparator = () => {
-      const dots = this._doc.createElement('div');
-      dots.classList.add('dots');
-      dots.textContent = '...';
-      return dots;
     };
 
     const chartIsLocked = () => {
@@ -162,6 +109,8 @@ export class TooltipPlugin {
 
           bound = over;
 
+          // since the charts are synchronized, the events are called in each chart, so it's difficult to know if we're
+          // hovering on one or on the other, so the following events keep track of the active chart.
           over.onclick = () => {
             // @ts-ignore
             const lockState = u.cursor._lock;
@@ -189,6 +138,7 @@ export class TooltipPlugin {
         setSize: (u: uPlot) => {
           syncBounds();
         },
+        // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
           // this is called for all linked charts
           if (chartIsLocked()) {
@@ -198,7 +148,7 @@ export class TooltipPlugin {
               // the cursor is moving on another chart
               hideTooltip();
             } else {
-              tooltip.style.display = 'block';
+              showTooltip();
             }
           }
           if (!cursorIsOnChartArea) {
@@ -214,12 +164,13 @@ export class TooltipPlugin {
           const hoveredValue = u.posToVal(top, 'y');
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
+          // first series is x axis (time)
           for (let i = 1; i < u.series.length; i++) {
             const series = u.series[i];
             const bucketValue = u.data[i][idx];
-            if (series.scale === 'y' && series.show) {
+            if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY && series.show) {
               if (bucketValue != undefined) {
-                const executionIds = ref.chartMetadata[i]?.[idx]?.['eId'];
+                const executionIds = ref.chartMetadata[i]?.[idx]?.[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
                 yPoints.push({
                   value: bucketValue,
                   name: series.label || '',
@@ -230,7 +181,7 @@ export class TooltipPlugin {
               }
               continue;
             }
-            if (series.scale === 'total' && bucketValue != null) {
+            if (series.scale === TimeSeriesConfig.SECONDARY_AXES_KEY && bucketValue != null) {
               summaryRow = {
                 value: bucketValue,
                 color: TimeSeriesConfig.TOTAL_BARS_COLOR,
@@ -271,10 +222,10 @@ export class TooltipPlugin {
           });
           if (yPoints.length < allSeriesLength) {
             if (elipsisBefore) {
-              tooltip.prepend(createDotsSeparator());
+              tooltip.prepend(this.createDotsSeparator());
             }
             if (elipsisAfter) {
-              tooltip.appendChild(createDotsSeparator());
+              tooltip.appendChild(this.createDotsSeparator());
             }
           }
           if (summaryRow) {
@@ -298,6 +249,60 @@ export class TooltipPlugin {
         },
       },
     };
+  }
+
+  private createTooltipElement() {
+    const tooltip = this.createElementWithClass('div', 'ts-tooltip');
+    tooltip.id = 'tooltip';
+    tooltip.classList.add('ts-tooltip');
+    tooltip.style.display = 'none';
+    tooltip.style.position = 'absolute';
+    return tooltip;
+  }
+
+  private createExecutionsMenu = (event: MouseEvent, tooltipContainer: HTMLElement, executionIds: string[]) => {
+    const menu = this.createElementWithClass('div', 'tooltip-menu');
+    menu.innerText = 'Loading...';
+    const tooltipBounds = tooltipContainer.getBoundingClientRect();
+    let computedLeft = event.clientX - tooltipBounds.left + 16;
+    const computedTop = event.clientY - tooltipBounds.top + 4;
+    const estimatedWidthOfExecutionLabel = 150;
+    if (event.clientX + 16 + estimatedWidthOfExecutionLabel > this.win.innerWidth) {
+      computedLeft -= estimatedWidthOfExecutionLabel;
+    }
+    menu.style.left = computedLeft + 'px';
+    menu.style.top = computedTop + 'px';
+    this._executionsService.getExecutionsByIds(executionIds).subscribe((executions) => {
+      menu.innerText = '';
+      executions.forEach((ex) => {
+        const row = this.createElementWithClass('div', 'link-row');
+        row.setAttribute('title', 'Show executions');
+        row.innerText = `${ex.description!} (${new Date(ex.startTime!).toLocaleString()})`;
+        row.addEventListener('click', () => {
+          this.win.open(getExecutionLink(ex.id!));
+        });
+        menu.appendChild(row);
+      });
+      let menuRightBound = menu.getBoundingClientRect().right;
+      if (menuRightBound > this.win.innerWidth) {
+        menu.style.left = computedLeft - (menuRightBound - this.win.innerWidth) - 16 + 'px';
+      }
+    });
+
+    return menu;
+  };
+
+  private createRowLeftSection(row: TooltipRowEntry) {
+    const leftContainer = this.createElementWithClass('div', 'left');
+    const nameDiv = this.createElementWithClass('div', 'name');
+    nameDiv.textContent = `${row.name} `;
+    if (row.color) {
+      const colorDiv = this.createElementWithClass('div', 'color');
+      colorDiv.style.backgroundColor = row.color;
+      leftContainer.appendChild(colorDiv);
+    }
+    leftContainer.appendChild(nameDiv);
+    return leftContainer;
   }
 
   private createSeparator(): HTMLDivElement {
@@ -341,6 +346,7 @@ export class TooltipPlugin {
     let index = 0;
     for (let val = 0; val < arr.length; val++) {
       let newdiff = Math.abs(num - arr[val].value);
+
       if (newdiff < diff) {
         diff = newdiff;
         curr = arr[val];
@@ -354,6 +360,13 @@ export class TooltipPlugin {
     const dom = this._doc.createElement(element);
     dom.classList.add(className);
     return dom;
+  }
+
+  private createDotsSeparator() {
+    const dots = this._doc.createElement('div');
+    dots.classList.add('dots');
+    dots.textContent = '...';
+    return dots;
   }
 }
 

@@ -68,7 +68,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
-
   @Input() timeRangeOptions!: TimeRangePickerSelection[];
   @Input() activeTimeRange!: TimeRangePickerSelection;
   @Input() editMode = false;
@@ -281,7 +280,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
       this.activeTimeRange = { type: 'ABSOLUTE', absoluteSelection: newRange };
-      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: false });
+      this.timeRangeChange.next({ selection: this.activeTimeRange, triggerRefresh: true });
     }
     this.emitFilterChange$.next();
   }
@@ -300,6 +299,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
           max = execution.endTime;
         }
       } else {
+        console.error('Execution entities not found in the filters');
         allExecutionsAreKnown = false;
       }
     });
@@ -308,6 +308,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       let fullTimeRange = this.context.getFullTimeRange();
       min = Math.min(fullTimeRange.from!, min);
       max = Math.max(fullTimeRange.to!, max);
+    }
+    if (!max) {
+      max = new Date().getTime();
     }
     return { from: min, to: max };
   }

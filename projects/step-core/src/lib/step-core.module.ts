@@ -21,7 +21,6 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
-import { InputModelFormatterDirective } from './directives/input-model-formatter.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
@@ -69,6 +68,8 @@ import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
 import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
+import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
+import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 
 @NgModule({
   declarations: [
@@ -94,7 +95,6 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     RecursiveTabIndexDirective,
     ReferenceArtefactNameComponent,
     PlanNameComponent,
-    InputModelFormatterDirective,
     PredefinedOptionsInputComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
@@ -139,6 +139,8 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     DRAG_DROP_EXPORTS,
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
+    RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -179,7 +181,6 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     PlanNameComponent,
-    InputModelFormatterDirective,
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     ArtefactDetailsComponent,
@@ -204,6 +205,8 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
     DashboardNavigationParamsPipe,
+    RICH_EDITOR_EXPORTS,
+    MULTI_LEVEL_SELECT_EXPORTS,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -263,13 +266,12 @@ export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
-export * from './directives/input-model-formatter.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';
 export * from './domain';
-export * from './guards/check-project-guard.factory';
+export * from './guards/check-entity-guard.factory';
 export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
@@ -330,3 +332,5 @@ export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
+export * from './modules/rich-editor';
+export * from './modules/multi-level-select';

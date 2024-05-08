@@ -32,7 +32,7 @@ export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, 
 
   readonly artefactClass = 'CallPlan';
 
-  readonly attributesScreenId = 'planTable';
+  readonly attributesScreenId = 'plan';
 
   readonly captions = PLAN_CAPTIONS;
 

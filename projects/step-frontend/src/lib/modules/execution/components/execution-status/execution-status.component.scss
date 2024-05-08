@@ -1,0 +1,19 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin status($status, $color) {
+  .step-#{$status} {
+    background: $color;
+    color: var.$white;
+  }
+}
+
+step-execution-status {
+  .status {
+    @include core.status-shape();
+  }
+
+  @each $status, $color in var.$statuses {
+    @include status($status, $color);
+  }
+}

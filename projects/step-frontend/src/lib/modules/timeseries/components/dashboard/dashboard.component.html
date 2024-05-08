@@ -1,16 +1,8 @@
 @if (dashboard) {
   <div class="page-container">
     <div class="header-container">
-      <div class="left-section">
-        <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="mainMenu" mat-raised-button>
-          <step-icon name="settings" />
-          Settings
-        </button>
-        <step-autorefresh-toggle
-          [interval]="refreshInterval"
-          (refresh)="triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
+      <div>
+        <div class="dashboard-name">{{ dashboard.name }}</div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -18,6 +10,10 @@
               <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
             </div>
           </mat-menu>
+          <button mat-menu-item (click)="toggleCompareMode()" [disabled]="editMode">
+            <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
+            {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
+          </button>
           <button mat-menu-item (click)="exportRawData()">
             <step-icon name="download" />
             <span>Export Raw Measurements</span>
@@ -25,6 +21,21 @@
         </mat-menu>
       </div>
       <div class="header-buttons-container">
+        <button
+          class="menu-btn grey-border"
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="mainMenu"
+          mat-icon-button
+        >
+          <step-icon name="settings" />
+        </button>
+        <step-autorefresh-toggle
+          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
+          [buttonDisabled]="compareModeEnabled"
+          [interval]="refreshInterval"
+          (refresh)="mainEngine.triggerRefresh()"
+          (intervalChange)="handleRefreshIntervalChange($event)"
+        />
         @if (hasWritePermission) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
@@ -35,66 +46,122 @@
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
             <step-form-field>
-              <input type="text" [(ngModel)]="dashboard.name" />
+              <input type="text" class="name-input" [(ngModel)]="dashboard.name" />
             </step-form-field>
           } @else {
-            <button
-              mat-button
-              mat-flat-button
-              color="primary"
-              [disabled]="!('dashboard-write' | hasRight | async)"
-              (click)="enableEditMode()"
-            >
-              Edit
-            </button>
-            <span class="dashboard-name">{{ dashboard.name }}</span>
+            <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
+              <button
+                mat-button
+                mat-flat-button
+                color="primary"
+                [disabled]="!('dashboard-write' | hasRight | async) || compareModeEnabled"
+                (click)="enableEditMode()"
+              >
+                Edit
+              </button>
+            </div>
           }
-        } @else {
-          <span class="dashboard-name">{{ dashboard.name }}</span>
         }
       </div>
     </div>
 
-    <div>
-      @if (context) {
-        <step-ts-dashboard-filter-bar
-          [editMode]="editMode"
-          [context]="context"
-          (timeRangeChange)="handleTimeRangeChange($event)"
-          [timeRangeOptions]="timeRangeOptions"
-          [activeTimeRange]="timeRangeSelection"
-          [compactView]="compareModeEnabled"
-        />
+    <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
+      @if (mainEngine) {
+        <div style="flex-grow: 1; flex-basis: 0">
+          <step-ts-dashboard-filter-bar
+            #filterBar
+            [editMode]="editMode"
+            [context]="mainEngine.state.context"
+            (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
+            [timeRangeOptions]="timeRangeOptions"
+            [activeTimeRange]="mainEngine.state.timeRangeSelection"
+            [compactView]="compareModeEnabled"
+          />
+        </div>
+        @if (compareModeEnabled) {
+          <div style="flex-grow: 1; flex-basis: 0">
+            <step-ts-dashboard-filter-bar
+              #compareFilterBar
+              [editMode]="editMode"
+              [context]="compareEngine!.state.context"
+              (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
+              [timeRangeOptions]="timeRangeOptions"
+              [activeTimeRange]="compareEngine!.state.timeRangeSelection"
+              [compactView]="compareModeEnabled"
+            />
+          </div>
+        }
       }
     </div>
 
     <div class="dashlet-container">
       @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
-        <div class="dashlet" [class.size-full]="dashlet.size === 2">
-          <step-chart-dashlet
-            [editMode]="editMode"
-            [item]="dashlet"
-            [context]="context"
-            [height]="DASHLET_HEIGHT"
-            (remove)="handleChartDelete(i)"
-            (shiftLeft)="handleChartShiftLeft(i)"
-            (shiftRight)="handleChartShiftRight(i)"
-          />
-        </div>
+        @if (dashlet.type === 'CHART') {
+          <div class="dashlet" [class.size-full]="!compareModeEnabled && dashlet.size === 2">
+            <step-chart-dashlet
+              #chart
+              [editMode]="editMode"
+              [item]="dashlet"
+              [context]="mainEngine.state.context"
+              [height]="DASHLET_HEIGHT"
+              (remove)="handleChartDelete(i)"
+              (shiftLeft)="handleChartShiftLeft(i)"
+              (shiftRight)="handleChartShiftRight(i)"
+            />
+          </div>
+          @if (compareModeEnabled) {
+            <div class="dashlet">
+              <div class="compare-mode-tag">Compare</div>
+              <step-chart-dashlet
+                #compareChart
+                [editMode]="editMode"
+                [item]="dashlet"
+                [context]="compareEngine!.state.context"
+                [height]="DASHLET_HEIGHT"
+                (remove)="handleChartDelete(i)"
+                (shiftLeft)="handleChartShiftLeft(i)"
+                (shiftRight)="handleChartShiftRight(i)"
+              />
+            </div>
+          }
+        } @else if (dashlet.type === 'TABLE') {
+          <div class="dashlet" [class.size-full]="compareModeEnabled || dashlet.size === 2">
+            <step-table-dashlet
+              #chart
+              [item]="dashlet"
+              [context]="mainEngine.state.context"
+              [editMode]="editMode"
+              (remove)="handleChartDelete(i)"
+              (shiftLeft)="handleChartShiftLeft(i)"
+              (shiftRight)="handleChartShiftRight(i)"
+            />
+          </div>
+        }
       }
       @if (!editMode && !dashboard.dashlets.length) {
         <div class="no-charts-message size-full">Dashboard has no charts.</div>
       }
       @if (editMode && metricTypes) {
-        <div class="add-dashlet-container size-full" [style.height.px]="DASHLET_HEIGHT">
-          <div [matMenuTriggerFor]="menu">
+        <div class="add-dashlet-container" [style.height.px]="DASHLET_HEIGHT">
+          <div [matMenuTriggerFor]="dashletsMenu">
             <button mat-raised-button color="primary">
               <step-icon name="plus" />
-              Add Chart
+              Add Dashlet
             </button>
-            <mat-menu #menu="matMenu">
+            <mat-menu #dashletsMenu="matMenu">
+              <button mat-menu-item [matMenuTriggerFor]="chartMetrics">Chart</button>
+              <button mat-menu-item [matMenuTriggerFor]="tableMetrics">Table</button>
+            </mat-menu>
+            <mat-menu #chartMetrics="matMenu">
               @for (metric of metricTypes; track metric.name) {
-                <button mat-menu-item (click)="addDashlet(metric)">
+                <button mat-menu-item (click)="addChartDashlet(metric)">
+                  {{ metric.displayName }}
+                </button>
+              }
+            </mat-menu>
+            <mat-menu #tableMetrics="matMenu">
+              @for (metric of metricTypes; track metric.name) {
+                <button mat-menu-item (click)="addTableDashlet(metric)">
                   {{ metric.displayName }}
                 </button>
               }

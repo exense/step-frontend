@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .active {
   background-color: #eeeeee;
 }
@@ -13,5 +15,14 @@
     background: var(--main-header-bg-color, #293e50);
     color: white;
     border-radius: 6px;
+
+    &.disabled {
+      background: var.$gray-400;
+    }
   }
+}
+
+.refresh-btn {
+  border: 1px solid var.$gray-300;
+  z-index: 1000;
 }

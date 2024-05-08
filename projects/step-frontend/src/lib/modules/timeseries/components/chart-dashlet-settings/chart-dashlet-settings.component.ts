@@ -1,13 +1,20 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { AggregatorType, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import { DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
-import { COMMON_IMPORTS, FilterBarItem, FilterBarItemType, FilterUtils } from '../../modules/_common';
+import {
+  COMMON_IMPORTS,
+  FilterBarItem,
+  FilterBarItemType,
+  FilterUtils,
+  TimeSeriesContext,
+} from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
+  context: TimeSeriesContext;
 }
 
 @Component({
@@ -46,10 +53,17 @@ export class ChartDashletSettingsComponent implements OnInit {
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
 
+  tableDashlets: DashboardItem[] = [];
+  masterDashlet?: DashboardItem;
+
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
-    this.item.chartSettings!.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
-    this.filterItems = this.item.chartSettings!.filters.map((item) => {
+    this.tableDashlets = this._inputData.context.getDashlets().filter((i) => i.type === 'TABLE');
+    if (this.item.masterChartId) {
+      this.masterDashlet = this.tableDashlets.find((d) => d.id === this.item.masterChartId);
+    }
+    this.item.attributes.forEach((attr) => (this._attributesByKey[attr.name] = attr));
+    this.filterItems = this.item.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
@@ -57,10 +71,6 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   private fetchMetricTypes() {
     this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
-  }
-
-  setPclValue(pclValue: number) {
-    this.item.chartSettings!.primaryAxes!.pclValue = pclValue;
   }
 
   onSecondaryAggregateSelect(aggregation: ChartAggregation) {
@@ -72,6 +82,7 @@ export class ChartDashletSettingsComponent implements OnInit {
         unit: '',
         displayType: 'BAR_CHART',
         pclValue: this.PCL_VALUES[0],
+        colorizationType: 'STROKE',
       };
     }
   }
@@ -97,10 +108,8 @@ export class ChartDashletSettingsComponent implements OnInit {
       this.formContainer.form.markAllAsTouched();
       return;
     }
-    this.item.chartSettings!.filters = this.filterItems
-      .filter(FilterUtils.filterItemIsValid)
-      .map(FilterUtils.convertToApiFilterItem);
-    this.item.chartSettings!.attributes = this.item.chartSettings!.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
+    this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
+    this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close({ ...this.item });
   }
 

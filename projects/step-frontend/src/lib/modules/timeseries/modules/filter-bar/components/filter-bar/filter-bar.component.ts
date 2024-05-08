@@ -141,7 +141,7 @@ export class FilterBarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const filterOptions = changes['filterOptions'].currentValue;
+    const filterOptions = changes['filterOptions']?.currentValue;
     if (filterOptions) {
       this.collectUnusedFilterOptions();
     }

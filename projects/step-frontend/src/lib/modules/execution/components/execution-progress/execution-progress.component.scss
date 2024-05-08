@@ -21,3 +21,15 @@ as-split {
 .small-screen {
   width: fit-content;
 }
+
+.auto-scaling-status {
+  display: grid;
+  grid-template-columns: 15rem auto;
+  column-gap: 1rem;
+  row-gap: 1rem;
+  align-items: center;
+}
+
+step-autorefresh-toggle {
+  margin-top: 0.5rem;
+}

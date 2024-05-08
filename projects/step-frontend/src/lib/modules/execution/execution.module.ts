@@ -36,6 +36,7 @@ import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
 import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
+import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -74,6 +75,7 @@ import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-e
     ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
+    ExecutionStatusComponent,
     AltExecutionsComponent,
     AltExecutionsComponent,
     AltExecutionProgressComponent,

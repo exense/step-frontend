@@ -6,6 +6,7 @@ import {
   DialogParentService,
   selectionCollectionProvider,
   STORE_ALL,
+  tableColumnsConfigProvider,
   TableComponent,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
@@ -20,6 +21,9 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './automation-packages-list.component.html',
   styleUrls: ['./automation-packages-list.component.scss'],
   providers: [
+    tableColumnsConfigProvider({
+      entityTableRemoteId: AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID,
+    }),
     tablePersistenceConfigProvider('automationPackagesList', STORE_ALL),
     selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {

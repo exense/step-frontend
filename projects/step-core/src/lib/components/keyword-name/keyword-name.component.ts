@@ -45,7 +45,7 @@ export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFun
 
   readonly artefactClass = 'CallKeyword';
 
-  readonly attributesScreenId = 'functionTable';
+  readonly attributesScreenId = 'keyword';
 
   readonly captions = KEYWORD_CAPTIONS;
 

@@ -49,7 +49,7 @@ export class KeywordCallsComponent implements OnInit {
 
   ngOnInit(): void {
     this._screenApiService
-      .getInputsForScreenPost('functionTable')
+      .getInputsForScreenPost('keyword')
       .pipe(
         map((inputs) => inputs.map((input) => input?.id || '').filter((id) => !!id)),
         catchError((err) => {

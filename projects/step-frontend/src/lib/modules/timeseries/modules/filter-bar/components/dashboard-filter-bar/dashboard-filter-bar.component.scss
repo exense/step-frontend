@@ -5,20 +5,22 @@ step-ts-dashboard-filter-bar {
   display: flex;
   flex-direction: column;
   padding: 1.6rem 0.1rem;
-  gap: 2.4rem;
 
   .ranger-section {
-    margin: 0 4rem;
+    margin: 0 1rem 0 2rem;
+    flex-grow: 1;
   }
 
   .time-container {
     display: flex;
-    flex-direction: column;
-    margin-top: 1.2rem;
+    flex-direction: row;
     gap: 1.6rem;
+    justify-content: space-between;
 
     step-time-range-picker {
-      align-self: flex-end;
+      button {
+        margin-top: 1rem;
+      }
     }
   }
 
@@ -80,6 +82,7 @@ step-ts-dashboard-filter-bar {
   .more-btn {
     @include core.button-round;
     min-width: 9rem;
+    border: 1px solid var.$gray-300 !important;
   }
 
   .more-applied-filters {
@@ -114,10 +117,14 @@ step-ts-dashboard-filter-bar {
         margin: 0 !important;
       }
       a.mdc-tab {
-        height: 3.6rem !important;
+        height: 3rem !important;
         min-width: 4rem !important;
         margin: 0 !important;
       }
     }
   }
+}
+
+button {
+  box-shadow: none !important;
 }

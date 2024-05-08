@@ -1,22 +1,29 @@
-import { Directive, Optional, Self } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import { MatColumnDef } from '@angular/material/table';
 import { Observable, of } from 'rxjs';
 import { SearchColDirective } from './search-col.directive';
 import { CustomColumnsBaseComponent } from '../components/custom-columns/custom-columns-base.component';
+import { ActivityColDirective } from './activity-col.directive';
+import { ColumnInfo } from '../types/column-info';
+import { ActionColDirective } from './action-col.directive';
 
 @Directive({
   selector:
     '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container,step-lock-column-container',
 })
 export class ColumnDirective {
-  constructor(
-    @Self() @Optional() private _matColumnDef?: MatColumnDef,
-    @Self() @Optional() private _customColumns?: CustomColumnsBaseComponent,
-    @Self() @Optional() private _searchColumn?: SearchColDirective
-  ) {}
+  private _matColumnDef = inject(MatColumnDef, { self: true, optional: true });
+  private _customColumns = inject(CustomColumnsBaseComponent, { self: true, optional: true });
+  private _searchColumn = inject(SearchColDirective, { self: true, optional: true });
+  private _colLabel = inject(ActivityColDirective, { self: true, optional: true });
+  private _actionCol = inject(ActionColDirective, { self: true, optional: true });
 
   get isCustom(): boolean {
     return !!this._customColumns;
+  }
+
+  get isActionColumn(): boolean {
+    return !!this._actionCol;
   }
 
   get ready$(): Observable<unknown> {
@@ -33,5 +40,12 @@ export class ColumnDirective {
       : this._customColumns!.searchColDef?.map((x) => x) ?? [];
 
     return searchCols.filter((col) => !col.isSearchDisabled);
+  }
+
+  get columnInfos(): ColumnInfo[] {
+    if (!this.isCustom) {
+      return [this._colLabel?.columnInfo()!].filter((item) => !!item);
+    }
+    return (this._customColumns?.colDefLabel ?? []).map((item) => item.columnInfo()).filter((item) => !!item);
   }
 }

@@ -66,7 +66,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
           return of(result);
         }
         return this._asyncOperationService.performOperation(optionsPerform);
-      })
+      }),
     );
   }
 
@@ -125,7 +125,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
   }
 
   private createErrorMessageHandler(
-    config: BulkOperationConfig<ID>
+    config: BulkOperationConfig<ID>,
   ): (errorOrReulst: Error | AsyncTaskStatus) => string {
     return (errorOrResult) => {
       if (!(errorOrResult instanceof Error) && errorOrResult.error) {
@@ -139,9 +139,21 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
   private createSuccessMessageHandler(config: BulkOperationConfig<ID>): (result?: AsyncTaskStatus) => SafeHtml {
     return (result) => {
       const count = result?.result?.count;
-      const message = count
-        ? `Bulk operation ${config.operationInfo.type} for ${count} item(s) completed`
-        : `Bulk operation ${config.operationInfo.type} for selected items completed`;
+      const skipped = result?.result?.skipped;
+      const failed = result?.result?.failed;
+
+      let message =
+        count || count === 0
+          ? `Bulk operation ${config.operationInfo.type} for ${count} item(s) completed.`
+          : `Bulk operation ${config.operationInfo.type} for selected items completed.`;
+
+      if (skipped) {
+        message += ` ${skipped} item(s) have been skipped.`;
+      }
+
+      if (failed) {
+        message += ` ${failed} item(s) have failed.`;
+      }
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
   }

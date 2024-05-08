@@ -1,0 +1,117 @@
+<step-modal-window title="Chart settings" [stepZIndex]="1000">
+  <div step-modal-window-body>
+    <form #formContainer="ngForm">
+      @if (item) {
+        <div class="form-row">
+          <step-form-field [showRequiredMarker]="true">
+            <step-label>Name</step-label>
+            <input placeholder="Dashlet name" [(ngModel)]="item.name" name="name" required />
+          </step-form-field>
+        </div>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Type</step-label>
+            <input disabled placeholder="Type" [value]="item.type" name="type" />
+          </step-form-field>
+
+          <step-form-field>
+            <step-label>Metric</step-label>
+            <input disabled placeholder="Metric" [value]="item.metricKey" name="metricKey" />
+          </step-form-field>
+        </div>
+        <mat-divider />
+        <div>
+          <step-label>Filters and grouping</step-label>
+        </div>
+        <div class="filters-container">
+          @for (item of filterItems; track item; let i = $index) {
+            <step-ts-filter-bar-item
+              [item]="item"
+              (removeItem)="filterItems.splice(i, 1)"
+              [removable]="true"
+              [updateTimeRangeOption]="false"
+            />
+          }
+          <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
+        </div>
+        <mat-menu #typesMenu="matMenu">
+          @for (attribute of item.attributes; track attribute.name) {
+            <button mat-menu-item (click)="addFilterItem(attribute)">
+              {{ attribute.displayName }}
+            </button>
+          }
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
+        </mat-menu>
+        <div class="form-row">
+          <div>
+            <step-form-field>
+              <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalFilters" name="inheritGlobalFilters">
+                <span>Inherit global filters</span>
+                <step-icon
+                  class="help-icon"
+                  matTooltip="The chart filters will be combined with the dashboard filters"
+                  name="help-circle"
+                ></step-icon>
+              </mat-checkbox>
+            </step-form-field>
+            <step-form-field>
+              <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalGrouping" name="inheritGlobalGrouping">
+                <span>Inherit global grouping</span>
+                <step-icon
+                  class="help-icon"
+                  matTooltip="The grouping will be inherited from the dashboard level"
+                  name="help-circle"
+                ></step-icon>
+              </mat-checkbox>
+            </step-form-field>
+          </div>
+          <div></div>
+        </div>
+
+        @if (!item.inheritGlobalGrouping) {
+          <step-form-field>
+            <step-label>Grouping</step-label>
+            <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+              @for (attr of item.attributes; track attr.name) {
+                <mat-option [value]="attr.name">{{ attr.displayName }}</mat-option>
+              }
+            </mat-select>
+          </step-form-field>
+        }
+        <mat-divider />
+        <step-label>Columns</step-label>
+        <div class="columns-container">
+          @for (column of item.tableSettings!.columns; track column.column) {
+            <mat-checkbox
+              color="primary"
+              [(ngModel)]="column.selected"
+              [ngModelOptions]="{ standalone: true }"
+              class="item"
+            >
+              <span>{{ column.column }}</span>
+            </mat-checkbox>
+          }
+        </div>
+        <mat-divider />
+        <step-label>Visual settings</step-label>
+        <div class="form-row">
+          <step-form-field>
+            <step-label>Chart width</step-label>
+            <mat-select [(ngModel)]="item.size" name="size">
+              <mat-option [value]="1">50%</mat-option>
+              <mat-option [value]="2">100%</mat-option>
+            </mat-select>
+          </step-form-field>
+          <div></div>
+        </div>
+      }
+    </form>
+  </div>
+
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" (click)="save()" mat-flat-button color="primary">Apply</button>
+  </div>
+</step-modal-window>

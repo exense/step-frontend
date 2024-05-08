@@ -14,7 +14,20 @@ import {
   PlanContextApiService,
   PlanContext,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, first, map, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  first,
+  forkJoin,
+  map,
+  merge,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -76,23 +89,25 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     });
   }
 
-  addFunction(keywordId: string): void {
+  addKeywords(keywordIds: string[]): void {
     if (this._treeState.isMultipleNodesSelected()) {
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
-    this._artefactsFactory.createCallKeywordArtefact(keywordId).subscribe((artefact) => {
-      this._treeState.addChildrenToSelectedNode(artefact);
+    const artefactsCreation = keywordIds.map((id) => this._artefactsFactory.createCallKeywordArtefact(id));
+    forkJoin(artefactsCreation).subscribe((artefacts) => {
+      this._treeState.addChildrenToSelectedNode(...artefacts);
     });
   }
 
-  addPlan(planId: string): void {
+  addPlans(planIds: string[]): void {
     if (this._treeState.isMultipleNodesSelected()) {
       this._dialogs.showErrorMsg(MESSAGE_ADD_AT_MULTIPLE_NODES).subscribe();
       return;
     }
-    this._artefactsFactory.createCallPlanArtefact(planId).subscribe((artefact) => {
-      this._treeState.addChildrenToSelectedNode(artefact);
+    const artefactsCreation = planIds.map((id) => this._artefactsFactory.createCallPlanArtefact(id));
+    forkJoin(artefactsCreation).subscribe((artefacts) => {
+      this._treeState.addChildrenToSelectedNode(...artefacts);
     });
   }
 

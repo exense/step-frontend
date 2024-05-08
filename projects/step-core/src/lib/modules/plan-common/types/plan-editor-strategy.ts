@@ -10,8 +10,8 @@ export abstract class PlanEditorStrategy {
   abstract readonly planContext$: Observable<PlanContext | undefined>;
 
   abstract addControl(artefactTypeId: string): void;
-  abstract addFunction(keywordId: string): void;
-  abstract addPlan(planId: string): void;
+  abstract addKeywords(keywordIds: string[]): void;
+  abstract addPlans(planIds: string[]): void;
 
   abstract undo(): void;
 

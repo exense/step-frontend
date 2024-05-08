@@ -11,6 +11,7 @@ import type { FindByCriteraParam } from '../models/FindByCriteraParam';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
+import type { TokenProvisioningStatus } from '../models/TokenProvisioningStatus';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -193,6 +194,21 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns a map of execution ID to names by the provided ids.
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getExecutionsNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/search/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Returns the list of report nodes with contributing errors for the given execution
    * @param id
    * @param skip
@@ -265,6 +281,21 @@ export class ExecutionsService {
       url: '/executions/bulk/stop',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param executionId
+   * @returns TokenProvisioningStatus default response
+   * @throws ApiError
+   */
+  public getAutoscalingStatus(executionId: string): Observable<TokenProvisioningStatus> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{executionId}/provisioning/status',
+      path: {
+        executionId: executionId,
+      },
     });
   }
 }

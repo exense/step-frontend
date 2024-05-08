@@ -65,7 +65,7 @@ export class KeywordsService {
   public callFunctionById(
     id: string,
     functionId: string,
-    requestBody?: FunctionInputJsonObject
+    requestBody?: FunctionInputJsonObject,
   ): Observable<OutputJsonObject> {
     return this.httpRequest.request({
       method: 'POST',
@@ -167,6 +167,21 @@ export class KeywordsService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/find',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the map of entities IDs to names for the provided list of IDs
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public findFunctionNamesByIds(requestBody?: Array<string>): Observable<Record<string, string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/find/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
     });

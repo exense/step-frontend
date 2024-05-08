@@ -9,7 +9,6 @@ import {
   TableRemoteDataSourceFactoryService,
 } from '../../client/table/step-table-client.module';
 import { CustomColumnsComponent } from './components/custom-columns/custom-columns.component';
-import { CustomCellValuePipe } from './pipe/custom-cell-value.pipe';
 import { ColumnDirective } from './directives/column.directive';
 import {
   CustomRegistriesModule,
@@ -35,9 +34,19 @@ import { RangeFilterComponent } from './components/range-filter/range-filter.com
 import { DateFilterComponent } from './components/date-filter/date-filter.component';
 import { TableNavigatorQueryParamsCleanupService } from './services/table-navigator-query-params-cleanup.service';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from '../routing';
-import { HasRightPipe } from '../auth';
 import { PaginatorComponent } from './components/paginator/paginator.component';
 import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
+import { AUTH_EXPORTS } from '../auth';
+import { DRAG_DROP_EXPORTS } from '../drag-drop';
+import { DragColumnCaptionComponent } from './components/drag-column-caption/drag-column-caption.component';
+import { ColumnSettingsComponent } from './components/column-settings/column-settings.component';
+import { ActivityColDirective } from './directives/activity-col.directive';
+import { HeaderCellContainerComponent } from './components/header-cell-container/header-cell-container.component';
+import { ColumnSettingsSaveDashletComponent } from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
+import { ActionColDirective } from './directives/action-col.directive';
+import { CustomCellColInputPipe } from './pipe/custom-cell-col-input.pipe';
+import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pipe';
+import { SettingsInsideActionColDirective } from './directives/settings-inside-action-col.directive';
 
 @NgModule({
   imports: [
@@ -50,14 +59,14 @@ import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
     EDITABLE_LABELS_EXPORTS,
     StepBasicsModule,
     DatePickerModule,
-    HasRightPipe,
+    AUTH_EXPORTS,
+    DRAG_DROP_EXPORTS,
   ],
   declarations: [
     TableComponent,
     SearchColDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
-    CustomCellValuePipe,
     ColumnDirective,
     CustomCellComponentsPipe,
     AdditionalHeaderDirective,
@@ -70,7 +79,16 @@ import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    DragColumnCaptionComponent,
+    ColumnSettingsComponent,
     PaginatorComponent,
+    ActivityColDirective,
+    ActionColDirective,
+    HeaderCellContainerComponent,
+    ColumnSettingsSaveDashletComponent,
+    CustomCellColInputPipe,
+    CustomCellApplySubPathPipe,
+    SettingsInsideActionColDirective,
   ],
   exports: [
     TableComponent,
@@ -86,7 +104,14 @@ import { EDITABLE_LABELS_EXPORTS } from '../editable-labels';
     HighlightTableRowDirective,
     RangeFilterComponent,
     DateFilterComponent,
+    DragColumnCaptionComponent,
+    ColumnSettingsComponent,
     PaginatorComponent,
+    ActivityColDirective,
+    ActionColDirective,
+    HeaderCellContainerComponent,
+    ColumnSettingsSaveDashletComponent,
+    SettingsInsideActionColDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -122,9 +147,15 @@ export * from './components/custom-search-dropdown/custom-search-checkbox.compon
 export * from './components/custom-columns/custom-columns-base.component';
 export * from './components/range-filter/range-filter.component';
 export * from './components/date-filter/date-filter.component';
+export * from './components/drag-column-caption/drag-column-caption.component';
+export * from './components/column-settings/column-settings.component';
+export * from './components/header-cell-container/header-cell-container.component';
 export * from './components/base-column-container/base-column-container.component';
 export * from './components/paginator/paginator.component';
+export * from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
 export * from './directives/column.directive';
+export * from './directives/activity-col.directive';
+export * from './directives/action-col.directive';
 export * from './shared/search-value';
 export * from './shared/table-remote-data-source';
 export * from './shared/table-local-data-source';
@@ -137,15 +168,22 @@ export * from './directives/search-col.directive';
 export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
 export * from './directives/highlight-table-row.directive';
+export * from './directives/settings-inside-action-col.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './shared/filter-condition';
 export * from './shared/table-local-data-source-config';
 export * from './shared/search-column.interface';
+export * from './shared/request-filter-interceptor';
+export * from './shared/filter-condition-type.enum';
+export * from './services/request-filter-interceptors.token';
+export * from './services/request-filter-interceptors.token';
 export * from './services/filter-condition-factory.service';
 export * from './shared/table-persistence-config';
 export * from './services/table-persistence-config.provider';
 export * from './services/table-storage.service';
 export * from './shared/search-column-accessor';
 export * from './services/table-highlight-item-container.service';
+export * from './services/table-columns-config.provider';
+export * from './services/table-columns.service';

@@ -1,24 +1,30 @@
-<ng-container *ngIf="isProgress; then progress; else complete"> </ng-container>
-<ng-template #complete>
-  <div class="distribution" [matTooltip]="tooltipMessage">
-    <div class="bar-SKIPPED" *ngIf="percentPassed > 0 && passed === 0" [style.width.%]="percentPassed">0</div>
-    <div class="bar-PASSED" *ngIf="percentPassed > 0 && passed > 0" [style.width.%]="percentPassed">{{ passed }}</div>
-    <div class="bar-FAILED" *ngIf="percentFailed > 0" [style.width.%]="percentFailed">{{ failed }}</div>
-    <div class="bar-TECHNICAL_ERROR" *ngIf="percentTechError > 0" [style.width.%]="percentTechError">
-      {{ techError }}
+@if (distributionState(); as ds) {
+  @if (!isProgress()) {
+    <div class="distribution" [matTooltip]="ds.tooltipMessage">
+      @if (ds.percentPassed > 0 && ds.passed === 0) {
+        <div class="bar-SKIPPED" [style.width.%]="ds.percentPassed">0</div>
+      }
+      @if (ds.percentPassed > 0 && ds.passed > 0) {
+        <div class="bar-PASSED" [style.width.%]="ds.percentPassed">{{ ds.passed }}</div>
+      }
+      @if (ds.percentFailedError > 0) {
+        <div class="bar-FAILED" [style.width.%]="ds.percentFailedError">{{ ds.failedError }}</div>
+      }
+      @if (ds.percentTechError > 0) {
+        <div class="bar-TECHNICAL_ERROR" [style.width.%]="ds.percentTechError">{{ ds.techError }}</div>
+      }
     </div>
-  </div>
-</ng-template>
-<ng-template #progress>
-  <div class="distribution in-progress" [matTooltip]="tooltipProgressMessage">
-    <div
-      class="bar-RUNNING"
-      [style.width.%]="countPercent"
-      aria-valuemin="0"
-      [attr.arial-valuenow]="summary?.count"
-      [attr.arial-valuemax]="summary?.countForecast"
-    >
-      {{ summary?.count }} / {{ summary?.countForecast }}
+  } @else {
+    <div class="distribution in-progress" [matTooltip]="ds.tooltipProgressMessage">
+      <div
+        class="bar-RUNNING"
+        [style.width.%]="ds.countPercent"
+        aria-valuemin="0"
+        [attr.arial-valuenow]="summary()?.count"
+        [attr.arial-valuemax]="summary()?.countForecast"
+      >
+        {{ summary()?.count }} / {{ summary()?.countForecast }}
+      </div>
     </div>
-  </div>
-</ng-template>
+  }
+}

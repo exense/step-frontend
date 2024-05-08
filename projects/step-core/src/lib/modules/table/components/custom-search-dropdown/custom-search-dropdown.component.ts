@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
-import { Input as ColInput } from '../../../../client/step-client-module';
 import { TableSearch } from '../../services/table-search';
+import { ColInputExt } from '../../types/col-input-ext';
+import { CustomCellApplySubPathPipe } from '../../pipe/custom-cell-apply-sub-path.pipe';
 
 @Component({
   selector: 'step-custom-search-dropdown',
@@ -10,30 +11,27 @@ import { TableSearch } from '../../services/table-search';
 })
 export class CustomSearchDropdownComponent implements CustomComponent {
   private _tableSearch? = inject(TableSearch, { optional: true });
-  private contextInternal?: ColInput;
+  context?: ColInputExt;
 
-  get context(): ColInput | undefined {
-    return this.contextInternal;
-  }
-
-  set context(value: ColInput | undefined) {
-    if (value === this.contextInternal) {
+  contextChange(previousContext?: ColInputExt, currentContext?: ColInputExt): void {
+    if (previousContext === currentContext) {
       return;
     }
-    this.contextInternal = value;
     this.updateOptions();
   }
 
   protected options: string[] = [];
 
   protected updateOptions(): void {
-    this.options = (this.contextInternal?.options || []).map(({ value }) => value!).filter((value) => !!value);
+    this.options = (this.context?.options || []).map(({ value }) => value!).filter((value) => !!value);
   }
 
   onItemsChange(value: string): void {
-    if (!this._tableSearch || !this.contextInternal?.id) {
+    if (!this._tableSearch || !this.context?.id) {
       return;
     }
-    this._tableSearch.onSearch(this.contextInternal.id, value, true);
+
+    const column = CustomCellApplySubPathPipe.transform(this.context.id, this.context.entitySubPath);
+    this._tableSearch.onSearch(column, value, true);
   }
 }

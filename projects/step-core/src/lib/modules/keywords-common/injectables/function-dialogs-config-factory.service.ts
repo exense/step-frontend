@@ -6,14 +6,14 @@ import { FunctionDialogsConfig } from '../types/function-dialogs-config.interfac
 })
 export class FunctionDialogsConfigFactoryService {
   getDefaultConfig(): FunctionDialogsConfig {
-    return this.getConfigObject('Keyword', [], false, 'functionTable');
+    return this.getConfigObject('Keyword', [], false, 'keyword');
   }
 
   getConfigObject(
     title: string,
     functionTypeFilters: string[],
     lightForm: boolean,
-    customScreenTable: string
+    customScreenTable: string,
   ): FunctionDialogsConfig {
     return {
       title,
