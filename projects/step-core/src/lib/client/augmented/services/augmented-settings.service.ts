@@ -1,15 +1,23 @@
 import { SettingsService } from '../../generated';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
+import { Observable, OperatorFunction } from 'rxjs';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AugmentedSettingsService extends SettingsService {
-  constructor(httpRequest: BaseHttpRequest, private _http: HttpClient) {
-    super(httpRequest);
+export class AugmentedSettingsService extends SettingsService implements HttpOverrideResponseInterceptor {
+  private _http = inject(HttpClient);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
   }
 
   override getSetting<T>(id: string): Observable<T> {
@@ -17,7 +25,11 @@ export class AugmentedSettingsService extends SettingsService {
   }
 
   getSettingAsText(id: string): Observable<string> {
-    return this._http.request('GET', `rest/settings/${id}`, { responseType: 'text' });
+    return this._http.request(
+      'GET',
+      `rest/settings/${id}`,
+      this._requestContextHolder.decorateRequestOptions({ responseType: 'text' }),
+    );
   }
 
   /*
@@ -25,6 +37,10 @@ export class AugmentedSettingsService extends SettingsService {
    */
   override saveSetting<T>(id: string, requestBody?: any): Observable<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-    return this._http.post<T>(`rest/settings/${id}`, requestBody, { headers });
+    return this._http.post<T>(
+      `rest/settings/${id}`,
+      requestBody,
+      this._requestContextHolder.decorateRequestOptions({ headers }),
+    );
   }
 }

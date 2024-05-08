@@ -214,6 +214,7 @@ export const sendRequest = <T>(
     body: body ?? formData,
     withCredentials: config.WITH_CREDENTIALS,
     observe: 'response',
+    context: options.context,
   });
 };
 

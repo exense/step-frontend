@@ -1,9 +1,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import { HttpContext } from '@angular/common/http';
+
 export type ApiRequestOptions = {
   readonly method: 'GET' | 'PUT' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'PATCH';
   readonly url: string;
+  readonly context?: HttpContext;
   readonly path?: Record<string, any>;
   readonly cookies?: Record<string, any>;
   readonly headers?: Record<string, any>;
