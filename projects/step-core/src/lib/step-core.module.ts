@@ -70,6 +70,7 @@ import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-para
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
+import { TestDataIdDirective } from './directives/test-dataid.directive';
 
 @NgModule({
   declarations: [
@@ -106,6 +107,7 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     LockColumnContainerComponent,
     LockColumnComponent,
     DashboardNavigationParamsPipe,
+    TestDataIdDirective,
   ],
   imports: [
     CommonModule,
@@ -207,6 +209,7 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    TestDataIdDirective,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -334,3 +337,4 @@ export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
+export { TestDataIdDirective } from './directives/test-dataid.directive';
