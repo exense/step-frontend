@@ -36,7 +36,7 @@
           (refresh)="mainEngine.triggerRefresh()"
           (intervalChange)="handleRefreshIntervalChange($event)"
         />
-        @if (hasWritePermission) {
+        @if (hasWritePermission && editable) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
               >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert

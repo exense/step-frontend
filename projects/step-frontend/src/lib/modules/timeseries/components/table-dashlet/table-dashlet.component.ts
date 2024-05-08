@@ -227,7 +227,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       freeTextValues: [`"${this.item.metricKey}"`],
       searchEntities: [],
     };
-    let filterItems = [];
+    let filterItems: FilterBarItem[] = [];
     if (this.item.inheritGlobalFilters) {
       filterItems = FilterUtils.combineGlobalWithChartFilters(
         context.getFilteringSettings().filterItems,
@@ -236,7 +236,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       filterItems = this.item.filters.map(FilterUtils.convertApiFilterItem);
     }
-
     filterItems.push(metricItem);
     return filterItems;
   }

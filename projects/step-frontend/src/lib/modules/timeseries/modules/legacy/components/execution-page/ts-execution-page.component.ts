@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { AsyncTasksService, Execution, pollAsyncTask, TimeSeriesService } from '@exense/step-core';
+import { AsyncTasksService, DashboardsService, Execution, pollAsyncTask, TimeSeriesService } from '@exense/step-core';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { ChartsViewComponent } from '../charts-view/charts-view.component';
@@ -26,6 +26,7 @@ import {
 import { TimeSeriesDashboardComponent } from '../time-series-dashboard/time-series-dashboard.component';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
 import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
+import { Dashboard } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/client/generated';
 
 @Component({
   selector: 'step-execution-performance',
@@ -40,7 +41,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
 
   terminator$ = new Subject<void>();
 
-  @ViewChild('dashboard') dashboard!: TimeSeriesDashboardComponent;
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   @ViewChild(ChartsViewComponent) performanceView!: ChartsViewComponent;
 
@@ -48,23 +48,22 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   @Input() executionInput: Execution | undefined;
   execution: Execution | undefined;
 
-  timeRangeSelection: TimeRangePickerSelection = { type: 'FULL' };
-
-  performanceViewSettings: PerformanceViewSettings | undefined;
-
   compareModeEnabled = false;
   executionHasToBeBuilt = false;
   migrationInProgress = false;
 
-  updateSubscription = new Subscription();
-
   dashboardSettings: TimeSeriesDashboardSettings | undefined;
 
   private timeSeriesService = inject(TimeSeriesService);
+  private dashboardService = inject(DashboardsService);
   private _asyncTaskService = inject(AsyncTasksService);
   private cd = inject(ChangeDetectorRef);
 
+  executionDashboardId: string = '66143cd49c3bc94ab0bc1419';
+  dashboard!: Dashboard;
+
   ngOnInit(): void {
+    console.log(this.executionId, this.executionInput);
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }
@@ -73,18 +72,9 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
         this.executionHasToBeBuilt = true;
       }
     });
-  }
-
-  handleResolutionChange(resolution: number) {
-    this.menuTrigger.closeMenu();
-    this.dashboard.setChartsResolution(resolution);
-  }
-
-  onTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeSelection = selection;
-    this.dashboard.updateFullRange(
-      TimeSeriesUtils.convertExecutionAndSelectionToTimeRange(this.execution!, this.timeRangeSelection),
-    );
+    this.dashboardService
+      .getDashboardById(this.executionDashboardId)
+      .subscribe((dashboard) => (this.dashboard = dashboard));
   }
 
   // auto-refresh goes through here
@@ -99,7 +89,7 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
       this.initDashboard(currentExecution);
       this.cd.detectChanges();
     } else {
-      this.dashboard.refresh(); // the new execution is sent via input
+      // this.dashboard.refresh(); // the new execution is sent via input
     }
   }
 
@@ -178,19 +168,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
           console.error(error);
         },
       });
-  }
-
-  toggleCompareMode() {
-    this.compareModeEnabled = !this.compareModeEnabled;
-    if (this.compareModeEnabled) {
-      this.dashboard.enableCompareMode();
-    } else {
-      this.dashboard.disableCompareMode();
-    }
-  }
-
-  exportRawData() {
-    this.dashboard.exportRawData();
   }
 
   ngOnDestroy(): void {

@@ -16,10 +16,12 @@ import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-param
 import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
+import { DashboardPageComponent } from './components/dashboard-page/dashboard-page.component';
+import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 
 @NgModule({
-  imports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
-  exports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
+  imports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent],
+  exports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent],
   providers: [
     {
       provide: MatPaginatorIntl,
@@ -80,7 +82,7 @@ export class TimeSeriesModule {
               );
             },
           ],
-          component: DashboardComponent,
+          component: DashboardPageComponent,
         },
       ],
     });

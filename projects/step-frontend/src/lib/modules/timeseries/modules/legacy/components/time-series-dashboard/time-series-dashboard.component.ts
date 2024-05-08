@@ -15,17 +15,17 @@ import { TimeSeriesDashboardSettings } from '../../types/ts-dashboard-settings';
 import { ChartsViewComponent } from '../charts-view/charts-view.component';
 import { TableApiWrapperService, TimeRange, TimeSeriesService } from '@exense/step-core';
 import {
+  COMMON_IMPORTS,
+  FilterBarItem,
+  FilterUtils,
   RelativeTimeSelection,
   TimeRangePickerSelection,
-  TimeSeriesUtils,
   TimeSeriesConfig,
-  FilterBarItemType,
-  FilterBarItem,
   TimeSeriesContext,
   TimeSeriesContextParams,
   TimeSeriesContextsFactory,
-  COMMON_IMPORTS,
-  FilterUtils,
+  TimeSeriesUtils,
+  TsFilteringMode,
 } from '../../../_common';
 import { PerformanceViewSettings } from '../../types/performance-view-settings';
 import { FilterBarComponent } from '../../../filter-bar';
@@ -98,7 +98,10 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChange
       id: this.settings.contextId,
       dashlets: [],
       timeRange: this.settings.timeRange,
-      filters: this.filterItems,
+      filteringSettings: {
+        mode: TsFilteringMode.STANDARD,
+        filterItems: this.filterItems,
+      },
       grouping: this.settings.grouping || ['name'],
     };
     this.context = this._contextsFactory.createContext(contextParams);
@@ -204,10 +207,6 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChange
       this.compareModeChange.next(enabled);
       this.compareModeContext = context;
     });
-  }
-
-  handleFiltersChange(filters: FilterBarItem[]): void {
-    this.context.updateActiveFilters(filters);
   }
 
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
@@ -329,7 +328,11 @@ export class TimeSeriesDashboardComponent implements OnInit, OnDestroy, OnChange
       timeRange: timeRange,
       id: new Date().getTime().toString(),
       grouping: this.context.getGroupDimensions(),
-      filters: this.compareModeFilterItems,
+      // filters: this.compareModeFilterItems,
+      filteringSettings: {
+        mode: TsFilteringMode.STANDARD,
+        filterItems: this.compareModeFilterItems,
+      },
       keywordsContext: this.context.keywordsContext, // share the same keywords context and colors
     });
     this.compareModeActiveRangeOption = { type: 'ABSOLUTE', absoluteSelection: timeRange };

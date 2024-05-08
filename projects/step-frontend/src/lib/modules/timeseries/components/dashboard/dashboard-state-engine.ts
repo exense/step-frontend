@@ -118,6 +118,14 @@ export class DashboardStateEngine {
 
   private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
     switch (selection.type) {
+      case 'FULL':
+        if (this.state.context.defaultFullTimeRange?.from) {
+          throw new Error('Default full time range is not set before using "FULL" selection');
+        }
+        return {
+          from: this.state.context.defaultFullTimeRange!.from!,
+          to: this.state.context.defaultFullTimeRange?.to || new Date().getTime(),
+        };
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
       case 'RELATIVE':
