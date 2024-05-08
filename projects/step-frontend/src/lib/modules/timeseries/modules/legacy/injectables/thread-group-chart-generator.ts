@@ -69,7 +69,7 @@ export class ThreadGroupChartGenerator {
       series: [
         {
           id: 'total',
-          scale: 'total',
+          scale: 'z',
           label: 'Total',
           labelItems: ['Total'],
           legendName: 'Total',
@@ -90,7 +90,7 @@ export class ThreadGroupChartGenerator {
         {
           side: 1,
           size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'total',
+          scale: 'z',
           values: (u: unknown, vals: number[]) => vals.map((v) => (v === Math.floor(v) ? v : null)),
           grid: { show: false },
         },

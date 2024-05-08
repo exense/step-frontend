@@ -161,7 +161,7 @@ export class TooltipPlugin {
             // some weird uPlot behaviour. it happens to be -10 many times
             return;
           }
-          const hoveredValue = u.posToVal(top, '1');
+          const hoveredValue = u.posToVal(top, 'y');
           let yPoints: TooltipRowEntry[] = [];
           let summaryRow: TooltipRowEntry | undefined;
           // first series is x axis (time)
