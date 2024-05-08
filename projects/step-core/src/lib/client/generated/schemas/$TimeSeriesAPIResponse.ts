@@ -35,5 +35,9 @@ export const $TimeSeriesAPIResponse = {
       },
       isRequired: true,
     },
+    truncated: {
+      type: 'boolean',
+      isRequired: true,
+    },
   },
 } as const;

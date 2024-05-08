@@ -1,4 +1,4 @@
-import { Axis, Cursor, Hooks, Scale } from 'uplot';
+import { Axis, Cursor, Hooks } from 'uplot';
 import { TsTooltipOptions } from './ts-tooltip-options';
 import { TSChartSeries } from './ts-chart-series';
 
@@ -12,4 +12,5 @@ export interface TSChartSettings {
   tooltipOptions: TsTooltipOptions;
   showLegend?: boolean; // default true
   hooks?: Hooks.Arrays; // if some hooks have to be override
+  truncated?: boolean;
 }

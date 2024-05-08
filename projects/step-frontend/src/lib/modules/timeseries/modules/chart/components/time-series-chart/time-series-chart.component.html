@@ -15,7 +15,11 @@
   }
 </div>
 
-@if (!chartIsUnavailable && !chartIsEmpty && (legendSettings.items.length || legendSettings.zAxisLabel)) {
+@if (
+  !chartIsUnavailable &&
+  !chartIsEmpty &&
+  (legendSettings.items.length || legendSettings.zAxisLabel || settings.truncated)
+) {
   <div class="ts-chart-legend">
     @if (legendSettings.show) {
       <div class="left-section">
@@ -29,10 +33,23 @@
         }
       </div>
     }
-    @if (legendSettings.zAxisLabel) {
-      <div class="aggregate-section">
-        <step-icon name="bar-chart-2" class="total-value-icon" />
-        <span class="item-label">{{ legendSettings.zAxisLabel }}</span>
+    @if (legendSettings.zAxisLabel || settings.truncated) {
+      <div class="other-section">
+        @if (settings.truncated) {
+          <div class="truncated-section">
+            <step-icon
+              name="alert-circle"
+              matTooltip="Data for this chart has been truncated"
+              matTooltipPosition="below"
+            />
+          </div>
+        }
+        @if (legendSettings.zAxisLabel) {
+          <div class="aggregate-section">
+            <step-icon name="bar-chart-2" class="total-value-icon" />
+            <span class="item-label">{{ legendSettings.zAxisLabel }}</span>
+          </div>
+        }
       </div>
     }
   </div>

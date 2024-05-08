@@ -24,6 +24,7 @@ export const $AxesSettings = {
     },
     colorizationType: {
       type: 'Enum',
+      isRequired: true,
     },
   },
 } as const;
