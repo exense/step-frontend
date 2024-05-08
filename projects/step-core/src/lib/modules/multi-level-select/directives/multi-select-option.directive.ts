@@ -16,10 +16,8 @@ export class MultiSelectOptionDirective<T extends string | number | symbol> {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
 
-  private selectionState = computed(() => this._state.visualSelectionState()[this._matOption.value]);
-
   private effSelectionChange = effect(() => {
-    const selectionState = this.selectionState();
+    const selectionState = this._state.visualSelectionState()[this._matOption.value];
     const checkbox = this._elRef.nativeElement.querySelector('mat-pseudo-checkbox');
     if (!checkbox) {
       return;
@@ -30,7 +28,7 @@ export class MultiSelectOptionDirective<T extends string | number | symbol> {
   private assignSelectionClassed(checkbox: Element, state: SelectionState): void {
     this._renderer.removeClass(checkbox, CLASS_CHECKED);
     this._renderer.removeClass(checkbox, CLASS_INDETERMINATE);
-    switch (this.selectionState()) {
+    switch (state) {
       case SelectionState.SELECTED:
         this._renderer.addClass(checkbox, CLASS_CHECKED);
         break;
