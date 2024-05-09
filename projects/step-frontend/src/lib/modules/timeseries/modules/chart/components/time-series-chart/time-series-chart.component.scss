@@ -83,11 +83,16 @@ step-timeseries-chart {
 
     .left-section {
       display: flex;
-      overflow: hidden;
+      gap: 0.5rem;
       max-width: 100%;
 
-      &:hover {
-        overflow: auto;
+      .legend-items {
+        display: flex;
+        overflow: hidden;
+        max-width: 100%;
+        &:hover {
+          overflow: auto;
+        }
       }
     }
 
@@ -106,16 +111,11 @@ step-timeseries-chart {
       text-overflow: ellipsis;
     }
 
-    .other-section,
-    .other-section > div {
+    .aggregate-section {
       white-space: nowrap;
       display: flex;
       align-items: center;
-    }
-
-    .other-section {
       margin-left: 5rem;
-      gap: 0.5rem;
     }
 
     /* width */

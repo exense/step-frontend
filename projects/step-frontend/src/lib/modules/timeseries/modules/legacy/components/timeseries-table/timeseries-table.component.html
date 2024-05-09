@@ -21,7 +21,7 @@
   </mat-menu>
 </div>
 
-<div>
+<div class="table-container">
   <step-table
     [dataSource]="tableDataSource"
     [inProgress]="tableIsLoading"
@@ -102,4 +102,13 @@
       </ng-container>
     </ng-container>
   </step-table>
+  @if (truncated) {
+    <div class="truncated">
+      <step-icon
+        name="alert-circle"
+        matTooltip="Maximum number of series reached, excess series can’t be shown"
+        matTooltipPosition="below"
+      />
+    </div>
+  }
 </div>
