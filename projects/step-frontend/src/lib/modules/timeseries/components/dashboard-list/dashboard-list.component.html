@@ -68,7 +68,7 @@
           >
             <step-icon name="eye" />
           </a>
-          @if (!element.metadata?.isLegacy) {
+          @if (!element.customFields?.locked && !element.metadata?.isLegacy) {
             <a
               mat-icon-button
               matTooltip="Edit dashboard"

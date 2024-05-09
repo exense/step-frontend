@@ -63,7 +63,6 @@ export class ExecutionPerformanceComponent implements OnInit, OnDestroy, OnChang
   dashboard!: Dashboard;
 
   ngOnInit(): void {
-    console.log(this.executionId, this.executionInput);
     if (!this.executionId) {
       throw new Error('ExecutionId parameter is not present');
     }

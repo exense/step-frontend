@@ -92,6 +92,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
+  @Input() showExecutionLinks = false;
 
   private exportInProgress = false;
   dashboard!: DashboardView;

@@ -44,7 +44,6 @@ export class TimeseriesColorsPool {
    * @param key
    */
   getColor(key: string): string {
-    console.log(key);
     if (this.assignedColors[key]) {
       return this.assignedColors[key];
     } else {

@@ -30,6 +30,7 @@ export class NewDashboardDialogComponent {
     const { name, description } = formValue;
     return {
       name: name!,
+      attributes: { name: name! },
       description,
       timeRange: { type: 'RELATIVE', relativeSelection: { timeInMs: 3600_000 } },
       grouping: [],
