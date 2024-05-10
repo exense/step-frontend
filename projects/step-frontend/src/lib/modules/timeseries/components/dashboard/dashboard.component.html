@@ -29,13 +29,15 @@
         >
           <step-icon name="settings" />
         </button>
-        <step-autorefresh-toggle
-          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-          [buttonDisabled]="compareModeEnabled"
-          [interval]="refreshInterval"
-          (refresh)="mainEngine.triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
+        @if (showRefreshOption) {
+          <step-autorefresh-toggle
+            [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
+            [buttonDisabled]="compareModeEnabled"
+            [interval]="refreshInterval"
+            (refresh)="mainEngine.triggerRefresh()"
+            (intervalChange)="handleRefreshIntervalChange($event)"
+          />
+        }
         @if (hasWritePermission && editable) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"

@@ -25,7 +25,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Input() activeSelection!: TimeRangePickerSelection;
   @Input() selectOptions!: TimeRangePickerSelection[];
   @Input() initialSelectionIndex: number | undefined;
-  @Input() includeFullRangeOption: boolean = true;
   @Input() compact = false;
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
@@ -93,12 +92,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     }
     if (!from && !to) {
       // both are missing
-      if (this.includeFullRangeOption) {
-        this.emitSelectionChange({ type: 'FULL' });
-        this.closeMenu();
-      } else {
-        this._snackBar.open('Time range not applied', 'dismiss');
-      }
+      this._snackBar.open('Time range not applied', 'dismiss');
     }
     if (!from) {
       this._snackBar.open('From selection is required', 'dismiss');

@@ -40,12 +40,16 @@ export class DashboardStateEngine {
     if ((state.refreshInProgress || state.context.getChartsLockedState()) && !force) {
       return;
     }
-    const refreshRanger = state.timeRangeSelection.type === 'RELATIVE';
-    if (refreshRanger) {
-      const newTimeRange = TimeSeriesUtils.convertSelectionToTimeRange(state.timeRangeSelection);
-      this.updateFullAndSelectedRange(newTimeRange);
+    let newRange: TimeRange;
+    if (state.timeRangeSelection.type === 'FULL' && state.context.defaultFullTimeRange?.from) {
+      const defaultFullTimeRange = state.context.defaultFullTimeRange;
+      newRange = { from: defaultFullTimeRange.from!, to: defaultFullTimeRange.to || new Date().getTime() };
+    } else {
+      newRange = TimeSeriesUtils.convertSelectionToTimeRange(state.timeRangeSelection);
     }
-    this.refreshAllCharts(refreshRanger, force);
+
+    this.updateFullAndSelectedRange(newRange);
+    this.refreshAllCharts(true, force);
   }
 
   /**
@@ -119,7 +123,7 @@ export class DashboardStateEngine {
   private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
     switch (selection.type) {
       case 'FULL':
-        if (this.state.context.defaultFullTimeRange?.from) {
+        if (!this.state.context.defaultFullTimeRange?.from) {
           throw new Error('Default full time range is not set before using "FULL" selection');
         }
         return {

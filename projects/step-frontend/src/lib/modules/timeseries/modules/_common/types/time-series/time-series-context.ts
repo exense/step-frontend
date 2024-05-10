@@ -35,7 +35,7 @@ export class TimeSeriesContext {
 
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
 
-  readonly defaultFullTimeRange?: Partial<TimeRange>; // The 'Full selection' initial interval
+  defaultFullTimeRange?: Partial<TimeRange>; // The 'Full selection' initial interval. 'To' can be undefined.
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private selectedTimeRange: TimeRange; // this is the zooming selection.
@@ -92,6 +92,10 @@ export class TimeSeriesContext {
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
     ) as Observable<void>;
+  }
+
+  updateDefaultFullTimeRange(range: Partial<TimeRange>) {
+    this.defaultFullTimeRange = range;
   }
 
   getSyncGroups(): TimeSeriesSyncGroup[] {

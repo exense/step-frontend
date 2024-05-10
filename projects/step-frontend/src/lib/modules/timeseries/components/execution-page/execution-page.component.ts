@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
@@ -28,8 +28,9 @@ import { AuthService, Execution, TimeRange } from '@exense/step-core';
     DashboardComponent,
   ],
 })
-export class ExecutionPageComponent implements OnInit {
+export class ExecutionPageComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
+  @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);
 
@@ -59,7 +60,20 @@ export class ExecutionPageComponent implements OnInit {
         type: FilterBarItemType.FREE_TEXT,
       },
     ];
-    this.executionRange = { from: this.execution.startTime, to: this.execution.endTime };
+    this.executionRange = this.getExecutionRange(this.execution);
     this.initialized = true;
+  }
+
+  getExecutionRange(execution: Execution): Partial<TimeRange> {
+    return { from: execution.startTime, to: execution.endTime };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const executionChange = changes['execution'];
+    if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
+      console.log('execution changed', executionChange.currentValue);
+      this.executionRange = this.getExecutionRange(this.execution);
+      this.dashboard.refresh();
+    }
   }
 }

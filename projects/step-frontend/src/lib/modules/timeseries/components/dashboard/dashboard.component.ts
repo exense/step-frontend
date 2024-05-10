@@ -3,9 +3,11 @@ import {
   DestroyRef,
   inject,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   QueryList,
+  SimpleChanges,
   ViewChild,
   ViewChildren,
 } from '@angular/core';
@@ -70,7 +72,14 @@ import uPlot = require('uplot');
     TableDashletComponent,
   ],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
+  ngOnChanges(changes: SimpleChanges): void {
+    let fullTimeRangeChange = changes['defaultFullTimeRange'];
+    if (fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue) {
+      this.mainEngine.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
+    }
+  }
+
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren('chart') dashlets!: QueryList<ChartDashlet>;
@@ -93,7 +102,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
-  @Input() showExecutionLinks = false;
+  @Input() showExecutionLinks = true;
+  @Input() showRefreshOption = true;
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -155,6 +165,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.fetchMetricTypes();
       this.enableEditMode();
     }
+  }
+
+  public refresh() {
+    this.mainEngine.triggerRefresh(false);
+    this.compareEngine?.triggerRefresh(false);
   }
 
   handleRefreshIntervalChange(interval: number) {
@@ -328,7 +343,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
     this.fetchFilterEntities(visibleFilters);
-
+    console.log(this.defaultFullTimeRange);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       dashlets: this.dashboard.dashlets,
