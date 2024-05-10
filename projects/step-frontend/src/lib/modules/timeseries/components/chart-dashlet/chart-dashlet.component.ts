@@ -281,15 +281,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         if (value === undefined && !removeChartGaps) {
           value = 0;
         }
-        // if (removeChartGaps) {
-        //   if (i > 0 && removeChartGaps && value === undefined) {
-        //     value = seriesData[i - 1];
-        //   }
-        // } else {
-        //   if (value === undefined) {
-        //     value = 0;
-        //   }
-        // }
         seriesData[i] = value;
       });
       const s: TSChartSeries = {

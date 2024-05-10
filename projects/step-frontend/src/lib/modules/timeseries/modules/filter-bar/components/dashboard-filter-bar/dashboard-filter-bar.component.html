@@ -68,16 +68,18 @@
         </step-form-field>
         <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
       } @else {
-        @for (item of _internalFilters | visibleFilterItems; track item.attributeName; let i = $index) {
-          <step-ts-filter-bar-item
-            #appliedFilter
-            [item]="item"
-            [highlightRemoveButton]="editMode"
-            [compact]="compactView"
-            [removable]="item.removable || editMode"
-            (removeItem)="removeFilterItem(i)"
-            (filterChange)="handleFilterChange(i, $event)"
-          />
+        @for (item of _internalFilters; track item.attributeName; let i = $index) {
+          @if (!item.isHidden) {
+            <step-ts-filter-bar-item
+              #appliedFilter
+              [item]="item"
+              [highlightRemoveButton]="editMode"
+              [compact]="compactView"
+              [removable]="item.removable || editMode"
+              (removeItem)="removeFilterItem(i)"
+              (filterChange)="handleFilterChange(i, $event)"
+            />
+          }
         }
         <button type="button" class="more-btn" mat-raised-button [matMenuTriggerFor]="addFilterMenu">
           <step-icon name="plus" />

@@ -273,7 +273,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
-      this.removeFilterItem(index);
+      // this.removeFilterItem(index);
       return;
     }
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {

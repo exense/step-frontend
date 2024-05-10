@@ -51,6 +51,8 @@ export class ExecutionPageComponent implements OnInit {
     this.hiddenFilters = [
       {
         attributeName: 'eId',
+        label: 'Execution',
+        isLocked: true,
         exactMatch: true,
         freeTextValues: [this.execution.id!],
         searchEntities: [],

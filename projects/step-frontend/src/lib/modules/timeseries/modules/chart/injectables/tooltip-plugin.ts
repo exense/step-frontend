@@ -210,7 +210,7 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
-            tooltip.style.zIndex = '-1';
+            // tooltip.style.zIndex = '-1';
             return; // there is no data to show
           } else {
             tooltip.style.zIndex = '1000';

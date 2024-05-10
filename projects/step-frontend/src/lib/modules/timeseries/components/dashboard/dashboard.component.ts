@@ -36,6 +36,7 @@ import {
   TimeSeriesContextsFactory,
   TimeSeriesUtilityService,
   TsFilteringMode,
+  TsFilteringSettings,
 } from '../../modules/_common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -492,6 +493,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  private createCompareModeFilters() {
+    const clonedSettings: TsFilteringSettings = JSON.parse(
+      JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
+    );
+    clonedSettings.filterItems.forEach((item) => (item.isHidden = false)); // make everything visible in compare mode
+    console.log(clonedSettings.filterItems);
+    return clonedSettings;
+  }
+
   enableCompareMode() {
     const mainState = this.mainEngine.state;
     const timeRange = JSON.parse(JSON.stringify(mainState.context.getFullTimeRange()));
@@ -501,7 +511,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       id: new Date().getTime().toString(),
       attributes: this.mainEngine.state.context.getAllAttributes(),
       grouping: mainState.context.getGroupDimensions(),
-      filteringSettings: JSON.parse(JSON.stringify(this.mainEngine.state.context.getFilteringSettings())),
+      filteringSettings: this.createCompareModeFilters(),
       colorsPool: mainState.context.colorsPool,
       syncGroups: mainState.context.getSyncGroups(),
     });
