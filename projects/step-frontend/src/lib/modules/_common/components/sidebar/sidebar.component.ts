@@ -58,7 +58,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         dynamicMenuItems!.map((element) => {
           const menuEntry = {
             title: element.customFields!['label'],
-            id: element.customFields!['link'],
+            id: element.customFields!['fullLink'],
             icon: element.customFields!['icon'],
             parentId: 'bookmarks-root',
             weight: 1000 + dynamicMenuItems!.length,

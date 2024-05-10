@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { take } from 'rxjs';
@@ -19,6 +19,7 @@ import { BookmarkService } from '../../injectables/bookmark.service';
 })
 export class BookmarkCreateDialogComponent implements OnInit {
   private _router = inject(Router);
+  private _route = inject(ActivatedRoute);
   private _matDialogRef = inject(MatDialogRef);
   private _multipleProjects = inject(MultipleProjectsService);
   private _api = inject(AugmentedBookmarksService);
@@ -39,15 +40,22 @@ export class BookmarkCreateDialogComponent implements OnInit {
     });
     const tenant = this._multipleProjects.currentProject()?.name;
     const slashIndex = this._router.url.indexOf('/');
-    const link = this._router.url.slice(slashIndex + 1);
+    const questionMarkIndex = this._router.url.indexOf('?');
+    const link = this._router.url.slice(slashIndex + 1, questionMarkIndex);
+    const fullLink = this._router.url.slice(slashIndex + 1);
     const initBookmark = this.getIconAndPage(link);
-    this.bookmark = {
-      label: this._data?.label ?? '',
-      page: initBookmark?.page,
-      link,
-      tenant,
-      icon: initBookmark?.icon,
-    };
+
+    this._route.queryParams.subscribe((params) => {
+      this.bookmark = {
+        label: this._data?.label ?? '',
+        page: initBookmark?.page,
+        link,
+        fullLink,
+        tenant,
+        icon: initBookmark?.icon,
+        params,
+      };
+    });
   }
 
   @HostListener('keydown.enter')

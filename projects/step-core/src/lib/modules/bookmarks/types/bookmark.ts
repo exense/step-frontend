@@ -3,6 +3,8 @@ export type Bookmark = {
   label?: string;
   page?: string;
   link?: string;
+  fullLink?: string;
   tenant?: string;
   icon?: string;
+  params?: object;
 };
