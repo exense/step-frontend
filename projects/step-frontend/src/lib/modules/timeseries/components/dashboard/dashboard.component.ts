@@ -73,13 +73,6 @@ import uPlot = require('uplot');
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
-  ngOnChanges(changes: SimpleChanges): void {
-    let fullTimeRangeChange = changes['defaultFullTimeRange'];
-    if (fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue) {
-      this.mainEngine.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
-    }
-  }
-
   readonly DASHLET_HEIGHT = 300;
 
   @ViewChildren('chart') dashlets!: QueryList<ChartDashlet>;
@@ -111,7 +104,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   refreshInterval: number = 0;
 
   compareModeEnabled = false;
-  timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
+  timeRangeOptions: TimeRangePickerSelection[] = [...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS];
   resolution?: number;
 
   editMode = false;
@@ -136,6 +129,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this._dashboardService.getDashboardById(this.dashboardId).subscribe((dashboard) => {
       this.initState(pageParams, dashboard);
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    let fullTimeRangeChange = changes['defaultFullTimeRange'];
+    if (fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue && !fullTimeRangeChange.firstChange) {
+      this.mainEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
+      this.compareEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
+    }
   }
 
   initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
@@ -529,6 +530,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       filteringSettings: this.createCompareModeFilters(),
       colorsPool: mainState.context.colorsPool,
       syncGroups: mainState.context.getSyncGroups(),
+      defaultFullTimeRange: mainState.context.defaultFullTimeRange,
     });
     const state = {
       context: compareModeContext,
