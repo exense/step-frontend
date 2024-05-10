@@ -1,17 +1,29 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Input, ScreenInput, ScreensService } from '../../generated';
-import { map, Observable, of, pipe, tap, UnaryFunction } from 'rxjs';
+import { map, Observable, of, OperatorFunction, pipe, tap, UnaryFunction } from 'rxjs';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { HttpEvent } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AugmentedScreenService extends ScreensService {
+export class AugmentedScreenService extends ScreensService implements HttpOverrideResponseInterceptor {
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
+
   private screenCache: Record<string, Input[]> = {};
   private screenInputCache: Record<string, ScreenInput[]> = {};
 
   clearCache(): void {
     this.screenCache = {};
     this.screenInputCache = {};
+  }
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
   }
 
   override getInputsForScreenPost(id: string, requestBody?: any): Observable<Input[]> {
