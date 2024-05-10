@@ -15,18 +15,33 @@
   }
 </div>
 
-@if (!chartIsUnavailable && !chartIsEmpty && (legendSettings.items.length || legendSettings.zAxisLabel)) {
+@if (
+  !chartIsUnavailable &&
+  !chartIsEmpty &&
+  (legendSettings.items.length || legendSettings.zAxisLabel || settings.truncated)
+) {
   <div class="ts-chart-legend">
     @if (legendSettings.show) {
       <div class="left-section">
-        @for (item of legendSettings.items; track item.label) {
-          @if (item.isVisible) {
-            <div class="item">
-              <step-marker [markerType]="legendMarker" [color]="item.color" />
-              <div class="item-label" [title]="item.label">{{ item.label }}</div>
-            </div>
-          }
+        @if (settings.truncated) {
+          <div class="truncated">
+            <step-icon
+              name="alert-circle"
+              matTooltip="Maximum number of series reached, excess series can’t be shown"
+              matTooltipPosition="below"
+            />
+          </div>
         }
+        <div class="legend-items">
+          @for (item of legendSettings.items; track item.label) {
+            @if (item.isVisible) {
+              <div class="item">
+                <step-marker [markerType]="legendMarker" [color]="item.color" />
+                <div class="item-label" [title]="item.label">{{ item.label }}</div>
+              </div>
+            }
+          }
+        </div>
       </div>
     }
     @if (legendSettings.zAxisLabel) {

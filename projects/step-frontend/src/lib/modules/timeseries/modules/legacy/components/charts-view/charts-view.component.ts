@@ -448,7 +448,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
         ? this.getCompareChart(TsChartType.THREAD_GROUP)
         : this.getChart(TsChartType.THREAD_GROUP);
       threadGroupChart?.setAsUnavailable();
-      let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [] };
+      let emptyResponse = { start: 0, end: 0, interval: 0, matrix: [], matrixKeys: [], truncated: false };
       return of(emptyResponse);
     }
 
@@ -746,6 +746,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
               grid: { show: false },
             },
           ],
+          truncated: response.truncated,
         };
         const responseTimeSettings: TSChartSettings = {
           title: TimeSeriesConfig.RESPONSE_TIME_CHART_TITLE + ` (${responseTimeMetric.label})`,
@@ -763,6 +764,7 @@ export class ChartsViewComponent implements OnInit, OnDestroy {
               values: (u, vals: number[]) => vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v)),
             },
           ],
+          truncated: response.truncated,
         };
 
         if (compareChart) {
