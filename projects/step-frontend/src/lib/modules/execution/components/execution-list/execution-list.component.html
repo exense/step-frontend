@@ -13,7 +13,12 @@
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>
-        <step-autorefresh-toggle [(disabled)]="autoRefreshDisabled" [interval]="5000" (refresh)="refreshTable()" />
+        <step-autorefresh-toggle
+          testDataId="execution-auto-refresh"
+          [(disabled)]="autoRefreshDisabled"
+          [interval]="5000"
+          (refresh)="refreshTable()"
+        />
       </step-btn-group>
     </section>
     <ng-container matColumnDef="bulkSelection">
