@@ -11,6 +11,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group class="import-export">
         <a
+          testDataId="import-schedule"
           type="button"
           mat-icon-button
           matTooltip="Import schedule"
@@ -21,6 +22,7 @@
           <step-icon name="download" />
         </a>
         <a
+          testDataId="export-schedules"
           type="button"
           mat-icon-button
           matTooltip="Export all schedules"
@@ -33,6 +35,7 @@
       </step-btn-group>
       <step-btn-group>
         <a
+          testDataId="new-schedule"
           mat-mini-fab
           color="primary"
           matTooltip="New schedule"
@@ -44,6 +47,7 @@
         </a>
       </step-btn-group>
       <a
+        testDataId="configure-scheduler"
         type="button"
         mat-icon-button
         matTooltip="Configure scheduler"
@@ -90,6 +94,7 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <button
+          testDataId="switch-active"
           [ngClass]="{
             status: true,
             'status-on': element.active,
@@ -117,6 +122,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
+            testDataId="go-to-plan"
             mat-icon-button
             matTooltip="Go to plan"
             [disabled]="!element?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
@@ -125,6 +131,7 @@
             <step-icon name="file" />
           </a>
           <button
+            testDataId="execute-schedule"
             mat-icon-button
             matTooltip="Execute schedule"
             [disabled]="!('plan-execute' | hasRight | async)"
@@ -133,6 +140,7 @@
             <step-icon name="play" />
           </button>
           <a
+            testDataId="edit-schedule"
             mat-icon-button
             matTooltip="Edit schedule"
             [disabled]="!('task-write' | hasRight | async)"
@@ -141,6 +149,7 @@
             <step-icon name="edit-2" />
           </a>
           <button
+            testDataId="delete-schedule"
             mat-icon-button
             matTooltip="Delete schedule"
             [disabled]="!('task-delete' | hasRight | async)"
@@ -149,6 +158,7 @@
             <step-icon name="trash-2" />
           </button>
           <a
+            testDataId="analyze-performance"
             mat-icon-button
             matTooltip="Analyze performance"
             [disabled]="!('execution-read' | hasRight | async)"
@@ -158,7 +168,12 @@
           >
             <step-icon name="trending-up" />
           </a>
-          <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
+          <step-entity-menu-button
+            testDataId="task-entity-menu"
+            [entityItem]="element"
+            [entityMenu]="entityMenu"
+            stepHighlightTableRow
+          >
             <step-icon name="more-horizontal" />
           </step-entity-menu-button>
         </step-btn-group>
@@ -169,6 +184,7 @@
 <step-entity-menu #entityMenu entity="tasks" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
     <a
+      testDataId="export-schedule"
       mat-menu-item
       [disabled]="!('task-write' | hasRight | async)"
       [routerLink]="['/', 'scheduler', 'export', element.id]"

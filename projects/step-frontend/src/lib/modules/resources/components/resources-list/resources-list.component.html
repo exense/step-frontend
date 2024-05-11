@@ -13,6 +13,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
+          testDataId="new-resource"
           mat-mini-fab
           color="primary"
           matTooltip="New resource"
@@ -69,10 +70,16 @@
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
-          <button mat-icon-button matTooltip="Download resource" (click)="downloadResource(element.id)">
+          <button
+            testDataId="download-resource"
+            mat-icon-button
+            matTooltip="Download resource"
+            (click)="downloadResource(element.id)"
+          >
             <step-icon name="download-cloud"></step-icon>
           </button>
           <button
+            testDataId="search-resource"
             mat-icon-button
             matTooltip="Search for resource"
             [disabled]="element.resourceType !== 'datasource' && element.resourceType !== 'functions'"
@@ -80,17 +87,23 @@
           >
             <step-icon name="search"></step-icon>
           </button>
-          <a mat-icon-button matTooltip="Edit resource" [routerLink]="element | resourceUrl">
+          <a testDataId="edit-resource" mat-icon-button matTooltip="Edit resource" [routerLink]="element | resourceUrl">
             <step-icon name="edit-2"></step-icon>
           </a>
           <button
+            testDataId="delete-resource"
             mat-icon-button
             matTooltip="Delete resource"
             (click)="deleteResource(element.id, element.resourceName)"
           >
             <step-icon name="trash-2">delete</step-icon>
           </button>
-          <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
+          <step-entity-menu-button
+            testDataId="resources-entity-menu"
+            [entityItem]="element"
+            [entityMenu]="entityMenu"
+            stepHighlightTableRow
+          >
             <step-icon name="more-horizontal"></step-icon>
           </step-entity-menu-button>
         </step-btn-group>

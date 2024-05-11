@@ -4,6 +4,7 @@
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
       <step-btn-group class="import-keyword-button-group">
         <a
+          testDataId="import-keyword"
           type="button"
           mat-icon-button
           matTooltip="Import keyword"
@@ -14,6 +15,7 @@
           <step-icon name="download" />
         </a>
         <a
+          testDataId="export-keywords"
           type="button"
           mat-icon-button
           matTooltip="Export all keywords"
@@ -26,6 +28,7 @@
       </step-btn-group>
       <step-btn-group class="create-keyword-button-group">
         <a
+          testDataId="new-keyword"
           type="button"
           mat-mini-fab
           color="primary"
@@ -86,6 +89,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <button
+            testDataId="open-keyword"
             mat-icon-button
             matTooltip="Open keyword in editor"
             [disabled]="!('kw-write' | hasRight | async)"
@@ -94,6 +98,7 @@
             <step-icon name="edit-2" />
           </button>
           <button
+            testDataId="execute-keyword"
             mat-icon-button
             matTooltip="Execute keyword"
             [disabled]="!('kw-execute' | hasRight | async)"
@@ -102,6 +107,7 @@
             <step-icon name="play" />
           </button>
           <button
+            testDataId="delete-keyword"
             mat-icon-button
             matTooltip="Delete keyword"
             [disabled]="!('kw-delete' | hasRight | async)"
@@ -119,17 +125,28 @@
 </step-drag-drop-container>
 <step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
-    <a mat-menu-item [disabled]="!('kw-write' | hasRight | async)" [routerLink]="element | keywordConfigurerUrl">
+    <a
+      testDataId="configure-keyword"
+      mat-menu-item
+      [disabled]="!('kw-write' | hasRight | async)"
+      [routerLink]="element | keywordConfigurerUrl"
+    >
       <step-icon name="tool" />
       Configure keyword
     </a>
 
-    <button mat-menu-item [disabled]="!('kw-write' | hasRight | async)" (click)="duplicateFunction(element.id)">
+    <button
+      testDataId="duplicate-keyword"
+      mat-menu-item
+      [disabled]="!('kw-write' | hasRight | async)"
+      (click)="duplicateFunction(element.id)"
+    >
       <step-icon name="copy" />
       Duplicate keyword
     </button>
 
     <a
+      testDataId="export-keyword"
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
       [routerLink]="['/', 'functions', 'export', element.id]"
@@ -139,6 +156,7 @@
     </a>
 
     <button
+      testDataId="functions-find-usages"
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
