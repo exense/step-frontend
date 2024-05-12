@@ -48,6 +48,7 @@
     <step-entity-column-container entityName="parameters" />
     <ng-container matColumnDef="scope" stepActivityCol="Scope" stepSearchCol>
       <step-input-filter
+        testDataId="scope-input"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.scopeFilterCondition"
@@ -96,6 +97,7 @@
     </ng-container>
     <ng-container matColumnDef="priority" stepActivityCol="Priority" stepSearchCol>
       <step-input-filter
+        testDataId="priority-input"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.numberFilterCondition"

@@ -51,7 +51,12 @@
     </ng-container>
     <step-entity-column-container entityName="functions" />
     <ng-container matColumnDef="type" stepSearchCol stepActivityCol="Type">
-      <step-function-type-filter *stepSearchCellDef stepFilterConnect [useRegex]="true" />
+      <step-function-type-filter
+        testDataId="type-filter-select"
+        *stepSearchCellDef
+        stepFilterConnect
+        [useRegex]="true"
+      />
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Type</step-drag-column-caption>
       </th>
@@ -60,6 +65,7 @@
     @if (_hasPackages) {
       <ng-container matColumnDef="customFields.functionPackageId" stepSearchCol stepActivityCol="Package">
         <step-search-custom-cell
+          testDataId="package-input"
           *stepSearchCellDef
           itemKey="rest/table/functionPackage/searchIdsBy/attributes.name"
           stepFilterConnect

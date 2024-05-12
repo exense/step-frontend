@@ -31,6 +31,7 @@
   </ng-container>
   <ng-container matColumnDef="state" stepSearchCol>
     <step-array-filter
+      testDataId="state-select"
       *stepSearchCellDef
       [items]="['IN_USE', 'MAINTENANCE', 'ERROR', 'FREE']"
       stepFilterConnect
