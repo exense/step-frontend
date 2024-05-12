@@ -15,10 +15,6 @@ export const $DashboardView = {
         type: 'string',
       },
     },
-    name: {
-      type: 'string',
-      isRequired: true,
-    },
     description: {
       type: 'string',
     },
