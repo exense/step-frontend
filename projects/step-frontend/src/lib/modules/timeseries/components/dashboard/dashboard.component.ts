@@ -56,6 +56,7 @@ import { forkJoin, map, Observable } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
+import { DashboardState } from './dashboard-state';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -519,7 +520,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
     );
     clonedSettings.filterItems.forEach((item) => (item.isHidden = false)); // make everything visible in compare mode
-    console.log(clonedSettings.filterItems);
     return clonedSettings;
   }
 
@@ -538,7 +538,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       defaultFullTimeRange: mainState.context.defaultFullTimeRange,
       resolution: mainState.context.getChartsResolution(),
     });
-    const state = {
+    const state: DashboardState = {
       context: compareModeContext,
       timeRangeSelection: JSON.parse(JSON.stringify(mainState.timeRangeSelection)),
       getDashlets: () => this.compareDashlets,
