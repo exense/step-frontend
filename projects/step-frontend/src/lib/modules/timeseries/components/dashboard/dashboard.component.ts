@@ -344,7 +344,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
 
     const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
     this.fetchFilterEntities(visibleFilters);
-    console.log(this.defaultFullTimeRange);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       dashlets: this.dashboard.dashlets,
@@ -356,7 +355,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         mode: TsFilteringMode.STANDARD,
         filterItems: visibleFilters,
       },
-      resolution: urlParams.resolution,
+      resolution: this.resolution,
     });
   }
 
@@ -368,7 +367,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     // url filters are excluded from the dashboard filters
     const dashboardConvertedFilters =
       dashboardFilters
-        ?.filter((filter) => !urlFilters.find((f) => f.attributeName === filter.attribute))
+        ?.filter((filter) => {
+          const foundUrlFilter = urlFilters.find((f) => f.attributeName === filter.attribute);
+          if (foundUrlFilter) {
+            foundUrlFilter.removable = filter.removable; // keep the removable flag when deleting duplicates
+          }
+          return !foundUrlFilter;
+        })
         ?.map(FilterUtils.convertApiFilterItem) || [];
     let visibleFilters = [...urlFilters, ...dashboardConvertedFilters];
     hiddenFilters.forEach((f) => {
@@ -531,6 +536,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       colorsPool: mainState.context.colorsPool,
       syncGroups: mainState.context.getSyncGroups(),
       defaultFullTimeRange: mainState.context.defaultFullTimeRange,
+      resolution: mainState.context.getChartsResolution(),
     });
     const state = {
       context: compareModeContext,
