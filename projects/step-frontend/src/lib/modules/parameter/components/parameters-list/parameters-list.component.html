@@ -4,7 +4,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
-          testDataId="import-parameter"
+          testDataId="import-parameter-btn"
           mat-icon-button
           matTooltipPosition="below"
           matTooltip="Import parameter"
@@ -14,7 +14,7 @@
           <step-icon name="download" />
         </a>
         <a
-          testDataId="export-parameters"
+          testDataId="export-parameters-btn"
           mat-icon-button
           matTooltipPosition="below"
           matTooltip="Export all parameters"
@@ -26,7 +26,7 @@
       </step-btn-group>
       <step-btn-group>
         <a
-          testDataId="new-parameter"
+          testDataId="new-parameter-btn"
           type="button"
           mat-mini-fab
           color="primary"
@@ -125,7 +125,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
-            testDataId="edit-parameter"
+            testDataId="edit-parameter-btn"
             mat-icon-button
             matTooltip="Edit parameter"
             [disabled]="
@@ -137,7 +137,7 @@
             <step-icon name="edit-2" />
           </a>
           <button
-            testDataId="duplicate-parameter"
+            testDataId="duplicate-parameter-btn"
             mat-icon-button
             matTooltip="Duplicate parameter"
             [disabled]="
@@ -149,7 +149,7 @@
             <step-icon name="copy" />
           </button>
           <button
-            testDataId="delete-parameter"
+            testDataId="delete-parameter-btn"
             mat-icon-button
             matTooltip="Delete parameter"
             [disabled]="
@@ -161,7 +161,7 @@
             <step-icon name="trash-2" />
           </button>
           <step-entity-menu-button
-            testDataId="parameters-entity-menu"
+            testDataId="parameters-entity-menu-btn"
             [entityItem]="element"
             [entityMenu]="entityMenu"
             stepHighlightTableRow

@@ -4,7 +4,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group class="import-export">
         <a
-          testDataId="import-plan"
+          testDataId="import-plan-btn"
           type="button"
           mat-icon-button
           matTooltip="Import plan"
@@ -15,7 +15,7 @@
           <step-icon name="download" />
         </a>
         <a
-          testDataId="export-plans"
+          testDataId="export-plans-btn"
           type="button"
           mat-icon-button
           matTooltip="Export all plans"
@@ -28,7 +28,7 @@
       </step-btn-group>
       <step-btn-group>
         <a
-          testDataId="add-plan"
+          testDataId="add-plan-btn"
           type="button"
           mat-mini-fab
           color="primary"
@@ -72,7 +72,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
-            testDataId="execute-plan"
+            testDataId="execute-plan-btn"
             mat-icon-button
             matTooltip="Execute plan"
             [disabled]="!('plan-execute' | hasRight | async)"
@@ -82,7 +82,7 @@
             <step-icon name="play-circle" />
           </a>
           <button
-            testDataId="duplicate-plan"
+            testDataId="duplicate-plan-btn"
             mat-icon-button
             matTooltip="Duplicate plan"
             [disabled]="!('plan-write' | hasRight | async)"
@@ -91,7 +91,7 @@
             <step-icon name="copy" />
           </button>
           <button
-            testDataId="delete-plan"
+            testDataId="delete-plan-btn"
             mat-icon-button
             matTooltip="Delete plan"
             [disabled]="!('plan-delete' | hasRight | async)"
@@ -114,7 +114,7 @@
       Edit plan
     </a>
     <a
-      testDataId="export-plan"
+      testDataId="export-plan-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
       [routerLink]="['/', 'plans', 'list', 'export', element.id]"
@@ -123,7 +123,7 @@
       Export plan
     </a>
     <button
-      testDataId="find-usages"
+      testDataId="find-usages-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
