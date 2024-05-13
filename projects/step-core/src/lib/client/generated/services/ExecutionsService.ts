@@ -11,7 +11,6 @@ import type { FindByCriteraParam } from '../models/FindByCriteraParam';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
-import type { TokenProvisioningStatus } from '../models/TokenProvisioningStatus';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
@@ -281,21 +280,6 @@ export class ExecutionsService {
       url: '/executions/bulk/stop',
       body: requestBody,
       mediaType: 'application/json',
-    });
-  }
-
-  /**
-   * @param executionId
-   * @returns TokenProvisioningStatus default response
-   * @throws ApiError
-   */
-  public getAutoscalingStatus(executionId: string): Observable<TokenProvisioningStatus> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/executions/{executionId}/provisioning/status',
-      path: {
-        executionId: executionId,
-      },
     });
   }
 }

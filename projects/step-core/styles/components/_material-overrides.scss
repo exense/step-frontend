@@ -155,6 +155,10 @@
   --mdc-filled-text-field-container-color: rgba(0, 0, 0, 0);
 }
 
+@mixin mat-option {
+  --mat-option-selected-state-label-text-color: var.$blue-700;
+}
+
 @mixin material-overrides($primary-color) {
   @include mat-mdc-accordion;
   @include mat-mdc-card;
@@ -167,4 +171,5 @@
   @include mat-button;
   @include mat-select($primary-color);
   @include mat-input;
+  @include mat-option;
 }

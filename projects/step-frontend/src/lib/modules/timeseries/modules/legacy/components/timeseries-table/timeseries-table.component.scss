@@ -91,4 +91,13 @@ step-timeseries-table {
     margin: 0;
     margin-right: 0.6rem;
   }
+
+  .table-container {
+    position: relative;
+    .truncated {
+      position: absolute;
+      bottom: 1.8rem;
+      left: 1.5rem;
+    }
+  }
 }

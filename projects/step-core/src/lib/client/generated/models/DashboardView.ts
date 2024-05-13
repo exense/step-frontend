@@ -9,7 +9,6 @@ import type { TimeSeriesFilterItem } from './TimeSeriesFilterItem';
 export type DashboardView = {
   customFields?: Record<string, any>;
   attributes?: Record<string, string>;
-  name: string;
   description?: string;
   resolution?: number;
   refreshInterval?: number;

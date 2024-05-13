@@ -357,6 +357,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       },
       showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
       axes: axes,
+      truncated: response.truncated,
     };
   }
 

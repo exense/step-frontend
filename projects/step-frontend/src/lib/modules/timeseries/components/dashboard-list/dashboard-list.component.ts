@@ -44,9 +44,15 @@ export class DashboardListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
+  duplicateDashboard(id: string): void {
+    this._dashboardsService.cloneDashboard(id).subscribe(() => {
+      this.dataSource.reload();
+    });
+  }
+
   delete(dashboard: DashboardView) {
     this._dialogs
-      .showDeleteWarning(1, `Dashboard "${dashboard.name}"`)
+      .showDeleteWarning(1, `Dashboard "${dashboard.attributes!['name']}"`)
       .pipe(
         filter((confirm) => confirm),
         catchError(() => of(false)),

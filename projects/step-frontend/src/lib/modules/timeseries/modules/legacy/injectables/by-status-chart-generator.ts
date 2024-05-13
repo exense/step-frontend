@@ -64,6 +64,7 @@ export class ByStatusChartGenerator {
             vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h'),
         },
       ],
+      truncated: response.truncated,
     };
   }
 }

@@ -67,6 +67,11 @@ interface ProcessedBucket extends BucketResponse {
   selected: boolean;
 }
 
+interface ProcessedBucketResponse {
+  buckets: ProcessedBucket[];
+  truncated: boolean;
+}
+
 @Component({
   selector: 'step-table-dashlet',
   templateUrl: './table-dashlet.component.html',
@@ -105,6 +110,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   compareModeEnabled: boolean = false;
   compareContext: TimeSeriesContext | undefined;
+  truncated?: boolean;
   baseBuckets: ProcessedBucket[] = []; // for caching
   compareBuckets: ProcessedBucket[] = []; // for caching
 
@@ -127,7 +133,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const context = this.compareContext!;
     return this.fetchData(context).pipe(
       tap((response) => {
-        this.compareBuckets = response;
+        this.compareBuckets = response.buckets;
+        this.truncated = response.truncated;
         this.updateTableData();
       }),
     );
@@ -210,11 +217,12 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .pipe(map((response) => this.processResponse(response, context)));
   }
 
-  private fetchBaseData(): Observable<ProcessedBucket[]> {
+  private fetchBaseData(): Observable<ProcessedBucketResponse> {
     const context = this.context;
     return this.fetchData(context).pipe(
       tap((response) => {
-        this.baseBuckets = response;
+        this.baseBuckets = response.buckets;
+        this.truncated = response.truncated;
       }),
     );
   }
@@ -301,9 +309,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     });
   }
 
-  private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucket[] {
+  private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucketResponse {
     const syncGroup = context.getSyncGroup(this.item.id);
-    return response.matrix.map((series, i) => {
+    const buckets = response.matrix.map((series, i) => {
       if (series.length != 1) {
         // we should have just one bucket
         throw new Error('More than one bucket was provided');
@@ -323,6 +331,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         selected: syncGroup.seriesShouldBeVisible(seriesKey),
       } as ProcessedBucket;
     });
+    const truncated = response.truncated;
+    return { buckets, truncated };
   }
 
   onAllSeriesCheckboxClick(checked: boolean) {

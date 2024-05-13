@@ -109,6 +109,7 @@ export class ChartGenerators {
         },
       ],
       autoResize: true,
+      truncated: response.truncated,
     };
   }
 }
