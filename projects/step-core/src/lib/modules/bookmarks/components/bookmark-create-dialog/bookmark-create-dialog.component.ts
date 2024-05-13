@@ -41,7 +41,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
     const tenant = this._multipleProjects.currentProject()?.name;
     const slashIndex = this._router.url.indexOf('/');
     const questionMarkIndex = this._router.url.indexOf('?');
-    const link = this._router.url.slice(slashIndex + 1, questionMarkIndex);
+    const link = this._router.url.slice(slashIndex + 1, questionMarkIndex === -1 ? undefined : questionMarkIndex);
     const fullLink = this._router.url.slice(slashIndex + 1);
     const initBookmark = this.getIconAndPage(link);
 
