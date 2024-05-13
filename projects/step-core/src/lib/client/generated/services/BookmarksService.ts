@@ -12,6 +12,8 @@ import type { TableResponseUserBookmark } from '../models/TableResponseUserBookm
 import type { UserBookmark } from '../models/UserBookmark';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
+import { map } from 'rxjs';
+import { Params } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class BookmarksService {
@@ -202,12 +204,25 @@ export class BookmarksService {
    * @throws ApiError
    */
   public getUserBookmarkTable(requestBody?: TableRequest): Observable<TableResponseUserBookmark> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/bookmarks/table',
-      body: requestBody,
-      mediaType: 'application/json',
-    });
+    return this.httpRequest
+      .request({
+        method: 'POST',
+        url: '/bookmarks/table',
+        body: requestBody,
+        mediaType: 'application/json',
+      })
+      .pipe(
+        map((data: any) => {
+          if (data.data) {
+            data.data.forEach((element: any) => {
+              if (element.customFields && typeof element.customFields['params'] === 'string') {
+                element.customFields['params'] = JSON.parse(element.customFields['params']) as Params;
+              }
+            });
+          }
+          return data;
+        }),
+      );
   }
 
   /**

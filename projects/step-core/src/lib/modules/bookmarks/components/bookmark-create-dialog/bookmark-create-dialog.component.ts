@@ -53,7 +53,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
         fullLink,
         tenant,
         icon: initBookmark?.icon,
-        params,
+        params: JSON.stringify(params),
       };
     });
   }

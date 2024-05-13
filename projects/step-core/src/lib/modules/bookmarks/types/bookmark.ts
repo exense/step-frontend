@@ -6,5 +6,5 @@ export type Bookmark = {
   fullLink?: string;
   tenant?: string;
   icon?: string;
-  params?: object;
+  params?: string;
 };
