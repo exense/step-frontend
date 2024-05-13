@@ -21,6 +21,7 @@
         <step-entity-selection-di [entity]="element" />
       </td>
     </ng-container>
+    <step-entity-column-container entityName="time-series" />
     <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Name</step-drag-column-caption>
@@ -31,7 +32,7 @@
           matTooltipPosition="below"
           [routerLink]="['/', 'dashboards', element.id]"
           class="name-column"
-          >{{ element.name }}</a
+          >{{ element.attributes.name }}</a
         >
       </td>
     </ng-container>
@@ -79,6 +80,14 @@
             >
               <step-icon name="edit" />
             </a>
+            <button
+              mat-icon-button
+              matTooltip="Duplicate dashboard"
+              [disabled]="!('dashboard-write' | hasRight | async)"
+              (click)="duplicateDashboard(element.id)"
+            >
+              <step-icon name="copy" />
+            </button>
             <button
               mat-icon-button
               matTooltip="Delete dashboard"
