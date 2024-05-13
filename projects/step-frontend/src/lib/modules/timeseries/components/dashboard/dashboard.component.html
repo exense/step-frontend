@@ -6,7 +6,7 @@
           <step-editable-label
             [ngModel]="dashboard.attributes!['name']"
             (ngModelChange)="onDashboardNameChange($event)"
-            [disabled]="!hasWritePermission || !dashboard.customFields?.['locked']"
+            [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
           />
         </div>
         <mat-menu #mainMenu="matMenu">
