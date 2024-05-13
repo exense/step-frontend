@@ -1,6 +1,6 @@
 <step-drag-drop-container>
   <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-    <div *stepAdditionalHeader="'btngroup-bulk-import-create'"></div>
+    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="time-series" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a

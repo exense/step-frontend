@@ -17,6 +17,7 @@ import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-param
 import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
+import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
 
 @NgModule({
   imports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
@@ -39,7 +40,12 @@ import { map } from 'rxjs';
   ],
 })
 export class TimeSeriesModule {
-  constructor(_viewRegistry: ViewRegistryService, _entityRegistry: EntityRegistry) {
+  constructor(
+    _viewRegistry: ViewRegistryService,
+    _entityRegistry: EntityRegistry,
+    _bulkOperations: DashboardBulkOperationsRegisterService,
+  ) {
+    _bulkOperations.register();
     _entityRegistry.register('time-series', 'Dashboard', { icon: 'monitor' });
     _viewRegistry.registerRoute({
       path: 'analytics',
