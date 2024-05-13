@@ -2,7 +2,13 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <div class="dashboard-name">{{ dashboard.attributes!['name'] }}</div>
+        <div class="dashboard-name">
+          <step-editable-label
+            [ngModel]="dashboard.attributes!['name']"
+            (ngModelChange)="onDashboardNameChange($event)"
+            [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
+          />
+        </div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -53,16 +59,13 @@
               Save
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-            <step-form-field>
-              <input type="text" class="name-input" [(ngModel)]="dashboard.attributes!['name']" />
-            </step-form-field>
           } @else {
             <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
               <button
                 mat-button
                 mat-flat-button
                 color="primary"
-                [disabled]="!('dashboard-write' | hasRight | async) || compareModeEnabled"
+                [disabled]="!hasWritePermission || compareModeEnabled"
                 (click)="enableEditMode()"
               >
                 Edit
