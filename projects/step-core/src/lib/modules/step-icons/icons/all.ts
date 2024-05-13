@@ -116,6 +116,7 @@ import { DownloadCloud } from './svg/download-cloud';
 import { Download } from './svg/download';
 import { Edit2 } from './svg/edit-2';
 import { Edit } from './svg/edit';
+import { Dashboard } from './svg/dashboard';
 import { Dribbble } from './svg/dribbble';
 import { Droplet } from './svg/droplet';
 import { Edit3 } from './svg/edit-3';
@@ -431,6 +432,7 @@ export const allIcons = {
   Download,
   Edit2,
   Edit,
+  Dashboard,
   Dribbble,
   Droplet,
   Edit3,
