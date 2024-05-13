@@ -1,6 +1,6 @@
 <step-drag-drop-container>
   <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="time-series" />
+    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="dashboard" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
@@ -21,7 +21,7 @@
         <step-entity-selection-di [entity]="element" />
       </td>
     </ng-container>
-    <step-entity-column-container entityName="time-series" />
+    <step-entity-column-container entityName="dashboard" />
     <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Name</step-drag-column-caption>

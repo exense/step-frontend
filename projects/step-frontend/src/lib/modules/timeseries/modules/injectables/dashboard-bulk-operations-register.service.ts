@@ -10,12 +10,12 @@ export class DashboardBulkOperationsRegisterService {
 
   register(): void {
     this._entityBulkOperationsRegister
-      .register('time-series', {
+      .register('dashboard', {
         type: BulkOperationType.DELETE,
         permission: 'dashboard-delete',
         operation: (requestBody) => this._dashboardsService.deleteDashboards(requestBody),
       })
-      .register('time-series', {
+      .register('dashboard', {
         type: BulkOperationType.DUPLICATE,
         permission: 'dashboard-write',
         operation: (requestBody) => this._dashboardsService.cloneDashboards(requestBody),
