@@ -7,4 +7,7 @@
   @if (testCasesSummary$ | async; as testCasesSummary) {
     <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
   }
+  @if (_state.executionId$ | async; as executionId) {
+    <step-alt-report-response-time-chart [executionId]="executionId" [timeRange]="(timeRange$ | async)!" />
+  }
 </section>

@@ -17,10 +17,23 @@ import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-param
 import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
+import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.component';
 
 @NgModule({
-  imports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
-  exports: [AnalyticsPageComponent, ExecutionPerformanceComponent, DashboardComponent, DashboardListComponent],
+  imports: [
+    AnalyticsPageComponent,
+    ExecutionPerformanceComponent,
+    DashboardComponent,
+    DashboardListComponent,
+    ChartDashletComponent,
+  ],
+  exports: [
+    AnalyticsPageComponent,
+    ExecutionPerformanceComponent,
+    DashboardComponent,
+    DashboardListComponent,
+    ChartDashletComponent,
+  ],
   providers: [
     {
       provide: MatPaginatorIntl,

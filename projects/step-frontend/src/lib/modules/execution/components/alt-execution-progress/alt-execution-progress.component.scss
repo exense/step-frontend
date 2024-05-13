@@ -37,11 +37,27 @@ step-alt-execution-progress {
       }
     }
 
-    .controls {
+    .progress-controls {
       display: flex;
-      align-items: center;
-      align-content: flex-end;
-      gap: 2rem;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-end;
+
+      .controls {
+        display: flex;
+        align-items: center;
+        align-content: flex-end;
+        gap: 2rem;
+      }
+      .range-picker {
+        min-width: 35rem;
+        step-form-field {
+          --form-field-border-radius: 1.6rem;
+          input {
+            border-left-style: none;
+          }
+        }
+      }
     }
   }
 

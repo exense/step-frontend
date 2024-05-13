@@ -1,0 +1,6 @@
+<h5>Relative time ranges</h5>
+<section>
+  @for (option of relativeTimes(); track option.key) {
+    <div (click)="pickRelativeTime.emit(option.key)">{{ option.value }}</div>
+  }
+</section>

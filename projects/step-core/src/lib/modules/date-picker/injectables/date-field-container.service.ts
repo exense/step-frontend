@@ -38,6 +38,10 @@ export class DateFieldContainerService<D> implements DateField<D>, OnDestroy {
     return !!this.dateField?.withTime();
   }
 
+  withRelativeTime(): boolean {
+    return !!this.dateField?.withRelativeTime();
+  }
+
   ngOnDestroy(): void {
     this.dateField = undefined;
   }

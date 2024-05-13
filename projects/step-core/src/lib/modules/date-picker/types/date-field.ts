@@ -8,5 +8,6 @@ export interface DateField<D> {
   isFieldDisabled(): boolean;
   isRangeField(): boolean;
   withTime(): boolean;
+  withRelativeTime(): boolean;
   dateAdapter(): DateAdapterService<D> | undefined;
 }

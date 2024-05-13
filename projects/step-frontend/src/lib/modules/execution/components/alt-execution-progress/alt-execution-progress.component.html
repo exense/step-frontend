@@ -8,33 +8,42 @@
       </div>
     }
   </div>
-  <div class="controls">
-    @if (isExecutionCompleted$ | async) {
-      @if (activeExecution$ | async; as activeExecution) {
-        <step-btn-group class="with-borders">
-          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-        </step-btn-group>
+  <div class="progress-controls">
+    <div class="controls">
+      @if (isExecutionCompleted$ | async) {
+        @if (activeExecution$ | async; as activeExecution) {
+          <step-btn-group class="without-borders">
+            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+          </step-btn-group>
+        }
       }
-    }
-    @if (execution$ | async; as execution) {
-      <step-btn-group class="with-borders">
-        <button type="button" mat-stroked-button [matMenuTriggerFor]="executionMenu">
-          <step-icon name="play-circle" />
-        </button>
-      </step-btn-group>
-      <mat-menu #executionMenu="matMenu">
-        <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-          <step-execution-commands
-            [description]="execution.description"
-            [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-            [execution]="execution"
-            (refresh)="manualRefresh()"
-            (scheduleTask)="handleTaskSchedule($event)"
-          />
-          <!--todo includedTestCases-->
-        </span>
-      </mat-menu>
-    }
+      @if (execution$ | async; as execution) {
+        <step-execution-commands
+          [displayParametersForm]="false"
+          [description]="execution.description"
+          [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+          [execution]="execution"
+          (refresh)="manualRefresh()"
+          (scheduleTask)="handleTaskSchedule($event)"
+        />
+      }
+      <!--todo includedTestCases-->
+    </div>
+    <div class="range-picker">
+      <step-form-field>
+        <step-prefix class="icon-prefix">
+          <step-icon name="calendar" (click)="picker.open()" />
+        </step-prefix>
+        <input
+          type="text"
+          placeholder="From - To"
+          [formControl]="dateRangeCtrl"
+          [stepDateRangePicker]="picker"
+          [showRelativeTime]="true"
+        />
+      </step-form-field>
+      <step-date-picker #picker />
+    </div>
   </div>
 </section>
 <section class="main">

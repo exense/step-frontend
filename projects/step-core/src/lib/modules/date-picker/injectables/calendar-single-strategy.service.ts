@@ -35,6 +35,11 @@ export class CalendarSingleStrategyService implements CalendarStrategyService<Da
     return currentSelection.set({ ...time });
   }
 
+  pickRelativeTime(milliseconds: number): DateTime | undefined | null {
+    const current = DateTime.now();
+    return current.set({ millisecond: current.millisecond - milliseconds });
+  }
+
   getStartAt(selection?: DateTime | null): DateTime | undefined | null {
     return selection;
   }

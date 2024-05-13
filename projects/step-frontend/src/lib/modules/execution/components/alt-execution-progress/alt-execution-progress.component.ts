@@ -5,6 +5,7 @@ import { filter, map, of, shareReplay, switchMap, combineLatest } from 'rxjs';
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
+  DateRange,
   Execution,
   ExecutiontTaskParameters,
   ReportNode,
@@ -23,6 +24,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
+import { FormBuilder } from '@angular/forms';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -57,8 +60,11 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   private _router = inject(Router);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
+  private _fb = inject(FormBuilder);
 
   private isTreeInitialized = false;
+
+  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
   readonly executionId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),
@@ -117,9 +123,10 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   ];
 
   ngOnInit(): void {
-    this.execution$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((execution) => this.refreshExecutionTree(execution));
+    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      this.refreshExecutionTree(execution);
+      this.applyDefaultRange(execution);
+    });
   }
 
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
@@ -130,6 +137,14 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   manualRefresh(): void {
     const executionId = this._activatedRoute.snapshot.params['id'];
     this._activeExecutions.getActiveExecution(executionId)?.manualRefresh();
+  }
+
+  private applyDefaultRange(execution: Execution): void {
+    const range: DateRange = {
+      start: DateTime.fromMillis(execution.startTime!),
+      end: DateTime.fromMillis(execution.endTime!),
+    };
+    this.dateRangeCtrl.setValue(range);
   }
 
   private refreshExecutionTree(execution: Execution): void {

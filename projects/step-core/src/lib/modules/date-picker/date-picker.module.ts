@@ -7,6 +7,7 @@ import { DateRangePickerDirective } from './directives/date-range-picker.directi
 import { SingleTimePickerComponent } from './components/single-time-picker/single-time-picker.component';
 import { RangeTimePickerComponent } from './components/range-time-picker/range-time-picker.component';
 import { TimePickerComponent } from './components/time-picker/time-picker.component';
+import { RelativeTimePickerComponent } from './components/relative-time-picker/relative-time-picker.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { TimePickerComponent } from './components/time-picker/time-picker.compon
     SingleTimePickerComponent,
     RangeTimePickerComponent,
     TimePickerComponent,
+    RelativeTimePickerComponent,
   ],
   imports: [StepBasicsModule],
   exports: [DatePickerComponent, DatePickerDirective, DateRangePickerDirective],

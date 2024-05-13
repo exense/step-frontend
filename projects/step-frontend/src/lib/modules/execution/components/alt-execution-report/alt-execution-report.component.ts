@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { map } from 'rxjs';
+import { map, startWith } from 'rxjs';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
+import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -17,6 +17,18 @@ export class AltExecutionReportComponent {
   readonly keywordsSummary$ = this._state.keywords$.pipe(map((keywords) => this.createSummary(keywords)));
 
   readonly testCasesSummary$ = this._state.testCases$.pipe(map((testCases) => this.createSummary(testCases)));
+
+  readonly timeRange$ = this._state.dateRangeCtrl.valueChanges.pipe(
+    startWith(this._state.dateRangeCtrl.value),
+    map((dateRange) => {
+      if (!dateRange) {
+        return undefined;
+      }
+      const from = dateRange.start!.toMillis();
+      const to = dateRange.end!.toMillis();
+      return { from, to } as TimeRange;
+    }),
+  );
 
   private createSummary(reportNodes?: ReportNode[]): ReportNodeSummary | undefined {
     if (!reportNodes) {

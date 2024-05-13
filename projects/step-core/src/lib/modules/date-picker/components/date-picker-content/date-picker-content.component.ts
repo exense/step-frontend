@@ -8,6 +8,7 @@ import { DateSingleAdapterService } from '../../injectables/date-single-adapter.
 import { DateRange } from '../../types/date-range';
 import { TimeRange } from '../../types/time-range';
 import { Time } from '../../types/time';
+import { RELATIVE_TIME_OPTIONS } from '../../injectables/relative-time-options.token';
 
 @Component({
   selector: 'step-date-picker-content',
@@ -31,10 +32,12 @@ import { Time } from '../../types/time';
 export class DatePickerContentComponent {
   private _fieldContainer = inject<DateFieldContainerService<DateTime | DateRange>>(DateFieldContainerService);
   private _calendarStrategy = inject(CalendarStrategyService);
+  protected _relativeTimeOptions = inject(RELATIVE_TIME_OPTIONS);
   private adapter = this._fieldContainer.dateAdapter();
   private predefinedTime?: Time | TimeRange | null;
 
   readonly withTime = this._fieldContainer.withTime();
+  readonly withRelativeTime = this._fieldContainer.withRelativeTime();
 
   model = this._fieldContainer.getModel();
 
@@ -42,7 +45,8 @@ export class DatePickerContentComponent {
   startAt = this._calendarStrategy.getStartAt(this.model);
 
   handleSelectionChange(date: DateTime | undefined | null): void {
-    let changedModel = this._calendarStrategy.handleDateSelection(date, this.model, this.withTime);
+    const keepTime = this.withTime || this.withRelativeTime;
+    let changedModel = this._calendarStrategy.handleDateSelection(date, this.model, keepTime);
     if (this.predefinedTime) {
       changedModel = this._calendarStrategy.handleTimeSelection(this.predefinedTime, changedModel);
       this.predefinedTime = undefined;
@@ -56,6 +60,11 @@ export class DatePickerContentComponent {
       return;
     }
     const changedModel = this._calendarStrategy.handleTimeSelection(time, this.model);
+    this.updateModel(changedModel);
+  }
+
+  pickRelativeTime(milliseconds: number): void {
+    const changedModel = this._calendarStrategy.pickRelativeTime(milliseconds);
     this.updateModel(changedModel);
   }
 

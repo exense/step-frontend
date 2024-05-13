@@ -98,6 +98,12 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
     return currentSelection;
   }
 
+  pickRelativeTime(milliseconds: number): DateRange | undefined | null {
+    const end = DateTime.now();
+    const start = end.set({ millisecond: end.millisecond - milliseconds });
+    return { start, end };
+  }
+
   getStartAt(selection?: DateRange | null): DateTime | undefined | null {
     return selection?.start;
   }
