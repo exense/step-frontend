@@ -95,6 +95,7 @@ export class ThreadGroupChartGenerator {
           grid: { show: false },
         },
       ],
+      truncated: response.truncated,
     };
   }
 }

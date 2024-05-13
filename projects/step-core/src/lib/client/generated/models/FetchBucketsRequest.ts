@@ -13,4 +13,5 @@ export type FetchBucketsRequest = {
   percentiles?: Array<number>;
   collectAttributeKeys?: Array<string>;
   collectAttributesValuesLimit?: number;
+  maxNumberOfSeries?: number;
 };

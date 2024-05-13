@@ -56,6 +56,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   dimensionKey = 'name';
   baseResponse: TimeSeriesAPIResponse | undefined; // in the context of compare mode, the main execution is the 'base' one
   compareResponse: TimeSeriesAPIResponse | undefined;
+  truncated?: boolean;
   groupDimensions: string[] = [];
 
   allSeriesChecked: boolean = true;
@@ -212,6 +213,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   updateData(response: TimeSeriesAPIResponse) {
     this.tableIsLoading = false;
     this.baseResponse = response;
+    this.truncated = response.truncated;
     let baseData = this.processResponse(response, this.executionContext);
     const compareData = this.compareModeEnabled
       ? this.processResponse(this.compareResponse!, this.compareContext!)
@@ -240,6 +242,7 @@ export class TimeseriesTableComponent implements OnInit, OnDestroy {
   updateCompareData(response: TimeSeriesAPIResponse, compareContext: TimeSeriesContext) {
     this.tableIsLoading = false;
     this.compareResponse = response;
+    this.truncated = response.truncated;
     const baseData = this.processResponse(this.baseResponse!, this.executionContext);
     const compareData = this.processResponse(response, compareContext);
     const mergedData = this.mergeBaseAndCompareData(baseData, compareData);

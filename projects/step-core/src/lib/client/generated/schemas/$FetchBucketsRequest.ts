@@ -51,5 +51,9 @@ export const $FetchBucketsRequest = {
       type: 'number',
       format: 'int32',
     },
+    maxNumberOfSeries: {
+      type: 'number',
+      format: 'int32',
+    },
   },
 } as const;

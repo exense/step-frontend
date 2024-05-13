@@ -1,23 +1,34 @@
 import { FunctionPackage, KeywordPackagesService } from '../../generated';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {
   StepDataSource,
   TableRemoteDataSourceFactoryService,
   TableApiWrapperService,
 } from '../../table/step-table-client.module';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { HttpEvent } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AugmentedKeywordPackagesService extends KeywordPackagesService {
+export class AugmentedKeywordPackagesService extends KeywordPackagesService implements HttpOverrideResponseInterceptor {
   private _tableRest = inject(TableApiWrapperService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
 
   private functionPackagedCached?: FunctionPackage;
 
   static readonly FUNCTION_PACKAGE_TABLE_ID = 'functionPackage';
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
+  }
 
   createDataSource(): StepDataSource<FunctionPackage> {
     return this._dataSourceFactory.createDataSource(AugmentedKeywordPackagesService.FUNCTION_PACKAGE_TABLE_ID, {

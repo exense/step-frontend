@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <div class="dashboard-name">{{ dashboard.name }}</div>
+        <div class="dashboard-name">{{ dashboard.attributes!['name'] }}</div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -41,12 +41,18 @@
             <step-alert class="edit-alert" type="WARNING"
               >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
             >
-            <button [disabled]="!dashboard.name" mat-button mat-flat-button color="primary" (click)="saveEditChanges()">
+            <button
+              [disabled]="!dashboard.attributes!['name']"
+              mat-button
+              mat-flat-button
+              color="primary"
+              (click)="saveEditChanges()"
+            >
               Save
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
             <step-form-field>
-              <input type="text" class="name-input" [(ngModel)]="dashboard.name" />
+              <input type="text" class="name-input" [(ngModel)]="dashboard.attributes!['name']" />
             </step-form-field>
           } @else {
             <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">

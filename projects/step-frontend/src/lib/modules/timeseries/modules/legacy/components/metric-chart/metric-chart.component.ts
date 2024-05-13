@@ -217,6 +217,7 @@ export class MetricChartComponent implements OnInit, OnChanges {
           },
         },
       ],
+      truncated: response.truncated,
     };
   }
 

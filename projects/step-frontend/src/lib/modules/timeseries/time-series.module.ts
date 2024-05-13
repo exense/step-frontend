@@ -5,6 +5,7 @@ import {
   SimpleOutletComponent,
   ViewRegistryService,
   DashboardsService,
+  EntityRegistry,
 } from '@exense/step-core';
 import { NoTotalCountPaginator } from './modules/_common';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -38,7 +39,8 @@ import { map } from 'rxjs';
   ],
 })
 export class TimeSeriesModule {
-  constructor(_viewRegistry: ViewRegistryService) {
+  constructor(_viewRegistry: ViewRegistryService, _entityRegistry: EntityRegistry) {
+    _entityRegistry.register('time-series', 'Dashboard', { icon: 'monitor' });
     _viewRegistry.registerRoute({
       path: 'analytics',
       component: AnalyticsPageComponent,
