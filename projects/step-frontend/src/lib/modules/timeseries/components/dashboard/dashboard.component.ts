@@ -136,6 +136,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  onDashboardNameChange(name: string) {
+    if (!name) {
+      this.dashboard.attributes!['name'] = 'Unnamed';
+      return;
+    }
+    this.dashboard.attributes!['name'] = name;
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
   handleRefreshIntervalChange(interval: number) {
     this.refreshInterval = interval;
     this.updateUrl();
