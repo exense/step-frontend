@@ -134,7 +134,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     let fullTimeRangeChange = changes['defaultFullTimeRange'];
-    if (fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue && !fullTimeRangeChange.firstChange) {
+    if (
+      fullTimeRangeChange &&
+      fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue &&
+      !fullTimeRangeChange.firstChange
+    ) {
       this.mainEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
       this.compareEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
     }
