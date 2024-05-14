@@ -6,7 +6,7 @@ import { Directive, ElementRef, inject, Input } from '@angular/core';
 export class TestDataIdDirective {
   @Input('testDataId') testDataId: string | undefined;
 
-  private _el = inject(ElementRef);
+  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
 
   ngOnInit() {
     this._el.nativeElement.setAttribute('data-testid', this.testDataId);
