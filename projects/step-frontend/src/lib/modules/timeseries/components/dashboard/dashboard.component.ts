@@ -175,8 +175,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public refresh() {
-    this.mainEngine.triggerRefresh(false);
-    this.compareEngine?.triggerRefresh(false);
+    if (!this.compareModeEnabled) {
+      this.mainEngine.triggerRefresh(false);
+      this.compareEngine?.triggerRefresh(false);
+    }
   }
 
   onDashboardNameChange(name: string) {
