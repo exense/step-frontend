@@ -31,7 +31,7 @@ import {
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { TsComparePercentagePipe } from '../../modules/legacy/pipes/ts-compare-percentage.pipe';
+import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';

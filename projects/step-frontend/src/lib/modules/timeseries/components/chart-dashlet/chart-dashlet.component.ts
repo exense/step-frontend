@@ -24,7 +24,6 @@ import { forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
-import { ChartGenerators } from '../../modules/legacy/injectables/chart-generators';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
@@ -44,6 +43,7 @@ interface MetricAttributeSelection extends MetricAttribute {
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
+  private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
@@ -340,7 +340,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: secondaryAxesData,
         value: (x, v: number) => Math.trunc(v) + ' total',
         fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
-        paths: ChartGenerators.barsFunction({ size: [1, 100, 4], radius: 0.2, gap: 1 }),
+        paths: this.barsFunction({ size: [1, 100, 4], radius: 0.2, gap: 1 }),
         points: { show: false },
       });
     }

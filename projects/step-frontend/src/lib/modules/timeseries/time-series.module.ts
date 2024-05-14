@@ -29,11 +29,6 @@ import { AnalyticsPageComponent } from './components/analytics-page/analytics-pa
     },
     {
       provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
-      useClass: TsNavigatorQueryParamsCleanupService,
-      multi: true,
-    },
-    {
-      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
       useClass: DashboardNavigatorQueryParamsCleanupService,
       multi: true,
     },
