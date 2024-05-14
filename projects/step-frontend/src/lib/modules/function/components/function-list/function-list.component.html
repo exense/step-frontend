@@ -4,7 +4,7 @@
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
       <step-btn-group class="import-keyword-button-group">
         <a
-          testDataId="import-keyword-btn"
+          stepTestId="import-keyword-btn"
           type="button"
           mat-icon-button
           matTooltip="Import keyword"
@@ -15,7 +15,7 @@
           <step-icon name="download" />
         </a>
         <a
-          testDataId="export-keywords-btn"
+          stepTestId="export-keywords-btn"
           type="button"
           mat-icon-button
           matTooltip="Export all keywords"
@@ -28,7 +28,7 @@
       </step-btn-group>
       <step-btn-group class="create-keyword-button-group">
         <a
-          testDataId="new-keyword-btn"
+          stepTestId="new-keyword-btn"
           type="button"
           mat-mini-fab
           color="primary"
@@ -52,7 +52,7 @@
     <step-entity-column-container entityName="functions" />
     <ng-container matColumnDef="type" stepSearchCol stepActivityCol="Type">
       <step-function-type-filter
-        testDataId="type-filter-select"
+        stepTestId="type-filter-select"
         *stepSearchCellDef
         stepFilterConnect
         [useRegex]="true"
@@ -65,7 +65,7 @@
     @if (_hasPackages) {
       <ng-container matColumnDef="customFields.functionPackageId" stepSearchCol stepActivityCol="Package">
         <step-search-custom-cell
-          testDataId="package-input"
+          stepTestId="package-input"
           *stepSearchCellDef
           itemKey="rest/table/functionPackage/searchIdsBy/attributes.name"
           stepFilterConnect
@@ -95,7 +95,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <button
-            testDataId="open-keyword-btn"
+            stepTestId="open-keyword-btn"
             mat-icon-button
             matTooltip="Open keyword in editor"
             [disabled]="!('kw-write' | hasRight | async)"
@@ -104,7 +104,7 @@
             <step-icon name="edit-2" />
           </button>
           <button
-            testDataId="execute-keyword-btn"
+            stepTestId="execute-keyword-btn"
             mat-icon-button
             matTooltip="Execute keyword"
             [disabled]="!('kw-execute' | hasRight | async)"
@@ -113,7 +113,7 @@
             <step-icon name="play" />
           </button>
           <button
-            testDataId="delete-keyword-btn"
+            stepTestId="delete-keyword-btn"
             mat-icon-button
             matTooltip="Delete keyword"
             [disabled]="!('kw-delete' | hasRight | async)"
@@ -132,7 +132,7 @@
 <step-entity-menu #entityMenu entity="functions" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
     <a
-      testDataId="configure-keyword-btn"
+      stepTestId="configure-keyword-btn"
       mat-menu-item
       [disabled]="!('kw-write' | hasRight | async)"
       [routerLink]="element | keywordConfigurerUrl"
@@ -142,7 +142,7 @@
     </a>
 
     <button
-      testDataId="duplicate-keyword-btn"
+      stepTestId="duplicate-keyword-btn"
       mat-menu-item
       [disabled]="!('kw-write' | hasRight | async)"
       (click)="duplicateFunction(element.id)"
@@ -152,7 +152,7 @@
     </button>
 
     <a
-      testDataId="export-keyword-btn"
+      stepTestId="export-keyword-btn"
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
       [routerLink]="['/', 'functions', 'export', element.id]"
@@ -162,7 +162,7 @@
     </a>
 
     <button
-      testDataId="functions-find-usages-btn"
+      stepTestId="functions-find-usages-btn"
       mat-menu-item
       [disabled]="!('kw-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"

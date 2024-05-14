@@ -4,7 +4,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
-          testDataId="import-parameter-btn"
+          stepTestId="import-parameter-btn"
           mat-icon-button
           matTooltipPosition="below"
           matTooltip="Import parameter"
@@ -14,7 +14,7 @@
           <step-icon name="download" />
         </a>
         <a
-          testDataId="export-parameters-btn"
+          stepTestId="export-parameters-btn"
           mat-icon-button
           matTooltipPosition="below"
           matTooltip="Export all parameters"
@@ -26,7 +26,7 @@
       </step-btn-group>
       <step-btn-group>
         <a
-          testDataId="new-parameter-btn"
+          stepTestId="new-parameter-btn"
           type="button"
           mat-mini-fab
           color="primary"
@@ -48,7 +48,7 @@
     <step-entity-column-container entityName="parameters" />
     <ng-container matColumnDef="scope" stepActivityCol="Scope" stepSearchCol>
       <step-input-filter
-        testDataId="scope-input"
+        stepTestId="scope-input"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.scopeFilterCondition"
@@ -97,7 +97,7 @@
     </ng-container>
     <ng-container matColumnDef="priority" stepActivityCol="Priority" stepSearchCol>
       <step-input-filter
-        testDataId="priority-input"
+        stepTestId="priority-input"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.numberFilterCondition"
@@ -127,7 +127,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
-            testDataId="edit-parameter-btn"
+            stepTestId="edit-parameter-btn"
             mat-icon-button
             matTooltip="Edit parameter"
             [disabled]="
@@ -139,7 +139,7 @@
             <step-icon name="edit-2" />
           </a>
           <button
-            testDataId="duplicate-parameter-btn"
+            stepTestId="duplicate-parameter-btn"
             mat-icon-button
             matTooltip="Duplicate parameter"
             [disabled]="
@@ -151,7 +151,7 @@
             <step-icon name="copy" />
           </button>
           <button
-            testDataId="delete-parameter-btn"
+            stepTestId="delete-parameter-btn"
             mat-icon-button
             matTooltip="Delete parameter"
             [disabled]="
@@ -163,7 +163,7 @@
             <step-icon name="trash-2" />
           </button>
           <step-entity-menu-button
-            testDataId="parameters-entity-menu-btn"
+            stepTestId="parameters-entity-menu-btn"
             [entityItem]="element"
             [entityMenu]="entityMenu"
             stepHighlightTableRow

@@ -14,7 +14,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>
         <step-autorefresh-toggle
-          testDataId="execution-auto-refresh"
+          stepTestId="execution-auto-refresh"
           [(disabled)]="autoRefreshDisabled"
           [interval]="5000"
           (refresh)="refreshTable()"
@@ -39,7 +39,7 @@
     </ng-container>
     <ng-container matColumnDef="executionTime" stepActivityCol="Execution Time" stepSearchCol>
       <step-range-filter
-        testDataId="execution-time-select"
+        stepTestId="execution-time-select"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.dateRangeFilterCondition"
@@ -72,7 +72,7 @@
     </ng-container>
     <ng-container matColumnDef="startTime" stepActivityCol="Start Time" stepSearchCol [isHiddenByDefault]="true">
       <step-date-filter
-        testDataId="start-time-filter"
+        stepTestId="start-time-filter"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
@@ -86,7 +86,7 @@
     </ng-container>
     <ng-container matColumnDef="endTime" stepActivityCol="End Time" stepSearchCol [isHiddenByDefault]="true">
       <step-date-filter
-        testDataId="end-time-filter"
+        stepTestId="end-time-filter"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
@@ -106,7 +106,7 @@
     </ng-container>
     <ng-container matColumnDef="status" stepActivityCol="Status" stepSearchCol>
       <step-multi-level-array-filter
-        testDataId="status-select"
+        stepTestId="status-select"
         *stepSearchCellDef
         #statusFilter
         stepFilterConnect

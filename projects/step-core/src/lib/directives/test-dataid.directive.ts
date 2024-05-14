@@ -1,14 +1,20 @@
-import { Directive, ElementRef, inject, Input } from '@angular/core';
+import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Renderer2 } from '@angular/core';
 
 @Directive({
-  selector: '[testDataId]',
+  selector: '[stepTestId]',
 })
 export class TestDataIdDirective {
-  @Input('testDataId') testDataId: string | undefined;
+  testDataId: InputSignal<string | undefined> = input<string | undefined>();
 
   private _el = inject(ElementRef);
+  private renderer = inject(Renderer2);
 
-  ngOnInit() {
-    this._el.nativeElement.setAttribute('data-testid', this.testDataId);
+  constructor() {
+    effect(() => {
+      const value = this.testDataId();
+      if (value !== undefined) {
+        this.renderer.setAttribute(this._el.nativeElement, 'data-step-testid', value);
+      }
+    });
   }
 }

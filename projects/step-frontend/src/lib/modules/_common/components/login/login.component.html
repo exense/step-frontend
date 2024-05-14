@@ -17,7 +17,7 @@
         <div class="step-login-input-wrapper">
           <p class="step-login-input-label">Username</p>
           <input
-            testDataId="username-input"
+            stepTestId="username-input"
             [(ngModel)]="credentials.username"
             name="username"
             autocomplete="username"
@@ -29,7 +29,7 @@
         <div class="step-login-input-wrapper" (stepCapsLock)="capsLock = $event">
           <p class="step-login-input-label">Password</p>
           <input
-            testDataId="password-input"
+            stepTestId="password-input"
             [(ngModel)]="credentials.password"
             name="password"
             autocomplete="current-password"
@@ -42,7 +42,7 @@
         </div>
         <div>
           <button
-            testDataId="sign-in-btn"
+            stepTestId="sign-in-btn"
             class="step-login-button"
             mat-button
             color="primary"

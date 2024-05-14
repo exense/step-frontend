@@ -2,13 +2,13 @@
   <div class="token-group-checkboxes">
     <span class="token-group-checkboxes-groupby">Group by:</span>
     <span class="token-group-checkboxes-checkbox" *ngFor="let key of checkedMapKeys$ | async"
-      ><input testDataId="key-checkbox" type="checkbox" [checked]="checkedMap[key]" (click)="toggleCheckBox(key)" />{{
+      ><input stepTestId="key-checkbox" type="checkbox" [checked]="checkedMap[key]" (click)="toggleCheckBox(key)" />{{
         key
       }}</span
     >
   </div>
   <step-btn-group>
-    <step-autorefresh-toggle testDataId="token-group-auto-refresh" [interval]="5000" (refresh)="loadTable()">
+    <step-autorefresh-toggle stepTestId="token-group-auto-refresh" [interval]="5000" (refresh)="loadTable()">
     </step-autorefresh-toggle>
   </step-btn-group>
 </section>

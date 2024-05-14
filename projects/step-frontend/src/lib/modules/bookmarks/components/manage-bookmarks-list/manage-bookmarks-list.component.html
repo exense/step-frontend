@@ -21,14 +21,14 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
-          testDataId="rename-label-btn"
+          stepTestId="rename-label-btn"
           mat-icon-button
           matTooltip="Rename Label"
           (click)="renameBookmark(element)"
         >
           <step-icon name="edit"></step-icon></button
         ><button
-          testDataId="delete-bookmark-btn"
+          stepTestId="delete-bookmark-btn"
           mat-icon-button
           matTooltip="Delete Bookmark"
           (click)="deleteBookmark(element)"
@@ -36,7 +36,7 @@
           <step-icon name="trash-2"></step-icon>
         </button>
         <step-entity-menu-button
-          testDataId="bookmarks-entity-menu-btn"
+          stepTestId="bookmarks-entity-menu-btn"
           [entityItem]="element"
           [entityMenu]="entityMenu"
           stepHighlightTableRow
