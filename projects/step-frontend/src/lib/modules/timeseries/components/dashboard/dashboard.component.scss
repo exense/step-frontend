@@ -12,6 +12,8 @@
   display: flex;
   justify-content: space-between;
   margin: 0 0.4rem;
+  position: relative;
+  z-index: 101;
 
   .left-section {
     display: flex;
@@ -82,7 +84,6 @@
 .dashboard-name {
   font-size: 1.8rem;
   min-width: 10rem;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
