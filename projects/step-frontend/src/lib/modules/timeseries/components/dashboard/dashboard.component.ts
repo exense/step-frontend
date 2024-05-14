@@ -98,6 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
+  @Input() showDashboardName = true;
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -167,7 +168,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       this.updateUrl();
     });
 
-if (pageParams.editMode && this.hasWritePermission && this.editable) {
+    if (pageParams.editMode && this.hasWritePermission && this.editable) {
       this.fetchMetricTypes();
       this.enableEditMode();
     }

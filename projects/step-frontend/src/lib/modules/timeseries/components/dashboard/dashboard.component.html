@@ -3,11 +3,13 @@
     <div class="header-container">
       <div>
         <div class="dashboard-name">
-          <step-editable-label
-            [ngModel]="dashboard.attributes!['name']"
-            (ngModelChange)="onDashboardNameChange($event)"
-            [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-          />
+          @if (showDashboardName) {
+            <step-editable-label
+              [ngModel]="dashboard.attributes!['name']"
+              (ngModelChange)="onDashboardNameChange($event)"
+              [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
+            />
+          }
         </div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
