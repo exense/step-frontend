@@ -166,8 +166,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     context.stateChange$.subscribe((stateChanged) => {
       this.updateUrl();
     });
-    // this.subscribeForTimeRangeChange();
-    if (pageParams.editMode && this.hasWritePermission && this.editable) {
+
+if (pageParams.editMode && this.hasWritePermission && this.editable) {
       this.fetchMetricTypes();
       this.enableEditMode();
     }
@@ -176,6 +176,16 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   public refresh() {
     this.mainEngine.triggerRefresh(false);
     this.compareEngine?.triggerRefresh(false);
+  }
+
+  onDashboardNameChange(name: string) {
+    if (!name) {
+      this.dashboard.attributes!['name'] = 'Unnamed';
+      return;
+    }
+    this.dashboard.attributes!['name'] = name;
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
   }
 
   handleRefreshIntervalChange(interval: number) {
@@ -571,13 +581,9 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   removeOneTimeUrlParams() {
-    // Get a copy of the current query parameters
     const currentParams = { ...this._route.snapshot.queryParams };
-
-    // Remove the specific parameter
     currentParams[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + 'edit'] = null;
 
-    // Navigate with the updated parameters
     this._router.navigate([], {
       relativeTo: this._route,
       replaceUrl: true,
