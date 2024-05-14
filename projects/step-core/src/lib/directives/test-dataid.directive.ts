@@ -6,7 +6,7 @@ import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Rende
 export class TestDataIdDirective {
   testDataId: InputSignal<string | undefined> = input<string | undefined>();
 
-  private _el = inject(ElementRef);
+  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private renderer = inject(Renderer2);
 
   constructor() {
