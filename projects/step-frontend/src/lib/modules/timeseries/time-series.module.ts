@@ -12,17 +12,17 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DashboardListComponent } from './components/dashboard-list/dashboard-list.component';
 import { NewDashboardDialogComponent } from './components/new-dashboard-dialog/new-dashboard-dialog.component';
-import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
 import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { DashboardPageComponent } from './components/dashboard-page/dashboard-page.component';
 import { AnalyticsPageComponent } from './components/analytics-page/analytics-page.component';
 import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
+import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 
 @NgModule({
-  imports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent],
-  exports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent],
+  imports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent, ExecutionPageComponent],
+  exports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent, ExecutionPageComponent],
   providers: [
     {
       provide: MatPaginatorIntl,

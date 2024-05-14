@@ -37,7 +37,6 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
-import { ExecutionPageComponent } from '../timeseries/components/execution-page/execution-page.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +69,7 @@ import { ExecutionPageComponent } from '../timeseries/components/execution-page/
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ExecutionPageComponent],
+  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
