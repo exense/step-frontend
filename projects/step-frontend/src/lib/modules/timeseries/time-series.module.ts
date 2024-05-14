@@ -18,6 +18,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { DashboardPageComponent } from './components/dashboard-page/dashboard-page.component';
 import { AnalyticsPageComponent } from './components/analytics-page/analytics-page.component';
+import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
 
 @NgModule({
   imports: [AnalyticsPageComponent, DashboardComponent, DashboardListComponent],
@@ -35,8 +36,13 @@ import { AnalyticsPageComponent } from './components/analytics-page/analytics-pa
   ],
 })
 export class TimeSeriesModule {
-  constructor(_viewRegistry: ViewRegistryService, _entityRegistry: EntityRegistry) {
-    _entityRegistry.register('time-series', 'Dashboard', { icon: 'monitor' });
+  constructor(
+    _viewRegistry: ViewRegistryService,
+    _entityRegistry: EntityRegistry,
+    _bulkOperations: DashboardBulkOperationsRegisterService,
+  ) {
+    _bulkOperations.register();
+    _entityRegistry.register('dashboard', 'Dashboard', { icon: 'dashboard' });
     _viewRegistry.registerRoute({
       path: 'analytics',
       component: AnalyticsPageComponent,
