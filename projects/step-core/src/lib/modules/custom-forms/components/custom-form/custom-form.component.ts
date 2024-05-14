@@ -1,10 +1,11 @@
 import { Component, EventEmitter, HostBinding, inject, Input, OnInit, Output } from '@angular/core';
-import { Input as StInput, ScreensService } from '../../../../client/step-client-module';
-import { ObjectUtilsService } from '../../../basics/step-basics.module';
+import { AugmentedScreenService, Input as StInput } from '../../../../client/step-client-module';
+import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
 import { DynamicLabelCustomFormInputComponent } from '../custom-form-input/dynamic-label-custom-form-input.component';
 import { CustomFormInputModelPipe } from '../../pipes/custom-form-input-model.pipe';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'step-custom-forms',
@@ -19,7 +20,9 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
   ],
 })
 export class CustomFormComponent implements OnInit {
-  private _screensService = inject(ScreensService);
+  private _screensService = inject(AugmentedScreenService);
+  private _activatedRoute = inject(ActivatedRoute);
+  private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
 
   @HostBinding('class.editable-label-mode') @Input() stEditableLabelMode = false;
@@ -36,6 +39,7 @@ export class CustomFormComponent implements OnInit {
   inputs: StInput[] = [];
 
   ngOnInit(): void {
+    this._screenDataMeta.checkMetaInformationAboutScreenInRoute(this.stScreen, this._activatedRoute);
     this.updateInputs();
   }
 

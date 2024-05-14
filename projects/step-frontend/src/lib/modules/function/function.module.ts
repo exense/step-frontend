@@ -19,6 +19,7 @@ import {
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
   NavigatorService,
+  preloadScreenDataResolver,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -65,6 +66,9 @@ export class FunctionModule {
   private registerViews(): void {
     this._viewRegistry.registerRoute({
       path: 'functions',
+      resolve: {
+        keywordScreenData: preloadScreenDataResolver('keyword'),
+      },
       component: FunctionListComponent,
       children: [
         {
@@ -153,10 +157,12 @@ export class FunctionModule {
     });
     this._viewRegistry.registerRoute({
       path: 'composites',
-      component: SimpleOutletComponent,
       resolve: {
+        keywordScreenData: preloadScreenDataResolver('keyword'),
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
         activatedViewId: () => inject(NavigatorService).forceActivateView('functions'),
       },
+      component: SimpleOutletComponent,
       canDeactivate: [() => inject(NavigatorService).cleanupActivateView()],
       children: [
         {
