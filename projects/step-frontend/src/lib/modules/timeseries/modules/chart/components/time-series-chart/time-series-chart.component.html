@@ -21,6 +21,12 @@
   (legendSettings.items.length || legendSettings.zAxisLabel || settings.truncated)
 ) {
   <div class="ts-chart-legend">
+    <div
+      class="expand-triangle"
+      [class.expanded]="legendSettings.expanded"
+      [matTooltip]="legendSettings.expanded ? 'Collapse' : 'Expand'"
+      (click)="legendSettings.expanded = !legendSettings.expanded"
+    ></div>
     @if (legendSettings.show) {
       <div class="left-section">
         @if (settings.truncated) {
@@ -32,7 +38,7 @@
             />
           </div>
         }
-        <div class="legend-items">
+        <div class="legend-items" [class.expanded]="legendSettings.expanded">
           @for (item of legendSettings.items; track item.label) {
             @if (item.isVisible) {
               <div class="item">
