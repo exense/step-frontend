@@ -6,7 +6,6 @@ import { Params } from '@angular/router';
 })
 export class ExtractQueryParamsPipe implements PipeTransform {
   transform(url: string): Params {
-    // http://localhost:4201/#/parameters?tenant=Common&tq_key=r%5Btest%5D
     const urlParams = new URLSearchParams(url.split('?')[1]);
     const params: Record<string, string | string[]> = {};
     urlParams.forEach((value, key) => {
