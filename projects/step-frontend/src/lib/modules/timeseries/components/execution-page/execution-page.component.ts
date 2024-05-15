@@ -55,9 +55,9 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         label: 'Execution',
         isLocked: true,
         exactMatch: true,
-        freeTextValues: [this.execution.id!],
-        searchEntities: [],
-        type: FilterBarItemType.FREE_TEXT,
+        freeTextValues: [],
+        searchEntities: [{ searchValue: this.execution.id!, entity: this.execution }],
+        type: FilterBarItemType.EXECUTION,
       },
     ];
     this.executionRange = this.getExecutionRange(this.execution);
