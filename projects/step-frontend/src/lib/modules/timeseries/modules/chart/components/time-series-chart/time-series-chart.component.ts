@@ -48,7 +48,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
   @Input() height: number = 300;
-  @Input() legendMarker: MarkerType = MarkerType.SQUARE;
+  @Input() legendMarker: MarkerType = MarkerType.DOTS;
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
@@ -63,7 +63,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   chartIsEmpty = false; // meaning the chart is already created, but it has no data
   chartIsUnavailable = false;
 
-  legendSettings: LegendSettings = { show: true, items: [] };
+  legendSettings: LegendSettings = { show: true, items: [], expanded: false };
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
@@ -426,6 +426,7 @@ interface LegendSettings {
   show: boolean;
   items: LegendItem[];
   zAxisLabel?: string;
+  expanded: boolean;
 }
 
 interface LegendItem {
