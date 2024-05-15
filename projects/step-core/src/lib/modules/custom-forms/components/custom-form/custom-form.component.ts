@@ -6,6 +6,7 @@ import { DynamicLabelCustomFormInputComponent } from '../custom-form-input/dynam
 import { CustomFormInputModelPipe } from '../../pipes/custom-form-input-model.pipe';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
 import { ActivatedRoute } from '@angular/router';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'step-custom-forms',
@@ -44,12 +45,20 @@ export class CustomFormComponent implements OnInit {
   }
 
   protected updateInputs() {
-    this._screensService.getInputsForScreenPost(this.stScreen, this.stModel).subscribe((inputs) => {
-      const updatedInputs = inputs.filter((input) => !this.stExcludeFields.includes(input.id!));
-      if (JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)) {
-        this.inputs = updatedInputs;
-      }
-    });
+    this._screensService
+      .getScreenInputsByScreenIdWithCache(this.stScreen)
+      .pipe(
+        map(
+          (screenInputs) =>
+            screenInputs
+              .map((screenInput) => screenInput.input)
+              .filter((input) => !!input && !this.stExcludeFields.includes(input.id!)) as StInput[],
+        ),
+        filter((updatedInputs) => JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)),
+      )
+      .subscribe((inputs) => {
+        this.inputs = inputs;
+      });
   }
 
   protected onInputValueChange(input: StInput, value: string): void {
