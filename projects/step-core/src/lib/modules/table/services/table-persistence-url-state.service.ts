@@ -15,8 +15,16 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
   private _router = inject(Router);
 
   private isInternalUrlChange = false;
+  private isSearchRestoreRequired = false;
 
   private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
+
+  private storagePath = this.currentRouterUrlPath;
+
+  private get currentRouterUrlPath() {
+    const url = this._router.url;
+    return !url.includes('?') ? url : url.slice(0, url.indexOf('?'));
+  }
 
   private resetInternalUrlChangeFlag = this.navigationEnd$
     .pipe(
@@ -24,6 +32,20 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
       takeUntilDestroyed(),
     )
     .subscribe(() => (this.isInternalUrlChange = false));
+
+  private restoreUrlSearch = this.navigationEnd$
+    .pipe(
+      switchMap(() => timer(100)),
+      filter(() => this.isSearchRestoreRequired && this.storagePath === this._router.url),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => {
+      this.isSearchRestoreRequired = false;
+      if (this.hasSearch()) {
+        const search = super.getSearch();
+        this.setUrlSearch(search);
+      }
+    });
 
   private byUrlChange = this._activatedRoute.queryParams
     .pipe(
@@ -44,6 +66,18 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
       takeUntilDestroyed(),
     )
     .subscribe(() => this.triggerExternalSearchChange({}));
+
+  protected override triggerExternalSearchChange(search: Record<string, SearchValue>): void {
+    if (this.storagePath !== this.currentRouterUrlPath) {
+      // It means that during the external change, the route has been changed
+      // and new query parameters relates to another view. Indicate to restore the query parameters
+      // from the storage, when the route will be navigated back to the path, where component
+      // with current persistence url instance exists
+      this.isSearchRestoreRequired = true;
+      return;
+    }
+    super.triggerExternalSearchChange(search);
+  }
 
   override getSearch(): Record<string, SearchValue> {
     if (!this.canStoreSearch) {
