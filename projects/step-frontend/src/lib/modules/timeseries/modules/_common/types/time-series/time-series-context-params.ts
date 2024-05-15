@@ -9,16 +9,16 @@ export interface TimeSeriesContextParams {
   id: string;
   dashlets: DashboardItem[];
   timeRange: TimeRange;
+  defaultFullTimeRange?: Partial<TimeRange>; // used as a reset range, mostly in execution view where it is known
   attributes?: MetricAttribute[];
   grouping: string[];
-  filters?: FilterBarItem[];
   colorsPool?: TimeseriesColorsPool;
   /**
    * @Deprecated
    */
   keywordsContext?: TimeSeriesKeywordsContext;
   syncGroups?: TimeSeriesSyncGroup[];
-  filteringSettings?: TsFilteringSettings;
+  filteringSettings: TsFilteringSettings;
   editMode?: boolean;
   resolution?: number;
 }

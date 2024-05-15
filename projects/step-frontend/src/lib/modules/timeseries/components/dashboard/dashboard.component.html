@@ -2,7 +2,15 @@
   <div class="page-container">
     <div class="header-container">
       <div>
-        <div class="dashboard-name">{{ dashboard.attributes!['name'] }}</div>
+        <div class="dashboard-name">
+          @if (showDashboardName) {
+            <step-editable-label
+              [ngModel]="dashboard.attributes!['name']"
+              (ngModelChange)="onDashboardNameChange($event)"
+              [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
+            />
+          }
+        </div>
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -29,14 +37,16 @@
         >
           <step-icon name="settings" />
         </button>
-        <step-autorefresh-toggle
-          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-          [buttonDisabled]="compareModeEnabled"
-          [interval]="refreshInterval"
-          (refresh)="mainEngine.triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
-        @if (hasWritePermission) {
+        @if (showRefreshOption) {
+          <step-autorefresh-toggle
+            [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
+            [buttonDisabled]="compareModeEnabled"
+            [interval]="refreshInterval"
+            (refresh)="mainEngine.triggerRefresh()"
+            (intervalChange)="handleRefreshIntervalChange($event)"
+          />
+        }
+        @if (hasWritePermission && editable && !dashboard?.customFields?.['locked']) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
               >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
@@ -51,16 +61,13 @@
               Save
             </button>
             <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-            <step-form-field>
-              <input type="text" class="name-input" [(ngModel)]="dashboard.attributes!['name']" />
-            </step-form-field>
           } @else {
             <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
               <button
                 mat-button
                 mat-flat-button
                 color="primary"
-                [disabled]="!('dashboard-write' | hasRight | async) || compareModeEnabled"
+                [disabled]="!hasWritePermission || compareModeEnabled"
                 (click)="enableEditMode()"
               >
                 Edit
@@ -107,6 +114,7 @@
             <step-chart-dashlet
               #chart
               [editMode]="editMode"
+              [showExecutionLinks]="showExecutionLinks"
               [item]="dashlet"
               [context]="mainEngine.state.context"
               [height]="DASHLET_HEIGHT"

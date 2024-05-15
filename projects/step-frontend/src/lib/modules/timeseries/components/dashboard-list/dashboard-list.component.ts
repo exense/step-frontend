@@ -1,9 +1,12 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedDashboardsService,
+  AutoDeselectStrategy,
   DashboardView,
   DialogParentService,
   DialogsService,
+  Plan,
+  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
@@ -23,6 +26,7 @@ import { Params } from '@angular/router';
       entityTableRemoteId: AugmentedDashboardsService.TABLE_ID,
     }),
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
+    ...selectionCollectionProvider<string, DashboardView>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => DashboardListComponent),

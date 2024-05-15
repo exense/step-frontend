@@ -12,7 +12,7 @@ import { TimeSeriesContextParams } from '../types/time-series/time-series-contex
 export class TimeSeriesContextsFactory {
   private executionsContexts: { [key: string]: TimeSeriesContext } = {};
 
-  createContext(params: TimeSeriesContextParams) {
+  createContext(params: TimeSeriesContextParams): TimeSeriesContext {
     const id = params.id;
     if (this.executionsContexts[id]) {
       throw new Error('Execution already exists for id: ' + id);
