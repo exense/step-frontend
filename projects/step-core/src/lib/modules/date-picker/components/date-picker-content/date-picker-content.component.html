@@ -7,7 +7,7 @@
       }
       @if (withRelativeTime) {
         <step-relative-time-picker
-          [relativeTimes]="_relativeTimeOptions"
+          [relativeTimes]="(_relativeTimeOptions$ | async)!"
           (pickRelativeTime)="pickRelativeTime($event)"
         />
       }

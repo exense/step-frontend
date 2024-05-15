@@ -6,11 +6,14 @@ import {
   AugmentedControllerService,
   AugmentedExecutionsService,
   DateRange,
+  DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
   ExecutiontTaskParameters,
+  RELATIVE_TIME_OPTIONS,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
   Tab,
+  TimeOption,
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
@@ -27,6 +30,11 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
 
+const getDefaultRangeFromExecution = (execution: Execution): DateRange => ({
+  start: DateTime.fromMillis(execution.startTime!),
+  end: DateTime.fromMillis(execution.endTime!),
+});
+
 @Component({
   selector: 'step-alt-execution-progress',
   templateUrl: './alt-execution-progress.component.html',
@@ -36,6 +44,19 @@ import { DateTime } from 'luxon';
     {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
+    },
+    {
+      provide: RELATIVE_TIME_OPTIONS,
+      useFactory: () => {
+        const state = inject(AltExecutionStateService);
+        const defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
+
+        return state.execution$.pipe(
+          map(getDefaultRangeFromExecution),
+          map((value) => ({ value, label: 'Full Range' }) as TimeOption),
+          map((fullRangeOption) => [...defaultOptions, fullRangeOption]),
+        );
+      },
     },
     {
       provide: EXECUTION_TREE_PAGING_SETTINGS,
@@ -140,11 +161,7 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   }
 
   private applyDefaultRange(execution: Execution): void {
-    const range: DateRange = {
-      start: DateTime.fromMillis(execution.startTime!),
-      end: DateTime.fromMillis(execution.endTime!),
-    };
-    this.dateRangeCtrl.setValue(range);
+    this.dateRangeCtrl.setValue(getDefaultRangeFromExecution(execution));
   }
 
   private refreshExecutionTree(execution: Execution): void {

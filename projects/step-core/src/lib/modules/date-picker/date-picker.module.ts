@@ -29,4 +29,7 @@ export * from './components/date-picker/date-picker.component';
 export * from './directives/date-picker.directive';
 export * from './directives/date-range-picker.directive';
 export * from './types/date-range';
+export * from './types/time-option';
+export * from './injectables/default-relative-time-options.token';
+export * from './injectables/relative-time-options.token';
 export { StepDateFormatConfig, STEP_DATE_FORMAT_CONFIG } from './injectables/step-date-format-config.providers';

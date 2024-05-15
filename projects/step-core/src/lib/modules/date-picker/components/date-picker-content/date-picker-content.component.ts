@@ -32,7 +32,7 @@ import { RELATIVE_TIME_OPTIONS } from '../../injectables/relative-time-options.t
 export class DatePickerContentComponent {
   private _fieldContainer = inject<DateFieldContainerService<DateTime | DateRange>>(DateFieldContainerService);
   private _calendarStrategy = inject(CalendarStrategyService);
-  protected _relativeTimeOptions = inject(RELATIVE_TIME_OPTIONS);
+  protected _relativeTimeOptions$ = inject(RELATIVE_TIME_OPTIONS);
   private adapter = this._fieldContainer.dateAdapter();
   private predefinedTime?: Time | TimeRange | null;
 
@@ -63,8 +63,8 @@ export class DatePickerContentComponent {
     this.updateModel(changedModel);
   }
 
-  pickRelativeTime(milliseconds: number): void {
-    const changedModel = this._calendarStrategy.pickRelativeTime(milliseconds);
+  pickRelativeTime(range: DateRange): void {
+    const changedModel = this._calendarStrategy.pickRelativeTime(range);
     this.updateModel(changedModel);
   }
 
