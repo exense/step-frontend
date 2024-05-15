@@ -1,6 +1,6 @@
 <div>
   @if (!_internalSettings) {
-    <step-chart-skeleton></step-chart-skeleton>
+    <step-chart-skeleton [height]="height" />
   } @else {
     <step-timeseries-chart
       #chart

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
 import { COMMON_IMPORTS } from '../../../_common';
 
 /**
@@ -13,4 +13,6 @@ import { COMMON_IMPORTS } from '../../../_common';
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
-export class ChartSkeletonComponent {}
+export class ChartSkeletonComponent {
+  @Input() height: number = 300;
+}
