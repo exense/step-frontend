@@ -62,6 +62,13 @@ export class TablePersistenceStateService implements OnDestroy {
     }
   }
 
+  hasSearch(): boolean {
+    if (!this.canStoreSearch) {
+      return false;
+    }
+    return !!this.storage.getItem(this.searchKey);
+  }
+
   saveSearch(search: Record<string, SearchValue>): void {
     if (!this.canStoreSearch) {
       return;
