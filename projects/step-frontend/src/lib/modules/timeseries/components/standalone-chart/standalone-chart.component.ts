@@ -45,7 +45,7 @@ export class StandaloneChartComponent implements OnChanges {
 
   @Input() metricKey!: string;
   @Input() filters: FilterBarItem[] = [];
-  @Input() timeRange: TimeRange = { from: 1715705043136, to: 1715705283858 };
+  @Input() timeRange!: TimeRange;
   @Input() aggregation: ChartAggregation = ChartAggregation.AVG;
   @Input() pclValue: number = 90; // used only when aggregation is PERCENTILE
   @Input() grouping: string[] = [];
