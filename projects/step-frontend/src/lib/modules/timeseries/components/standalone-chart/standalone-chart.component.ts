@@ -43,9 +43,9 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 export class StandaloneChartComponent implements OnChanges {
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
 
-  @Input() metricKey!: string;
+  @Input({ required: true }) metricKey!: string;
   @Input() filters: FilterBarItem[] = [];
-  @Input() timeRange!: TimeRange;
+  @Input({ required: true }) timeRange!: TimeRange;
   @Input() aggregation: ChartAggregation = ChartAggregation.AVG;
   @Input() pclValue: number = 90; // used only when aggregation is PERCENTILE
   @Input() grouping: string[] = [];
@@ -72,6 +72,7 @@ export class StandaloneChartComponent implements OnChanges {
       end: range.to,
       oqlFilter: this.composeRequestFilter(),
       groupDimensions: groupDimensions,
+      percentiles: this.getRequiredPercentiles(this.aggregation),
     };
     if (this.config.resolution) {
       request.intervalSize = this.config.resolution;
@@ -215,6 +216,17 @@ export class StandaloneChartComponent implements OnChanges {
     if (!this.config) {
       throw new Error('Config input is required');
     }
+  }
+
+  private getRequiredPercentiles(aggregate: ChartAggregation): number[] {
+    const percentilesToRequest: number[] = [];
+    if (aggregate === ChartAggregation.MEDIAN) {
+      percentilesToRequest.push(50);
+    }
+    if (aggregate === ChartAggregation.PERCENTILE) {
+      percentilesToRequest.push(80, 90, 99);
+    }
+    return percentilesToRequest;
   }
 
   handleZoomReset() {
