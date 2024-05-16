@@ -4,14 +4,14 @@ import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Rende
   selector: '[stepTestId]',
 })
 export class TestIdDirective {
-  testDataId: InputSignal<string | undefined> = input<string | undefined>();
+  stepTestId: InputSignal<string | undefined> = input<string | undefined>();
 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private renderer = inject(Renderer2);
 
   constructor() {
     effect(() => {
-      const value = this.testDataId();
+      const value = this.stepTestId();
       if (value !== undefined) {
         this.renderer.setAttribute(this._el.nativeElement, 'data-step-testid', value);
       }
