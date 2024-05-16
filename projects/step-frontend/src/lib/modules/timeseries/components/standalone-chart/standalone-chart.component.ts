@@ -45,12 +45,15 @@ export class StandaloneChartComponent implements OnChanges {
 
   @Input({ required: true }) metricKey!: string;
   @Input({ required: true }) timeRange!: TimeRange;
-  @Input() filters: FilterBarItem[] = [];
-  @Input() aggregation: ChartAggregation = ChartAggregation.AVG;
-  @Input() pclValue: number = 90; // used only when aggregation is PERCENTILE
-  @Input() grouping: string[] = [];
-  @Input() config: StandaloneChartConfig = {};
-  @Input() colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
+  @Input({ transform: (value: FilterBarItem[] | undefined | null) => value || [] }) filters: FilterBarItem[] = [];
+  @Input({ transform: (value: ChartAggregation | undefined | null) => value || ChartAggregation.AVG })
+  aggregation: ChartAggregation = ChartAggregation.AVG;
+  @Input({ transform: (value: number | undefined | null) => value || 90 }) pclValue: number = 90; // used only when aggregation is PERCENTILE
+  @Input({ transform: (value: string[] | undefined | null) => value || [] }) grouping: string[] = [];
+  @Input({ transform: (value: StandaloneChartConfig | undefined | null) => value || {} })
+  config: StandaloneChartConfig = {};
+  @Input({ transform: (value: TimeseriesColorsPool | undefined | null) => value || new TimeseriesColorsPool() })
+  colorsPool: TimeseriesColorsPool = new TimeseriesColorsPool();
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>();
@@ -61,7 +64,6 @@ export class StandaloneChartComponent implements OnChanges {
   chartSettings?: TSChartSettings;
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.validateInputs();
     this.fetchDataAndCreateChart(this.timeRange).subscribe();
   }
 
@@ -197,24 +199,6 @@ export class StandaloneChartComponent implements OnChanges {
         return ' ms';
       default:
         return '';
-    }
-  }
-
-  private validateInputs() {
-    if (!this.metricKey) {
-      throw new Error('Metric input is required');
-    }
-    if (!this.aggregation) {
-      throw new Error('Aggregation input is required');
-    }
-    if (!this.timeRange || this.timeRange.from >= this.timeRange.to) {
-      throw new Error('Invalid time range input');
-    }
-    if (!this.grouping) {
-      throw new Error('Grouping input is required');
-    }
-    if (!this.config) {
-      throw new Error('Config input is required');
     }
   }
 
