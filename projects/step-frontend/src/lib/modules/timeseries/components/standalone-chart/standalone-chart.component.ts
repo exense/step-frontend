@@ -44,8 +44,8 @@ export class StandaloneChartComponent implements OnChanges {
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
 
   @Input({ required: true }) metricKey!: string;
-  @Input() filters: FilterBarItem[] = [];
   @Input({ required: true }) timeRange!: TimeRange;
+  @Input() filters: FilterBarItem[] = [];
   @Input() aggregation: ChartAggregation = ChartAggregation.AVG;
   @Input() pclValue: number = 90; // used only when aggregation is PERCENTILE
   @Input() grouping: string[] = [];
