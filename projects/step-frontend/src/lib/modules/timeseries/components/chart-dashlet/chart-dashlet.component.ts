@@ -304,14 +304,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       return s;
     });
     const primaryUnit = primaryAxes.unit!;
-    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
+    const yAxesUnit = TimeSeriesUtils.getUnitLabel(primaryAggregation, primaryUnit);
 
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
         values: (u, vals) => {
-          return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+          return vals.map((v: any) => TimeSeriesUtils.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
         },
       },
     ];
@@ -326,7 +326,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
           vals.map((v) =>
-            this.getAxesFormatFunction(
+            TimeSeriesUtils.getAxesFormatFunction(
               this.item.chartSettings!.secondaryAxes!.aggregation as ChartAggregation,
               undefined,
             )(v),
@@ -355,7 +355,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         yAxisUnit: yAxesUnit,
         useExecutionLinks: this.showExecutionLinks,
       },
-      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+      showLegend: true,
       axes: axes,
       truncated: response.truncated,
     };
@@ -476,39 +476,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       } else {
         return this.groupingSelection.filter((s) => s.selected).map((a) => a.name!);
       }
-    }
-  }
-
-  private getAxesFormatFunction(aggregation: ChartAggregation, unit?: string): (v: number) => string {
-    if (aggregation === ChartAggregation.RATE) {
-      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
-    }
-    if (!unit) {
-      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
-    }
-    switch (unit) {
-      case '1':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      case 'ms':
-        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
-      case '%':
-        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
-      default:
-        throw new Error('Unit not handled: ' + unit);
-    }
-  }
-
-  private getUnitLabel(aggregation: ChartAggregation, unit: string): string {
-    if (aggregation === 'RATE') {
-      return '/ h';
-    }
-    switch (unit) {
-      case '%':
-        return '%';
-      case 'ms':
-        return ' ms';
-      default:
-        return '';
     }
   }
 
