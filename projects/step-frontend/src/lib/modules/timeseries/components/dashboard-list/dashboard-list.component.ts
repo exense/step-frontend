@@ -56,7 +56,7 @@ export class DashboardListComponent implements DialogParentService {
 
   delete(dashboard: DashboardView) {
     this._dialogs
-      .showDeleteWarning(1, `Dashboard "${dashboard.attributes!['name']}"`)
+      .showDeleteWarning(1, `Dashboard "${dashboard.attributes?.['name']}"`)
       .pipe(
         filter((confirm) => confirm),
         catchError(() => of(false)),
