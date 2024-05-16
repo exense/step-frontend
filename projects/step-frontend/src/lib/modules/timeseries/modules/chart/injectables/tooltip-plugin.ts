@@ -122,7 +122,6 @@ export class TooltipPlugin {
             if (chartIsLocked()) {
               return;
             }
-            // showTooltip();
           };
 
           over.onmouseleave = () => {
