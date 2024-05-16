@@ -1,12 +1,12 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { inject, Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, map, shareReplay, tap } from 'rxjs';
 import { AugmentedBookmarksService } from '../../../client/augmented/services/augmented-bookmarks.service';
 import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
-export class BookmarkService {
+export class BookmarkService implements OnDestroy {
   private _bookmarksApi = inject(AugmentedBookmarksService);
 
   private refreshBookmarks$ = new BehaviorSubject<unknown>(undefined);
@@ -23,9 +23,14 @@ export class BookmarkService {
       }),
     ),
     map((table) => table.data),
+    shareReplay(1),
   );
 
   refreshBookmarks(): void {
     this.refreshBookmarks$.next(undefined);
+  }
+
+  ngOnDestroy(): void {
+    this.refreshBookmarks$.complete();
   }
 }

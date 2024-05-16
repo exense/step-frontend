@@ -32,6 +32,7 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   picker?: DatePickerComponent;
 
   @Input() showTime: boolean = false;
+  @Input() showRelativeTime: boolean = false;
 
   @HostBinding('attr.disabled')
   protected isDisabled: boolean | null = null;
@@ -39,6 +40,10 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   @Output() dateChange = new EventEmitter<D | null | undefined>();
 
   readonly formattedValue: string = '';
+
+  protected get useTimeInParser(): boolean {
+    return this.showTime || this.showRelativeTime;
+  }
 
   writeValue(date?: D | null): void {
     this.modelValue = date;
@@ -88,6 +93,10 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     return this.showTime;
   }
 
+  withRelativeTime(): boolean {
+    return this.showRelativeTime;
+  }
+
   abstract isRangeField(): boolean;
 
   private setupPicker(picker?: DatePickerComponent): void {
@@ -95,14 +104,14 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   }
 
   private formatValue(value?: D | null): void {
-    (this as FieldAccessor).formattedValue = this._dateAdapter.format(value, this.showTime);
+    (this as FieldAccessor).formattedValue = this._dateAdapter.format(value, this.useTimeInParser);
     this._elRef.nativeElement.value = this.formattedValue;
   }
 
   @HostListener('input', ['$event'])
   private handleInput($event: Event): void {
     const value = ($event.target as HTMLInputElement).value;
-    const date = this._dateAdapter.parse(value, this.showTime);
+    const date = this._dateAdapter.parse(value, this.useTimeInParser);
 
     (this as FieldAccessor).formattedValue = date ? value : '';
 

@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ title() }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (summary(); as summary) {
+      <section class="bars">
+        @if (summary.running) {
+          <div class="running" [style.width.%]="percentRunning()">{{ summary.running }}</div>
+        }
+        @if (summary.passed) {
+          <div class="passed" [style.width.%]="percentPassed()">{{ summary.passed }}</div>
+        }
+        @if (summary.failed) {
+          <div class="failed" [style.width.%]="percentFailed()">{{ summary.failed }}</div>
+        }
+        @if (summary.techError) {
+          <div class="techError" [style.width.%]="percentTechError()">{{ summary.techError }}</div>
+        }
+      </section>
+      <section class="legend">
+        @if (summary.running) {
+          <div class="running">running</div>
+        }
+        @if (summary.passed) {
+          <div class="passed">passed</div>
+        }
+        @if (summary.failed) {
+          <div class="failed">failed</div>
+        }
+        @if (summary.techError) {
+          <div class="techError">technical error</div>
+        }
+      </section>
+    }
+  </mat-card-content>
+</mat-card>

@@ -37,6 +37,16 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
+import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
+import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
+import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
+import { AltReportNodeSummaryComponent } from './components/alt-keywords-summary/alt-report-node-summary.component';
+import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
+import { AltStatusComponent } from './components/alt-status/alt-status.component';
+import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
+import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
+import { AltReportResponseTimeChartComponent } from './components/alt-report-response-time-chart/alt-report-response-time-chart.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +62,7 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
     RepositoryComponent,
+    ExecutionActionsComponent,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     DashletExecutionStepComponent,
@@ -68,6 +79,16 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
+    AltExecutionsComponent,
+    AltExecutionsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionAnalyticsComponent,
+    AltReportNodeSummaryComponent,
+    AltReportNodeListComponent,
+    AltExecutionTimeComponent,
+    AltStatusComponent,
+    AltReportResponseTimeChartComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -82,6 +103,10 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
     RepositoryComponent,
     ExecutionSelectionTableComponent,
     StatusComponent,
+    AltExecutionsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionAnalyticsComponent,
   ],
 })
 export class ExecutionModule {
@@ -190,6 +215,55 @@ export class ExecutionModule {
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
+      ],
+    });
+
+    this._viewRegistry.registerRoute({
+      path: 'alt-executions',
+      component: AltExecutionsComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: ExecutionListComponent,
+        },
+        {
+          path: ':id',
+          component: AltExecutionProgressComponent,
+          children: [
+            {
+              path: '',
+              redirectTo: 'report',
+            },
+            {
+              path: 'report',
+              component: AltExecutionReportComponent,
+            },
+            {
+              path: 'tree',
+              component: ExecutionTreeComponent,
+            },
+            {
+              path: 'analytics',
+              component: AltExecutionAnalyticsComponent,
+            },
+          ],
+        },
+        /*
+        {
+          matcher: (url) => {
+            if (url[0].path === 'list') {
+              return null;
+            }
+            return { consumed: url };
+          },
+          component: ExecutionProgressComponent,
+          children: [schedulePlanRoute('modal')],
+        },
+*/
       ],
     });
   }

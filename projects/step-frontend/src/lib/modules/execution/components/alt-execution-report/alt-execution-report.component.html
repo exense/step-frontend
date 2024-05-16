@@ -1,0 +1,13 @@
+<section [class.small-screen]="!!(_isSmallScreen$ | async)">
+  <step-alt-report-node-summary title="Summary: Keyword calls" [summary]="(keywordsSummary$ | async)!" />
+  <step-alt-report-node-list title="Keyword Calls" [reportNodes]="(_state.keywords$ | async)!" />
+  @if (_state.testCases$ | async; as testCases) {
+    <step-alt-report-node-list title="Test Cases" [reportNodes]="testCases" />
+  }
+  @if (testCasesSummary$ | async; as testCasesSummary) {
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+  }
+  @if (_state.executionId$ | async; as executionId) {
+    <step-alt-report-response-time-chart [executionId]="executionId" [timeRange]="(timeRange$ | async)!" />
+  }
+</section>
