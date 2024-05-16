@@ -4,7 +4,7 @@ import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Rende
   selector: '[stepTestId]',
 })
 export class TestDataIdDirective {
-  testDataId: InputSignal<string | undefined> = input<string | undefined>();
+  testDataId: InputSignal<string | undefined> = input<string | undefined>({ alias: 'stepTestId' });
 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private renderer = inject(Renderer2);
