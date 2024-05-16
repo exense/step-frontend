@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactsFactoryService,
@@ -14,23 +14,10 @@ import {
   PlanContextApiService,
   PlanContext,
 } from '@exense/step-core';
-import {
-  BehaviorSubject,
-  filter,
-  first,
-  forkJoin,
-  map,
-  merge,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -49,9 +36,9 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private _dialogs = inject(DialogsService);
   private _copyBuffer = inject(CopyBufferService);
   private _artefactsFactory = inject(ArtefactsFactoryService);
+  private _destroyRef = inject(DestroyRef);
 
   context?: any;
-  private terminator$ = new Subject<void>();
   private planChange$ = new Subject<PlanContext>();
 
   private selectedNode$ = toObservable(this._treeState.selectedNode);
@@ -75,8 +62,6 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     this.planChange$.complete();
     this.planContextInternal$.complete();
     this._planEditor.removeStrategy();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   addControl(artefactTypeId: string): void {
@@ -292,7 +277,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     merge(planUpdateByTree$, planUpdateByEditor$, planUpdatedByHistory$)
       .pipe(
         switchMap((context) => this._planEditorApi.savePlan(context!)),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((savedContext) => {
         const forceRefresh = savedContext.forceRefresh;

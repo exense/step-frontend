@@ -18,11 +18,12 @@ export interface DiscoverDialogData {
   imports: [COMMON_IMPORTS, DiscoverAttributeStatsComponent],
 })
 export class DiscoverComponent implements OnInit {
+  private _oqlFilter = inject<DiscoverDialogData>(MAT_DIALOG_DATA).oqlFilter;
+  private _matDialogRef = inject<MatDialogRef<DiscoverComponent>>(MatDialogRef);
   readonly DateFormat = DateFormat;
   pageSize = 50;
   pageSizeOptions = [20, 50, 100];
   dataSource: MatTableDataSource<Measurement> = new MatTableDataSource();
-  private oqlFilter: string;
   skip = 0;
   hasMore = true;
   isLoading = true;
@@ -38,13 +39,6 @@ export class DiscoverComponent implements OnInit {
 
   private _timeSeriesService = inject(TimeSeriesService);
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public _data: DiscoverDialogData,
-    public _matDialogRef: MatDialogRef<DiscoverComponent>,
-  ) {
-    this.oqlFilter = _data.oqlFilter;
-  }
-
   ngOnInit(): void {
     this.fetchStats();
     this.fetchMeasurements();
@@ -53,7 +47,7 @@ export class DiscoverComponent implements OnInit {
   private fetchMeasurements() {
     this.isLoading = true;
     this._timeSeriesService
-      .discoverMeasurements(this.oqlFilter, this.pageSize, this.currentPage * this.pageSize)
+      .discoverMeasurements(this._oqlFilter, this.pageSize, this.currentPage * this.pageSize)
       .subscribe((measurements) => {
         this.dataSource.data = measurements;
         this.isLoading = false;
@@ -96,7 +90,7 @@ export class DiscoverComponent implements OnInit {
   }
 
   private fetchStats() {
-    this._timeSeriesService.getRawMeasurementsStats(this._data.oqlFilter).subscribe((stats) => {
+    this._timeSeriesService.getRawMeasurementsStats(this._oqlFilter).subscribe((stats) => {
       this.stats = stats;
       this.dynamicColumns = stats.attributes;
       this.allColumns = ['timestamp', ...this.dynamicColumns];

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { AugmentedScreenService, Input } from '@exense/step-core';
 import { Observable, of, tap } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { Observable, of, tap } from 'rxjs';
 export abstract class ReportNodeCommonsService {
   private functionAttributes?: Input[];
 
-  constructor(private _screenService: AugmentedScreenService) {}
+  private _screenService = inject(AugmentedScreenService);
 
   getFunctionAttributes(): Observable<Input[]> {
     if (this.functionAttributes) {
