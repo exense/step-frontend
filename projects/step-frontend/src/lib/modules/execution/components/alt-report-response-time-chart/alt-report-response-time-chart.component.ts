@@ -1,7 +1,7 @@
 import { Component, computed, effect, input } from '@angular/core';
 import { DashboardItem, TimeRange } from '@exense/step-core';
 import { v4 } from 'uuid';
-import { TimeSeriesContext } from '../../../timeseries/modules/_common';
+import { TimeSeriesContext, TsFilteringMode } from '../../../timeseries/modules/_common';
 
 @Component({
   selector: 'step-alt-report-response-time-chart',
@@ -41,6 +41,10 @@ export class AltReportResponseTimeChartComponent {
       grouping: ['name'],
       timeRange,
       dashlets: [],
+      filteringSettings: {
+        mode: TsFilteringMode.STANDARD,
+        filterItems: [],
+      },
     });
   }
 
