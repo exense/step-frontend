@@ -10,7 +10,6 @@ export abstract class ExecutionStateService extends ExecutionViewServices {
   abstract progress?: ExecutionSummaryDto;
   abstract execution?: Execution;
   abstract testCases?: ReportNode[];
-  abstract showTestCaseCurrentOperation?: boolean;
   abstract keywordSearch?: string;
   abstract drillDownTestCase(id: string): void;
   abstract searchStepByError(error: string): void;

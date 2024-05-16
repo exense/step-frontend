@@ -1,11 +1,14 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import {
+  ApiError,
   AugmentedExecutionsService,
   AutoRefreshModel,
   AutoRefreshModelFactoryService,
   Execution,
 } from '@exense/step-core';
-import { BehaviorSubject, concatMap, filter, Observable, startWith } from 'rxjs';
+import { BehaviorSubject, concatMap, filter, Observable, startWith, Subject } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { HttpStatusCode } from '@angular/common/http';
 
 export interface ActiveExecution {
   readonly executionId: string;
@@ -63,6 +66,8 @@ export class ActiveExecutionsService implements OnDestroy {
   private _autoRefreshFactory = inject(AutoRefreshModelFactoryService);
 
   private executions = new Map<string, ActiveExecution>();
+  private autoCloseExecutionInternal$ = new Subject<string>();
+  readonly autoCloseExecution$ = this.autoCloseExecutionInternal$.asObservable();
 
   getActiveExecution(executionId: string): ActiveExecution {
     if (!this.executions.has(executionId)) {
@@ -93,6 +98,7 @@ export class ActiveExecutionsService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.autoCloseExecutionInternal$.complete();
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
   }
@@ -100,7 +106,19 @@ export class ActiveExecutionsService implements OnDestroy {
   private createActiveExecution(executionId: string): ActiveExecution {
     const autoRefreshModel = this._autoRefreshFactory.create();
     return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) =>
-      this._executionService.getExecutionById(executionId),
+      this._executionService.getExecutionById(executionId).pipe(
+        catchError((error) => {
+          if (!(error instanceof ApiError)) {
+            throw error;
+          }
+
+          if (error.status === HttpStatusCode.Forbidden || error.status === HttpStatusCode.NotFound) {
+            this.autoCloseExecutionInternal$.next(executionId);
+          }
+
+          throw error;
+        }),
+      ),
     );
   }
 }

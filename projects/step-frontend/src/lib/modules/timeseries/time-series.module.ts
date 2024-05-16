@@ -12,25 +12,26 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DashboardListComponent } from './components/dashboard-list/dashboard-list.component';
 import { NewDashboardDialogComponent } from './components/new-dashboard-dialog/new-dashboard-dialog.component';
-import { AnalyticsPageComponent, ExecutionPerformanceComponent } from './modules/legacy';
-import { TsNavigatorQueryParamsCleanupService } from './ts-navigator-query-params-cleanup.service';
 import { DashboardNavigatorQueryParamsCleanupService } from './modules/_common/injectables/dashboard-navigator-query-params-cleanup.service';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map } from 'rxjs';
+import { DashboardPageComponent } from './components/dashboard-page/dashboard-page.component';
+import { AnalyticsPageComponent } from './components/analytics-page/analytics-page.component';
 import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
+import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.component';
 
 @NgModule({
   imports: [
     AnalyticsPageComponent,
-    ExecutionPerformanceComponent,
+    ExecutionPageComponent,
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,
   ],
   exports: [
     AnalyticsPageComponent,
-    ExecutionPerformanceComponent,
+    ExecutionPageComponent,
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,
@@ -39,11 +40,6 @@ import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.
     {
       provide: MatPaginatorIntl,
       useClass: NoTotalCountPaginator,
-    },
-    {
-      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
-      useClass: TsNavigatorQueryParamsCleanupService,
-      multi: true,
     },
     {
       provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
@@ -101,7 +97,7 @@ export class TimeSeriesModule {
               );
             },
           ],
-          component: DashboardComponent,
+          component: DashboardPageComponent,
         },
       ],
     });

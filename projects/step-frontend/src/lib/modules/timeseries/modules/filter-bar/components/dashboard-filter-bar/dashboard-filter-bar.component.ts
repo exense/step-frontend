@@ -378,7 +378,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const filteringSettings = this.context.getFilteringSettings();
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
-        ? filteringSettings.oql.replace('attributes.', '')
+        ? filteringSettings.oql!.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
     // const contextualOql = FilterUtils.objectToOQL(
     //   this.performanceViewSettings.contextualFilters,

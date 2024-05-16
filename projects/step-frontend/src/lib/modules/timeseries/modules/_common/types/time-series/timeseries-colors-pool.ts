@@ -1,3 +1,14 @@
+const PREDEFINED_COLORS: Record<string, string> = {
+  TECHNICAL_ERROR: '#000000',
+  FAILED: '#d9534f',
+  INTERRUPTED: '#f9c038',
+  PASSED: '#5cb85c',
+  SKIPPED: '#a0a0a0',
+  NORUN: '#a0a0a0',
+  RUNNING: '#337ab7',
+  '': '#cccccc',
+};
+
 /**
  * The pool is responsible for storing and assigning one color for every unique string key. A list of predefined colors are stored in the pool.
  * If more keys are requested, new random colors will be generated and stored in the pool.
@@ -36,7 +47,7 @@ export class TimeseriesColorsPool {
     if (this.assignedColors[key]) {
       return this.assignedColors[key];
     } else {
-      return this.assignColor(key);
+      return PREDEFINED_COLORS[key] || this.assignColor(key);
     }
   }
 
