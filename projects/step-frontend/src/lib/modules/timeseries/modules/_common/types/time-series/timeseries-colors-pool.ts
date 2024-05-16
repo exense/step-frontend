@@ -55,7 +55,8 @@ export class TimeseriesColorsPool {
     const rgb = this.randomRGB();
     // Generate alpha value (0.5 to 1 range)
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
-    const alpha = Math.max(Number(Math.random().toFixed(1)), 0.5);
+    // const alpha = Math.max(Number(Math.random().toFixed(1)), 0.5);
+    const alpha = 0.3;
     const alphaHex = toHex(Math.round(alpha * 255));
     return `${rgb}${alphaHex}`;
   }
@@ -64,10 +65,10 @@ export class TimeseriesColorsPool {
     // Convert a number to a 2-digit hexadecimal string
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
 
-    // Generate RGB values
-    const red = Math.round(Math.random() * 255);
-    const green = Math.round(Math.random() * 255);
-    const blue = Math.round(Math.random() * 255);
+    // Generate random RGB values - don't go up to 255 to be more visible
+    const red = Math.round(Math.random() * 200);
+    const green = Math.round(Math.random() * 200);
+    const blue = Math.round(Math.random() * 200);
 
     return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
@@ -90,7 +91,32 @@ export class TimeseriesColorsPool {
   }
 }
 
-const colors = ['#0082CB', '#23ad9d', '#8c13ff'];
+const colors = [
+  'rgba(0,120,187,0.43)',
+  '#32aaa080',
+  '#ff861380',
+  '#6758ff80',
+  '#00a5f180',
+  '#0eab1e80',
+  '#8400b980',
+  '#ff525280',
+  '#15471980',
+  '#b167cf80',
+  '#53cb5e80',
+  '#e0000080',
+  '#79290080',
+  '#75a63080',
+  '#af000080',
+  '#0000ab80',
+  '#c6128780',
+  '#4995c480',
+  '#27856c80',
+  '#ce560080',
+  '#50cb9c80',
+  '#a9780080',
+  '#c341ca80',
+  '#814d1080',
+];
 
 const statusColors: { [key: string]: string } = {
   technical_error: '#000000',

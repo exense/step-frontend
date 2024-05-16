@@ -292,6 +292,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
         stroke: color,
+        width: 2,
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
