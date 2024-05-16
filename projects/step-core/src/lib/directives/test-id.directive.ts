@@ -3,7 +3,7 @@ import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Rende
 @Directive({
   selector: '[stepTestId]',
 })
-export class TestDataIdDirective {
+export class TestIdDirective {
   testDataId: InputSignal<string | undefined> = input<string | undefined>();
 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
