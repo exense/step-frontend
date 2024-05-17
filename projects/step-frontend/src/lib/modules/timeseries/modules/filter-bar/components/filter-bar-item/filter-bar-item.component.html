@@ -5,6 +5,7 @@
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
   [matTooltip]="formattedValue ?? ''"
+  class="cursor-pointer"
 >
   <step-prefix>{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
   @if (formattedValue) {

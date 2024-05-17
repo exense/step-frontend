@@ -116,7 +116,6 @@ export class ExecutionProgressComponent
 
   execution?: Execution;
   testCases?: ReportNode[];
-  showTestCaseCurrentOperation: boolean = true;
   keywordSearch?: string;
 
   readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
@@ -350,11 +349,6 @@ export class ExecutionProgressComponent
     if (updateSelection !== UpdateSelection.NONE) {
       this.determineDefaultSelection();
     }
-    const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
-    const showTestCaseCurrentOperation = parameters.find(
-      (o) => o.key === 'step.executionView.testcases.current-operations',
-    );
-    this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
 
   private loadExecutionTree(): void {

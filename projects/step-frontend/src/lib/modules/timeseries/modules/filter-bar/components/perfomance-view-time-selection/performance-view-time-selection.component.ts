@@ -83,12 +83,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
       .build();
-    return this.timeSeriesService.getMeasurements(request).pipe(
+    return this.timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];
         if (response.matrix[0]) {
-          avgData = response.matrix[0].map((b) => (b ? Math.round(b.sum / b.count) : null));
+          avgData = response.matrix[0].map((b) => b?.throughputPerHour || 0);
         }
 
         this.rangerSettings = {

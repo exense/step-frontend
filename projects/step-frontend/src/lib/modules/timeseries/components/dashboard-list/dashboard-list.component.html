@@ -69,7 +69,15 @@
           >
             <step-icon name="eye" />
           </a>
-          @if (!element.metadata?.isLegacy) {
+          <button
+            mat-icon-button
+            matTooltip="Duplicate dashboard"
+            [disabled]="!('dashboard-write' | hasRight | async)"
+            (click)="duplicateDashboard(element.id)"
+          >
+            <step-icon name="copy" />
+          </button>
+          @if (!element.customFields?.locked && !element.metadata?.isLegacy) {
             <a
               mat-icon-button
               matTooltip="Edit dashboard"
@@ -80,14 +88,6 @@
             >
               <step-icon name="edit" />
             </a>
-            <button
-              mat-icon-button
-              matTooltip="Duplicate dashboard"
-              [disabled]="!('dashboard-write' | hasRight | async)"
-              (click)="duplicateDashboard(element.id)"
-            >
-              <step-icon name="copy" />
-            </button>
             <button
               mat-icon-button
               matTooltip="Delete dashboard"

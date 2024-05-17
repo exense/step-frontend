@@ -1,10 +1,11 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ExecutionTab } from '../../shared/execution-tab';
-import { filter, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, map, of, startWith, switchMap } from 'rxjs';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { IS_SMALL_SCREEN } from '@exense/step-core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ID_LIST = 'list';
 const ID_OPEN = 'open';
@@ -21,12 +22,12 @@ const ID_OPEN = 'open';
     ActiveExecutionsService,
   ],
 })
-export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManagerService {
+export class ExecutionsComponent implements OnInit, ExecutionTabManagerService {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _activeExecutionsService = inject(ActiveExecutionsService);
+  private _destroyRef = inject(DestroyRef);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  private terminator$ = new Subject<void>();
 
   listTab: ExecutionTab = { label: 'Executions', type: 'list', id: ID_LIST, title: 'Executions List' };
   tabs: ExecutionTab[] = [this.listTab];
@@ -45,14 +46,13 @@ export class ExecutionsComponent implements OnInit, OnDestroy, ExecutionTabManag
         switchMap(() => this._activatedRoute.firstChild?.url ?? of(undefined)),
         map((url) => url?.[0]?.path),
         filter((path) => !!path && this.activeTab?.id !== path),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((executionId) => this.handleLocationChange(executionId!));
-  }
 
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
+    this._activeExecutionsService.autoCloseExecution$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((executionId) => this.handleTabClose(executionId));
   }
 
   handleTabChange(id: string): void {
