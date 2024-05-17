@@ -324,7 +324,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       return {
         ...responseBucket,
         seriesKey: seriesKey,
-        color: context.getColor(seriesKey),
+        color: context.getStrokeColor(seriesKey).color,
         avg: Math.trunc(responseBucket.sum / responseBucket.count),
         tps: Math.trunc(responseBucket.count / ((response.end! - response.start!) / 1000)),
         tph: Math.trunc((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),

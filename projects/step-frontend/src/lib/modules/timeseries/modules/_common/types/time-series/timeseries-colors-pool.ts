@@ -1,3 +1,6 @@
+import { SeriesStroke } from './series-stroke';
+import { SeriesStrokeType } from './series-stroke-type';
+
 const PREDEFINED_COLORS: Record<string, string> = {
   TECHNICAL_ERROR: '#000000',
   FAILED: '#d9534f',
@@ -14,40 +17,56 @@ const PREDEFINED_COLORS: Record<string, string> = {
  * If more keys are requested, new random colors will be generated and stored in the pool.
  */
 export class TimeseriesColorsPool {
-  static readonly NO_STATUS = 'No status';
-  static readonly GREY_COLOR = '#cccccc';
+  static readonly STROKE_TYPES: SeriesStrokeType[] = [
+    SeriesStrokeType.NORMAL,
+    SeriesStrokeType.DASHED,
+    SeriesStrokeType.DOTTED,
+  ];
 
   private predefinedColors: string[];
-  private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
+  private assignedColors: { [key: string]: SeriesStroke } = {}; // every unique key has a unique color assigned
+  private nextPredefinedColorsIndex = 0;
 
   constructor() {
-    this.predefinedColors = [...colors];
+    this.predefinedColors = [...defaultColors];
   }
 
   /**
    * @param key - If it is not new, the existing value will be returned, otherwise a new color is generated.
    */
-  assignColor(key: string): string {
-    let color;
-    if (this.predefinedColors.length == 0) {
-      color = this.randomRGBA();
+  private assignColor(key: string): SeriesStroke {
+    let stroke: SeriesStroke;
+    const alreadyAssignedStrokes = Object.keys(this.assignedColors).length;
+    if (alreadyAssignedStrokes >= this.predefinedColors.length * TimeseriesColorsPool.STROKE_TYPES.length) {
+      // there are no more 'predefined' options for next series
+      stroke = { type: SeriesStrokeType.NORMAL, color: this.randomRGBA() };
     } else {
-      color = this.predefinedColors[0];
-      this.predefinedColors.shift();
+      const existingColor = this.predefinedColors[this.nextPredefinedColorsIndex++];
+      if (this.nextPredefinedColorsIndex > this.predefinedColors.length) {
+        this.nextPredefinedColorsIndex = 0;
+      }
+      const strokeType =
+        TimeseriesColorsPool.STROKE_TYPES[Math.trunc(alreadyAssignedStrokes / this.predefinedColors.length)];
+      console.log(strokeType);
+      stroke = { type: strokeType, color: existingColor };
     }
-    this.assignedColors[key] = color;
-    return color;
+    this.assignedColors[key] = stroke;
+    return stroke;
   }
 
   /**
    * Return the color for a given key. If the key has no color attached, a new one will be created.
-   * @param key
    */
-  getColor(key: string): string {
+  getSeriesColor(key: string): SeriesStroke {
     if (this.assignedColors[key]) {
       return this.assignedColors[key];
     } else {
-      return PREDEFINED_COLORS[key] || this.assignColor(key);
+      let predefinedcolor = PREDEFINED_COLORS[key];
+      if (predefinedcolor) {
+        return { color: predefinedcolor, type: SeriesStrokeType.NORMAL };
+      } else {
+        return this.assignColor(key);
+      }
     }
   }
 
@@ -72,27 +91,10 @@ export class TimeseriesColorsPool {
 
     return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
-
-  /**
-   * These colors are globally scoped. Every pool will share the same status colors. When a color is requested for a new status, a new color is created.
-   * @param status
-   */
-  getStatusColor(status: string): string {
-    if (!status) {
-      return statusColors[TimeseriesColorsPool.NO_STATUS];
-    } else {
-      let foundColor = statusColors[status.toLowerCase()];
-      if (!foundColor) {
-        foundColor = this.randomRGBA();
-        statusColors[status.toLowerCase()] = foundColor;
-      }
-      return foundColor;
-    }
-  }
 }
 
-const colors = [
-  'rgba(0,120,187,0.43)',
+const defaultColors = [
+  '#0050aa90',
   '#32aaa080',
   '#ff861380',
   '#6758ff80',
@@ -117,14 +119,3 @@ const colors = [
   '#c341ca80',
   '#814d1080',
 ];
-
-const statusColors: { [key: string]: string } = {
-  technical_error: '#000000',
-  failed: '#d9534f',
-  interrupted: '#f9c038',
-  passed: '#5cb85c',
-  skipped: '#a0a0a0',
-  norun: '#a0a0a0',
-  running: '#337ab7',
-  [TimeseriesColorsPool.NO_STATUS]: TimeseriesColorsPool.GREY_COLOR,
-};

@@ -27,6 +27,8 @@ import { Axis } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
+import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
+import { SeriesStrokeType } from '../../modules/_common/types/time-series/series-stroke-type';
 
 declare const uPlot: any;
 
@@ -259,8 +261,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         labelItems = [this.item.metricKey];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const color =
-        primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.colorsPool.getColor(seriesKey);
+      const customSeriesColor = primaryAxes.renderingSettings?.seriesColors?.[seriesKey];
+      const stroke: SeriesStroke = customSeriesColor
+        ? { color: customSeriesColor, type: SeriesStrokeType.NORMAL }
+        : this.context.colorsPool.getSeriesColor(seriesKey);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
@@ -291,13 +295,25 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: seriesData,
         metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: color,
-        width: 2,
+        stroke: stroke.color,
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      switch (stroke.type) {
+        case SeriesStrokeType.NORMAL:
+          s.width = 1;
+          break;
+        case SeriesStrokeType.DASHED:
+          s.dash = [10, 5];
+          s.width = 2;
+          break;
+        case SeriesStrokeType.DOTTED:
+          s.width = 2;
+          s.dash = [2, 2];
+          break;
+      }
       if (primaryAxes.colorizationType === 'FILL') {
-        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
       }
       if (hasSteppedDisplay) {
         s.paths = this.stepped({ align: 1 });
