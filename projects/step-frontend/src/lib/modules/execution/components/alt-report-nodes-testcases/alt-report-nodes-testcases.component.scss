@@ -1,0 +1,15 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+:host > div {
+  color: var.$gray-500;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  align-items: center;
+}

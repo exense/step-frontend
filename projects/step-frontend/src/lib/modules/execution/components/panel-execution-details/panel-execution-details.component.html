@@ -1,48 +1,4 @@
 <step-panel [panelType]="Panels.EXECUTION_DETAILS">
   <step-status [status]="_state.execution?.status" titleAddon> </step-status>
-  <ul class="list-unstyled">
-    <li>
-      <strong>Plan</strong>
-      <span>
-        <a
-          routerLink="/plans/editor/{{ _state.execution!.planId }}"
-          *ngIf="!_state?.execution?.executionParameters?.['isolatedExecution']; else isolatedPlan"
-        >
-          {{ _state.execution!.description }}
-        </a>
-        <ng-template #isolatedPlan>
-          {{ _state.execution!.description }}
-        </ng-template>
-      </span>
-    </li>
-    <ng-container *ngIf="_state.execution?.executionParameters?.customParameters as execParams">
-      <li *ngFor="let item of execParams | keyvalue">
-        <strong>{{ item.key }}</strong
-        >&nbsp;<span>{{ item.value }}</span>
-      </li>
-    </ng-container>
-    <li>
-      <strong>Mode</strong>&nbsp;<span>{{ _state.execution?.executionParameters?.mode }}</span>
-    </li>
-    <li>
-      <strong>User</strong>&nbsp;<span>{{ _state.execution?.executionParameters?.userID }}</span>
-    </li>
-    <li>
-      <strong>Start</strong>&nbsp;<span>{{ _state.execution?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
-    </li>
-    <li>
-      <strong>End</strong>&nbsp;<span>{{ _state.execution?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
-    </li>
-    <li>
-      <strong>Execution ID</strong>&nbsp;<span>{{ _state.execution?.id }}</span>
-    </li>
-    <li>
-      <strong>Origin</strong>&nbsp;<span
-        >Repository={{ _state.execution?.executionParameters?.repositoryObject?.repositoryID }}</span
-      >
-      <ng-container *ngIf="_state.execution?.executionParameters?.repositoryObject?.repositoryParameters as repoParams">
-        <span *ngFor="let item of repoParams | keyvalue"> {{ item.key }}={{ item.value }} </span>
-      </ng-container>
-    </li>
-  </ul>
+  <step-execution-details [execution]="_state.execution" />
 </step-panel>

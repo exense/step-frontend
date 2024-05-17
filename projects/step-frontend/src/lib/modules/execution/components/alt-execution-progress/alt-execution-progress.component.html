@@ -5,45 +5,49 @@
       <div class="sub-title">
         <step-alt-execution-time [execution]="execution" />
         <div class="user">{{ execution.executionParameters?.userID }}</div>
+        <step-popover yPosition="below">
+          <step-icon name="help-circle" />
+          <step-popover-content>
+            <step-execution-details [execution]="execution" [showStatus]="true" />
+          </step-popover-content>
+        </step-popover>
       </div>
     }
   </div>
-  <div class="progress-controls">
-    <div class="controls">
-      @if (!(isExecutionCompleted$ | async)) {
-        @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="without-borders">
-            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-          </step-btn-group>
-        }
+  <div class="range-picker">
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="calendar" (click)="picker.open()" />
+      </step-prefix>
+      <input
+        type="text"
+        placeholder="From - To"
+        [formControl]="dateRangeCtrl"
+        [stepDateRangePicker]="picker"
+        [showRelativeTime]="true"
+        (relativeOptionChange)="relativeTime = $event"
+      />
+    </step-form-field>
+    <step-date-picker #picker />
+  </div>
+  <div class="controls">
+    @if (!(isExecutionCompleted$ | async)) {
+      @if (activeExecution$ | async; as activeExecution) {
+        <step-btn-group class="without-borders">
+          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+        </step-btn-group>
       }
-      @if (execution$ | async; as execution) {
-        <step-execution-commands
-          [displayParametersForm]="false"
-          [description]="execution.description"
-          [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-          [execution]="execution"
-          (refresh)="manualRefresh()"
-          (scheduleTask)="handleTaskSchedule($event)"
-        />
-      }
-    </div>
-    <div class="range-picker">
-      <step-form-field>
-        <step-prefix class="icon-prefix">
-          <step-icon name="calendar" (click)="picker.open()" />
-        </step-prefix>
-        <input
-          type="text"
-          placeholder="From - To"
-          [formControl]="dateRangeCtrl"
-          [stepDateRangePicker]="picker"
-          [showRelativeTime]="true"
-          (relativeOptionChange)="relativeTime = $event"
-        />
-      </step-form-field>
-      <step-date-picker #picker />
-    </div>
+    }
+    @if (execution$ | async; as execution) {
+      <step-execution-commands
+        [displayParametersForm]="false"
+        [description]="execution.description"
+        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+        [execution]="execution"
+        (refresh)="manualRefresh()"
+        (scheduleTask)="handleTaskSchedule($event)"
+      />
+    }
   </div>
 </section>
 <section class="main">

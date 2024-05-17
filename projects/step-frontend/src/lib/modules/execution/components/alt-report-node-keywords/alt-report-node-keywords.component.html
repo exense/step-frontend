@@ -1,0 +1,15 @@
+@for (node of _keywords(); track node.id) {
+  <div>
+    <step-alt-status [status]="node.status" />
+    <div>{{ node.executionTime | date: 'HH:mm:ss' }}</div>
+    <div class="name">{{ node.name }}</div>
+    <step-btn-group class="actions">
+      <button type="button" mat-icon-button matTooltip="Open keyword details" matTooltipPosition="below">
+        <step-icon name="keyword" />
+      </button>
+      <button type="button" mat-icon-button matTooltip="Show this node in tree view" matTooltipPosition="below">
+        <step-icon name="git-pull-request" />
+      </button>
+    </step-btn-group>
+  </div>
+}

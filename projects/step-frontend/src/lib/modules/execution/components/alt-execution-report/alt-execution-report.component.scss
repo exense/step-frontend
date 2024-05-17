@@ -1,14 +1,16 @@
 section {
   display: grid;
-  grid-template-rows: auto;
+  grid-template-rows: 33rem;
   gap: 2.4rem;
   margin-bottom: 2.4rem;
 
   &.small-screen {
+    min-width: 60rem;
     grid-template-columns: 100%;
   }
 
   &:not(.small-screen) {
+    width: 98%;
     grid-template-columns: repeat(3, 33%);
 
     & > *:nth-child(4n + 1) {

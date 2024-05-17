@@ -9,13 +9,15 @@ step-alt-execution-progress {
   padding: 0 3.2rem;
 
   .header {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    min-height: 12rem;
+    display: grid;
+    grid-template-areas:
+      'title title'
+      'ranger controls';
     gap: 1.5rem;
+    justify-content: space-between;
 
     .title {
+      grid-area: title;
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
@@ -41,28 +43,24 @@ step-alt-execution-progress {
       }
     }
 
-    .progress-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-end;
-      justify-content: space-between;
-
-      .controls {
-        display: flex;
-        align-items: center;
-        align-content: flex-end;
-        gap: 2rem;
-      }
-      .range-picker {
-        min-width: 35rem;
-        step-form-field {
-          --form-field-border-radius: 1.6rem;
-          input {
-            border-left-style: none;
-          }
+    .range-picker {
+      grid-area: ranger;
+      min-width: 35rem;
+      step-form-field {
+        --form-field-border-radius: 1.6rem;
+        input {
+          border-left-style: none;
         }
       }
+    }
+
+    .controls {
+      grid-area: controls;
+      display: flex;
+      align-items: center;
+      align-content: flex-end;
+      gap: 2rem;
+      flex-wrap: nowrap;
     }
   }
 

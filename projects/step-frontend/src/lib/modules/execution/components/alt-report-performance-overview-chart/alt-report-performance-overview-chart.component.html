@@ -1,8 +1,5 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Performance Overview (avg)</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
+<step-alt-report-widget title="Performance Overview (avg)">
+  <step-alt-report-widget-content>
     @if (timeRange(); as range) {
       <step-standalone-dashlet
         [metricKey]="metricKey"
@@ -11,5 +8,5 @@
         [timeRange]="range"
       />
     }
-  </mat-card-content>
-</mat-card>
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

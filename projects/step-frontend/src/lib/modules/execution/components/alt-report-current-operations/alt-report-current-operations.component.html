@@ -1,0 +1,7 @@
+<step-alt-report-widget title="Current operations" [applyOverflow]="true">
+  <step-alt-report-widget-content>
+    @for (operation of operations(); track operation.tid) {
+      <step-operation [operation]="operation" />
+    }
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

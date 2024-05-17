@@ -47,6 +47,13 @@ import { AltStatusComponent } from './components/alt-status/alt-status.component
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
 import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
+import { AltReportCurrentOperationsComponent } from './components/alt-report-current-operations/alt-report-current-operations.component';
+import { AltReportWidgetComponent } from './components/alt-report-widget/alt-report-widget.component';
+import { AltReportWidgetFilterDirective } from './directives/alt-report-widget-filter.directive';
+import { AltReportWidgetContentDirective } from './directives/alt-report-widget-content.directive';
+import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
+import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 
 @NgModule({
   declarations: [
@@ -89,6 +96,13 @@ import { AltReportPerformanceOverviewChartComponent } from './components/alt-rep
     AltExecutionTimeComponent,
     AltStatusComponent,
     AltReportPerformanceOverviewChartComponent,
+    AltReportCurrentOperationsComponent,
+    AltReportWidgetComponent,
+    AltReportWidgetFilterDirective,
+    AltReportWidgetContentDirective,
+    AltReportNodeKeywordsComponent,
+    AltReportNodesTestcasesComponent,
+    ExecutionDetailsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

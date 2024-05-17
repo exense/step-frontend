@@ -17,7 +17,7 @@ export class AltReportPerformanceOverviewChartComponent {
     zoomEnabled: false,
     primaryAxesUnit: 'ms',
     colorizationType: 'FILL',
-    height: 300,
+    height: 238,
   };
 
   protected readonly metricKey = 'response-time';

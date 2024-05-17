@@ -1,5 +1,6 @@
 import { Component, computed, input, model } from '@angular/core';
 import { ReportNode, TimeRange } from '@exense/step-core';
+import { AltReportNodesListService } from '../../services/alt-report-nodes-list.service';
 
 type KeywordStatus = ReportNode['status'];
 
@@ -7,8 +8,14 @@ type KeywordStatus = ReportNode['status'];
   selector: 'step-alt-report-node-list',
   templateUrl: './alt-report-node-list.component.html',
   styleUrl: './alt-report-node-list.component.scss',
+  providers: [
+    {
+      provide: AltReportNodesListService,
+      useExisting: AltReportNodeListComponent,
+    },
+  ],
 })
-export class AltReportNodeListComponent {
+export class AltReportNodeListComponent implements AltReportNodesListService {
   /** @Input() **/
   title = input('');
 
@@ -17,8 +24,6 @@ export class AltReportNodeListComponent {
     alias: 'reportNodes',
     transform: (value?: ReportNode[]) => value ?? [],
   });
-
-  showDates = input(false);
 
   search = model('');
 

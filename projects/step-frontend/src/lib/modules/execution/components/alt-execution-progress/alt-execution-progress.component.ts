@@ -12,6 +12,7 @@ import {
   RELATIVE_TIME_OPTIONS,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
+  SystemService,
   Tab,
   TimeOption,
   TreeNodeUtilsService,
@@ -84,6 +85,7 @@ export class AltExecutionProgressComponent
   private _router = inject(Router);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
+  private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
 
   private isTreeInitialized = false;
@@ -128,6 +130,21 @@ export class AltExecutionProgressComponent
     switchMap((keywordParams) => this._controllerService.getReportNodes(keywordParams)),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  readonly currentOperations$ = this.execution$.pipe(
+    map((execution) => {
+      if (!execution || execution.status === 'ENDED') {
+        return undefined;
+      }
+      return execution.id;
+    }),
+    switchMap((eId) => {
+      if (!eId) {
+        return of(undefined);
+      }
+      return this._systemService.getCurrentOperations(eId);
+    }),
   );
 
   readonly tabs: Tab<string>[] = [
