@@ -46,7 +46,7 @@ import { AltReportNodeListComponent } from './components/alt-report-node-list/al
 import { AltStatusComponent } from './components/alt-status/alt-status.component';
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
-import { AltReportResponseTimeChartComponent } from './components/alt-report-response-time-chart/alt-report-response-time-chart.component';
+import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
 
 @NgModule({
   declarations: [
@@ -88,7 +88,7 @@ import { AltReportResponseTimeChartComponent } from './components/alt-report-res
     AltReportNodeListComponent,
     AltExecutionTimeComponent,
     AltStatusComponent,
-    AltReportResponseTimeChartComponent,
+    AltReportPerformanceOverviewChartComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -250,20 +250,9 @@ export class ExecutionModule {
               path: 'analytics',
               component: AltExecutionAnalyticsComponent,
             },
+            schedulePlanRoute('modal'),
           ],
         },
-        /*
-        {
-          matcher: (url) => {
-            if (url[0].path === 'list') {
-              return null;
-            }
-            return { consumed: url };
-          },
-          component: ExecutionProgressComponent,
-          children: [schedulePlanRoute('modal')],
-        },
-*/
       ],
     });
   }

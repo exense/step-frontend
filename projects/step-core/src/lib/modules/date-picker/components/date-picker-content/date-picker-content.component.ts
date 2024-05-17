@@ -9,6 +9,7 @@ import { DateRange } from '../../types/date-range';
 import { TimeRange } from '../../types/time-range';
 import { Time } from '../../types/time';
 import { RELATIVE_TIME_OPTIONS } from '../../injectables/relative-time-options.token';
+import { TimeOption } from '../../types/time-option';
 
 @Component({
   selector: 'step-date-picker-content',
@@ -51,6 +52,7 @@ export class DatePickerContentComponent {
       changedModel = this._calendarStrategy.handleTimeSelection(this.predefinedTime, changedModel);
       this.predefinedTime = undefined;
     }
+    this.handleRelativeOptionChange(undefined);
     this.updateModel(changedModel);
   }
 
@@ -60,12 +62,20 @@ export class DatePickerContentComponent {
       return;
     }
     const changedModel = this._calendarStrategy.handleTimeSelection(time, this.model);
+    this.handleRelativeOptionChange(undefined);
     this.updateModel(changedModel);
   }
 
-  pickRelativeTime(range: DateRange): void {
+  handleRelativeRangeChange(range: DateRange): void {
     const changedModel = this._calendarStrategy.pickRelativeTime(range);
     this.updateModel(changedModel);
+  }
+
+  handleRelativeOptionChange(timeOption?: TimeOption): void {
+    if (!this.withRelativeTime) {
+      return;
+    }
+    this._fieldContainer.handleRelativeOptionChange(timeOption);
   }
 
   private updateModel(model: DateTime | DateRange): void {

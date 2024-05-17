@@ -1,5 +1,5 @@
 import { Component, computed, input, model } from '@angular/core';
-import { ReportNode } from '@exense/step-core';
+import { ReportNode, TimeRange } from '@exense/step-core';
 
 type KeywordStatus = ReportNode['status'];
 
@@ -18,6 +18,8 @@ export class AltReportNodeListComponent {
     transform: (value?: ReportNode[]) => value ?? [],
   });
 
+  showDates = input(false);
+
   search = model('');
 
   selectedStatuses = model<KeywordStatus[]>([]);
@@ -27,17 +29,26 @@ export class AltReportNodeListComponent {
     return Array.from(new Set(statuses));
   });
 
+  timeRange = input<TimeRange | undefined>(undefined);
+
   reportNodes = computed(() => {
     let result = this.allReportNodes();
 
+    const range = this.timeRange();
+    if (range?.from && range?.to) {
+      result = result.filter(
+        (node) => node.executionTime && node.executionTime >= range.from && node.executionTime <= range.to,
+      );
+    }
+
     const selectedStatuses = new Set(this.selectedStatuses());
     if (selectedStatuses.size) {
-      result = result.filter((keyword) => selectedStatuses.has(keyword.status));
+      result = result.filter((node) => selectedStatuses.has(node.status));
     }
 
     const search = this.search().trim().toLowerCase();
     if (search) {
-      result = result.filter((keyword) => (keyword.name ?? '').toLowerCase().includes(search));
+      result = result.filter((node) => (node.name ?? '').toLowerCase().includes(search));
     }
 
     return result;

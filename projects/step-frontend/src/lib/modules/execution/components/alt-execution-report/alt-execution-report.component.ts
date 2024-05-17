@@ -26,6 +26,9 @@ export class AltExecutionReportComponent {
       }
       const from = dateRange.start!.toMillis();
       const to = dateRange.end!.toMillis();
+      if (from >= to) {
+        return undefined;
+      }
       return { from, to } as TimeRange;
     }),
   );

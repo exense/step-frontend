@@ -15,6 +15,7 @@ import { DatePickerComponent } from '../components/date-picker/date-picker.compo
 import { ControlValueAccessor } from '@angular/forms';
 import { DateAdapterService } from '../injectables/date-adapter.service';
 import { Mutable } from '../../basics/step-basics.module';
+import { TimeOption, TimeOptionRelativeValue } from '../types/time-option';
 
 type FieldAccessor = Mutable<Pick<DatePickerBaseDirective<any>, 'formattedValue'>>;
 type OnChange<D> = (date?: D | null) => void;
@@ -38,6 +39,8 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   protected isDisabled: boolean | null = null;
 
   @Output() dateChange = new EventEmitter<D | null | undefined>();
+
+  @Output() relativeOptionChange = new EventEmitter<number | undefined>();
 
   readonly formattedValue: string = '';
 
@@ -95,6 +98,11 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
 
   withRelativeTime(): boolean {
     return this.showRelativeTime;
+  }
+
+  handleRelativeOptionChange(timeOption?: TimeOption): void {
+    const msFromNow = (timeOption?.value as TimeOptionRelativeValue)?.msFromNow;
+    this.relativeOptionChange.emit(msFromNow);
   }
 
   abstract isRangeField(): boolean;

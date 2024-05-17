@@ -10,7 +10,7 @@
   </div>
   <div class="progress-controls">
     <div class="controls">
-      @if (isExecutionCompleted$ | async) {
+      @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
           <step-btn-group class="without-borders">
             <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
@@ -27,7 +27,6 @@
           (scheduleTask)="handleTaskSchedule($event)"
         />
       }
-      <!--todo includedTestCases-->
     </div>
     <div class="range-picker">
       <step-form-field>
@@ -40,6 +39,7 @@
           [formControl]="dateRangeCtrl"
           [stepDateRangePicker]="picker"
           [showRelativeTime]="true"
+          (relativeOptionChange)="relativeTime = $event"
         />
       </step-form-field>
       <step-date-picker #picker />
@@ -50,3 +50,4 @@
   <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
   <router-outlet />
 </section>
+<router-outlet name="modal" />

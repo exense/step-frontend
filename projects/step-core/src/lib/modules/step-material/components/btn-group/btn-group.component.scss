@@ -32,22 +32,22 @@ step-btn-group {
 
     .mat-mdc-outlined-button {
       border-radius: 0;
-    }
 
-    &:not(:last-of-type):first-of-type {
-      border-radius: 0.8rem 0 0 0.8rem;
-    }
+      &:not(:last-of-type):first-of-type {
+        border-radius: 0.8rem 0 0 0.8rem;
+      }
 
-    &:not(:first-of-type):last-of-type {
-      border-radius: 0 0.8rem 0.8rem 0;
-    }
+      &:not(:first-of-type):last-of-type {
+        border-radius: 0 0.8rem 0.8rem 0;
+      }
 
-    &:only-of-type {
-      border-radius: 0.8rem;
-    }
+      &:only-of-type {
+        border-radius: 0.8rem;
+      }
 
-    &:not(:last-of-type) {
-      border-right: 0.1rem solid var.$gray-300;
+      &:not(:last-of-type) {
+        border-right: 0.1rem solid var.$gray-300;
+      }
     }
   }
 }

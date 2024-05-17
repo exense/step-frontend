@@ -13,20 +13,25 @@ export class RelativeTimePickerComponent {
   relativeTimes = input<TimeOption[]>([]);
 
   /** @Output() **/
-  pickRelativeTime = output<DateRange>();
+  rangeChange = output<DateRange>();
+
+  /** @Output() **/
+  relativeOptionChange = output<TimeOption | undefined>();
 
   protected pickOption(timeOption: TimeOption): void {
     let range: DateRange;
 
     if ((timeOption.value as TimeOptionRelativeValue).isRelative) {
+      this.relativeOptionChange.emit(timeOption);
       const ms = (timeOption.value as TimeOptionRelativeValue).msFromNow;
       const end = DateTime.now();
       const start = end.set({ millisecond: end.millisecond - ms });
       range = { start, end };
     } else {
+      this.relativeOptionChange.emit(undefined);
       range = timeOption.value as DateRange;
     }
 
-    this.pickRelativeTime.emit(range);
+    this.rangeChange.emit(range);
   }
 }

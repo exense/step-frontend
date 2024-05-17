@@ -1,11 +1,11 @@
 import { inject, NgModule } from '@angular/core';
 import {
-  NAVIGATOR_QUERY_PARAMS_CLEANUP,
+  DashboardsService,
   dialogRoute,
+  EntityRegistry,
+  NAVIGATOR_QUERY_PARAMS_CLEANUP,
   SimpleOutletComponent,
   ViewRegistryService,
-  DashboardsService,
-  EntityRegistry,
 } from '@exense/step-core';
 import { NoTotalCountPaginator } from './modules/_common';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -20,6 +20,7 @@ import { AnalyticsPageComponent } from './components/analytics-page/analytics-pa
 import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
 import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
 import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.component';
+import { StandaloneChartComponent } from './components/standalone-chart/standalone-chart.component';
 
 @NgModule({
   imports: [
@@ -28,6 +29,7 @@ import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,
+    StandaloneChartComponent,
   ],
   exports: [
     AnalyticsPageComponent,
@@ -35,6 +37,7 @@ import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,
+    StandaloneChartComponent,
   ],
   providers: [
     {
@@ -103,3 +106,6 @@ export class TimeSeriesModule {
     });
   }
 }
+
+export { StandaloneChartConfig } from './components/standalone-chart/standalone-chart-config';
+export { FilterBarItem, FilterBarItemType } from './modules/_common';

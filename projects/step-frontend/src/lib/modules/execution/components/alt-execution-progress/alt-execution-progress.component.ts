@@ -29,11 +29,7 @@ import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
-
-const getDefaultRangeFromExecution = (execution: Execution): DateRange => ({
-  start: DateTime.fromMillis(execution.startTime!),
-  end: DateTime.fromMillis(execution.endTime!),
-});
+import { AltExecutionDefaultRangeService } from '../../services/alt-execution-default-range.service';
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -46,15 +42,20 @@ const getDefaultRangeFromExecution = (execution: Execution): DateRange => ({
       useExisting: AltExecutionProgressComponent,
     },
     {
+      provide: AltExecutionDefaultRangeService,
+      useExisting: AltExecutionProgressComponent,
+    },
+    {
       provide: RELATIVE_TIME_OPTIONS,
       useFactory: () => {
-        const state = inject(AltExecutionStateService);
-        const defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
+        const _state = inject(AltExecutionStateService);
+        const _defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
+        const _executionDefaultRange = inject(AltExecutionDefaultRangeService);
 
-        return state.execution$.pipe(
-          map(getDefaultRangeFromExecution),
+        return _state.execution$.pipe(
+          map((execution) => _executionDefaultRange.getDefaultRangeForExecution(execution)),
           map((value) => ({ value, label: 'Full Range' }) as TimeOption),
-          map((fullRangeOption) => [...defaultOptions, fullRangeOption]),
+          map((fullRangeOption) => [..._defaultOptions, fullRangeOption]),
         );
       },
     },
@@ -71,7 +72,9 @@ const getDefaultRangeFromExecution = (execution: Execution): DateRange => ({
     TreeStateService,
   ],
 })
-export class AltExecutionProgressComponent implements OnInit, AltExecutionStateService {
+export class AltExecutionProgressComponent
+  implements OnInit, AltExecutionStateService, AltExecutionDefaultRangeService
+{
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -84,6 +87,8 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   private _fb = inject(FormBuilder);
 
   private isTreeInitialized = false;
+
+  protected relativeTime?: number;
 
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
@@ -150,6 +155,24 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
     });
   }
 
+  getDefaultRangeForExecution(execution: Execution): DateRange {
+    let start: DateTime;
+    let end: DateTime;
+
+    if (execution.endTime) {
+      start = DateTime.fromMillis(execution.startTime!);
+      end = DateTime.fromMillis(execution.endTime);
+    } else if (this.relativeTime) {
+      end = DateTime.now();
+      start = end.set({ millisecond: end.millisecond - this.relativeTime });
+    } else {
+      start = DateTime.fromMillis(execution.startTime!);
+      end = DateTime.now();
+    }
+
+    return { start, end };
+  }
+
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
@@ -161,7 +184,7 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   }
 
   private applyDefaultRange(execution: Execution): void {
-    this.dateRangeCtrl.setValue(getDefaultRangeFromExecution(execution));
+    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution));
   }
 
   private refreshExecutionTree(execution: Execution): void {

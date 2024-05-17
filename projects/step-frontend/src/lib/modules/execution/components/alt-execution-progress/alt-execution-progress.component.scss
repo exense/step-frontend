@@ -12,17 +12,21 @@ step-alt-execution-progress {
     display: flex;
     justify-content: space-between;
     flex-wrap: nowrap;
+    min-height: 12rem;
+    gap: 1.5rem;
 
     .title {
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
+      justify-content: flex-end;
 
       .sub-title {
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
         gap: 0.4rem;
+        white-space: nowrap;
       }
 
       h3 {
@@ -42,6 +46,7 @@ step-alt-execution-progress {
       flex-direction: column;
       gap: 1rem;
       align-items: flex-end;
+      justify-content: space-between;
 
       .controls {
         display: flex;

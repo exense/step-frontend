@@ -22,10 +22,13 @@
   </mat-card-header>
   <mat-card-content>
     <section class="report-nodes">
-      @for (keyword of reportNodes(); track keyword.id) {
+      @for (node of reportNodes(); track node.id) {
         <div>
-          <step-alt-status [status]="keyword.status" />
-          <div>{{ keyword.name }}</div>
+          <step-alt-status [status]="node.status" />
+          @if (showDates()) {
+            <div>{{ node.executionTime | date: 'HH:mm:ss' }}</div>
+          }
+          <div>{{ node.name }}</div>
         </div>
       }
     </section>

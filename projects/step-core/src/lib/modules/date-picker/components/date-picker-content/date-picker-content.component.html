@@ -8,7 +8,8 @@
       @if (withRelativeTime) {
         <step-relative-time-picker
           [relativeTimes]="(_relativeTimeOptions$ | async)!"
-          (pickRelativeTime)="pickRelativeTime($event)"
+          (rangeChange)="handleRelativeRangeChange($event)"
+          (relativeOptionChange)="handleRelativeOptionChange($event)"
         />
       }
     </mat-card-content>

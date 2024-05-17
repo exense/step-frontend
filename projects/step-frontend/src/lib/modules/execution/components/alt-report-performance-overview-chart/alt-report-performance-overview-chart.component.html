@@ -1,0 +1,15 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Performance Overview (avg)</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (timeRange(); as range) {
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [config]="chartConfig"
+        [filters]="chartFilters()"
+        [timeRange]="range"
+      />
+    }
+  </mat-card-content>
+</mat-card>
