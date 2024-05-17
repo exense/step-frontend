@@ -9,9 +9,6 @@ export const $TableSettings = {
         properties: {},
       },
     },
-    settingId: {
-      type: 'string',
-    },
     scope: {
       type: 'dictionary',
       contains: {
@@ -27,13 +24,6 @@ export const $TableSettings = {
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
-    },
-    columns: {
-      type: 'array',
-      contains: {
-        type: 'ColumnSelection',
-      },
-      isRequired: true,
     },
   },
 } as const;

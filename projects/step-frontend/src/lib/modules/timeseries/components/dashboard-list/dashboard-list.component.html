@@ -1,6 +1,6 @@
 <step-drag-drop-container>
   <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-    <div *stepAdditionalHeader="'btngroup-bulk-import-create'"></div>
+    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="dashboard" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
@@ -22,6 +22,7 @@
         <step-entity-selection-di [entity]="element" />
       </td>
     </ng-container>
+    <step-entity-column-container entityName="dashboard" />
     <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Name</step-drag-column-caption>
@@ -33,7 +34,7 @@
           matTooltipPosition="below"
           [routerLink]="['/', 'dashboards', element.id]"
           class="name-column"
-          >{{ element.name }}</a
+          >{{ element.attributes.name }}</a
         >
       </td>
     </ng-container>
@@ -71,7 +72,15 @@
           >
             <step-icon name="eye" />
           </a>
-          @if (!element.metadata?.isLegacy) {
+          <button
+            mat-icon-button
+            matTooltip="Duplicate dashboard"
+            [disabled]="!('dashboard-write' | hasRight | async)"
+            (click)="duplicateDashboard(element.id)"
+          >
+            <step-icon name="copy" />
+          </button>
+          @if (!element.customFields?.locked && !element.metadata?.isLegacy) {
             <a
               stepTestId="edit-dashboard-btn"
               mat-icon-button

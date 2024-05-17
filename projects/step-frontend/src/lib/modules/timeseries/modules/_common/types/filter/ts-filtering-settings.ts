@@ -3,6 +3,6 @@ import { FilterBarItem } from './filter-bar-item';
 
 export interface TsFilteringSettings {
   mode: TsFilteringMode;
-  oql: string; // for oql mode
   filterItems: FilterBarItem[]; // custom filters
+  oql?: string; // for oql mode
 }

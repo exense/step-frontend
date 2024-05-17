@@ -116,6 +116,7 @@ export { DownloadCloud } from './svg/download-cloud';
 export { Download } from './svg/download';
 export { Edit2 } from './svg/edit-2';
 export { Edit } from './svg/edit';
+export { Dashboard } from './svg/dashboard';
 export { Dribbble } from './svg/dribbble';
 export { Droplet } from './svg/droplet';
 export { Edit3 } from './svg/edit-3';

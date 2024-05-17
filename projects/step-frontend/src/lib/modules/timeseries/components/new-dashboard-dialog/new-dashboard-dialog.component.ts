@@ -26,10 +26,10 @@ export class NewDashboardDialogComponent {
     description: this._fb.control(''),
   });
 
-  private createEmptyDashboardObject(formValue: FormValue): DashboardView {
+  private createDashboardObject(formValue: FormValue): DashboardView {
     const { name, description } = formValue;
     return {
-      name: name!,
+      attributes: { name: name! },
       description,
       timeRange: { type: 'RELATIVE', relativeSelection: { timeInMs: 3600_000 } },
       grouping: [],
@@ -43,7 +43,7 @@ export class NewDashboardDialogComponent {
       this.form.markAllAsTouched();
       return;
     }
-    const dashboard = this.createEmptyDashboardObject(this.form.value);
+    const dashboard = this.createDashboardObject(this.form.value);
     this._dashboardsService.saveDashboard(dashboard).subscribe((dashboard) => {
       const isSuccess = !!dashboard;
       const canNavigateBack = !isEditAfterSave;

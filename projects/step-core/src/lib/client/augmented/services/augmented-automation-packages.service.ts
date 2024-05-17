@@ -6,21 +6,34 @@ import {
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
 } from '../../table/step-table-client.module';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, OperatorFunction } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
+import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
+import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AugmentedAutomationPackagesService extends AutomationPackagesService {
+export class AugmentedAutomationPackagesService
+  extends AutomationPackagesService
+  implements HttpOverrideResponseInterceptor
+{
   static readonly AUTOMATION_PACKAGE_TABLE_ID = 'automationPackages';
 
   private _http = inject(HttpClient);
   private _tableRest = inject(TableApiWrapperService);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
+  private _requestContextHolder = inject(HttpRequestContextHolderService);
+
+  overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
+    this._interceptorOverride.overrideInterceptor(override);
+    return this;
+  }
 
   createDataSource(): StepDataSource<AutomationPackage> {
     return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
@@ -74,15 +87,19 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     const body = new FormData();
     body.set('file', file);
 
-    const request$ = this._http.request('POST', `rest/automation-packages`, {
-      body,
-      headers: {
-        enctype: 'multipart/form-data',
-      },
-      observe: 'events',
-      responseType: 'arraybuffer',
-      reportProgress: true,
-    });
+    const request$ = this._http.request(
+      'POST',
+      `rest/automation-packages`,
+      this._requestContextHolder.decorateRequestOptions({
+        body,
+        headers: {
+          enctype: 'multipart/form-data',
+        },
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
 
     return uploadWithProgress(request$);
   }
@@ -91,15 +108,19 @@ export class AugmentedAutomationPackagesService extends AutomationPackagesServic
     const body = new FormData();
     body.set('file', file);
 
-    const request$ = this._http.request('PUT', `rest/automation-packages/${id}?async=true`, {
-      body,
-      headers: {
-        enctype: 'multipart/form-data',
-      },
-      observe: 'events',
-      responseType: 'arraybuffer',
-      reportProgress: true,
-    });
+    const request$ = this._http.request(
+      'PUT',
+      `rest/automation-packages/${id}?async=true`,
+      this._requestContextHolder.decorateRequestOptions({
+        body,
+        headers: {
+          enctype: 'multipart/form-data',
+        },
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
 
     return uploadWithProgress(request$);
   }

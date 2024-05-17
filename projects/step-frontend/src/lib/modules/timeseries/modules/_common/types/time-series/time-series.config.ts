@@ -7,7 +7,8 @@ export class TimeSeriesConfig {
   static readonly ONE_HOUR_MS = 3600 * 1000;
   static readonly DASHBOARD_URL_PARAMS_PREFIX = 'dc_';
   static readonly DASHBOARD_URL_FILTER_PREFIX = 'q_'; // filter params will be prefixed with both params and filter's prefix
-
+  static readonly PARAM_KEY_EXECUTION_DASHBOARD_ID = 'plugins.timeseries.execution.dashboard.id';
+  static readonly PARAM_KEY_ANALYTICS_DASHBOARD_ID = 'plugins.timeseries.analytics.dashboard.id';
   static readonly SECONDARY_AXES_KEY = 'z';
 
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';

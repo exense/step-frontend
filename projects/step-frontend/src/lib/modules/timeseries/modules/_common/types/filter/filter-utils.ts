@@ -190,7 +190,7 @@ export class FilterUtils {
       attributeName: attribute.name,
       label: attribute.displayName,
       isLocked: true,
-      removable: false,
+      removable: true,
       isHidden: false,
       textValues: [],
       searchEntities: [],

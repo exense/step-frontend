@@ -71,6 +71,8 @@ import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { TestIdDirective } from './directives/test-id.directive';
+import { ExtractUrlPipe } from './pipes/extract-url.pipe';
+import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 
 @NgModule({
   declarations: [
@@ -108,6 +110,8 @@ import { TestIdDirective } from './directives/test-id.directive';
     LockColumnComponent,
     DashboardNavigationParamsPipe,
     TestIdDirective,
+    ExtractUrlPipe,
+    ExtractQueryParamsPipe,
   ],
   imports: [
     CommonModule,
@@ -210,6 +214,8 @@ import { TestIdDirective } from './directives/test-id.directive';
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
     TestIdDirective,
+    ExtractUrlPipe,
+    ExtractQueryParamsPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -338,3 +344,5 @@ export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
+export * from './pipes/extract-url.pipe';
+export * from './pipes/extract-query-params.pipe';

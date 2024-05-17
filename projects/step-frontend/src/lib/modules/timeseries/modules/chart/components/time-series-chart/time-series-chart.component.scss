@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-timeseries-chart {
   display: block;
 
@@ -70,24 +72,71 @@ step-timeseries-chart {
 
   .ts-chart-legend {
     display: flex;
+    position: relative;
     flex-grow: 1;
     justify-content: space-between;
     flex-direction: row;
-    padding: 0.8rem 1.6rem;
+    padding: 0.4rem 1.6rem;
     align-items: center;
     font-size: 1.3rem;
     background: #f9fafb;
-    border-radius: 0.4rem;
-    height: 3.2rem;
+    border-radius: 0.2rem;
     font-weight: 500;
+
+    &:hover {
+      .expand-triangle {
+        display: block;
+      }
+    }
+
+    .expand-triangle {
+      display: none;
+      position: absolute;
+      cursor: pointer;
+      left: 4px;
+      width: 12px;
+      bottom: 1px;
+      height: 12px;
+
+      &.expanded {
+        bottom: unset;
+        top: 4px;
+
+        &:after {
+          border-width: 0 0 8px 8px;
+        }
+      }
+
+      &:after {
+        content: '';
+        border-style: solid;
+        border-width: 8px 0 0 8px;
+        border-color: transparent var.$gray-300;
+        position: absolute;
+        cursor: pointer;
+      }
+    }
 
     .left-section {
       display: flex;
-      overflow: hidden;
-      max-width: 100%;
+      gap: 0.5rem;
+      overflow: auto;
 
-      &:hover {
-        overflow: auto;
+      .legend-items {
+        display: flex;
+        overflow: hidden;
+        max-width: 100%;
+        min-height: 2rem;
+        flex-wrap: nowrap;
+
+        &:hover {
+          overflow: auto;
+        }
+
+        &.expanded {
+          height: unset;
+          flex-wrap: wrap;
+        }
       }
     }
 

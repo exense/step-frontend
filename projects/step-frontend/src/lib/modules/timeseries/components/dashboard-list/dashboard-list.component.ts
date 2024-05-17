@@ -1,9 +1,12 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedDashboardsService,
+  AutoDeselectStrategy,
   DashboardView,
   DialogParentService,
   DialogsService,
+  Plan,
+  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
@@ -23,6 +26,7 @@ import { Params } from '@angular/router';
       entityTableRemoteId: AugmentedDashboardsService.TABLE_ID,
     }),
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
+    ...selectionCollectionProvider<string, DashboardView>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => DashboardListComponent),
@@ -44,9 +48,15 @@ export class DashboardListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
+  duplicateDashboard(id: string): void {
+    this._dashboardsService.cloneDashboard(id).subscribe(() => {
+      this.dataSource.reload();
+    });
+  }
+
   delete(dashboard: DashboardView) {
     this._dialogs
-      .showDeleteWarning(1, `Dashboard "${dashboard.name}"`)
+      .showDeleteWarning(1, `Dashboard "${dashboard.attributes!['name']}"`)
       .pipe(
         filter((confirm) => confirm),
         catchError(() => of(false)),

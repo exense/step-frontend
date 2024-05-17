@@ -1,5 +1,8 @@
 import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Resource, ResourcesService } from '../../../../client/generated';
+import { Resource, AugmentedResourcesService } from '../../../../client/step-client-module';
+import { of, pipe } from 'rxjs';
+import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'step-resource-label',
@@ -7,7 +10,7 @@ import { Resource, ResourcesService } from '../../../../client/generated';
   styleUrls: ['./resource-label.component.scss'],
 })
 export class ResourceLabelComponent implements OnChanges {
-  private _api = inject(ResourcesService);
+  private _api = inject(AugmentedResourcesService);
 
   @Input() stModel: any;
   @Input() stFormat?: string;
@@ -32,15 +35,29 @@ export class ResourceLabelComponent implements OnChanges {
       const stModel = cStModel?.currentValue;
       const isResource = this.getIsResource(stModel);
       if (isResource) {
-        this._api.getResource(this.getResourceId(stModel)).subscribe((resource: Resource) => {
-          if (resource) {
-            this.resourceNotExisting = false;
-            this.resourceFilename = resource.resourceName;
-          } else {
-            this.resourceNotExisting = true;
-            this.resourceFilename = undefined;
-          }
-        });
+        this._api
+          .overrideInterceptor(
+            pipe(
+              catchError((error: HttpHeaderResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                  console.log('ERROR OVERRIDE');
+                  const empty = new HttpResponse({ status: HttpStatusCode.NoContent });
+                  return of(empty);
+                }
+                throw error;
+              }),
+            ),
+          )
+          .getResource(this.getResourceId(stModel))
+          .subscribe((resource?: Resource) => {
+            if (resource) {
+              this.resourceNotExisting = false;
+              this.resourceFilename = resource.resourceName;
+            } else {
+              this.resourceNotExisting = true;
+              this.resourceFilename = undefined;
+            }
+          });
       } else {
         this.absoluteFilepath = stModel;
         this.fileName = this.absoluteFilepath?.replace(/^.*[\\\/]/, '');

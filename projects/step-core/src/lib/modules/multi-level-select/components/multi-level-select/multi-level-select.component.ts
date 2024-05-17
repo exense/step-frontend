@@ -1,10 +1,8 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   computed,
   forwardRef,
-  inject,
   input,
   signal,
   ViewEncapsulation,
@@ -44,8 +42,6 @@ type OnTouch = () => void;
 export class MultiLevelSelectComponent<T extends string | number | symbol>
   implements ControlValueAccessor, MultiLevelVisualSelectionService<T>
 {
-  private _cd = inject(ChangeDetectorRef);
-
   private onChange?: OnChange<T>;
   private onTouch?: OnTouch;
 
@@ -64,28 +60,37 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
       parent: undefined as PlainMultiLevelItem<T> | undefined,
     }));
     const plainItems: PlainMultiLevelItem<T>[] = [];
+
     const itemsAccessCache = new Map<T, MultiLevelItem<T>>();
+    const plainItemsAccessCache = new Map<T, PlainMultiLevelItem<T>>();
+
     while (itemsToCheck.length) {
       const { item, level, parent } = itemsToCheck.shift()!;
       const plainItem: PlainMultiLevelItem<T> = { key: item.key, value: item.value, level, parent };
       plainItems.push(plainItem);
+
       if (item.children?.length) {
         const nextItemsToCheck = item.children.map((item) => ({ item, level: level + 1, parent: plainItem }));
         itemsToCheck.unshift(...nextItemsToCheck);
       }
 
+      plainItemsAccessCache.set(item.key, plainItem);
       itemsAccessCache.set(item.key, item);
     }
-    return { plainItems, itemsAccessCache };
+    return { plainItems, itemsAccessCache, plainItemsAccessCache };
   });
 
   private accessCache = computed(() => this.itemsData().itemsAccessCache);
+  private plainItemsAccessCache = computed(() => this.itemsData().plainItemsAccessCache);
 
   protected plainItems = computed(() => this.itemsData().plainItems);
 
   writeValue(selectedItems: T[]): void {
+    if (!this.isModelChanged(selectedItems)) {
+      return;
+    }
     this.selectedItems = selectedItems;
-    this._cd.markForCheck();
+    this.createVisualStateFromModel();
   }
 
   registerOnChange(fn: OnChange<T>): void {
@@ -101,56 +106,28 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
   }
 
   protected handleSelectionChange(event: MatOptionSelectionChange<T>, plainItem: PlainMultiLevelItem<T>): void {
+    if (!event.isUserInput) {
+      return;
+    }
+
     const item = this.accessCache().get(event.source.value);
 
     const visualSelectionState = this.visualSelectionState();
 
+    // Invert the old selection value (not selected becomes selected)
+    const isNewSelected = visualSelectionState[item!.key] !== SelectionState.SELECTED;
+
     if (item?.children?.length) {
-      /**
-       * Grouped elements are ignored from selection.
-       * They are determined by visual-state selection value only
-       * Ignore the further code when mat-select, tries to deselect it, because it is the side effect
-       * of excluding this element from model
-       * **/
-      if (!event.source.selected) {
-        return;
-      }
-
-      const itemsToRemove = [item.key];
-      const itemsToAdd: T[] = [];
-
-      if (
-        !visualSelectionState[item.key] ||
-        visualSelectionState[item.key] === SelectionState.NOT_SELECTED ||
-        visualSelectionState[item.key] === SelectionState.CHILD_SELECTED
-      ) {
-        itemsToAdd.push(...item.children.map((child) => child.key));
-      } else {
-        const itemsToCheck = [...item.children];
-        while (itemsToCheck.length) {
-          const item = itemsToCheck.shift()!;
-          itemsToRemove.push(item.key);
-          if (item.children?.length) {
-            itemsToCheck.push(...item.children);
-          }
-        }
-      }
-
-      queueMicrotask(() => {
-        const updatedItems = (this.selectedItems ?? []).filter((item) => !itemsToRemove.includes(item));
-        updatedItems.push(...itemsToAdd);
-        this.selectedItems = updatedItems;
-        this.onChange?.(updatedItems);
-      });
-
-      return;
+      this.determineChildVisualState(item, visualSelectionState, isNewSelected);
     }
 
-    visualSelectionState[item!.key] = event.source.selected ? SelectionState.SELECTED : SelectionState.NOT_SELECTED;
+    visualSelectionState[item!.key] = isNewSelected ? SelectionState.SELECTED : SelectionState.NOT_SELECTED;
 
-    this.determineParentVisualState(event.source.selected, visualSelectionState, plainItem.parent);
+    this.determineParentVisualState(isNewSelected, visualSelectionState, plainItem.parent);
 
     this.visualSelectionState.set({ ...visualSelectionState });
+
+    this.synchronizeVisualStateWithModel(visualSelectionState);
   }
 
   private determineParentVisualState(
@@ -183,13 +160,73 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
     this.determineParentVisualState(isChildSelected, visualSelectionState, parent.parent);
   }
 
-  protected handleBlur(): void {
-    this.onTouch?.();
+  private determineChildVisualState(
+    item: MultiLevelItem<T>,
+    visualSelectionState: Record<T, SelectionState>,
+    isSelected: boolean,
+  ) {
+    const itemsToProceed = [item];
+    while (itemsToProceed.length) {
+      const child = itemsToProceed.shift()!;
+      visualSelectionState[child.key] = isSelected ? SelectionState.SELECTED : SelectionState.NOT_SELECTED;
+      if (child.children) {
+        itemsToProceed.push(...child.children);
+      }
+    }
   }
 
-  protected handleSelectedItemsChange(selectedItems: T[]): void {
-    const cache = this.accessCache();
-    const modelItems = selectedItems.filter((item) => !cache.get(item)?.children?.length);
-    this.onChange?.(modelItems);
+  private synchronizeVisualStateWithModel(visualSelectionState: Record<T, SelectionState>): void {
+    const newModel: T[] = [];
+    const itemsToProceed = [...this.items()];
+    while (itemsToProceed.length) {
+      const item = itemsToProceed.shift()!;
+      if (visualSelectionState[item.key] === SelectionState.SELECTED) {
+        newModel.push(item.key);
+      } else if (item.children?.length) {
+        itemsToProceed.push(...item.children);
+      }
+    }
+    this.selectedItems = newModel;
+    this.onChange?.(newModel);
+  }
+
+  private createVisualStateFromModel(): void {
+    const visualState = {} as Record<T, SelectionState>;
+    const accessCache = this.accessCache();
+    const plainItemAccessCache = this.plainItemsAccessCache();
+
+    this.selectedItems.forEach((key) => {
+      visualState[key] = SelectionState.SELECTED;
+
+      const item = accessCache.get(key)!;
+      if (item.children) {
+        this.determineChildVisualState(item, visualState, true);
+      }
+
+      const plainItem = plainItemAccessCache.get(key)!;
+      if (plainItem.parent) {
+        this.determineParentVisualState(true, visualState, plainItem.parent);
+      }
+    });
+
+    this.visualSelectionState.set(visualState);
+  }
+
+  private isModelChanged(newSelectedItems: T[]): boolean {
+    if (!this.selectedItems?.length && !newSelectedItems?.length) {
+      return false;
+    }
+
+    if (this.selectedItems.length !== newSelectedItems.length) {
+      return true;
+    }
+
+    const newSet = new Set(newSelectedItems);
+    const areDifferent = !this.selectedItems.every((item) => newSet.has(item));
+    return areDifferent;
+  }
+
+  protected handleBlur(): void {
+    this.onTouch?.();
   }
 }

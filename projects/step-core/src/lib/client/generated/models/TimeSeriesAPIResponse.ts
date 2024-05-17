@@ -11,4 +11,5 @@ export type TimeSeriesAPIResponse = {
   end: number;
   matrix: Array<Array<BucketResponse>>;
   matrixKeys: Array<BucketAttributes>;
+  truncated: boolean;
 };
