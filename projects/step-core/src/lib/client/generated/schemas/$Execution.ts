@@ -68,6 +68,9 @@ export const $Execution = {
     executiontTaskParameters: {
       type: 'ExecutiontTaskParameters',
     },
+    resolvedPlanRootNodeId: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

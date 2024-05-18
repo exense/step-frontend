@@ -1,13 +1,17 @@
 <as-split direction="horizontal">
   <as-split-area [size]="30" class="tree-container">
-    <step-tree
-      (treeContextAction)="handleContextAction($event.actionId, $event.node)"
-      [dragDisabled]="true"
-      [forceFocus]="true"
-    />
+    <step-tree [dragDisabled]="true" [forceFocus]="true">
+      <div *stepTreeNodeTemplate="let node" class="node-name">
+        <span>{{ node?.name }}</span>
+        <step-aggregated-tree-status [nodeId]="node.id" />
+      </div>
+    </step-tree>
+    <!--
+    (treeContextAction)="handleContextAction($event.actionId, $event.node)"
+-->
   </as-split-area>
   <as-split-area [size]="70">
-    <ng-container *ngIf="selectedNode$ | async as node">
+    @if (reportNode(); as node) {
       <step-report-node-short
         [node]="node.originalNode"
         [includeStatus]="true"
@@ -15,6 +19,6 @@
         [isShowNodeInTreeVisible]="false"
         [showFooter]="true"
       />
-    </ng-container>
+    }
   </as-split-area>
 </as-split>

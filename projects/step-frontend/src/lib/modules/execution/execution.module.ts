@@ -37,6 +37,8 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
+import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
+import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 
 @NgModule({
   declarations: [
@@ -68,6 +70,8 @@ import { ExecutionStatusComponent } from './components/execution-status/executio
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
+    AggregatedTreeStatusComponent,
+    AppliedStatusPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

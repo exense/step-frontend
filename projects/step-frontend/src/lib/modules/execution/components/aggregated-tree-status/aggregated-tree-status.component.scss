@@ -1,0 +1,26 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin aggregatedNodeStatus($status, $color) {
+  .step-node-aggregated-status-#{$status} {
+    color: $color;
+    border-color: $color;
+  }
+}
+
+@each $status, $color in var.$statuses {
+  @include aggregatedNodeStatus($status, $color);
+}
+
+.step-node-aggregated-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: solid;
+  min-width: 4rem;
+  border-width: 0.1rem;
+  border-radius: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: var.$light-blue-gray;
+}
