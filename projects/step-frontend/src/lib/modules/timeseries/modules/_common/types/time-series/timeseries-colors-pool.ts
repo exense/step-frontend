@@ -83,9 +83,9 @@ export class TimeseriesColorsPool {
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
 
     // Generate random RGB values - don't go up to 255 to be more visible
-    const red = Math.round(Math.random() * 200);
-    const green = Math.round(Math.random() * 200);
-    const blue = Math.round(Math.random() * 200);
+    const red = Math.round(Math.random() * 200 + 30);
+    const green = Math.round(Math.random() * 200 + 30);
+    const blue = Math.round(Math.random() * 200 + 30);
 
     return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
@@ -96,24 +96,24 @@ const defaultColors = [
   '#32aaa0',
   '#ff8613',
   '#6758ff',
-  '#00a5f1',
-  '#0eab1e',
+  '#2f95d0',
+  '#29a136',
   '#8400b9',
-  '#ff5252',
-  '#154719',
+  '#dc5959',
+  '#266428',
   '#b167cf',
-  '#53cb5e',
-  '#e00000',
+  '#5eb766',
+  '#b0af00',
   '#792900',
   '#75a630',
-  '#af0000',
-  '#0000ab',
-  '#c61287',
+  '#b24e11',
+  '#26399b',
+  '#c42d8b',
   '#4995c4',
   '#27856c',
-  '#ce5600',
+  '#c75c12',
   '#50cb9c',
   '#a97800',
-  '#c341ca',
+  '#b74fbe',
   '#814d10',
 ];
