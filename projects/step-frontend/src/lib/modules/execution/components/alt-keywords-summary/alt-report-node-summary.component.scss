@@ -16,6 +16,7 @@ step-alt-report-widget-content {
 .bars {
   display: flex;
   gap: 0.4rem;
+  user-select: none;
 
   div {
     &:first-child {

@@ -10,7 +10,6 @@ import {
   Execution,
   ExecutiontTaskParameters,
   RELATIVE_TIME_OPTIONS,
-  ReportNode,
   ScheduledTaskTemporaryStorageService,
   SystemService,
   Tab,
@@ -18,8 +17,6 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
-import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
-import { ReportTreeNode } from '../../shared/report-tree-node';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -29,6 +26,7 @@ import { DateTime } from 'luxon';
 import { AltExecutionDefaultRangeService } from '../../services/alt-execution-default-range.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -36,6 +34,7 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [
+    AltExecutionTabsService,
     {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
@@ -142,24 +141,6 @@ export class AltExecutionProgressComponent
       return this._systemService.getCurrentOperations(eId);
     }),
   );
-
-  readonly tabs: Tab<string>[] = [
-    {
-      id: 'report',
-      label: 'Report',
-      link: 'report',
-    },
-    {
-      id: 'tree',
-      label: 'Tree',
-      link: 'tree',
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      link: 'analytics',
-    },
-  ];
 
   ngOnInit(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {

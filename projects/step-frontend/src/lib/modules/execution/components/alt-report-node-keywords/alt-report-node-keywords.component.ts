@@ -12,4 +12,7 @@ export class AltReportNodeKeywordsComponent {
 
   /** @Output() **/
   openKeywordInTreeView = output<ReportNode>();
+
+  /** @Output() **/
+  openKeywordDrilldown = output<ReportNode>();
 }

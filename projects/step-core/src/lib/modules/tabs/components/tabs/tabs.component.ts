@@ -1,27 +1,30 @@
 import {
   Component,
+  computed,
+  contentChild,
   effect,
-  EventEmitter,
   HostBinding,
   inject,
   input,
   Input,
-  OnChanges,
   output,
-  Output,
-  SimpleChanges,
   TemplateRef,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { Tab } from '../../shared/tab';
 import { MatTabNav } from '@angular/material/tabs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { StepMaterialModule } from '../../../step-material/step-material.module';
+import { CommonModule } from '@angular/common';
+import { TabTemplateDirective } from '../directives/tab-template.directive';
 
 @Component({
   selector: 'step-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
+  imports: [StepMaterialModule, CommonModule, RouterModule],
+  standalone: true,
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
 })
@@ -48,8 +51,15 @@ export class TabsComponent<T extends string | number> {
   /** @Output() **/
   activeTabIdChange = output<T>();
 
-  /** @Input() **/
-  tabTemplate = input<TemplateRef<unknown> | undefined>(undefined);
+  /** @Input('tabTemplate') **/
+  tabTemplateInput = input<TemplateRef<unknown> | undefined>(undefined, {
+    alias: 'tabTemplate',
+  });
+
+  /** @ContentChild(TabTemplateDirective) **/
+  private tabTemplateDirective = contentChild(TabTemplateDirective);
+
+  readonly tabTemplate = computed(() => this.tabTemplateDirective()?.templateRef ?? this.tabTemplateInput()!);
 
   @HostBinding('class.shrink') @Input() shrink: boolean = false;
   @HostBinding('class.tab-mode-buttons') isTabModeButtons: boolean = true;

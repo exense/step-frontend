@@ -4,7 +4,13 @@
     <div>{{ node.executionTime | date: 'HH:mm:ss' }}</div>
     <div class="name">{{ node.name }}</div>
     <step-btn-group class="actions">
-      <button type="button" mat-icon-button matTooltip="Open keyword details" matTooltipPosition="below">
+      <button
+        type="button"
+        mat-icon-button
+        matTooltip="Open keyword details"
+        matTooltipPosition="below"
+        (click)="openKeywordDrilldown.emit(node)"
+      >
         <step-icon name="keyword" />
       </button>
       <button

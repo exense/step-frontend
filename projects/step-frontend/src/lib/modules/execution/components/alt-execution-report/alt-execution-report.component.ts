@@ -56,11 +56,18 @@ export class AltExecutionReportComponent {
   }
 
   handleOpenKeywordInTreeView(keyword: ReportNode): void {
-    console.log('OPEN', keyword);
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
+  }
+
+  handleOpenKeywordDrilldown(keyword: ReportNode): void {
+    const id = keyword.id;
+    if (!id) {
+      return;
+    }
+    this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
   }
 }

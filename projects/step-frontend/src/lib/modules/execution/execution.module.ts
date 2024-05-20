@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -57,6 +57,11 @@ import { ExecutionDetailsComponent } from './components/execution-details/execut
 import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { AltExecutionStateService } from './services/alt-execution-state.service';
+import { map, take } from 'rxjs';
+import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 
 @NgModule({
   declarations: [
@@ -90,7 +95,7 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     AltExecutionsComponent,
-    AltExecutionsComponent,
+    AltExecutionTabsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
     AltExecutionAnalyticsComponent,
@@ -106,6 +111,7 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
     AltExecutionTreeComponent,
+    AltKeywordDrilldownComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AppliedStatusPipe,
@@ -128,6 +134,7 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
     AltExecutionReportComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
+    AltKeywordDrilldownComponent,
   ],
 })
 export class ExecutionModule {
@@ -270,6 +277,10 @@ export class ExecutionModule {
             {
               path: 'analytics',
               component: AltExecutionAnalyticsComponent,
+            },
+            {
+              path: `keyword-drilldown/:keywordId`,
+              component: AltKeywordDrilldownComponent,
             },
             schedulePlanRoute('modal'),
           ],
