@@ -1,5 +1,5 @@
 import { SeriesStroke } from './series-stroke';
-import { SeriesStrokeType } from './series-stroke-type';
+import { MarkerType } from '@exense/step-core';
 
 const PREDEFINED_COLORS: Record<string, string> = {
   TECHNICAL_ERROR: '#000000',
@@ -17,18 +17,14 @@ const PREDEFINED_COLORS: Record<string, string> = {
  * If more keys are requested, new random colors will be generated and stored in the pool.
  */
 export class TimeseriesColorsPool {
-  static readonly STROKE_TYPES: SeriesStrokeType[] = [
-    SeriesStrokeType.NORMAL,
-    SeriesStrokeType.DASHED,
-    SeriesStrokeType.DOTTED,
-  ];
+  static readonly STROKE_TYPES: MarkerType[] = [MarkerType.SQUARE, MarkerType.DASHED, MarkerType.DOTS];
 
   private predefinedColors: string[];
   private assignedColors: { [key: string]: SeriesStroke } = {}; // every unique key has a unique color assigned
   private nextPredefinedColorsIndex = 0;
 
   constructor() {
-    this.predefinedColors = [...defaultColors];
+    this.predefinedColors = defaultColors;
   }
 
   /**
@@ -39,16 +35,18 @@ export class TimeseriesColorsPool {
     const alreadyAssignedStrokes = Object.keys(this.assignedColors).length;
     if (alreadyAssignedStrokes >= this.predefinedColors.length * TimeseriesColorsPool.STROKE_TYPES.length) {
       // there are no more 'predefined' options for next series
-      stroke = { type: SeriesStrokeType.NORMAL, color: this.randomRGBA() };
+      stroke = { type: MarkerType.SQUARE, color: this.randomRGB() };
     } else {
       const existingColor = this.predefinedColors[this.nextPredefinedColorsIndex++];
-      if (this.nextPredefinedColorsIndex > this.predefinedColors.length) {
+      if (this.nextPredefinedColorsIndex === this.predefinedColors.length) {
         this.nextPredefinedColorsIndex = 0;
       }
       const strokeType =
         TimeseriesColorsPool.STROKE_TYPES[Math.trunc(alreadyAssignedStrokes / this.predefinedColors.length)];
-      console.log(strokeType);
       stroke = { type: strokeType, color: existingColor };
+      if (!existingColor) {
+        throw new Error(key);
+      }
     }
     this.assignedColors[key] = stroke;
     return stroke;
@@ -63,7 +61,7 @@ export class TimeseriesColorsPool {
     } else {
       let predefinedcolor = PREDEFINED_COLORS[key];
       if (predefinedcolor) {
-        return { color: predefinedcolor, type: SeriesStrokeType.NORMAL };
+        return { color: predefinedcolor, type: MarkerType.SQUARE };
       } else {
         return this.assignColor(key);
       }
@@ -94,28 +92,28 @@ export class TimeseriesColorsPool {
 }
 
 const defaultColors = [
-  '#0050aa90',
-  '#32aaa080',
-  '#ff861380',
-  '#6758ff80',
-  '#00a5f180',
-  '#0eab1e80',
-  '#8400b980',
-  '#ff525280',
-  '#15471980',
-  '#b167cf80',
-  '#53cb5e80',
-  '#e0000080',
-  '#79290080',
-  '#75a63080',
-  '#af000080',
-  '#0000ab80',
-  '#c6128780',
-  '#4995c480',
-  '#27856c80',
-  '#ce560080',
-  '#50cb9c80',
-  '#a9780080',
-  '#c341ca80',
-  '#814d1080',
+  '#0050aa',
+  '#32aaa0',
+  '#ff8613',
+  '#6758ff',
+  '#00a5f1',
+  '#0eab1e',
+  '#8400b9',
+  '#ff5252',
+  '#154719',
+  '#b167cf',
+  '#53cb5e',
+  '#e00000',
+  '#792900',
+  '#75a630',
+  '#af0000',
+  '#0000ab',
+  '#c61287',
+  '#4995c4',
+  '#27856c',
+  '#ce5600',
+  '#50cb9c',
+  '#a97800',
+  '#c341ca',
+  '#814d10',
 ];

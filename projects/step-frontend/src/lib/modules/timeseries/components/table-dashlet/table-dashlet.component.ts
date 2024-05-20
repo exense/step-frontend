@@ -38,13 +38,14 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
+import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 
 export interface TableEntry {
   name: string; // series id
   groupingLabels: string[]; // each grouping attribute will have a label
   base?: ProcessedBucket;
   compare?: ProcessedBucket;
-  color: string;
+  stroke: SeriesStroke;
   isSelected?: boolean;
   countDiff?: number;
   sumDiff?: number;
@@ -60,7 +61,7 @@ export interface TableEntry {
 
 interface ProcessedBucket extends BucketResponse {
   seriesKey: string;
-  color: string;
+  stroke: SeriesStroke;
   avg: number;
   tps: number;
   tph: number;
@@ -285,7 +286,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         isSelected: this.context
           .getSyncGroup(this.item.id)
           .seriesShouldBeVisible(baseBucket?.seriesKey || compareBucket?.seriesKey),
-        color: baseBucketsByIds[keyword]?.color || compareBucketsByIds[keyword]?.color,
+        stroke: baseBucketsByIds[keyword]?.stroke || compareBucketsByIds[keyword]?.stroke,
         countDiff: this.percentageBetween(baseBucket?.count, compareBucket?.count),
         sumDiff: this.percentageBetween(baseBucket?.sum, compareBucket?.sum),
         avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
@@ -324,7 +325,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       return {
         ...responseBucket,
         seriesKey: seriesKey,
-        color: context.getStrokeColor(seriesKey).color,
+        stroke: context.getStrokeColor(seriesKey),
         avg: Math.trunc(responseBucket.sum / responseBucket.count),
         tps: Math.trunc(responseBucket.count / ((response.end! - response.start!) / 1000)),
         tph: Math.trunc((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),

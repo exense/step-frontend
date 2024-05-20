@@ -1,8 +1,10 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
+  AxesSettings,
   BucketResponse,
   DashboardItem,
   FetchBucketsRequest,
+  MarkerType,
   MetricAttribute,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -28,7 +30,6 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
-import { SeriesStrokeType } from '../../modules/_common/types/time-series/series-stroke-type';
 
 declare const uPlot: any;
 
@@ -235,6 +236,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
+  private getSeriesStroke(id: string, axes: AxesSettings): SeriesStroke {
+    const hasGrouping = this.getGroupDimensions()?.length > 0;
+    if (!hasGrouping) {
+      return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
+    }
+    const customSeriesColor = axes.renderingSettings?.seriesColors?.[id];
+    if (customSeriesColor) {
+      return { color: customSeriesColor, type: MarkerType.SQUARE };
+    }
+    return this.context.colorsPool.getSeriesColor(id);
+  }
+
   /**
    * When there is no grouping, the key and label will be 'Value'.
    * If there are grouping, all empty elements will be replaced with an empty label
@@ -261,10 +274,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         labelItems = [this.item.metricKey];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const customSeriesColor = primaryAxes.renderingSettings?.seriesColors?.[seriesKey];
-      const stroke: SeriesStroke = customSeriesColor
-        ? { color: customSeriesColor, type: SeriesStrokeType.NORMAL }
-        : this.context.colorsPool.getSeriesColor(seriesKey);
+      const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
@@ -295,19 +305,19 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: seriesData,
         metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: stroke.color,
+        strokeConfig: stroke,
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
       switch (stroke.type) {
-        case SeriesStrokeType.NORMAL:
+        case MarkerType.SQUARE:
           s.width = 1;
           break;
-        case SeriesStrokeType.DASHED:
+        case MarkerType.DASHED:
           s.dash = [10, 5];
-          s.width = 2;
+          s.width = 1;
           break;
-        case SeriesStrokeType.DOTTED:
+        case MarkerType.DOTS:
           s.width = 2;
           s.dash = [2, 2];
           break;
@@ -351,9 +361,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         grid: { show: false },
       });
       series.unshift({
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+        scale: 'z',
         labelItems: ['Total'],
         id: 'total',
+        strokeConfig: { color: '', type: MarkerType.SQUARE },
         data: secondaryAxesData,
         value: (x, v: number) => Math.trunc(v) + ' total',
         fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
