@@ -18,10 +18,6 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
-import {
-  EXECUTION_TREE_PAGING_SETTINGS,
-  ExecutionTreePagingService,
-} from '../../services/execution-tree-paging.service';
 import { ReportTreeNodeUtilsService } from '../../services/report-tree-node-utils.service';
 import { ReportTreeNode } from '../../shared/report-tree-node';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -31,6 +27,8 @@ import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-repo
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
 import { AltExecutionDefaultRangeService } from '../../services/alt-execution-default-range.service';
+import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
+import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -60,17 +58,16 @@ import { AltExecutionDefaultRangeService } from '../../services/alt-execution-de
         );
       },
     },
-    {
-      provide: EXECUTION_TREE_PAGING_SETTINGS,
-      useValue: {},
-    },
-    ReportTreeNodeUtilsService,
+    AggregatedReportViewTreeNodeUtilsService,
     {
       provide: TreeNodeUtilsService,
-      useExisting: ReportTreeNodeUtilsService,
+      useExisting: AggregatedReportViewTreeNodeUtilsService,
     },
-    ExecutionTreePagingService,
-    TreeStateService,
+    AggregatedReportViewTreeStateService,
+    {
+      provide: TreeStateService,
+      useExisting: AggregatedReportViewTreeStateService,
+    },
   ],
 })
 export class AltExecutionProgressComponent
@@ -79,14 +76,13 @@ export class AltExecutionProgressComponent
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
-  private _treeUtils = inject(ReportTreeNodeUtilsService);
-  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _router = inject(Router);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
+  private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
 
   private isTreeInitialized = false;
 
@@ -205,6 +201,10 @@ export class AltExecutionProgressComponent
   }
 
   private refreshExecutionTree(execution: Execution): void {
+    this._aggregatedTreeState
+      .loadTree(execution.id!)
+      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    /*
     const isForceRefresh = execution.status === 'ENDED';
 
     const expandedNodeIds = this._executionTreeState.getExpandedNodeIds();
@@ -224,5 +224,6 @@ export class AltExecutionProgressComponent
         this._executionTreeState.init(rootNode, { expandAllByDefault: false });
         this.isTreeInitialized = true;
       });
+*/
   }
 }

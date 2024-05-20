@@ -1,0 +1,13 @@
+<as-split direction="horizontal">
+  <as-split-area [size]="30" class="tree-container">
+    <step-tree [dragDisabled]="true" [forceFocus]="true">
+      <div *stepTreeNodeTemplate="let node" class="node-name">
+        <span>{{ node?.name }}</span>
+        <step-aggregated-tree-status [nodeId]="node.id" />
+      </div>
+    </step-tree>
+  </as-split-area>
+  <as-split-area [size]="70">
+    {{ artefact() | json }}
+  </as-split-area>
+</as-split>

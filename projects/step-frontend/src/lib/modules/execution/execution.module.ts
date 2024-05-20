@@ -56,6 +56,7 @@ import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
+import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 
 @NgModule({
   declarations: [
@@ -104,6 +105,7 @@ import { AppliedStatusPipe } from './pipes/applied-status.pipe';
     AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
+    AltExecutionTreeComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AppliedStatusPipe,
@@ -125,6 +127,7 @@ import { AppliedStatusPipe } from './pipes/applied-status.pipe';
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
     AltExecutionAnalyticsComponent,
+    AltExecutionTreeComponent,
   ],
 })
 export class ExecutionModule {
@@ -262,7 +265,7 @@ export class ExecutionModule {
             },
             {
               path: 'tree',
-              component: ExecutionTreeComponent,
+              component: AltExecutionTreeComponent,
             },
             {
               path: 'analytics',

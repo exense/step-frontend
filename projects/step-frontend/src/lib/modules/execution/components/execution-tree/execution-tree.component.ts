@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import {
   AbstractArtefact,
   ReportNode,
@@ -13,49 +13,28 @@ import {
 } from '../../services/execution-tree-paging.service';
 import { ExecutionTreeAction } from '../../shared/execution-tree-action.enum';
 import { ReportTreeNode } from '../../shared/report-tree-node';
-import { map, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 
 @Component({
   selector: 'step-execution-tree',
   templateUrl: './execution-tree.component.html',
   styleUrl: './execution-tree.component.scss',
   providers: [
-    /*
     ExecutionTreePagingService,
     {
       provide: TreeActionsService,
       useExisting: forwardRef(() => ExecutionTreeComponent),
     },
-*/
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class ExecutionTreeComponent {
-  /*
+export class ExecutionTreeComponent implements TreeActionsService {
   private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);
   private _executionTreePagingService = inject(ExecutionTreePagingService);
   private _treeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   readonly selectedNode$: Observable<ReportTreeNode | undefined> = toObservable(this._treeState.selectedNode);
-*/
 
-  private _treeState = inject(AggregatedReportViewTreeStateService);
-  readonly reportNode = computed(() => {
-    const node = this._treeState.selectedNode();
-    if (!node) {
-      return undefined;
-    }
-    return {
-      originalNode: {
-        id: node.id,
-        name: node.name,
-        resolvedArtefact: node.originalArtefact,
-      },
-    } as ReportTreeNode;
-  });
-
-  /*
   handleContextAction(actionId: string, node?: AbstractArtefact): void {
     const nodeId = node?.id!;
     switch (actionId) {
@@ -132,5 +111,4 @@ export class ExecutionTreeComponent {
         : '')
     );
   }
-*/
 }

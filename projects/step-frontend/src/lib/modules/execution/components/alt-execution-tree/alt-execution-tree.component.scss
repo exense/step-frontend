@@ -1,0 +1,30 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-alt-execution-tree {
+  display: block;
+  height: 60vh;
+  max-height: 60vh;
+
+  @include core.reportNodeStatuses;
+
+  step-icon {
+    background: transparent !important;
+  }
+
+  .tree-container {
+    overflow: auto !important;
+  }
+
+  step-report-node-short {
+    display: block;
+    margin-left: 0.8rem;
+  }
+
+  .node-name {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    align-items: center;
+  }
+}
