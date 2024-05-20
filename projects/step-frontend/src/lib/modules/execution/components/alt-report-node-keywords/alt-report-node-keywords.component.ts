@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { AltReportNodesListService } from '../../services/alt-report-nodes-list.service';
+import { ReportNode } from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -8,4 +9,7 @@ import { AltReportNodesListService } from '../../services/alt-report-nodes-list.
 })
 export class AltReportNodeKeywordsComponent {
   _keywords = inject(AltReportNodesListService).reportNodes;
+
+  /** @Output() **/
+  openKeywordInTreeView = output<ReportNode>();
 }

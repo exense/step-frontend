@@ -8,6 +8,14 @@
     </step-tree>
   </as-split-area>
   <as-split-area [size]="70">
-    {{ artefact() | json }}
+    <section class="artefact-container">
+      @if (artefact()) {
+        <mat-card>
+          <mat-card-content>
+            <step-artefact-details [artefact]="artefact()" [readonly]="true" />
+          </mat-card-content>
+        </mat-card>
+      }
+    </section>
   </as-split-area>
 </as-split>

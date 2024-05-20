@@ -5,7 +5,7 @@
     [reportNodes]="(_state.keywords$ | async)!"
     [timeRange]="(timeRange$ | async)!"
   >
-    <step-alt-report-node-keywords />
+    <step-alt-report-node-keywords (openKeywordInTreeView)="handleOpenKeywordInTreeView($event)" />
   </step-alt-report-node-list>
   @if (_state.testCases$ | async; as testCases) {
     <step-alt-report-node-list title="Test Cases" [reportNodes]="testCases" [timeRange]="(timeRange$ | async)!">

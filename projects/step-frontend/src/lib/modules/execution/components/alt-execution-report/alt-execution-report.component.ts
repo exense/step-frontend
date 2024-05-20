@@ -3,6 +3,7 @@ import { map, startWith } from 'rxjs';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -10,6 +11,9 @@ import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
   styleUrl: './alt-execution-report.component.scss',
 })
 export class AltExecutionReportComponent {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _router = inject(Router);
+
   readonly _state = inject(AltExecutionStateService);
 
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
@@ -49,5 +53,14 @@ export class AltExecutionReportComponent {
     );
     summary.total = summary.passed + summary.failed + summary.techError + summary.running;
     return summary;
+  }
+
+  handleOpenKeywordInTreeView(keyword: ReportNode): void {
+    console.log('OPEN', keyword);
+    const artefactId = keyword.artefactID;
+    if (!artefactId) {
+      return;
+    }
+    this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
   }
 }

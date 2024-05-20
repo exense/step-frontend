@@ -7,7 +7,13 @@
       <button type="button" mat-icon-button matTooltip="Open keyword details" matTooltipPosition="below">
         <step-icon name="keyword" />
       </button>
-      <button type="button" mat-icon-button matTooltip="Show this node in tree view" matTooltipPosition="below">
+      <button
+        type="button"
+        mat-icon-button
+        matTooltip="Show this node in tree view"
+        matTooltipPosition="below"
+        (click)="openKeywordInTreeView.emit(node)"
+      >
         <step-icon name="git-pull-request" />
       </button>
     </step-btn-group>
