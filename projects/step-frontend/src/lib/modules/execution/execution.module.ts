@@ -54,6 +54,8 @@ import { AltReportWidgetContentDirective } from './directives/alt-report-widget-
 import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
 import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
+import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
+import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 
 @NgModule({
   declarations: [
@@ -103,6 +105,8 @@ import { ExecutionDetailsComponent } from './components/execution-details/execut
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
     ExecutionDetailsComponent,
+    AggregatedTreeStatusComponent,
+    AppliedStatusPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

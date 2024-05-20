@@ -44,5 +44,6 @@ export type Execution = {
   parameters?: Record<string, string>;
   executionParameters?: ExecutionParameters;
   executiontTaskParameters?: ExecutiontTaskParameters;
+  resolvedPlanRootNodeId?: string;
   id?: string;
 };

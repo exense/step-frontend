@@ -39,6 +39,8 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
+import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -60,14 +62,24 @@ interface RefreshParams {
   templateUrl: './execution-progress.component.html',
   styleUrls: ['./execution-progress.component.scss'],
   providers: [
-    {
-      provide: EXECUTION_TREE_PAGING_SETTINGS,
-      useValue: {},
-    },
-    ReportTreeNodeUtilsService,
+    // {
+    //   provide: EXECUTION_TREE_PAGING_SETTINGS,
+    //   useValue: {},
+    // },
+    // ReportTreeNodeUtilsService,
+    // {
+    //   provide: TreeNodeUtilsService,
+    //   useExisting: ReportTreeNodeUtilsService,
+    // },
+    AggregatedReportViewTreeNodeUtilsService,
     {
       provide: TreeNodeUtilsService,
-      useExisting: ReportTreeNodeUtilsService,
+      useExisting: AggregatedReportViewTreeNodeUtilsService,
+    },
+    AggregatedReportViewTreeStateService,
+    {
+      provide: TreeStateService,
+      useExisting: AggregatedReportViewTreeStateService,
     },
     {
       provide: ExecutionStateService,
@@ -78,9 +90,9 @@ interface RefreshParams {
       useExisting: forwardRef(() => ExecutionProgressComponent),
     },
     SingleExecutionPanelsService,
-    ExecutionTreePagingService,
+    // ExecutionTreePagingService,
     ...selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
-    TreeStateService,
+    // TreeStateService,
   ],
 })
 export class ExecutionProgressComponent
@@ -92,10 +104,11 @@ export class ExecutionProgressComponent
   private _viewService = inject(PrivateViewPluginService);
   private _systemService = inject(SystemService);
   private _viewRegistry = inject(ViewRegistryService);
-  private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  // private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
+  private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
   public _executionPanels = inject(SingleExecutionPanelsService);
   public _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
-  private _treeUtils = inject(ReportTreeNodeUtilsService);
+  // private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -162,10 +175,12 @@ export class ExecutionProgressComponent
         }),
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
-          return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
+          // return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));
+          return this._aggregatedTreeState.expandNode(path).pipe(map(() => finalNodeId));
         }),
       )
-      .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
+      // .subscribe((nodeId) => this._executionTreeState.selectNodeById(nodeId));
+      .subscribe((nodeId) => this._aggregatedTreeState.selectNodeById(nodeId));
   }
 
   showTestCase(nodeId: string): void {
@@ -355,36 +370,44 @@ export class ExecutionProgressComponent
     if (!this.executionId) {
       return;
     }
+    this._aggregatedTreeState
+      .loadTree(this.executionId)
+      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    /*
     this._treeUtils.loadNodes(this.executionId).subscribe((nodes) => {
       if (nodes[0]) {
         this._executionTreeState.init(nodes[0], { expandAllByDefault: false });
         this.isTreeInitialized = true;
       }
     });
+*/
   }
 
   private refreshExecutionTree(isForceRefresh?: boolean): void {
     if (!this.executionId) {
       return;
     }
-    const expandedNodIds = this._executionTreeState.getExpandedNodeIds();
-    this._treeUtils
-      .loadNodes(this.executionId)
-      .pipe(
-        map((nodes) => nodes[0]),
-        switchMap((rootNode) => {
-          if (!rootNode || !this.isTreeInitialized || isForceRefresh) {
-            return of(rootNode);
-          }
-          return this._treeUtils.restoreTree(rootNode, expandedNodIds);
-        }),
-      )
-      .subscribe((rootNode) => {
-        if (rootNode) {
-          this._executionTreeState.init(rootNode, { expandAllByDefault: false });
-          this.isTreeInitialized = true;
-        }
-      });
+    this._aggregatedTreeState
+      .loadTree(this.executionId)
+      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    // const expandedNodIds = this._executionTreeState.getExpandedNodeIds();
+    // this._treeUtils
+    //   .loadNodes(this.executionId)
+    //   .pipe(
+    //     map((nodes) => nodes[0]),
+    //     switchMap((rootNode) => {
+    //       if (!rootNode || !this.isTreeInitialized || isForceRefresh) {
+    //         return of(rootNode);
+    //       }
+    //       return this._treeUtils.restoreTree(rootNode, expandedNodIds);
+    //     }),
+    //   )
+    //   .subscribe((rootNode) => {
+    //     if (rootNode) {
+    //       this._executionTreeState.init(rootNode, { expandAllByDefault: false });
+    //       this.isTreeInitialized = true;
+    //     }
+    //   });
   }
 
   private refreshTestCaseTable(params?: RefreshParams): void {
