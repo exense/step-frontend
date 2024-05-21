@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject, map, shareReplay } from 'rxjs';
 import { AugmentedBookmarksService } from '../../../client/augmented/services/augmented-bookmarks.service';
 import { switchMap } from 'rxjs/operators';
 
@@ -23,6 +23,7 @@ export class BookmarkService {
       }),
     ),
     map((table) => table.data),
+    shareReplay(1),
   );
 
   refreshBookmarks(): void {
