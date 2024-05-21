@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ExecutionStepPanel } from '../shared/execution-step-panel';
 import { ExecutionCustomPanelRegistryService, ItemInfo, Mutable, ViewRegistryService } from '@exense/step-core';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -11,6 +11,8 @@ type Panel = { id: string; label: string };
   providedIn: 'root',
 })
 export class ExecutionsPanelsService {
+  private _executionCustomPanels = inject(ExecutionCustomPanelRegistryService);
+
   private _defaultPanels: Record<string, ExecutionStepPanel> = {
     testCases: { label: 'Test cases', show: false, enabled: false },
     steps: { label: 'Keyword calls', show: true, enabled: true },
@@ -28,11 +30,6 @@ export class ExecutionsPanelsService {
 
   readonly panels: Panel[] = [];
   readonly customPanels: ReadonlyArray<ItemInfo> = [];
-
-  constructor(
-    private _viewRegistry: ViewRegistryService,
-    private _executionCustomPanels: ExecutionCustomPanelRegistryService
-  ) {}
 
   initialize(): void {
     if (this._isInitialized) {
@@ -55,7 +52,7 @@ export class ExecutionsPanelsService {
     if (!this._panels$?.[executionId]?.[viewId]) {
       this._panels$[executionId] = this._panels$[executionId] || {};
       this._panels$[executionId][viewId] = new BehaviorSubject<ExecutionStepPanel | undefined>(
-        this.getPanel(viewId, executionId)
+        this.getPanel(viewId, executionId),
       );
       return this._panels$[executionId][viewId];
     }
@@ -102,9 +99,12 @@ export class ExecutionsPanelsService {
   }
 
   private _copyDefaultPanels(): Record<string, ExecutionStepPanel> {
-    return Object.entries(this._defaultPanels).reduce((result, [key, panel]) => {
-      result[key] = { ...panel };
-      return result;
-    }, {} as Record<string, ExecutionStepPanel>);
+    return Object.entries(this._defaultPanels).reduce(
+      (result, [key, panel]) => {
+        result[key] = { ...panel };
+        return result;
+      },
+      {} as Record<string, ExecutionStepPanel>,
+    );
   }
 }

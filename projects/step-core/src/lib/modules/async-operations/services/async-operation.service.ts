@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AsyncOperationDialogOptions } from '../shared/async-operation-dialog-options';
 import { Observable } from 'rxjs';
@@ -9,7 +9,7 @@ import { AsyncOperationDialogResult } from '../shared/async-operation-dialog-res
   providedIn: 'root',
 })
 export class AsyncOperationService {
-  constructor(private _dialog: MatDialog) {}
+  private _dialog = inject(MatDialog);
 
   performOperation(options: AsyncOperationDialogOptions): Observable<AsyncOperationDialogResult> {
     return this._dialog

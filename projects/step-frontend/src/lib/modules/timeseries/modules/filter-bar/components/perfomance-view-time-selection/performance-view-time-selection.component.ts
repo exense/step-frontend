@@ -1,20 +1,21 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
-  OnDestroy,
   OnInit,
   Output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable, Subject, takeUntil, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
 import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../_common';
 import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-execution-time-selection',
@@ -24,7 +25,7 @@ import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-buil
   standalone: true,
   imports: [COMMON_IMPORTS, TSRangerComponent],
 })
-export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy {
+export class PerformanceViewTimeSelectionComponent implements OnInit {
   @Input() context!: TimeSeriesContext;
 
   @Output() rangerLoaded = new EventEmitter<void>();
@@ -34,9 +35,8 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   timeLabels: number[] = [];
 
-  private terminator$ = new Subject<void>();
-
-  private timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesService = inject(TimeSeriesService);
+  private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     if (!this.context) {
@@ -45,7 +45,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
     this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
     this.context
       .onTimeSelectionChange()
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((selection) => {
         if (this.context.isFullRangeSelected()) {
           this.rangerComponent.resetSelect();
@@ -55,7 +55,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       });
     this.context
       .onFullRangeChange()
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((range) => {
         // this.settings.timeRange = range;
         let customSelection = undefined;
@@ -83,7 +83,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
       .build();
-    return this.timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.timeLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
         let avgData: (number | null)[] = [];
@@ -117,10 +117,5 @@ export class PerformanceViewTimeSelectionComponent implements OnInit, OnDestroy 
 
   onRangerZoomReset() {
     this.context.resetZoom();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 }

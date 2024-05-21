@@ -1,4 +1,4 @@
-import { Injectable, Injector, Type } from '@angular/core';
+import { inject, Injectable, Injector, Type } from '@angular/core';
 import { LinkProcessorFn, LinkProcessorService } from './link-processor.service';
 import { InvokeRunRegister } from './invoke-run.service';
 
@@ -10,7 +10,8 @@ export abstract class LinkProcessor {
   providedIn: 'root',
 })
 export class DeferredLinkProcessorService implements Pick<LinkProcessorService, 'registerProcessor'> {
-  constructor(private _injector: Injector, private _invokeRunRegister: InvokeRunRegister) {}
+  private _injector = inject(Injector);
+  private _invokeRunRegister = inject(InvokeRunRegister);
 
   private get _linkProcessor(): LinkProcessorService {
     return this._injector.get(LinkProcessorService);
