@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Panels } from '../../shared/panels.enum';
 import { Observable, of } from 'rxjs';
 import { ExecutionStepPanel } from '../../shared/execution-step-panel';
@@ -13,11 +13,11 @@ type FieldAccessor = Mutable<Pick<PanelComponent, 'panel$'>>;
   styleUrls: ['./panel.component.scss'],
 })
 export class PanelComponent implements OnChanges {
+  private _executionPanels = inject(SingleExecutionPanelsService);
+
   @Input() panelType?: Panels | string;
 
   readonly panel$: Observable<ExecutionStepPanel | undefined> = of(undefined);
-
-  constructor(private _executionPanels: SingleExecutionPanelsService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     const cPanelType = changes['panelType'];

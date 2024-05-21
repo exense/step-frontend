@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output, Input, OnDestroy, OnInit, Optional } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit, Optional, inject, DestroyRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, noop, Subject, combineLatest, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, combineLatest } from 'rxjs';
 import { jsonValidator } from '../../types/validators/json-validator';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 type OnChange = (value?: any) => void;
 type OnTouch = () => void;
 
@@ -10,14 +11,14 @@ type OnTouch = () => void;
   templateUrl: './json-raw-editor.component.html',
   styleUrls: ['./json-raw-editor.component.scss'],
 })
-export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class JsonRawEditorComponent implements ControlValueAccessor, OnInit {
+  private _destroyRef = inject(DestroyRef);
+
   @Output() blur = new EventEmitter<void>();
 
-  private terminator$ = new Subject<void>();
+  private onChange?: OnChange;
 
-  private onChange: OnChange = noop;
-
-  protected onTouch: OnTouch = noop;
+  protected onTouch?: OnTouch;
 
   protected internalValue?: any;
   protected internalJsonValue?: string;
@@ -74,7 +75,7 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
     const statusChange$ = this.rawValueFormControl.statusChanges.pipe(distinctUntilChanged());
 
     combineLatest([valueChange$, statusChange$])
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(([value, status]) => {
         if (status !== 'VALID' || value === this.internalJsonValue) {
           return;
@@ -91,15 +92,8 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
 
         this.internalJsonValue = value || '';
         this.internalValue = newValue;
-        this.onChange(newValue);
+        this.onChange?.(newValue);
       });
-  }
-
-  ngOnDestroy(): void {
-    this.onChange = noop;
-    this.onTouch = noop;
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   onBlur(): void {
@@ -107,7 +101,7 @@ export class JsonRawEditorComponent implements ControlValueAccessor, OnInit, OnD
       this.rawValueFormControl.setValue(this.internalJsonValue || '');
     }
     this.blur.emit();
-    this.onTouch();
+    this.onTouch?.();
   }
 
   protected stringify(value: any): string {

@@ -1,10 +1,10 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -12,17 +12,18 @@ import {
 } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { FormBuilder } from '@angular/forms';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map } from 'rxjs';
 import { createRange } from '../../../basics/types/create-range';
 import { Time } from '../../types/time';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-single-time-picker',
   templateUrl: './single-time-picker.component.html',
   styleUrls: ['./single-time-picker.component.scss'],
 })
-export class SingleTimePickerComponent implements OnInit, OnChanges, OnDestroy {
-  private terminator$ = new Subject<void>();
+export class SingleTimePickerComponent implements OnInit, OnChanges {
+  private _destroyRef = inject(DestroyRef);
   private _fb = inject(FormBuilder).nonNullable;
 
   readonly hours = createRange(23).map(this.convert);
@@ -45,7 +46,7 @@ export class SingleTimePickerComponent implements OnInit, OnChanges, OnDestroy {
     this.timeForm.valueChanges
       .pipe(
         map((value) => value as Time),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((time) => this.timeChange.emit(time));
   }
@@ -63,11 +64,6 @@ export class SingleTimePickerComponent implements OnInit, OnChanges, OnDestroy {
         { emitEvent: false },
       );
     }
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   private convert(key: number): KeyValue<number, string> {

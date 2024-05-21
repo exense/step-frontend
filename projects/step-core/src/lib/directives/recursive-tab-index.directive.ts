@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, inject, Input } from '@angular/core';
 import { breadthFirstSearch } from '../shared';
 
 /**
@@ -10,9 +10,9 @@ import { breadthFirstSearch } from '../shared';
   selector: '[stepRecursiveTabIndex]',
 })
 export class RecursiveTabIndexDirective implements AfterViewInit {
-  @Input('stepRecursiveTabIndex') tabIndex!: number;
+  private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  constructor(private _elementRef: ElementRef<HTMLElement>) {}
+  @Input('stepRecursiveTabIndex') tabIndex!: number;
 
   ngAfterViewInit(): void {
     breadthFirstSearch({

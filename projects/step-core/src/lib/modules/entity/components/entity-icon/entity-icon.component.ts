@@ -1,4 +1,4 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { EntityTypeResolver } from '../../injectables/entity-type-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../injectables/entity-registry';
@@ -12,7 +12,7 @@ import { ArtefactService } from '../../../../services/artefact.service';
   templateUrl: './entity-icon.component.html',
   styleUrls: ['./entity-icon.component.scss'],
 })
-export class EntityIconComponent {
+export class EntityIconComponent implements OnChanges {
   @Input() entityName?: string;
   @Input() entity!: Entity;
 
@@ -22,8 +22,6 @@ export class EntityIconComponent {
   private _entityTypeResolver = inject(EntityTypeResolver);
   private entityRegistry = inject(EntityRegistry);
   private _artefactService = inject(ArtefactService);
-
-  constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (

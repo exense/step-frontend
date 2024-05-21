@@ -11,10 +11,11 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BehaviorSubject, Subject, combineLatest, startWith, debounceTime, takeUntil, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, startWith, debounceTime, map } from 'rxjs';
 import { KeyValue } from '@angular/common';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange = (value: string) => void;
 type OnTouch = () => void;
@@ -35,7 +36,6 @@ type OnTouch = () => void;
 export class AutocompleteInputComponent<T = unknown> implements ControlValueAccessor, OnChanges, OnDestroy {
   private _fb = inject(FormBuilder).nonNullable;
 
-  private terminator$ = new Subject<void>();
   private availableItems$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
 
   private onChange?: OnChange;
@@ -49,7 +49,7 @@ export class AutocompleteInputComponent<T = unknown> implements ControlValueAcce
 
   protected readonly displayItems$ = combineLatest([
     this.availableItems$,
-    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntil(this.terminator$)),
+    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntilDestroyed()),
   ]).pipe(
     map(([availableItems, filter]) => {
       let result = availableItems.filter(
@@ -100,8 +100,6 @@ export class AutocompleteInputComponent<T = unknown> implements ControlValueAcce
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
     this.availableItems$.complete();
   }
 

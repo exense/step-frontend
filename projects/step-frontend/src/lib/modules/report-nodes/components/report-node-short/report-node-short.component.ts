@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { ArtefactService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
 import { map, Observable, of } from 'rxjs';
@@ -22,6 +31,10 @@ type FieldsAccessor = Mutable<Pick<ReportNodeShortComponent, 'headerText' | 'rep
   styleUrls: ['./report-node-short.component.scss'],
 })
 export class ReportNodeShortComponent implements OnChanges {
+  private _artefactTypes = inject(ArtefactService);
+  private _reportNodeCommons = inject(ReportNodeCommonsService);
+  private _controllerService = inject(ControllerService);
+
   @Input() node?: ReportNode & ReportNodeAddon;
   @Input() includeStatus: boolean = false;
   @Input() showDetails: boolean = false;
@@ -39,12 +52,6 @@ export class ReportNodeShortComponent implements OnChanges {
   readonly reportNodeId: string = '';
   readonly children?: ReportNode[];
   readonly ViewerFormat = ViewerFormat;
-
-  constructor(
-    private _artefactTypes: ArtefactService,
-    private _reportNodeCommons: ReportNodeCommonsService,
-    private _controllerService: ControllerService
-  ) {}
 
   readonly trackByReportNode: TrackByFunction<ReportNode> = (index, item) => item.id;
 
@@ -95,7 +102,7 @@ export class ReportNodeShortComponent implements OnChanges {
         (child) =>
           (child._class === 'step.artefacts.reports.AssertReportNode' ||
             child._class === 'step.artefacts.reports.PerformanceAssertReportNode') &&
-          child.status !== 'PASSED'
+          child.status !== 'PASSED',
       );
     });
   }
@@ -114,8 +121,8 @@ export class ReportNodeShortComponent implements OnChanges {
             return attributeValue || '';
           })
           .filter((x) => !!x)
-          .join('.')
-      )
+          .join('.'),
+      ),
     );
 
     return result$;

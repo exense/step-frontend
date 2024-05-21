@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, forwardRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, forwardRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   AugmentedAutomationPackagesService,
   AutoDeselectStrategy,
@@ -15,6 +15,7 @@ import { AutomationPackagesActionsService } from '../../injectables/automation-p
 import { filter, map, Subject, takeUntil } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-automation-packages-list',
@@ -32,18 +33,17 @@ import { ActivatedRoute, Router } from '@angular/router';
     },
   ],
 })
-export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy, DialogParentService {
+export class AutomationPackagesListComponent implements AfterViewInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _destroyRef = inject(DestroyRef);
 
   readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
 
   readonly ENTITY_ID = ENTITY_ID;
 
   readonly AutomationPackagePermission = AutomationPackagePermission;
-
-  private terminator$ = new Subject<void>();
 
   @ViewChild('table', { static: true })
   private table?: TableComponent<AutomationPackage>;
@@ -56,11 +56,6 @@ export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     this.predefineAutomationPackageFileFilter();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   createPackage(): void {
@@ -84,7 +79,7 @@ export class AutomationPackagesListComponent implements AfterViewInit, OnDestroy
       .pipe(
         map((params) => params?.['automationPackageFileName']),
         filter((automationPackageFileName) => !!automationPackageFileName),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((automationPackageFileName) => {
         this.table?.onSearch('fileName', automationPackageFileName);

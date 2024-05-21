@@ -1,10 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { BaseEditorComponent } from '../base-editor/base-editor.component';
 import { RANGE_HOURS, RANGE_MINUTES } from '../../injectables/ranges.tokens';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { debounceTime } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { AlertType } from '../../../basics/types/alert-type.enum';
 import { TOOLTIP_HOURS_RANGE, TOOLTIP_MINUTES_RANGE } from '../../injectables/tooltip.tokens';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-any-date-range-editor',
@@ -15,10 +16,9 @@ import { TOOLTIP_HOURS_RANGE, TOOLTIP_MINUTES_RANGE } from '../../injectables/to
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class AnyDateRangeEditorComponent extends BaseEditorComponent implements OnInit, OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class AnyDateRangeEditorComponent extends BaseEditorComponent implements OnInit {
   private _fb = inject(FormBuilder);
+  private _destroyRef = inject(DestroyRef);
   readonly _MINUTES = inject(RANGE_MINUTES);
   readonly _HOURS = inject(RANGE_HOURS);
   readonly _tooltipMinutes = inject(TOOLTIP_MINUTES_RANGE);
@@ -37,11 +37,6 @@ export class AnyDateRangeEditorComponent extends BaseEditorComponent implements 
     this.setupFormUpdate();
   }
 
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
   protected override getExpression(): string {
     const formValue = this.anyDateRangeForm.value;
     const minutesRange = this.formatInterval(formValue.minuteFrom, formValue.minuteTo);
@@ -51,7 +46,7 @@ export class AnyDateRangeEditorComponent extends BaseEditorComponent implements 
 
   private setupFormUpdate(): void {
     this.anyDateRangeForm.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.terminator$))
+      .pipe(debounceTime(300), takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.updateExpression());
   }
 }

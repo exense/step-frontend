@@ -1,15 +1,15 @@
-import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ElementRefMapDirective } from './element-ref-map.directive';
 
 @Directive({
   selector: '[widthExpanders]',
 })
 export class WidthExpandersDirective implements OnInit, OnDestroy {
+  private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
   @Input() key?: string;
 
   private resizeObserver?: ResizeObserver;
-
-  constructor(private _elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
     this.resizeObserver = new ResizeObserver(() => {

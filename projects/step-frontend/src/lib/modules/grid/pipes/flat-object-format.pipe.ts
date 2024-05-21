@@ -4,8 +4,6 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'flatObjectStringFormat',
 })
 export class FlatObjectStringFormatPipe implements PipeTransform {
-  constructor() {}
-
   static format(obj: any): string {
     let str = '';
     for (let key of Object.keys(obj)) {

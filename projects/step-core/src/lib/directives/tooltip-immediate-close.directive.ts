@@ -1,11 +1,11 @@
-import { Directive, HostListener, Optional } from '@angular/core';
+import { Directive, HostListener, inject } from '@angular/core';
 import { MatTooltip } from '@angular/material/tooltip';
 
 @Directive({
   selector: '[matTooltip]',
 })
 export class TooltipImmediateCloseDirective {
-  constructor(@Optional() private tooltip?: MatTooltip) {}
+  private tooltip = inject(MatTooltip, { optional: true });
 
   @HostListener('mouseleave')
   mouseLeave(): void {
