@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 import { Tab } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'step-alt-execution-tabs',
   templateUrl: './alt-execution-tabs.component.html',
   styleUrl: './alt-execution-tabs.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionTabsComponent {
   private _activatedRoute = inject(ActivatedRoute);

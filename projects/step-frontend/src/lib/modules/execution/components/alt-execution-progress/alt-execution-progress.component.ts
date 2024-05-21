@@ -12,7 +12,6 @@ import {
   RELATIVE_TIME_OPTIONS,
   ScheduledTaskTemporaryStorageService,
   SystemService,
-  Tab,
   TimeOption,
   TreeNodeUtilsService,
   TreeStateService,

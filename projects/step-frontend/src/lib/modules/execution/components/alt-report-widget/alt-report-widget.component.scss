@@ -37,4 +37,15 @@ step-alt-report-widget {
     margin-top: 1rem;
     height: 100%;
   }
+
+  @media print {
+    step-alt-report-widget-filter {
+      display: none;
+    }
+    &.overflow-content step-alt-report-widget-content {
+      overflow: hidden;
+      max-height: none;
+      padding-bottom: 5rem;
+    }
+  }
 }

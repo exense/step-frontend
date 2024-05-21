@@ -62,6 +62,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { AltExecutionStateService } from './services/alt-execution-state.service';
 import { map, take } from 'rxjs';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
+import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +99,7 @@ import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-e
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
+    AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltReportNodeSummaryComponent,
     AltReportNodeListComponent,
@@ -132,6 +134,7 @@ import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-e
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
+    AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
@@ -268,7 +271,17 @@ export class ExecutionModule {
             },
             {
               path: 'report',
-              component: AltExecutionReportComponent,
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionReportComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionReportControlsComponent,
+                  outlet: 'controls',
+                },
+              ],
             },
             {
               path: 'tree',

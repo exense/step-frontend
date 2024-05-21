@@ -1,10 +1,11 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 
 @Component({
   selector: 'step-alt-report-node-summary',
   templateUrl: './alt-report-node-summary.component.html',
   styleUrl: './alt-report-node-summary.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltReportNodeSummaryComponent {
   /** @Input() **/

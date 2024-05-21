@@ -5,7 +5,7 @@
       <div class="sub-title">
         <step-alt-execution-time [execution]="execution" />
         <div class="user">{{ execution.executionParameters?.userID }}</div>
-        <step-popover yPosition="below">
+        <step-popover class="details-hint" yPosition="below">
           <step-icon name="help-circle" />
           <step-popover-content>
             <step-execution-details [execution]="execution" [showStatus]="true" />
@@ -31,13 +31,14 @@
     <step-date-picker #picker />
   </div>
   <div class="controls">
-    @if (!(isExecutionCompleted$ | async)) {
-      @if (activeExecution$ | async; as activeExecution) {
-        <step-btn-group class="without-borders">
+    <step-btn-group class="without-borders">
+      @if (!(isExecutionCompleted$ | async)) {
+        @if (activeExecution$ | async; as activeExecution) {
           <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-        </step-btn-group>
+        }
       }
-    }
+      <router-outlet name="controls" />
+    </step-btn-group>
     @if (execution$ | async; as execution) {
       <step-execution-commands
         [displayParametersForm]="false"

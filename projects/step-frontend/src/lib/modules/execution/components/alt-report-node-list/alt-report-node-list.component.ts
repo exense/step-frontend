@@ -1,4 +1,4 @@
-import { Component, computed, input, model } from '@angular/core';
+import { Component, computed, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNode, TimeRange } from '@exense/step-core';
 import { AltReportNodesListService } from '../../services/alt-report-nodes-list.service';
 
@@ -14,6 +14,7 @@ type KeywordStatus = ReportNode['status'];
       useExisting: AltReportNodeListComponent,
     },
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltReportNodeListComponent implements AltReportNodesListService {
   /** @Input() **/

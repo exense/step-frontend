@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { map, startWith } from 'rxjs';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'step-alt-execution-report',
   templateUrl: './alt-execution-report.component.html',
   styleUrl: './alt-execution-report.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);

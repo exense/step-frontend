@@ -1,5 +1,24 @@
-.tab-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+step-alt-execution-tabs {
+  step-tabs {
+    nav.mat-mdc-tab-header {
+      border-bottom: none;
+    }
+
+    .mat-mdc-tab-list {
+      width: 100%;
+    }
+    .mat-mdc-tab-links {
+      margin: 0;
+    }
+  }
+
+  .tab-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  @media print {
+    display: none;
+  }
 }

@@ -19,3 +19,9 @@
 .name {
   flex: 1;
 }
+
+@media print {
+  .actions {
+    display: none;
+  }
+}
