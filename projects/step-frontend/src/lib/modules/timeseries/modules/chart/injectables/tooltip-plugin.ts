@@ -309,13 +309,13 @@ export class TooltipPlugin {
     container.style.margin = '0 0.4rem';
     switch (stroke.type) {
       case MarkerType.SQUARE:
-        container.innerHTML = `<div class="marker-filled-square" style="--item-color: ${stroke.color}"></div>`;
+        container.innerHTML = `<div class="step-marker-filled-square" style="--item-color: ${stroke.color}"></div>`;
         break;
       case MarkerType.DOTS:
-        container.innerHTML = `<div class=marker-dots style="--item-color: ${stroke.color}"></div>`;
+        container.innerHTML = `<div class="step-marker-dots" style="--item-color: ${stroke.color}"></div>`;
         break;
       case MarkerType.DASHED:
-        container.innerHTML = `<div class="marker-dashed-square" style="--item-color: ${stroke.color}"></div>`;
+        container.innerHTML = `<div class="step-marker-dashed-square" style="--item-color: ${stroke.color}"></div>`;
         break;
     }
     return container;

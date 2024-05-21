@@ -24,7 +24,7 @@ export class TimeseriesColorsPool {
   private nextPredefinedColorsIndex = 0;
 
   constructor() {
-    this.predefinedColors = defaultColors;
+    this.predefinedColors = defaultColors.slice(0, 5);
   }
 
   /**
