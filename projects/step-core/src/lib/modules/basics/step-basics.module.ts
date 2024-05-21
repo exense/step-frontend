@@ -279,3 +279,5 @@ export * from './components/message-dialog/message-dialog.component';
 export * from './components/dialog-route/dialog-route.component';
 export * from './types/mutable';
 export * from './types/date-format.enum';
+export * from './guards/preload-screen-data.resolver';
+export * from './injectables/screen-data-meta.service';
