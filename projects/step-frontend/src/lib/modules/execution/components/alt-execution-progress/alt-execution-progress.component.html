@@ -14,6 +14,26 @@
       </div>
     }
   </div>
+  <div class="controls">
+    @if (execution$ | async; as execution) {
+      <step-execution-commands
+        [displayParametersForm]="false"
+        [description]="execution.description"
+        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+        [execution]="execution"
+        (refresh)="manualRefresh()"
+        (scheduleTask)="handleTaskSchedule($event)"
+      />
+    }
+    <step-btn-group class="without-borders">
+      @if (!(isExecutionCompleted$ | async)) {
+        @if (activeExecution$ | async; as activeExecution) {
+          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+        }
+      }
+      <router-outlet name="controls" />
+    </step-btn-group>
+  </div>
   <div class="range-picker">
     <step-form-field>
       <step-prefix class="icon-prefix">
@@ -29,26 +49,6 @@
       />
     </step-form-field>
     <step-date-picker #picker />
-  </div>
-  <div class="controls">
-    <step-btn-group class="without-borders">
-      @if (!(isExecutionCompleted$ | async)) {
-        @if (activeExecution$ | async; as activeExecution) {
-          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-        }
-      }
-      <router-outlet name="controls" />
-    </step-btn-group>
-    @if (execution$ | async; as execution) {
-      <step-execution-commands
-        [displayParametersForm]="false"
-        [description]="execution.description"
-        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-        [execution]="execution"
-        (refresh)="manualRefresh()"
-        (scheduleTask)="handleTaskSchedule($event)"
-      />
-    }
   </div>
 </section>
 <section class="main">

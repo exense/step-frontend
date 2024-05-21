@@ -10,11 +10,10 @@ step-alt-execution-progress {
 
   .header {
     display: grid;
-    grid-template-areas:
-      'title title'
-      'ranger controls';
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: 'title controls ranger';
     gap: 1.5rem;
-    justify-content: space-between;
+    align-items: flex-start;
 
     .title {
       grid-area: title;
@@ -45,6 +44,7 @@ step-alt-execution-progress {
 
     .range-picker {
       grid-area: ranger;
+      justify-self: flex-end;
       min-width: 35rem;
       step-form-field {
         --form-field-border-radius: 1.6rem;
@@ -56,10 +56,11 @@ step-alt-execution-progress {
 
     .controls {
       grid-area: controls;
+      justify-self: flex-end;
       display: flex;
       align-items: center;
       align-content: flex-end;
-      gap: 2rem;
+      gap: 1rem;
       flex-wrap: nowrap;
     }
   }
