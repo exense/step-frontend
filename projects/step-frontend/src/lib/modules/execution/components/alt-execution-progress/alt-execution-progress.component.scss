@@ -70,6 +70,13 @@ step-alt-execution-progress {
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  @media screen {
+    .print-execution-details {
+      display: none;
+    }
+  }
+
   @media print {
     padding: 0 !important;
     .header {
@@ -78,6 +85,10 @@ step-alt-execution-progress {
       .controls {
         display: none;
       }
+    }
+
+    .print-execution-details {
+      margin-bottom: 2rem;
     }
   }
 }

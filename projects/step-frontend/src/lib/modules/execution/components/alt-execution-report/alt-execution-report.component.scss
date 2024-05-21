@@ -40,6 +40,18 @@ step-alt-execution-report {
     @media print {
       @include single-col-view;
       width: 100%;
+      grid-template-rows: auto;
+
+      .keywords {
+        display: none;
+      }
+
+      step-alt-report-performance-overview-chart {
+        step-alt-report-widget {
+          page-break-before: always;
+          height: 43rem !important;
+        }
+      }
     }
   }
 }

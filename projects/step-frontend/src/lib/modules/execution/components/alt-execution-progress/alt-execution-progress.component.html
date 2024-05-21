@@ -53,6 +53,13 @@
 </section>
 <section class="main">
   <step-alt-execution-tabs />
+  @if (execution$ | async; as execution) {
+    <step-alt-report-widget class="print-execution-details">
+      <step-alt-report-widget-content>
+        <step-execution-details [execution]="execution" [showStatus]="true" />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  }
   <router-outlet />
 </section>
 <router-outlet name="modal" />

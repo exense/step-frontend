@@ -39,6 +39,7 @@ step-alt-report-widget {
   }
 
   @media print {
+    min-height: 0 !important;
     step-alt-report-widget-filter {
       display: none;
     }

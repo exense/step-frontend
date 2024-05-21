@@ -2,6 +2,7 @@
   <step-alt-report-node-summary title="Summary: Keyword calls" [summary]="(keywordsSummary$ | async)!" />
   <step-alt-report-node-list
     title="Keyword Calls"
+    class="keywords"
     [reportNodes]="(_state.keywords$ | async)!"
     [timeRange]="(timeRange$ | async)!"
   >
