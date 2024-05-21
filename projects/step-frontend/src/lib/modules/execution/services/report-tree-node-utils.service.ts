@@ -1,24 +1,18 @@
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ArtefactService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
-import {
-  EXECUTION_TREE_PAGING_SETTINGS,
-  ExecutionTreePagingSetting,
-  ExecutionTreePagingService,
-} from './execution-tree-paging.service';
+import { EXECUTION_TREE_PAGING_SETTINGS, ExecutionTreePagingService } from './execution-tree-paging.service';
 import { ReportTreeNode } from '../shared/report-tree-node';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { ReportNodeWithChildren } from '../shared/report-node-with-children';
 
 @Injectable()
 export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNodeWithChildren, ReportTreeNode> {
-  private readonly hasChildrenFlags: Record<string, boolean> = {};
+  private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);
+  private _artefactTypes = inject(ArtefactService);
+  private _controllerService = inject(ControllerService);
+  private _executionTreePagingService = inject(ExecutionTreePagingService);
 
-  constructor(
-    @Inject(EXECUTION_TREE_PAGING_SETTINGS) private _paging: ExecutionTreePagingSetting,
-    private _artefactTypes: ArtefactService,
-    private _controllerService: ControllerService,
-    private _executionTreePagingService: ExecutionTreePagingService,
-  ) {}
+  private readonly hasChildrenFlags: Record<string, boolean> = {};
 
   convertItem(
     item: ReportNodeWithChildren,

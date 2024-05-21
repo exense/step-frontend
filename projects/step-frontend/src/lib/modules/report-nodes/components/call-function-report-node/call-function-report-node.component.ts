@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { DateFormat, Execution, Measure, ReportNode } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
@@ -19,11 +19,7 @@ export class CallFunctionReportNodeComponent implements OnChanges {
   hideMeasures: boolean = false;
   hideRouting: boolean = true;
 
-  execution: Execution;
-
-  constructor(executionService: ExecutionStateService) {
-    this.execution = executionService.execution!;
-  }
+  execution: Execution = inject(ExecutionStateService).execution!;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cChildren = changes['children'];

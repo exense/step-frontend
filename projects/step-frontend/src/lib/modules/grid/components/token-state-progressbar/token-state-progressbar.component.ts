@@ -9,6 +9,4 @@ import { TokenGroupCapacity } from '@exense/step-core';
 })
 export class TokenStateProgressbarComponent {
   @Input() tokenGroup!: TokenGroupCapacity;
-
-  constructor() {}
 }

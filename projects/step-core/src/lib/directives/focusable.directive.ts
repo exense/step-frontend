@@ -1,5 +1,17 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  DestroyRef,
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Documentation:
@@ -13,26 +25,23 @@ import { Subject, takeUntil } from 'rxjs';
   },
 })
 export class FocusableDirective implements OnInit, OnDestroy {
+  private _destroyRef = inject(DestroyRef);
+  _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
   @Input() focus$ = new Subject<void>();
   @Input() defaultSpace: boolean = true;
 
   @Output() keydownSpace = new EventEmitter<void>();
 
-  private readonly terminator$ = new Subject<void>();
-
   readonly focusEvent$ = new Subject<FocusEvent>();
 
-  constructor(public _elementRef: ElementRef<HTMLElement>) {}
-
   ngOnInit(): void {
-    this.focus$.pipe(takeUntil(this.terminator$)).subscribe(() => {
+    this.focus$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
       this._elementRef.nativeElement.focus();
     });
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
     this.focus$.complete();
     this.focusEvent$.complete();
   }

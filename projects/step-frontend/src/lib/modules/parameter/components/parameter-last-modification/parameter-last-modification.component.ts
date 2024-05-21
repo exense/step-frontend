@@ -9,6 +9,4 @@ import { CustomComponent, Parameter, DateFormat } from '@exense/step-core';
 export class ParameterLastModificationComponent implements CustomComponent {
   @Input() context?: Parameter;
   readonly DateFormat = DateFormat;
-
-  constructor() {}
 }

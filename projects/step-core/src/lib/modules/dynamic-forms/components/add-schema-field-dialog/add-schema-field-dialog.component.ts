@@ -8,6 +8,7 @@ import { jsonValidator } from '../../../basics/types/validators/json-validator';
 import { comaSplitArrayValidator } from '../../../basics/types/validators/coma-split-array-validator';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type DialogRef = MatDialogRef<AddSchemaFieldDialogComponent, FieldSchemaMeta>;
 
@@ -16,8 +17,7 @@ type DialogRef = MatDialogRef<AddSchemaFieldDialogComponent, FieldSchemaMeta>;
   templateUrl: './add-schema-field-dialog.component.html',
   styleUrls: ['./add-schema-field-dialog.component.scss'],
 })
-export class AddSchemaFieldDialogComponent implements OnInit, OnDestroy {
-  private _terminator$ = new Subject<void>();
+export class AddSchemaFieldDialogComponent implements OnInit {
   private _fb = inject(FormBuilder).nonNullable;
   private _dialogRef = inject<DialogRef>(MatDialogRef);
 
@@ -41,7 +41,7 @@ export class AddSchemaFieldDialogComponent implements OnInit, OnDestroy {
   protected readonly fieldType$ = this.fieldForm.controls.fieldType.valueChanges.pipe(
     startWith(this.fieldForm.controls.fieldType.value),
     shareReplay(1),
-    takeUntil(this._terminator$),
+    takeUntilDestroyed(),
   );
 
   protected readonly isEnum$ = this.fieldType$.pipe(map((value) => value === FieldSchemaType.ENUM));
@@ -49,11 +49,6 @@ export class AddSchemaFieldDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.setupDynamicValidatorBehavior();
-  }
-
-  ngOnDestroy(): void {
-    this._terminator$.next();
-    this._terminator$.complete();
   }
 
   @HostListener('keydown.enter')

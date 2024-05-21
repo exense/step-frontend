@@ -1,10 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { BaseEditorComponent } from '../base-editor/base-editor.component';
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
 import { RANGE_DAYS, RANGE_HOURS, RANGE_MONTHS_NAMES, RANGE_YEARS } from '../../injectables/ranges.tokens';
-import { debounceTime, distinctUntilChanged, startWith, Subject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, takeUntil } from 'rxjs';
 import { TOOLTIP_HOURS_RANGE } from '../../injectables/tooltip.tokens';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 enum TimeRangeType {
   CONCRETE_DATE = 'CONCRETE_DATE',
@@ -20,9 +21,8 @@ enum TimeRangeType {
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class TimeRangeEditorComponent extends BaseEditorComponent implements OnInit, OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class TimeRangeEditorComponent extends BaseEditorComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _fb = inject(FormBuilder);
   readonly _MONTHS = inject(RANGE_MONTHS_NAMES);
   readonly _YEARS = inject(RANGE_YEARS);
@@ -48,11 +48,6 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
   ngOnInit(): void {
     this.setupFormUpdate();
     this.setupFieldsDisableState();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   protected updateRange(rangeType: TimeRangeType): void {
@@ -86,13 +81,13 @@ export class TimeRangeEditorComponent extends BaseEditorComponent implements OnI
 
   private setupFormUpdate(): void {
     this.timeRangeForm.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.terminator$))
+      .pipe(debounceTime(300), takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.updateExpression());
   }
 
   private setupFieldsDisableState(): void {
     this.timeRangeForm.controls.type.valueChanges
-      .pipe(startWith(this.timeRangeForm.value.type), distinctUntilChanged(), takeUntil(this.terminator$))
+      .pipe(startWith(this.timeRangeForm.value.type), distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
       .subscribe((type) => {
         switch (type) {
           case TimeRangeType.CONCRETE_DATE:
