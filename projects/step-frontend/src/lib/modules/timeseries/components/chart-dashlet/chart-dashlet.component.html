@@ -30,7 +30,7 @@
   </div>
   @if (
     !editMode &&
-    !((item.readonlyGrouping || item.inheritGlobalGrouping) && item.readonlyAggregate && selectedAggregate !== 'RATE')
+    ((!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE')
   ) {
     <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
       <step-icon name="settings"></step-icon>
