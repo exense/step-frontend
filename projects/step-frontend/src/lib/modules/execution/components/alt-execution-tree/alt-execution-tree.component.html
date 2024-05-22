@@ -1,21 +1,5 @@
-<as-split direction="horizontal">
-  <as-split-area [size]="30" class="tree-container">
-    <step-tree [dragDisabled]="true" [forceFocus]="true">
-      <div *stepTreeNodeTemplate="let node" class="node-name">
-        <span>{{ node?.name }}</span>
-        <step-aggregated-tree-status [nodeId]="node.id" />
-      </div>
-    </step-tree>
-  </as-split-area>
-  <as-split-area [size]="70">
-    <section class="artefact-container">
-      @if (artefact()) {
-        <mat-card>
-          <mat-card-content>
-            <step-artefact-details [artefact]="artefact()" [readonly]="true" />
-          </mat-card-content>
-        </mat-card>
-      }
-    </section>
-  </as-split-area>
-</as-split>
+<step-tree [dragDisabled]="true" [forceFocus]="true">
+  <div *stepTreeNodeTemplate="let node" class="node-name">
+    <step-aggregated-tree-node [nodeId]="node.id" />
+  </div>
+</step-tree>

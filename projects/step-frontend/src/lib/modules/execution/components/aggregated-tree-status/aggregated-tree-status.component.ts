@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AppliedStatusPipe } from '../../pipes/applied-status.pipe';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 @Component({
   selector: 'step-aggregated-tree-status',
@@ -12,10 +13,13 @@ export class AggregatedTreeStatusComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected _appliedStatus = inject(AppliedStatusPipe);
 
-  nodeId = input.required<string>();
+  nodeId = input<string>();
+  node = input<AggregatedTreeNode>();
 
   status = computed(() => {
-    const node = this._treeState.findNodeById(this.nodeId());
+    let node = this.node();
+    const nodeId = this.nodeId();
+    node = node ?? (nodeId ? this._treeState.findNodeById(nodeId) : undefined);
     return node?.countByStatus;
   });
 

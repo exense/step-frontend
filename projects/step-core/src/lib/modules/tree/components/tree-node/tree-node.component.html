@@ -13,15 +13,19 @@
   } @else {
     <div class="no-toggle"></div>
   }
-  <div
-    class="node-content"
-    (contextmenu)="openContextMenu($event)"
-    [stepDragItem]="node().id"
-    [dragDisabled]="dragDisabled"
-  >
-    <div class="node-icon">
-      <step-icon [name]="node().icon" [class]="node().iconClassName" />
+  @if (node(); as n) {
+    <div
+      class="node-content"
+      (contextmenu)="openContextMenu($event)"
+      [stepDragItem]="n.id"
+      [dragDisabled]="dragDisabled"
+    >
+      @if (n.icon) {
+        <div class="node-icon">
+          <step-icon [name]="n.icon" [class]="n.iconClassName" />
+        </div>
+      }
+      <step-tree-node-name [node]="n" />
     </div>
-    <step-tree-node-name [node]="node()" />
-  </div>
+  }
 </div>

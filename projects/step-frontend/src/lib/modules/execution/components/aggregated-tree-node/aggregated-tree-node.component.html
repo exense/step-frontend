@@ -1,0 +1,22 @@
+@if (node(); as node) {
+  @switch (node.nodeType) {
+    @case (AggregateTreeNodeType.KEYWORD) {
+      <div class="keyword">
+        <span>{{ node?.name }}</span>
+        <step-aggregated-tree-status [node]="node" />
+      </div>
+    }
+    @case (AggregateTreeNodeType.DETAILS_NODE) {
+      <span>{{ node?.name }}</span>
+    }
+    @case (AggregateTreeNodeType.DETAILS_DATA) {
+      <section class="artefact-container">
+        <mat-card>
+          <mat-card-content>
+            <step-artefact-details [artefact]="node.originalArtefact" [readonly]="true" />
+          </mat-card-content>
+        </mat-card>
+      </section>
+    }
+  }
+}

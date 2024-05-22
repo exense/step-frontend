@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { ActivatedRoute } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -23,7 +23,9 @@ export class AltExecutionTreeComponent implements OnInit {
         map((params) => params['artefactId']),
         filter((artefactId) => !!artefactId),
         takeUntilDestroyed(this._destroyRef),
+        map((artefactId) => `details_data_${artefactId}`),
+        switchMap((nodeId) => this._treeState.expandNode(nodeId)),
       )
-      .subscribe((artefactId) => this._treeState.selectNode(artefactId));
+      .subscribe();
   }
 }

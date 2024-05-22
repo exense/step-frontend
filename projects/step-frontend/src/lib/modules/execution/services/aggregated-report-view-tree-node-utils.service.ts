@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import {
+  AbstractArtefact,
   AggregatedReportView,
   ArtefactService,
   ArtefactTreeNode,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
-import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
+import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 
 @Injectable()
 export class AggregatedReportViewTreeNodeUtilsService
@@ -27,6 +28,9 @@ export class AggregatedReportViewTreeNodeUtilsService
     const children = (item.children ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
     );
+
+    children.unshift(this.createDetailsNode(item));
+
     const result = {
       id,
       name,
@@ -38,8 +42,8 @@ export class AggregatedReportViewTreeNodeUtilsService
       parentId,
       originalArtefact,
       countByStatus: item.countByStatus,
+      nodeType: AggregatedTreeNodeType.KEYWORD,
     };
-    console.log('NODE', result);
     return result;
   }
 
@@ -56,5 +60,36 @@ export class AggregatedReportViewTreeNodeUtilsService
     data: Partial<Pick<TreeNode, 'name' | 'isSkipped'>>,
   ): boolean {
     return false;
+  }
+
+  private createDetailsNode(item: AggregatedReportView): AggregatedTreeNode {
+    const originalArtefact = item.artefact!;
+    const artefactId = originalArtefact.id!;
+    const id = `details_${artefactId}`;
+    const parentId = artefactId;
+    const name = 'Details';
+    const icon = 'file-text';
+    return {
+      id,
+      name,
+      icon,
+      parentId,
+      isSkipped: false,
+      isVisuallySkipped: false,
+      expandable: true,
+      nodeType: AggregatedTreeNodeType.DETAILS_NODE,
+      originalArtefact: undefined as any as AbstractArtefact,
+      children: [
+        {
+          id: `details_data_${artefactId}`,
+          parentId: id,
+          originalArtefact,
+          nodeType: AggregatedTreeNodeType.DETAILS_DATA,
+          isSkipped: false,
+          isVisuallySkipped: false,
+          expandable: false,
+        } as AggregatedTreeNode,
+      ],
+    };
   }
 }

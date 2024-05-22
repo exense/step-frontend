@@ -1,4 +1,4 @@
-import { inject, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -58,11 +58,9 @@ import { AggregatedTreeStatusComponent } from './components/aggregated-tree-stat
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { AltExecutionStateService } from './services/alt-execution-state.service';
-import { map, take } from 'rxjs';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
+import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 
 @NgModule({
   declarations: [
@@ -116,6 +114,7 @@ import { AltExecutionReportControlsComponent } from './components/alt-execution-
     AltKeywordDrilldownComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
+    AggregatedTreeNodeComponent,
     AppliedStatusPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],

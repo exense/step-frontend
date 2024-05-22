@@ -13,7 +13,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
         if (!root) {
           return false;
         }
-        this.init(root, { expandAllByDefault: true });
+        this.init(root, { expandAllByDefault: false });
         return true;
       }),
     );
