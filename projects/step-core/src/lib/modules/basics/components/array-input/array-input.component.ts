@@ -17,6 +17,7 @@ import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/m
 import { BehaviorSubject, combineLatest, debounceTime, map, startWith, Subject, takeUntil } from 'rxjs';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange = (value?: string[]) => void;
 type OnTouch = () => void;
@@ -37,7 +38,6 @@ type OnTouch = () => void;
 export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, OnChanges, OnDestroy {
   private _fb = inject(FormBuilder).nonNullable;
 
-  private terminator$ = new Subject<void>();
   private availableItems$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
 
   private onChange?: OnChange;
@@ -54,7 +54,7 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
 
   protected readonly displayItems$ = combineLatest([
     this.availableItems$,
-    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntil(this.terminator$)),
+    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntilDestroyed()),
   ]).pipe(
     map(([availableItems, filter]) => {
       let result = availableItems.filter(
@@ -84,8 +84,6 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
     this.availableItems$.complete();
   }
 

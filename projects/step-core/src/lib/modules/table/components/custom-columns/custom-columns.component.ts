@@ -22,6 +22,8 @@ import { CustomColumnsBaseComponent } from './custom-columns-base.component';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
 import { ActivityColDirective } from '../../directives/activity-col.directive';
 import { CustomColumnsScreenInputs } from './custom-columns-screen-inputs';
+import { ActivatedRoute } from '@angular/router';
+import { ScreenDataMetaService } from '../../../basics/injectables/screen-data-meta.service';
 
 @Component({
   selector: 'step-custom-columns',
@@ -41,6 +43,8 @@ import { CustomColumnsScreenInputs } from './custom-columns-screen-inputs';
 export class CustomColumnsComponent
   implements OnInit, OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent, CustomColumnsScreenInputs
 {
+  private _activatedRoute = inject(ActivatedRoute);
+  private _screenDataMeta = inject(ScreenDataMetaService);
   private _customColumns = inject(TableCustomColumnsService);
 
   private readonly optionsInternal$ = new BehaviorSubject<string[]>([]);
@@ -74,6 +78,7 @@ export class CustomColumnsComponent
   @ViewChildren(ActivityColDirective) colDefLabel?: QueryList<ActivityColDirective>;
 
   ngOnInit(): void {
+    this._screenDataMeta.checkMetaInformationAboutScreenInRoute(this.screen, this._activatedRoute);
     this.columns = this._customColumns.getScreenColumnsSignal(this.screen);
     this._customColumns
       .updateColumnsForScreen(this.screen)

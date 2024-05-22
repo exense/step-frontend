@@ -1,5 +1,5 @@
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { Component, EventEmitter, Input, Optional, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Optional, Output } from '@angular/core';
 import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 
 @Component({
@@ -14,8 +14,8 @@ import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
   styleUrls: [],
 })
 export class BulkSelectionDiComponent<KEY, ENTITY> {
+  _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector, { optional: true })!;
   @Input() showLabel: boolean = true;
   @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
-  constructor(@Optional() public _selectionCollector?: SelectionCollector<KEY, ENTITY>) {}
 }

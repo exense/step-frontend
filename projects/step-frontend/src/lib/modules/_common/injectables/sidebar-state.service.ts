@@ -1,17 +1,9 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { IS_SMALL_SCREEN, LogoutCleanup, Mutable } from '@exense/step-core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  first,
-  pairwise,
-  Subject,
-  takeUntil,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, pairwise } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { MenuStorageService } from './menu-storage.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MAIN_WHEN_SIDEBAR_CLOSED = 'main-when-sidebar-closed';
 const MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN = 'main-when-sidebar-closed-small-screen';
@@ -27,11 +19,9 @@ type FieldAccessor = Mutable<Pick<SidebarStateService, 'openedMenuItems'>>;
   providedIn: 'root',
 })
 export class SidebarStateService implements OnDestroy, LogoutCleanup {
-  private terminator$ = new Subject<void>();
-
   private _menuStorage = inject(MenuStorageService);
   private _document = inject(DOCUMENT);
-  private _isSmallScreen$ = inject(IS_SMALL_SCREEN).pipe(distinctUntilChanged(), takeUntil(this.terminator$));
+  private _isSmallScreen$ = inject(IS_SMALL_SCREEN).pipe(distinctUntilChanged(), takeUntilDestroyed());
 
   private isOpenedInternal$ = new BehaviorSubject<boolean>(this.getIsOpenedInitialValue());
 
@@ -58,8 +48,6 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
 
   ngOnDestroy(): void {
     this.isOpenedInternal$.complete();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   toggleIsOpened(): void {
@@ -86,7 +74,7 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
     this._isSmallScreen$
       .pipe(
         pairwise(),
-        filter(([previous, current]) => !previous && current)
+        filter(([previous, current]) => !previous && current),
       )
       .subscribe(() => {
         if (this.isOpened) {

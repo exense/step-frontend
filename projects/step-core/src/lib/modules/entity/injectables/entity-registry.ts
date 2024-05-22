@@ -1,4 +1,4 @@
-import { Injectable, Type } from '@angular/core';
+import { inject, Injectable, Type } from '@angular/core';
 import { EntityMeta } from '../types/entity-meta';
 import {
   CustomComponent,
@@ -10,9 +10,9 @@ import {
   providedIn: 'root',
 })
 export class EntityRegistry {
-  protected readonly registryType = CustomRegistryType.ENTITY;
+  private _customRegistry = inject(CustomRegistryService);
 
-  constructor(private _customRegistry: CustomRegistryService) {}
+  protected readonly registryType = CustomRegistryType.ENTITY;
 
   registerEntity(
     displayName: string,
@@ -23,7 +23,7 @@ export class EntityRegistry {
     postUrl?: string,
     tableType?: string,
     component?: Type<CustomComponent>,
-    callback?: Function
+    callback?: Function,
   ): void {
     const type = entityName;
     const label = displayName;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   AgentListEntry,
   GridService,
@@ -15,6 +15,8 @@ import { TokenTypeComponent } from '../token-type/token-type.component';
   providers: [tablePersistenceConfigProvider('agentList', STORE_ALL)],
 })
 export class AgentListComponent {
+  private _gridService = inject(GridService);
+
   readonly searchableAgent = new TableFetchLocalDataSource(
     () => this._gridService.getAgents(true.toString()),
     TableFetchLocalDataSource.configBuilder<AgentListEntry>()
@@ -22,10 +24,8 @@ export class AgentListComponent {
       .addSearchStringPredicate('type', (item) => TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[item.agentRef!.agentType!])
       .addSortStringPredicate('url', (item) => item.agentRef!.agentUrl!)
       .addSortStringPredicate('type', (item) => TokenTypeComponent.TYPE_LABEL_TRANSLATIONS[item.agentRef!.agentType!])
-      .build()
+      .build(),
   );
-
-  constructor(private _gridService: GridService) {}
 
   loadTable(): void {
     this.searchableAgent.reload();

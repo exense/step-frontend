@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, TrackByFunction, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, inject, OnDestroy, TrackByFunction, ViewChild } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactFormChangeHelperService,
@@ -10,6 +10,7 @@ import { OperatorType } from '../../shared/operator-type.enum';
 import { NgForm, NgModel } from '@angular/forms';
 import { KeyValue } from '@angular/common';
 import { map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface AssertArtefact extends AbstractArtefact {
   actual: DynamicValueString;
@@ -36,8 +37,8 @@ const NUMBER_OPERATORS = [
   styleUrls: ['./assert.component.scss'],
   providers: [ArtefactFormChangeHelperService],
 })
-export class AssertComponent extends BaseArtefactComponent<AssertArtefact> implements AfterViewInit, OnDestroy {
-  private terminator$ = new Subject<void>();
+export class AssertComponent extends BaseArtefactComponent<AssertArtefact> implements AfterViewInit {
+  private _destroyRef = inject(DestroyRef);
 
   @ViewChild('form')
   protected form!: NgForm;
@@ -67,17 +68,11 @@ export class AssertComponent extends BaseArtefactComponent<AssertArtefact> imple
     this.setupNumberExpectedValue();
   }
 
-  override ngOnDestroy(): void {
-    super.ngOnDestroy();
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
   private setupNumberExpectedValue(): void {
     this.isNumberExpectedValue$ = this.operator.valueChanges!.pipe(
       startWith(this.context!.artefact!.operator),
       map((operator) => NUMBER_OPERATORS.includes(operator)),
-      takeUntil(this.terminator$)
+      takeUntilDestroyed(this._destroyRef),
     );
   }
 }

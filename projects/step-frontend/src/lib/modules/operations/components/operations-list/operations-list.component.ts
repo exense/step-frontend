@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import {
   OperationDetails,
   STORE_ALL,
@@ -15,6 +15,8 @@ import { ExecutionViewServices } from '../../operations.module';
   providers: [tablePersistenceConfigProvider('operationList', STORE_ALL)],
 })
 export class OperationsListComponent {
+  private _systemService = inject(SystemService);
+
   @Input() executionViewServices?: ExecutionViewServices;
 
   readonly dataSource = new TableFetchLocalDataSource<OperationDetails>(
@@ -30,10 +32,8 @@ export class OperationsListComponent {
       .addSortStringPredicate('execution', (item) => this.getExecution(item))
       .addSortStringPredicate('testcase', (item) => this.getTestcase(item))
       .addSortStringPredicate('operation', (item) => this.getOperation(item))
-      .build()
+      .build(),
   );
-
-  constructor(private _systemService: SystemService) {}
 
   triggerRefresh(): void {
     this.dataSource.reload();
