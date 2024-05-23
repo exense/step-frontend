@@ -40,11 +40,11 @@ export class ScreenInputEditDialogComponent {
     this._screenApi
       .saveInput(this.screenInput)
       .pipe(
-        switchMap(() => {
+        switchMap((savedInput) => {
           if (!this.isNew) {
             return of(undefined);
           }
-          return this._tableColumnsDefaultVisibility.setupDefaultVisibilityForScreenInputColumn(this.screenInput);
+          return this._tableColumnsDefaultVisibility.setupDefaultVisibilityForScreenInputColumn(savedInput);
         }),
       )
       .subscribe({
