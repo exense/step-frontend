@@ -1,8 +1,14 @@
 import { Component, HostBinding, inject } from '@angular/core';
-import { AugmentedScreenService, DialogRouteResult, Input as SInput } from '@exense/step-core';
+import {
+  AugmentedScreenService,
+  DialogRouteResult,
+  Input as SInput,
+  TableColumnsDefaultVisibilityService,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
 import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
+import { of, switchMap } from 'rxjs';
 
 type InputType = SInput['type'];
 type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>;
@@ -16,17 +22,34 @@ export class ScreenInputEditDialogComponent {
   private _screenApi = inject(AugmentedScreenService);
   private _matDialogRef = inject<DialogRef>(MatDialogRef);
   private _dialogData = inject<ScreenInputEditDialogData>(MAT_DIALOG_DATA);
+  private _tableColumnsDefaultVisibility = inject(TableColumnsDefaultVisibilityService);
   protected screenInput = this._dialogData.screenInput;
-  readonly modalTitle = `${!!this.screenInput.id ? 'Edit' : 'New'} Input`;
+  private isNew = !this.screenInput?.id;
+  readonly modalTitle = `${this.isNew ? 'New' : 'Edit'} Input`;
   readonly ALLOWED_TYPES: InputType[] = ['DROPDOWN', 'TEXT', 'CHECKBOX'];
 
   protected showAdvanced = false;
+  protected inProgress = false;
 
   readonly customUIComponentsFormatter = CUSTOM_UI_COMPONENTS_FORMATTER;
   readonly activationExpressionFormatter = EXPRESSION_SCRIPT_FORMATTER;
 
   @HostBinding('keydown.enter')
   save(): void {
-    this._screenApi.saveInput(this.screenInput).subscribe(() => this._matDialogRef.close({ isSuccess: true }));
+    this.inProgress = true;
+    this._screenApi
+      .saveInput(this.screenInput)
+      .pipe(
+        switchMap(() => {
+          if (!this.isNew) {
+            return of(undefined);
+          }
+          return this._tableColumnsDefaultVisibility.setupDefaultVisibilityForScreenInputColumn(this.screenInput);
+        }),
+      )
+      .subscribe({
+        next: () => this._matDialogRef.close({ isSuccess: true }),
+        complete: () => (this.inProgress = false),
+      });
   }
 }

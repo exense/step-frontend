@@ -1,7 +1,7 @@
 <step-modal-window title="Warning" [hideButtonsSection]="true">
   <div step-modal-window-body>
     <form (submit)="onSubmit()">
-      <step-alert [type]="AlertType.DANGER">{{ dialogData.message }}</step-alert>
+      <step-alert [type]="alertType">{{ dialogData.message }}</step-alert>
 
       <div class="dialog-actions">
         <button type="button" mat-stroked-button [matDialogClose]="undefined">Cancel</button>
