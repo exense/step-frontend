@@ -53,8 +53,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per hour', unitLabel: 'h', tphMultiplier: 1 },
-    { menuLabel: 'Per minute', unitLabel: 'm', tphMultiplier: 60 },
-    { menuLabel: 'Per second', unitLabel: 's', tphMultiplier: 3600 },
+    { menuLabel: 'Per minute', unitLabel: 'm', tphMultiplier: 1 / 60 },
+    { menuLabel: 'Per second', unitLabel: 's', tphMultiplier: 1 / 3600 },
   ];
 
   readonly AGGREGATES: ChartAggregation[] = [
