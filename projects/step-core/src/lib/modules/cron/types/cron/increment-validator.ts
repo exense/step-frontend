@@ -1,5 +1,7 @@
 import { BaseCronValidator } from './_base-cron-validator';
 
+const REGEX_NUM = /^\d+$/;
+
 export class IncrementValidator extends BaseCronValidator {
   override validate(source: unknown): boolean {
     if (typeof source !== 'string' || !source.includes('/')) {
@@ -19,7 +21,7 @@ export class IncrementValidator extends BaseCronValidator {
       return false;
     }
 
-    if (isNaN(parseInt(parts[1])) || parseInt(parts[1]) <= 0) {
+    if (!REGEX_NUM.test(parts[1]) || parseInt(parts[1]) <= 0) {
       return false;
     }
 
