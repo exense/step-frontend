@@ -1,5 +1,5 @@
 import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
-import { DashboardItem, Execution, MetricAttribute, TimeRange } from '@exense/step-core';
+import { DashboardItem, Execution, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
 import { FilterBarItem } from '../filter/filter-bar-item';
@@ -56,6 +56,7 @@ export class TimeSeriesContext {
   private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
 
   private dashlets: DashboardItem[];
+  private indexedMetrics: Record<string, MetricType> = {};
 
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
@@ -79,6 +80,7 @@ export class TimeSeriesContext {
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
+    params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
     // any specific context change will trigger the main stateChange
     this.stateChange$ = merge(
@@ -92,6 +94,10 @@ export class TimeSeriesContext {
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
     ) as Observable<void>;
+  }
+
+  getMetric(key: string): MetricType {
+    return this.indexedMetrics[key];
   }
 
   updateDefaultFullTimeRange(range: Partial<TimeRange>) {

@@ -1,4 +1,4 @@
-import { DashboardItem, MetricAttribute, TimeRange } from '@exense/step-core';
+import { DashboardItem, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
 import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { FilterBarItem } from '../filter/filter-bar-item';
 import { TimeseriesColorsPool } from './timeseries-colors-pool';
@@ -10,6 +10,7 @@ export interface TimeSeriesContextParams {
   dashlets: DashboardItem[];
   timeRange: TimeRange;
   defaultFullTimeRange?: Partial<TimeRange>; // used as a reset range, mostly in execution view where it is known
+  metrics?: MetricType[];
   attributes?: MetricAttribute[];
   grouping: string[];
   colorsPool?: TimeseriesColorsPool;
