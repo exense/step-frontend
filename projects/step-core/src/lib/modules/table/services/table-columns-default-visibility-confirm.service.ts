@@ -12,7 +12,7 @@ export class TableColumnsDefaultVisibilityConfirmService implements ConfirmVisib
 
   confirmVisibility(screenInput: ScreenInput): Observable<{ isVisible?: boolean; scope?: string[] }> {
     return this._dialogs
-      .showWarning(`Should the column "${screenInput.input?.label}" be visible by default?`, AlertType.DEFAULT)
+      .showWarning(`Show the column "${screenInput.input?.label}" in tables?`, AlertType.DEFAULT)
       .pipe(map((isVisible) => ({ isVisible })));
   }
 }
