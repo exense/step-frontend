@@ -9,6 +9,7 @@ import {
   DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
   ExecutiontTaskParameters,
+  IS_SMALL_SCREEN,
   RELATIVE_TIME_OPTIONS,
   ScheduledTaskTemporaryStorageService,
   SystemService,
@@ -81,6 +82,7 @@ export class AltExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
   private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isTreeInitialized = false;
 

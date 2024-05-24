@@ -20,6 +20,15 @@
   flex: 1;
 }
 
+.actions {
+  gap: 1rem;
+  margin-right: 1rem;
+  & > button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
 @media print {
   .actions {
     display: none;

@@ -1,9 +1,9 @@
 @for (node of _testcases(); track node.id) {
+  <step-alt-status [status]="node.status" />
   <div>
-    <step-alt-status [status]="node.status" />
     @if (node.status === 'RUNNING') {
       <step-current-operations [reportNodeId]="node.id" [(showAll)]="showAllOperations" />
     }
-    <div>{{ node.name }}</div>
   </div>
+  <div>{{ node.name }}</div>
 }

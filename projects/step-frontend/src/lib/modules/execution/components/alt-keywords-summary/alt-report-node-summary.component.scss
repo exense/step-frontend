@@ -1,90 +1,15 @@
-@use 'projects/step-core/styles/core-variables' as var;
-
 step-alt-report-node-summary {
-  $running: map-get(var.$statuses, 'RUNNING');
-  $passed: map-get(var.$statuses, 'PASSED');
-  $failed: map-get(var.$statuses, 'FAILED');
-  $techError: map-get(var.$statuses, 'TECHNICAL_ERROR');
-
   step-alt-report-widget-content {
     display: flex;
     flex-direction: column;
     gap: 1.6rem;
     justify-content: center;
+    align-items: center;
     flex: 1;
-  }
 
-  .bars {
-    display: flex;
-    gap: 0.4rem;
-    user-select: none;
-
-    div {
-      &:first-child {
-        border-top-left-radius: 1rem;
-        border-bottom-left-radius: 1rem;
-      }
-
-      &:last-child {
-        border-top-right-radius: 1rem;
-        border-bottom-right-radius: 1rem;
-      }
-
-      color: var.$white;
-      font-size: 1.2rem;
-      font-weight: 600;
-      text-align: center;
-      min-width: 2rem;
-
-      &.running {
-        background: $running;
-      }
-
-      &.passed {
-        background: $passed;
-      }
-
-      &.failed {
-        background: $failed;
-      }
-
-      &.techError {
-        background: $techError;
-      }
-    }
-  }
-
-  .legend {
-    display: flex;
-    gap: 1rem;
-
-    div {
-      color: var.$gray-500;
-
-      &::before {
-        content: ' ';
-        display: inline-block;
-        width: 1rem;
-        height: 1rem;
-        border-radius: 1rem;
-        margin-right: 0.4rem;
-      }
-
-      &.running::before {
-        background: $running;
-      }
-
-      &.passed::before {
-        background: $passed;
-      }
-
-      &.failed::before {
-        background: $failed;
-      }
-
-      &.techError::before {
-        background: $techError;
-      }
+    canvas {
+      width: 26rem !important;
+      height: 26rem !important;
     }
   }
 }

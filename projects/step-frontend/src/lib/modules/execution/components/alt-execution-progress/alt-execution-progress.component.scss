@@ -15,6 +15,13 @@ step-alt-execution-progress {
     gap: 1.5rem;
     align-items: flex-start;
 
+    &.small-screen {
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        'title title'
+        'controls ranger';
+    }
+
     .title {
       grid-area: title;
       display: flex;

@@ -1,4 +1,4 @@
-<section class="header">
+<section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
   <div class="title">
     @if (execution$ | async; as execution) {
       <h3>{{ execution?.description }}</h3>
