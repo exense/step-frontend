@@ -16,6 +16,4 @@ export class TokenTypeComponent {
   };
 
   readonly typeLabelTranslations = TokenTypeComponent.TYPE_LABEL_TRANSLATIONS;
-
-  constructor() {}
 }

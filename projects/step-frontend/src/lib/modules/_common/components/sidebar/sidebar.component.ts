@@ -41,11 +41,15 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
+  private _bookmarkService = inject(BookmarkService);
+  private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
 
-  private locationStateSubscription: SubscriptionLike;
+  private locationStateSubscription = this._location.subscribe((popState: any) => {
+    this.openMainMenuBasedOnActualView();
+  });
 
   private _sideBarState = inject(SidebarStateService);
   private _customMenuEntries = inject(CustomMenuEntriesService);
@@ -79,12 +83,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   readonly isOpened$ = this._sideBarState.isOpened$;
-
-  constructor(private _location: Location) {
-    this.locationStateSubscription = this._location.subscribe((popState: any) => {
-      this.openMainMenuBasedOnActualView();
-    });
-  }
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();

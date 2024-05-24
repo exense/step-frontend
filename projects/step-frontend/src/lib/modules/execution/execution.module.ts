@@ -14,7 +14,13 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
-import { DashletRegistryService, EntityRegistry, schedulePlanRoute, ViewRegistryService } from '@exense/step-core';
+import {
+  DashletRegistryService,
+  EntityRegistry,
+  preloadScreenDataResolver,
+  schedulePlanRoute,
+  ViewRegistryService,
+} from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
 import { ExecutionTreeComponent } from './components/execution-tree/execution-tree.component';
@@ -219,6 +225,9 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'executions',
+      resolve: {
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+      },
       component: ExecutionsComponent,
       children: [
         {

@@ -1,7 +1,9 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -15,6 +17,7 @@ import { AugmentedResourcesService, ResourceUploadResponse } from '../../../../c
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MAX_FILES = 1;
 
@@ -24,6 +27,11 @@ const MAX_FILES = 1;
   styleUrls: ['./resouce-input.component.scss'],
 })
 export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
+  private _augmentedResourcesService = inject(AugmentedResourcesService);
+  private _resourceDialogsService = inject(ResourceDialogsService);
+  private _resourceInputBridgeService = inject(ResourceInputBridgeService);
+  private _destroyRef = inject(DestroyRef);
+
   @Input() stModel?: string;
   @Input() stBounded?: boolean;
   @Input() stDirectory?: boolean;
@@ -54,7 +62,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
-  private readonly terminator$ = new Subject<void>();
   private readonly uploadTerminator$ = new Subject<void>();
 
   initializingResource?: boolean;
@@ -69,16 +76,12 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   lastStModelValue?: string;
   uploadedResourceIds: string[] = [];
 
-  constructor(
-    private _augmentedResourcesService: AugmentedResourcesService,
-    private _resourceDialogsService: ResourceDialogsService,
-    private _resourceInputBridgeService: ResourceInputBridgeService,
-  ) {}
-
   ngOnInit(): void {
-    this._resourceInputBridgeService.deleteUploadedResource$.pipe(takeUntil(this.terminator$)).subscribe(() => {
-      this.deleteUploadedResource();
-    });
+    this._resourceInputBridgeService.deleteUploadedResource$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        this.deleteUploadedResource();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -86,8 +89,6 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
     this.uploadTerminator$.next();
     this.uploadTerminator$.complete();
   }

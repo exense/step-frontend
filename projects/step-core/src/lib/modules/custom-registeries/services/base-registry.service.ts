@@ -1,6 +1,6 @@
 import { CustomRegistryType } from '../shared/custom-registry-type.enum';
 import { CustomRegistryService } from './custom-registry.service';
-import { Type } from '@angular/core';
+import { inject, Type } from '@angular/core';
 import { CustomRegistryItem } from '../shared/custom-registry-item';
 import { CustomComponent } from '../shared/custom-component';
 
@@ -15,9 +15,8 @@ const convert = (item?: CustomRegistryItem): ItemInfo | undefined => {
 };
 
 export abstract class BaseRegistryService {
+  protected _customRegistry = inject(CustomRegistryService);
   protected abstract readonly registryType: CustomRegistryType;
-
-  protected constructor(protected _customRegistry: CustomRegistryService) {}
 
   register(type: string, label: string, component?: Type<CustomComponent>): void {
     this._customRegistry.register(this.registryType, type, { type, label, component });

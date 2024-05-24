@@ -1,17 +1,17 @@
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
 import {
   DynamicFieldGroupValue,
@@ -23,6 +23,7 @@ import { ArtefactRefreshNotificationService } from '../../services/artefact-refr
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
 import { HintFor } from '../../shared/hint-for.enum';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface ReferenceMeta {
   icon: string;
@@ -64,14 +65,13 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
   styleUrls: ['./reference-artefact-name.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit, OnDestroy {
+export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit {
   private _schemaFactory = inject(SchemasFactoryService);
   private _entityTypeResolver = inject(EntityTypeResolver);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _artefactRefreshNotification = inject(ArtefactRefreshNotificationService, { optional: true });
+  private _destroyRef = inject(DestroyRef);
   readonly _artefactNameConfig = inject<ReferenceArtefactNameConfig<A, T>>(ReferenceArtefactNameConfig);
-
-  private terminator$ = new Subject<void>();
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: A;
@@ -92,11 +92,6 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
   ngOnInit(): void {
     this.setupArtefactExternalRefresh();
     this.initSchema();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -268,7 +263,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       return;
     }
     this._artefactRefreshNotification.refreshArtefact$
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.initArtefactName(this.artefact));
   }
 

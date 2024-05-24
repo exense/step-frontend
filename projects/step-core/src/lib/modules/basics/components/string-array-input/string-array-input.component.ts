@@ -1,6 +1,7 @@
-import { Component, inject, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NgControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, map, Subject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange = (value: string[]) => void;
 type OnTouch = () => void;
@@ -11,13 +12,13 @@ type OnTouch = () => void;
   styleUrls: ['./string-array-input.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class StringArrayInputComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class StringArrayInputComponent implements OnInit, ControlValueAccessor {
   @Input() label?: string;
   @Input() showRequiredMarker: boolean = false;
   @Input() tooltip?: string;
   @Input() errorsDictionary?: Record<string, string>;
 
-  private terminator$ = new Subject<void>();
+  private _destroyRef = inject(DestroyRef);
   private _fb = inject(FormBuilder).nonNullable;
 
   private onChange?: OnChange;
@@ -63,15 +64,10 @@ export class StringArrayInputComponent implements OnInit, OnDestroy, ControlValu
           (value ?? '')
             .split(',')
             .map((item) => item.trim())
-            .filter((item) => !!item)
+            .filter((item) => !!item),
         ),
-        takeUntil(this.terminator$)
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((value: string[]) => this.onChange?.(value));
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   GridService,
   AugmentedTokenWrapperOwner,
@@ -16,6 +16,8 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
   providers: [tablePersistenceConfigProvider('tokenList', STORE_ALL)],
 })
 export class TokenListComponent {
+  private _gridService = inject(GridService);
+
   readonly searchableToken = new TableFetchLocalDataSource(
     () => this._gridService.getTokenAssociations(),
     TableFetchLocalDataSource.configBuilder<TokenWrapper>()
@@ -26,19 +28,17 @@ export class TokenListComponent {
       .addSearchStringRegexPredicate('state', (item) => item.state!)
       .addSearchStringPredicate(
         'executionDescription',
-        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
+        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription,
       )
       .addSortStringPredicate('id', (item) => item.token!.id!)
       .addSortStringPredicate('type', (item) => item.token!.attributes!['$agenttype'])
       .addSortStringPredicate('agent', (item) => item.agent!.agentUrl!)
       .addSortStringPredicate(
         'executionDescription',
-        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription
+        (item) => (item.currentOwner as AugmentedTokenWrapperOwner)?.executionDescription,
       )
-      .build()
+      .build(),
   );
-
-  constructor(private _gridService: GridService) {}
 
   loadTable(): void {
     this.searchableToken.reload();

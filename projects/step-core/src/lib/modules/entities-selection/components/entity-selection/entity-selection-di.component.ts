@@ -1,4 +1,4 @@
-import { Component, Input, Optional } from '@angular/core';
+import { Component, inject, Input, Optional } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
 
 @Component({
@@ -10,6 +10,6 @@ import { SelectionCollector } from '../../services/selection-collector/selection
   styleUrls: [],
 })
 export class EntitySelectionDiComponent<KEY, ENTITY> {
+  _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector);
   @Input() entity?: ENTITY;
-  constructor(@Optional() public _selectionCollector?: SelectionCollector<KEY, ENTITY>) {}
 }

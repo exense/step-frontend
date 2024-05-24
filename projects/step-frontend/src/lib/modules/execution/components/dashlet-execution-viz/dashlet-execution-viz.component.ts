@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CustomComponent } from '@exense/step-core';
 import { ExecutionStateService } from '../../services/execution-state.service';
 
@@ -8,7 +8,6 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   styleUrls: ['./dashlet-execution-viz.component.scss'],
 })
 export class DashletExecutionVizComponent implements CustomComponent {
+  _state = inject(ExecutionStateService);
   context?: any;
-
-  constructor(public _state: ExecutionStateService) {}
 }

@@ -1,15 +1,15 @@
-import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
 
 @Directive({
   selector: '[stepElementRefMap]',
 })
 export class ElementRefMapDirective implements OnInit, OnDestroy {
+  public _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
   @Input() key?: string;
   @Input() parentKey?: string;
 
   static readonly instancesByKey = new Map<string, ElementRefMapDirective[]>();
-
-  constructor(public _elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
     if (!this.key) {
@@ -37,19 +37,5 @@ export class ElementRefMapDirective implements OnInit, OnDestroy {
     }
 
     instances.splice(instances.indexOf(this), 1);
-  }
-
-  static get childrenByKey(): Map<string, ElementRefMapDirective[]> {
-    const childrenByKey = new Map<string, ElementRefMapDirective[]>();
-
-    const flatInstances = Array.from(this.instancesByKey.values()).flatMap((instances) => [...instances]);
-
-    for (const key of this.instancesByKey.keys()) {
-      const children = flatInstances.filter((instance) => instance.parentKey === key);
-
-      childrenByKey.set(key, children);
-    }
-
-    return childrenByKey;
   }
 }

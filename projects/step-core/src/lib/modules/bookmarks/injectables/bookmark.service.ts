@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, map, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, map, shareReplay } from 'rxjs';
 import { AugmentedBookmarksService } from '../../../client/augmented/services/augmented-bookmarks.service';
 import { switchMap } from 'rxjs/operators';
 

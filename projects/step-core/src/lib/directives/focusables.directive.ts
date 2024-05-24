@@ -1,4 +1,4 @@
-import { AfterContentInit, ContentChildren, Directive, Input, OnDestroy, QueryList } from '@angular/core';
+import { AfterContentInit, ContentChildren, Directive, Input, QueryList } from '@angular/core';
 import { Subject } from 'rxjs';
 import { FocusableDirective } from './focusable.directive';
 
@@ -11,12 +11,10 @@ import { FocusableDirective } from './focusable.directive';
   selector: '[stepFocusables]',
   exportAs: 'stepFocusables',
 })
-export class FocusablesDirective implements AfterContentInit, OnDestroy {
+export class FocusablesDirective implements AfterContentInit {
   @Input() focusIndex: number = 0;
 
   @ContentChildren(FocusableDirective, { descendants: true }) focusables?: QueryList<FocusableDirective>;
-
-  private readonly terminator$ = new Subject<void>();
 
   private focusSubjectByIndex?: Map<number, Subject<void>>;
 
@@ -26,11 +24,6 @@ export class FocusablesDirective implements AfterContentInit, OnDestroy {
     }
 
     this.focusSubjectByIndex = new Map(this.focusables.map((focusable, index) => [index, focusable.focus$]));
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   refocus(): void {
