@@ -11,5 +11,17 @@ export class ExecutionDetailsComponent {
   showStatus = input(false);
 
   /** @Input() **/
+  showPlan = input(true);
+
+  /** @Input() **/
+  showMode = input(true);
+
+  /** @Input() **/
+  showUser = input(true);
+
+  /** @Input() **/
+  showExecutionId = input(true);
+
+  /** @Input() **/
   execution = input<Execution>();
 }

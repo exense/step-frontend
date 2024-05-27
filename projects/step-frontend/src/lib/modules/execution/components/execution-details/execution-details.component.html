@@ -2,18 +2,20 @@
   <step-status [status]="execution()?.status" />
 }
 <ul class="list-unstyled">
-  <li>
-    <strong>Plan</strong>
-    <span>
-      @if (execution()?.executionParameters?.['isolatedExecution']) {
-        {{ execution()?.description }}
-      } @else {
-        <a routerLink="/plans/editor/{{ execution()?.planId }}">
+  @if (showPlan()) {
+    <li>
+      <strong>Plan</strong>
+      <span>
+        @if (execution()?.executionParameters?.['isolatedExecution']) {
           {{ execution()?.description }}
-        </a>
-      }
-    </span>
-  </li>
+        } @else {
+          <a routerLink="/plans/editor/{{ execution()?.planId }}">
+            {{ execution()?.description }}
+          </a>
+        }
+      </span>
+    </li>
+  }
   @if (execution()?.executionParameters?.customParameters; as execParams) {
     @for (item of execParams | keyvalue; track item.key) {
       <li>
@@ -22,21 +24,27 @@
       </li>
     }
   }
-  <li>
-    <strong>Mode</strong>&nbsp;<span>{{ execution()?.executionParameters?.mode }}</span>
-  </li>
-  <li>
-    <strong>User</strong>&nbsp;<span>{{ execution()?.executionParameters?.userID }}</span>
-  </li>
+  @if (showMode()) {
+    <li>
+      <strong>Mode</strong>&nbsp;<span>{{ execution()?.executionParameters?.mode }}</span>
+    </li>
+  }
+  @if (showUser()) {
+    <li>
+      <strong>User</strong>&nbsp;<span>{{ execution()?.executionParameters?.userID }}</span>
+    </li>
+  }
   <li>
     <strong>Start</strong>&nbsp;<span>{{ execution()?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
   </li>
   <li>
     <strong>End</strong>&nbsp;<span>{{ execution()?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
   </li>
-  <li>
-    <strong>Execution ID</strong>&nbsp;<span>{{ execution()?.id }}</span>
-  </li>
+  @if (showExecutionId()) {
+    <li>
+      <strong>Execution ID</strong>&nbsp;<span>{{ execution()?.id }}</span>
+    </li>
+  }
   <li>
     <strong>Origin</strong>&nbsp;<span
       >Repository={{ execution()?.executionParameters?.repositoryObject?.repositoryID }}</span

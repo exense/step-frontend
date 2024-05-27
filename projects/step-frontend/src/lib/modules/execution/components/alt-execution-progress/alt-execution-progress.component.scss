@@ -97,6 +97,11 @@ step-alt-execution-progress {
     .print-execution-details {
       margin-bottom: 2rem;
     }
+
+    .plan-link,
+    .simulate-icon {
+      display: none;
+    }
   }
 }
 

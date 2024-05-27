@@ -7,6 +7,18 @@
           <mat-option [value]="status">{{ status }}</mat-option>
         }
       </mat-select>
+      @if (showNonPassedFilterBtn()) {
+        <step-suffix class="button-suffix">
+          <button
+            type="button"
+            mat-stroked-button
+            matTooltip="Filter for all status except passed"
+            (click)="filterNonPassed()"
+          >
+            <step-icon name="alert-circle" />
+          </button>
+        </step-suffix>
+      }
     </step-form-field>
     <step-form-field>
       <step-prefix class="icon-prefix">

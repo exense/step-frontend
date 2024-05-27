@@ -26,18 +26,23 @@ export class AltReportNodeListComponent implements AltReportNodesListService {
     transform: (value?: ReportNode[]) => value ?? [],
   });
 
-  search = model('');
+  readonly search = model('');
 
-  selectedStatuses = model<KeywordStatus[]>([]);
+  readonly selectedStatuses = model<KeywordStatus[]>([]);
 
-  statuses = computed(() => {
+  readonly statuses = computed(() => {
     const statuses = (this.allReportNodes() ?? []).map((keyword) => keyword.status);
     return Array.from(new Set(statuses));
   });
 
+  readonly showNonPassedFilterBtn = computed(() => {
+    const statuses = this.statuses();
+    return statuses.includes('PASSED') && statuses.length > 0;
+  });
+
   timeRange = input<TimeRange | undefined>(undefined);
 
-  reportNodes = computed(() => {
+  readonly reportNodes = computed(() => {
     let result = this.allReportNodes();
 
     const range = this.timeRange();
@@ -59,4 +64,9 @@ export class AltReportNodeListComponent implements AltReportNodesListService {
 
     return result;
   });
+
+  filterNonPassed(): void {
+    const statuses = this.statuses().filter((status) => status !== 'PASSED');
+    this.selectedStatuses.set(statuses);
+  }
 }
