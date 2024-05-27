@@ -34,6 +34,12 @@ interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
 }
 
+interface RateUnit {
+  menuLabel: string;
+  unitLabel: string;
+  tphMultiplier: number;
+}
+
 @Component({
   selector: 'step-chart-dashlet',
   templateUrl: './chart-dashlet.component.html',
@@ -44,6 +50,12 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+
+  readonly RATE_UNITS: RateUnit[] = [
+    { menuLabel: 'Per hour', unitLabel: 'h', tphMultiplier: 1 },
+    { menuLabel: 'Per minute', unitLabel: 'm', tphMultiplier: 1 / 60 },
+    { menuLabel: 'Per second', unitLabel: 's', tphMultiplier: 1 / 3600 },
+  ];
 
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
@@ -77,11 +89,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   selectedPclValue?: number;
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
+  selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
   syncGroupSubscription?: Subscription;
+  cachedResponse?: TimeSeriesAPIResponse;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -166,6 +180,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.selectedPclValue = pclValue;
     this.selectedAggregate = aggregate;
     this.refresh(true).subscribe();
+  }
+
+  switchRateUnit(unit: RateUnit) {
+    this.selectedRateUnit = unit;
+    if (this.cachedResponse) {
+      this.createChart(this.cachedResponse);
+    } else {
+      this.fetchDataAndCreateChart();
+    }
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
@@ -377,7 +400,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
     switch (aggregation) {
       case ChartAggregation.RATE:
-        return 'Total Hits/h';
+        return 'Total Hits/' + this.selectedRateUnit.unitLabel;
       default:
         return 'Overall ' + aggregation;
     }
@@ -414,6 +437,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
+        this.cachedResponse = response;
         this.createChart(response);
       }),
     );
@@ -479,6 +503,39 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
+  private getAxesFormatFunction(aggregation: ChartAggregation, unit?: string): (v: number) => string {
+    if (aggregation === ChartAggregation.RATE) {
+      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + this.selectedRateUnit.unitLabel;
+    }
+    if (!unit) {
+      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
+    }
+    switch (unit) {
+      case '1':
+        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
+      case 'ms':
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
+      case '%':
+        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
+      default:
+        throw new Error('Unit not handled: ' + unit);
+    }
+  }
+
+  private getUnitLabel(aggregation: ChartAggregation, unit: string): string {
+    if (aggregation === 'RATE') {
+      return '/ ' + this.selectedRateUnit.unitLabel;
+    }
+    switch (unit) {
+      case '%':
+        return '%';
+      case 'ms':
+        return ' ms';
+      default:
+        return '';
+    }
+  }
+
   private getRequiredPercentiles(): number[] {
     const aggregate = this.selectedAggregate;
     const secondaryAggregate = this.item.chartSettings!.secondaryAxes?.aggregation;
@@ -512,7 +569,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'COUNT':
         return b.count;
       case 'RATE':
-        return b.throughputPerHour;
+        return b.throughputPerHour * this.selectedRateUnit.tphMultiplier;
       case 'MEDIAN':
         return b.pclValues?.[50];
       case 'PERCENTILE':
