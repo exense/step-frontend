@@ -1,9 +1,10 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
-import { map, startWith } from 'rxjs';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
+import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
+import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
+import { ViewMode } from '../../shared/view-mode';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -19,42 +20,10 @@ export class AltExecutionReportComponent {
 
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  readonly keywordsSummary$ = this._state.keywords$.pipe(map((keywords) => this.createSummary(keywords)));
+  readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
+  readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
 
-  readonly testCasesSummary$ = this._state.testCases$.pipe(map((testCases) => this.createSummary(testCases)));
-
-  readonly timeRange$ = this._state.dateRangeCtrl.valueChanges.pipe(
-    startWith(this._state.dateRangeCtrl.value),
-    map((dateRange) => {
-      if (!dateRange) {
-        return undefined;
-      }
-      const from = dateRange.start!.toMillis();
-      const to = dateRange.end!.toMillis();
-      if (from >= to) {
-        return undefined;
-      }
-      return { from, to } as TimeRange;
-    }),
-  );
-
-  private createSummary(reportNodes?: ReportNode[]): ReportNodeSummary | undefined {
-    if (!reportNodes) {
-      return undefined;
-    }
-    const summary = reportNodes.reduce(
-      (res, keyword) => {
-        if (keyword.status === 'PASSED') res.passed++;
-        if (keyword.status === 'FAILED') res.failed++;
-        if (keyword.status === 'TECHNICAL_ERROR') res.techError++;
-        if (keyword.status === 'RUNNING') res.running++;
-        return res;
-      },
-      { passed: 0, failed: 0, techError: 0, running: 0, total: 0 } as ReportNodeSummary,
-    );
-    summary.total = summary.passed + summary.failed + summary.techError + summary.running;
-    return summary;
-  }
+  readonly mode = (this._activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
 
   handleOpenKeywordInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
@@ -71,4 +40,6 @@ export class AltExecutionReportComponent {
     }
     this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
   }
+
+  protected readonly ViewMode = ViewMode;
 }

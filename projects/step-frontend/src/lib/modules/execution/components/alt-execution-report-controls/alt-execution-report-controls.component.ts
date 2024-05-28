@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
 
 @Component({
   selector: 'step-alt-execution-report-controls',
@@ -7,9 +7,5 @@ import { DOCUMENT } from '@angular/common';
   styleUrl: './alt-execution-report-controls.component.scss',
 })
 export class AltExecutionReportControlsComponent {
-  private _doc = inject(DOCUMENT);
-
-  printReport(): void {
-    this._doc?.defaultView?.print();
-  }
+  protected _printService = inject(AltExecutionReportPrintService);
 }

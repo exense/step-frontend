@@ -187,3 +187,4 @@ export * from './shared/search-column-accessor';
 export * from './services/table-highlight-item-container.service';
 export * from './services/table-columns-config.provider';
 export * from './services/table-columns.service';
+export * from './services/items-per-page.service';

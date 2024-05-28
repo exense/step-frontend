@@ -2,6 +2,7 @@ import { Component, computed, effect, ElementRef, input, OnDestroy, viewChild, V
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
+import { ViewMode } from '../../shared/view-mode';
 
 const STATUS_DICTIONARY: Record<keyof Omit<ReportNodeSummary, 'total'>, { label: string; color: string }> = {
   running: { label: 'running', color: '#337ab7' },
@@ -22,6 +23,9 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
 
   /** @Input() **/
   summary = input.required<ReportNodeSummary>();
+
+  /** @Input() **/
+  mode = input<ViewMode>(ViewMode.VIEW);
 
   private canvas = viewChild<ElementRef<HTMLCanvasElement>>('cnv');
 
@@ -106,6 +110,9 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
       },
       plugins: [ChartDataLabels],
       options: {
+        animation: {
+          duration: this.mode() === ViewMode.PRINT ? 0 : 500,
+        },
         plugins: {
           datalabels: {
             color: '#fff',

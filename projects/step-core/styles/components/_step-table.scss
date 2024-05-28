@@ -51,10 +51,41 @@
   }
 }
 
+@mixin paddingless-sides {
+  th.mat-mdc-header-cell:first-of-type,
+  td.mat-mdc-cell:first-of-type,
+  td.mat-mdc-footer-cell:first-of-type {
+    padding-left: 0;
+  }
+
+  th.mat-mdc-header-cell:last-of-type,
+  td.mat-mdc-cell:last-of-type,
+  td.mat-mdc-footer-cell:last-of-type {
+    padding-right: 0;
+  }
+}
+
+@mixin paddingless-edges {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell,
+  td.mat-mdc-footer-cell {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
 step-table {
-  tr.row-highlight,
-  tr.content-row:hover {
-    background: var.$highlight !important;
+  &.hide-header {
+    thead {
+      display: none;
+    }
+  }
+
+  &:not(.no-highlight) {
+    tr.row-highlight,
+    tr.content-row:hover {
+      background: var.$highlight !important;
+    }
   }
 
   th.mat-mdc-header-cell,
@@ -65,7 +96,7 @@ step-table {
     font-size: 1.2rem;
   }
 
-  &:not(.paddingless) {
+  &:not(.paddingless):not(.paddingless-full) {
     tr > td.mat-mdc-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions),
     tr > th.mat-mdc-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions) {
       padding: 8px;
@@ -83,16 +114,18 @@ step-table {
   }
 
   &.paddingless {
-    th.mat-mdc-header-cell:first-of-type,
-    td.mat-mdc-cell:first-of-type,
-    td.mat-mdc-footer-cell:first-of-type {
-      padding-left: 0;
-    }
+    @include paddingless-sides;
+  }
 
-    th.mat-mdc-header-cell:last-of-type,
-    td.mat-mdc-cell:last-of-type,
-    td.mat-mdc-footer-cell:last-of-type {
-      padding-right: 0;
+  &.paddingless-full {
+    @include paddingless-sides;
+    @include paddingless-edges;
+  }
+
+  &.no-border {
+    td,
+    th {
+      border: none;
     }
   }
 

@@ -27,8 +27,11 @@ step-alt-report-widget {
     flex-direction: column;
   }
 
+  mat-card-content {
+    padding-bottom: 0 !important;
+  }
+
   &.overflow-content step-alt-report-widget-content {
-    max-height: 25rem;
     overflow: auto;
     display: flex;
     flex: 1;
@@ -40,9 +43,6 @@ step-alt-report-widget {
 
   @media print {
     min-height: 0 !important;
-    step-alt-report-widget-filter {
-      display: none;
-    }
     &.overflow-content step-alt-report-widget-content {
       overflow: hidden;
       max-height: none;

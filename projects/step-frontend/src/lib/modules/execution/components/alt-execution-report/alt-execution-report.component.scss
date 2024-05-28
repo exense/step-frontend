@@ -10,7 +10,7 @@ step-alt-execution-report {
     gap: 2.4rem;
     margin-bottom: 2.4rem;
 
-    @media screen {
+    &:not(.print) {
       &.small-screen {
         @include single-col-view;
       }
@@ -37,7 +37,7 @@ step-alt-execution-report {
       }
     }
 
-    @media print {
+    .print {
       @include single-col-view;
       width: 100%;
       grid-template-rows: auto;
@@ -52,6 +52,12 @@ step-alt-execution-report {
           height: 43rem !important;
         }
       }
+    }
+  }
+
+  @media print {
+    step-paginator {
+      display: none;
     }
   }
 }

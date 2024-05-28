@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { filter, map, of, shareReplay, switchMap, combineLatest } from 'rxjs';
+import { filter, map, of, shareReplay, switchMap, combineLatest, startWith } from 'rxjs';
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
@@ -14,6 +14,7 @@ import {
   ScheduledTaskTemporaryStorageService,
   SystemService,
   TimeOption,
+  TimeRange,
   TreeNodeUtilsService,
   TreeStateService,
 } from '@exense/step-core';
@@ -27,6 +28,9 @@ import { AltExecutionDefaultRangeService } from '../../services/alt-execution-de
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
+import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
+import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
+import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -67,6 +71,9 @@ import { AltExecutionTabsService } from '../../services/alt-execution-tabs.servi
       provide: TreeStateService,
       useExisting: AggregatedReportViewTreeStateService,
     },
+    AltKeywordNodesStateService,
+    AltTestCasesNodesStateService,
+    AltExecutionReportPrintService,
   ],
 })
 export class AltExecutionProgressComponent
@@ -89,6 +96,22 @@ export class AltExecutionProgressComponent
   protected relativeTime?: number;
 
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
+
+  readonly timeRange$ = this.dateRangeCtrl.valueChanges.pipe(
+    startWith(this.dateRangeCtrl.value),
+    map((dateRange) => {
+      if (!dateRange) {
+        return undefined;
+      }
+      const from = dateRange.start!.toMillis();
+      const to = dateRange.end!.toMillis();
+      if (from >= to) {
+        return undefined;
+      }
+      return { from, to } as TimeRange;
+    }),
+    takeUntilDestroyed(),
+  );
 
   readonly executionId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),

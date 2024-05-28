@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { DateRange, Execution, Operation, ReportNode } from '@exense/step-core';
+import { DateRange, Execution, Operation, ReportNode, TimeRange } from '@exense/step-core';
 import { FormControl } from '@angular/forms';
 
 export abstract class AltExecutionStateService {
@@ -9,4 +9,5 @@ export abstract class AltExecutionStateService {
   abstract readonly keywords$: Observable<ReportNode[]>;
   abstract readonly testCases$: Observable<ReportNode[] | undefined>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
+  abstract readonly timeRange$: Observable<TimeRange | undefined>;
 }

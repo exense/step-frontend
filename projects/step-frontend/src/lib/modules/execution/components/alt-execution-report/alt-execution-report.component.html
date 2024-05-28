@@ -1,28 +1,30 @@
-<section [class.small-screen]="!!(_isSmallScreen$ | async)">
-  <step-alt-report-node-summary title="Summary: Keyword calls" [summary]="(keywordsSummary$ | async)!" />
-  <step-alt-report-node-list
-    title="Keyword Calls"
-    class="keywords"
-    [reportNodes]="(_state.keywords$ | async)!"
-    [timeRange]="(timeRange$ | async)!"
-  >
-    <step-alt-report-node-keywords
-      (openKeywordDrilldown)="handleOpenKeywordDrilldown($event)"
-      (openKeywordInTreeView)="handleOpenKeywordInTreeView($event)"
-    />
-  </step-alt-report-node-list>
-  @if (_state.testCases$ | async; as testCases) {
-    <step-alt-report-node-list title="Test Cases" [reportNodes]="testCases" [timeRange]="(timeRange$ | async)!">
-      <step-alt-report-nodes-testcases />
-    </step-alt-report-node-list>
-  }
-  @if (testCasesSummary$ | async; as testCasesSummary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
-  }
-  @if (_state.executionId$ | async; as executionId) {
-    <step-alt-report-performance-overview-chart [executionId]="executionId" [timeRange]="(timeRange$ | async)!" />
-  }
-  @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations [operations]="currentOperations" />
-  }
-</section>
+@if (mode) {
+  <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="mode === ViewMode.PRINT">
+    @if (keywordsSummary$ | async; as keywordsSummary) {
+      <step-alt-report-node-summary title="Summary: Keyword calls" [summary]="keywordsSummary" [mode]="mode" />
+    }
+    @if (_state.keywords$ | async) {
+      <step-alt-report-node-keywords
+        class="keywords"
+        [mode]="mode"
+        (openKeywordDrilldown)="handleOpenKeywordDrilldown($event)"
+        (openKeywordInTreeView)="handleOpenKeywordInTreeView($event)"
+      />
+    }
+    @if (_state.testCases$ | async) {
+      <step-alt-report-nodes-testcases [mode]="mode" />
+    }
+    @if (testCasesSummary$ | async; as testCasesSummary) {
+      <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" [mode]="mode" />
+    }
+    @if (_state.executionId$ | async; as executionId) {
+      <step-alt-report-performance-overview-chart
+        [executionId]="executionId"
+        [timeRange]="(_state.timeRange$ | async)!"
+      />
+    }
+    @if (_state.currentOperations$ | async; as currentOperations) {
+      <step-alt-report-current-operations [operations]="currentOperations" />
+    }
+  </section>
+}

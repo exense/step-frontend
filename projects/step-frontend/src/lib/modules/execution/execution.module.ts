@@ -67,6 +67,7 @@ import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
+import { ViewMode } from './shared/view-mode';
 
 @NgModule({
   declarations: [
@@ -279,6 +280,9 @@ export class ExecutionModule {
             },
             {
               path: 'report',
+              data: {
+                mode: ViewMode.VIEW,
+              },
               children: [
                 {
                   path: '',
@@ -288,6 +292,18 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportControlsComponent,
                   outlet: 'controls',
+                },
+              ],
+            },
+            {
+              path: 'report-print',
+              data: {
+                mode: ViewMode.PRINT,
+              },
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionReportComponent,
                 },
               ],
             },
