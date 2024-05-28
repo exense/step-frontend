@@ -1,7 +1,18 @@
-import { DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
-import { map, startWith, combineLatest, debounceTime, shareReplay, take, Observable, iif } from 'rxjs';
+import {
+  map,
+  startWith,
+  combineLatest,
+  debounceTime,
+  shareReplay,
+  take,
+  Observable,
+  iif,
+  Subject,
+  BehaviorSubject,
+} from 'rxjs';
 import { ReportNode } from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,10 +21,11 @@ import { ActivatedRoute } from '@angular/router';
 type ReportNodeStatus = ReportNode['status'];
 
 @Injectable()
-export abstract class AltReportNodesStateService {
-  protected constructor(private nodes$: Observable<ReportNode[] | undefined>) {}
+export abstract class AltReportNodesStateService implements OnDestroy {
+  protected constructor(nodes$: Observable<ReportNode[] | undefined>) {
+    nodes$.pipe(takeUntilDestroyed()).subscribe(this.nodes$);
+  }
 
-  private _destroyRef = inject(DestroyRef);
   private _activatedRoute = inject(ActivatedRoute);
   private _executionState = inject(AltExecutionStateService);
   private _fb = inject(FormBuilder);
@@ -22,7 +34,12 @@ export abstract class AltReportNodesStateService {
     return this._activatedRoute.snapshot.queryParamMap.has('viewAll');
   }
 
-  private reportNodes$ = this.createNodes();
+  private nodes$ = new BehaviorSubject<ReportNode[] | undefined>(undefined);
+
+  private reportNodes$ = this.nodes$.pipe(
+    map((nodes) => nodes ?? []),
+    takeUntilDestroyed(),
+  );
 
   readonly summary$ = this.reportNodes$.pipe(map((nodes) => this.createSummary(nodes)));
 
@@ -120,6 +137,10 @@ export abstract class AltReportNodesStateService {
     return statuses.includes('PASSED') && statuses.length > 0;
   }
 
+  ngOnDestroy(): void {
+    this.nodes$.complete();
+  }
+
   getStatusText(): string {
     if (this.isIgnoreFilter) {
       return '';
@@ -142,12 +163,5 @@ export abstract class AltReportNodesStateService {
       return '';
     }
     return `Search: ${searchText}`;
-  }
-
-  private createNodes(): Observable<ReportNode[]> {
-    return this.nodes$.pipe(
-      map((nodes) => nodes ?? []),
-      takeUntilDestroyed(this._destroyRef),
-    );
   }
 }
