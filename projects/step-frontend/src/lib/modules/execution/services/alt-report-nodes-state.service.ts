@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import { map, startWith, combineLatest, debounceTime, shareReplay, take, Observable, iif } from 'rxjs';
@@ -13,6 +13,7 @@ type ReportNodeStatus = ReportNode['status'];
 export abstract class AltReportNodesStateService {
   protected constructor(private nodes$: Observable<ReportNode[] | undefined>) {}
 
+  private _destroyRef = inject(DestroyRef);
   private _activatedRoute = inject(ActivatedRoute);
   private _executionState = inject(AltExecutionStateService);
   private _fb = inject(FormBuilder);
@@ -21,10 +22,7 @@ export abstract class AltReportNodesStateService {
     return this._activatedRoute.snapshot.queryParamMap.has('viewAll');
   }
 
-  private reportNodes$ = this.nodes$.pipe(
-    map((nodes) => nodes ?? []),
-    takeUntilDestroyed(),
-  );
+  private reportNodes$ = this.createNodes();
 
   readonly summary$ = this.reportNodes$.pipe(map((nodes) => this.createSummary(nodes)));
 
@@ -144,5 +142,12 @@ export abstract class AltReportNodesStateService {
       return '';
     }
     return `Search: ${searchText}`;
+  }
+
+  private createNodes(): Observable<ReportNode[]> {
+    return this.nodes$.pipe(
+      map((nodes) => nodes ?? []),
+      takeUntilDestroyed(this._destroyRef),
+    );
   }
 }
