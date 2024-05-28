@@ -4,7 +4,7 @@ $circle-size: 0.4rem;
   .step-marker-filled-square {
     background: var(--item-color);
     display: flex;
-    width: 1.4rem;
+    width: 1.6rem;
     height: 0.3rem;
   }
 
@@ -43,7 +43,7 @@ $circle-size: 0.4rem;
   }
 
   .step-marker-dashed-square {
-    width: 1.8rem;
+    width: 1.6rem;
     height: 0.2rem;
     background: linear-gradient(
       to right,
