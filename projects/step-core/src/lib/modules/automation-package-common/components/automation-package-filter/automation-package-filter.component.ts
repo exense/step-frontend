@@ -56,8 +56,7 @@ export class AutomationPackageFilterComponent
     this.setupTooltip();
   }
 
-  override ngOnDestroy(): void {
-    super.ngOnDestroy();
+  ngOnDestroy(): void {
     this.terminatePopoverStreams();
     this.refreshTooltip$.complete();
   }

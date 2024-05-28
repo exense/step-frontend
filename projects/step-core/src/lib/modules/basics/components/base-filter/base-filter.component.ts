@@ -1,15 +1,16 @@
 import { FormBuilder, FormControl } from '@angular/forms';
-import { ChangeDetectorRef, Directive, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { ChangeDetectorRef, DestroyRef, Directive, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({})
-export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestroy {
+export abstract class BaseFilterComponent<T, CV = T> implements OnInit {
   protected _cd = inject(ChangeDetectorRef);
   protected _formBuilder = inject(FormBuilder);
+  protected _destroyRef = inject(DestroyRef);
 
   readonly filterControl = this.createControl(this._formBuilder);
 
-  protected terminator$ = new Subject<void>();
   protected abstract createControl(fb: FormBuilder): FormControl<CV>;
   protected abstract createControlChangeStream(control: FormControl<CV>): Observable<T>;
   protected handleChange(value: T): void {
@@ -32,14 +33,9 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestro
     this.setupChange();
   }
 
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
-  }
-
   protected setupChange(): void {
     this.createControlChangeStream(this.filterControl)
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((value) => this.handleChange(value));
   }
 }

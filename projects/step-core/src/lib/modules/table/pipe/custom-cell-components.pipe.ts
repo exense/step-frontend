@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Input as ColInput } from '../../../client/generated';
 import { CustomCellRegistryService } from '../../custom-registeries/services/custom-cell-registry.service';
 
@@ -6,7 +6,7 @@ import { CustomCellRegistryService } from '../../custom-registeries/services/cus
   name: 'customCellComponents',
 })
 export class CustomCellComponentsPipe implements PipeTransform {
-  constructor(protected _customCells: CustomCellRegistryService) {}
+  protected _customCells = inject(CustomCellRegistryService);
 
   transform(column: ColInput): string[] | undefined {
     const componentKeys = this._customCells.filterKeys(column?.customUIComponents || []);

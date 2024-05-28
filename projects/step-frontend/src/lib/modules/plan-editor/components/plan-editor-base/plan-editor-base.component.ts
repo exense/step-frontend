@@ -1,11 +1,11 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   forwardRef,
   inject,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -35,12 +35,11 @@ import {
   PlanContextApiService,
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
-  PlanUrlPipe,
   CommonEntitiesUrlsService,
   ExecutiontTaskParameters,
   PlanContext,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -48,6 +47,7 @@ import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const PLAN_SIZE = 'PLAN_SIZE';
 const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
@@ -93,7 +93,6 @@ export class PlanEditorBaseComponent
   implements
     OnInit,
     OnChanges,
-    OnDestroy,
     PlanInteractiveSessionService,
     PlanArtefactResolverService,
     PlanContextInitializerService
@@ -113,6 +112,7 @@ export class PlanEditorBaseComponent
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  private _destroyRef = inject(DestroyRef);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -152,7 +152,6 @@ export class PlanEditorBaseComponent
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  private terminator$ = new Subject<void>();
   @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
   private keywords?: KeywordCallsComponent;
 
@@ -173,11 +172,6 @@ export class PlanEditorBaseComponent
         (cPlanCtx?.currentValue as PlanContext)?.id,
       );
     }
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   handlePlanSizeChange(size: number): void {
@@ -368,7 +362,7 @@ export class PlanEditorBaseComponent
             : this.componentTabs.filter((tab) => tab.id !== consoleTab.id);
           return { tabs, withConsole };
         }),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ tabs, withConsole }) => {
         this.componentTabs = tabs;
@@ -392,7 +386,7 @@ export class PlanEditorBaseComponent
   private initPlanTypeChanges(): void {
     this.planTypeControl.valueChanges
       .pipe(
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
         map((item) => {
           const context = this._planEditService.planContext;
           return { item, context };

@@ -14,6 +14,7 @@ import {
   ViewRegistryService,
   ImportDialogComponent,
   ExportDialogComponent,
+  preloadScreenDataResolver,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -64,6 +65,9 @@ export class SchedulerModule {
   private registerViews(): void {
     this._viewRegistry.registerRoute({
       path: 'scheduler',
+      resolve: {
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+      },
       component: ScheduledTaskListComponent,
       children: [
         {

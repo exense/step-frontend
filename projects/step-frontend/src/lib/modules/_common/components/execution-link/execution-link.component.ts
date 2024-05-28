@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Execution, ExecutionsService } from '@exense/step-core';
 
 @Component({
@@ -7,10 +7,10 @@ import { Execution, ExecutionsService } from '@exense/step-core';
   styleUrls: ['./execution-link.component.scss'],
 })
 export class ExecutionLinkComponent implements OnInit {
+  private _executionService = inject(ExecutionsService);
+
   @Input() executionId?: string;
   @Input() executionDescription?: string;
-
-  constructor(private _executionService: ExecutionsService) {}
 
   ngOnInit(): void {
     if (this.executionId && !this.executionDescription) {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -9,7 +9,6 @@ import {
   Resource,
   ResourceInputComponent,
 } from '@exense/step-core';
-import { Subject } from 'rxjs';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
 import {
   resourceConfigurationDialogFormCreate,
@@ -23,7 +22,7 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   templateUrl: './resource-configuration-dialog.component.html',
   styleUrls: ['./resource-configuration-dialog.component.scss'],
 })
-export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
+export class ResourceConfigurationDialogComponent implements OnInit {
   private _cd = inject(ChangeDetectorRef);
   private _formBuilder = inject(FormBuilder);
   private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
@@ -36,8 +35,6 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     { key: PredefinedResourceType.DATA_SOURCE, value: PredefinedResourceType.DATA_SOURCE },
     { key: PredefinedResourceType.FUNCTIONS, value: PredefinedResourceType.FUNCTIONS },
   ];
-
-  private readonly terminator$ = new Subject<void>();
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
@@ -59,11 +56,6 @@ export class ResourceConfigurationDialogComponent implements OnInit, OnDestroy {
     const { resource } = this._resourceConfigurationDialogData;
     const isReadonly = !!resource && !this._multipleProjectsService.isEntityBelongsToCurrentProject(resource);
     this.setFormValue(resource, isReadonly);
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   protected handleResourceInitialize(value: boolean): void {

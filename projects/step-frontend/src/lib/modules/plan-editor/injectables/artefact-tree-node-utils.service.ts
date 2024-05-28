@@ -6,17 +6,16 @@ import {
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Injectable()
 export class ArtefactTreeNodeUtilsService
   implements OnDestroy, TreeNodeUtilsService<AbstractArtefact, ArtefactTreeNode>, ArtefactRefreshNotificationService
 {
+  private _artefactTypes = inject(ArtefactService);
   private refreshArtefactInternal$ = new Subject<void>();
   readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
-
-  constructor(private _artefactTypes: ArtefactService) {}
 
   ngOnDestroy(): void {
     this.refreshArtefactInternal$.complete();
@@ -24,7 +23,7 @@ export class ArtefactTreeNodeUtilsService
 
   convertItem(
     originalArtefact: AbstractArtefact,
-    params?: { parentId?: string; isParentVisuallySkipped?: boolean }
+    params?: { parentId?: string; isParentVisuallySkipped?: boolean },
   ): ArtefactTreeNode {
     const id = originalArtefact.id!;
     const { parentId, isParentVisuallySkipped } = params ?? {};
@@ -34,7 +33,7 @@ export class ArtefactTreeNodeUtilsService
     const icon = this._artefactTypes.getArtefactType(originalArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = (originalArtefact?.children?.length ?? -1) > 0;
     const children = (originalArtefact?.children || []).map((child) =>
-      this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped })
+      this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
     );
 
     return {
@@ -54,7 +53,7 @@ export class ArtefactTreeNodeUtilsService
     root: AbstractArtefact,
     nodeId: string,
     children: ArtefactTreeNode[],
-    updateType: 'append' | 'replace'
+    updateType: 'append' | 'replace',
   ): void {
     //Remove children for their previous parents
     children
@@ -73,7 +72,7 @@ export class ArtefactTreeNodeUtilsService
         const { parent, child } = chain;
         // Remove children after all chains were found to avoid side effects, when children wil be lost
         parent!.children = parent!.children!.filter(
-          (artefact: AbstractArtefact) => child.originalArtefact !== artefact
+          (artefact: AbstractArtefact) => child.originalArtefact !== artefact,
         );
       });
 

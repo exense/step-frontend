@@ -25,10 +25,7 @@ export class DynamicTextfieldComponent
 
   protected allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
 
-  constructor(
-    private _dialogsService: DialogsService,
-    _ngControl: NgControl,
-  ) {
+  constructor(_ngControl: NgControl) {
     super(_ngControl);
   }
 

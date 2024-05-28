@@ -1,6 +1,15 @@
-import { AfterContentInit, ContentChildren, Directive, HostListener, OnDestroy, QueryList } from '@angular/core';
-import { combineLatest, startWith, Subject, takeUntil } from 'rxjs';
+import {
+  AfterContentInit,
+  ContentChildren,
+  DestroyRef,
+  Directive,
+  HostListener,
+  inject,
+  QueryList,
+} from '@angular/core';
+import { combineLatest, startWith } from 'rxjs';
 import { FocusableDirective } from './focusable.directive';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Documentation:
@@ -10,10 +19,10 @@ import { FocusableDirective } from './focusable.directive';
 @Directive({
   selector: '[stepTrapFocus]',
 })
-export class TrapFocusDirective implements AfterContentInit, OnDestroy {
-  @ContentChildren(FocusableDirective, { descendants: true }) focusables?: QueryList<FocusableDirective>;
+export class TrapFocusDirective implements AfterContentInit {
+  private _destroyRef = inject(DestroyRef);
 
-  private readonly terminator$ = new Subject<void>();
+  @ContentChildren(FocusableDirective, { descendants: true }) focusables?: QueryList<FocusableDirective>;
 
   private lastEvent?: FocusEvent;
 
@@ -25,17 +34,12 @@ export class TrapFocusDirective implements AfterContentInit, OnDestroy {
     const focusSubjects = this.focusables.map((focusable) => focusable.focusEvent$.pipe(startWith(undefined)));
 
     combineLatest(focusSubjects)
-      .pipe(takeUntil(this.terminator$))
+      .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((focusEvents) => {
         const orderedEvents = focusEvents.filter(Boolean).sort((a, b) => b!.timeStamp - a!.timeStamp);
 
         this.lastEvent = orderedEvents[0];
       });
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   @HostListener('keydown.tab', ['$event'])

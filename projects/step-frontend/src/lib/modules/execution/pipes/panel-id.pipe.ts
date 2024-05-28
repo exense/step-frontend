@@ -1,11 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { inject, Pipe, PipeTransform } from '@angular/core';
 import { SingleExecutionPanelsService } from '../services/single-execution-panels.service';
 
 @Pipe({
   name: 'panelId',
 })
 export class PanelIdPipe implements PipeTransform {
-  constructor(private _panels: SingleExecutionPanelsService) {}
+  private _panels = inject(SingleExecutionPanelsService);
+
   transform(viewId?: string): string | undefined {
     return !viewId ? undefined : this._panels.getPanelId(viewId!);
   }

@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeRangePickerSelection } from '../../types/time-selection/time-range-picker-selection';
 import { ExecutionTimeSelection } from '../../types/time-selection/execution-time-selection';
@@ -20,6 +30,8 @@ import { TimeRange } from '@exense/step-core';
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
+  private _snackBar = inject(MatSnackBar);
+
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Input() activeSelection!: TimeRangePickerSelection;
@@ -34,8 +46,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  constructor(private _snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     if (!this.selectOptions) {

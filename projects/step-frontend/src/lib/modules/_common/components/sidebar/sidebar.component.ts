@@ -26,6 +26,7 @@ import {
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MIDDLE_BUTTON = 1;
 
@@ -42,15 +43,17 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkService = inject(BookmarkService);
+  private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
   @ViewChild('tabs') tabs?: ElementRef<HTMLElement>;
 
-  private terminator$ = new Subject<void>();
-  private locationStateSubscription: SubscriptionLike;
+  private locationStateSubscription = this._location.subscribe((popState: any) => {
+    this.openMainMenuBasedOnActualView();
+  });
 
   private _sideBarState = inject(SidebarStateService);
-  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntil(this.terminator$));
+  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
     map(([menuItems, dynamicMenuItems]) =>
@@ -75,12 +78,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   readonly isOpened$ = this._sideBarState.isOpened$;
   readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
-  constructor(private _location: Location) {
-    this.locationStateSubscription = this._location.subscribe((popState: any) => {
-      this.openMainMenuBasedOnActualView();
-    });
-  }
-
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
     this._menuItems$.subscribe(() => {
@@ -99,8 +96,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.locationStateSubscription.unsubscribe();
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   private openMainMenuBasedOnActualView(): void {

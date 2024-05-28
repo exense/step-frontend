@@ -10,6 +10,7 @@ import {
   ImportDialogComponent,
   PlanCreateDialogComponent,
   PlanLinkComponent,
+  preloadScreenDataResolver,
   quickAccessRoute,
   schedulePlanRoute,
   SimpleOutletComponent,
@@ -42,6 +43,10 @@ export class PlanModule {
     _cellsRegister.registerCell('planLink', PlanLinkComponent);
     _viewRegistry.registerRoute({
       path: 'plans',
+      resolve: {
+        planScreenData: preloadScreenDataResolver('plan'),
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+      },
       component: SimpleOutletComponent,
       children: [
         {

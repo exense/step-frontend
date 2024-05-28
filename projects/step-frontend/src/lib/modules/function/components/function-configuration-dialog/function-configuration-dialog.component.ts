@@ -2,6 +2,7 @@ import { KeyValue } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   forwardRef,
   HostListener,
   inject,
@@ -31,6 +32,7 @@ import {
 } from '@exense/step-core';
 import { map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-function-configuration-dialog',
@@ -43,7 +45,7 @@ import { Router } from '@angular/router';
     },
   ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, FunctionTypeParentFormService {
+export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
@@ -53,8 +55,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
   private _formBuilder = inject(FormBuilder);
   private _authService = inject(AuthService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
-
-  private readonly terminator$ = new Subject<void>();
+  private _destroyRef = inject(DestroyRef);
 
   protected readonly lightForm = this._functionConfigurationDialogData.dialogConfig.lightForm;
   protected readonly schemaEnforced = this._authService.getConf()?.miscParams?.['enforceschemas'] === 'true';
@@ -83,7 +84,7 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
       this._functionConfigurationDialogData,
     );
 
-    this.formGroup.statusChanges.pipe(takeUntil(this.terminator$)).subscribe(() => {
+    this.formGroup.statusChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
       this._changeDetectorRef.detectChanges();
     });
 
@@ -96,11 +97,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, OnDestroy, 
     }
 
     this.initStepFunction();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   protected get functionType(): string {
