@@ -4,6 +4,7 @@
       <div class="keyword">
         <span>{{ node?.name }}</span>
         <step-aggregated-tree-status [node]="node" />
+        <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
       </div>
     }
     @case (AggregateTreeNodeType.DETAILS_NODE) {

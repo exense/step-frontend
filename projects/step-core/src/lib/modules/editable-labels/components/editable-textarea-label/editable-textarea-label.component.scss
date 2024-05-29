@@ -1,27 +1,35 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-editable-textarea-label {
   position: relative;
+
   &.disabled .editable-textarea-label {
     background: var.$gray-50;
   }
-}
 
-.editable-textarea-label {
-  line-height: 1.8rem;
-  padding: 0.8rem 1.4rem;
-  border-radius: 0.8rem;
-  border: 0.1rem solid transparent;
-  word-break: break-word;
-  & > .editable-textarea-placeholder {
-    color: var.$gray-525;
+  .editable-textarea-label {
+    line-height: 1.8rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: 0.8rem;
+    border: 0.1rem solid transparent;
+    word-break: break-word;
+
+    & > .editable-textarea-placeholder {
+      color: var.$gray-525;
+    }
+
+    &:hover {
+      background: var.$gray-50;
+    }
+
+    .editable-textarea-label-content {
+      .decorated {
+        font-weight: bold;
+      }
+    }
   }
 
-  &:hover {
-    background: var.$gray-50;
+  textarea {
+    resize: none;
   }
-}
-
-textarea {
-  resize: none;
 }

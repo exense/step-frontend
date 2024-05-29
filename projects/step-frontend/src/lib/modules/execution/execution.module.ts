@@ -68,6 +68,7 @@ import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-e
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
+import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 
 @NgModule({
   declarations: [
@@ -123,6 +124,7 @@ import { ViewMode } from './shared/view-mode';
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
+    TreeNodeDescriptionPipe,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
