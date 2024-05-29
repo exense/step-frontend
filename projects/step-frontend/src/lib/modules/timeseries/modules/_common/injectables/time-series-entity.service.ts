@@ -44,6 +44,10 @@ export class TimeSeriesEntityService {
       // All IDs are cached
       return of(cachedResults);
     }
+    if (idsToFetch.length < 100) {
+      // Make sure the request id is the same when sorting does not have a high complexity
+      idsToFetch.sort();
+    }
 
     const requestKey = idsToFetch.join(',');
 
