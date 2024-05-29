@@ -20,13 +20,14 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { forkJoin, Observable, of, Subscription, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
+import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 
 declare const uPlot: any;
 
@@ -92,7 +93,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
 
   private _timeSeriesService = inject(TimeSeriesService);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
@@ -339,8 +340,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       },
     ];
 
-    this.fetchLegendEntities(series).subscribe();
-
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
@@ -368,20 +367,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       });
     }
 
-    this._internalSettings = {
-      title: this.getChartTitle(),
-      xValues: xLabels,
-      series: series,
-      tooltipOptions: {
-        enabled: true,
-        zAxisLabel: this.getSecondAxesLabel(),
-        yAxisUnit: yAxesUnit,
-        useExecutionLinks: this.showExecutionLinks,
-      },
-      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
-      axes: axes,
-      truncated: response.truncated,
-    };
+    this.fetchLegendEntities(series).subscribe((v) => {
+      this._internalSettings = {
+        title: this.getChartTitle(),
+        xValues: xLabels,
+        series: series,
+        tooltipOptions: {
+          enabled: true,
+          zAxisLabel: this.getSecondAxesLabel(),
+          yAxisUnit: yAxesUnit,
+          useExecutionLinks: this.showExecutionLinks,
+        },
+        showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+        axes: axes,
+        truncated: response.truncated,
+      };
+    });
   }
 
   private removeDataGaps(data: (number | undefined)[]): number[] {
@@ -452,11 +453,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         if (!entityName) {
           return undefined;
         }
-        const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        const entityIds: Set<string> = new Set<string>(
+          series
+            .map((s) => {
+              if (s.scale !== 'y') {
+                // ignore other scales
+                return '';
+              } else {
+                return s.labelItems[i]!;
+              }
+            })
+            .filter((v) => !!v),
+        );
         if (entityIds.size === 0) {
           of(undefined);
         }
-        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+        return this._timeSeriesEntityService.getEntityNames(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
@@ -467,14 +479,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
                 } else {
                   newLabel = labelId + ' (unresolved)';
                 }
-                this.chart.setLabelItem(s.id, i, newLabel);
+                // this.chart.setLabelItem(s.id, i, newLabel);
+                s.labelItems[i] = newLabel;
               }
             });
           }),
         );
       })
       .filter((x) => !!x);
-    return forkJoin(requests$);
+    return forkJoin(requests$).pipe(defaultIfEmpty(null));
   }
 
   /**

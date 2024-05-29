@@ -38,6 +38,7 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
+import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 
 export interface TableEntry {
   name: string; // series id
@@ -94,7 +95,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
@@ -405,7 +406,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const requestTypesIndexes: Record<string, number> = {}; // used for fast access of responses
     requestTypes.forEach((type, i) => (requestTypesIndexes[type] = i));
     const requests$ = requestTypes.map((entityType) =>
-      this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entitiesByTypes[entityType]), entityType),
+      this._timeSeriesEntityService.getEntityNames(Array.from(entitiesByTypes[entityType]), entityType),
     );
     if (requests$.length === 0) {
       return of(data);
