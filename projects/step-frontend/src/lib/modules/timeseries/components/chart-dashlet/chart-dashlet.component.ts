@@ -327,14 +327,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       return s;
     });
     const primaryUnit = primaryAxes.unit!;
-    const yAxesUnit = this.getUnitLabel(primaryAggregation, primaryUnit);
+    const yAxesUnit = TimeSeriesUtils.getUnitLabel(primaryAggregation, primaryUnit);
 
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
         values: (u, vals) => {
-          return vals.map((v: any) => this.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
+          return vals.map((v: any) => TimeSeriesUtils.getAxesFormatFunction(primaryAggregation, primaryUnit)(v));
         },
       },
     ];
@@ -349,7 +349,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
           vals.map((v) =>
-            this.getAxesFormatFunction(
+            TimeSeriesUtils.getAxesFormatFunction(
               this.item.chartSettings!.secondaryAxes!.aggregation as ChartAggregation,
               undefined,
             )(v),
@@ -378,7 +378,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         yAxisUnit: yAxesUnit,
         useExecutionLinks: this.showExecutionLinks,
       },
-      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+      showLegend: true,
       axes: axes,
       truncated: response.truncated,
     };

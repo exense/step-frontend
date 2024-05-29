@@ -24,6 +24,9 @@ export class EditableLabelComponent extends EditableComponent<string> {
   @ViewChild('input') input?: ElementRef<HTMLElement>;
 
   protected override onLabelClick(): void {
+    if (this.isDisabled) {
+      return;
+    }
     super.onLabelClick();
     this.input!.nativeElement.focus();
     this.focusedElement = this.input!.nativeElement;

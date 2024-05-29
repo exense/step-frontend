@@ -1,0 +1,13 @@
+<step-alt-report-widget title="Performance Overview (avg)">
+  <step-alt-report-widget-content>
+    @if (timeRange(); as range) {
+      <step-standalone-dashlet
+        [metricKey]="metricKey"
+        [config]="chartConfig"
+        [filters]="chartFilters()"
+        [timeRange]="range"
+        [class.print]="mode() === ViewMode.PRINT"
+      />
+    }
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

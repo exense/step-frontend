@@ -61,4 +61,14 @@ export class CommonEntitiesUrlsService {
     // for proper content rerender
     return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
   }
+
+  altExecutionUrl(idOrExecution?: string | Execution): string {
+    if (!idOrExecution) {
+      return '';
+    }
+    const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
+    // /executions/open/id route is required, when one execution is opened from another
+    // for proper content rerender
+    return `/alt-executions/${id}`;
+  }
 }

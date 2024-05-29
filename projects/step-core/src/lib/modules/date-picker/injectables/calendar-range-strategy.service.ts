@@ -98,6 +98,10 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
     return currentSelection;
   }
 
+  pickRelativeTime(range: DateRange): DateRange | undefined | null {
+    return range;
+  }
+
   getStartAt(selection?: DateRange | null): DateTime | undefined | null {
     return selection?.start;
   }

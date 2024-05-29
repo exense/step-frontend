@@ -29,6 +29,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
 
   private _autoRefreshModelFactory = inject(AutoRefreshModelFactoryService);
   @Input() model = this._autoRefreshModelFactory.create();
+  @Input() buttonType: 'icon' | 'stroke' = 'icon';
 
   @Input() presets: ReadonlyArray<AutorefreshPreset> = [
     { label: 'OFF', value: 0 },

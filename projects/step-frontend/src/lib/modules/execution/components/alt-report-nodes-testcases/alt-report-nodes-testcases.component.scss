@@ -1,0 +1,17 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+step-table {
+  --mat-table-row-item-container-height: 3rem;
+  flex: 1;
+}
+
+.name {
+  width: 100%;
+}

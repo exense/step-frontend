@@ -1,0 +1,9 @@
+@if (chartSettings) {
+  <step-timeseries-chart
+    #chart
+    (zoomChange)="handleZoomChange($event)"
+    (zoomReset)="handleZoomReset()"
+    [settings]="chartSettings!"
+    [height]="config.height || 300"
+  />
+}

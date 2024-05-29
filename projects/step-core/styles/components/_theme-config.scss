@@ -12,6 +12,7 @@
 @use 'step-datepicker';
 @use 'step-alert';
 @use 'step-tooltip';
+@use 'print';
 @use 'material-overrides' as mat-ov;
 @use '../core-variables' as var;
 
@@ -262,4 +263,6 @@ $light-primary-text: var.$white;
     // TODO: investigate why is it happening
     padding-bottom: 1px;
   }
+
+  @include print.print-overrides;
 }

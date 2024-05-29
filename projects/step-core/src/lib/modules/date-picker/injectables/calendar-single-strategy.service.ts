@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { DateSingleAdapterService } from './date-single-adapter.service';
 import { Time } from '../types/time';
 import { extractTime } from '../types/extract-time';
+import { DateRange } from '../types/date-range';
 
 @Injectable()
 export class CalendarSingleStrategyService implements CalendarStrategyService<DateTime, Time> {
@@ -33,6 +34,10 @@ export class CalendarSingleStrategyService implements CalendarStrategyService<Da
       return currentSelection;
     }
     return currentSelection.set({ ...time });
+  }
+
+  pickRelativeTime(range: DateRange): DateTime | undefined | null {
+    return range.end;
   }
 
   getStartAt(selection?: DateTime | null): DateTime | undefined | null {

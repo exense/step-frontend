@@ -8,21 +8,12 @@ import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predi
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
 import { QuickAccessRouteService } from '../../basics/step-basics.module';
+import { MenuEntry } from '../types/menu-entry';
 
 export interface CustomView {
   template: string;
   isPublicView: boolean;
   isStaticView?: boolean;
-}
-
-export interface MenuEntry {
-  id: string;
-  title: string;
-  icon: string;
-  weight?: number;
-  parentId?: string;
-
-  isEnabledFct(): boolean;
 }
 
 export interface Dashlet {
@@ -92,6 +83,7 @@ export class ViewRegistryService implements OnDestroy {
 
     // Sub Menus Execute
     this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
+    this.registerMenuEntry('Executions (New)', 'alt-executions', 'rocket', { weight: 15, parentId: 'execute-root' });
     this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });

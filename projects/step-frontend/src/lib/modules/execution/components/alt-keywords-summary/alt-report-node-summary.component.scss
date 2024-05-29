@@ -1,0 +1,15 @@
+step-alt-report-node-summary {
+  step-alt-report-widget-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+
+    canvas {
+      width: 26rem !important;
+      height: 26rem !important;
+    }
+  }
+}

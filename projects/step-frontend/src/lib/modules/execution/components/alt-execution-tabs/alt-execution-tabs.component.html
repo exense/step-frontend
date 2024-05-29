@@ -1,0 +1,8 @@
+<step-tabs [tabs]="tabs()" [userRouteLinks]="true">
+  <div *stepTabTemplate="let tab" class="tab-content">
+    <span>{{ tab.label }}</span>
+    @if (tab.id !== STATIC_TABS.REPORT && tab.id !== STATIC_TABS.TREE && tab.id !== STATIC_TABS.ANALYTICS) {
+      <step-icon name="x" (click)="closeTab(tab, $event)" />
+    }
+  </div>
+</step-tabs>

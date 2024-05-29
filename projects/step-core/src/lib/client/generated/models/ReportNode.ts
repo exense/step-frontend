@@ -12,6 +12,7 @@ export type ReportNode = {
   name?: string;
   executionID?: string;
   artefactID?: string;
+  artefactHash?: string;
   executionTime?: number;
   duration?: number;
   attachments?: Array<AttachmentMeta>;

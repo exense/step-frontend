@@ -35,7 +35,6 @@ import { EntitiesSelectionModule } from './modules/entities-selection/entities-s
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
-import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
@@ -72,6 +71,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
+import { TAB_EXPORTS } from './modules/tabs';
 
 @NgModule({
   declarations: [
@@ -123,7 +123,6 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
@@ -145,6 +144,7 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EXECUTION_COMMON_EXPORTS,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    TAB_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -161,7 +161,6 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
@@ -211,6 +210,7 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    TAB_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -287,7 +287,7 @@ export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
-export * from './modules/tabs/tabs.module';
+export * from './modules/tabs';
 export * from './modules/tree/tree.module';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';

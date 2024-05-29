@@ -1,58 +1,81 @@
 import {
   Component,
-  EventEmitter,
+  computed,
+  contentChild,
+  effect,
   HostBinding,
+  inject,
+  input,
   Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
+  output,
   TemplateRef,
-  TrackByFunction,
-  ViewChild,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { Tab } from '../../shared/tab';
 import { MatTabNav } from '@angular/material/tabs';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { StepMaterialModule } from '../../../step-material/step-material.module';
+import { CommonModule } from '@angular/common';
+import { TabTemplateDirective } from '../directives/tab-template.directive';
 
 @Component({
   selector: 'step-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
+  imports: [StepMaterialModule, CommonModule, RouterModule],
+  standalone: true,
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
 })
-export class TabsComponent<T extends string | number> implements OnChanges {
-  readonly trackByTab: TrackByFunction<Tab<T>> = (index, item) => item.id;
+export class TabsComponent<T extends string | number> {
+  readonly _activatedRoute = inject(ActivatedRoute, { optional: true });
 
-  @ViewChild(MatTabNav)
-  private tabBar!: MatTabNav;
+  /** @ViewChild(MatTabNav) **/
+  private tabBar = viewChild(MatTabNav);
 
-  @Input() tabMode: 'buttons' | 'tabs' = 'buttons';
-  @Input() disablePagination: boolean = false;
-  @Input() tabs: Tab<T>[] = [];
-  @Input() activeTabId?: T;
-  @Input() tabTemplate?: TemplateRef<unknown>;
-  @Output() activeTabIdChange = new EventEmitter<T>();
+  /** @Input() **/
+  tabMode = input<'buttons' | 'tabs'>('buttons');
+
+  userRouteLinks = input(false);
+
+  /** @Iput() **/
+  disablePagination = input(false);
+
+  /** @Input() **/
+  tabs = input<Tab<T>[]>([]);
+
+  /** @Input() **/
+  activeTabId = input<T | undefined>();
+
+  /** @Output() **/
+  activeTabIdChange = output<T>();
+
+  /** @Input('tabTemplate') **/
+  tabTemplateInput = input<TemplateRef<unknown> | undefined>(undefined, {
+    alias: 'tabTemplate',
+  });
+
+  /** @ContentChild(TabTemplateDirective) **/
+  private tabTemplateDirective = contentChild(TabTemplateDirective);
+
+  readonly tabTemplate = computed(() => this.tabTemplateDirective()?.templateRef ?? this.tabTemplateInput()!);
 
   @HostBinding('class.shrink') @Input() shrink: boolean = false;
   @HostBinding('class.tab-mode-buttons') isTabModeButtons: boolean = true;
   @HostBinding('class.tab-mode-tabs') isTabModeTabs: boolean = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cTabMode = changes['tabMode'];
-    if (!!cTabMode?.currentValue && (cTabMode?.previousValue !== cTabMode?.currentValue || cTabMode?.firstChange)) {
-      const tabMode = cTabMode.currentValue;
-      this.isTabModeButtons = tabMode === 'button';
-      this.isTabModeTabs = tabMode === 'tabs';
-    }
-  }
+  private effectModeChange = effect(() => {
+    const tabMode = this.tabMode();
+    this.isTabModeButtons = tabMode === 'buttons';
+    this.isTabModeTabs = tabMode === 'tabs';
+  });
 
   selectTab(tab: Tab<T>): void {
-    this.activeTabId = tab.id;
     this.activeTabIdChange.emit(tab.id);
   }
 
   updatePagination(): void {
-    this.tabBar.updatePagination();
+    this.tabBar()!.updatePagination();
   }
 }
