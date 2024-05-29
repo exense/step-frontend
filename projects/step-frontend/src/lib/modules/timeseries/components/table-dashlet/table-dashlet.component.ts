@@ -16,7 +16,7 @@ import {
   FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
@@ -38,7 +38,6 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
-import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 
 export interface TableEntry {
   name: string; // series id

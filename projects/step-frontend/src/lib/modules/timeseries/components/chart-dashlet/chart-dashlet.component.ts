@@ -15,7 +15,7 @@ import {
   OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
@@ -27,7 +27,6 @@ import { Axis } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
-import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 
 declare const uPlot: any;
 

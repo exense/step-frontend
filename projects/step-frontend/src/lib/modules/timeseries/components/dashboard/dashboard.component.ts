@@ -36,7 +36,6 @@ import {
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  TimeSeriesUtilityService,
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
@@ -57,6 +56,7 @@ import { forkJoin, map, Observable } from 'rxjs';
 //@ts-ignore
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
+import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -83,7 +83,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
@@ -439,17 +439,17 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       switch (attribute) {
         case TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getExecutions(entitiesByAttributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getExecutions(entitiesByAttributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]),
           );
           break;
         case TimeSeriesConfig.PLAN_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getPlans(entitiesByAttributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getPlans(entitiesByAttributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]),
           );
           break;
         case TimeSeriesConfig.TASK_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getTasks(entitiesByAttributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getTasks(entitiesByAttributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]),
           );
           break;
         default:

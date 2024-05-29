@@ -3,7 +3,7 @@ export * from './components/discover/discover.component';
 export * from './components/resolution-picker/resolution-picker.component';
 export * from './components/grouping/ts-grouping.component';
 export * from './injectables/no-total-count-paginator';
-export * from './injectables/time-series-utility.service';
+export * from './injectables/time-series-entity.service';
 export * from './injectables/uplot-utils.service';
 export * from './injectables/chart-url-params.service';
 export * from './injectables/time-series-contexts-factory.service';
