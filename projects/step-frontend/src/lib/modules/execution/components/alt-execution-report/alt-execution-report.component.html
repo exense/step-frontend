@@ -21,10 +21,16 @@
       <step-alt-report-performance-overview-chart
         [executionId]="executionId"
         [timeRange]="(_state.timeRange$ | async)!"
+        [mode]="mode"
       />
     }
     @if (_state.currentOperations$ | async; as currentOperations) {
       <step-alt-report-current-operations [operations]="currentOperations" />
     }
   </section>
+}
+@if (mode === ViewMode.PRINT) {
+  <div class="print-overlay">
+    <h2>Print in progress</h2>
+  </div>
 }

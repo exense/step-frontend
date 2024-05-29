@@ -35,7 +35,7 @@ export class AltExecutionReportPrintService implements OnDestroy {
         queryParamsHandling: 'merge',
       }),
     )
-      .pipe(switchMap(() => timer(500)))
+      .pipe(switchMap(() => timer(700)))
       .subscribe(() => {
         this._doc.defaultView?.print();
       });

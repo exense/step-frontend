@@ -110,6 +110,7 @@ export class AltExecutionProgressComponent
       }
       return { from, to } as TimeRange;
     }),
+    shareReplay(1),
     takeUntilDestroyed(),
   );
 

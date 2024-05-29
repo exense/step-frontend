@@ -6,6 +6,7 @@
         [config]="chartConfig"
         [filters]="chartFilters()"
         [timeRange]="range"
+        [class.print]="mode() === ViewMode.PRINT"
       />
     }
   </step-alt-report-widget-content>

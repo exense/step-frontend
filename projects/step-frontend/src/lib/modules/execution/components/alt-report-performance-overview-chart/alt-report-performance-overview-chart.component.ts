@@ -1,11 +1,13 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
+import { ViewMode } from '../../shared/view-mode';
 
 @Component({
   selector: 'step-alt-report-performance-overview-chart',
   templateUrl: './alt-report-performance-overview-chart.component.html',
   styleUrl: './alt-report-performance-overview-chart.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltReportPerformanceOverviewChartComponent {
   protected readonly chartConfig: StandaloneChartConfig = {
@@ -21,6 +23,9 @@ export class AltReportPerformanceOverviewChartComponent {
   };
 
   protected readonly metricKey = 'response-time';
+
+  /** @Input() **/
+  mode = input<ViewMode>(ViewMode.VIEW);
 
   /** @Input() **/
   executionId = input.required<string>();
@@ -45,4 +50,5 @@ export class AltReportPerformanceOverviewChartComponent {
       },
     ] as FilterBarItem[];
   });
+  protected readonly ViewMode = ViewMode;
 }

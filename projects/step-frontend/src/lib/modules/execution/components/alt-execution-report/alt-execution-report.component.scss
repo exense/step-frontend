@@ -1,9 +1,12 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 @mixin single-col-view {
   min-width: 60rem;
   grid-template-columns: 100%;
 }
 
 step-alt-execution-report {
+  position: relative;
   section {
     display: grid;
     grid-template-rows: 33rem;
@@ -37,25 +40,37 @@ step-alt-execution-report {
       }
     }
 
-    .print {
+    &.print {
       @include single-col-view;
       width: 100%;
       grid-template-rows: auto;
 
-      .keywords {
-        display: none;
-      }
-
       step-alt-report-performance-overview-chart {
+        page-break-before: always;
         step-alt-report-widget {
-          page-break-before: always;
-          height: 43rem !important;
+          min-height: 43rem !important;
         }
       }
     }
   }
 
+  .print-overlay {
+    position: absolute;
+    top: 0;
+    left: -2px;
+    right: -2px;
+    bottom: 0;
+    background: var.$white;
+    display: flex;
+    justify-content: center;
+
+    h2 {
+      margin-top: 10rem;
+    }
+  }
+
   @media print {
+    .print-overlay,
     step-paginator {
       display: none;
     }
