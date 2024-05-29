@@ -281,3 +281,5 @@ export * from './types/mutable';
 export * from './types/date-format.enum';
 export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
+export * from './types/time-converter';
+export * from './injectables/time-converters-factory.service';
