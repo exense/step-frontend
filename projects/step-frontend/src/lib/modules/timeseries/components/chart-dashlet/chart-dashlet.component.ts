@@ -17,6 +17,7 @@ import {
   TimeSeriesContext,
   TimeSeriesUtilityService,
   TimeSeriesUtils,
+  TsFilteringMode,
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
@@ -203,34 +204,47 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private composeRequestFilter(): string {
     const masterChart = this.getMasterChart();
     const metric = masterChart?.metricKey || this.item.metricKey;
-    const metricFilterItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${metric}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
+    const metricOql: string =
+      metric === 'threadgroup'
+        ? '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))'
+        : `attributes.metricType = \"${metric}\"`;
+
+    let filterItemsToInherit: FilterBarItem[] = [];
+
+    const globalFiltering = this.context.getFilteringSettings();
 
     const itemToInheritSettingsFrom = masterChart || this.item;
     if (itemToInheritSettingsFrom.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        this.context.getFilteringSettings().filterItems,
-        itemToInheritSettingsFrom.filters,
-      );
-    } else {
-      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
+      if (globalFiltering.mode === TsFilteringMode.STANDARD) {
+        if (itemToInheritSettingsFrom.inheritSpecificFiltersOnly) {
+          filterItemsToInherit = globalFiltering.filterItems.filter((i) =>
+            itemToInheritSettingsFrom.specificFiltersToInherit.find((attribute) => attribute === i.attributeName),
+          );
+        } else {
+          filterItemsToInherit = globalFiltering.filterItems;
+        }
+      }
     }
-    if (metric !== 'threadgroup') {
-      filterItems.push(metricFilterItem);
-      return FilterUtils.filtersToOQL(filterItems, 'attributes');
-    } else {
-      // TODO clean this once the migration of sampler measurements is done
+
+    const localFiltersOql: string = FilterUtils.filtersToOQL(
+      itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem),
+      'attributes',
+    );
+
+    if (globalFiltering.mode === TsFilteringMode.STANDARD) {
       return new OQLBuilder()
-        .append(
-          '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))',
-        )
-        .append(FilterUtils.filtersToOQL(filterItems, 'attributes'))
+        .append(metricOql)
+        .append(localFiltersOql)
+        .append(FilterUtils.filtersToOQL(globalFiltering.hiddenFilters, 'attributes'))
+        .append(FilterUtils.filtersToOQL(filterItemsToInherit, 'attributes'))
+        .build();
+    } else {
+      // OQL filtering
+      return new OQLBuilder()
+        .append(metricOql)
+        .append(localFiltersOql)
+        .append(FilterUtils.filtersToOQL(globalFiltering.hiddenFilters, 'attributes'))
+        .conditionalAppend(itemToInheritSettingsFrom.inheritGlobalFilters, globalFiltering.oql)
         .build();
     }
   }
