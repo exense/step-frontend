@@ -51,7 +51,6 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
-  metricTypes: MetricType[] = [];
   allAttributes: MetricAttribute[] = [];
 
   tableDashlets: DashboardItem[] = [];
@@ -69,7 +68,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     });
     this.allAttributes = this._inputData.context
       .getAllAttributes()
-      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : 0));
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
   onSecondaryAggregateSelect(aggregation: ChartAggregation) {
