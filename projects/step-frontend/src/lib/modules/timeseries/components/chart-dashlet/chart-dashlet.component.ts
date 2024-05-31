@@ -197,58 +197,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.refresh(true).subscribe();
   }
 
-  private getMasterChart(): DashboardItem | undefined {
-    return this.item.masterChartId ? this.context.getDashlet(this.item.masterChartId) : undefined;
-  }
-
-  private composeRequestFilter(): string {
-    const masterChart = this.getMasterChart();
-    const metric = masterChart?.metricKey || this.item.metricKey;
-    const metricOql: string =
-      metric === 'threadgroup'
-        ? '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))'
-        : `attributes.metricType = \"${metric}\"`;
-
-    let filterItemsToInherit: FilterBarItem[] = [];
-
-    const globalFiltering = this.context.getFilteringSettings();
-
-    const itemToInheritSettingsFrom = masterChart || this.item;
-    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
-      if (globalFiltering.mode === TsFilteringMode.STANDARD) {
-        if (itemToInheritSettingsFrom.inheritSpecificFiltersOnly) {
-          filterItemsToInherit = globalFiltering.filterItems.filter((i) =>
-            itemToInheritSettingsFrom.specificFiltersToInherit.find((attribute) => attribute === i.attributeName),
-          );
-        } else {
-          filterItemsToInherit = globalFiltering.filterItems;
-        }
-      }
-    }
-
-    const localFiltersOql: string = FilterUtils.filtersToOQL(
-      itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem),
-      'attributes',
-    );
-
-    if (globalFiltering.mode === TsFilteringMode.STANDARD) {
-      return new OQLBuilder()
-        .append(metricOql)
-        .append(localFiltersOql)
-        .append(FilterUtils.filtersToOQL(globalFiltering.hiddenFilters, 'attributes'))
-        .append(FilterUtils.filtersToOQL(filterItemsToInherit, 'attributes'))
-        .build();
-    } else {
-      // OQL filtering
-      return new OQLBuilder()
-        .append(metricOql)
-        .append(localFiltersOql)
-        .append(FilterUtils.filtersToOQL(globalFiltering.hiddenFilters, 'attributes'))
-        .conditionalAppend(itemToInheritSettingsFrom.inheritGlobalFilters, globalFiltering.oql)
-        .build();
-    }
-  }
-
   handleLockStateChange(locked: boolean) {
     this.context.setChartsLockedState(locked);
   }
@@ -597,10 +545,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return 'CHART';
   }
 
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
+  getContext(): TimeSeriesContext {
+    return this.context;
   }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
+
+  getItem(): DashboardItem {
+    return this.item;
   }
 }
