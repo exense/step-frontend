@@ -21,6 +21,9 @@
       <step-alt-report-performance-overview-chart
         [executionId]="executionId"
         [timeRange]="(_state.timeRange$ | async)!"
+        (timeRangeChange)="_state.updateRange($event)"
+        [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
+        (fullRange)="_state.selectFullRange()"
         [mode]="mode"
       />
     }

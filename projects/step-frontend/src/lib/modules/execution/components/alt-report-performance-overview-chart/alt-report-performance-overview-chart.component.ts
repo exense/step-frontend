@@ -1,4 +1,4 @@
-import { Component, computed, input, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
 import { ViewMode } from '../../shared/view-mode';
@@ -16,13 +16,16 @@ export class AltReportPerformanceOverviewChartComponent {
     showYAxes: true,
     showTimeAxes: true,
     showCursor: true,
-    zoomEnabled: false,
+    zoomEnabled: true,
     primaryAxesUnit: 'ms',
     colorizationType: 'FILL',
     height: 238,
   };
 
   protected readonly metricKey = 'response-time';
+
+  /** @Input() **/
+  isFullRange = input<boolean>(true);
 
   /** @Input() **/
   mode = input<ViewMode>(ViewMode.VIEW);
@@ -32,6 +35,12 @@ export class AltReportPerformanceOverviewChartComponent {
 
   /** @Input() **/
   timeRange = input<TimeRange>();
+
+  /** @Output() **/
+  timeRangeChange = output<TimeRange>();
+
+  /** @Output() **/
+  fullRange = output();
 
   chartFilters = computed(() => {
     const executionId = this.executionId();

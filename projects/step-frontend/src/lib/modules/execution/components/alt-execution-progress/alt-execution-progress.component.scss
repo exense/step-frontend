@@ -52,13 +52,6 @@ step-alt-execution-progress {
     .range-picker {
       grid-area: ranger;
       justify-self: flex-end;
-      min-width: 35rem;
-      step-form-field {
-        --form-field-border-radius: 1.6rem;
-        input {
-          border-left-style: none;
-        }
-      }
     }
 
     .controls {

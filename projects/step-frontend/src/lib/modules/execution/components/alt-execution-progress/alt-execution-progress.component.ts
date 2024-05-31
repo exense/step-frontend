@@ -1,11 +1,12 @@
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { filter, map, of, shareReplay, switchMap, combineLatest, startWith } from 'rxjs';
+import { filter, map, of, shareReplay, switchMap, combineLatest, startWith, take } from 'rxjs';
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
   DateRange,
+  DateUtilsService,
   DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
   ExecutiontTaskParameters,
@@ -24,7 +25,6 @@ import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
-import { AltExecutionDefaultRangeService } from '../../services/alt-execution-default-range.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
@@ -44,18 +44,12 @@ import { AltExecutionReportPrintService } from '../../services/alt-execution-rep
       useExisting: AltExecutionProgressComponent,
     },
     {
-      provide: AltExecutionDefaultRangeService,
-      useExisting: AltExecutionProgressComponent,
-    },
-    {
       provide: RELATIVE_TIME_OPTIONS,
       useFactory: () => {
         const _state = inject(AltExecutionStateService);
         const _defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
-        const _executionDefaultRange = inject(AltExecutionDefaultRangeService);
 
-        return _state.execution$.pipe(
-          map((execution) => _executionDefaultRange.getDefaultRangeForExecution(execution)),
+        return _state.executionFulLRange$.pipe(
           map((value) => ({ value, label: 'Full Range' }) as TimeOption),
           map((fullRangeOption) => [..._defaultOptions, fullRangeOption]),
         );
@@ -76,9 +70,7 @@ import { AltExecutionReportPrintService } from '../../services/alt-execution-rep
     AltExecutionReportPrintService,
   ],
 })
-export class AltExecutionProgressComponent
-  implements OnInit, AltExecutionStateService, AltExecutionDefaultRangeService
-{
+export class AltExecutionProgressComponent implements OnInit, AltExecutionStateService {
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -89,16 +81,26 @@ export class AltExecutionProgressComponent
   private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
   private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
+  private _dateUtils = inject(DateUtilsService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isTreeInitialized = false;
 
-  protected relativeTime?: number;
+  private relativeTime?: number;
+
+  updateRelativeTime(time?: number) {
+    this.relativeTime = time;
+  }
 
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
-  readonly timeRange$ = this.dateRangeCtrl.valueChanges.pipe(
+  private dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly timeRange$ = this.dateRange$.pipe(
     map((dateRange) => {
       if (!dateRange) {
         return undefined;
@@ -114,6 +116,22 @@ export class AltExecutionProgressComponent
     takeUntilDestroyed(),
   );
 
+  updateRange(timeRange: TimeRange | null | undefined) {
+    if (!timeRange) {
+      this.dateRangeCtrl.setValue(undefined);
+      return;
+    }
+    const start = DateTime.fromMillis(timeRange.from);
+    const end = DateTime.fromMillis(timeRange.to);
+    this.dateRangeCtrl.setValue({ start, end });
+  }
+
+  selectFullRange(): void {
+    this.execution$.pipe(take(1)).subscribe((execution) => {
+      this.applyDefaultRange(execution);
+    });
+  }
+
   readonly executionId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),
     filter((id) => !!id),
@@ -123,6 +141,16 @@ export class AltExecutionProgressComponent
 
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
+  );
+
+  readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
+
+  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
+    map(([selectedRange, fullRange]) => {
+      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
+      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
+      return startEq && endEq;
+    }),
   );
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
@@ -174,7 +202,7 @@ export class AltExecutionProgressComponent
     });
   }
 
-  getDefaultRangeForExecution(execution: Execution): DateRange {
+  private getDefaultRangeForExecution(execution: Execution): DateRange {
     let start: DateTime;
     let end: DateTime;
 

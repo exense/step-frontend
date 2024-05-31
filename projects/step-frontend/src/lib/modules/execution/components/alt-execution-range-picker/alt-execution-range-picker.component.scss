@@ -1,0 +1,19 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  min-width: 26rem;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+step-form-field {
+  --form-field-border-radius: 1.6rem;
+  input {
+    border-left-style: none;
+  }
+}
+
+.full-range-warn {
+  color: var.$orange;
+}

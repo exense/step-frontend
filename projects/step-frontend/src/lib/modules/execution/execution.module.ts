@@ -69,6 +69,8 @@ import { AltExecutionReportControlsComponent } from './components/alt-execution-
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
+import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
+import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +122,8 @@ import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
     AltReportNodesTestcasesComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
+    AltExecutionRangePickerComponent,
+    AltExecutionRangePrintComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -295,6 +299,11 @@ export class ExecutionModule {
                   component: AltExecutionReportControlsComponent,
                   outlet: 'controls',
                 },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
+                },
               ],
             },
             {
@@ -307,11 +316,26 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportComponent,
                 },
+                {
+                  path: '',
+                  component: AltExecutionRangePrintComponent,
+                  outlet: 'rangePicker',
+                },
               ],
             },
             {
               path: 'tree',
-              component: AltExecutionTreeComponent,
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionTreeComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
+                },
+              ],
             },
             {
               path: 'analytics',

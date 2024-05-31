@@ -32,4 +32,11 @@ export * from './types/date-range';
 export * from './types/time-option';
 export * from './injectables/default-relative-time-options.token';
 export * from './injectables/relative-time-options.token';
-export { StepDateFormatConfig, STEP_DATE_FORMAT_CONFIG } from './injectables/step-date-format-config.providers';
+export * from './injectables/date-utils.service';
+export * from './injectables/date-single-adapter.service';
+export * from './injectables/date-range-adapter.service';
+export {
+  StepDateFormatConfig,
+  STEP_DATE_FORMAT_CONFIG,
+  STEP_DATE_TIME_FORMAT_PROVIDERS,
+} from './injectables/step-date-format-config.providers';
