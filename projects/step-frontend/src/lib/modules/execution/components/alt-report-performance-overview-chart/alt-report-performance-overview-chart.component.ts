@@ -14,11 +14,12 @@ export class AltReportPerformanceOverviewChartComponent {
     showTooltip: true,
     showLegend: true,
     showYAxes: true,
+    showZAxes: true,
     showTimeAxes: true,
     showCursor: true,
     zoomEnabled: true,
     primaryAxesUnit: 'ms',
-    colorizationType: 'FILL',
+    colorizationType: 'STROKE',
     height: 238,
   };
 

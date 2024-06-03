@@ -33,6 +33,8 @@ import { Axis } from 'uplot';
 import { StandaloneChartConfig } from './standalone-chart-config';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
+declare const uPlot: any;
+
 @Component({
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
@@ -41,6 +43,7 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class StandaloneChartComponent implements OnChanges {
+  private readonly barsFunction = uPlot.paths.bars;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
 
   @Input({ required: true }) metricKey!: string;
@@ -91,6 +94,9 @@ export class StandaloneChartComponent implements OnChanges {
   private createChart(response: TimeSeriesAPIResponse): void {
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAggregation = this.aggregation;
+    const hasZAxes = this.config.showZAxes;
+    const zAxesAggregation = ChartAggregation.RATE;
+    const zAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = this.grouping.map((field) => response.matrixKeys[i]?.[field]);
@@ -102,6 +108,14 @@ export class StandaloneChartComponent implements OnChanges {
 
       const seriesData: (number | undefined | null)[] = [];
       seriesBuckets.forEach((b, i) => {
+        if (hasZAxes) {
+          const bucketValue = this.getBucketValue(b, zAxesAggregation);
+          if (zAxesData[i] == undefined) {
+            zAxesData[i] = bucketValue;
+          } else if (bucketValue) {
+            zAxesData[i]! += bucketValue;
+          }
+        }
         seriesData[i] = this.getBucketValue(b, primaryAggregation!);
       });
       const s: TSChartSeries = {
@@ -136,6 +150,27 @@ export class StandaloneChartComponent implements OnChanges {
         show: this.config.showYAxes ?? true,
       },
     ];
+    if (hasZAxes) {
+      axes.push({
+        // @ts-ignore
+        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+        side: 1,
+        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+        values: (u: unknown, vals: number[]) =>
+          vals.map((v) => TimeSeriesUtils.getAxesFormatFunction(zAxesAggregation, undefined)(v)),
+        grid: { show: false },
+      });
+      series.unshift({
+        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+        labelItems: ['Total'],
+        id: 'total',
+        data: zAxesData,
+        value: (x, v: number) => Math.trunc(v) + ' total',
+        fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
+        paths: this.barsFunction({ size: [1, 100, 4], radius: 0.2, gap: 1 }),
+        points: { show: false },
+      });
+    }
 
     this.chartSettings = {
       title: this.config.title || '',

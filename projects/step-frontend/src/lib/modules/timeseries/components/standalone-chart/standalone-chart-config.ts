@@ -5,6 +5,7 @@ export interface StandaloneChartConfig {
   showTooltip?: boolean;
   showLegend?: boolean;
   showYAxes?: boolean;
+  showZAxes?: boolean;
   showTimeAxes?: boolean;
   showCursor?: boolean;
   tooltipYAxesUnit?: string;
