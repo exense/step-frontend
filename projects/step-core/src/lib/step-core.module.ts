@@ -72,6 +72,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
+import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 
 @NgModule({
   declarations: [
@@ -145,6 +146,7 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EXECUTION_COMMON_EXPORTS,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    INFO_BANNER_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -211,6 +213,7 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    INFO_BANNER_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
