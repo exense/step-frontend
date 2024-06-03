@@ -340,5 +340,6 @@ export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
+export * from './modules/info-banner';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';

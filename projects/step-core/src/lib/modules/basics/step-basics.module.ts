@@ -262,7 +262,7 @@ export * from './injectables/quick-access-route.service';
 export * from './types/marker-type.enum';
 export * from './types/dialog-route';
 export * from './types/dialog-route-result';
-export * from './types/quick-access-route';
+export * from './types/step-route-additional-config';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './directives/input-model-formatter.directive';

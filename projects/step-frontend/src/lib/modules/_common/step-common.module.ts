@@ -7,6 +7,7 @@ import {
   StepCoreModule,
   LockColumnComponent,
   ColumnSettingsSaveDashletComponent,
+  INFO_BANNER_EXPORTS,
 } from '@exense/step-core';
 import { ExecutionLinkComponent } from './components/execution-link/execution-link.component';
 import { LoginComponent } from './components/login/login.component';
@@ -42,8 +43,9 @@ import { HttpErrorOverrideInterceptor } from './interceptors/http-error-override
     IsEmptyJsonPipe,
     ContainsVersionPipe,
     MenuFilterPipe,
+    INFO_BANNER_EXPORTS,
   ],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, INFO_BANNER_EXPORTS],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
