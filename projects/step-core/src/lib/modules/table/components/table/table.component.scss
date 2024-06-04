@@ -70,3 +70,11 @@ step-table {
     }
   }
 }
+
+@media print {
+  step-table {
+    .table-container {
+      overflow: hidden;
+    }
+  }
+}

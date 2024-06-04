@@ -7,6 +7,7 @@
 
 step-alt-execution-report {
   position: relative;
+
   section {
     display: grid;
     grid-template-rows: 33rem;
@@ -44,13 +45,6 @@ step-alt-execution-report {
       @include single-col-view;
       width: 100%;
       grid-template-rows: auto;
-
-      step-alt-report-performance-overview-chart {
-        page-break-before: always;
-        step-alt-report-widget {
-          min-height: 43rem !important;
-        }
-      }
     }
   }
 
@@ -69,10 +63,24 @@ step-alt-execution-report {
     }
   }
 
+  .print-footer {
+    display: none;
+  }
+
   @media print {
     .print-overlay,
     step-paginator {
       display: none;
     }
+
+    .print-footer {
+      display: block;
+      width: 100%;
+      height: 150rem;
+    }
   }
+}
+
+@page {
+  size: portrait;
 }

@@ -5,13 +5,13 @@
 } @else {
   @if (showBothRanges$ | async) {
     <step-form-field>
-      <step-label>Full range</step-label>
+      <step-label>Execution time</step-label>
       <input type="text" readonly [ngModel]="fullRange" [size]="fullRange.length" />
     </step-form-field>
   }
   <step-form-field>
     @if (showBothRanges$ | async) {
-      <step-label>Selected range</step-label>
+      <step-label>Filtered time</step-label>
     }
     <input type="text" readonly [ngModel]="selectedRange" [size]="selectedRange.length" />
   </step-form-field>

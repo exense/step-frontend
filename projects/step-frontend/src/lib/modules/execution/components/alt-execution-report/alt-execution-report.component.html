@@ -30,6 +30,9 @@
     @if (_state.currentOperations$ | async; as currentOperations) {
       <step-alt-report-current-operations [operations]="currentOperations" />
     }
+    @if (mode === ViewMode.PRINT) {
+      <div class="print-footer"></div>
+    }
   </section>
 }
 @if (mode === ViewMode.PRINT) {
