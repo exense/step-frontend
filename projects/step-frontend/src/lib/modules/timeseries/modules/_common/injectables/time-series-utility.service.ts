@@ -20,7 +20,7 @@ export class TimeSeriesUtilityService {
   private _schedulerService = inject(SchedulerService);
 
   getExecutions(ids: string[]): Observable<Execution[]> {
-    return this._executionService.getExecutionsByIds(ids);
+    return this._executionService.searchByIds(ids);
   }
 
   getPlans(ids: string[]): Observable<Plan[]> {
