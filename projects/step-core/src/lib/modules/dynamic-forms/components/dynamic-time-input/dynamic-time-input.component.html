@@ -29,5 +29,6 @@
     (displayMeasureChange)="displayMeasureChange.emit($event)"
     (toggleDynamicExpression)="toggleDynamicExpression(true)"
     (blur)="onBlur()"
+    [disabled]="isDisabled"
   />
 }

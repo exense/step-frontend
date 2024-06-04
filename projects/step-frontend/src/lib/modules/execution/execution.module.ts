@@ -43,6 +43,7 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
+import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -103,6 +104,7 @@ import { AltExecutionRangePrintComponent } from './components/alt-execution-rang
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
+    ExecutionDurationComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -142,6 +144,7 @@ import { AltExecutionRangePrintComponent } from './components/alt-execution-rang
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionSelectionTableComponent,
+    ExecutionDurationComponent,
     StatusComponent,
     AltExecutionsComponent,
     AltExecutionProgressComponent,
