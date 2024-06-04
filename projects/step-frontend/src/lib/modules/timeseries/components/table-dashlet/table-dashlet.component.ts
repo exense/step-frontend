@@ -208,7 +208,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
       groupDimensions: this.getGroupDimensions(context),
-      oqlFilter: FilterUtils.filtersToOQL(this.getFilterItems(context), 'attributes'),
+      oqlFilter: this.composeRequestFilter(),
       numberOfBuckets: 1,
       percentiles: [80, 90, 99],
     };
@@ -375,10 +375,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
-  hideSeries(key: string): void {}
-
-  showSeries(key: string): void {}
-
   private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
     const baseDimensions = this.getGroupDimensions(this.context);
     const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
@@ -479,6 +475,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   getType(): 'TABLE' | 'CHART' {
     return 'TABLE';
+  }
+
+  getContext(): TimeSeriesContext {
+    return this.context;
+  }
+
+  getItem(): DashboardItem {
+    return this.item;
   }
 }
 

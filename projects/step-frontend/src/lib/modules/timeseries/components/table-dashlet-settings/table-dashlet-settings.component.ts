@@ -38,6 +38,7 @@ export class TableDashletSettingsComponent implements OnInit {
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
   metricTypes: MetricType[] = [];
+  allAttributes: MetricAttribute[] = [];
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
@@ -46,6 +47,10 @@ export class TableDashletSettingsComponent implements OnInit {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
+    this.allAttributes = this._inputData.context
+      .getAllAttributes()
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
+    console.log(this.allAttributes);
   }
 
   private fetchMetricTypes() {
