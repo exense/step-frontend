@@ -1,3 +1,6 @@
+import { SeriesStroke } from './series-stroke';
+import { MarkerType } from '@exense/step-core';
+
 const PREDEFINED_COLORS: Record<string, string> = {
   TECHNICAL_ERROR: '#000000',
   FAILED: '#d9534f',
@@ -14,40 +17,54 @@ const PREDEFINED_COLORS: Record<string, string> = {
  * If more keys are requested, new random colors will be generated and stored in the pool.
  */
 export class TimeseriesColorsPool {
-  static readonly NO_STATUS = 'No status';
-  static readonly GREY_COLOR = '#cccccc';
+  static readonly STROKE_TYPES: MarkerType[] = [MarkerType.SQUARE, MarkerType.DASHED, MarkerType.DOTS];
 
   private predefinedColors: string[];
-  private assignedColors: { [key: string]: string } = {}; // every unique key has a unique color assigned
+  private assignedColors: { [key: string]: SeriesStroke } = {}; // every unique key has a unique color assigned
+  private nextPredefinedColorsIndex = 0;
 
   constructor() {
-    this.predefinedColors = [...colors];
+    this.predefinedColors = defaultColors;
   }
 
   /**
    * @param key - If it is not new, the existing value will be returned, otherwise a new color is generated.
    */
-  assignColor(key: string): string {
-    let color;
-    if (this.predefinedColors.length == 0) {
-      color = this.randomRGBA();
+  private assignColor(key: string): SeriesStroke {
+    let stroke: SeriesStroke;
+    const alreadyAssignedStrokes = Object.keys(this.assignedColors).length;
+    if (alreadyAssignedStrokes >= this.predefinedColors.length * TimeseriesColorsPool.STROKE_TYPES.length) {
+      // there are no more 'predefined' options for next series
+      stroke = { type: MarkerType.SQUARE, color: this.randomRGB() };
     } else {
-      color = this.predefinedColors[0];
-      this.predefinedColors.shift();
+      const existingColor = this.predefinedColors[this.nextPredefinedColorsIndex++];
+      if (this.nextPredefinedColorsIndex === this.predefinedColors.length) {
+        this.nextPredefinedColorsIndex = 0;
+      }
+      const strokeType =
+        TimeseriesColorsPool.STROKE_TYPES[Math.trunc(alreadyAssignedStrokes / this.predefinedColors.length)];
+      stroke = { type: strokeType, color: existingColor };
+      if (!existingColor) {
+        throw new Error(key);
+      }
     }
-    this.assignedColors[key] = color;
-    return color;
+    this.assignedColors[key] = stroke;
+    return stroke;
   }
 
   /**
    * Return the color for a given key. If the key has no color attached, a new one will be created.
-   * @param key
    */
-  getColor(key: string): string {
+  getSeriesColor(key: string): SeriesStroke {
     if (this.assignedColors[key]) {
       return this.assignedColors[key];
     } else {
-      return PREDEFINED_COLORS[key] || this.assignColor(key);
+      let predefinedcolor = PREDEFINED_COLORS[key];
+      if (predefinedcolor) {
+        return { color: predefinedcolor, type: MarkerType.SQUARE };
+      } else {
+        return this.assignColor(key);
+      }
     }
   }
 
@@ -55,7 +72,8 @@ export class TimeseriesColorsPool {
     const rgb = this.randomRGB();
     // Generate alpha value (0.5 to 1 range)
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
-    const alpha = Math.max(Number(Math.random().toFixed(1)), 0.5);
+    // const alpha = Math.max(Number(Math.random().toFixed(1)), 0.5);
+    const alpha = 0.3;
     const alphaHex = toHex(Math.round(alpha * 255));
     return `${rgb}${alphaHex}`;
   }
@@ -64,41 +82,38 @@ export class TimeseriesColorsPool {
     // Convert a number to a 2-digit hexadecimal string
     const toHex = (num: number) => num.toString(16).padStart(2, '0');
 
-    // Generate RGB values
-    const red = Math.round(Math.random() * 255);
-    const green = Math.round(Math.random() * 255);
-    const blue = Math.round(Math.random() * 255);
+    // Generate random RGB values - don't go up to 255 to be more visible
+    const red = Math.round(Math.random() * 200 + 30);
+    const green = Math.round(Math.random() * 200 + 30);
+    const blue = Math.round(Math.random() * 200 + 30);
 
     return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
   }
-
-  /**
-   * These colors are globally scoped. Every pool will share the same status colors. When a color is requested for a new status, a new color is created.
-   * @param status
-   */
-  getStatusColor(status: string): string {
-    if (!status) {
-      return statusColors[TimeseriesColorsPool.NO_STATUS];
-    } else {
-      let foundColor = statusColors[status.toLowerCase()];
-      if (!foundColor) {
-        foundColor = this.randomRGBA();
-        statusColors[status.toLowerCase()] = foundColor;
-      }
-      return foundColor;
-    }
-  }
 }
 
-const colors = ['#0082CB', '#23ad9d', '#8c13ff'];
-
-const statusColors: { [key: string]: string } = {
-  technical_error: '#000000',
-  failed: '#d9534f',
-  interrupted: '#f9c038',
-  passed: '#5cb85c',
-  skipped: '#a0a0a0',
-  norun: '#a0a0a0',
-  running: '#337ab7',
-  [TimeseriesColorsPool.NO_STATUS]: TimeseriesColorsPool.GREY_COLOR,
-};
+const defaultColors = [
+  '#0050aa',
+  '#32aaa0',
+  '#ff8613',
+  '#6758ff',
+  '#2f95d0',
+  '#29a136',
+  '#8400b9',
+  '#dc5959',
+  '#266428',
+  '#b167cf',
+  '#5eb766',
+  '#b0af00',
+  '#792900',
+  '#75a630',
+  '#b24e11',
+  '#26399b',
+  '#c42d8b',
+  '#4995c4',
+  '#27856c',
+  '#c75c12',
+  '#50cb9c',
+  '#a97800',
+  '#b74fbe',
+  '#814d10',
+];
