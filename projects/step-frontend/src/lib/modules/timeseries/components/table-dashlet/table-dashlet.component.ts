@@ -16,7 +16,7 @@ import {
   FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
@@ -95,7 +95,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
@@ -406,7 +406,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const requestTypesIndexes: Record<string, number> = {}; // used for fast access of responses
     requestTypes.forEach((type, i) => (requestTypesIndexes[type] = i));
     const requests$ = requestTypes.map((entityType) =>
-      this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entitiesByTypes[entityType]), entityType),
+      this._timeSeriesEntityService.getEntityNames(Array.from(entitiesByTypes[entityType]), entityType),
     );
     if (requests$.length === 0) {
       return of(data);
