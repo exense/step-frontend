@@ -104,7 +104,7 @@ export class StandaloneChartComponent implements OnChanges {
         labelItems = [this.metricKey];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const color = this.colorsPool.getColor(seriesKey);
+      const color = this.colorsPool.getSeriesColor(seriesKey).color;
 
       const seriesData: (number | undefined | null)[] = [];
       seriesBuckets.forEach((b, i) => {
