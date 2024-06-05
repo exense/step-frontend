@@ -294,7 +294,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
       if (groupDimensions.length === 0) {
-        labelItems = [this.item.metricKey];
+        labelItems = [this.context.getMetric(this.item.metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
       const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
