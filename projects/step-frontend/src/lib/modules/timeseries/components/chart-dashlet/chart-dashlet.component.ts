@@ -440,7 +440,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
                 } else {
                   newLabel = labelId + ' (unresolved)';
                 }
-                // this.chart.setLabelItem(s.id, i, newLabel);
                 s.labelItems[i] = newLabel;
               }
             });
