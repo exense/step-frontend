@@ -1,6 +1,4 @@
 import { DashboardItem, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
-import { FilterBarItem } from '../filter/filter-bar-item';
 import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { TsFilteringSettings } from '../filter/ts-filtering-settings';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
