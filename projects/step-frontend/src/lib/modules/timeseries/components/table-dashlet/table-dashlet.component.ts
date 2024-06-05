@@ -326,9 +326,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         ...responseBucket,
         seriesKey: seriesKey,
         stroke: context.getStrokeColor(seriesKey),
-        avg: Math.trunc(responseBucket.sum / responseBucket.count),
-        tps: Math.trunc(responseBucket.count / ((response.end! - response.start!) / 1000)),
-        tph: Math.trunc((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),
+        avg: Math.round(responseBucket.sum / responseBucket.count),
+        tps: Math.round(responseBucket.count / ((response.end! - response.start!) / 1000)),
+        tph: Math.round((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),
         selected: syncGroup.seriesShouldBeVisible(seriesKey),
       } as ProcessedBucket;
     });
