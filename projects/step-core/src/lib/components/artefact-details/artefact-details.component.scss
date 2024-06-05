@@ -52,7 +52,7 @@ step-artefact-details {
     z-index: 1000 !important;
   }
 
-  .call-plan {
+  .call-plan:not(.call-direct-plan) {
     .artefact-hint {
       top: 3rem;
       left: 1rem;
@@ -60,6 +60,11 @@ step-artefact-details {
 
     input {
       padding-left: 3.5rem;
+    }
+  }
+  .call-direct-plan {
+    .artefact-hint {
+      display: none;
     }
   }
 

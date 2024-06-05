@@ -31,9 +31,9 @@
       </section>
     }
     @if (!!artefactMeta?.component) {
-      @if (artefactMeta!.label === 'CallPlan' || artefactMeta!.label === 'CallKeyword') {
-        <section class="editor plan-or-keyword" [ngClass]="{ 'call-plan': artefactMeta!.label === 'CallPlan' }">
-          <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label"></step-icon>
+      @if (isPlan || isKeyword) {
+        <section class="editor plan-or-keyword" [ngClass]="{ 'call-plan': isPlan, 'call-direct-plan': isDirectPlan }">
+          <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label" />
           <step-custom-item-render
             id="call-name-input"
             [artefactId]="artefact.id"
