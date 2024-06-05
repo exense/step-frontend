@@ -14,10 +14,6 @@ export interface TimeSeriesContextParams {
   attributes?: MetricAttribute[];
   grouping: string[];
   colorsPool?: TimeseriesColorsPool;
-  /**
-   * @Deprecated
-   */
-  keywordsContext?: TimeSeriesKeywordsContext;
   syncGroups?: TimeSeriesSyncGroup[];
   filteringSettings: TsFilteringSettings;
   editMode?: boolean;

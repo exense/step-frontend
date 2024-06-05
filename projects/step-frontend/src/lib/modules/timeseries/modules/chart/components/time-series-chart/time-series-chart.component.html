@@ -42,7 +42,7 @@
           @for (item of legendSettings.items; track item.label) {
             @if (item.isVisible) {
               <div class="item">
-                <step-marker [markerType]="legendMarker" [color]="item.color" />
+                <step-marker [markerType]="item.strokeType" [color]="item.color" />
                 <div class="item-label" [title]="item.label">{{ item.label }}</div>
               </div>
             }

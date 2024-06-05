@@ -2,14 +2,13 @@ import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 
 import { DashboardItem, Execution, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
-import { FilterBarItem } from '../filter/filter-bar-item';
 import { TsFilteringSettings } from '../filter/ts-filtering-settings';
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { FilterUtils } from '../filter/filter-utils';
 import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
+import { SeriesStroke } from './series-stroke';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -47,10 +46,6 @@ export class TimeSeriesContext {
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
-  /**
-   * @Deprecated
-   */
-  public readonly keywordsContext: TimeSeriesKeywordsContext;
   public readonly colorsPool: TimeseriesColorsPool;
 
   private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
@@ -78,7 +73,6 @@ export class TimeSeriesContext {
       ) || {};
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
-    this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
     params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
@@ -131,8 +125,8 @@ export class TimeSeriesContext {
     Object.keys(this.syncGroups).forEach((key) => this.syncGroups[key]?.destroy());
   }
 
-  getColor(key: string): string {
-    return this.colorsPool.getColor(key);
+  getStrokeColor(key: string): SeriesStroke {
+    return this.colorsPool.getSeriesColor(key);
   }
 
   getSyncGroup(key: string): TimeSeriesSyncGroup {

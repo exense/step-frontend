@@ -1,8 +1,10 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
+  AxesSettings,
   BucketResponse,
   DashboardItem,
   FetchBucketsRequest,
+  MarkerType,
   MetricAttribute,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -27,11 +29,18 @@ import { Axis } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
+import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 
 declare const uPlot: any;
 
 interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
+}
+
+interface RateUnit {
+  menuLabel: string;
+  unitLabel: string;
+  tphMultiplier: number;
 }
 
 @Component({
@@ -44,6 +53,12 @@ interface MetricAttributeSelection extends MetricAttribute {
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+
+  readonly RATE_UNITS: RateUnit[] = [
+    { menuLabel: 'Per hour', unitLabel: 'h', tphMultiplier: 1 },
+    { menuLabel: 'Per minute', unitLabel: 'm', tphMultiplier: 1 / 60 },
+    { menuLabel: 'Per second', unitLabel: 's', tphMultiplier: 1 / 3600 },
+  ];
 
   readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
@@ -77,11 +92,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   selectedPclValue?: number;
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
+  selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
 
   syncGroupSubscription?: Subscription;
+  cachedResponse?: TimeSeriesAPIResponse;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -168,6 +185,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.refresh(true).subscribe();
   }
 
+  switchRateUnit(unit: RateUnit) {
+    this.selectedRateUnit = unit;
+    if (this.cachedResponse) {
+      this.createChart(this.cachedResponse);
+    } else {
+      this.fetchDataAndCreateChart();
+    }
+  }
+
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe();
@@ -233,6 +259,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
+  private getSeriesStroke(id: string, axes: AxesSettings): SeriesStroke {
+    const hasGrouping = this.getGroupDimensions()?.length > 0;
+    if (!hasGrouping) {
+      return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
+    }
+    const customSeriesColor = axes.renderingSettings?.seriesColors?.[id];
+    if (customSeriesColor) {
+      return { color: customSeriesColor, type: MarkerType.SQUARE };
+    }
+    return this.context.colorsPool.getSeriesColor(id);
+  }
+
   /**
    * When there is no grouping, the key and label will be 'Value'.
    * If there are grouping, all empty elements will be replaced with an empty label
@@ -259,8 +297,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         labelItems = [this.context.getMetric(this.item.metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const color =
-        primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.colorsPool.getColor(seriesKey);
+      const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
@@ -291,12 +328,25 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: seriesData,
         metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: color,
+        strokeConfig: stroke,
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      switch (stroke.type) {
+        case MarkerType.SQUARE:
+          s.width = 1;
+          break;
+        case MarkerType.DASHED:
+          s.dash = [10, 5];
+          s.width = 1;
+          break;
+        case MarkerType.DOTS:
+          s.width = 2;
+          s.dash = [2, 2];
+          break;
+      }
       if (primaryAxes.colorizationType === 'FILL') {
-        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
       }
       if (hasSteppedDisplay) {
         s.paths = this.stepped({ align: 1 });
@@ -334,9 +384,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         grid: { show: false },
       });
       series.unshift({
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+        scale: 'z',
         labelItems: ['Total'],
         id: 'total',
+        strokeConfig: { color: '', type: MarkerType.SQUARE },
         data: secondaryAxesData,
         value: (x, v: number) => Math.trunc(v) + ' total',
         fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
@@ -377,7 +428,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
     switch (aggregation) {
       case ChartAggregation.RATE:
-        return 'Total Hits/h';
+        return 'Total Hits/' + this.selectedRateUnit.unitLabel;
       default:
         return 'Overall ' + aggregation;
     }
@@ -414,6 +465,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
+        this.cachedResponse = response;
         this.createChart(response);
       }),
     );
@@ -481,7 +533,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private getAxesFormatFunction(aggregation: ChartAggregation, unit?: string): (v: number) => string {
     if (aggregation === ChartAggregation.RATE) {
-      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
+      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + this.selectedRateUnit.unitLabel;
     }
     if (!unit) {
       return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
@@ -500,7 +552,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private getUnitLabel(aggregation: ChartAggregation, unit: string): string {
     if (aggregation === 'RATE') {
-      return '/ h';
+      return '/ ' + this.selectedRateUnit.unitLabel;
     }
     switch (unit) {
       case '%':
@@ -545,7 +597,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'COUNT':
         return b.count;
       case 'RATE':
-        return b.throughputPerHour;
+        return b.throughputPerHour * this.selectedRateUnit.tphMultiplier;
       case 'MEDIAN':
         return b.pclValues?.[50];
       case 'PERCENTILE':
