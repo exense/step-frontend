@@ -16,6 +16,13 @@ export class OQLBuilder {
     return this;
   }
 
+  conditionalAppend(condition: boolean, clause?: string) {
+    if (condition) {
+      this.append(clause);
+    }
+    return this;
+  }
+
   append(clause?: string): OQLBuilder {
     if (clause) {
       this.clauses.push(clause);
