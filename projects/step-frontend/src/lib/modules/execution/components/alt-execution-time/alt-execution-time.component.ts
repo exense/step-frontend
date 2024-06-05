@@ -1,17 +1,32 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { DateFormat, DurationPipe, Execution } from '@exense/step-core';
+import {
+  DateFormat,
+  DateRangeAdapterService,
+  DateSingleAdapterService,
+  DurationPipe,
+  Execution,
+  STEP_DATE_TIME_FORMAT_PROVIDERS,
+} from '@exense/step-core';
 import { DatePipe } from '@angular/common';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-alt-execution-time',
   templateUrl: './alt-execution-time.component.html',
   styleUrl: './alt-execution-time.component.scss',
-  providers: [DatePipe, DurationPipe],
+  providers: [
+    DatePipe,
+    DurationPipe,
+    STEP_DATE_TIME_FORMAT_PROVIDERS,
+    DateSingleAdapterService,
+    DateRangeAdapterService,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltExecutionTimeComponent {
   private _datePipe = inject(DatePipe);
   private _durationPipe = inject(DurationPipe);
+  private _dateRangeAdapter = inject(DateRangeAdapterService);
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
@@ -32,5 +47,12 @@ export class AltExecutionTimeComponent {
       return '';
     }
     return this._durationPipe.transform(execution.endTime, execution.startTime);
+  });
+
+  readonly dateTooltip = computed(() => {
+    const { startTime, endTime } = this.execution() ?? {};
+    const start = startTime ? DateTime.fromMillis(startTime) : undefined;
+    const end = endTime ? DateTime.fromMillis(endTime) : undefined;
+    return this._dateRangeAdapter.format({ start, end }, true);
   });
 }

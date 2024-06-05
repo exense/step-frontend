@@ -20,6 +20,28 @@
     >
       <step-icon name="play-circle" aria-hidden="true" />
     </button>
+    @if (allowExecuteWithContent()) {
+      <button
+        type="button"
+        mat-icon-button
+        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated()"
+        aria-label="Left Align"
+        matTooltip="New execution with parameters"
+        [matMenuTriggerFor]="executionContent"
+      >
+        <step-icon name="plus-circle" aria-hidden="true" />
+      </button>
+      <mat-menu #executionContent="matMenu">
+        <span
+          class="execution-content"
+          mat-menu-item
+          [disableRipple]="true"
+          (click)="$event.stopImmediatePropagation()"
+        >
+          <ng-content select="step-execution-actions-execute-content" />
+        </span>
+      </mat-menu>
+    }
     <button
       type="button"
       mat-icon-button

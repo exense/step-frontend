@@ -16,4 +16,12 @@ step-status {
   @each $status, $color in var.$statuses {
     @include status($status, $color);
   }
+
+  &.full-width {
+    display: block;
+    width: 100%;
+    .status {
+      width: 100%;
+    }
+  }
 }

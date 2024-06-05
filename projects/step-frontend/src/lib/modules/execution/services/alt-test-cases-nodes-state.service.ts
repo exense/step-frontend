@@ -5,6 +5,6 @@ import { AltExecutionStateService } from './alt-execution-state.service';
 @Injectable()
 export class AltTestCasesNodesStateService extends AltReportNodesStateService {
   constructor(_executionState: AltExecutionStateService) {
-    super(_executionState.testCases$);
+    super(_executionState.testCases$, 'testCases');
   }
 }

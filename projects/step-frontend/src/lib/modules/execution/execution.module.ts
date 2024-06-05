@@ -50,7 +50,6 @@ import { AltExecutionReportComponent } from './components/alt-execution-report/a
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
 import { AltReportNodeSummaryComponent } from './components/alt-keywords-summary/alt-report-node-summary.component';
 import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
-import { AltStatusComponent } from './components/alt-status/alt-status.component';
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
 import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
@@ -72,6 +71,7 @@ import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
 import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
+import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 
 @NgModule({
   declarations: [
@@ -114,7 +114,6 @@ import { AltExecutionRangePrintComponent } from './components/alt-execution-rang
     AltReportNodeSummaryComponent,
     AltReportNodeListComponent,
     AltExecutionTimeComponent,
-    AltStatusComponent,
     AltReportPerformanceOverviewChartComponent,
     AltReportCurrentOperationsComponent,
     AltReportWidgetComponent,
@@ -131,6 +130,7 @@ import { AltExecutionRangePrintComponent } from './components/alt-execution-rang
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
+    ExecutionActionsExecuteContentDirective,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

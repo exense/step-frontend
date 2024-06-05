@@ -13,17 +13,3 @@
     @include reportNodeStatus($status, $color);
   }
 }
-
-@mixin altStatus($status, $color, $background) {
-  .step-node-alt-status-#{$status} {
-    background: $background;
-    color: $color;
-  }
-}
-
-@mixin altStatuses {
-  @each $status, $backgroundColor in var.$alt-statuses {
-    $color: map.get(var.$statuses, $status);
-    @include altStatus($status, $color, $backgroundColor);
-  }
-}

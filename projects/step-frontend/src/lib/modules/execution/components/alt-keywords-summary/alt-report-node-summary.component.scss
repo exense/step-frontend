@@ -1,12 +1,24 @@
 step-alt-report-node-summary {
   step-alt-report-widget-content {
-    display: block;
-    height: 28rem;
+    display: grid;
+    grid-template-columns: auto 26rem;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.5rem;
+
+    padding-bottom: 2rem;
+    height: 26rem;
 
     canvas {
-      margin: 0 auto;
       width: 26rem !important;
       height: 26rem !important;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+      align-items: center;
     }
   }
 }

@@ -16,7 +16,9 @@
       </h3>
       <div class="sub-title">
         <step-alt-execution-time [execution]="execution" />
-        <step-status [status]="execution?.status" />
+        @if (displayStatus$ | async; as status) {
+          <step-status [status]="status" />
+        }
         <div class="user">{{ execution.executionParameters?.userID }}</div>
         <step-popover class="details-hint" yPosition="below">
           <step-icon name="help-circle" />
@@ -27,6 +29,7 @@
               [showMode]="false"
               [showUser]="false"
               [showExecutionId]="false"
+              [showDates]="false"
             />
           </step-popover-content>
         </step-popover>

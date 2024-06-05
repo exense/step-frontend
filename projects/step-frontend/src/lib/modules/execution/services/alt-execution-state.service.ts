@@ -4,6 +4,7 @@ import { FormControl } from '@angular/forms';
 
 export abstract class AltExecutionStateService {
   abstract readonly dateRangeCtrl: FormControl<DateRange | null | undefined>;
+  abstract readonly executionIdSnapshot?: string;
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;
   abstract readonly executionFulLRange$: Observable<DateRange | null | undefined>;

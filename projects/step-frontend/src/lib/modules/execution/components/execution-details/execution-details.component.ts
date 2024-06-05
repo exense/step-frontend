@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { Execution } from '@exense/step-core';
 
 @Component({
@@ -23,5 +23,13 @@ export class ExecutionDetailsComponent {
   showExecutionId = input(true);
 
   /** @Input() **/
+  showDates = input(true);
+
+  /** @Input() **/
   execution = input<Execution>();
+
+  protected status = computed(() => {
+    const execution = this.execution();
+    return execution?.status === 'ENDED' ? execution?.result : execution?.status;
+  });
 }

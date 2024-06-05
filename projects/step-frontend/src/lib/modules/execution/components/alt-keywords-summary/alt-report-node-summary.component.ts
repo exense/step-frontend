@@ -114,6 +114,9 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
           duration: this.mode() === ViewMode.PRINT ? 0 : 500,
         },
         plugins: {
+          legend: {
+            display: false,
+          },
           datalabels: {
             color: '#fff',
             formatter: (value, context) => {

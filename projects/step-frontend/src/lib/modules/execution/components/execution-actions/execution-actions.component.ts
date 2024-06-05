@@ -14,6 +14,9 @@ export class ExecutionActionsComponent {
   /** @Input() **/
   isExecutionIsolated = input(false);
 
+  /** @Input() **/
+  allowExecuteWithContent = input(false);
+
   /** @Output() **/
   execute = output<boolean>();
 

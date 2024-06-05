@@ -31,6 +31,9 @@ import { AltExecutionTabsService } from '../../services/alt-execution-tabs.servi
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
+import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
+
+const rangeKey = (executionId: string) => `${executionId}_range`;
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -82,17 +85,27 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   private _fb = inject(FormBuilder);
   private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
   private _dateUtils = inject(DateUtilsService);
+  private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   private isTreeInitialized = false;
 
   private relativeTime?: number;
 
+  get executionIdSnapshot(): string {
+    const routeSnapshot = this._activatedRoute.snapshot;
+    return routeSnapshot.params?.['id'] ?? '';
+  }
+
   updateRelativeTime(time?: number) {
     this.relativeTime = time;
   }
 
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
+
+  private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
+    .pipe(takeUntilDestroyed())
+    .subscribe((range) => this.saveRangeToStorage(range));
 
   private dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -141,6 +154,12 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
 
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly displayStatus$ = this.execution$.pipe(
+    map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
   );
 
   readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
@@ -198,17 +217,24 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   ngOnInit(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
       this.refreshExecutionTree(execution);
-      this.applyDefaultRange(execution);
+      this.applyDefaultRange(execution, true);
     });
   }
 
-  private getDefaultRangeForExecution(execution: Execution): DateRange {
+  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
     let start: DateTime;
     let end: DateTime;
 
     if (execution.endTime) {
-      start = DateTime.fromMillis(execution.startTime!);
-      end = DateTime.fromMillis(execution.endTime);
+      const storedRange = useStorage ? this._executionStorage.getItem(rangeKey(execution.id!)) : undefined;
+      if (storedRange) {
+        const parsed = JSON.parse(storedRange) as { start?: number; end?: number };
+        start = DateTime.fromMillis(parsed.start ?? execution.startTime!);
+        end = DateTime.fromMillis(parsed.end ?? execution.endTime);
+      } else {
+        start = DateTime.fromMillis(execution.startTime!);
+        end = DateTime.fromMillis(execution.endTime);
+      }
     } else if (this.relativeTime) {
       end = DateTime.now();
       start = end.set({ millisecond: end.millisecond - this.relativeTime });
@@ -218,6 +244,16 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
     }
 
     return { start, end };
+  }
+
+  private saveRangeToStorage(range?: DateRange | null): void {
+    const executionId = this.executionIdSnapshot;
+    if (!range || !executionId) {
+      return;
+    }
+    const start = range.start?.toMillis();
+    const end = range.end?.toMillis();
+    this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
   }
 
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
@@ -230,34 +266,13 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
     this._activeExecutions.getActiveExecution(executionId)?.manualRefresh();
   }
 
-  private applyDefaultRange(execution: Execution): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution));
+  private applyDefaultRange(execution: Execution, useStorage = false): void {
+    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
   }
 
   private refreshExecutionTree(execution: Execution): void {
     this._aggregatedTreeState
       .loadTree(execution.id!)
       .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
-    /*
-    const isForceRefresh = execution.status === 'ENDED';
-
-    const expandedNodeIds = this._executionTreeState.getExpandedNodeIds();
-    this._treeUtils
-      .loadNodes(execution.id!)
-      .pipe(
-        map((nodes) => nodes[0]),
-        switchMap((rootNode) => {
-          if (!rootNode || !this.isTreeInitialized || isForceRefresh) {
-            return of(rootNode);
-          }
-          return this._treeUtils.restoreTree(rootNode, expandedNodeIds);
-        }),
-        filter((rootNode) => !!rootNode),
-      )
-      .subscribe((rootNode) => {
-        this._executionTreeState.init(rootNode, { expandAllByDefault: false });
-        this.isTreeInitialized = true;
-      });
-*/
   }
 }

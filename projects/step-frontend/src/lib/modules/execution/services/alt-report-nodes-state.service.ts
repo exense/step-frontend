@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
@@ -10,22 +10,29 @@ import {
   take,
   Observable,
   iif,
-  Subject,
   BehaviorSubject,
+  distinctUntilChanged,
 } from 'rxjs';
 import { ReportNode } from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { AltExecutionStorageService } from './alt-execution-storage.service';
 
 type ReportNodeStatus = ReportNode['status'];
 
 @Injectable()
 export abstract class AltReportNodesStateService implements OnDestroy {
-  protected constructor(nodes$: Observable<ReportNode[] | undefined>) {
+  protected constructor(
+    nodes$: Observable<ReportNode[] | undefined>,
+    private storagePrefix: string,
+  ) {
     nodes$.pipe(takeUntilDestroyed()).subscribe(this.nodes$);
+    this.setupSyncWithStorage();
   }
 
+  private _destroyRef = inject(DestroyRef);
+  private _executionStorage = inject(AltExecutionStorageService);
   private _activatedRoute = inject(ActivatedRoute);
   private _executionState = inject(AltExecutionStateService);
   private _fb = inject(FormBuilder);
@@ -68,6 +75,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     debounceTime(200),
     shareReplay(1),
     map((value) => (value ?? '').trim().toLowerCase()),
+    takeUntilDestroyed(),
   );
 
   private readonly filteredNodes$ = combineLatest([
@@ -163,5 +171,66 @@ export abstract class AltReportNodesStateService implements OnDestroy {
       return '';
     }
     return `Search: ${searchText}`;
+  }
+
+  private searchKey(executionId: string): string {
+    return `${executionId}_${this.storagePrefix}_search`;
+  }
+
+  private saveSearch(search?: string | null): void {
+    const executionId = this._executionState.executionIdSnapshot;
+    if (executionId && search) {
+      this._executionStorage.setItem(this.searchKey(executionId), search);
+    }
+  }
+
+  private restoreSearch(executionId: string): void {
+    if (!executionId) {
+      return;
+    }
+    const search = this._executionStorage.getItem(this.searchKey(executionId));
+    if (search) {
+      this.searchCtrl.setValue(search);
+    }
+  }
+
+  private statusesKey(executionId: string): string {
+    return `${executionId}_${this.storagePrefix}_statuses`;
+  }
+
+  private saveStatuses(statuses?: ReportNodeStatus[] | null): void {
+    const executionId = this._executionState.executionIdSnapshot;
+    if (executionId && statuses?.length) {
+      const statusesString = statuses.join('|');
+      this._executionStorage.setItem(this.statusesKey(executionId), statusesString);
+    }
+  }
+
+  private restoreStatues(executionId: string): void {
+    if (!executionId) {
+      return;
+    }
+    const statusesString = this._executionStorage.getItem(this.statusesKey(executionId));
+    if (statusesString) {
+      const statuses = statusesString.split('|') as ReportNodeStatus[];
+      this.statusesCtrl.setValue(statuses);
+    }
+  }
+
+  private setupSyncWithStorage(): void {
+    this._executionState.executionId$
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this._destroyRef))
+      .subscribe((executionID) => {
+        this.restoreSearch(executionID);
+        this.restoreStatues(executionID);
+      });
+
+    this.statusesCtrl.valueChanges
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((statuses) => this.saveStatuses(statuses));
+
+    this.searchCtrl.valueChanges
+      .pipe(debounceTime(200), takeUntilDestroyed(this._destroyRef))
+      .subscribe((search) => this.saveSearch(search));
   }
 }

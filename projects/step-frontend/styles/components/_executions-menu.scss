@@ -1,15 +1,10 @@
+@use './custom-menu' as customMenu;
+
 @mixin executions-menu {
-  span.mat-mdc-menu-item.execution-menu {
-    height: auto;
-    font-size: inherit;
-    line-height: initial;
-    font-weight: initial;
+  @include customMenu.custom-menu('execution-menu');
+  $menu-selector: customMenu.custom-menu-selector('execution-menu');
 
-    &.cdk-program-focused:not([disabled]),
-    &:hover:not([disabled]) {
-      background: transparent;
-    }
-
+  #{$menu-selector} {
     .interactive-parameters,
     step-execution-commands {
       width: 25rem;

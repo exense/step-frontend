@@ -1,5 +1,21 @@
 <step-alt-report-widget [title]="title()">
   <step-alt-report-widget-content>
+    @if (summary(); as summary) {
+      <section class="summary">
+        @if (summary.passed > 0) {
+          <step-status status="PASSED" class="full-width" />
+          <span>{{ summary.passed }}</span>
+        }
+        @if (summary.running > 0) {
+          <step-status status="RUNNING" class="full-width" />
+          <span>{{ summary.running }}</span>
+        }
+        <step-status status="TECHNICAL_ERROR" class="full-width" />
+        <span>{{ summary.techError }}</span>
+        <step-status status="FAILED" class="full-width" />
+        <span>{{ summary.failed }}</span>
+      </section>
+    }
     <canvas #cnv></canvas>
   </step-alt-report-widget-content>
 </step-alt-report-widget>

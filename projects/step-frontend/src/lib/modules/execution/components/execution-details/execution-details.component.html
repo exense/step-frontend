@@ -1,5 +1,5 @@
 @if (showStatus()) {
-  <step-status [status]="execution()?.status" />
+  <step-status [status]="status()" />
 }
 <ul class="list-unstyled">
   @if (showPlan()) {
@@ -34,12 +34,14 @@
       <strong>User</strong>&nbsp;<span>{{ execution()?.executionParameters?.userID }}</span>
     </li>
   }
-  <li>
-    <strong>Start</strong>&nbsp;<span>{{ execution()?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
-  </li>
-  <li>
-    <strong>End</strong>&nbsp;<span>{{ execution()?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
-  </li>
+  @if (showDates()) {
+    <li>
+      <strong>Start</strong>&nbsp;<span>{{ execution()?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+    </li>
+    <li>
+      <strong>End</strong>&nbsp;<span>{{ execution()?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+    </li>
+  }
   @if (showExecutionId()) {
     <li>
       <strong>Execution ID</strong>&nbsp;<span>{{ execution()?.id }}</span>

@@ -8,7 +8,7 @@
 step-alt-execution-report {
   position: relative;
 
-  section {
+  & > section {
     display: grid;
     grid-template-rows: 33rem;
     gap: 2.4rem;
