@@ -14,7 +14,6 @@ export * from './types/time-series/time-series.config';
 export * from './types/time-series/timeseries-colors-pool';
 export * from './types/time-series/time-series-context-params';
 export * from './types/time-series/time-series-context';
-export * from './types/time-series/time-series-keywords.context';
 export * from './types/oql-builder';
 export * from './types/common-imports.constant';
 export * from './types/throughput-metric-type.enum';

@@ -15,8 +15,6 @@ export type DashboardItem = {
   metricKey: string;
   attributes: Array<MetricAttribute>;
   filters: Array<TimeSeriesFilterItem>;
-  inheritSpecificFiltersOnly: boolean;
-  specificFiltersToInherit: string[];
   oql?: string;
   grouping: Array<string>;
   inheritGlobalFilters: boolean;

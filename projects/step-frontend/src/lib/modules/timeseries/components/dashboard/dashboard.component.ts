@@ -51,7 +51,7 @@ import { TableDashletComponent } from '../table-dashlet/table-dashlet.component'
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -128,7 +128,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.resolution = pageParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
-    this._dashboardService.getDashboardById(this.dashboardId).subscribe((dashboard) => {
+    const metrics$ = this._timeSeriesService.getMetricTypes();
+    const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);
+    forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
+      this.metricTypes = metrics;
       this.initState(pageParams, dashboard);
     });
   }
@@ -169,7 +172,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     });
 
     if (pageParams.editMode && this.hasWritePermission && this.editable) {
-      this.fetchMetricTypes();
       this.enableEditMode();
     }
   }
@@ -217,13 +219,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   enableEditMode() {
     this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
-    if (!this.metricTypes) {
-      this.fetchMetricTypes();
-    }
-  }
-
-  private fetchMetricTypes() {
-    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
   cancelEditMode() {
@@ -262,8 +257,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
-      inheritSpecificFiltersOnly: false,
-      specificFiltersToInherit: [],
       tableSettings: {
         columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
       },
@@ -286,8 +279,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: false,
       inheritGlobalFilters: true,
       inheritGlobalGrouping: true,
-      inheritSpecificFiltersOnly: false,
-      specificFiltersToInherit: [],
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
@@ -364,11 +355,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     );
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
 
-    const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
-      urlFilters,
-      dashboard.filters,
-      this.hiddenFilters,
-    );
+    const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
     this.fetchFilterEntities(visibleFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
@@ -380,13 +367,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       filteringSettings: {
         mode: TsFilteringMode.STANDARD,
         filterItems: visibleFilters,
-        hiddenFilters: this.hiddenFilters,
       },
       resolution: this.resolution,
+      metrics: this.metricTypes,
     });
   }
 
-  private mergeAndExcludeHiddenFilters(
+  private mergeFilters(
     urlFilters: FilterBarItem[],
     dashboardFilters: TimeSeriesFilterItem[],
     hiddenFilters: FilterBarItem[],
@@ -407,7 +394,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       f.isHidden = true;
       visibleFilters = visibleFilters.filter((v) => v.attributeName !== f.attributeName);
     });
-    return visibleFilters;
+    return [...hiddenFilters, ...visibleFilters];
   }
 
   private fetchFilterEntities(items: FilterBarItem[]): void {
@@ -563,6 +550,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       syncGroups: mainState.context.getSyncGroups(),
       defaultFullTimeRange: mainState.context.defaultFullTimeRange,
       resolution: mainState.context.getChartsResolution(),
+      metrics: this.metricTypes,
     });
     const state: DashboardState = {
       context: compareModeContext,
