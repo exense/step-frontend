@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Route } from '@angular/router';
-import { ROUTE_ALIAS } from '../types/quick-access-route';
+import { getAdditionalConfig } from '../types/step-route-additional-config';
 
 @Injectable({
   providedIn: 'root',
@@ -16,10 +16,10 @@ export class QuickAccessRouteService {
     const routesToProceed = [route];
     while (!!routesToProceed.length) {
       const current = routesToProceed.shift()!;
-      const alias = (current as any)[ROUTE_ALIAS];
-      if (!!alias) {
-        delete (current as any)[ROUTE_ALIAS];
-        this.routesDictionary.set(alias, current);
+      const routeAdditionalConfig = getAdditionalConfig(current);
+      if (!!routeAdditionalConfig?.quickAccessAlias) {
+        this.routesDictionary.set(routeAdditionalConfig.quickAccessAlias, current);
+        delete routeAdditionalConfig.quickAccessAlias;
       }
 
       if (!!current.children?.length) {

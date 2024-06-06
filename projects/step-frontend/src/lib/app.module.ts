@@ -23,6 +23,7 @@ import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app
 import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
+import { INFO_BANNER_PROVIDER } from './injectables/info-banner.provider';
 
 Settings.defaultLocale = 'en';
 
@@ -53,6 +54,7 @@ Settings.defaultLocale = 'en';
     LEGACY_URL_HANDLER,
     PLUGINS_INITIALIZER,
     DEFAULT_ROUTE_INITIALIZER,
+    INFO_BANNER_PROVIDER,
     {
       provide: BaseHttpRequest,
       useExisting: StepHttpRequestService,

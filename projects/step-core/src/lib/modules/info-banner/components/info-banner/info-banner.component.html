@@ -1,0 +1,8 @@
+@if (info(); as infoHTML) {
+  <step-alert [type]="AlertType.SUCCESS">
+    <section class="info-container">
+      <div class="message" [innerHTML]="infoHTML"></div>
+      <step-icon class="close" name="x" (click)="closeBanner()" />
+    </section>
+  </step-alert>
+}
