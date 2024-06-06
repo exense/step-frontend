@@ -13,6 +13,23 @@
   }
 </div>
 
+<div class="info-container">
+  <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
+    <step-icon name="filter"></step-icon>
+  </button>
+  <mat-menu #oqlMenu="matMenu">
+    <div class="oql" (click)="$event.stopPropagation()">
+      <div style="transform: scale(0.7)">
+        <step-icon
+          name="help-circle"
+          matTooltip="The OQL represents all the active filters used in the current chart."
+        ></step-icon>
+      </div>
+      <div>{{ requestOql }}</div>
+    </div>
+  </mat-menu>
+</div>
+
 <div class="settings-container">
   <div class="edit-buttons" *ngIf="editMode">
     <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
