@@ -123,4 +123,8 @@ step-table-dashlet {
   flex-direction: row;
   gap: 0.6rem;
   align-items: center;
+
+  step-icon {
+    transform: scale(0.8);
+  }
 }
