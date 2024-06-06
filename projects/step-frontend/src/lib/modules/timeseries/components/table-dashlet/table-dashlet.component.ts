@@ -209,7 +209,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private fetchData(compareData: boolean) {
     const context = compareData ? this.compareContext! : this.context;
-    const oql = this.composeRequestFilter();
+    const oql = this.composeRequestFilter(context);
     if (compareData) {
       this.compareRequestOql = oql;
     } else {
@@ -385,10 +385,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
-  hideSeries(key: string): void {}
-
-  showSeries(key: string): void {}
-
   private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
     const baseDimensions = this.getGroupDimensions(this.context);
     const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
@@ -485,6 +481,13 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       return ((y - x) / x) * 100;
     }
+  }
+
+  getItem(): DashboardItem {
+    return this.item;
+  }
+  getContext(): TimeSeriesContext {
+    throw new Error('Method not implemented.');
   }
 
   getType(): 'TABLE' | 'CHART' {
