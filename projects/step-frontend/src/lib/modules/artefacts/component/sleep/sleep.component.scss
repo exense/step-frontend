@@ -3,3 +3,9 @@
 form {
   @include core.common-form-content;
 }
+
+step-alert {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

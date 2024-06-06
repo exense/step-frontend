@@ -16,7 +16,7 @@ import {
   FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
@@ -38,13 +38,14 @@ import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
+import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 
 export interface TableEntry {
   name: string; // series id
   groupingLabels: string[]; // each grouping attribute will have a label
   base?: ProcessedBucket;
   compare?: ProcessedBucket;
-  color: string;
+  stroke: SeriesStroke;
   isSelected?: boolean;
   countDiff?: number;
   sumDiff?: number;
@@ -60,7 +61,7 @@ export interface TableEntry {
 
 interface ProcessedBucket extends BucketResponse {
   seriesKey: string;
-  color: string;
+  stroke: SeriesStroke;
   avg: number;
   tps: number;
   tph: number;
@@ -94,7 +95,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
@@ -294,7 +295,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         isSelected: this.context
           .getSyncGroup(this.item.id)
           .seriesShouldBeVisible(baseBucket?.seriesKey || compareBucket?.seriesKey),
-        color: baseBucketsByIds[keyword]?.color || compareBucketsByIds[keyword]?.color,
+        stroke: baseBucketsByIds[keyword]?.stroke || compareBucketsByIds[keyword]?.stroke,
         countDiff: this.percentageBetween(baseBucket?.count, compareBucket?.count),
         sumDiff: this.percentageBetween(baseBucket?.sum, compareBucket?.sum),
         avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
@@ -333,10 +334,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       return {
         ...responseBucket,
         seriesKey: seriesKey,
-        color: context.getColor(seriesKey),
-        avg: Math.trunc(responseBucket.sum / responseBucket.count),
-        tps: Math.trunc(responseBucket.count / ((response.end! - response.start!) / 1000)),
-        tph: Math.trunc((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),
+        stroke: context.getStrokeColor(seriesKey),
+        avg: Math.round(responseBucket.sum / responseBucket.count),
+        tps: Math.round(responseBucket.count / ((response.end! - response.start!) / 1000)),
+        tph: Math.round((responseBucket.count / ((response.end! - response.start!) / 1000)) * 3600),
         selected: syncGroup.seriesShouldBeVisible(seriesKey),
       } as ProcessedBucket;
     });
@@ -384,6 +385,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
+  hideSeries(key: string): void {}
+
+  showSeries(key: string): void {}
+
   private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
     const baseDimensions = this.getGroupDimensions(this.context);
     const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
@@ -410,7 +415,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const requestTypesIndexes: Record<string, number> = {}; // used for fast access of responses
     requestTypes.forEach((type, i) => (requestTypesIndexes[type] = i));
     const requests$ = requestTypes.map((entityType) =>
-      this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entitiesByTypes[entityType]), entityType),
+      this._timeSeriesEntityService.getEntityNames(Array.from(entitiesByTypes[entityType]), entityType),
     );
     if (requests$.length === 0) {
       return of(data);
@@ -484,14 +489,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   getType(): 'TABLE' | 'CHART' {
     return 'TABLE';
-  }
-
-  getContext(): TimeSeriesContext {
-    return this.context;
-  }
-
-  getItem(): DashboardItem {
-    return this.item;
   }
 }
 

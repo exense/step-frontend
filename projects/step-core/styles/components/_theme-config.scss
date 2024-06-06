@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 @use 'sass:map';
 @use 'step-tabs';
+@use 'step-ts-marker';
 @use 'step-sidebar';
 @use 'step-header';
 @use 'step-icon';
@@ -168,6 +169,7 @@ $light-primary-text: var.$white;
   @include step-datepicker.datepicker();
   @include step-alert.step-alert();
   @include step-tooltip.tooltip($text-color);
+  @include step-ts-marker.timeseries-marker();
 
   .cdk-overlay-pane {
     z-index: 1050;
