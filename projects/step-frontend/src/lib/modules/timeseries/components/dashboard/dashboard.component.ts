@@ -191,6 +191,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
   }
 
+  handleDashboardDescriptionChange(description: string) {
+    console.log('saving new description', description);
+    this.dashboard.description = description;
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
   handleRefreshIntervalChange(interval: number) {
     this.refreshInterval = interval;
     this.updateUrl();
