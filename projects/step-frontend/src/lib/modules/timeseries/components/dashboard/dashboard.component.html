@@ -50,7 +50,7 @@
           @if (showRefreshOption) {
             <step-autorefresh-toggle
               [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-              [buttonDisabled]="compareModeEnabled"
+              [disableAutoRefreshButton]="compareModeEnabled"
               [interval]="refreshInterval"
               (refresh)="mainEngine.triggerRefresh()"
               (intervalChange)="handleRefreshIntervalChange($event)"

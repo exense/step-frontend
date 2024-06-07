@@ -29,7 +29,7 @@
         <step-btn-group>
           @if (activeExecution) {
             <step-autorefresh-toggle
-              [buttonDisabled]="!showAutoRefreshButton"
+              [disableAutoRefreshButton]="!showAutoRefreshButton"
               [model]="activeExecution!.autoRefreshModel"
             />
           }
