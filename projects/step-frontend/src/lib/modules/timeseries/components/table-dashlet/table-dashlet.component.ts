@@ -115,6 +115,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   baseBuckets: ProcessedBucket[] = []; // for caching
   compareBuckets: ProcessedBucket[] = []; // for caching
 
+  baseRequestOql: string = '';
+  compareRequestOql: string = '';
+
   readonly MarkerType = MarkerType;
 
   ngOnInit(): void {
@@ -131,8 +134,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   refreshCompareData(): Observable<any> {
-    const context = this.compareContext!;
-    return this.fetchData(context).pipe(
+    return this.fetchData(true).pipe(
       tap((response) => {
         this.compareBuckets = response.buckets;
         this.truncated = response.truncated;
@@ -167,6 +169,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.compareModeEnabled = true;
     this.compareContext = context;
     this.compareBuckets = this.baseBuckets;
+    this.compareRequestOql = this.baseRequestOql;
     this.updateVisibleColumns();
     this.updateTableData();
   }
@@ -204,12 +207,19 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return this.item.inheritGlobalGrouping ? context.getGroupDimensions() : this.item.grouping;
   }
 
-  private fetchData(context: TimeSeriesContext) {
+  private fetchData(compareData: boolean) {
+    const context = compareData ? this.compareContext! : this.context;
+    const oql = this.composeRequestFilter(context);
+    if (compareData) {
+      this.compareRequestOql = oql;
+    } else {
+      this.baseRequestOql = oql;
+    }
     const request: FetchBucketsRequest = {
       start: context.getSelectedTimeRange().from,
       end: context.getSelectedTimeRange().to,
       groupDimensions: this.getGroupDimensions(context),
-      oqlFilter: FilterUtils.filtersToOQL(this.getFilterItems(context), 'attributes'),
+      oqlFilter: oql,
       numberOfBuckets: 1,
       percentiles: [80, 90, 99],
     };
@@ -219,8 +229,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchBaseData(): Observable<ProcessedBucketResponse> {
-    const context = this.context;
-    return this.fetchData(context).pipe(
+    return this.fetchData(false).pipe(
       tap((response) => {
         this.baseBuckets = response.buckets;
         this.truncated = response.truncated;
@@ -376,10 +385,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
   }
 
-  hideSeries(key: string): void {}
-
-  showSeries(key: string): void {}
-
   private fetchLegendEntities(data: TableEntry[]): Observable<TableEntry[]> {
     const baseDimensions = this.getGroupDimensions(this.context);
     const compareDimensions = this.compareContext ? this.getGroupDimensions(this.compareContext) : [];
@@ -476,6 +481,13 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     } else {
       return ((y - x) / x) * 100;
     }
+  }
+
+  getItem(): DashboardItem {
+    return this.item;
+  }
+  getContext(): TimeSeriesContext {
+    throw new Error('Method not implemented.');
   }
 
   getType(): 'TABLE' | 'CHART' {
