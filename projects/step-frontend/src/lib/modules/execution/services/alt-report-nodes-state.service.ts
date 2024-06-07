@@ -28,6 +28,11 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     private summaryView: string,
     private storagePrefix: string,
   ) {
+    this.listInProgress$ = datasource$.pipe(
+      switchMap((dataSource) => dataSource.inProgress$),
+      distinctUntilChanged(),
+      takeUntilDestroyed(),
+    );
     this.setupSyncWithStorage();
   }
 
@@ -46,10 +51,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
 
   readonly summaryInProgress$ = this.summaryInProgressInternal$.pipe(distinctUntilChanged());
 
-  readonly listInProgress$ = this.datasource$.pipe(
-    switchMap((dataSource) => dataSource.inProgress$),
-    distinctUntilChanged(),
-  );
+  readonly listInProgress$: Observable<boolean>;
 
   readonly summary$ = this._executionState.executionId$.pipe(
     filter((executionId) => !!executionId),
