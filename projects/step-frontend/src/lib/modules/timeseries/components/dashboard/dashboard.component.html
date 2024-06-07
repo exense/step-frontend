@@ -17,28 +17,26 @@
           <span>Export Raw Measurements</span>
         </button>
       </mat-menu>
-      <div>
-        <div class="dashboard-name">
-          @if (showDashboardName) {
-            <div class="name">
-              <step-editable-label
-                [ngModel]="dashboard.attributes!['name']"
-                (ngModelChange)="onDashboardNameChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-              />
-            </div>
-            <div class="description">
-              <step-editable-textarea-label
-                [(ngModel)]="dashboard.description"
-                (ngModelChange)="handleDashboardDescriptionChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-                name="description"
-              >
-                <div *stepEditableLabelTemplate>Add description</div>
-              </step-editable-textarea-label>
-            </div>
-          }
-        </div>
+      <div class="dashboard-title">
+        @if (showDashboardName) {
+          <div class="name">
+            <step-editable-label
+              [ngModel]="dashboard.attributes!['name']"
+              (ngModelChange)="onDashboardNameChange($event)"
+              [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
+            />
+          </div>
+          <div class="description">
+            <step-editable-textarea-label
+              [(ngModel)]="dashboard.description"
+              (ngModelChange)="handleDashboardDescriptionChange($event)"
+              [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
+              name="description"
+            >
+              <div *stepEditableLabelTemplate>Add description</div>
+            </step-editable-textarea-label>
+          </div>
+        }
         <mat-menu #mainMenu="matMenu">
           <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
           <mat-menu #resolutionsMenu="matMenu" class="wide">
@@ -68,7 +66,7 @@
         @if (showRefreshOption) {
           <step-autorefresh-toggle
             [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-            [buttonDisabled]="compareModeEnabled"
+            [disableAutoRefreshButton]="compareModeEnabled"
             [interval]="refreshInterval"
             (refresh)="mainEngine.triggerRefresh()"
             (intervalChange)="handleRefreshIntervalChange($event)"
