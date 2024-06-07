@@ -1,7 +1,4 @@
 export interface ReportNodeSummary {
-  passed: number;
-  failed: number;
-  techError: number;
-  running: number;
+  [key: string]: number;
   total: number;
 }

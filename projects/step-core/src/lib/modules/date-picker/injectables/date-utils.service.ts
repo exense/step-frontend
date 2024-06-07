@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DateObjectUnits, DateTime } from 'luxon';
+import { DateRange } from '../types/date-range';
+import { TimeRange } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
@@ -20,5 +22,26 @@ export class DateUtilsService {
     const aMillis = a?.set(zeroTime)?.toMillis() ?? 0;
     const bMillis = b?.set(zeroTime)?.toMillis() ?? 0;
     return aMillis - bMillis;
+  }
+
+  dateRange2TimeRange(dateRange?: DateRange | null): TimeRange | undefined {
+    if (!dateRange) {
+      return undefined;
+    }
+    const from = dateRange.start?.toMillis() ?? 0;
+    const to = dateRange.end?.toMillis() ?? 0;
+    if (from >= to) {
+      return undefined;
+    }
+    return { from, to };
+  }
+
+  timeRange2DateRange(timeRange?: TimeRange | null): DateRange | undefined {
+    if (!timeRange) {
+      return undefined;
+    }
+    const start = DateTime.fromMillis(timeRange.from);
+    const end = DateTime.fromMillis(timeRange.to);
+    return { start, end };
   }
 }

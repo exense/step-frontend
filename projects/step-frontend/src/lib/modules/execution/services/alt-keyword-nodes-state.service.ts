@@ -5,6 +5,6 @@ import { AltReportNodesStateService } from './alt-report-nodes-state.service';
 @Injectable()
 export class AltKeywordNodesStateService extends AltReportNodesStateService {
   constructor(_executionState: AltExecutionStateService) {
-    super(_executionState.keywords$, 'keywords');
+    super(_executionState.keywordsDataSource$, 'statusDistributionForFunctionCalls', 'keywords');
   }
 }

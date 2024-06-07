@@ -1,6 +1,5 @@
 import { TableLocalDataSource } from './table-local-data-source';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
-import { CollectionViewer } from '@angular/cdk/collections';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { Mutable } from '../../basics/step-basics.module';
 
@@ -35,8 +34,8 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     this.reload$.next(reloadOptions);
   }
 
-  override disconnect(collectionViewer: CollectionViewer) {
-    super.disconnect(collectionViewer);
+  override destroy(): void {
+    super.destroy();
     this.inProgressInternal$.complete();
     this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;

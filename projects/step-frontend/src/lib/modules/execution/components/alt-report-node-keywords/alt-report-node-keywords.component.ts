@@ -1,9 +1,9 @@
-import { Component, input, output } from '@angular/core';
-import { ItemsPerPageService, ReportNode } from '@exense/step-core';
+import { Component, inject, output, viewChild } from '@angular/core';
+import { ItemsPerPageService, ReportNode, TableReload, TableSearch } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
-import { ViewMode } from '../../shared/view-mode';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -21,8 +21,11 @@ import { ViewMode } from '../../shared/view-mode';
   ],
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
-  /** @Input() **/
-  mode = input<ViewMode>(ViewMode.VIEW);
+  private _executionState = inject(AltExecutionStateService);
+
+  protected tableSearch = viewChild('table', { read: TableSearch });
+
+  protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
 
   /** @Output() **/
   openKeywordInTreeView = output<ReportNode>();

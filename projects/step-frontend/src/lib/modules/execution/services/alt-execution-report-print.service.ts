@@ -1,13 +1,16 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { from, switchMap, timer } from 'rxjs';
+import { filter, from, Observable, of, pairwise, switchMap, take, timer } from 'rxjs';
+import { ALT_EXECUTION_REPORT_IN_PROGRESS } from './alt-execution-report-in-progress.token';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable()
 export class AltExecutionReportPrintService implements OnDestroy {
   private _doc = inject(DOCUMENT);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
+  private _inProgress$ = inject(ALT_EXECUTION_REPORT_IN_PROGRESS).pipe(takeUntilDestroyed());
 
   private handleAfterPrint = () => this.afterPrint();
 
@@ -23,6 +26,28 @@ export class AltExecutionReportPrintService implements OnDestroy {
     this.print(true);
   }
 
+  private readyToPrint(): Observable<any> {
+    const currentProgress$ = this._inProgress$.pipe(take(1));
+
+    const preparationStopped$ = this._inProgress$.pipe(
+      pairwise(),
+      // check switch from `inProgress === true` to `inProgress === false`
+      filter(([oldState, newState]) => oldState && !newState),
+      take(1),
+    );
+
+    return timer(1000).pipe(
+      switchMap(() => currentProgress$),
+      switchMap((currentProgress) => {
+        if (currentProgress) {
+          return preparationStopped$;
+        }
+        return of(undefined);
+      }),
+      switchMap(() => timer(300)),
+    );
+  }
+
   private print(isPrintAll?: boolean): void {
     this._doc.defaultView?.addEventListener('afterprint', this.handleAfterPrint);
 
@@ -35,7 +60,7 @@ export class AltExecutionReportPrintService implements OnDestroy {
         queryParamsHandling: 'merge',
       }),
     )
-      .pipe(switchMap(() => timer(700)))
+      .pipe(switchMap(() => this.readyToPrint()))
       .subscribe(() => {
         this._doc.defaultView?.print();
       });

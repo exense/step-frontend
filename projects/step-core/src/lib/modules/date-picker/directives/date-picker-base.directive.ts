@@ -8,16 +8,15 @@ import {
   Input,
   OnChanges,
   Output,
+  signal,
   SimpleChanges,
 } from '@angular/core';
 import { DateField } from '../types/date-field';
 import { DatePickerComponent } from '../components/date-picker/date-picker.component';
 import { ControlValueAccessor } from '@angular/forms';
 import { DateAdapterService } from '../injectables/date-adapter.service';
-import { Mutable } from '../../basics/step-basics.module';
 import { TimeOption, TimeOptionRelativeValue } from '../types/time-option';
 
-type FieldAccessor = Mutable<Pick<DatePickerBaseDirective<any>, 'formattedValue'>>;
 type OnChange<D> = (date?: D | null) => void;
 type OnTouch = () => void;
 
@@ -42,7 +41,8 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
 
   @Output() relativeOptionChange = new EventEmitter<number | undefined>();
 
-  readonly formattedValue: string = '';
+  private formattedValueInternal = signal('');
+  readonly formattedValue = this.formattedValueInternal.asReadonly();
 
   protected get useTimeInParser(): boolean {
     return this.showTime || this.showRelativeTime;
@@ -112,8 +112,9 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   }
 
   private formatValue(value?: D | null): void {
-    (this as FieldAccessor).formattedValue = this._dateAdapter.format(value, this.useTimeInParser);
-    this._elRef.nativeElement.value = this.formattedValue;
+    const formattedValue = this._dateAdapter.format(value, this.useTimeInParser);
+    this.formattedValueInternal.set(formattedValue);
+    this._elRef.nativeElement.value = formattedValue;
   }
 
   @HostListener('input', ['$event'])
@@ -121,7 +122,8 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     const value = ($event.target as HTMLInputElement).value;
     const date = this._dateAdapter.parse(value, this.useTimeInParser);
 
-    (this as FieldAccessor).formattedValue = date ? value : '';
+    const formattedValue = date ? value : '';
+    this.formattedValueInternal.set(formattedValue);
 
     const hasChanges = !this._dateAdapter.areEqual(date, this.modelValue);
 

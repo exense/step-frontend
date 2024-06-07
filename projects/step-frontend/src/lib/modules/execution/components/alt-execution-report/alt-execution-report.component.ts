@@ -4,12 +4,21 @@ import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
-import { ViewMode } from '../../shared/view-mode';
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 @Component({
   selector: 'step-alt-execution-report',
   templateUrl: './alt-execution-report.component.html',
   styleUrl: './alt-execution-report.component.scss',
+  providers: [
+    {
+      provide: VIEW_MODE,
+      useFactory: () => {
+        const _activatedRoute = inject(ActivatedRoute);
+        return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
+      },
+    },
+  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionReportComponent {
@@ -23,7 +32,7 @@ export class AltExecutionReportComponent {
   readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
   readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
 
-  readonly mode = (this._activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
+  readonly _mode = inject(VIEW_MODE);
 
   handleOpenKeywordInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;

@@ -9,7 +9,7 @@
     [stepDateRangePicker]="picker"
     [showRelativeTime]="true"
     (relativeOptionChange)="_state.updateRelativeTime($event)"
-    [matTooltip]="rangePicker.formattedValue"
+    [matTooltip]="rangePicker.formattedValue()"
     matTooltipPosition="before"
     #rangePicker="DateRangePicker"
   />

@@ -48,7 +48,7 @@ import { AltExecutionsComponent } from './components/alt-executions/alt-executio
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
 import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
-import { AltReportNodeSummaryComponent } from './components/alt-keywords-summary/alt-report-node-summary.component';
+import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
 import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
 import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
 import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';

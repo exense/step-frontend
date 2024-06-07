@@ -1,15 +1,19 @@
-import { Component, computed, effect, ElementRef, input, OnDestroy, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  OnDestroy,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { ViewMode } from '../../shared/view-mode';
-
-const STATUS_DICTIONARY: Record<keyof Omit<ReportNodeSummary, 'total'>, { label: string; color: string }> = {
-  running: { label: 'running', color: '#337ab7' },
-  passed: { label: 'passed', color: '#5bc85c' },
-  failed: { label: 'failed', color: '#d9534f' },
-  techError: { label: 'technical error', color: '#000' },
-};
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { STATUS_COLORS } from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-report-node-summary',
@@ -18,14 +22,29 @@ const STATUS_DICTIONARY: Record<keyof Omit<ReportNodeSummary, 'total'>, { label:
   encapsulation: ViewEncapsulation.None,
 })
 export class AltReportNodeSummaryComponent implements OnDestroy {
+  private _statusColors = inject(STATUS_COLORS);
+  protected readonly _mode = inject(VIEW_MODE);
+
   /** @Input() **/
   title = input('');
 
   /** @Input() **/
   summary = input.required<ReportNodeSummary>();
 
-  /** @Input() **/
-  mode = input<ViewMode>(ViewMode.VIEW);
+  protected readonly legend = computed(() => {
+    const summary = this.summary();
+    const keysSet = new Set(Object.keys(summary));
+    keysSet.delete('total');
+    keysSet.add('TECHNICAL_ERROR');
+    keysSet.add('FAILED');
+
+    const items = Array.from(keysSet).map((status) => {
+      const value = summary?.[status] ?? 0;
+      return { status, value };
+    });
+
+    return items;
+  });
 
   private canvas = viewChild<ElementRef<HTMLCanvasElement>>('cnv');
 
@@ -34,9 +53,9 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
     if (!summary) {
       return undefined;
     }
-    return Object.keys(STATUS_DICTIONARY).reduce(
+    return Object.keys(this._statusColors).reduce(
       (res, key) => {
-        const value = summary[key as keyof ReportNodeSummary];
+        const value = summary[key];
         if (value > 0) {
           const percent = this.calcPercent(value, summary.total);
           res[key] = { value, percent };
@@ -73,14 +92,14 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
       return;
     }
 
-    const items = Object.entries(STATUS_DICTIONARY)
-      .map(([status, dictItem]) => {
+    const items = Object.entries(this._statusColors)
+      .map(([status, color]) => {
         const value = dictionary[status]?.percent ?? 0;
-        return { ...dictItem, value };
+        return { status, color, value };
       })
       .filter((item) => item.value > 0);
 
-    chart.data.labels = items.map((item) => item.label);
+    chart.data.labels = items.map((item) => item.status);
     chart.data.datasets[0]!.data = items.map((item) => item.value);
     chart.data.datasets[0]!.backgroundColor = items.map((item) => item.color);
     chart.data.datasets[0]!.borderColor = items.map((item) => item.color);
@@ -111,7 +130,7 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
       plugins: [ChartDataLabels],
       options: {
         animation: {
-          duration: this.mode() === ViewMode.PRINT ? 0 : 500,
+          duration: this._mode === ViewMode.PRINT ? 0 : 500,
         },
         plugins: {
           legend: {

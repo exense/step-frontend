@@ -1,7 +1,18 @@
-import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { filter, map, of, shareReplay, switchMap, combineLatest, startWith, take } from 'rxjs';
+import {
+  filter,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  combineLatest,
+  startWith,
+  take,
+  tap,
+  distinctUntilChanged,
+} from 'rxjs';
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
@@ -12,8 +23,11 @@ import {
   ExecutiontTaskParameters,
   IS_SMALL_SCREEN,
   RELATIVE_TIME_OPTIONS,
+  ReportNode,
   ScheduledTaskTemporaryStorageService,
   SystemService,
+  TableDataSource,
+  TableLocalDataSource,
   TimeOption,
   TimeRange,
   TreeNodeUtilsService,
@@ -32,6 +46,8 @@ import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nod
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
 import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
+import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
+import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -68,12 +84,30 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
       provide: TreeStateService,
       useExisting: AggregatedReportViewTreeStateService,
     },
+    AltExecutionViewAllService,
     AltKeywordNodesStateService,
     AltTestCasesNodesStateService,
+    {
+      provide: ALT_EXECUTION_REPORT_IN_PROGRESS,
+      useFactory: () => {
+        const _keywords = inject(AltKeywordNodesStateService);
+        const _testcases = inject(AltTestCasesNodesStateService);
+        return combineLatest([
+          _keywords.summaryInProgress$,
+          _keywords.listInProgress$,
+          _testcases.summaryInProgress$,
+          _testcases.listInProgress$,
+        ]).pipe(
+          map((inProgressFlags) => inProgressFlags.reduce((res, inProgress) => res || inProgress, false)),
+          distinctUntilChanged(),
+          shareReplay(1),
+        );
+      },
+    },
     AltExecutionReportPrintService,
   ],
 })
-export class AltExecutionProgressComponent implements OnInit, AltExecutionStateService {
+export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -87,6 +121,7 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   private _dateUtils = inject(DateUtilsService);
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  private _viewAllService = inject(AltExecutionViewAllService);
 
   private isTreeInitialized = false;
 
@@ -105,38 +140,29 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
 
   private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
     .pipe(takeUntilDestroyed())
-    .subscribe((range) => this.saveRangeToStorage(range));
+    .subscribe((range) => {
+      // Ignore synchronization in case of view all mode
+      if (this._viewAllService.isViewAll) {
+        return;
+      }
+      this.saveRangeToStorage(range);
+    });
 
-  private dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
+  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
+    map((range) => range ?? undefined),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
   readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => {
-      if (!dateRange) {
-        return undefined;
-      }
-      const from = dateRange.start!.toMillis();
-      const to = dateRange.end!.toMillis();
-      if (from >= to) {
-        return undefined;
-      }
-      return { from, to } as TimeRange;
-    }),
+    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
-  updateRange(timeRange: TimeRange | null | undefined) {
-    if (!timeRange) {
-      this.dateRangeCtrl.setValue(undefined);
-      return;
-    }
-    const start = DateTime.fromMillis(timeRange.from);
-    const end = DateTime.fromMillis(timeRange.to);
-    this.dateRangeCtrl.setValue({ start, end });
+  updateRange(timeRange?: TimeRange | null) {
+    this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
   }
 
   selectFullRange(): void {
@@ -183,6 +209,15 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
     takeUntilDestroyed(),
   );
 
+  private testCasesDataSource?: TableDataSource<ReportNode>;
+  readonly testCasesDataSource$ = this.testCases$.pipe(
+    tap(() => this.testCasesDataSource?.destroy()),
+    map((nodes) => this.createReportNodesDatasource(nodes ?? []).sharable()),
+    tap((dataSource) => (this.testCasesDataSource = dataSource)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   readonly keywordParameters$ = combineLatest([this.execution$, this.testCases$]).pipe(
     map(([execution, testCases]) => {
       return {
@@ -191,13 +226,12 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
         testcases: !testCases?.length ? undefined : testCases.map((testCase) => testCase.artefactID!),
       } as KeywordParameters;
     }),
-  );
-
-  readonly keywords$ = this.keywordParameters$.pipe(
-    switchMap((keywordParams) => this._controllerService.getReportNodes(keywordParams)),
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
+  readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
   readonly currentOperations$ = this.execution$.pipe(
     map((execution) => {
@@ -215,10 +249,18 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
   );
 
   ngOnInit(): void {
-    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
-      this.refreshExecutionTree(execution);
-      this.applyDefaultRange(execution, true);
-    });
+    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
+    combineLatest([this.execution$, isIgnoreFilter$])
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(([execution, isIgnoreFilter]) => {
+        this.refreshExecutionTree(execution);
+        this.applyDefaultRange(execution, !isIgnoreFilter);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.keywordsDataSource.destroy();
+    this.testCasesDataSource?.destroy();
   }
 
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
@@ -274,5 +316,22 @@ export class AltExecutionProgressComponent implements OnInit, AltExecutionStateS
     this._aggregatedTreeState
       .loadTree(execution.id!)
       .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+  }
+
+  private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
+    return new TableLocalDataSource(
+      nodes,
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringPredicate('name', (item) => item.name)
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .addCustomSearchPredicate('executionTime', (item, searchValue) => {
+          const [from, to] = searchValue.split('|').map((item) => parseFloat(item));
+          if (!from || !to || isNaN(from) || isNaN(to)) {
+            return true;
+          }
+          return !!item.executionTime && item.executionTime >= from && item.executionTime <= to;
+        })
+        .build(),
+    );
   }
 }

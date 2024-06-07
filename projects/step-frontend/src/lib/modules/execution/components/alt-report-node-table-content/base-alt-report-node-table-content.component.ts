@@ -1,33 +1,75 @@
-import { AfterViewInit, ChangeDetectorRef, Component, computed, inject, input, Signal } from '@angular/core';
-import { ItemsPerPageService, ReportNode, TableLocalDataSource } from '@exense/step-core';
-import { ViewMode } from '../../shared/view-mode';
+import { AfterViewInit, Component, DestroyRef, effect, inject, Signal } from '@angular/core';
+import {
+  arrayToRegex,
+  DateUtilsService,
+  FilterConditionFactoryService,
+  ItemsPerPageService,
+  TableReload,
+  TableRemoteDataSource,
+  TableSearch,
+} from '@exense/step-core';
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map, combineLatest, take } from 'rxjs';
 
-const DEFAULT_PAGE_SIZE = 7;
+const VIEW_PAGE_SIZE = 7;
+const PRINT_PAGE_SIZE = 50_000;
 
 @Component({
   template: '',
 })
 export abstract class BaseAltReportNodeTableContentComponent implements ItemsPerPageService, AfterViewInit {
-  private _cd = inject(ChangeDetectorRef);
-
-  abstract mode: Signal<ViewMode>;
-
   private _state = inject(AltReportNodesStateService);
-  protected dataSource?: TableLocalDataSource<ReportNode>;
+  private _filterConditionFactory = inject(FilterConditionFactoryService);
+  private _destroyRef = inject(DestroyRef);
+  private _dateUtils = inject(DateUtilsService);
+  protected readonly _mode = inject(VIEW_MODE);
 
-  private total = toSignal(this._state.total$);
+  protected abstract tableSearch: Signal<TableSearch | undefined>;
+
+  readonly dataSource$ = this._state.datasource$;
+
+  private isRemoteDataSource$ = this.dataSource$.pipe(map((dataSource) => dataSource instanceof TableRemoteDataSource));
 
   ngAfterViewInit(): void {
-    this.dataSource = new TableLocalDataSource(this._state.nodesToDisplay$);
-    this._cd.detectChanges();
+    this.setupFilters();
   }
 
   getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[] {
-    const mode = this.mode();
-    const total = this.total()!;
-    const allowedPageSize = mode === ViewMode.PRINT ? total : DEFAULT_PAGE_SIZE;
+    const allowedPageSize = this._mode === ViewMode.PRINT ? PRINT_PAGE_SIZE : VIEW_PAGE_SIZE;
     return [allowedPageSize];
+  }
+
+  private setupFilters(): void {
+    this._state.search$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
+      this.tableSearch()?.onSearch('name', value);
+    });
+
+    this._state.selectedStatuses$
+      .pipe(
+        map((statuses) => arrayToRegex(Array.from(statuses))),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((statuses) => {
+        this.tableSearch()?.onSearch('status', { value: statuses, regex: true });
+      });
+
+    combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
+      .pipe(
+        map(([dateRange, isRemote]) => {
+          if (isRemote) {
+            // Remote dataSource test case
+            return this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+          }
+          // Local dataSource test case
+          const timeRange = this._dateUtils.dateRange2TimeRange(dateRange);
+          return timeRange ? `${timeRange.from}|${timeRange.to}` : '';
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((searchValue) => {
+        this.tableSearch()?.onSearch('executionTime', searchValue);
+      });
   }
 }

@@ -1,7 +1,7 @@
-import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, input, output, ViewEncapsulation } from '@angular/core';
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
-import { ViewMode } from '../../shared/view-mode';
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 @Component({
   selector: 'step-alt-report-performance-overview-chart',
@@ -24,12 +24,10 @@ export class AltReportPerformanceOverviewChartComponent {
   };
 
   protected readonly metricKey = 'response-time';
+  protected readonly _mode = inject(VIEW_MODE);
 
   /** @Input() **/
   isFullRange = input<boolean>(true);
-
-  /** @Input() **/
-  mode = input<ViewMode>(ViewMode.VIEW);
 
   /** @Input() **/
   executionId = input.required<string>();

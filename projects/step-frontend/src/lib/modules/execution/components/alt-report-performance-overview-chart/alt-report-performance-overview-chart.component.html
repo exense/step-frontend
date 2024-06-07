@@ -1,6 +1,6 @@
 <step-alt-report-widget title="Performance Overview (avg)">
   <step-alt-report-widget-filter>
-    @if (mode() === ViewMode.VIEW) {
+    @if (_mode === ViewMode.VIEW) {
       <button type="button" mat-stroked-button [disabled]="isFullRange()" (click)="fullRange.emit()">
         Select full range
       </button>
@@ -14,7 +14,7 @@
         [filters]="chartFilters()"
         [timeRange]="range"
         (zoomChange)="timeRangeChange.emit($event)"
-        [class.print]="mode() === ViewMode.PRINT"
+        [class.print]="_mode === ViewMode.PRINT"
       />
     }
   </step-alt-report-widget-content>

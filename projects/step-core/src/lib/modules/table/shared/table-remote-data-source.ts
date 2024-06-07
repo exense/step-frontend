@@ -111,6 +111,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
+  private isSharable = false;
   private isSkipOngoingRequest?: boolean;
   private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
     undefined,
@@ -180,6 +181,17 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
+    if (!this.isSharable) {
+      this.destroy();
+    }
+  }
+
+  sharable(): this {
+    this.isSharable = true;
+    return this;
+  }
+
+  destroy(): void {
     this._request$.complete();
     this._inProgress$.complete();
     this._terminator$.next();

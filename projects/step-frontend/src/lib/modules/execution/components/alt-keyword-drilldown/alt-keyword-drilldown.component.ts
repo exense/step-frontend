@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { map, combineLatest, shareReplay, tap } from 'rxjs';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { map, shareReplay, tap, switchMap } from 'rxjs';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
-import { ReportNode } from '@exense/step-core';
+import { AugmentedControllerService, ReportNode } from '@exense/step-core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-alt-keyword-drilldown',
@@ -14,18 +14,19 @@ export class AltKeywordDrilldownComponent {
   private _tabsService = inject(AltExecutionTabsService);
 
   private _activatedRoute = inject(ActivatedRoute);
-  private _state = inject(AltExecutionStateService);
+  private _controllerService = inject(AugmentedControllerService);
 
   private keywordId$ = this._activatedRoute.params.pipe(map((params) => params['keywordId']));
 
-  readonly keyword$ = combineLatest([this._state.keywords$, this.keywordId$]).pipe(
-    map(([keywords, keywordId]) => keywords.find((keyword) => keyword.id === keywordId)),
+  readonly keyword$ = this.keywordId$.pipe(
+    switchMap((keywordId) => this._controllerService.getReportNode(keywordId)),
     tap((keyword) => {
       if (keyword) {
         this.addTabForKeyword(keyword);
       }
     }),
     shareReplay(1),
+    takeUntilDestroyed(),
   );
 
   private addTabForKeyword(keyword: ReportNode): void {
