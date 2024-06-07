@@ -99,6 +99,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
+  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
 
   private exportInProgress = false;
   dashboard!: DashboardView;

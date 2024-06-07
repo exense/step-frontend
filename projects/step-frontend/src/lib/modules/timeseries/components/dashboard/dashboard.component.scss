@@ -2,6 +2,7 @@
 
 .page-container {
   padding: 0 2rem;
+  position: relative;
 }
 
 .resolution-select-container {
@@ -88,6 +89,13 @@
   white-space: nowrap;
   text-align: center;
   align-self: center;
+}
+
+.floating-settings-btn {
+  position: absolute;
+  top: -64px;
+  right: 52px;
+  z-index: 100;
 }
 
 .no-charts-message {
