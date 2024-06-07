@@ -5,6 +5,7 @@ import { FilterBarItem } from './filter/filter-bar-item';
 import { TsFilteringMode } from './filter/ts-filtering-mode.enum';
 import { FilterUtils } from './filter/filter-utils';
 import { OQLBuilder } from './oql-builder';
+import { TsFilteringSettings } from './filter/ts-filtering-settings';
 
 export abstract class ChartDashlet {
   /**
@@ -23,7 +24,7 @@ export abstract class ChartDashlet {
 
     let filterItemsToInherit: FilterBarItem[] = [];
 
-    const globalFiltering = context.getFilteringSettings();
+    const globalFiltering: TsFilteringSettings = context.getFilteringSettings();
 
     const itemToInheritSettingsFrom = masterChart || item;
     if (itemToInheritSettingsFrom.inheritGlobalFilters) {
