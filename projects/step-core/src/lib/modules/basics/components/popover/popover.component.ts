@@ -60,7 +60,7 @@ export class PopoverComponent {
     this.tooltipTimeout = setTimeout(() => {
       this.isMouseOverPopover = true;
       this.triggerPopoverDirective.openMenu();
-    }, 300);
+    }, 100);
   }
 
   @HostListener('mouseleave')
