@@ -93,6 +93,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
   selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
+  requestOql: string = '';
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
@@ -197,45 +198,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe();
-  }
-
-  private getMasterChart(): DashboardItem | undefined {
-    return this.item.masterChartId ? this.context.getDashlet(this.item.masterChartId) : undefined;
-  }
-
-  private composeRequestFilter(): string {
-    const masterChart = this.getMasterChart();
-    const metric = masterChart?.metricKey || this.item.metricKey;
-    const metricFilterItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${metric}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
-
-    const itemToInheritSettingsFrom = masterChart || this.item;
-    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        this.context.getFilteringSettings().filterItems,
-        itemToInheritSettingsFrom.filters,
-      );
-    } else {
-      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
-    }
-    if (metric !== 'threadgroup') {
-      filterItems.push(metricFilterItem);
-      return FilterUtils.filtersToOQL(filterItems, 'attributes');
-    } else {
-      // TODO clean this once the migration of sampler measurements is done
-      return new OQLBuilder()
-        .append(
-          '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))',
-        )
-        .append(FilterUtils.filtersToOQL(filterItems, 'attributes'))
-        .build();
-    }
   }
 
   handleLockStateChange(locked: boolean) {
@@ -445,11 +407,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
     const groupDimensions = this.getGroupDimensions();
+    const oqlFilter = this.composeRequestFilter();
+    this.requestOql = oqlFilter;
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: this.composeRequestFilter(),
+      oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
     };
     const customResolution = this.context.getChartsResolution();
@@ -622,10 +586,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return 'CHART';
   }
 
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
+  getContext(): TimeSeriesContext {
+    return this.context;
   }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
+
+  getItem(): DashboardItem {
+    return this.item;
   }
 }

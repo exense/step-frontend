@@ -30,7 +30,6 @@ export class TimeSeriesEntityService {
     }
     const cachedResults: { [key: string]: string } = {};
     const idsToFetch: string[] = [];
-    console.log(this.cache);
     // Separate cached IDs from those that need to be fetched
     ids.forEach((id) => {
       if (this.cache.has(id)) {
