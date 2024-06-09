@@ -84,7 +84,7 @@ export class PopoverComponent {
         if (!this.isMouseOverPopover) {
           this.triggerPopoverDirective.closeMenu();
         }
-      }, 0);
+      }, 400);
     }
   }
 }
