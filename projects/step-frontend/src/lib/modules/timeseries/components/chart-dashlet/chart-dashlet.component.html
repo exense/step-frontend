@@ -1,6 +1,6 @@
 <div>
   @if (!_internalSettings) {
-    <step-chart-skeleton></step-chart-skeleton>
+    <step-chart-skeleton [height]="height" />
   } @else {
     <step-timeseries-chart
       #chart
@@ -28,10 +28,28 @@
       <step-icon name="x"></step-icon>
     </button>
   </div>
-  @if (!editMode && !((item.readonlyGrouping || item.inheritGlobalGrouping) && item.readonlyAggregate)) {
-    <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
-      <step-icon name="settings"></step-icon>
+  @if (!editMode) {
+    <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
+      <step-icon name="filter"></step-icon>
     </button>
+    <mat-menu #oqlMenu="matMenu">
+      <div class="oql" (click)="$event.stopPropagation()">
+        <div>
+          <step-icon
+            name="help-circle"
+            matTooltip="The OQL represents all the active filters used in the current chart."
+          ></step-icon>
+        </div>
+        <div>{{ requestOql }}</div>
+      </div>
+    </mat-menu>
+    @if (
+      (!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE'
+    ) {
+      <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+        <step-icon name="settings"></step-icon>
+      </button>
+    }
   }
 
   <mat-menu #settingsMenu="matMenu">
@@ -40,6 +58,21 @@
     }
     @if (!item.readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
+    }
+    @if (selectedAggregate === 'RATE') {
+      <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
+    }
+  </mat-menu>
+
+  <mat-menu #rateUnitMenu="matMenu">
+    @for (rate of RATE_UNITS; track rate.tphMultiplier) {
+      <button
+        mat-menu-item
+        [class.selected-menu-item]="rate.tphMultiplier === selectedRateUnit.tphMultiplier"
+        (click)="switchRateUnit(rate)"
+      >
+        {{ rate.menuLabel }}
+      </button>
     }
   </mat-menu>
 

@@ -1,15 +1,14 @@
 import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
-import { DashboardItem, Execution, MetricAttribute, TimeRange } from '@exense/step-core';
+import { DashboardItem, Execution, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
-import { FilterBarItem } from '../filter/filter-bar-item';
 import { TsFilteringSettings } from '../filter/ts-filtering-settings';
-import { TimeSeriesKeywordsContext } from './time-series-keywords.context';
 import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { FilterUtils } from '../filter/filter-utils';
 import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
+import { SeriesStroke } from './series-stroke';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -21,7 +20,6 @@ export interface TsCompareModeSettings {
  */
 export class TimeSeriesContext {
   id!: string;
-  activeExecution: Execution | undefined;
   filteringMode: TsFilteringMode = TsFilteringMode.STANDARD;
 
   readonly compareModeChange$ = new BehaviorSubject<TsCompareModeSettings>({ enabled: false });
@@ -36,6 +34,7 @@ export class TimeSeriesContext {
 
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
 
+  defaultFullTimeRange?: Partial<TimeRange>; // The 'Full selection' initial interval. 'To' can be undefined.
   private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private selectedTimeRange: TimeRange; // this is the zooming selection.
@@ -43,33 +42,25 @@ export class TimeSeriesContext {
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
-  private readonly activeFilters$: BehaviorSubject<FilterBarItem[]>;
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
 
-  /**
-   * @Deprecated
-   */
-  public readonly keywordsContext: TimeSeriesKeywordsContext;
   public readonly colorsPool: TimeseriesColorsPool;
 
   private syncGroups: Record<string, TimeSeriesSyncGroup> = {}; // used for master-salve charts relationships
 
   private dashlets: DashboardItem[];
+  private indexedMetrics: Record<string, MetricType> = {};
 
   constructor(params: TimeSeriesContextParams) {
     this.id = params.id;
     this.dashlets = params.dashlets;
     params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
+    this.defaultFullTimeRange = params.defaultFullTimeRange;
     this.fullTimeRange = params.timeRange;
     this.selectedTimeRange = params.timeRange;
-    this.activeFilters$ = new BehaviorSubject(params.filters || []);
-    this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>({
-      mode: TsFilteringMode.STANDARD,
-      oql: '',
-      filterItems: params.filters || [],
-    });
+    this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>(params.filteringSettings);
     this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
     const attributes: Record<string, MetricAttribute> =
@@ -82,15 +73,14 @@ export class TimeSeriesContext {
       ) || {};
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
-    this.keywordsContext = params.keywordsContext || new TimeSeriesKeywordsContext(this.colorsPool);
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
+    params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
     // any specific context change will trigger the main stateChange
     this.stateChange$ = merge(
       this.compareModeChange$.pipe(skip(1)),
       this.inProgress$.pipe(skip(1)),
       this.activeGroupings$.pipe(skip(1)),
-      this.activeFilters$.pipe(skip(1)),
       this.filterSettings$.pipe(skip(1)),
       this.chartsResolution$.pipe(skip(1)),
       this.chartsLockedState$.pipe(skip(1)),
@@ -98,6 +88,14 @@ export class TimeSeriesContext {
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
     ) as Observable<void>;
+  }
+
+  getMetric(key: string): MetricType {
+    return this.indexedMetrics[key];
+  }
+
+  updateDefaultFullTimeRange(range: Partial<TimeRange>) {
+    this.defaultFullTimeRange = range;
   }
 
   getSyncGroups(): TimeSeriesSyncGroup[] {
@@ -121,15 +119,14 @@ export class TimeSeriesContext {
     this.fullTimeRangeChange$.complete();
     this.selectedTimeRangeChange$.complete();
     this.activeGroupings$.complete();
-    this.activeFilters$.complete();
     this.filterSettings$.complete();
     this.chartsLockedState$.complete();
     this.stateChangeInternal$.complete();
     Object.keys(this.syncGroups).forEach((key) => this.syncGroups[key]?.destroy());
   }
 
-  getColor(key: string): string {
-    return this.colorsPool.getColor(key);
+  getStrokeColor(key: string): SeriesStroke {
+    return this.colorsPool.getSeriesColor(key);
   }
 
   getSyncGroup(key: string): TimeSeriesSyncGroup {
@@ -208,16 +205,8 @@ export class TimeSeriesContext {
     this.inProgress$.next(inProgress);
   }
 
-  getDynamicFilters(): FilterBarItem[] {
-    return this.activeFilters$.getValue();
-  }
-
   inProgressChange() {
     return this.inProgress$.asObservable();
-  }
-
-  updateFilters(items: FilterBarItem[]) {
-    this.activeFilters$.next(items);
   }
 
   getChartsLockedState(): boolean {
@@ -279,8 +268,8 @@ export class TimeSeriesContext {
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
         ? removeAttributesPrefix
-          ? filteringSettings.oql.replace('attributes.', '')
-          : filteringSettings.oql
+          ? filteringSettings.oql!.replace('attributes.', '')
+          : filteringSettings.oql!
         : FilterUtils.filtersToOQL(
             filteringSettings.filterItems,
             undefined,
@@ -299,31 +288,12 @@ export class TimeSeriesContext {
     this.selectedTimeRangeChange$.next(this.selectedTimeRange);
   }
 
-  setExecution(execution: Execution) {
-    this.activeExecution = execution;
-  }
-
-  getExecution(): Execution {
-    if (!this.activeExecution) {
-      throw new Error('Execution was not set yet');
-    }
-    return this.activeExecution;
-  }
-
   onGroupingChange(): Observable<string[]> {
     return this.activeGroupings$.asObservable().pipe(skip(1));
   }
 
-  onFiltersChange(): Observable<FilterBarItem[]> {
-    return this.activeFilters$.asObservable().pipe(skip(1));
-  }
-
   onFilteringChange(): Observable<TsFilteringSettings> {
     return this.filterSettings$.asObservable().pipe(skip(1));
-  }
-
-  updateActiveFilters(items: FilterBarItem[]): void {
-    this.activeFilters$.next(items);
   }
 
   updateGrouping(grouping: string[]) {

@@ -28,6 +28,7 @@ export class TableDashletSettingsComponent implements OnInit {
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
 
+  allAttributes: MetricAttribute[] = [];
   _attributesByKey: Record<string, MetricAttribute> = {};
 
   @ViewChild('formContainer', { static: true })
@@ -46,6 +47,9 @@ export class TableDashletSettingsComponent implements OnInit {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
+    this.allAttributes = this._inputData.context
+      .getAllAttributes()
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
   private fetchMetricTypes() {

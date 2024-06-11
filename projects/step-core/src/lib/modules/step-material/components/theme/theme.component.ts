@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  Inject,
+  inject,
   Injector,
   ViewContainerRef,
   ViewEncapsulation,
@@ -18,12 +18,10 @@ import { ThemeRegisterService } from '../../services/theme-register.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeComponent implements AfterViewInit {
-  constructor(
-    private _view: ViewContainerRef,
-    private _injector: Injector,
-    private _themeRegister: ThemeRegisterService,
-    @Inject(DOCUMENT) private _document: Document
-  ) {}
+  private _view = inject(ViewContainerRef);
+  private _injector = inject(Injector);
+  private _themeRegister = inject(ThemeRegisterService);
+  private _document = inject(DOCUMENT);
 
   ngAfterViewInit(): void {
     const definitions = this._themeRegister.definitions;

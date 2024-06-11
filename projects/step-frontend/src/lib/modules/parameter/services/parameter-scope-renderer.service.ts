@@ -6,8 +6,6 @@ import { ParameterScope } from '../types/parameter-scope.type';
   providedIn: 'root',
 })
 export class ParameterScopeRendererService {
-  constructor() {}
-
   // Backward compatibility: assuming GLOBAL scope if not set
   normalizeScope(scope?: ParameterScope): ParameterScope {
     return scope || 'GLOBAL';

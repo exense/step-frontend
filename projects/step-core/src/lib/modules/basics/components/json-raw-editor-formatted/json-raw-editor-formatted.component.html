@@ -15,7 +15,7 @@
     [class.disabled]="rawValueFormControl.disabled"
     [contentEditable]="rawValueFormControl.enabled"
     (input)="handleInput(preElement)"
-    (blur)="onTouch()"
+    (blur)="onTouch?.()"
   ></pre>
   <step-error *ngIf="_ngControl?.touched && _ngControl?.errors">
     <step-errors-list [errors]="_ngControl!.errors!" [keysDictionary]="errorKeysDictionary"> </step-errors-list>

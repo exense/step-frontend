@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AlertType,
   AugmentedExecutionsService,
@@ -39,6 +39,7 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -100,7 +101,7 @@ export class ExecutionProgressComponent
   private _executionTabManager = inject(ExecutionTabManagerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
-  private _terminator$ = new Subject<void>();
+  private _destroyRef = inject(DestroyRef);
   private _currentExecutionTerminator$?: Subject<void>;
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
@@ -116,7 +117,6 @@ export class ExecutionProgressComponent
 
   execution?: Execution;
   testCases?: ReportNode[];
-  showTestCaseCurrentOperation: boolean = true;
   keywordSearch?: string;
 
   readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
@@ -202,8 +202,6 @@ export class ExecutionProgressComponent
 
   ngOnDestroy(): void {
     this.terminateCurrentExecutionChanges();
-    this._terminator$.next();
-    this._terminator$.complete();
   }
 
   drillDownTestCase(id: string): void {
@@ -252,7 +250,7 @@ export class ExecutionProgressComponent
     const executionId$ = this._activatedRoute.url.pipe(
       map((url) => url[0].path),
       distinctUntilChanged(),
-      takeUntil(this._terminator$),
+      takeUntilDestroyed(this._destroyRef),
     );
 
     executionId$.subscribe((executionId) => {
@@ -275,7 +273,7 @@ export class ExecutionProgressComponent
         const allowedTabs = this.tabs.map((tab) => tab.id);
         return allowedTabs.includes(subPath) && subPath !== this.activeTabId;
       }),
-      takeUntil(this._terminator$),
+      takeUntilDestroyed(this._destroyRef),
     );
 
     subTab$.subscribe((tab) => this.selectTab(tab));
@@ -350,11 +348,6 @@ export class ExecutionProgressComponent
     if (updateSelection !== UpdateSelection.NONE) {
       this.determineDefaultSelection();
     }
-    const parameters: { key: string; value: string }[] = (execution.parameters as any) || [];
-    const showTestCaseCurrentOperation = parameters.find(
-      (o) => o.key === 'step.executionView.testcases.current-operations',
-    );
-    this.showTestCaseCurrentOperation = showTestCaseCurrentOperation?.value.toLowerCase() === 'true';
   }
 
   private loadExecutionTree(): void {

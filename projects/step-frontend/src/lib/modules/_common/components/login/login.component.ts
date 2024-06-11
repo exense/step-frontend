@@ -21,8 +21,6 @@ export class LoginComponent implements OnInit {
   readonly loginDescriptionText: string = '';
   readonly _auth = inject(AuthService);
 
-  constructor() {}
-
   ngOnInit() {
     this._auth.checkOidc();
     if (this._auth.getConf()?.demo) {

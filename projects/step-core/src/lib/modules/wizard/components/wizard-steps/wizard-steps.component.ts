@@ -41,7 +41,6 @@ import { WizardStep } from '../../types/wizard-step.interface';
   encapsulation: ViewEncapsulation.None,
 })
 export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalContext {
-  private _terminator$ = new Subject<void>();
   private _wizardsRegistry = inject(WizardStepRegistryService);
   private _formBuilder = inject(FormBuilder);
   private _injector = inject(Injector);
@@ -80,8 +79,6 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
 
   ngOnDestroy(): void {
     this.disposeSteps();
-    this._terminator$.next();
-    this._terminator$.complete();
   }
 
   updateModel(): void {
@@ -193,7 +190,7 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
             return result;
           },
           deps: [WIZARD_STEP_TYPE, WIZARD_GLOBAL_CONTEXT],
-        }
+        },
       );
     }
 
@@ -205,7 +202,7 @@ export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalC
         {
           provide: WIZARD_STEP_BEHAVIOR_CONFIG,
           useExisting: step.behaviorConfig,
-        }
+        },
       );
     }
 

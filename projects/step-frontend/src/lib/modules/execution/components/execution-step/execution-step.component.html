@@ -37,7 +37,7 @@
         <th mat-header-cell *matHeaderCellDef>Current operations</th>
         <td mat-cell *matCellDef="let element">
           <step-current-operations
-            *ngIf="element.status === 'RUNNING' && showTestCaseCurrentOperation"
+            *ngIf="element.status === 'RUNNING'"
             [reportNodeId]="element.id"
             [executionViewServices]="executionViewServices"
             [(showAll)]="showAllOperations"

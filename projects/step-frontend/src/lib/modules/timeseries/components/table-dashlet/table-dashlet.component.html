@@ -20,6 +20,27 @@
       </div>
     }
     @if (!editMode) {
+      <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
+        <step-icon name="filter"></step-icon>
+      </button>
+      <mat-menu #oqlMenu="matMenu">
+        <div class="oql-info-container" (click)="$event.stopPropagation()">
+          <div>
+            <step-icon
+              name="help-circle"
+              matTooltip="The OQL represents all the active filters used in the current chart."
+            ></step-icon>
+          </div>
+          <div>
+            @if (compareModeEnabled) {
+              <p><strong>Base data:</strong> {{ baseRequestOql }}</p>
+              <p><strong>Compare data:</strong> {{ compareRequestOql }}</p>
+            } @else {
+              {{ baseRequestOql }}
+            }
+          </div>
+        </div>
+      </mat-menu>
       <button mat-icon-button matTooltip="Table Settings" [matMenuTriggerFor]="settingsMenu">
         <step-icon name="settings" />
       </button>
@@ -76,7 +97,7 @@
           >
             <div class="element-name">
               <span>{{ element | tableEntryFormat }}</span>
-              <step-marker [color]="element.color" [markerType]="MarkerType.DOTS" />
+              <step-marker [color]="element.stroke.color" [markerType]="element.stroke.type" />
             </div>
           </mat-checkbox>
         </div>

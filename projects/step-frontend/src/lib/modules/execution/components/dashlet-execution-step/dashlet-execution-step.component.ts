@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CustomComponent, ReportNode, SelectionCollector } from '@exense/step-core';
+import { Component, inject } from '@angular/core';
+import { CustomComponent } from '@exense/step-core';
 import { ExecutionStateService } from '../../services/execution-state.service';
 
 @Component({
@@ -8,10 +8,6 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   styleUrls: ['./dashlet-execution-step.component.scss'],
 })
 export class DashletExecutionStepComponent implements CustomComponent {
+  _state = inject(ExecutionStateService);
   context?: any;
-
-  constructor(
-    public _state: ExecutionStateService,
-    public _testCasesSelection: SelectionCollector<string, ReportNode>
-  ) {}
 }

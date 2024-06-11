@@ -63,7 +63,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   chartIsEmpty = false; // meaning the chart is already created, but it has no data
   chartIsUnavailable = false;
 
-  legendSettings: LegendSettings = { show: true, items: [] };
+  legendSettings: LegendSettings = { show: true, items: [], expanded: false };
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
@@ -149,11 +149,16 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       }
       series.label = this.mergeLabelItems(series.labelItems);
       this.chartMetadata.push(series.metadata || []);
-      if (series.stroke) {
-        // aggregate series don't have stroke (e.g total)
+      // aggregate series don't have stroke (e.g total)
+      if (series.scale !== 'z') {
+        series.stroke = series.strokeConfig?.color || series.stroke || DEFAULT_STROKE_COLOR;
+        if (series.stroke.length === 7) {
+          series.stroke += 'cc'; // lower the opacity for more clarity
+        }
         this.legendSettings.items.push({
           seriesId: series.id,
-          color: (series.stroke as string) || DEFAULT_STROKE_COLOR,
+          color: series.strokeConfig?.color || series.stroke || DEFAULT_STROKE_COLOR,
+          strokeType: series.strokeConfig?.type || MarkerType.SQUARE,
           label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });
@@ -426,11 +431,13 @@ interface LegendSettings {
   show: boolean;
   items: LegendItem[];
   zAxisLabel?: string;
+  expanded: boolean;
 }
 
 interface LegendItem {
   seriesId: string;
   label: string;
   color: string;
+  strokeType: MarkerType;
   isVisible: boolean;
 }

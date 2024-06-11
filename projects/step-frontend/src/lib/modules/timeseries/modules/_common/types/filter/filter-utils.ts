@@ -52,7 +52,7 @@ export class FilterUtils {
    * Method to convert FE filters to a valid OQL
    */
   static filtersToOQL(
-    items: FilterBarItem[],
+    items?: FilterBarItem[],
     attributesPrefix?: string,
     attributeProcessFn?: (attribute: string) => string,
   ): string {
@@ -190,7 +190,7 @@ export class FilterUtils {
       attributeName: attribute.name,
       label: attribute.displayName,
       isLocked: true,
-      removable: false,
+      removable: true,
       isHidden: false,
       textValues: [],
       searchEntities: [],

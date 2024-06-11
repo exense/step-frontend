@@ -1,9 +1,10 @@
-import { Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { BaseEditorComponent } from '../base-editor/base-editor.component';
 import { FormBuilder } from '@angular/forms';
 import { RANGE_HOURS } from '../../injectables/ranges.tokens';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { debounceTime } from 'rxjs';
 import { TOOLTIP_HOURS_RANGE } from '../../injectables/tooltip.tokens';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-weekly-time-range-editor',
@@ -14,9 +15,8 @@ import { TOOLTIP_HOURS_RANGE } from '../../injectables/tooltip.tokens';
   },
   encapsulation: ViewEncapsulation.None,
 })
-export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implements OnInit, OnDestroy {
-  private terminator$ = new Subject<void>();
-
+export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implements OnInit {
+  private _destroyRef = inject(DestroyRef);
   private _fb = inject(FormBuilder);
   readonly _HOURS = inject(RANGE_HOURS);
   readonly _tooltipHours = inject(TOOLTIP_HOURS_RANGE);
@@ -29,11 +29,6 @@ export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implemen
 
   ngOnInit(): void {
     this.setupFormUpdate();
-  }
-
-  ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
   }
 
   protected override getExpression(): string {
@@ -49,7 +44,7 @@ export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implemen
 
   private setupFormUpdate(): void {
     this.weeklyTimeRangeForm.valueChanges
-      .pipe(debounceTime(300), takeUntil(this.terminator$))
+      .pipe(debounceTime(300), takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.updateExpression());
   }
 }

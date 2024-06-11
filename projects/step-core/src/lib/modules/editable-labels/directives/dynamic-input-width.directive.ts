@@ -1,14 +1,14 @@
-import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, Input, OnInit } from '@angular/core';
 
 @Directive({
   selector: '[dynamicInputWidth]',
   standalone: true,
 })
 export class DynamicInputWidthDirective implements OnInit {
+  private _el = inject<ElementRef<HTMLInputElement>>(ElementRef);
+
   @Input() text: string | undefined;
   @Input() minWidth = 20;
-
-  constructor(private el: ElementRef<HTMLInputElement>) {}
 
   ngOnInit() {
     this.resizeInput(this.text);
@@ -22,9 +22,9 @@ export class DynamicInputWidthDirective implements OnInit {
   private resizeInput(value?: string): void {
     const length = value?.length;
     if (length && length > 20) {
-      this.el.nativeElement.style.width = `${length + 2}ch`;
+      this._el.nativeElement.style.width = `${length + 2}ch`;
     } else {
-      this.el.nativeElement.style.width = `${this.minWidth}ch`;
+      this._el.nativeElement.style.width = `${this.minWidth}ch`;
     }
   }
 }

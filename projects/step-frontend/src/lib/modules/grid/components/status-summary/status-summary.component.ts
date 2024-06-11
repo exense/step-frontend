@@ -9,6 +9,4 @@ import { TokenGroupCapacity } from '@exense/step-core';
 })
 export class StatusSummaryComponent {
   @Input() tokenGroup!: TokenGroupCapacity;
-
-  constructor() {}
 }

@@ -1,9 +1,10 @@
-import { Component, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { map, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { DialogParentService } from '../../injectables/dialog-parent.service';
 import { DialogRouteResult } from '../../types/dialog-route-result';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-dialog-route',
@@ -15,24 +16,22 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
   private _activatedRoute = inject(ActivatedRoute);
   private _viewContainerRef = inject(ViewContainerRef);
   private _router = inject(Router);
+  private _destroyRef = inject(DestroyRef);
   private _dialogParent = inject(DialogParentService, { optional: true });
 
   private modalRef?: MatDialogRef<unknown>;
-  private terminator$ = new Subject<void>();
   private dialogCloseTerminator$?: Subject<void>;
 
   ngOnInit(): void {
     this._activatedRoute.data
       .pipe(
         switchMap((data) => timer(100).pipe(map(() => data))),
-        takeUntil(this.terminator$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((data) => this.createModal(data));
   }
 
   ngOnDestroy(): void {
-    this.terminator$.next();
-    this.terminator$.complete();
     this.closeModalAndTerminate();
   }
 

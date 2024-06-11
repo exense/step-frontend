@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BaseRegistryService } from './base-registry.service';
-import { CustomRegistryService } from './custom-registry.service';
 import { CustomRegistryType } from '../shared/custom-registry-type.enum';
 import { CustomRegistryItem } from '../shared/custom-registry-item';
 
@@ -9,10 +8,6 @@ import { CustomRegistryItem } from '../shared/custom-registry-item';
 })
 export class WizardRegistryService extends BaseRegistryService {
   protected override readonly registryType = CustomRegistryType.WIZARD_STEP;
-
-  constructor(customRegistry: CustomRegistryService) {
-    super(customRegistry);
-  }
 
   registerWizardStep<T extends CustomRegistryItem>(wizardStep: T): void {
     this._customRegistry.register(this.registryType, wizardStep.type, wizardStep);

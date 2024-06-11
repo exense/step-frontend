@@ -236,6 +236,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
       filterItems: this.getValidFilters(),
+      hiddenFilters: this.context.getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };
     this.context.setFilteringSettings(settings);
@@ -378,7 +379,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const filteringSettings = this.context.getFilteringSettings();
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
-        ? filteringSettings.oql.replace('attributes.', '')
+        ? filteringSettings.oql!.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
     // const contextualOql = FilterUtils.objectToOQL(
     //   this.performanceViewSettings.contextualFilters,
