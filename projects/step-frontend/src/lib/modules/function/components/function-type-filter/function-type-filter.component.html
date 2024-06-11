@@ -1,6 +1,11 @@
 <step-form-field>
-  <mat-select multiple [formControl]="filterControl">
-    <mat-option *ngFor="let item of _functionTypes; trackBy: trackByItemInfo" [value]="item.type">
+  <mat-select [formControl]="filterControl" multiple>
+    <mat-option>
+      <ngx-mat-select-search [formControl]="filterMultiControl" placeholderLabel="Search...">
+        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+      </ngx-mat-select-search>
+    </mat-option>
+    <mat-option *ngFor="let item of functionTypesFiltered; trackBy: trackByItemInfo" [value]="item.type">
       {{ item.label }}
     </mat-option>
   </mat-select>
