@@ -21,6 +21,7 @@ import {
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
   BucketResponse,
+  ColumnSelection,
   DashboardItem,
   FetchBucketsRequest,
   MarkerType,
@@ -40,9 +41,21 @@ import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-d
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 
+interface TableColumn {
+  id: string;
+  // type: TableColumnType;
+  label: string;
+  subLabel?: string;
+  pclValue?: number;
+  mapValue: (bucket: BucketResponse) => any;
+  mapDiffValue: (entry: TableEntry) => number | undefined;
+  isVisible: boolean;
+}
+
 export interface TableEntry {
   name: string; // series id
   groupingLabels: string[]; // each grouping attribute will have a label
+  pclValue?: number;
   base?: ProcessedBucket;
   compare?: ProcessedBucket;
   stroke: SeriesStroke;
@@ -148,13 +161,37 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
-        label: ColumnsLabels[column.column],
-        isVisible: column.selected,
-        mapValue: ColumnsValueFunctions[column.column!],
+        label: this.getColumnLabel(column),
+        isVisible: column.selected!,
+        pclValue: column.pclValue,
+        mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
-      } as TableColumn;
+      };
     });
     this.updateVisibleColumns();
+  }
+
+  private getColumnLabel(column: ColumnSelection): string {
+    let label = ColumnsLabels[column.column];
+    switch (column.column) {
+      case TableColumnType.PCL_80:
+      case TableColumnType.PCL_90:
+      case TableColumnType.PCL_99:
+        if (!column.pclValue) {
+          column.pclValue = 90;
+        }
+        label += ` ${column.pclValue} (ms)`;
+    }
+
+    return label;
+  }
+
+  private getBucketMapFunction(column: ColumnSelection) {
+    if (column.pclValue) {
+      return (b: ProcessedBucket) => b?.pclValues![column.pclValue!];
+    } else {
+      return ColumnsValueFunctions[column.column!];
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -200,7 +237,24 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onColumnVisibilityChange(column: TableColumn): void {
     const newVisible = !column.isVisible;
     // update the chart settings
-    this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
+    this.settings?.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
+  }
+
+  onColumnPclValueChange(column: TableColumn, value: string) {
+    console.log('pcl changed', column.pclValue, value);
+    const oldValue = column.pclValue;
+    let parsedNumber: number = parseFloat(value);
+    if (!isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100) {
+      console.log('value is good:', parsedNumber);
+      column.pclValue = parsedNumber;
+    } else {
+      console.log('wrong number');
+      // column.pclValue = parsedNumber;
+      setTimeout(() => {
+        console.log(oldValue);
+        column.pclValue = Math.max(oldValue!, 50);
+      }, 500);
+    }
   }
 
   private getGroupDimensions(context: TimeSeriesContext): string[] {
@@ -235,27 +289,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         this.truncated = response.truncated;
       }),
     );
-  }
-
-  private getFilterItems(context: TimeSeriesContext): FilterBarItem[] {
-    const metricItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${this.item.metricKey}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
-    if (this.item.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        context.getFilteringSettings().filterItems,
-        this.item.filters,
-      );
-    } else {
-      filterItems = this.item.filters.map(FilterUtils.convertApiFilterItem);
-    }
-    filterItems.push(metricItem);
-    return filterItems;
   }
 
   private mergeBaseAndCompareData(): TableEntry[] {
@@ -495,51 +528,38 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 }
 
-interface TableColumn {
-  id: string;
-  // type: TableColumnType;
-  label: string;
-  subLabel?: string;
-  mapValue: (bucket: BucketResponse) => any;
-  mapDiffValue: (entry: TableEntry) => number | undefined;
-  isVisible: boolean;
-}
-
-const ColumnsValueFunctions = {
+const ColumnsValueFunctions: Record<string, any> = {
   [TableColumnType.COUNT]: (b: ProcessedBucket) => b?.count,
   [TableColumnType.SUM]: (b: ProcessedBucket) => b?.sum,
   [TableColumnType.AVG]: (b: ProcessedBucket) => b?.avg,
   [TableColumnType.MIN]: (b: ProcessedBucket) => b?.min,
   [TableColumnType.MAX]: (b: ProcessedBucket) => b?.max,
-  [TableColumnType.PCL_80]: (b: ProcessedBucket) => b?.pclValues?.[80],
-  [TableColumnType.PCL_90]: (b: ProcessedBucket) => b?.pclValues?.[90],
-  [TableColumnType.PCL_99]: (b: ProcessedBucket) => b?.pclValues?.[99],
   [TableColumnType.TPS]: (b: ProcessedBucket) => b?.tps,
   [TableColumnType.TPH]: (b: ProcessedBucket) => b?.tph,
 };
 
-const ColumnsDiffFunctions: Record<TableColumnType, (entry: TableEntry) => number | undefined> = {
+const ColumnsDiffFunctions: Record<string, (entry: TableEntry) => number | undefined> = {
   [TableColumnType.COUNT]: (entry: TableEntry) => entry.countDiff,
   [TableColumnType.SUM]: (entry: TableEntry) => entry.sumDiff,
   [TableColumnType.AVG]: (entry: TableEntry) => entry.avgDiff,
-  [TableColumnType.MIN]: (entry: TableEntry) => entry.minDiff,
-  [TableColumnType.MAX]: (entry: TableEntry) => entry.maxDiff,
   [TableColumnType.PCL_80]: (entry: TableEntry) => entry.pcl80Diff,
   [TableColumnType.PCL_90]: (entry: TableEntry) => entry.pcl90Diff,
   [TableColumnType.PCL_99]: (entry: TableEntry) => entry.pcl99Diff,
+  [TableColumnType.MIN]: (entry: TableEntry) => entry.minDiff,
+  [TableColumnType.MAX]: (entry: TableEntry) => entry.maxDiff,
   [TableColumnType.TPS]: (entry: TableEntry) => entry.tpsDiff,
   [TableColumnType.TPH]: (entry: TableEntry) => entry.tphDiff,
 };
 
-const ColumnsLabels = {
+const ColumnsLabels: Record<string, string> = {
   [TableColumnType.COUNT]: 'Count',
   [TableColumnType.SUM]: 'Sum',
   [TableColumnType.AVG]: 'Avg',
   [TableColumnType.MIN]: 'Min',
   [TableColumnType.MAX]: 'Max',
-  [TableColumnType.PCL_80]: 'Pcl. 80 (ms)',
-  [TableColumnType.PCL_90]: 'Pcl. 90 (ms)',
-  [TableColumnType.PCL_99]: 'Pcl. 99 (ms)',
   [TableColumnType.TPS]: 'Tps',
   [TableColumnType.TPH]: 'Tph',
+  [TableColumnType.PCL_80]: 'Pcl.',
+  [TableColumnType.PCL_90]: 'Pcl.',
+  [TableColumnType.PCL_99]: 'Pcl.',
 };

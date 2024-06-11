@@ -42,7 +42,7 @@
         </div>
         <mat-divider />
         <step-label>Filters</step-label>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
               <step-ts-filter-bar-item
@@ -112,7 +112,7 @@
         <div>
           <step-label>Grouping</step-label>
         </div>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="form-row">
             <div>
               <step-form-field>
@@ -165,7 +165,7 @@
               }
             </mat-select>
           </step-form-field>
-          @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
+          @if (item.chartSettings!.primaryAxes.aggregation === ChartAggregation.PERCENTILE) {
             <step-form-field>
               <step-label>Pcl. value</step-label>
               <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">

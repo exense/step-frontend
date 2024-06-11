@@ -11,10 +11,6 @@ import {
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
-  FilterUtils,
-  OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -30,6 +26,7 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 declare const uPlot: any;
 
@@ -73,6 +70,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
 
+  @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
   _internalSettings?: TSChartSettings;
   _attributesByIds: Record<string, MetricAttribute> = {};
@@ -90,6 +88,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   readonly ChartAggregation = ChartAggregation;
   readonly PCL_VALUES = [80, 90, 99];
   selectedPclValue?: number;
+  customPclValueInput?: number;
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
   selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
@@ -435,6 +434,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     );
   }
 
+  applyCustomPclValue() {
+    if (this.customPclValueInput && this.customPclValueInput > 0 && this.customPclValueInput < 100) {
+      this.switchAggregate(ChartAggregation.PERCENTILE, this.customPclValueInput);
+      this.settingsMenuTrigger?.closeMenu();
+    }
+  }
+
   private fetchLegendEntities(series: TSChartSeries[]): Observable<any> {
     const groupDimensions = this.getGroupDimensions();
     const requests$ = groupDimensions
@@ -540,14 +546,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private getRequiredPercentiles(): number[] {
-    const aggregate = this.selectedAggregate;
+    const aggregate: ChartAggregation = this.selectedAggregate;
     const secondaryAggregate = this.item.chartSettings!.secondaryAxes?.aggregation;
     const percentilesToRequest: number[] = [];
     if (aggregate === ChartAggregation.MEDIAN || secondaryAggregate === ChartAggregation.MEDIAN) {
       percentilesToRequest.push(50);
     }
     if (aggregate === ChartAggregation.PERCENTILE || secondaryAggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(80, 90, 99);
+      percentilesToRequest.push(this.selectedPclValue!);
     }
     return percentilesToRequest;
   }

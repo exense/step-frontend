@@ -50,20 +50,39 @@
     }
     <mat-menu #columnsMenu="matMenu">
       @for (column of columnsDefinition; track column.id) {
-        <button
-          mat-menu-item
-          (click)="column.isVisible = !column.isVisible; updateVisibleColumns(); $event.stopPropagation()"
-        >
-          <div class="flex flex-row" style="gap: 12px; align-items: center">
+        @if (column.pclValue) {
+          <div class="pcl-label" (click)="$event.stopPropagation()">
             <mat-checkbox
               color="primary"
               [ngModel]="column.isVisible"
               (ngModelChange)="onColumnVisibilityChange(column)"
             >
-              <span>{{ column.label }}</span>
             </mat-checkbox>
+            <span>Pcl</span>
+            <step-editable-label
+              [ngModel]="column.pclValue"
+              style="background-color: #f3f3f3; border-radius: 8px; max-width: 7rem"
+              (ngModelChange)="onColumnPclValueChange(column, $event)"
+            >
+            </step-editable-label>
+            <span>(ms)</span>
           </div>
-        </button>
+        } @else {
+          <button
+            mat-menu-item
+            (click)="column.isVisible = !column.isVisible; updateVisibleColumns(); $event.stopPropagation()"
+          >
+            <div class="flex flex-row" style="gap: 12px; align-items: center">
+              <mat-checkbox
+                color="primary"
+                [ngModel]="column.isVisible"
+                (ngModelChange)="onColumnVisibilityChange(column)"
+              >
+                <div>{{ column.label }}</div>
+              </mat-checkbox>
+            </div>
+          </button>
+        }
       }
     </mat-menu>
   </div>

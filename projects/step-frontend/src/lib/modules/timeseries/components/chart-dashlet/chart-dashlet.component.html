@@ -46,7 +46,12 @@
     @if (
       (!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE'
     ) {
-      <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+      <button
+        mat-icon-button
+        matTooltip="Settings"
+        [matMenuTriggerFor]="settingsMenu"
+        #settingsMenuTrigger="matMenuTrigger"
+      >
         <step-icon name="settings"></step-icon>
       </button>
     }
@@ -121,5 +126,18 @@
         {{ pcl }}th
       </button>
     }
+    <div class="custom-pcl-container" (click)="$event.stopPropagation()">
+      <step-form-field>
+        <input placeholder="other" autocomplete="one-time-code" type="number" [(ngModel)]="customPclValueInput" />
+      </step-form-field>
+      <button
+        (click)="applyCustomPclValue()"
+        mat-button
+        color="primary"
+        [disabled]="!customPclValueInput || !(customPclValueInput > 0 && customPclValueInput < 100)"
+      >
+        Apply
+      </button>
+    </div>
   </mat-menu>
 </div>
