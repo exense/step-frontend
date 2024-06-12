@@ -9,8 +9,10 @@
         <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
       </ngx-mat-select-search>
     </mat-option>
-    <mat-option *ngFor="let item of functionTypesFiltered; trackBy: trackByItemInfo" [value]="item.type">
-      {{ item.label }}
-    </mat-option>
+    @for (item of functionTypesFiltered; track trackByItemInfo) {
+      <mat-option [value]="item.type">
+        {{ item.label }}
+      </mat-option>
+    }
   </mat-select>
 </step-form-field>

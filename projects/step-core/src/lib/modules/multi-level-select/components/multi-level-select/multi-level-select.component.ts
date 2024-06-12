@@ -2,12 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   forwardRef,
+  inject,
   input,
+  OnInit,
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { MultiSelectOptionDirective } from '../../directives/multi-select-option.directive';
 import { MatOptionSelectionChange } from '@angular/material/core';
@@ -15,6 +18,8 @@ import { PlainMultiLevelItem } from '../../types/plain-multi-level-item';
 import { MultiLevelItem } from '../../types/multi-level-item';
 import { MultiLevelVisualSelectionService } from '../../injectables/multi-level-visual-selection.service';
 import { SelectionState } from '../../types/selection-state.enum';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange<T> = (value: T[]) => void;
 type OnTouch = () => void;
@@ -23,7 +28,7 @@ type OnTouch = () => void;
   selector: 'step-multi-level-select',
   templateUrl: './multi-level-select.component.html',
   styleUrl: './multi-level-select.component.scss',
-  imports: [StepBasicsModule, MultiSelectOptionDirective],
+  imports: [StepBasicsModule, MultiSelectOptionDirective, NgxMatSelectSearchModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -40,15 +45,18 @@ type OnTouch = () => void;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultiLevelSelectComponent<T extends string | number | symbol>
-  implements ControlValueAccessor, MultiLevelVisualSelectionService<T>
+  implements ControlValueAccessor, MultiLevelVisualSelectionService<T>, OnInit
 {
   private onChange?: OnChange<T>;
   private onTouch?: OnTouch;
 
   protected isDisabled = false;
   protected selectedItems: T[] = [];
+  protected _destroyRef = inject(DestroyRef);
 
   readonly visualSelectionState = signal<Record<T, SelectionState>>({} as Record<T, SelectionState>);
+
+  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
 
   /** @Input() **/
   items = input<MultiLevelItem<T>[]>([]);
@@ -82,8 +90,33 @@ export class MultiLevelSelectComponent<T extends string | number | symbol>
 
   private accessCache = computed(() => this.itemsData().itemsAccessCache);
   private plainItemsAccessCache = computed(() => this.itemsData().plainItemsAccessCache);
+  private filterValue = signal({ value: '' });
 
-  protected plainItems = computed(() => this.itemsData().plainItems);
+  protected plainItems = computed(() => {
+    const parents = new Set<string>();
+    const filterValue = this.filterValue().value.toLowerCase();
+    this.itemsData().plainItems.forEach((item) => {
+      if (item.value.toLocaleLowerCase().includes(filterValue) && item.parent) {
+        parents.add(item.parent.value.toLowerCase());
+      }
+    });
+    return this.itemsData().plainItems.filter(
+      (item) =>
+        item.value.toLocaleLowerCase().includes(filterValue) ||
+        item.parent?.value.toLocaleLowerCase().includes(filterValue) ||
+        parents.has(item.value.toLocaleLowerCase()),
+    );
+  });
+
+  ngOnInit(): void {
+    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
+      if (value) {
+        this.filterValue.set({ value });
+      } else {
+        this.filterValue.set({ value: '' });
+      }
+    });
+  }
 
   writeValue(selectedItems: T[]): void {
     if (!this.isModelChanged(selectedItems)) {

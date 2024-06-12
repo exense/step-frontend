@@ -23,7 +23,7 @@ export class FunctionTypeFilterComponent
   filterMultiControl: FormControl<string | null> = new FormControl<string>('');
   functionTypesFiltered: ItemInfo[] = [...this._functionTypes];
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
       if (value) {
         this.functionTypesFiltered = this._functionTypes.filter((type) =>
