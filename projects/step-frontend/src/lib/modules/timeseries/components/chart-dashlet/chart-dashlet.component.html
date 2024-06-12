@@ -128,7 +128,13 @@
     }
     <div class="custom-pcl-container" (click)="$event.stopPropagation()">
       <step-form-field>
-        <input placeholder="other" autocomplete="one-time-code" type="number" [(ngModel)]="customPclValueInput" />
+        <input
+          placeholder="other"
+          autocomplete="one-time-code"
+          type="number"
+          [(ngModel)]="customPclValueInput"
+          (keydown)="$event.stopPropagation()"
+        />
       </step-form-field>
       <button
         (click)="applyCustomPclValue()"

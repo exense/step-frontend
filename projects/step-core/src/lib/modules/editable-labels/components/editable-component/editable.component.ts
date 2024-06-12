@@ -139,8 +139,12 @@ export abstract class EditableComponent<T> implements ControlValueAccessor {
       return;
     }
 
-    this.value = this.newValue;
-    this.onChange?.(this.value);
+    if (this.onChange) {
+      // let the onChange to take care of new value assignment
+      this.onChange(this.newValue);
+    } else {
+      this.value = this.newValue;
+    }
   }
 
   protected onValueChange(value: T): void {

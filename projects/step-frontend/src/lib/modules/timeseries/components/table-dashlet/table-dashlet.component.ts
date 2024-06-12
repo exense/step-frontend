@@ -55,10 +55,10 @@ interface TableColumn {
 export interface TableEntry {
   name: string; // series id
   groupingLabels: string[]; // each grouping attribute will have a label
-  pclValue?: number;
   base?: ProcessedBucket;
   compare?: ProcessedBucket;
   stroke: SeriesStroke;
+  pclValues: number[];
   isSelected?: boolean;
   countDiff?: number;
   sumDiff?: number;
@@ -241,19 +241,20 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   onColumnPclValueChange(column: TableColumn, value: string) {
-    console.log('pcl changed', column.pclValue, value);
     const oldValue = column.pclValue;
     let parsedNumber: number = parseFloat(value);
-    if (!isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100) {
-      console.log('value is good:', parsedNumber);
+    const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
+    if (validPclValue) {
       column.pclValue = parsedNumber;
+      this.item.tableSettings!.columns.find((c) => c.column === column.id)!.pclValue = parsedNumber;
+      this.prepareState();
+      this.refresh(true).subscribe(() => {
+        if (this.compareModeEnabled) {
+          this.refreshCompareData().subscribe();
+        }
+      });
     } else {
-      console.log('wrong number');
-      // column.pclValue = parsedNumber;
-      setTimeout(() => {
-        console.log(oldValue);
-        column.pclValue = Math.max(oldValue!, 50);
-      }, 500);
+      // do nothing
     }
   }
 
@@ -275,7 +276,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       groupDimensions: this.getGroupDimensions(context),
       oqlFilter: oql,
       numberOfBuckets: 1,
-      percentiles: [80, 90, 99],
+      percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
     };
     return this._timeSeriesService
       .getTimeSeries(request)
@@ -312,6 +313,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       ...new Set([...Object.keys(baseBucketsByIds), ...(compareBuckets ? Object.keys(compareBucketsByIds) : [])]),
     ];
     allSeriesIds = allSeriesIds.sort();
+    const pclValues: number[] = this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!);
     const entries: TableEntry[] = allSeriesIds.map((keyword) => {
       const baseBucket: ProcessedBucket = baseBucketsByIds[keyword];
       const compareBucket: ProcessedBucket = compareBucketsByIds[keyword];
@@ -321,6 +323,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       );
       return {
         name: keyword,
+        pclValues: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
         base: baseBucket,
         compare: compareBucket,
         groupingLabels: labelItems,
@@ -334,9 +337,18 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
         minDiff: this.percentageBetween(baseBucket?.min, compareBucket?.min),
         maxDiff: this.percentageBetween(baseBucket?.max, compareBucket?.max),
-        pcl80Diff: this.percentageBetween(baseBucket?.pclValues?.[80], compareBucket?.pclValues?.[80]),
-        pcl90Diff: this.percentageBetween(baseBucket?.pclValues?.[90], compareBucket?.pclValues?.[90]),
-        pcl99Diff: this.percentageBetween(baseBucket?.pclValues?.[99], compareBucket?.pclValues?.[99]),
+        pcl80Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[0]],
+          compareBucket?.pclValues?.[pclValues[0]],
+        ),
+        pcl90Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[1]],
+          compareBucket?.pclValues?.[pclValues[1]],
+        ),
+        pcl99Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[2]],
+          compareBucket?.pclValues?.[pclValues[2]],
+        ),
         tpsDiff: this.percentageBetween(baseBucket?.tps, compareBucket?.tps),
         tphDiff: this.percentageBetween(baseBucket?.tph, compareBucket?.tph),
       };
@@ -490,14 +502,14 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('MAX', (item) => item.base?.max)
       .addSortNumberPredicate('MAX_comp', (item) => item.compare?.max)
       .addSortNumberPredicate('MAX_diff', (item) => item.maxDiff)
-      .addSortNumberPredicate('PCL_80', (item) => item.base?.pclValues?.[80])
-      .addSortNumberPredicate('PCL_80_comp', (item) => item.compare?.pclValues?.[80])
+      .addSortNumberPredicate('PCL_80', (item) => item.base?.pclValues?.[item.pclValues[0]])
+      .addSortNumberPredicate('PCL_80_comp', (item) => item.compare?.pclValues?.[item.pclValues[0]])
       .addSortNumberPredicate('PCL_80_diff', (item) => item.pcl80Diff)
-      .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[90])
-      .addSortNumberPredicate('PCL_90_comp', (item) => item.compare?.pclValues?.[90])
+      .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[item.pclValues[1]])
+      .addSortNumberPredicate('PCL_90_comp', (item) => item.compare?.pclValues?.[item.pclValues[1]])
       .addSortNumberPredicate('PCL_90_diff', (item) => item.pcl90Diff)
-      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[99])
-      .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[99])
+      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[item.pclValues[2]])
+      .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[item.pclValues[2]])
       .addSortNumberPredicate('PCL_99_diff', (item) => item.pcl99Diff)
       .addSortNumberPredicate('TPS', (item) => item.base?.tps)
       .addSortNumberPredicate('TPS_comp', (item) => item.compare?.tps)
