@@ -263,6 +263,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
       tableSettings: {
         columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
       },
@@ -285,6 +287,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: false,
       inheritGlobalFilters: true,
       inheritGlobalGrouping: true,
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
@@ -361,7 +365,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     );
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
 
-    const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
+    const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
+      urlFilters,
+      dashboard.filters,
+      this.hiddenFilters,
+    );
     this.fetchFilterEntities(visibleFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
@@ -373,13 +381,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       filteringSettings: {
         mode: TsFilteringMode.STANDARD,
         filterItems: visibleFilters,
+        hiddenFilters: this.hiddenFilters,
       },
       resolution: this.resolution,
       metrics: this.metricTypes,
     });
   }
 
-  private mergeFilters(
+  private mergeAndExcludeHiddenFilters(
     urlFilters: FilterBarItem[],
     dashboardFilters: TimeSeriesFilterItem[],
     hiddenFilters: FilterBarItem[],
@@ -400,7 +409,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       f.isHidden = true;
       visibleFilters = visibleFilters.filter((v) => v.attributeName !== f.attributeName);
     });
-    return [...hiddenFilters, ...visibleFilters];
+    return visibleFilters;
   }
 
   private fetchFilterEntities(items: FilterBarItem[]): void {
