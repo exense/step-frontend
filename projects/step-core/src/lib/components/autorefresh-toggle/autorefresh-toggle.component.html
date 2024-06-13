@@ -3,10 +3,12 @@
   [matMenuTriggerFor]="menu"
   [matTooltip]="selectedInterval.label"
   class="refresh-btn"
-  [disabled]="buttonDisabled"
+  [disabled]="disableAutoRefreshButton"
 >
   <step-icon name="refresh-cw"></step-icon>
-  <div *ngIf="model.interval === 0" class="refresh-off"><span [class.disabled]="buttonDisabled">off</span></div>
+  <div *ngIf="model.interval === 0" class="refresh-off">
+    <span [class.disabled]="disableAutoRefreshButton">off</span>
+  </div>
 </button>
 <mat-menu #menu="matMenu">
   <button

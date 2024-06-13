@@ -56,7 +56,7 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 //@ts-ignore
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
-import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
+import { TimeSeriesEntityService } from '../../modules/_common';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -90,7 +90,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
   @Input() editable: boolean = true;
@@ -99,6 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
+  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -190,6 +190,12 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.dashboard.attributes!['name'] = name;
     const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
+  handleDashboardDescriptionChange(description: string) {
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    modifiedDashboard.description = description;
     this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
   }
 
