@@ -2,7 +2,7 @@
   [primaryFieldsLabel]="primaryFieldsLabel ?? 'Inputs (required)'"
   [optionalFieldsLabel]="optionalFieldsLabel ?? 'Inputs (optional)'"
   [addFieldBtnLabel]="addFieldBtnLabel ?? 'Add input'"
-  [schema]="schema"
+  [schema]="schema()"
   [value]="internalValue"
   (valueChange)="handleChange($event)"
   [isDisabled]="isDisabled"

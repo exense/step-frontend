@@ -11,11 +11,12 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
 import {
   DynamicFieldGroupValue,
   DynamicFieldsSchema,
+  SchemaObjectField,
   SchemasFactoryService,
 } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type-resolver';
@@ -85,7 +86,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
   protected reference?: any;
   protected isEditorMode: boolean = false;
   protected referenceMeta?: ReferenceMeta;
-  protected schema?: DynamicFieldsSchema;
+  protected schema?: SchemaObjectField;
 
   hintFor = HintFor;
 
@@ -272,6 +273,9 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     if (!screenId) {
       return;
     }
-    this._schemaFactory.buildAttributesSchemaForScreen(screenId).subscribe((schema) => (this.schema = schema));
+    this._schemaFactory
+      .buildAttributesSchemaForScreen(screenId)
+      .pipe(map((schema) => ({ ...schema, type: 'object' }) as SchemaObjectField))
+      .subscribe((schema) => (this.schema = schema));
   }
 }

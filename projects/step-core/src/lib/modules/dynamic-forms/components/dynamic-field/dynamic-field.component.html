@@ -69,6 +69,18 @@
         />
       }
       @case (DynamicFieldType.OBJECT) {
+        <step-dynamic-field-group
+          primaryFieldsLabel="Inputs (required)"
+          optionalFieldsLabel="Inputs (optional)"
+          addFieldBtnLabel="Add input"
+          [isDisabled]="isDisabled"
+          [schema]="$any(fieldSchema)"
+          [value]="$any(value)"
+          (valueChange)="valueChange($event)"
+          (blur)="onTouch()"
+          [tabIndex]="tabIndex"
+        />
+        <!--
         <input
           type="text"
           [disabled]="isDisabled"
@@ -77,6 +89,7 @@
           (blur)="onTouch()"
           [tabindex]="tabIndex"
         />
+-->
       }
       @case (DynamicFieldType.ARRAY) {
         <input

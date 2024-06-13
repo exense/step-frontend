@@ -1,12 +1,10 @@
 import { Component, EventEmitter, inject, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { noop } from 'rxjs';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
-import { Ace } from 'ace-builds';
-
-type DynamicValue = DynamicValueString | DynamicValueBoolean | DynamicValueInteger;
+import { DynamicValue } from '../../../../client/step-client-module';
+import { SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
 
 type OnChange = (dynamicValue?: DynamicValue) => void;
 type OnTouch = () => void;
@@ -49,6 +47,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   @Input() tooltip?: string = '';
 
   @Input() fieldType: DynamicFieldType = DynamicFieldType.STRING;
+  @Input() fieldSchema?: SchemaField;
 
   @Input() canRemove?: boolean = false;
 
@@ -107,7 +106,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   protected valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
-    if ((type === DynamicFieldType.ARRAY || type === DynamicFieldType.OBJECT) && typeof value === 'string') {
+    if (type === DynamicFieldType.ARRAY && typeof value === 'string') {
       try {
         value = JSON.parse(value);
       } catch (e) {
@@ -160,6 +159,4 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
     this.displayEnumExtraValue = !(this.enumItems || []).includes(this.value ? this.value.toString() : '');
   }
-
-  protected readonly Ace = Ace;
 }

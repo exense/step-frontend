@@ -1,23 +1,15 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, NonNullableFormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
+import { DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
-import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
+import { DynamicFieldsSchema, SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
+import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
+import { FieldSchemaType } from '../../shared/field-schema-type.enum';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
@@ -42,15 +34,15 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   @Input() addFieldBtnLabel?: string;
 
   @Input() isDisabled?: boolean;
-  @Input() schema?: DynamicFieldsSchema;
+  @Input() schema?: SchemaObjectField;
   @Input() allowNotSchemaFields: boolean = false;
   @Input() value?: DynamicFieldGroupValue;
   @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
+
   protected primaryFields: DynamicFieldMetaData[] = [];
   protected optionalFields: DynamicFieldMetaData[] = [];
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
-  readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.trackId;
 
   ngOnDestroy(): void {
     this.destroyForm();
@@ -233,6 +225,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const isRequired = !!config?.isRequired;
     const isAdditional = !!config?.isAdditional;
 
+    let fieldSchema: SchemaField | undefined;
     let fieldType!: DynamicFieldType;
     let enumItems: string[] = [];
 
@@ -242,7 +235,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
         throw new Error('Invalid schema');
       }
 
-      if (fieldDescription.enum) {
+      if (!fieldDescription.type && fieldDescription.enum) {
         fieldType = DynamicFieldType.ENUM;
         enumItems = fieldDescription.enum;
       } else {
@@ -259,9 +252,11 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
             break;
           case 'array':
             fieldType = DynamicFieldType.ARRAY;
+            fieldSchema = fieldDescription.items;
             break;
           case 'object':
             fieldType = DynamicFieldType.OBJECT;
+            fieldSchema = fieldDescription.properties;
             break;
           default:
             break;
@@ -271,7 +266,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       fieldType = DynamicFieldType.STRING;
     }
 
-    const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {
+    const fieldValue: DynamicValue = value[field] || {
       ...DEFAULT_FIELD_VALUE,
     };
     if (fieldValue.value === undefined && value[field] === undefined) {
@@ -279,10 +274,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
-    const control = this.formBuilder.control<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
-      fieldValue,
-      validator,
-    );
+    const control = this.formBuilder.control<DynamicValue>(fieldValue, validator);
 
     if (!fieldType) {
       throw new Error('Invalid schema');
@@ -294,6 +286,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       label: field,
       control,
       fieldType,
+      fieldSchema,
       isRequired,
       isAdditional,
       enumItems,
