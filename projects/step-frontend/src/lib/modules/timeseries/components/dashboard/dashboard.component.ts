@@ -56,7 +56,7 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 //@ts-ignore
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
-import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
+import { TimeSeriesEntityService } from '../../modules/_common';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -90,7 +90,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
   @Input() editable: boolean = true;
