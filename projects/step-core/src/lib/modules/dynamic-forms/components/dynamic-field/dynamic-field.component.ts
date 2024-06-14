@@ -1,10 +1,21 @@
-import { Component, EventEmitter, inject, Input, OnDestroy, Optional, Output, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  inject,
+  Input,
+  OnDestroy,
+  Optional,
+  Output,
+  TemplateRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { noop } from 'rxjs';
 import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { DynamicValue } from '../../../../client/step-client-module';
 import { SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
+import { ComplexFieldContext, ComplexFieldContextService } from '../../services/complex-field-context.service';
 
 type OnChange = (dynamicValue?: DynamicValue) => void;
 type OnTouch = () => void;
@@ -15,17 +26,18 @@ type OnTouch = () => void;
   styleUrls: ['./dynamic-field.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
+export class DynamicFieldComponent implements ControlValueAccessor, ComplexFieldContextService, OnDestroy {
   private _richEditorDialogs = inject(RichEditorDialogService);
+  protected complexFieldContext?: ComplexFieldContextService = this as ComplexFieldContextService;
 
-  private onChange: OnChange = noop;
-  protected onTouch: OnTouch = noop;
+  private onChange?: OnChange;
+  private onTouch?: OnTouch;
 
   private internalValue?: DynamicValue;
 
-  protected isDisabled = false;
+  isDisabled = false;
 
-  protected value: DynamicValue['value'];
+  value: DynamicValue['value'];
 
   protected expression: string = '';
 
@@ -48,6 +60,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() fieldType: DynamicFieldType = DynamicFieldType.STRING;
   @Input() fieldSchema?: SchemaField;
+  @Input() fieldObjectTemplate?: TemplateRef<ComplexFieldContext>;
 
   @Input() canRemove?: boolean = false;
 
@@ -61,6 +74,10 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.complexFieldContext = undefined;
   }
 
   registerOnChange(fn: OnChange): void {
@@ -80,11 +97,6 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     this.synchronizeInternalValueWithFields();
   }
 
-  ngOnDestroy(): void {
-    this.onChange = noop;
-    this.onTouch = noop;
-  }
-
   editValueInModal(predefinedMode?: AceMode): void {
     const text = this.value?.toString() ?? '';
     this._richEditorDialogs.editText(text, { predefinedMode }).subscribe((value) => {
@@ -99,13 +111,17 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     });
   }
 
+  handleBlur(): void {
+    this.onTouch?.();
+  }
+
   protected fixLabelFocus($event: MouseEvent): void {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
   }
 
-  protected valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
+  valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
     if (type === DynamicFieldType.ARRAY && typeof value === 'string') {
       try {
         value = JSON.parse(value);
@@ -117,14 +133,14 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
     this.value = value;
     this.internalValue = { ...this.internalValue, value };
-    this.onChange(this.internalValue);
+    this.onChange?.(this.internalValue);
     this.determineEnumExtraValueFlag();
   }
 
   protected expressionChange(expression: string): void {
     this.expression = expression;
     this.internalValue = { ...this.internalValue, expression };
-    this.onChange(this.internalValue);
+    this.onChange?.(this.internalValue);
   }
 
   protected toggleDynamic(): void {
@@ -140,7 +156,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     }
 
     this.internalValue = { value, expression, dynamic };
-    this.onChange(this.internalValue);
+    this.onChange?.(this.internalValue);
     this.synchronizeInternalValueWithFields();
   }
 

@@ -32,7 +32,7 @@
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabIndex]="tabIndex"
         >
           @if (displayEnumExtraValue) {
@@ -49,7 +49,7 @@
           color="primary"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           (focusin)="forceFocus = true"
           (focusout)="forceFocus = false"
         >
@@ -64,11 +64,15 @@
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabindex]="tabIndex"
         />
       }
       @case (DynamicFieldType.OBJECT) {
+        @if (fieldObjectTemplate && complexFieldContext) {
+          <ng-container *ngTemplateOutlet="fieldObjectTemplate; context: { $implicit: complexFieldContext }" />
+        }
+        <!--
         <step-dynamic-field-group
           primaryFieldsLabel="Inputs (required)"
           optionalFieldsLabel="Inputs (optional)"
@@ -77,16 +81,17 @@
           [schema]="$any(fieldSchema)"
           [value]="$any(value)"
           (valueChange)="valueChange($event)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabIndex]="tabIndex"
         />
+-->
         <!--
         <input
           type="text"
           [disabled]="isDisabled"
           [ngModel]="value | json"
           (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabindex]="tabIndex"
         />
 -->
@@ -97,7 +102,7 @@
           [disabled]="isDisabled"
           [ngModel]="value | json"
           (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabindex]="tabIndex"
         />
       }
@@ -107,7 +112,7 @@
           [disabled]="isDisabled"
           [ngModel]="value"
           (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabindex]="tabIndex"
         />
       }
@@ -135,7 +140,7 @@
       [disabled]="isDisabled"
       [ngModel]="expression"
       (ngModelChange)="expressionChange($event)"
-      (blur)="onTouch()"
+      (blur)="handleBlur()"
       [tabindex]="tabIndex"
     />
     <step-suffix class="button-suffix">

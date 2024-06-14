@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  TemplateRef,
+} from '@angular/core';
 import { FormBuilder, NonNullableFormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
@@ -9,7 +19,7 @@ import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
 import { DynamicFieldsSchema, SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
 import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
-import { FieldSchemaType } from '../../shared/field-schema-type.enum';
+import { ComplexFieldContext, ComplexFieldContextService } from '../../services/complex-field-context.service';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
@@ -32,6 +42,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   @Input() primaryFieldsDescription?: string;
   @Input() optionalFieldsDescription?: string;
   @Input() addFieldBtnLabel?: string;
+  @Input() complexObjectTemplate?: TemplateRef<ComplexFieldContext>;
 
   @Input() isDisabled?: boolean;
   @Input() schema?: SchemaObjectField;
