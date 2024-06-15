@@ -123,6 +123,9 @@
           </div>
         </div>
       </div>
+      <section>
+        <mat-slide-toggle color="primary" name="active" [(ngModel)]="task.active">Enable rule</mat-slide-toggle>
+      </section>
 
       <step-custom-forms
         [stModel]="task.executionsParameters!.customParameters!"
