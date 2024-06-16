@@ -135,14 +135,34 @@
         <step-label>Columns</step-label>
         <div class="columns-container">
           @for (column of item.tableSettings!.columns; track column.column) {
-            <mat-checkbox
-              color="primary"
-              [(ngModel)]="column.selected"
-              [ngModelOptions]="{ standalone: true }"
-              class="item"
-            >
-              <span>{{ column.column }}</span>
-            </mat-checkbox>
+            @if (column.pclValue) {
+              <div class="pcl-column-container">
+                <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="column.selected"
+                  [ngModelOptions]="{ standalone: true }"
+                  class="item"
+                >
+                </mat-checkbox>
+                <span>Pcl</span>
+                <step-editable-label
+                  (keydown)="$event.stopPropagation()"
+                  [ngModel]="column.pclValue"
+                  style="background-color: #f3f3f3; border-radius: 8px; max-width: 7rem"
+                  (ngModelChange)="onColumnPclValueChange(column, $event)"
+                >
+                </step-editable-label>
+              </div>
+            } @else {
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="column.selected"
+                [ngModelOptions]="{ standalone: true }"
+                class="item"
+              >
+                <span>{{ column.column }}</span>
+              </mat-checkbox>
+            }
           }
         </div>
         <mat-divider />

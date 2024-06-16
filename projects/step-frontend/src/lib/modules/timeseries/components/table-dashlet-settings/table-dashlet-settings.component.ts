@@ -71,6 +71,17 @@ export class TableDashletSettingsComponent implements OnInit {
     });
   }
 
+  onColumnPclValueChange(column: any, value: string) {
+    const oldValue = column.pclValue;
+    let parsedNumber: number = parseFloat(value);
+    const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
+    if (validPclValue) {
+      column.pclValue = parsedNumber;
+    } else {
+      // do nothing
+    }
+  }
+
   @HostListener('keydown.enter')
   save(): void {
     if (this.formContainer.invalid) {

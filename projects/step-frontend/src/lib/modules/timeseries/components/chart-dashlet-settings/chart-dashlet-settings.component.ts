@@ -11,6 +11,7 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { PclMenuPickerComponent } from '../../modules/_common/components/pcl-menu-picker/pcl-menu-picker.component';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -22,7 +23,7 @@ export interface ChartDashletSettingsData {
   templateUrl: './chart-dashlet-settings.component.html',
   styleUrls: ['./chart-dashlet-settings.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, FilterBarItemComponent],
+  imports: [COMMON_IMPORTS, FilterBarItemComponent, PclMenuPickerComponent],
 })
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
@@ -36,7 +37,7 @@ export class ChartDashletSettingsComponent implements OnInit {
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly AGGREGATE_TYPES: ChartAggregation[] = [
+  readonly AGGREGATES: ChartAggregation[] = [
     ChartAggregation.SUM,
     ChartAggregation.AVG,
     ChartAggregation.MAX,
@@ -44,7 +45,6 @@ export class ChartDashletSettingsComponent implements OnInit {
     ChartAggregation.COUNT,
     ChartAggregation.RATE,
     ChartAggregation.MEDIAN,
-    ChartAggregation.PERCENTILE,
   ];
   readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
@@ -111,7 +111,10 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._dialogRef.close({ ...this.item });
   }
 
-  switchAggregate(aggregate: ChartAggregation) {
+  switchAggregate(aggregate: ChartAggregation, pclValue?: number) {
     this.item.chartSettings!.primaryAxes.aggregation = aggregate;
+    if (pclValue) {
+      this.item.chartSettings!.primaryAxes.pclValue = pclValue;
+    }
   }
 }
