@@ -1,7 +1,7 @@
+@if (allowEmptyAggregate) {
+  <button mat-menu-item (click)="switchAggregate(undefined)"></button>
+}
 @for (agr of AGGREGATES; track agr) {
-  @if (allowEmptyAggregate) {
-    <button mat-menu-item (click)="switchAggregate(undefined)"></button>
-  }
   <button
     (click)="switchAggregate(agr)"
     mat-menu-item

@@ -98,15 +98,21 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
-    if (change.aggregate) {
+    console.log('change', change);
+    const newAggregate = change.aggregate;
+    const newPcl = change.pclValue;
+    if (newAggregate) {
       if (!this.item.chartSettings!.secondaryAxes) {
         this.item.chartSettings!.secondaryAxes = {
-          aggregation: change.aggregate,
-          pclValue: change.pclValue,
+          aggregation: newAggregate,
+          pclValue: newPcl,
           displayType: 'BAR_CHART',
           colorizationType: 'STROKE',
           unit: '',
         };
+      } else {
+        this.item.chartSettings!.secondaryAxes.aggregation = newAggregate;
+        this.item.chartSettings!.secondaryAxes.pclValue = newPcl;
       }
     } else {
       this.item.chartSettings!.secondaryAxes = undefined;

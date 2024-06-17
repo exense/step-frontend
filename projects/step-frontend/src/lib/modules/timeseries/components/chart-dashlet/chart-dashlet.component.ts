@@ -167,6 +167,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   switchAggregate(aggregate: ChartAggregation, pclValue?: number) {
     this.item.chartSettings!.primaryAxes.pclValue = pclValue;
+    this.item.chartSettings!.primaryAxes.aggregation = aggregate;
     this.selectedAggregate = aggregate;
     this.refresh(true).subscribe();
   }
@@ -566,9 +567,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'RATE':
         return b.throughputPerHour * this.selectedRateUnit.tphMultiplier;
       case 'MEDIAN':
-        return b.pclValues?.[50];
+        return b.pclValues?.['50.0'];
       case 'PERCENTILE':
-        return b.pclValues?.[pclValue || 90];
+        return b.pclValues?.[pclValue?.toFixed(1) || 90.0];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
