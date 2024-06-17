@@ -159,24 +159,17 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <!--            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">-->
-            <!--              @for (attr of AGGREGATE_TYPES; track attr) {-->
-            <!--                <mat-option [value]="attr">{{ attr }}</mat-option>-->
-            <!--              }-->
-            <!--            </mat-select>-->
-            <div class="aggregate-select-container">
-              <button [matMenuTriggerFor]="aggregateMenu" mat-button>
-                {{ item.chartSettings!.primaryAxes.aggregation }}
-              </button>
+            <button
+              class="aggregate-select-container"
+              #primaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="aggregateMenu"
+              mat-button
+            >
+              {{ item.chartSettings!.primaryAxes.aggregation }}
               @if (item.chartSettings!.primaryAxes.aggregation === ChartAggregation.PERCENTILE) {
-                <step-editable-label
-                  (keydown)="$event.stopPropagation()"
-                  [ngModel]="item.chartSettings!.primaryAxes.pclValue"
-                  style="background-color: #f3f3f3; border-radius: 8px; max-width: 7rem"
-                >
-                </step-editable-label>
+                {{ item.chartSettings!.primaryAxes.pclValue }}
               }
-            </div>
+            </button>
           </step-form-field>
           <step-form-field>
             <step-label>Unit</step-label>
@@ -187,7 +180,11 @@
             />
           </step-form-field>
           <mat-menu #aggregateMenu="matMenu">
-            <step-timeseries-pcl-picker [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)" />
+            <step-timeseries-aggregate-picker
+              [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+              [pclValue]="item.chartSettings!.primaryAxes.pclValue"
+              (aggregateChange)="handlePrimaryAggregationChange($event)"
+            />
           </mat-menu>
         </div>
         <step-form-field>
@@ -207,28 +204,27 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <mat-select
-              [value]="item.chartSettings!.secondaryAxes?.aggregation"
-              (valueChange)="onSecondaryAggregateSelect($event)"
+            <button
+              class="aggregate-select-container"
+              #secondaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="secondaryAggregateMenu"
+              mat-button
             >
-              <mat-option [value]="undefined">-</mat-option>
-              @for (attr of AGGREGATES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
+              {{ item.chartSettings!.secondaryAxes?.aggregation }}
+              @if (item.chartSettings!.secondaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.secondaryAxes?.pclValue }}
               }
-            </mat-select>
+            </button>
+            <mat-menu #secondaryAggregateMenu="matMenu">
+              <step-timeseries-aggregate-picker
+                [selectedAggregate]="$any(item.chartSettings!.secondaryAxes?.aggregation)"
+                [allowEmptyAggregate]="true"
+                [pclValue]="item.chartSettings!.secondaryAxes?.pclValue"
+                (aggregateChange)="handleSecondaryAggregationChange($event)"
+              />
+            </mat-menu>
           </step-form-field>
-          @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          } @else {
-            <div></div>
-          }
+          <div></div>
         </div>
         <mat-divider />
         <step-label>Visual settings</step-label>

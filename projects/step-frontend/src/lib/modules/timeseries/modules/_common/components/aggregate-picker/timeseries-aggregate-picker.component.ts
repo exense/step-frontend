@@ -3,19 +3,20 @@ import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { ChartAggregation } from '../../types/chart-aggregation';
 
 @Component({
-  selector: 'step-timeseries-pcl-picker',
-  templateUrl: './pcl-menu-picker.component.html',
-  styleUrls: ['./pcl-menu-picker.component.scss'],
+  selector: 'step-timeseries-aggregate-picker',
+  templateUrl: './timeseries-aggregate-picker.component.html',
+  styleUrls: ['./timeseries-aggregate-picker.component.scss'],
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
-export class PclMenuPickerComponent {
+export class TimeseriesAggregatePickerComponent {
   protected readonly ChartAggregation = ChartAggregation;
 
   @Input() selectedAggregate!: ChartAggregation;
   @Input() pclValue?: number;
+  @Input() allowEmptyAggregate: boolean = false;
 
-  @Output() aggregateChange: EventEmitter<{ aggregate: ChartAggregation; pclValue?: number }> = new EventEmitter();
+  @Output() aggregateChange: EventEmitter<{ aggregate?: ChartAggregation; pclValue?: number }> = new EventEmitter();
 
   readonly PCL_VALUES = [80, 90, 99];
   readonly AGGREGATES: ChartAggregation[] = [
@@ -36,5 +37,7 @@ export class PclMenuPickerComponent {
     }
   }
 
-  switchAggregate(aggregate: ChartAggregation, pclValue?: number) {}
+  switchAggregate(aggregate?: ChartAggregation, pclValue?: number) {
+    this.aggregateChange.emit({ aggregate, pclValue });
+  }
 }
