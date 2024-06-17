@@ -1,18 +1,10 @@
 :host {
   > *:last-child {
-    padding-bottom: 3.2rem;
+    padding-bottom: 0.5rem;
   }
 }
 
 step-dynamic-field {
   margin-bottom: 1rem;
   display: block;
-}
-
-h5 {
-  margin-top: 16px;
-}
-
-p.description {
-  font-style: italic;
 }

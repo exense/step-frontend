@@ -1,8 +1,7 @@
 import { Component, computed, EventEmitter, input, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
-import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
+import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldsSchema, SchemaObjectField } from '../../shared/dynamic-fields-schema';
-import { DynamicValueObject } from '../../../../client/augmented/models/dynamic-value-complex-types';
 
 @Component({
   selector: 'step-dynamic-field-editor',
@@ -33,7 +32,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Output() blur = new EventEmitter<void>();
 
   protected showJson: boolean = false;
-  protected internalValue?: DynamicFieldGroupValue;
+  protected internalValue?: DynamicFieldObjectValue;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cValue = changes['value'];
@@ -42,7 +41,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
     }
   }
 
-  handleChange(value?: DynamicFieldGroupValue): void {
+  handleChange(value?: DynamicFieldObjectValue): void {
     this.internalValue = value;
 
     if (value) {

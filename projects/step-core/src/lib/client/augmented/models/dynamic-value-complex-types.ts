@@ -19,9 +19,6 @@ export type DynamicValueArray = {
   expressionType?: string;
 };
 
-export type DynamicValue =
-  | DynamicValueString
-  | DynamicValueBoolean
-  | DynamicValueInteger
-  | DynamicValueObject
-  | DynamicValueArray;
+export type DynamicSimpleValue = DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
+export type DynamicComplexValue = DynamicValueObject | DynamicValueArray;
+export type DynamicValue = DynamicSimpleValue | DynamicComplexValue;

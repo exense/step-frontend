@@ -3,4 +3,4 @@ import { DynamicValueArray, DynamicValueObject } from '../../../client/step-clie
 export type DynamicFieldObjectValue = Required<DynamicValueObject>['value'];
 export type DynamicFieldArrayValue = Required<DynamicValueArray>['value'];
 
-export type DynamicFieldGroupValue = DynamicFieldObjectValue;
+export type DynamicFieldGroupValue = DynamicFieldObjectValue | DynamicFieldArrayValue;

@@ -7,7 +7,7 @@ export type SchemaObjectField = {
 
 export type SchemaArrayField = {
   type: 'array';
-  items: SchemaField;
+  items?: SchemaField;
   default?: any;
 };
 

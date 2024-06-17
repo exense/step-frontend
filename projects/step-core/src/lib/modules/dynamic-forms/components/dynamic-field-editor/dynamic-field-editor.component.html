@@ -1,4 +1,4 @@
-<step-dynamic-field-group
+<step-dynamic-field-object-editor
   [primaryFieldsLabel]="primaryFieldsLabel ?? 'Inputs (required)'"
   [optionalFieldsLabel]="optionalFieldsLabel ?? 'Inputs (optional)'"
   [addFieldBtnLabel]="addFieldBtnLabel ?? 'Add input'"
@@ -6,20 +6,35 @@
   [value]="internalValue"
   (valueChange)="handleChange($event)"
   [isDisabled]="isDisabled"
-  [complexObjectTemplate]="complexFieldTemplate"
+  [complexObjectTemplate]="complexObjectFieldTemplate"
+  [complexArrayTemplate]="complexArrayFieldTemplate"
 />
-<ng-template #complexFieldTemplate let-field>
-  <step-dynamic-field-group
-    primaryFieldsLabel="Inputs (required)"
-    optionalFieldsLabel="Inputs (optional)"
-    addFieldBtnLabel="Add input"
-    [schema]="field.fieldSchema"
-    [value]="field.value"
-    (valueChange)="field.valueChange($event)"
-    [isDisabled]="field.isDisabled"
-    [tabIndex]="field.tabIndex"
-    (blur)="field.handleBlur()"
-    [complexObjectTemplate]="field.fieldObjectTemplate"
+<ng-template #complexObjectFieldTemplate let-fieldCtx>
+  <step-dynamic-field-object-editor
+    addFieldBtnLabel="Add property"
+    [schema]="fieldCtx.fieldSchema()"
+    [value]="fieldCtx.value()"
+    (valueChange)="fieldCtx.handleValueChange($event)"
+    [isDisabled]="fieldCtx.isDisabled()"
+    [tabIndex]="fieldCtx.tabIndex()"
+    (blur)="fieldCtx.handleBlur()"
+    [complexObjectTemplate]="fieldCtx.fieldObjectTemplate()"
+    [complexArrayTemplate]="fieldCtx.fieldArrayTemplate()"
+    [isChildNode]="true"
+  />
+</ng-template>
+<ng-template #complexArrayFieldTemplate let-fieldCtx>
+  <step-dynamic-field-array-editor
+    addFieldBtnLabel="Add item"
+    [schema]="fieldCtx.fieldSchema()"
+    [value]="fieldCtx.value()"
+    (valueChange)="fieldCtx.handleValueChange($event)"
+    [isDisabled]="fieldCtx.isDisabled()"
+    [tabIndex]="fieldCtx.tabIndex()"
+    (blur)="fieldCtx.handleBlur()"
+    [complexObjectTemplate]="fieldCtx.fieldObjectTemplate()"
+    [complexArrayTemplate]="fieldCtx.fieldArrayTemplate()"
+    [isChildNode]="true"
   />
 </ng-template>
 <div class="toggle-bar" (click)="showJson = !showJson">
