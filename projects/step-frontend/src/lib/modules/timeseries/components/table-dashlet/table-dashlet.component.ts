@@ -148,13 +148,31 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
-        label: ColumnsLabels[column.column],
+        label: ColumnsLabels[column.column] + this.getLabelUnit(column.column),
         isVisible: column.selected,
         mapValue: ColumnsValueFunctions[column.column!],
         mapDiffValue: ColumnsDiffFunctions[column.column!],
       } as TableColumn;
     });
     this.updateVisibleColumns();
+  }
+
+  private getLabelUnit(
+    column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_99' | 'TPS' | 'TPH',
+  ): string {
+    switch (column) {
+      case 'COUNT':
+      case 'TPS':
+      case 'TPH':
+        return '';
+      default:
+        const unit = this.context.getMetric(this.item.metricKey).unit;
+        if (unit === '1') {
+          return '';
+        } else {
+          return ` (${unit})`;
+        }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -448,8 +466,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('SUM', (item) => item.base?.sum)
       .addSortNumberPredicate('SUM_comp', (item) => item.compare?.sum)
       .addSortNumberPredicate('SUM_diff', (item) => item.sumDiff)
-      .addSortNumberPredicate('AVG', (item) => item.base?.attributes['avg'])
-      .addSortNumberPredicate('AVG_comp', (item) => item.compare?.attributes['avg'])
+      .addSortNumberPredicate('AVG', (item) => item.base?.avg)
+      .addSortNumberPredicate('AVG_comp', (item) => item.compare?.avg)
       .addSortNumberPredicate('AVG_diff', (item) => item.avgDiff)
       .addSortNumberPredicate('MIN', (item) => item.base?.min)
       .addSortNumberPredicate('MIN_comp', (item) => item.compare?.min)
@@ -537,9 +555,9 @@ const ColumnsLabels = {
   [TableColumnType.AVG]: 'Avg',
   [TableColumnType.MIN]: 'Min',
   [TableColumnType.MAX]: 'Max',
-  [TableColumnType.PCL_80]: 'Pcl. 80 (ms)',
-  [TableColumnType.PCL_90]: 'Pcl. 90 (ms)',
-  [TableColumnType.PCL_99]: 'Pcl. 99 (ms)',
+  [TableColumnType.PCL_80]: 'Pcl. 80',
+  [TableColumnType.PCL_90]: 'Pcl. 90',
+  [TableColumnType.PCL_99]: 'Pcl. 99',
   [TableColumnType.TPS]: 'Tps',
   [TableColumnType.TPH]: 'Tph',
 };
