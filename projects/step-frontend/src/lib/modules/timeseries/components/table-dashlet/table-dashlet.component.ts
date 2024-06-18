@@ -161,7 +161,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
-        label: this.getColumnLabel(column),
+        label: ColumnsLabels[column.column] + this.getLabelUnit(column.column),
         isVisible: column.selected!,
         pclValue: column.pclValue,
         mapValue: this.getBucketMapFunction(column),
@@ -171,16 +171,31 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.updateVisibleColumns();
   }
 
+  private getLabelUnit(
+    column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_99' | 'TPS' | 'TPH',
+  ): string {
+    switch (column) {
+      case 'COUNT':
+      case 'TPS':
+      case 'TPH':
+        return '';
+      default:
+        const unit = this.context.getMetric(this.item.metricKey).unit;
+        if (unit === '1') {
+          return '';
+        } else {
+          return ` (${unit})`;
+        }
+    }
+  }
+
   private getColumnLabel(column: ColumnSelection): string {
     let label = ColumnsLabels[column.column];
     switch (column.column) {
       case TableColumnType.PCL_80:
       case TableColumnType.PCL_90:
       case TableColumnType.PCL_99:
-        if (!column.pclValue) {
-          column.pclValue = 90;
-        }
-        label += ` ${column.pclValue} (ms)`;
+        label += ` ${column.pclValue || 90}`;
     }
 
     return label;
@@ -493,8 +508,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('SUM', (item) => item.base?.sum)
       .addSortNumberPredicate('SUM_comp', (item) => item.compare?.sum)
       .addSortNumberPredicate('SUM_diff', (item) => item.sumDiff)
-      .addSortNumberPredicate('AVG', (item) => item.base?.attributes['avg'])
-      .addSortNumberPredicate('AVG_comp', (item) => item.compare?.attributes['avg'])
+      .addSortNumberPredicate('AVG', (item) => item.base?.avg)
+      .addSortNumberPredicate('AVG_comp', (item) => item.compare?.avg)
       .addSortNumberPredicate('AVG_diff', (item) => item.avgDiff)
       .addSortNumberPredicate('MIN', (item) => item.base?.min)
       .addSortNumberPredicate('MIN_comp', (item) => item.compare?.min)
