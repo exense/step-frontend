@@ -34,9 +34,10 @@ export class CredentialsService implements CredentialsStrategy {
   }
 
   private invokeLogoutCleanup(): void {
-    // This is currently redundant due to the reload
+    // this currently only works for non-plugin components
     this.logoutCleanup.forEach((item) => item.logoutCleanup());
 
-    window.location.reload();
+    // reload and remove tenant from url
+    window.location.replace(location.pathname);
   }
 }
