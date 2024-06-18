@@ -98,7 +98,6 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
-    console.log('change', change);
     const newAggregate = change.aggregate;
     const newPcl = change.pclValue;
     if (newAggregate) {
