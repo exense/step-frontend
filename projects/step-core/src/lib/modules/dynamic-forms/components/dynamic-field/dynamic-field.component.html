@@ -27,7 +27,7 @@
 
   @if (!dynamic) {
     @switch (fieldType) {
-      @case (DynamicFieldType.ENUM) {
+      @case (JsonFieldType.ENUM) {
         <mat-select
           [disabled]="isDisabled"
           [ngModel]="value"
@@ -43,7 +43,7 @@
           }
         </mat-select>
       }
-      @case (DynamicFieldType.BOOLEAN) {
+      @case (JsonFieldType.BOOLEAN) {
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
@@ -57,7 +57,7 @@
           <mat-radio-button [value]="false" [tabIndex]="tabIndex">False</mat-radio-button>
         </mat-radio-group>
       }
-      @case (DynamicFieldType.NUMBER) {
+      @case (JsonFieldType.NUMBER) {
         <input
           type="number"
           step="any"
@@ -68,7 +68,7 @@
           [tabindex]="tabIndex"
         />
       }
-      @case (DynamicFieldType.OBJECT) {
+      @case (JsonFieldType.OBJECT) {
         <input
           type="text"
           [disabled]="isDisabled"
@@ -78,7 +78,7 @@
           [tabindex]="tabIndex"
         />
       }
-      @case (DynamicFieldType.ARRAY) {
+      @case (JsonFieldType.ARRAY) {
         <input
           type="text"
           [disabled]="isDisabled"
@@ -108,7 +108,7 @@
           matTooltipPosition="below"
           [tabindex]="tabIndex"
           [disabled]="isDisabled"
-          (click)="editValueInModal(fieldType === DynamicFieldType.OBJECT ? AceMode.JSON : undefined)"
+          (click)="editValueInModal(fieldType === JsonFieldType.OBJECT ? AceMode.JSON : undefined)"
           (focusin)="forceFocus = true"
           (focusout)="forceFocus = false"
         >

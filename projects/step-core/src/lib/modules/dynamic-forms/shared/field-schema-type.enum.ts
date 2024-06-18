@@ -1,9 +1,2 @@
-export enum FieldSchemaType {
-  STRING = 'string',
-  NUMBER = 'number',
-  BOOLEAN = 'boolean',
-  INTEGER = 'integer',
-  ARRAY = 'array',
-  OBJECT = 'object',
-  ENUM = 'enum',
-}
+import { JsonSchemaFieldType } from '../../json-forms';
+export type FieldSchemaType = JsonSchemaFieldType;

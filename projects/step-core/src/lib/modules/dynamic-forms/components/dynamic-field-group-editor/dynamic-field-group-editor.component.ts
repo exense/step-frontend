@@ -15,9 +15,9 @@ import { v4 } from 'uuid';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
 import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
+import { JsonFieldType } from '../../../json-forms';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
@@ -233,7 +233,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     const isRequired = !!config?.isRequired;
     const isAdditional = !!config?.isAdditional;
 
-    let fieldType!: DynamicFieldType;
+    let fieldType!: JsonFieldType;
     let enumItems: string[] = [];
 
     if (!isAdditional) {
@@ -243,32 +243,32 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       }
 
       if (fieldDescription.enum) {
-        fieldType = DynamicFieldType.ENUM;
+        fieldType = JsonFieldType.ENUM;
         enumItems = fieldDescription.enum;
       } else {
         switch (fieldDescription.type) {
           case 'string':
-            fieldType = DynamicFieldType.STRING;
+            fieldType = JsonFieldType.STRING;
             break;
           case 'number':
           case 'integer':
-            fieldType = DynamicFieldType.NUMBER;
+            fieldType = JsonFieldType.NUMBER;
             break;
           case 'boolean':
-            fieldType = DynamicFieldType.BOOLEAN;
+            fieldType = JsonFieldType.BOOLEAN;
             break;
           case 'array':
-            fieldType = DynamicFieldType.ARRAY;
+            fieldType = JsonFieldType.ARRAY;
             break;
           case 'object':
-            fieldType = DynamicFieldType.OBJECT;
+            fieldType = JsonFieldType.OBJECT;
             break;
           default:
             break;
         }
       }
     } else {
-      fieldType = DynamicFieldType.STRING;
+      fieldType = JsonFieldType.STRING;
     }
 
     const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {

@@ -25,7 +25,7 @@ import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
+import { StepBasicsModule } from './modules/basics/step-basics.module';
 import {
   CustomCellRegistryService,
   CustomRegistriesModule,
@@ -72,6 +72,7 @@ import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
+import { REPOSITORY_PARAMETERS_INITIALIZER } from './modules/repository-parameters';
 
 @NgModule({
   declarations: [
@@ -289,6 +290,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs/tabs.module';
 export * from './modules/tree/tree.module';
+export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';

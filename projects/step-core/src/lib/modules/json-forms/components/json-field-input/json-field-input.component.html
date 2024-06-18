@@ -1,0 +1,117 @@
+<step-form-field
+  [class.ng-invalid]="!!_ngControl?.invalid"
+  [class.step-force-focus]="forceFocus()"
+  [class.editable-label]="canEditLabel()"
+>
+  <step-prefix>
+    <div class="json-field-label" stepElementRefMap [key]="elementRefMapKey()">
+      @if (canEditLabel()) {
+        <input
+          type="text"
+          [disabled]="isDisabled()"
+          (click)="fixLabelFocus($event)"
+          [(ngModel)]="labelModel"
+          (blur)="finishLabelChange()"
+          [tabindex]="tabIndex()"
+          (focusin)="forceFocus.set(true)"
+          (focusout)="forceFocus.set(false)"
+        />
+      } @else {
+        <span [matTooltip]="label() ?? ''">{{ label() }}</span>
+      }
+      @if (tooltip(); as tooltip) {
+        <step-icon name="help-circle" [matTooltip]="tooltip" />
+      }
+    </div>
+  </step-prefix>
+  @switch (fieldType()) {
+    @case (JsonFieldType.ENUM) {
+      <mat-select
+        [disabled]="isDisabled()"
+        [ngModel]="fieldValue()"
+        (ngModelChange)="handleValueChange($event)"
+        (blur)="handleBlur()"
+        [tabIndex]="tabIndex()"
+      >
+        @if (displayEnumExtraValue()) {
+          <mat-option [value]="fieldValue()">{{ fieldValue() }}</mat-option>
+        }
+        @for (item of enumItems(); track item) {
+          <mat-option [value]="item">{{ item }}</mat-option>
+        }
+      </mat-select>
+    }
+    @case (JsonFieldType.BOOLEAN) {
+      <mat-radio-group
+        aria-label="Select an option"
+        color="primary"
+        [ngModel]="fieldValue()"
+        (ngModelChange)="handleValueChange($event)"
+        (blur)="handleBlur()"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
+      >
+        <mat-radio-button [value]="true" [tabIndex]="tabIndex()">True</mat-radio-button>
+        <mat-radio-button [value]="false" [tabIndex]="tabIndex()">False</mat-radio-button>
+      </mat-radio-group>
+    }
+    @case (JsonFieldType.NUMBER) {
+      <input
+        type="number"
+        step="any"
+        [disabled]="isDisabled()"
+        [ngModel]="fieldValue()"
+        (ngModelChange)="handleValueChange($event)"
+        (blur)="handleBlur()"
+        [tabindex]="tabIndex()"
+      />
+    }
+    @case (JsonFieldType.OBJECT) {
+      <input
+        type="text"
+        [disabled]="isDisabled()"
+        [ngModel]="fieldValue() | json"
+        (ngModelChange)="handleValueChange($event, fieldType())"
+        (blur)="handleBlur()"
+        [tabindex]="tabIndex()"
+      />
+    }
+    @case (JsonFieldType.ARRAY) {
+      <input
+        type="text"
+        [disabled]="isDisabled()"
+        [ngModel]="fieldValue() | json"
+        (ngModelChange)="handleValueChange($event, fieldType())"
+        (blur)="handleBlur()"
+        [tabindex]="tabIndex()"
+      />
+    }
+    @default {
+      <input
+        type="text"
+        [disabled]="isDisabled()"
+        [ngModel]="fieldValue()"
+        (ngModelChange)="handleValueChange($event, fieldType())"
+        (blur)="handleBlur()"
+        [tabindex]="tabIndex()"
+      />
+    }
+  }
+  @if (canRemove()) {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Remove"
+        matTooltipPosition="below"
+        [disabled]="isDisabled()"
+        [tabindex]="tabIndex()"
+        (click)="remove.emit()"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
+      >
+        <step-icon name="x" />
+      </button>
+    </step-suffix>
+  }
+</step-form-field>

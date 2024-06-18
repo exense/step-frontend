@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddSchemaFieldDialogComponent } from '../add-schema-field-dialog/add-schema-field-dialog.component';
 import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
 import { DynamicFieldProperty, DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
-import { FieldSchemaType } from '../../shared/field-schema-type.enum';
+import { JsonSchemaFieldType } from '../../../json-forms';
 
 @Component({
   selector: 'step-add-field-schema-button',
@@ -35,7 +35,7 @@ export class AddFieldSchemaButtonComponent {
 
     const fieldProperty: DynamicFieldProperty = {};
 
-    if (fieldMeta.type === FieldSchemaType.ENUM) {
+    if (fieldMeta.type === JsonSchemaFieldType.ENUM) {
       fieldProperty.enum = fieldMeta.enumItems;
     } else {
       fieldProperty.type = fieldMeta.type;
