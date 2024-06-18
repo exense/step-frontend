@@ -27,10 +27,19 @@ step-dynamic-field-complex {
 
     .complex-field-editor {
       margin-bottom: 1rem;
+      position: relative;
+      &:before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        border-left: solid 0.1rem var.$gray-500;
+        top: -1rem;
+        left: 0.9rem;
+        bottom: 0.5rem;
+      }
       step-dynamic-field-object-editor,
       step-dynamic-field-array-editor {
         display: block;
-        border-left: solid 0.1rem var.$gray-500;
         padding-left: 2rem;
       }
     }
