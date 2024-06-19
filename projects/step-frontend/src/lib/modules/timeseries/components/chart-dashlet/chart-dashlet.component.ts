@@ -17,12 +17,12 @@ import {
   OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { forkJoin, Observable, of, Subscription, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -93,9 +93,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
   selectedRateUnit: RateUnit = this.RATE_UNITS[0]; // used only for RATE aggregate
+  requestOql: string = '';
 
   private _timeSeriesService = inject(TimeSeriesService);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
@@ -197,45 +198,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe();
-  }
-
-  private getMasterChart(): DashboardItem | undefined {
-    return this.item.masterChartId ? this.context.getDashlet(this.item.masterChartId) : undefined;
-  }
-
-  private composeRequestFilter(): string {
-    const masterChart = this.getMasterChart();
-    const metric = masterChart?.metricKey || this.item.metricKey;
-    const metricFilterItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${metric}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
-
-    const itemToInheritSettingsFrom = masterChart || this.item;
-    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        this.context.getFilteringSettings().filterItems,
-        itemToInheritSettingsFrom.filters,
-      );
-    } else {
-      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
-    }
-    if (metric !== 'threadgroup') {
-      filterItems.push(metricFilterItem);
-      return FilterUtils.filtersToOQL(filterItems, 'attributes');
-    } else {
-      // TODO clean this once the migration of sampler measurements is done
-      return new OQLBuilder()
-        .append(
-          '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))',
-        )
-        .append(FilterUtils.filtersToOQL(filterItems, 'attributes'))
-        .build();
-    }
   }
 
   handleLockStateChange(locked: boolean) {
@@ -366,8 +328,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       },
     ];
 
-    this.fetchLegendEntities(series).subscribe();
-
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
@@ -396,20 +356,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       });
     }
 
-    this._internalSettings = {
-      title: this.getChartTitle(),
-      xValues: xLabels,
-      series: series,
-      tooltipOptions: {
-        enabled: true,
-        zAxisLabel: this.getSecondAxesLabel(),
-        yAxisUnit: yAxesUnit,
-        useExecutionLinks: this.showExecutionLinks,
-      },
-      showLegend: true,
-      axes: axes,
-      truncated: response.truncated,
-    };
+    this.fetchLegendEntities(series).subscribe((v) => {
+      this._internalSettings = {
+        title: this.getChartTitle(),
+        xValues: xLabels,
+        series: series,
+        tooltipOptions: {
+          enabled: true,
+          zAxisLabel: this.getSecondAxesLabel(),
+          yAxisUnit: yAxesUnit,
+          useExecutionLinks: this.showExecutionLinks,
+        },
+        showLegend: true,
+        axes: axes,
+        truncated: response.truncated,
+      };
+    });
   }
 
   private removeDataGaps(data: (number | undefined)[]): number[] {
@@ -445,11 +407,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
     const groupDimensions = this.getGroupDimensions();
+    const oqlFilter = this.composeRequestFilter();
+    this.requestOql = oqlFilter;
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: this.composeRequestFilter(),
+      oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
     };
     const customResolution = this.context.getChartsResolution();
@@ -480,11 +444,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         if (!entityName) {
           return undefined;
         }
-        const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        const entityIds: Set<string> = new Set<string>(
+          series
+            .map((s) => {
+              if (s.scale !== 'y') {
+                // ignore other scales
+                return '';
+              } else {
+                return s.labelItems[i]!;
+              }
+            })
+            .filter((v) => !!v),
+        );
         if (entityIds.size === 0) {
           of(undefined);
         }
-        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+        return this._timeSeriesEntityService.getEntityNames(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
@@ -495,14 +470,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
                 } else {
                   newLabel = labelId + ' (unresolved)';
                 }
-                this.chart.setLabelItem(s.id, i, newLabel);
+                s.labelItems[i] = newLabel;
               }
             });
           }),
         );
       })
       .filter((x) => !!x);
-    return forkJoin(requests$);
+    return forkJoin(requests$).pipe(defaultIfEmpty(null));
   }
 
   /**
@@ -611,10 +586,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return 'CHART';
   }
 
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
+  getContext(): TimeSeriesContext {
+    return this.context;
   }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
+
+  getItem(): DashboardItem {
+    return this.item;
   }
 }

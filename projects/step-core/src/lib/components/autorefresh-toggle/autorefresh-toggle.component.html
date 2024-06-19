@@ -1,11 +1,21 @@
 @switch (buttonType) {
   @case ('icon') {
-    <button mat-icon-button [matMenuTriggerFor]="menu" [matTooltip]="selectedInterval.label">
+    <button
+      mat-icon-button
+      [disabled]="disableAutoRefreshButton"
+      [matMenuTriggerFor]="menu"
+      [matTooltip]="selectedInterval.label"
+    >
       <ng-container *ngTemplateOutlet="btnContent" />
     </button>
   }
   @case ('stroke') {
-    <button mat-stroked-button [matMenuTriggerFor]="menu" [matTooltip]="selectedInterval.label">
+    <button
+      mat-stroked-button
+      [disabled]="disableAutoRefreshButton"
+      [matMenuTriggerFor]="menu"
+      [matTooltip]="selectedInterval.label"
+    >
       <ng-container *ngTemplateOutlet="btnContent" />
     </button>
   }
@@ -14,7 +24,7 @@
 <ng-template #btnContent>
   <step-icon name="refresh-cw" />
   @if (model.interval === 0) {
-    <div class="refresh-off"><span>off</span></div>
+    <div class="refresh-off" [class.disabled]="disableAutoRefreshButton"><span>off</span></div>
   }
 </ng-template>
 <mat-menu #menu="matMenu">

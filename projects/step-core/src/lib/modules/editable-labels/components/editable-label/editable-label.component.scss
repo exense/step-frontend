@@ -3,6 +3,10 @@
 step-editable-label {
   position: relative;
 
+  .max-width-100 {
+    max-width: 100%;
+  }
+
   .editable-label {
     line-height: 18px;
     padding: 8px 14px;

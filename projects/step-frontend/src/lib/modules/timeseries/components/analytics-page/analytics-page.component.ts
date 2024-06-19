@@ -4,6 +4,7 @@ import {
   ResolutionPickerComponent,
   TimeRangePickerComponent,
   TimeSeriesConfig,
+  TimeSeriesEntityService,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
@@ -26,8 +27,9 @@ import { AuthService } from '@exense/step-core';
     DashboardComponent,
   ],
 })
-export class AnalyticsPageComponent implements OnInit {
+export class AnalyticsPageComponent implements OnInit, OnDestroy {
   private _authService: AuthService = inject(AuthService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   dashboardId?: string;
 
@@ -36,5 +38,9 @@ export class AnalyticsPageComponent implements OnInit {
     if (!this.dashboardId) {
       throw new Error('Analytics dashboard id is not present on conf');
     }
+  }
+
+  ngOnDestroy(): void {
+    this._timeSeriesEntityService.clearCache();
   }
 }
