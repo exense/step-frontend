@@ -268,8 +268,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           this.refreshCompareData().subscribe();
         }
       });
-    } else {
-      // do nothing
     }
   }
 

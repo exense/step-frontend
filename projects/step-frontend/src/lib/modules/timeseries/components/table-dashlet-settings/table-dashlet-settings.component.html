@@ -148,7 +148,7 @@
                 <step-editable-label
                   (keydown)="$event.stopPropagation()"
                   [ngModel]="column.pclValue"
-                  style="background-color: #f3f3f3; border-radius: 8px; max-width: 7rem"
+                  class="pcl-editable-label"
                   (ngModelChange)="onColumnPclValueChange(column, $event)"
                 >
                 </step-editable-label>
