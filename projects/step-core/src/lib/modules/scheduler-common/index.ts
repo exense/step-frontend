@@ -5,6 +5,7 @@ import { TaskUrlPipe } from './pipes/task-url.pipe';
 import { SelectTaskComponent } from './components/select-task/select-task.component';
 
 export * from './components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+export { TaskForm } from './components/edit-scheduler-task-dialog/task.form';
 export * from './components/scheduler-task-link/scheduler-task-link.component';
 export * from './components/schedule-plan/schedule-plan.component';
 export * from './components/select-task/select-task.component';

@@ -2,9 +2,9 @@ import { Component, EventEmitter, inject, Input, OnDestroy, Optional, Output, Vi
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { noop } from 'rxjs';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { Ace } from 'ace-builds';
+import { JsonFieldType } from '../../../json-forms';
 
 type DynamicValue = DynamicValueString | DynamicValueBoolean | DynamicValueInteger;
 
@@ -37,7 +37,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   protected forceFocus: boolean = false;
 
-  readonly DynamicFieldType = DynamicFieldType;
+  readonly JsonFieldType = JsonFieldType;
   readonly AceMode = AceMode;
 
   @Input() tabIndex?: number;
@@ -48,7 +48,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input() tooltip?: string = '';
 
-  @Input() fieldType: DynamicFieldType = DynamicFieldType.STRING;
+  @Input() fieldType: JsonFieldType = JsonFieldType.STRING;
 
   @Input() canRemove?: boolean = false;
 
@@ -106,8 +106,8 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
     $event.stopImmediatePropagation();
   }
 
-  protected valueChange(value: DynamicValue['value'], type?: DynamicFieldType): void {
-    if ((type === DynamicFieldType.ARRAY || type === DynamicFieldType.OBJECT) && typeof value === 'string') {
+  protected valueChange(value: DynamicValue['value'], type?: JsonFieldType): void {
+    if ((type === JsonFieldType.ARRAY || type === JsonFieldType.OBJECT) && typeof value === 'string') {
       try {
         value = JSON.parse(value);
       } catch (e) {
@@ -153,7 +153,7 @@ export class DynamicFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   private determineEnumExtraValueFlag(): void {
-    if (this.fieldType !== DynamicFieldType.ENUM) {
+    if (this.fieldType !== JsonFieldType.ENUM) {
       this.displayEnumExtraValue = false;
       return;
     }

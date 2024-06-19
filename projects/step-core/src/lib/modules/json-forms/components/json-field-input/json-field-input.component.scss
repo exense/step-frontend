@@ -1,0 +1,52 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-json-field-input {
+  step-prefix {
+    flex: 1;
+  }
+
+  button {
+    width: 4rem;
+  }
+
+  .editable-label {
+    padding: 0;
+  }
+
+  .json-field-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    color: var.$gray-500;
+
+    span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    input[type='text'] {
+      border: none;
+      outline: none;
+      width: auto;
+      font-weight: 400;
+      padding: 8px 0;
+      line-height: 18px;
+      margin-top: 0;
+      margin-bottom: 0;
+      box-sizing: border-box;
+      flex-grow: 1;
+    }
+  }
+
+  mat-radio-button {
+    transform: scale(0.85);
+
+    .mat-mdc-ripple-element {
+      // left and top are set inline dynamically, hence the usage of !important
+      left: 0 !important;
+      top: 0 !important;
+    }
+  }
+}

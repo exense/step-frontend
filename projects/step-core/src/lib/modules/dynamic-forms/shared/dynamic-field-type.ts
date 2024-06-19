@@ -1,8 +1,3 @@
-export enum DynamicFieldType {
-  STRING = 'string',
-  NUMBER = 'number',
-  BOOLEAN = 'boolean',
-  ARRAY = 'array',
-  OBJECT = 'object',
-  ENUM = 'enum',
-}
+import { JsonFieldType } from '../../json-forms';
+
+export type DynamicFieldType = JsonFieldType;

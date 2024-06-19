@@ -1,9 +1,4 @@
-export type DynamicFieldProperty = {
-  type?: 'string' | 'number' | 'boolean' | 'integer' | 'array' | 'object';
-  enum?: string[];
-  default?: any;
-};
-export interface DynamicFieldsSchema {
-  properties: Record<string, DynamicFieldProperty>;
-  required?: string[];
-}
+import { JsonFieldProperty, JsonFieldSchema } from '../../json-forms';
+
+export type DynamicFieldProperty = JsonFieldProperty;
+export type DynamicFieldsSchema = JsonFieldSchema;
