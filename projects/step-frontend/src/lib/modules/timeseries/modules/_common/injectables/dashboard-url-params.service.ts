@@ -73,7 +73,6 @@ export class DashboardUrlParamsService {
   }
 
   private decodeUrlFilters(params: Params): UrlFilterAttribute[] {
-    console.log(params);
     return Object.entries(params)
       .filter(
         ([key, value]) =>
