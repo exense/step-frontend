@@ -56,6 +56,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
+import { BigNumberPipe } from './pipes/big-number.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -113,6 +114,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    BigNumberPipe,
   ],
   exports: [
     CommonModule,
@@ -173,6 +175,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    BigNumberPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -203,6 +206,7 @@ export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
+export * from './pipes/big-number.pipe';
 export * from './pipes/array-item-label.pipe';
 export * from './injectables/item-by-id-cache.service';
 export * from './injectables/cron-presets.token';

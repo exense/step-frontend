@@ -66,16 +66,6 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
     );
   });
 
-  private valueDictionary = computed(() =>
-    Object.values(this.dictionary() ?? {}).reduce(
-      (res, item) => {
-        res[item.percent] = item.value;
-        return res;
-      },
-      {} as Record<number, number>,
-    ),
-  );
-
   private chart = computed(() => {
     const canvas = this.canvas()?.nativeElement;
     if (!canvas) {
@@ -111,7 +101,7 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
   }
 
   private calcPercent(count: number, total: number): number {
-    return Math.max(total ? Math.floor((count / total) * 100) : 0, 5);
+    return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);
   }
 
   private createChart(canvas: HTMLCanvasElement): Chart {
@@ -139,7 +129,8 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
           datalabels: {
             color: '#fff',
             formatter: (value, context) => {
-              return this.valueDictionary()[value] ?? value;
+              // return this.valueDictionary()[value] ?? value;
+              return '';
             },
             font: {
               weight: 'bold',
