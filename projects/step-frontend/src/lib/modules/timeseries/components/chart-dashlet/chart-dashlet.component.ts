@@ -569,10 +569,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'MEDIAN':
         return b.pclValues?.['50.0'];
       case 'PERCENTILE':
-        return b.pclValues?.[pclValue?.toFixed(1) || 90.0];
+        return b.pclValues?.[this.getPclWithDecimals(pclValue!) || '90.0'];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
     }
+  }
+
+  private getPclWithDecimals(value: number) {
+    if (Math.floor(value) === value) return value.toString();
+    let decimalsCount = value.toString().split('.')[1].length || 0;
+    return value.toFixed(Math.max(1, decimalsCount));
   }
 
   getType(): 'TABLE' | 'CHART' {
