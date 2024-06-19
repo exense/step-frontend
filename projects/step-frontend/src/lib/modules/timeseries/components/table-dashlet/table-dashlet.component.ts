@@ -161,7 +161,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
       return {
         id: column.column!,
-        label: ColumnsLabels[column.column] + this.getLabelUnit(column.column),
+        label: this.getColumnLabel(column),
         isVisible: column.selected!,
         pclValue: column.pclValue,
         mapValue: this.getBucketMapFunction(column),
@@ -198,15 +198,21 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         label += ` ${column.pclValue || 90}`;
     }
 
-    return label;
+    return label + this.getLabelUnit(column.column);
   }
 
   private getBucketMapFunction(column: ColumnSelection) {
-    if (column.pclValue) {
-      return (b: ProcessedBucket) => b?.pclValues![column.pclValue!];
+    const pclValue = column.pclValue;
+    if (pclValue) {
+      return (b: ProcessedBucket) => b?.pclValues![pclValue!.toFixed(Math.max(1, this.countDecimals(pclValue!)))];
     } else {
       return ColumnsValueFunctions[column.column!];
     }
+  }
+
+  private countDecimals(value: number) {
+    if (Math.floor(value) === value) return 0;
+    return value.toString().split('.')[1].length || 0;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -268,6 +274,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           this.refreshCompareData().subscribe();
         }
       });
+    } else {
+      column.pclValue = 0;
+      setTimeout(() => (column.pclValue = oldValue), 100);
     }
   }
 
