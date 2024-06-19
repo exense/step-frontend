@@ -1,4 +1,4 @@
-import { Router, Routes } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, Routes } from '@angular/router';
 import { LoginComponent } from './modules/_common/step-common.module';
 import { APP_INITIALIZER, FactoryProvider, inject } from '@angular/core';
 import { AdditionalInitializationService, authGuard, AuthService, DEFAULT_PAGE, nonAuthGuard } from '@exense/step-core';
@@ -22,7 +22,11 @@ export const APP_ROUTES: Routes = [
         path: '',
         component: MainViewComponent,
         children: [],
-        canActivate: [authGuard, () => inject(AdditionalInitializationService).initialize().pipe(take(1))],
+        canActivate: [
+          authGuard,
+          (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
+            inject(AdditionalInitializationService).initialize(route, state).pipe(take(1)),
+        ],
         runGuardsAndResolvers: 'always',
       },
       {
