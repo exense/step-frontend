@@ -232,10 +232,14 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
         }
       }),
       map((items) => {
-        const testCasesWithIds = items?.filter((item) => !!item.key);
-        const testCasesNamesOnly = items
+        let testCasesWithIds = items?.filter((item) => !!item.key);
+        let testCasesNamesOnly = items
           ?.filter((item) => !item.key)
           ?.map(({ value }) => ({ key: value, value }) as KeyValue<string, string>);
+
+        testCasesWithIds = !!testCasesWithIds?.length ? testCasesWithIds : undefined;
+        testCasesNamesOnly = !!testCasesNamesOnly?.length ? testCasesNamesOnly : undefined;
+
         return {
           testCasesWithIds,
           testCasesNamesOnly,

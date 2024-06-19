@@ -5,6 +5,7 @@ import { ScriptEditorModule } from './modules/script-editor/script-editor.module
 import { FunctionPackagesModule } from './modules/function-packages/function-packages.module';
 import { NodePluginModule } from './modules/node-plugin/node-plugin.module';
 import { JmeterPluginModule } from './modules/jmeter-plugin/jmeter-plugin.module';
+import { MavenRepositoryModule } from './modules/maven-repository/maven-repository.module';
 
 @NgModule({
   declarations: [],
@@ -17,6 +18,10 @@ export class PluginModule extends PluginLazyLoad {
       functionPackages: () => Promise.resolve({ Module: FunctionPackagesModule }),
       NodePlugin: () => Promise.resolve({ Module: NodePluginModule }),
       jmeterPlugin: () => Promise.resolve({ Module: JmeterPluginModule }),
+      mavenRepository: {
+        isForceLoad: true,
+        load: () => Promise.resolve({ Module: MavenRepositoryModule }),
+      },
     };
   }
 }
