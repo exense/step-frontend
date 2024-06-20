@@ -1,0 +1,175 @@
+@if (dynamic()) {
+  <step-form-field
+    [class.ng-invalid]="!!_ngControl?.invalid"
+    [class.step-force-focus]="forceFocus()"
+    [class.editable-label]="canEditLabel() && hasLabel()"
+  >
+    @if (hasLabel()) {
+      <step-prefix>
+        <div class="dynamic-field-label" stepElementRefMap [key]="elementRefMapKey()">
+          @if (canEditLabel()) {
+            <input
+              type="text"
+              [disabled]="isDisabled()"
+              (click)="fixLabelFocus($event)"
+              [(ngModel)]="labelModel"
+              (blur)="labelChange.emit(labelModel())"
+              [tabindex]="tabIndex"
+              (focusin)="forceFocus.set(true)"
+              (focusout)="forceFocus.set(false)"
+            />
+          } @else {
+            <span [matTooltip]="label() ?? ''">{{ label() }}</span>
+          }
+          @if (tooltip(); as tooltip) {
+            <step-icon name="help-circle" [matTooltip]="tooltip" />
+          }
+        </div>
+      </step-prefix>
+    }
+    <input
+      type="text"
+      [disabled]="isDisabled()"
+      [ngModel]="expression()"
+      (ngModelChange)="handleExpressionChange($event)"
+      (blur)="handleBlur()"
+      [tabindex]="tabIndex()"
+    />
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Open texteditor"
+        matTooltipPosition="below"
+        [tabindex]="tabIndex()"
+        [disabled]="isDisabled()"
+        (click)="editExpressionInModal()"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
+      >
+        <step-icon name="edit" />
+      </button>
+    </step-suffix>
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-flat-button
+        matTooltip="Toggle dynamic field"
+        matTooltipPosition="below"
+        [disabled]="isDisabled()"
+        color="primary"
+        [tabindex]="tabIndex()"
+        (click)="toggleDynamic()"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
+      >
+        <step-icon name="zap" />
+      </button>
+    </step-suffix>
+    @if (canRemove()) {
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Remove"
+          matTooltipPosition="below"
+          [disabled]="isDisabled()"
+          [tabindex]="tabIndex()"
+          (click)="remove.emit()"
+          (focusin)="forceFocus.set(true)"
+          (focusout)="forceFocus.set(false)"
+        >
+          <step-icon name="x" />
+        </button>
+      </step-suffix>
+    }
+  </step-form-field>
+} @else {
+  <section class="complex-field">
+    <div class="complex-field-header">
+      <div class="complex-field-label">
+        @if (hasLabel()) {
+          @if (canEditLabel()) {
+            <step-form-field>
+              <input
+                type="text"
+                [disabled]="isDisabled()"
+                (click)="fixLabelFocus($event)"
+                [(ngModel)]="labelModel"
+                (blur)="labelChange.emit(labelModel())"
+                [tabindex]="tabIndex"
+                (focusin)="forceFocus.set(true)"
+                (focusout)="forceFocus.set(false)"
+              />
+            </step-form-field>
+          } @else {
+            <span [matTooltip]="label() ?? ''">{{ label() }}</span>
+          }
+        }
+        @if (tooltip(); as tooltip) {
+          <step-icon name="help-circle" [matTooltip]="tooltip" />
+        }
+      </div>
+      <step-btn-group>
+        @if (fieldType() | dynamicFieldIsExpressionEditorAllowed) {
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Open texteditor"
+            matTooltipPosition="below"
+            [tabindex]="tabIndex()"
+            [disabled]="isDisabled()"
+            (click)="editValueInModal(AceMode.JSON)"
+            (focusin)="forceFocus.set(true)"
+            (focusout)="forceFocus.set(false)"
+          >
+            <step-icon name="edit" />
+          </button>
+        }
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Toggle dynamic field"
+          matTooltipPosition="below"
+          [disabled]="isDisabled()"
+          [tabindex]="tabIndex()"
+          (click)="toggleDynamic()"
+          (focusin)="forceFocus.set(true)"
+          (focusout)="forceFocus.set(false)"
+        >
+          <step-icon name="zap" />
+        </button>
+        @if (canRemove()) {
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Remove"
+            matTooltipPosition="below"
+            [disabled]="isDisabled()"
+            [tabindex]="tabIndex()"
+            (click)="remove.emit()"
+            (focusin)="forceFocus.set(true)"
+            (focusout)="forceFocus.set(false)"
+          >
+            <step-icon name="x" />
+          </button>
+        }
+      </step-btn-group>
+    </div>
+    <div class="complex-field-editor">
+      @switch (fieldType()) {
+        @case (DynamicFieldType.OBJECT) {
+          @if (fieldObjectTemplate(); as tplObject) {
+            <ng-container *ngTemplateOutlet="tplObject; context: { $implicit: fieldContext }" />
+          }
+        }
+        @case (DynamicFieldType.ARRAY) {
+          @if (fieldArrayTemplate(); as tplArray) {
+            <ng-container *ngTemplateOutlet="tplArray; context: { $implicit: fieldContext }" />
+          }
+        }
+        @default {}
+      }
+    </div>
+  </section>
+}

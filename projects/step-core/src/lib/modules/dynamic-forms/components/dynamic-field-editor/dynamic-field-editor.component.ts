@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, computed, EventEmitter, input, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
-import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
-import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
+import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
+import { DynamicFieldsSchema, SchemaObjectField } from '../../shared/dynamic-fields-schema';
 
 @Component({
   selector: 'step-dynamic-field-editor',
@@ -10,7 +10,17 @@ import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
 })
 export class DynamicFieldEditorComponent implements OnChanges {
   @Input() isDisabled?: boolean;
-  @Input() schema?: DynamicFieldsSchema;
+
+  /** @Input() **/
+  readonly dynamicSchema = input<DynamicFieldsSchema | undefined>(undefined, { alias: 'schema' });
+  protected schema = computed(() => {
+    const dynamicSchema = this.dynamicSchema();
+    if (!dynamicSchema) {
+      return undefined;
+    }
+    return { ...dynamicSchema, type: 'object' } as SchemaObjectField;
+  });
+
   @Input() value?: string;
 
   @Input() primaryFieldsLabel?: string;
@@ -22,7 +32,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Output() blur = new EventEmitter<void>();
 
   protected showJson: boolean = false;
-  protected internalValue?: DynamicFieldGroupValue;
+  protected internalValue?: DynamicFieldObjectValue;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cValue = changes['value'];
@@ -31,7 +41,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
     }
   }
 
-  handleChange(value?: DynamicFieldGroupValue): void {
+  handleChange(value?: DynamicFieldObjectValue): void {
     this.internalValue = value;
 
     if (value) {
@@ -46,7 +56,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   }
 
   private convertToValueType(value: any): DynamicValueInteger | DynamicValueBoolean | DynamicValueString {
-    if (typeof value !== 'string' && !this.schema?.properties) {
+    if (typeof value !== 'string' && !this.schema()?.properties) {
       return {
         expression: value.toString(),
         dynamic: true,
