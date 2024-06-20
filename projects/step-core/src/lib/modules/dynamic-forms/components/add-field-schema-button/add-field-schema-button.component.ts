@@ -3,8 +3,14 @@ import { NgControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AddSchemaFieldDialogComponent } from '../add-schema-field-dialog/add-schema-field-dialog.component';
 import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
-import { DynamicFieldProperty, DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
+import {
+  SchemaField,
+  DynamicFieldsSchema,
+  SchemaArrayField,
+  SchemaObjectField,
+} from '../../shared/dynamic-fields-schema';
 import { FieldSchemaType } from '../../shared/field-schema-type.enum';
+import { DynamicFieldType } from '../../shared/dynamic-field-type';
 
 @Component({
   selector: 'step-add-field-schema-button',
@@ -33,13 +39,24 @@ export class AddFieldSchemaButtonComponent {
       schema.properties = {};
     }
 
-    const fieldProperty: DynamicFieldProperty = {};
+    let fieldProperty: SchemaField = {};
 
     if (fieldMeta.type === FieldSchemaType.ENUM) {
       fieldProperty.enum = fieldMeta.enumItems;
+    } else if (fieldMeta.type === FieldSchemaType.ARRAY) {
+      fieldProperty = {
+        type: DynamicFieldType.ARRAY,
+        items: { type: DynamicFieldType.STRING },
+      } as SchemaArrayField;
+    } else if (fieldMeta.type === FieldSchemaType.OBJECT) {
+      fieldProperty = {
+        type: DynamicFieldType.OBJECT,
+        properties: {},
+      } as SchemaObjectField;
     } else {
       fieldProperty.type = fieldMeta.type;
     }
+
     if (fieldMeta.defaultValue !== undefined) {
       fieldProperty.default = fieldMeta.defaultValue;
     }

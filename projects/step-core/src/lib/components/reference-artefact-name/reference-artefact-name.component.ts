@@ -11,11 +11,12 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
 import {
-  DynamicFieldGroupValue,
+  DynamicFieldObjectValue,
   DynamicFieldsSchema,
+  SchemaObjectField,
   SchemasFactoryService,
 } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type-resolver';
@@ -80,12 +81,12 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
 
   @Output() referenceUpdate = new EventEmitter<T | undefined>();
   protected artefactName: string = '';
-  protected artefactReferenceAttributes?: DynamicFieldGroupValue;
+  protected artefactReferenceAttributes?: DynamicFieldObjectValue;
   protected referenceString: string = '';
   protected reference?: any;
   protected isEditorMode: boolean = false;
   protected referenceMeta?: ReferenceMeta;
-  protected schema?: DynamicFieldsSchema;
+  protected schema?: SchemaObjectField;
 
   hintFor = HintFor;
 
@@ -115,7 +116,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this.onSave.emit();
   }
 
-  updateReferenceAttributes(attributes?: DynamicFieldGroupValue): void {
+  updateReferenceAttributes(attributes?: DynamicFieldObjectValue): void {
     if (!this.artefact) {
       return;
     }
@@ -151,7 +152,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
       if (!attributesJson) {
         this.artefactReferenceAttributes = undefined;
       } else {
-        const parsedAttributes = JSON.parse(attributesJson) as DynamicFieldGroupValue | Record<string, string>;
+        const parsedAttributes = JSON.parse(attributesJson) as DynamicFieldObjectValue | Record<string, string>;
         this.artefactReferenceAttributes = Object.entries(parsedAttributes).reduce((res, [key, value]) => {
           res[key] =
             typeof value === 'string'
@@ -162,7 +163,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
                 }
               : value;
           return res;
-        }, {} as DynamicFieldGroupValue);
+        }, {} as DynamicFieldObjectValue);
       }
     } catch (err) {
       this.artefactReferenceAttributes = undefined;
@@ -170,7 +171,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this.createReferenceString(this.artefactReferenceAttributes);
   }
 
-  private createReferenceString(attributes?: DynamicFieldGroupValue): void {
+  private createReferenceString(attributes?: DynamicFieldObjectValue): void {
     if (!attributes) {
       this.referenceString = '';
       return;
@@ -272,6 +273,9 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     if (!screenId) {
       return;
     }
-    this._schemaFactory.buildAttributesSchemaForScreen(screenId).subscribe((schema) => (this.schema = schema));
+    this._schemaFactory
+      .buildAttributesSchemaForScreen(screenId)
+      .pipe(map((schema) => ({ ...schema, type: 'object' }) as SchemaObjectField))
+      .subscribe((schema) => (this.schema = schema));
   }
 }

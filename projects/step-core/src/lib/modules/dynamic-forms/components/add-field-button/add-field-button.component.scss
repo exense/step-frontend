@@ -6,6 +6,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  &.child-mode {
+    justify-content: flex-end;
+  }
 }
 
 hr {
