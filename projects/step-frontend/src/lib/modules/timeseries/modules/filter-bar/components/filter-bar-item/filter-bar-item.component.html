@@ -74,7 +74,7 @@
       <mat-form-field class="w-100" appearance="fill">
         <mat-label>Search values</mat-label>
         <mat-chip-grid #chipGrid aria-label="Enter values">
-          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
+          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="removeTextValue(i)">
             {{ value }}
             <button matChipRemove [attr.aria-label]="'remove'">
               <step-icon name="x"></step-icon>

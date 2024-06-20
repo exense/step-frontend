@@ -45,7 +45,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
-    this.freeTextValues = this.item.freeTextValues || [];
   }
 
   onMenuClose(): void {
@@ -66,7 +65,12 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (changes['item'] && changes['item'].currentValue) {
       // Create a clone of the input item to work with as a draft
       this.itemDraft = JSON.parse(JSON.stringify(this.item));
+      this.freeTextValues = [...(this.item.freeTextValues || [])];
     }
+  }
+
+  removeTextValue(index: number) {
+    this.freeTextValues.splice(index, 1);
   }
 
   toggleOption(option: { value: string; isSelected?: boolean }, checked: boolean, checkbox?: MatCheckbox) {
@@ -99,7 +103,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       case FilterBarItemType.OPTIONS:
         break;
       case FilterBarItemType.FREE_TEXT:
-        this.item.freeTextValues = this.freeTextValues;
+        this.item.freeTextValues = [...this.freeTextValues];
         break;
       case FilterBarItemType.NUMERIC:
       case FilterBarItemType.DATE:
