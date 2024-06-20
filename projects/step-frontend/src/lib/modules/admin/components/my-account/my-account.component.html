@@ -79,7 +79,7 @@
     </step-description-hint>
   </div>
 </div>
-<mat-card-content>
+<div>
   <step-table [dataSource]="preferences$">
     <section class="header" *stepAdditionalHeader="'add-preference'">
       <button type="button" mat-mini-fab color="primary" (click)="addPreference()">
@@ -111,4 +111,4 @@
       </td>
     </ng-container>
   </step-table>
-</mat-card-content>
+</div>
