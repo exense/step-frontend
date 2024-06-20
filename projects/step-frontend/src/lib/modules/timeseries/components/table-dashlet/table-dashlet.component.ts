@@ -204,15 +204,15 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   private getBucketMapFunction(column: ColumnSelection) {
     const pclValue = column.pclValue;
     if (pclValue) {
-      return (b: ProcessedBucket) => b?.pclValues![pclValue!.toFixed(Math.max(1, this.countDecimals(pclValue!)))];
+      return (b: ProcessedBucket) => b?.pclValues![this.getPclWithDecimals(pclValue)];
     } else {
       return ColumnsValueFunctions[column.column!];
     }
   }
 
-  private countDecimals(value: number) {
-    if (Math.floor(value) === value) return 0;
-    return value.toString().split('.')[1].length || 0;
+  private getPclWithDecimals(value: number) {
+    if (Math.floor(value) === value) return value.toFixed(1);
+    return value;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -524,14 +524,23 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('MAX', (item) => item.base?.max)
       .addSortNumberPredicate('MAX_comp', (item) => item.compare?.max)
       .addSortNumberPredicate('MAX_diff', (item) => item.maxDiff)
-      .addSortNumberPredicate('PCL_80', (item) => item.base?.pclValues?.[item.pclValues[0]])
-      .addSortNumberPredicate('PCL_80_comp', (item) => item.compare?.pclValues?.[item.pclValues[0]])
+      .addSortNumberPredicate('PCL_80', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])])
+      .addSortNumberPredicate(
+        'PCL_80_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])],
+      )
       .addSortNumberPredicate('PCL_80_diff', (item) => item.pcl80Diff)
-      .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[item.pclValues[1]])
-      .addSortNumberPredicate('PCL_90_comp', (item) => item.compare?.pclValues?.[item.pclValues[1]])
+      .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])])
+      .addSortNumberPredicate(
+        'PCL_90_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])],
+      )
       .addSortNumberPredicate('PCL_90_diff', (item) => item.pcl90Diff)
-      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[item.pclValues[2]])
-      .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[item.pclValues[2]])
+      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])])
+      .addSortNumberPredicate(
+        'PCL_99_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])],
+      )
       .addSortNumberPredicate('PCL_99_diff', (item) => item.pcl99Diff)
       .addSortNumberPredicate('TPS', (item) => item.base?.tps)
       .addSortNumberPredicate('TPS_comp', (item) => item.compare?.tps)

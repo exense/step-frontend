@@ -576,9 +576,11 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private getPclWithDecimals(value: number) {
-    if (Math.floor(value) === value) return value.toString();
-    let decimalsCount = value.toString().split('.')[1].length || 0;
-    return value.toFixed(Math.max(1, decimalsCount));
+    if (Math.floor(value) === value) {
+      return value.toFixed(1);
+    } else {
+      return value;
+    }
   }
 
   getType(): 'TABLE' | 'CHART' {

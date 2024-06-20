@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { ChartAggregation } from '../../types/chart-aggregation';
 
@@ -9,7 +9,7 @@ import { ChartAggregation } from '../../types/chart-aggregation';
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
-export class TimeseriesAggregatePickerComponent {
+export class TimeseriesAggregatePickerComponent implements OnChanges {
   protected readonly ChartAggregation = ChartAggregation;
 
   @Input() selectedAggregate!: ChartAggregation;
@@ -30,6 +30,17 @@ export class TimeseriesAggregatePickerComponent {
   ];
 
   customPclValueInput?: number;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // let's set the custom PCL in the input
+    const pclChange = changes['pclValue'];
+    if (pclChange) {
+      const currentPcl = pclChange.currentValue;
+      if (!this.PCL_VALUES.find((c) => c === currentPcl)) {
+        this.customPclValueInput = currentPcl;
+      }
+    }
+  }
 
   applyCustomPclValue() {
     if (this.customPclValueInput && this.customPclValueInput > 0 && this.customPclValueInput < 100) {
