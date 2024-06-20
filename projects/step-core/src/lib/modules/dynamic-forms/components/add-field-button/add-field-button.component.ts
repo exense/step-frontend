@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostBinding,
   HostListener,
   inject,
   Input,
@@ -25,6 +26,10 @@ export class AddFieldButtonComponent<T = string> {
   private _elRef = inject(ElementRef);
 
   protected showPossibleFields = false;
+
+  @HostBinding('class.child-mode')
+  @Input()
+  isChildMode: boolean = false;
 
   @Input() addLabel: string = 'Add optional field';
   @Input() addCustomLabel?: string;

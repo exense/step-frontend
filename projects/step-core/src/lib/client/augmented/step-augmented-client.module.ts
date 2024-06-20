@@ -38,3 +38,4 @@ export * from './shared/pipe-operators';
 export * from './shared/keyword';
 export * from './shared/http-override-response-interceptor';
 export * from './shared/token-provisioning-status';
+export * from './models/dynamic-value-complex-types';

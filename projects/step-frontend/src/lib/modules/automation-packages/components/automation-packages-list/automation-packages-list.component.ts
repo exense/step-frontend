@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, forwardRef, inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, effect, forwardRef, inject, OnInit, viewChild } from '@angular/core';
 import {
   AugmentedAutomationPackagesService,
   AutoDeselectStrategy,
@@ -12,10 +12,10 @@ import {
 } from '@exense/step-core';
 import { ENTITY_ID } from '../../types/constants';
 import { AutomationPackagesActionsService } from '../../injectables/automation-packages-actions.service';
-import { filter, map, Subject, takeUntil } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 
 @Component({
   selector: 'step-automation-packages-list',
@@ -33,11 +33,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     },
   ],
 })
-export class AutomationPackagesListComponent implements AfterViewInit, DialogParentService {
+export class AutomationPackagesListComponent implements OnInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
-  private _destroyRef = inject(DestroyRef);
 
   readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
 
@@ -45,8 +44,21 @@ export class AutomationPackagesListComponent implements AfterViewInit, DialogPar
 
   readonly AutomationPackagePermission = AutomationPackagePermission;
 
-  @ViewChild('table', { static: true })
-  private table?: TableComponent<AutomationPackage>;
+  protected isReady = false;
+
+  private automationPackageFileName?: string;
+  private table = viewChild('table', { read: TableComponent<AutomationPackagesListComponent> });
+
+  private effectTableChange = effect(
+    () => {
+      const table = this.table();
+      if (table && this.automationPackageFileName) {
+        table?.onSearch('fileName', this.automationPackageFileName);
+        this.automationPackageFileName = undefined;
+      }
+    },
+    { allowSignalWrites: true },
+  );
 
   readonly returnParentUrl = this._actions.rootUrl;
 
@@ -54,8 +66,11 @@ export class AutomationPackagesListComponent implements AfterViewInit, DialogPar
     this._dataSource.reload();
   }
 
-  ngAfterViewInit(): void {
-    this.predefineAutomationPackageFileFilter();
+  ngOnInit(): void {
+    this.getAutomationPackageFileFilter().subscribe((automationPackageFileName) => {
+      this.automationPackageFileName = automationPackageFileName;
+      this.isReady = true;
+    });
   }
 
   createPackage(): void {
@@ -74,20 +89,17 @@ export class AutomationPackagesListComponent implements AfterViewInit, DialogPar
     });
   }
 
-  private predefineAutomationPackageFileFilter(): void {
-    this._activatedRoute.queryParams
-      .pipe(
-        map((params) => params?.['automationPackageFileName']),
-        filter((automationPackageFileName) => !!automationPackageFileName),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((automationPackageFileName) => {
-        this.table?.onSearch('fileName', automationPackageFileName);
-        this._router.navigate([], {
-          queryParams: { automationPackageFileName: undefined },
-          queryParamsHandling: 'merge',
-          relativeTo: this._activatedRoute,
-        });
-      });
+  private getAutomationPackageFileFilter(): Observable<string | undefined> {
+    const automationPackageFileName = this._activatedRoute.snapshot.queryParams?.['automationPackageFileName'];
+    if (!automationPackageFileName) {
+      return of(undefined);
+    }
+    return fromPromise(
+      this._router.navigate([], {
+        queryParams: { automationPackageFileName: undefined },
+        queryParamsHandling: 'merge',
+        relativeTo: this._activatedRoute,
+      }),
+    ).pipe(map(() => automationPackageFileName));
   }
 }
