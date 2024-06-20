@@ -32,7 +32,6 @@ export class AutomationPackageRefIconComponent<T extends AutomationPackageChildE
     }
     this._router.navigate(['automation-package', 'list'], {
       queryParams: { automationPackageFileName },
-      queryParamsHandling: 'merge',
     });
   }
 }
