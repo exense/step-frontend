@@ -1,81 +1,83 @@
-<step-drag-drop-container>
-  <step-table #table [dataSource]="_dataSource" matSort [matSortDisableClear]="true">
-    <step-bulk-operations *stepAdditionalHeader="'automation-package-header'" [entity]="ENTITY_ID" />
-    <section class="header" *stepAdditionalHeader="'automation-package-header'">
-      <step-btn-group>
-        <button
-          type="button"
-          mat-flat-button
-          color="primary"
-          class="header-btn"
-          (click)="createPackage()"
-          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
-        >
-          Upload package
-        </button>
-      </step-btn-group>
-    </section>
-    <ng-container matColumnDef="bulkSelection">
-      <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
-      <td mat-cell *matCellDef="let element">
-        <step-entity-selection-di [entity]="element" />
-      </td>
-    </ng-container>
-    <step-entity-column-container [entityName]="ENTITY_ID" />
-    <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <step-drag-column-caption>Name</step-drag-column-caption>
-      </th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.attributes?.['name'] }}
-        <step-status [status]="element.status" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="fileName" stepActivityCol="Package file" stepSearchCol>
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <step-drag-column-caption>Package file</step-drag-column-caption>
-      </th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.customFields?.['automationPackageFileName'] }}
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="actions" stepActionCol>
-      <th mat-header-cell *matHeaderCellDef>
-        Actions
-        <step-column-settings />
-      </th>
-      <td mat-cell *matCellDef="let element" class="cell-actions">
+@if (isReady) {
+  <step-drag-drop-container>
+    <step-table #table [dataSource]="_dataSource" matSort [matSortDisableClear]="true">
+      <step-bulk-operations *stepAdditionalHeader="'automation-package-header'" [entity]="ENTITY_ID" />
+      <section class="header" *stepAdditionalHeader="'automation-package-header'">
         <step-btn-group>
           <button
             type="button"
-            mat-icon-button
-            matTooltip="Edit package"
-            (click)="editPackage(element)"
+            mat-flat-button
+            color="primary"
+            class="header-btn"
+            (click)="createPackage()"
             [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
           >
-            <step-icon name="tool" />
-          </button>
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Delete package"
-            (click)="deletePackage(element)"
-            [disabled]="!(AutomationPackagePermission.DELETE | hasRight | async)"
-          >
-            <step-icon name="trash-2" />
-          </button>
-          <button
-            *ngIf="entityMenu.hasContent"
-            mat-icon-button
-            [matMenuTriggerFor]="entityMenu.menu!"
-            [matMenuTriggerData]="{ element }"
-          >
-            <step-icon name="more-horizontal" />
+            Upload package
           </button>
         </step-btn-group>
-      </td>
-    </ng-container>
-  </step-table>
-</step-drag-drop-container>
-<step-entity-menu #entityMenu [entity]="ENTITY_ID" (entityOperationSuccess)="table.reload()" />
+      </section>
+      <ng-container matColumnDef="bulkSelection">
+        <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
+        <td mat-cell *matCellDef="let element">
+          <step-entity-selection-di [entity]="element" />
+        </td>
+      </ng-container>
+      <step-entity-column-container [entityName]="ENTITY_ID" />
+      <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <step-drag-column-caption>Name</step-drag-column-caption>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.attributes?.['name'] }}
+          <step-status [status]="element.status" />
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="fileName" stepActivityCol="Package file" stepSearchCol>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <step-drag-column-caption>Package file</step-drag-column-caption>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.customFields?.['automationPackageFileName'] }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions" stepActionCol>
+        <th mat-header-cell *matHeaderCellDef>
+          Actions
+          <step-column-settings />
+        </th>
+        <td mat-cell *matCellDef="let element" class="cell-actions">
+          <step-btn-group>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Edit package"
+              (click)="editPackage(element)"
+              [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+            >
+              <step-icon name="tool" />
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Delete package"
+              (click)="deletePackage(element)"
+              [disabled]="!(AutomationPackagePermission.DELETE | hasRight | async)"
+            >
+              <step-icon name="trash-2" />
+            </button>
+            <button
+              *ngIf="entityMenu.hasContent"
+              mat-icon-button
+              [matMenuTriggerFor]="entityMenu.menu!"
+              [matMenuTriggerData]="{ element }"
+            >
+              <step-icon name="more-horizontal" />
+            </button>
+          </step-btn-group>
+        </td>
+      </ng-container>
+    </step-table>
+  </step-drag-drop-container>
+  <step-entity-menu #entityMenu [entity]="ENTITY_ID" (entityOperationSuccess)="table.reload()" />
+}
 <router-outlet />
