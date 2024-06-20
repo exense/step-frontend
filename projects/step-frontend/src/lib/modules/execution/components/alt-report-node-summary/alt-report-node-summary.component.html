@@ -1,13 +1,15 @@
 <step-alt-report-widget [title]="title()">
   <step-alt-report-widget-content>
     <section class="chart-container">
-      @if (summary()?.total; as total) {
-        <div class="total-value">
-          <span>
+      <div class="total-value">
+        <span>
+          @if (summary()?.total; as total) {
             {{ total | bigNumber }}
-          </span>
-        </div>
-      }
+          } @else {
+            0
+          }
+        </span>
+      </div>
       <canvas #cnv> </canvas>
     </section>
     @if (legend(); as legend) {

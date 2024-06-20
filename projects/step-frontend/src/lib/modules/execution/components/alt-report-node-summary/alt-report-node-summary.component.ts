@@ -50,8 +50,10 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
 
   private dictionary = computed(() => {
     const summary = this.summary();
-    if (!summary) {
-      return undefined;
+    if (!summary?.total) {
+      return {
+        ['EMPTY']: { value: 100, percent: 100 },
+      };
     }
     return Object.keys(this._statusColors).reduce(
       (res, key) => {
@@ -128,14 +130,7 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
           },
           datalabels: {
             color: '#fff',
-            formatter: (value, context) => {
-              // return this.valueDictionary()[value] ?? value;
-              return '';
-            },
-            font: {
-              weight: 'bold',
-              size: 14,
-            },
+            formatter: () => '',
           },
           tooltip: {
             enabled: false,
