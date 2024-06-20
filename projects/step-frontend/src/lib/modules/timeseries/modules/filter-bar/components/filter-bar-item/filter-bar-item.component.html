@@ -66,7 +66,7 @@
           [readonly]="item.isLocked"
           matInput
           name="attributeName"
-          [(ngModel)]="itemDraft.attributeName"
+          [(ngModel)]="item.attributeName"
           stepFocusable
         />
       </mat-form-field>
@@ -74,7 +74,7 @@
       <mat-form-field class="w-100" appearance="fill">
         <mat-label>Search values</mat-label>
         <mat-chip-grid #chipGrid aria-label="Enter values">
-          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="removeTextValue(i)">
+          <mat-chip-row *ngFor="let value of freeTextValues; let i = index" (removed)="freeTextValues.splice(i, 1)">
             {{ value }}
             <button matChipRemove [attr.aria-label]="'remove'">
               <step-icon name="x"></step-icon>
@@ -111,10 +111,10 @@
       <div class="item-header">
         {{ item.label }}
       </div>
-      <step-ts-filter-bar-execution-item [values]="itemDraft.searchEntities"></step-ts-filter-bar-execution-item>
+      <step-ts-filter-bar-execution-item [values]="item.searchEntities"></step-ts-filter-bar-execution-item>
 
       <div class="apply-checkbox" *ngIf="updateTimeRangeOption">
-        <mat-checkbox [(ngModel)]="itemDraft.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
+        <mat-checkbox [(ngModel)]="item.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
           >Update time range
         </mat-checkbox>
         <step-icon
@@ -140,7 +140,7 @@
       <div class="item-header">
         {{ item.label }}
       </div>
-      <step-ts-filter-bar-task-item [values]="itemDraft.searchEntities"></step-ts-filter-bar-task-item>
+      <step-ts-filter-bar-task-item [values]="item.searchEntities"></step-ts-filter-bar-task-item>
 
       <button
         type="submit"
@@ -160,7 +160,7 @@
       <div class="item-header">
         {{ item.label }}
       </div>
-      <step-ts-filter-bar-plan-item [values]="itemDraft.searchEntities"></step-ts-filter-bar-plan-item>
+      <step-ts-filter-bar-plan-item [values]="item.searchEntities"></step-ts-filter-bar-plan-item>
 
       <button
         type="submit"
