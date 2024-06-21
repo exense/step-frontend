@@ -1,37 +1,65 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AppliedStatusPipe } from '../../pipes/applied-status.pipe';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { Status } from '../../../_common/shared/status.enum';
+
+export interface StatusItem {
+  status: Status;
+  className: string;
+  count: number;
+  tooltipMessage: string;
+}
 
 @Component({
   selector: 'step-aggregated-tree-status',
   templateUrl: './aggregated-tree-status.component.html',
   styleUrl: './aggregated-tree-status.component.scss',
-  providers: [AppliedStatusPipe],
 })
 export class AggregatedTreeStatusComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  protected _appliedStatus = inject(AppliedStatusPipe);
 
-  nodeId = input<string>();
-  node = input<AggregatedTreeNode>();
+  readonly nodeId = input<string>();
+  readonly node = input<AggregatedTreeNode>();
 
-  status = computed(() => {
+  protected status = computed(() => {
     let node = this.node();
     const nodeId = this.nodeId();
     node = node ?? (nodeId ? this._treeState.findNodeById(nodeId) : undefined);
     return node?.countByStatus;
   });
 
-  total = computed(() => {
-    const status = this.status() ?? {};
-    return Object.values(status).reduce((res, value) => res + value, 0);
-  });
+  protected errorStatusGroup = computed(() =>
+    this.createStatusItemGroup(this.status(), Status.TECHNICAL_ERROR, Status.FAILED, Status.INTERRUPTED),
+  );
+  protected successStatusGroup = computed(() =>
+    this.createStatusItemGroup(this.status(), Status.PASSED, Status.SKIPPED),
+  );
+  protected runningStatusGroup = computed(() => this.createStatusItemGroup(this.status(), Status.RUNNING));
 
-  appliedStatus = computed(() => this._appliedStatus.transform(this.status()));
+  private createStatusItemGroup(
+    aggregatedStatus: Record<string, number> | undefined,
+    ...statuses: Status[]
+  ): StatusItem[] | undefined {
+    if (!aggregatedStatus) {
+      return undefined;
+    }
 
-  statusClassName = computed(() => {
-    const status = this.appliedStatus();
-    return `step-node-aggregated-status-${status}`;
-  });
+    const result = statuses
+      .map((status) => this.createStatusItem(status, aggregatedStatus[status]))
+      .filter((item) => !!item);
+    if (!result.length) {
+      return undefined;
+    }
+
+    return result as StatusItem[];
+  }
+
+  private createStatusItem(status?: Status, count?: number): StatusItem | undefined {
+    if (!status || !count) {
+      return undefined;
+    }
+    const className = `step-node-aggregated-status-${status}`;
+    const tooltipMessage = `${status}: ${count}`;
+    return { className, count, status, tooltipMessage };
+  }
 }

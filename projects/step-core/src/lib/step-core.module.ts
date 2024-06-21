@@ -72,6 +72,7 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { TAB_EXPORTS } from './modules/tabs';
+import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 
 @NgModule({
   declarations: [
@@ -110,6 +111,7 @@ import { TAB_EXPORTS } from './modules/tabs';
     DashboardNavigationParamsPipe,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -213,6 +215,7 @@ import { TAB_EXPORTS } from './modules/tabs';
     TAB_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -266,6 +269,7 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
@@ -323,6 +327,8 @@ export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
 export * from './modules/execution-common';
 export * from './components/base-artefact/base-artefact.component';
+export * from './components/base-artefact/base-inline-artefact.component';
+export * from './components/base-artefact/artefact-inline-item';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';

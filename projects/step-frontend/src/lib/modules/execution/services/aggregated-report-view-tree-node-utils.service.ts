@@ -29,7 +29,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
     );
 
-    children.unshift(this.createDetailsNode(item));
+    // children.unshift(this.createDetailsNode(item));
 
     const result = {
       id,
@@ -62,6 +62,7 @@ export class AggregatedReportViewTreeNodeUtilsService
     return false;
   }
 
+  /*
   private createDetailsNode(item: AggregatedReportView): AggregatedTreeNode {
     const originalArtefact = item.artefact!;
     const artefactId = originalArtefact.id!;
@@ -92,4 +93,5 @@ export class AggregatedReportViewTreeNodeUtilsService
       ],
     };
   }
+*/
 }

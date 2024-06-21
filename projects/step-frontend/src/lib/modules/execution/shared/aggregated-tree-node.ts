@@ -1,4 +1,4 @@
-import { AbstractArtefact, ArtefactTreeNode } from '@exense/step-core';
+import { AggregatedArtefactInfo, ArtefactTreeNode } from '@exense/step-core';
 
 export enum AggregatedTreeNodeType {
   KEYWORD,
@@ -6,7 +6,7 @@ export enum AggregatedTreeNodeType {
   DETAILS_DATA,
 }
 
-export interface AggregatedTreeNode extends ArtefactTreeNode {
+export interface AggregatedTreeNode extends ArtefactTreeNode, AggregatedArtefactInfo {
   countByStatus?: Record<string, number>;
-  nodeType: AggregatedTreeNodeType;
+  // nodeType: AggregatedTreeNodeType;
 }
