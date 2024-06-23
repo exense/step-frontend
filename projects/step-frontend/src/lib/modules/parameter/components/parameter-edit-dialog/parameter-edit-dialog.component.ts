@@ -47,11 +47,15 @@ export class ParameterEditDialogComponent implements OnInit {
     this.initScopeItems();
   }
 
-  @HostListener('keydown.enter')
-  save(): void {
-    if (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write')) {
+  @HostListener('keydown.enter', ['$event'])
+  save(event?: KeyboardEvent): void {
+    if (
+      (!!event?.target && event.target instanceof HTMLTextAreaElement) ||
+      (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write'))
+    ) {
       return;
     }
+
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });

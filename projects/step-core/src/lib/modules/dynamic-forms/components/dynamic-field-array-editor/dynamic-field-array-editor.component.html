@@ -1,0 +1,30 @@
+<ng-container [formGroup]="form">
+  @for (field of fields(); track field.trackId) {
+    @if (field.fieldType === DynamicFieldType.OBJECT || field.fieldType === DynamicFieldType.ARRAY) {
+      <step-dynamic-field-complex
+        [formControl]="field.control"
+        [hasLabel]="false"
+        [fieldType]="field.fieldType"
+        [canRemove]="true"
+        [tooltip]="field.tooltip"
+        [fieldSchema]="field.fieldSchema"
+        [fieldObjectTemplate]="complexObjectTemplate()"
+        [fieldArrayTemplate]="complexArrayTemplate()"
+        (remove)="removeField(field)"
+      />
+    } @else {
+      <step-dynamic-field
+        [formControl]="field.control"
+        [hasLabel]="false"
+        [fieldType]="field.fieldType"
+        [canRemove]="true"
+        [enumItems]="field.enumItems"
+        [tooltip]="field.tooltip"
+        (remove)="removeField(field)"
+      />
+    }
+  }
+</ng-container>
+@if (!isDisabled()) {
+  <step-add-field-button [isChildMode]="isChildNode()" [addLabel]="addFieldBtnLabel()" (addField)="addField()" />
+}

@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { TimeSeriesConfig, TimeSeriesUtils, TimeSeriesContext, COMMON_IMPORTS } from '../../../_common';
+import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../_common';
 import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
@@ -101,7 +101,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
               labelItems: ['Response Time'],
               data: avgData,
               // value: (self, x) => Math.trunc(x) + ' ms',
-              stroke: 'red',
               legendName: 'Ranger',
             },
           ],

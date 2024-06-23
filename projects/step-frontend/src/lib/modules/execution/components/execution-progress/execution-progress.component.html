@@ -27,8 +27,11 @@
       <div class="tab-panel">
         <step-tabs [tabs]="tabs" [activeTabId]="activeTabId" (activeTabIdChange)="selectTab($event)" />
         <step-btn-group>
-          @if (showAutoRefreshButton && activeExecution) {
-            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" />
+          @if (activeExecution) {
+            <step-autorefresh-toggle
+              [disableAutoRefreshButton]="!showAutoRefreshButton"
+              [model]="activeExecution!.autoRefreshModel"
+            />
           }
         </step-btn-group>
       </div>

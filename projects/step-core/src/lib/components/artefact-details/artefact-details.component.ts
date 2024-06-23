@@ -46,6 +46,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
 
   protected isKeyword = false;
   protected isPlan = false;
+  protected isDirectPlan = false;
 
   protected artefactMeta?: ArtefactType;
 
@@ -57,7 +58,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
     const cArtefact = changes['artefact'];
     if (cArtefact?.currentValue !== cArtefact?.previousValue || cArtefact?.firstChange) {
       const artefact = cArtefact?.currentValue as AbstractArtefact | undefined;
-      this.determineArtefactMetaData(artefact?._class);
+      this.determineArtefactMetaData(artefact?._class, artefact);
       if (this.form) {
         this._artefactFormChangeHelper.setupFormBehavior(this.form.form, () => this.save());
       }
@@ -90,7 +91,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
     this.artefact!.attributes!['name'] = dynamicValue.value ?? '';
   }
 
-  private determineArtefactMetaData(classname?: string): void {
+  private determineArtefactMetaData(classname?: string, artefact?: AbstractArtefact): void {
     if (!classname) {
       this.isKeyword = false;
       this.isPlan = false;
@@ -98,6 +99,7 @@ export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, Aft
     }
     this.isKeyword = classname === 'CallKeyword';
     this.isPlan = classname === 'CallPlan';
+    this.isDirectPlan = this.isPlan && !!(artefact as { planId?: string }).planId;
     this.artefactMeta = this._artefactsService.getArtefactType(classname);
   }
 }

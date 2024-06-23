@@ -18,7 +18,7 @@
     <span
       *ngIf="isOpened$ | async"
       class="visible-when-collapsed sidebar-home-button"
-      (mouseup)="navigateTo('home', $event)"
+      (stepSideBarClick)="navigateTo('home', $event)"
     >
       <step-icon name="home"></step-icon>
     </span>
@@ -51,7 +51,7 @@
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
-              (mouseup)="navigateTo(entry.id, $event)"
+              (stepSideBarClick)="navigateTo(entry.id, $event)"
             >
               <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>
               <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
@@ -60,7 +60,7 @@
         </div>
       </div>
       <ng-container *ngIf="!(isOpened$ | async)">
-        <div class="sidebar-collapsable-tab" (mouseup)="navigateTo('home', $event)">
+        <div class="sidebar-collapsable-tab" (stepSideBarClick)="navigateTo('home', $event)">
           <label>
             <step-icon class="visible-when-collapsed" name="home"></step-icon>
             <span class="sidebar-aligned-text">Home</span>

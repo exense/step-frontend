@@ -22,11 +22,13 @@ import { SidebarStateService } from './injectables/sidebar-state.service';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 import { ConnectionErrorInterceptor } from './interceptors/connection-error.interceptor';
 import { HttpErrorOverrideInterceptor } from './interceptors/http-error-override.interceptor';
+import { SideBarClickDirective } from './directives/side-bar-click.directive';
 
 @NgModule({
   declarations: [
     LoginComponent,
     SidebarComponent,
+    SideBarClickDirective,
     ExecutionLinkComponent,
     IsEmptyJsonPipe,
     ContainsVersionPipe,

@@ -236,6 +236,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
       filterItems: this.getValidFilters(),
+      hiddenFilters: this.context.getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };
     this.context.setFilteringSettings(settings);

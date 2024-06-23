@@ -51,12 +51,11 @@
 
         <step-form-field>
           <step-label>Value</step-label>
-          <input
-            title="Value"
-            [type]="parameter.protectedValue ? 'password' : 'text'"
-            placeholder="Value"
-            [(ngModel)]="parameter.value"
-          />
+          @if (parameter.protectedValue) {
+            <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value" />
+          } @else {
+            <textarea placeholder="Value" rows="5" [(ngModel)]="parameter.value"> </textarea>
+          }
         </step-form-field>
 
         <step-form-field class="protect-field">

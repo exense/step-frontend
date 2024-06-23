@@ -44,6 +44,12 @@
           [disabled]="context.readonly"
           name="file"
         />
+        <step-dynamic-textfield
+          label="Delimiter"
+          [(ngModel)]="context.artefact!.dataSource!.delimiter"
+          [disabled]="context.readonly"
+          name="delimiter"
+        />
       }
       @case (DataSourceType.SQL) {
         <step-dynamic-textfield

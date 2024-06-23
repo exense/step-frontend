@@ -51,7 +51,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
-  metricTypes: MetricType[] = [];
+  allAttributes: MetricAttribute[] = [];
 
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
@@ -66,11 +66,9 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.filterItems = this.item.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
-    this.fetchMetricTypes();
-  }
-
-  private fetchMetricTypes() {
-    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
+    this.allAttributes = this._inputData.context
+      .getAllAttributes()
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
   onSecondaryAggregateSelect(aggregation: ChartAggregation) {
