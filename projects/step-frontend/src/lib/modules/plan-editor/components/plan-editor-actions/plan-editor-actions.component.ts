@@ -45,7 +45,7 @@ export class PlanEditorActionsComponent {
     revertAll: 'Revert all changes',
     undo: 'Undo (Ctrl + Z)',
     redo: 'Redo (Ctrl + Y)',
-    duplicate: 'Duplicate this plan',
+    duplicate: 'Duplicate & Edit this plan',
     showSource: "Show plan's YAML source",
     export: 'Export this plan',
     start: 'Execute this plan',

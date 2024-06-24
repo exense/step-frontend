@@ -12,6 +12,7 @@ import {
   tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-plan-list',
@@ -34,6 +35,7 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
 export class PlanListComponent implements DialogParentService {
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
+  private _router = inject(Router);
 
   readonly _plansApiService = inject(AugmentedPlansService);
 
@@ -51,14 +53,18 @@ export class PlanListComponent implements DialogParentService {
     this.dataSource.reload();
   }
 
-  duplicatePlan(id: string): void {
+  duplicatePlan(event: any, id: string): void {
     this._plansApiService
       .clonePlan(id)
       .pipe(
         switchMap((clone) => this._plansApiService.savePlan(clone)),
         this.updateDataSourceAfterChange,
       )
-      .subscribe();
+      .subscribe((data) => {
+        if (typeof data === 'object' && data !== null && 'id' in data && event.ctrlKey === true) {
+          this._router.navigateByUrl(`/plans/editor/${(data as Plan).id}`);
+        }
+      });
   }
 
   deletePlan(plan: Plan): void {
