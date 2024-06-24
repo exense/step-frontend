@@ -77,14 +77,19 @@
           >
             <step-icon name="play-circle" />
           </a>
-          <button
-            mat-icon-button
-            matTooltip="Duplicate plan"
-            [disabled]="!('plan-write' | hasRight | async)"
-            (click)="duplicatePlan(element.id)"
-          >
-            <step-icon name="copy" />
-          </button>
+          <step-popover [yPosition]="'below'">
+            <button
+              mat-icon-button
+              [disabled]="!('plan-write' | hasRight | async)"
+              (click)="duplicatePlan($event, element.id)"
+            >
+              <step-icon name="copy" />
+            </button>
+            <step-popover-content>
+              <step-icon name="mousePointer"></step-icon> Duplicate<br />
+              <step-icon name="mousePointer"></step-icon> + ctrl Duplicate & Edit<br />
+            </step-popover-content>
+          </step-popover>
           <button
             mat-icon-button
             matTooltip="Delete plan"
