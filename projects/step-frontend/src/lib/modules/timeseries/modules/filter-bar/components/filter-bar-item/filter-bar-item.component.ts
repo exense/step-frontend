@@ -114,33 +114,13 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       default:
         throw new Error('Unhandled item type: ' + this.item.type);
     }
-    console.log(this.item, this.minValue, this.maxValue);
     if (!this.item.isLocked && !isEntityFilter) {
       this.item.label = this.item.attributeName;
-    }
-    if (this.filterIsEmpty(this.item) || FilterUtils.filterItemIsValid(this.item)) {
-    } else {
     }
     this.filterChange.emit(this.item);
     this.changesApplied = true;
     this.matTrigger.closeMenu();
     this.formattedValue = this.getFormattedValue(this.item);
-  }
-
-  private filterIsEmpty(item: FilterBarItem): boolean {
-    switch (item.type) {
-      case FilterBarItemType.OPTIONS:
-        return item.textValues === undefined || item.textValues.find((v) => v.isSelected) === undefined;
-      case FilterBarItemType.FREE_TEXT:
-        return !item.freeTextValues || item.freeTextValues.length === 0;
-      case FilterBarItemType.EXECUTION:
-      case FilterBarItemType.TASK:
-      case FilterBarItemType.PLAN:
-        return item.searchEntities.find((s) => !!s.searchValue) === undefined;
-      case FilterBarItemType.NUMERIC:
-      case FilterBarItemType.DATE:
-        return item.min === undefined && item.max === undefined;
-    }
   }
 
   onMinDateChanged(date: DateTime | undefined) {
