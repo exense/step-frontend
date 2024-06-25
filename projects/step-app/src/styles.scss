@@ -3,7 +3,3 @@
 
 @include common-mixins.common-styles();
 @include common-mixins.ts-tooltip();
-
-:root .default-theme {
-  --step-logo-path: url('images/logotopleft.png');
-}
