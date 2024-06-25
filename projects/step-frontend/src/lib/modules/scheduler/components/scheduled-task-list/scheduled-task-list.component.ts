@@ -21,6 +21,11 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
 
 type StatusItem = KeyValue<string, string>;
 
+enum ActiveLabels {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+}
+
 @Component({
   selector: 'step-scheduled-task-list',
   templateUrl: './scheduled-task-list.component.html',
@@ -54,8 +59,7 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
     }),
   );
 
-  readonly STATUS_ACTIVE_STRING = 'On';
-  readonly STATUS_INACTIVE_STRING = 'Off';
+  readonly ActiveLabels = ActiveLabels;
 
   readonly dataSource = this._schedulerService.createSelectionDataSource();
   readonly returnParentUrl = '/scheduler';
@@ -70,8 +74,8 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
       : '/settings/scheduler';
 
   readonly statusItems: StatusItem[] = [
-    { key: true.toString(), value: this.STATUS_ACTIVE_STRING },
-    { key: false.toString(), value: this.STATUS_INACTIVE_STRING },
+    { key: true.toString(), value: this.ActiveLabels.ACTIVE },
+    { key: false.toString(), value: this.ActiveLabels.INACTIVE },
   ];
 
   readonly extractor: ArrayItemLabelValueExtractor<StatusItem> = {

@@ -1,5 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'sass:map';
 
 .nav-to-plan-icon {
   transform: scale(0.7);
@@ -20,12 +21,12 @@
 }
 
 .status-on {
-  background-color: var.$on;
+  background: map.get(var.$statuses, 'RUNNING');
   color: var.$white;
 }
 
 .status-off {
-  background-color: var.$of;
+  background: map.get(var.$statuses, 'INTERRUPTED');
   color: var.$white;
 }
 
