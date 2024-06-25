@@ -43,7 +43,6 @@ import { ExecutionsComponent } from './components/executions/executions.componen
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
-import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +74,6 @@ import { ExecutionDurationComponent } from './components/execution-duration/exec
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
-    ExecutionDurationComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -89,7 +87,6 @@ import { ExecutionDurationComponent } from './components/execution-duration/exec
     ExecutionProgressComponent,
     RepositoryComponent,
     ExecutionSelectionTableComponent,
-    ExecutionDurationComponent,
     StatusComponent,
   ],
 })
