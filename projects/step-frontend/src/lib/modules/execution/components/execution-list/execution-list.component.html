@@ -1,0 +1,139 @@
+<step-drag-drop-container>
+  <step-table
+    [dataSource]="dataSource"
+    matSort
+    matSortActive="executionTime"
+    matSortDirection="desc"
+    [matSortDisableClear]="true"
+  >
+    <step-bulk-operations
+      *stepAdditionalHeader="'btngroup-bulk-new'"
+      entity="executions"
+      (selectionTypeChange)="changeType($event)"
+    />
+    <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
+      <step-btn-group>
+        <step-autorefresh-toggle [(disabled)]="autoRefreshDisabled" [interval]="5000" (refresh)="refreshTable()" />
+      </step-btn-group>
+    </section>
+    <ng-container matColumnDef="bulkSelection">
+      <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
+      <td mat-cell *matCellDef="let element">
+        <step-entity-selection-di [entity]="element" />
+      </td>
+    </ng-container>
+    <step-entity-column-container entityName="executions" />
+    <ng-container matColumnDef="description" stepActivityCol="Description" stepSearchCol>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>Description</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element" class="description-cell">
+        <step-report-node-icon [class.is-importing]="element.status === 'IMPORTING'" [node]="element.rootReportNode" />
+        <a [routerLink]="element | executionUrl" queryParamsHandling="preserve">{{ element?.description }}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="executionTime" stepActivityCol="Execution Time" stepSearchCol>
+      <step-range-filter
+        *stepSearchCellDef
+        stepFilterConnect
+        [createConditionFn]="_filterConditionFactory.dateRangeFilterCondition"
+      />
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>Execution Time</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element" class="execution-time-cell">
+        @if (element?.endTime && element?.startTime) {
+          <step-popover yPosition="below">
+            <div class="execution-time">
+              {{ element?.startTime | date: DateFormat.DATE }}
+              <span class="duration">{{ element?.endTime | duration: element?.startTime }}</span>
+            </div>
+            <step-popover-content>
+              <section class="execution-duration-description">
+                <div>Start time:</div>
+                <div>{{ element?.startTime | date: DateFormat.DATE }}</div>
+                <div>End time:</div>
+                <div>{{ element?.endTime | date: DateFormat.DATE }}</div>
+                <div>Duration:</div>
+                <div>{{ element?.endTime | duration: element?.startTime : true }}</div>
+              </section>
+            </step-popover-content>
+          </step-popover>
+        } @else {
+          {{ element?.startTime | date: DateFormat.DATE }}
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="startTime" stepActivityCol="Start Time" stepSearchCol [isHiddenByDefault]="true">
+      <step-date-filter
+        *stepSearchCellDef
+        stepFilterConnect
+        [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+      />
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>Start Time</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.startTime | date: DateFormat.DATE }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="endTime" stepActivityCol="End Time" stepSearchCol [isHiddenByDefault]="true">
+      <step-date-filter
+        *stepSearchCellDef
+        stepFilterConnect
+        [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
+      />
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>End Time</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.endTime | date: DateFormat.DATE }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="user" stepActivityCol="User" stepSearchCol>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>User</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">{{ element?.executionParameters?.userID }}</td>
+    </ng-container>
+    <ng-container matColumnDef="status" stepActivityCol="Status" stepSearchCol>
+      <step-multi-level-array-filter
+        *stepSearchCellDef
+        #statusFilter
+        stepFilterConnect
+        [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
+        [items]="(statusItemsTree$ | async)!"
+      />
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <step-drag-column-caption>
+          <step-execution-running-status-header
+            [runningExecutionsCount]="runningExecutionsCount$ | async"
+            (statusBadgeClick)="handleRunningStatusClick()"
+          >
+            Status
+          </step-execution-running-status-header>
+        </step-drag-column-caption>
+      </th>
+
+      <td mat-cell *matCellDef="let element">
+        <step-execution-status [execution]="element" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="executionSummary" stepActivityCol="Summary">
+      <th mat-header-cell *matHeaderCellDef>
+        <step-drag-column-caption>Summary</step-drag-column-caption>
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <div class="result">
+          <step-status-distribution [summary]="element.executionSummary" />
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions" stepActionCol>
+      <th mat-header-cell *matHeaderCellDef>
+        <step-column-settings />
+      </th>
+      <td mat-cell *matCellDef></td>
+    </ng-container>
+  </step-table>
+</step-drag-drop-container>

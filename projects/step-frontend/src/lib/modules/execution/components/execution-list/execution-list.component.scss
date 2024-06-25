@@ -1,7 +1,45 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 @use 'sass:map';
 
-step-execution-duration {
+step-execution-list {
+  @include core.table-container;
+
+  .header {
+    @include core.table-header;
+  }
+
+  th.actions-column-settings-container .header-cell-container {
+    justify-content: flex-end !important;
+  }
+
+  step-report-node-icon.is-importing {
+    visibility: hidden;
+  }
+
+  .result {
+    display: flex;
+  }
+
+  .description-cell {
+    entity-icon {
+      margin-right: 5px;
+    }
+
+    a {
+      vertical-align: middle;
+    }
+  }
+
+  th step-input-filter step-form-field .form-field-content input,
+  th step-array-filter step-form-field .form-field-content mat-select {
+    width: 8rem !important;
+  }
+
+  td.execution-time-cell {
+    width: 0;
+  }
+
   .execution-time {
     display: flex;
     align-items: center;
@@ -22,9 +60,6 @@ step-execution-duration {
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    &.running {
-      background-color: map.get(var.$statuses, 'RUNNING');
-    }
   }
 }
 
