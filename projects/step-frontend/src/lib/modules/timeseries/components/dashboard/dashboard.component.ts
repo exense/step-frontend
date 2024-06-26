@@ -493,8 +493,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
     if (itemToDelete.type === 'TABLE') {
       this.dashboard.dashlets
-        .filter((d) => d.masterChartId === itemToDelete.id)
-        .forEach((i) => (i.masterChartId = undefined));
+        .filter((dashboardItem) => dashboardItem.masterChartId === itemToDelete.id)
+        .forEach((dashboardItem) => (dashboardItem.masterChartId = undefined));
     }
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
@@ -549,7 +549,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     );
     const hiddenFilters = clonedSettings.hiddenFilters || [];
     clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
-    clonedSettings.filterItems.forEach((i) => (i.isHidden = false));
+    clonedSettings.filterItems.forEach((item) => (item.isHidden = false));
     clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
