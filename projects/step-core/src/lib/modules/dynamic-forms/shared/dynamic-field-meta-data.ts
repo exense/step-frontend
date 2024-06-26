@@ -1,6 +1,7 @@
 import { FormControl } from '@angular/forms';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
+import { DynamicValue } from '../../../client/step-client-module';
 import { DynamicFieldType } from './dynamic-field-type';
+import { SchemaField } from './dynamic-fields-schema';
 
 export interface DynamicFieldMetaData {
   trackId: string;
@@ -8,8 +9,9 @@ export interface DynamicFieldMetaData {
   label?: string;
   tooltip?: string;
   fieldType: DynamicFieldType;
+  fieldSchema?: SchemaField;
   isAdditional?: boolean;
   isRequired?: boolean;
-  control: FormControl<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>;
+  control: FormControl<DynamicValue>;
   enumItems?: string[];
 }
