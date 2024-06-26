@@ -164,9 +164,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private collectUnusedAttributes(): MetricAttribute[] {
+    const hiddenFilters = this.context.getFilteringSettings().hiddenFilters || [];
     return this.context
       .getAllAttributes()
-      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
+      .filter(
+        (attr) =>
+          !this._internalFilters.find((i) => attr.name === i.attributeName) &&
+          !hiddenFilters.find((i) => attr.name === i.attributeName),
+      );
   }
 
   getValidFilters(): FilterBarItem[] {

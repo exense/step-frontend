@@ -547,7 +547,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const clonedSettings: TsFilteringSettings = JSON.parse(
       JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
     );
-    clonedSettings.filterItems.forEach((item) => (item.isHidden = false)); // make everything visible in compare mode
+    const hiddenFilters = clonedSettings.hiddenFilters || [];
+    clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
+    clonedSettings.filterItems.forEach((i) => (i.isHidden = false));
+    clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
 
