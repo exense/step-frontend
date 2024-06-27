@@ -32,9 +32,10 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { CompositeKeywordPlanContextApiService } from './injectables/composite-keyword-plan-context-api.service';
 import { map } from 'rxjs';
 import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
+  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule, NgxMatSelectSearchModule],
   declarations: [
     FunctionListComponent,
     FunctionTypeFilterComponent,
