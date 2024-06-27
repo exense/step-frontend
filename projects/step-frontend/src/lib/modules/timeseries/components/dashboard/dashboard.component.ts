@@ -269,6 +269,9 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
       },
     };
+    this.filterBar!.addUniqueFilterItems(
+      tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
+    );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
