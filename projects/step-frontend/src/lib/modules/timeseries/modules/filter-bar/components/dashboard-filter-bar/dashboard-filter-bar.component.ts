@@ -356,11 +356,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.filterOptions = this.collectUnusedAttributes();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
-    this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
-      if (!item.attributeName || (!this.editMode && !FilterUtils.filterItemIsValid(item))) {
-        this.removeFilterItem(this._internalFilters.length - 1);
-      }
-    });
   }
 
   private haveNewGrouping() {
@@ -388,11 +383,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       filteringSettings.mode === TsFilteringMode.OQL
         ? filteringSettings.oql!.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    // const contextualOql = FilterUtils.objectToOQL(
-    //   this.performanceViewSettings.contextualFilters,
-    //   undefined,
-    //   ATTRIBUTES_REMOVAL_FUNCTION
-    // );
     const selectedTimeRange = this.context.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
