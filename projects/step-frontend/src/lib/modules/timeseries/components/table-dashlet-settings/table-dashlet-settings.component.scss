@@ -47,9 +47,31 @@ div[step-modal-window-body] > form {
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
+  justify-content: space-between;
 
   .item {
     width: 45%;
     flex-grow: 1;
+    height: 36px;
+    line-height: 36px;
+  }
+}
+
+.pcl-column-container {
+  display: flex;
+  width: 45%;
+  flex-grow: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pcl-editable-label {
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  max-width: 7rem;
+
+  .editable-label {
+    background: red !important;
   }
 }

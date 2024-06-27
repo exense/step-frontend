@@ -36,6 +36,17 @@ export const $DashboardItem = {
       },
       isRequired: true,
     },
+    inheritSpecificFiltersOnly: {
+      type: 'boolean',
+      isRequired: true,
+    },
+    specificFiltersToInherit: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+      isRequired: true,
+    },
     oql: {
       type: 'string',
     },
