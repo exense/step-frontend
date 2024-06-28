@@ -27,7 +27,7 @@ export class ManageBookmarksListComponent {
 
   renameBookmark(bookmark: Bookmark): void {
     this._matDialog
-      .open(BookmarkCreateDialogComponent, { data: { id: bookmark.id, label: bookmark.label } })
+      .open(BookmarkCreateDialogComponent, { data: bookmark })
       .afterClosed()
       .subscribe(() => {
         this._bookmarksService.refreshBookmarks();
