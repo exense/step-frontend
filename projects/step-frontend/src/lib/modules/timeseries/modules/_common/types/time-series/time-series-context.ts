@@ -9,6 +9,7 @@ import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
 import { SeriesStroke } from './series-stroke';
+import { TimeRangeSettings } from '../../../../components/dashboard/time-range-settings';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -34,11 +35,9 @@ export class TimeSeriesContext {
 
   private dashboardAttributes$: BehaviorSubject<Record<string, MetricAttribute>>;
 
-  defaultFullTimeRange?: Partial<TimeRange>; // The 'Full selection' initial interval. 'To' can be undefined.
-  private fullTimeRange: TimeRange; // this represents the entire time-series interval. usually this is displayed entirely in the time-ranger
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
-  private selectedTimeRange: TimeRange; // this is the zooming selection.
   private readonly selectedTimeRangeChange$ = new Subject<TimeRange>();
+  private readonly timeRangeSettings: TimeRangeSettings;
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
@@ -58,9 +57,7 @@ export class TimeSeriesContext {
     this.id = params.id;
     this.dashlets = params.dashlets;
     params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
-    this.defaultFullTimeRange = params.defaultFullTimeRange;
-    this.fullTimeRange = params.timeRange;
-    this.selectedTimeRange = params.selectedTimeRange || params.timeRange;
+    this.timeRangeSettings = params.timeRangeSettings;
     this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>(params.filteringSettings);
     this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
@@ -93,6 +90,10 @@ export class TimeSeriesContext {
     ) as Observable<void>;
   }
 
+  getTimeRangeSettings() {
+    return this.timeRangeSettings;
+  }
+
   getMetric(key: string): MetricType {
     return this.indexedMetrics[key];
   }
@@ -110,7 +111,7 @@ export class TimeSeriesContext {
   }
 
   updateDefaultFullTimeRange(range: Partial<TimeRange>) {
-    this.defaultFullTimeRange = range;
+    this.timeRangeSettings.defaultFullRange = range;
   }
 
   getSyncGroups(): TimeSeriesSyncGroup[] {
@@ -234,7 +235,7 @@ export class TimeSeriesContext {
   }
 
   updateFullRange(range: TimeRange, emitEvent = true) {
-    this.fullTimeRange = range;
+    this.timeRangeSettings.fullRange = range;
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
     } else {
@@ -243,7 +244,7 @@ export class TimeSeriesContext {
   }
 
   updateSelectedRange(range: TimeRange, emitEvent = true) {
-    this.selectedTimeRange = range;
+    this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
       this.selectedTimeRangeChange$.next(range);
     } else {
@@ -260,11 +261,14 @@ export class TimeSeriesContext {
   }
 
   isFullRangeSelected() {
-    return JSON.stringify(this.selectedTimeRange) === JSON.stringify(this.fullTimeRange);
+    return (
+      this.timeRangeSettings.fullRange.from === this.timeRangeSettings.selectedRange.from &&
+      this.timeRangeSettings.fullRange.to === this.timeRangeSettings.selectedRange.to
+    );
   }
 
   getSelectedTimeRange(): TimeRange {
-    return this.selectedTimeRange;
+    return this.timeRangeSettings.selectedRange;
   }
 
   setFilteringMode(mode: TsFilteringMode): void {
@@ -300,8 +304,8 @@ export class TimeSeriesContext {
   }
 
   resetZoom() {
-    this.selectedTimeRange = this.fullTimeRange;
-    this.selectedTimeRangeChange$.next(this.selectedTimeRange);
+    this.timeRangeSettings.selectedRange = this.timeRangeSettings.fullRange;
+    this.selectedTimeRangeChange$.next(this.timeRangeSettings.selectedRange);
   }
 
   onGroupingChange(): Observable<string[]> {
@@ -321,6 +325,6 @@ export class TimeSeriesContext {
   }
 
   getFullTimeRange(): TimeRange {
-    return this.fullTimeRange;
+    return this.timeRangeSettings.fullRange;
   }
 }

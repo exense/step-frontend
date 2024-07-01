@@ -58,6 +58,7 @@ import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
 import { StateTest } from './state.test';
+import { TimeRangeType } from './time-range-type';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -395,9 +396,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
       dashlets: this.dashboard.dashlets,
-      timeRange: timeRange,
+      timeRangeSettings: {
+        type: timeRangeSelection.type as TimeRangeType,
+        defaultFullRange: this.defaultFullTimeRange,
+        fullRange: timeRange,
+        relativeSelection: timeRangeSelection.relativeSelection,
+        selectedRange: urlParams.selectedTimeRange || timeRange,
+      },
       selectedTimeRange: urlParams.selectedTimeRange,
-      defaultFullTimeRange: this.defaultFullTimeRange,
       attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
       filteringSettings: {
@@ -580,14 +586,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const timeRange = JSON.parse(JSON.stringify(mainState.context.getFullTimeRange()));
     const compareModeContext = this._timeSeriesContextFactory.createContext({
       dashlets: JSON.parse(JSON.stringify(this.dashboard.dashlets)), // clone
-      timeRange: timeRange,
+      timeRangeSettings: JSON.parse(JSON.stringify(mainState.context.getTimeRangeSettings())),
       id: new Date().getTime().toString(),
       attributes: this.mainEngine.state.context.getAllAttributes(),
       grouping: mainState.context.getGroupDimensions(),
       filteringSettings: this.createCompareModeFilters(),
       colorsPool: mainState.context.colorsPool,
       syncGroups: mainState.context.getSyncGroups(),
-      defaultFullTimeRange: mainState.context.defaultFullTimeRange,
       resolution: mainState.context.getChartsResolution(),
       metrics: this.metricTypes,
     });
