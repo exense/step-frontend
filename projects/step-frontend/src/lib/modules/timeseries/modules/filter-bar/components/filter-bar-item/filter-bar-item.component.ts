@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
-import { TimeSeriesUtils, FilterBarItemType, FilterBarItem, COMMON_IMPORTS } from '../../../_common';
+import { TimeSeriesUtils, FilterBarItemType, FilterBarItem, COMMON_IMPORTS, FilterUtils } from '../../../_common';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { FilterBarPlanItemComponent } from '../filter-bar-plan-item/filter-bar-plan-item.component';
@@ -16,7 +16,8 @@ import { FilterBarExecutionItemComponent } from '../filter-bar-execution-executi
   imports: [COMMON_IMPORTS, FilterBarPlanItemComponent, FilterBarTaskItemComponent, FilterBarExecutionItemComponent],
 })
 export class FilterBarItemComponent implements OnInit, OnChanges {
-  @Input() item!: FilterBarItem;
+  @Input() item!: FilterBarItem; // should not make edits on it
+  itemDraft!: FilterBarItem;
   @Input() removable?: boolean;
   @Input() compact = false;
   @Input() highlightRemoveButton = false;
@@ -44,7 +45,6 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item) {
       throw new Error('Item input is mandatory');
     }
-    this.freeTextValues = this.item.freeTextValues || [];
   }
 
   onMenuClose(): void {
@@ -59,8 +59,18 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     this.menuTrigger?.openMenu();
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.formattedValue = this.getFormattedValue(this.item);
+
+    if (changes['item'] && changes['item'].currentValue) {
+      // Create a clone of the input item to work with as a draft
+      this.itemDraft = JSON.parse(JSON.stringify(this.item));
+      this.freeTextValues = [...(this.item.freeTextValues || [])];
+    }
+  }
+
+  removeTextValue(index: number) {
+    this.freeTextValues.splice(index, 1);
   }
 
   toggleOption(option: { value: string; isSelected?: boolean }, checked: boolean, checkbox?: MatCheckbox) {
@@ -78,6 +88,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   }
 
   applyChanges() {
+    this.item = this.itemDraft;
     if (this.chipInputValue) {
       this.addSearchValue(this.chipInputValue);
     }
@@ -86,13 +97,14 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
       case FilterBarItemType.EXECUTION:
       case FilterBarItemType.PLAN:
       case FilterBarItemType.TASK:
+        this.item.searchEntities = [...this.itemDraft.searchEntities];
         this.item.freeTextValues = this.item.searchEntities.map((e) => e.searchValue);
         isEntityFilter = true;
         break;
       case FilterBarItemType.OPTIONS:
         break;
       case FilterBarItemType.FREE_TEXT:
-        this.item.freeTextValues = this.freeTextValues;
+        this.item.freeTextValues = [...this.freeTextValues];
         break;
       case FilterBarItemType.NUMERIC:
       case FilterBarItemType.DATE:
@@ -105,11 +117,10 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     if (!this.item.isLocked && !isEntityFilter) {
       this.item.label = this.item.attributeName;
     }
-
-    this.formattedValue = this.getFormattedValue(this.item);
     this.filterChange.emit(this.item);
     this.changesApplied = true;
     this.matTrigger.closeMenu();
+    this.formattedValue = this.getFormattedValue(this.item);
   }
 
   onMinDateChanged(date: DateTime | undefined) {
@@ -145,9 +156,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
           // both are undefined
           formattedValue = '';
         }
-
         break;
-
       case FilterBarItemType.DATE:
         const min = item.min ? TimeSeriesUtils.formatInputDate(new Date(item.min), false) : '';
         const max = item.max ? TimeSeriesUtils.formatInputDate(new Date(item.max), false) : '';
