@@ -11,5 +11,6 @@ export type Bookmark = {
     link?: string;
     page?: string;
     tenant?: string;
+    position?: string;
   };
 };
