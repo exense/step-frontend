@@ -14,7 +14,7 @@ export class DashboardStateEngine {
   destroy() {
     this.terminator$.next();
     this.terminator$.complete();
-    this.state.context.destroy();
+    // this.state.context.destroy();
   }
 
   subscribeForContextChange(): void {

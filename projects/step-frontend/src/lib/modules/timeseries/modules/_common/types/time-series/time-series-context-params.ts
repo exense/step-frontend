@@ -8,6 +8,7 @@ export interface TimeSeriesContextParams {
   dashlets: DashboardItem[];
   timeRange: TimeRange;
   defaultFullTimeRange?: Partial<TimeRange>; // used as a reset range, mostly in execution view where it is known
+  selectedTimeRange?: TimeRange; // ranger selection
   metrics?: MetricType[];
   attributes?: MetricAttribute[];
   grouping: string[];
@@ -16,4 +17,5 @@ export interface TimeSeriesContextParams {
   filteringSettings: TsFilteringSettings;
   editMode?: boolean;
   resolution?: number;
+  refreshInterval?: number;
 }

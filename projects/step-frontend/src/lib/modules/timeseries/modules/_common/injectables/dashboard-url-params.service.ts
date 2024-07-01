@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
-import { TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
+import { TimeRange, TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
 import { TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
@@ -16,6 +16,7 @@ const MAX_SUFFIX = '_max';
 export interface DashboardUrlParams {
   refreshInterval?: number;
   timeRange?: TimeRangeSelection;
+  selectedTimeRange?: TimeRange;
   grouping?: string[];
   filters: UrlFilterAttribute[];
   relativeRange?: string;
@@ -48,10 +49,21 @@ export class DashboardUrlParamsService {
       refreshInterval: params['refreshInterval'] ? parseInt(params['refreshInterval']) : undefined,
       editMode: editModeValue === '1',
       timeRange: this.extractTimeRange(params),
+      selectedTimeRange: this.extractRangeSelection(params),
       grouping: params['grouping']?.split(','),
       filters: this.decodeUrlFilters(params),
       resolution: params['resolution'],
     };
+  }
+
+  private extractRangeSelection(params: Params): TimeRange | undefined {
+    const from = parseInt(params['select_from']);
+    const to = parseInt(params['select_to']);
+    if (from && to) {
+      return { from, to };
+    } else {
+      return undefined;
+    }
   }
 
   private extractTimeRange(params: Params): TimeRangeSelection | undefined {
@@ -161,6 +173,11 @@ export class DashboardUrlParamsService {
       params['to'] = timeSelection.absoluteSelection!.to;
     } else if (timeSelection.type === TimeRangeType.RELATIVE) {
       params['relativeRange'] = timeSelection.relativeSelection!.timeInMs;
+    }
+    if (!context.isFullRangeSelected()) {
+      const selectedTimeRange = context.getSelectedTimeRange();
+      params['select_from'] = selectedTimeRange.from;
+      params['select_to'] = selectedTimeRange.to;
     }
     const customResolution = context.getChartsResolution();
     if (customResolution > 0) {

@@ -45,6 +45,7 @@ export class TimeSeriesContext {
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
+  private readonly refreshInterval$: BehaviorSubject<number>;
 
   public readonly colorsPool: TimeseriesColorsPool;
 
@@ -59,7 +60,7 @@ export class TimeSeriesContext {
     params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
     this.defaultFullTimeRange = params.defaultFullTimeRange;
     this.fullTimeRange = params.timeRange;
-    this.selectedTimeRange = params.timeRange;
+    this.selectedTimeRange = params.selectedTimeRange || params.timeRange;
     this.filterSettings$ = new BehaviorSubject<TsFilteringSettings>(params.filteringSettings);
     this.editMode$ = new BehaviorSubject<boolean>(params.editMode || false);
     this.activeGroupings$ = new BehaviorSubject(params.grouping);
@@ -74,6 +75,7 @@ export class TimeSeriesContext {
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
+    this.refreshInterval$ = new BehaviorSubject<number>(params.refreshInterval || 0);
     params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
     // any specific context change will trigger the main stateChange
@@ -84,6 +86,7 @@ export class TimeSeriesContext {
       this.filterSettings$.pipe(skip(1)),
       this.chartsResolution$.pipe(skip(1)),
       this.chartsLockedState$.pipe(skip(1)),
+      this.refreshInterval$.pipe(skip(1)),
       this.fullTimeRangeChange$,
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
@@ -92,6 +95,18 @@ export class TimeSeriesContext {
 
   getMetric(key: string): MetricType {
     return this.indexedMetrics[key];
+  }
+
+  getRefreshInterval(): number {
+    return this.refreshInterval$.getValue();
+  }
+
+  updateRefreshInterval(value: number) {
+    this.refreshInterval$.next(value);
+  }
+
+  onRefreshIntervalChange(): Observable<number> {
+    return this.refreshInterval$.asObservable();
   }
 
   updateDefaultFullTimeRange(range: Partial<TimeRange>) {
@@ -117,6 +132,7 @@ export class TimeSeriesContext {
   destroy(): void {
     this.inProgress$.complete();
     this.fullTimeRangeChange$.complete();
+    this.refreshInterval$.complete();
     this.selectedTimeRangeChange$.complete();
     this.activeGroupings$.complete();
     this.filterSettings$.complete();

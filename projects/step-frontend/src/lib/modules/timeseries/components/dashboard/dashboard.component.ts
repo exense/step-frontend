@@ -57,6 +57,7 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
+import { StateTest } from './state.test';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -149,14 +150,26 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Parameters of the dashboard are combined from 3 places, in the following order:
+   * 1. URL
+   * 2. Stored state
+   * 3. Dashboard object
+   */
   initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
-    this.refreshInterval =
-      (pageParams.refreshInterval !== undefined ? pageParams.refreshInterval : this.dashboard.refreshInterval) || 0;
-    this.resolution = pageParams.resolution || this.dashboard.resolution;
-    pageParams.resolution = this.resolution;
-    const timeRangeSelection = this.computeTimeRange(dashboard, pageParams);
-    const context = this.createContext(this.dashboard, pageParams, timeRangeSelection);
+    // this.refreshInterval =
+    //   (pageParams.refreshInterval !== undefined ? pageParams.refreshInterval : this.dashboard.refreshInterval) || 0;
+    // this.resolution = pageParams.resolution || this.dashboard.resolution;
+    // pageParams.resolution = this.resolution;
+    const existingContext: TimeSeriesContext = StateTest.contexts[this.dashboardId];
+    const hasCustomSelection = existingContext?.isFullRangeSelected();
+    const existingCustomSelection = hasCustomSelection ? existingContext!.getSelectedTimeRange() : undefined;
+    const timeRangeSelection = this.computeTimeRange(existingCustomSelection, dashboard, pageParams);
+    const context = existingContext || this.createContext(this.dashboard, pageParams, timeRangeSelection);
+    this.resolution = context.getChartsResolution();
+    this.refreshInterval = context.getRefreshInterval();
+    StateTest.contexts[this.dashboardId] = context;
     const state = {
       context: context,
       timeRangeSelection: timeRangeSelection,
@@ -321,8 +334,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private computeTimeRange(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeRangeSelection {
-    // priority of time ranges property: 1. URL 2. Default full selection 3. Dashboard
+  private computeTimeRange(
+    existingCustomSelection: TimeRange | undefined,
+    dashboard: DashboardView,
+    urlParams: DashboardUrlParams,
+  ): TimeRangeSelection {
+    if (existingCustomSelection) {
+      return { type: 'ABSOLUTE', absoluteSelection: existingCustomSelection };
+    }
+    // priority of time ranges property: 1. existingCustomSelection 2. URL 3. Default full selection 4. Dashboard
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
       return {
         type: 'FULL',
@@ -376,6 +396,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       id: dashboard.id!,
       dashlets: this.dashboard.dashlets,
       timeRange: timeRange,
+      selectedTimeRange: urlParams.selectedTimeRange,
       defaultFullTimeRange: this.defaultFullTimeRange,
       attributes: metricAttributes,
       grouping: urlParams.grouping || dashboard.grouping || [],
@@ -386,6 +407,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       },
       resolution: this.resolution,
       metrics: this.metricTypes,
+      refreshInterval:
+        urlParams.refreshInterval !== undefined ? urlParams.refreshInterval : this.dashboard.refreshInterval,
     });
   }
 
@@ -620,8 +643,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this._timeSeriesContextFactory.destroyContext(this.mainEngine.state.context.id);
-    this._timeSeriesContextFactory.destroyContext(this.compareEngine?.state.context.id);
+    // this._timeSeriesContextFactory.destroyContext(this.mainEngine.state.context.id);
+    // this._timeSeriesContextFactory.destroyContext(this.compareEngine?.state.context.id);
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
   }

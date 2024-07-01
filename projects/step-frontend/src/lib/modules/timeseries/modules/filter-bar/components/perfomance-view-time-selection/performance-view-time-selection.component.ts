@@ -42,11 +42,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
     if (!this.context) {
       throw new Error('Context input is required');
     }
-    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
+    this.createRanger(this.context).subscribe(() => this.rangerLoaded.next());
     this.context
       .onTimeSelectionChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((selection) => {
+        console.log('SELECTION CHANGED', selection, this.context.isFullRangeSelected());
         if (this.context.isFullRangeSelected()) {
           this.rangerComponent.resetSelect();
         } else {
@@ -58,25 +59,17 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((range) => {
         // this.settings.timeRange = range;
-        let customSelection = undefined;
-        if (!this.context.isFullRangeSelected()) {
-          customSelection = this.context.getSelectedTimeRange();
-        }
-        this.createRanger(this.context.getFullTimeRange(), customSelection).subscribe();
+        this.createRanger(this.context).subscribe();
       });
   }
 
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
-    const selection = this.context.getSelectedTimeRange();
-    return this.createRanger(
-      this.context.getFullTimeRange(),
-      this.context.isFullRangeSelected() ? undefined : selection,
-    );
+    return this.createRanger(this.context);
   }
 
-  createRanger(fullTimeRange: TimeRange, selection?: TimeRange): Observable<TimeSeriesAPIResponse> {
+  createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
     const request = new FindBucketsRequestBuilder()
-      .withRange(fullTimeRange)
+      .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
       .withFilteringSettings(this.context.getFilteringSettings())
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
@@ -90,10 +83,10 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
         if (response.matrix[0]) {
           avgData = response.matrix[0].map((b) => b?.throughputPerHour || 0);
         }
-
+        const customSelection = context.isFullRangeSelected() ? undefined : context.getSelectedTimeRange();
         this.rangerSettings = {
           xValues: this.timeLabels,
-          selection: selection,
+          selection: customSelection,
           series: [
             {
               id: 'avg',
@@ -110,12 +103,14 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   }
 
   onRangerSelectionChange(event: TimeRange) {
+    console.log('RANGER HAS NEW RANGE');
     // check for full range selection
     this.context.updateSelectedRange(event);
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset() {
+    console.log('zoom reset from ranger');
     this.context.resetZoom();
   }
 }
