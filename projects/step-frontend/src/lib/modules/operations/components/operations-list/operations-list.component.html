@@ -2,7 +2,8 @@
   <h4>Current operations</h4>
 
   <step-btn-group>
-    <step-autorefresh-toggle [interval]="5000" (refresh)="triggerRefresh()"> </step-autorefresh-toggle>
+    <step-autorefresh-toggle stepTestId="operations-auto-refresh" [interval]="5000" (refresh)="triggerRefresh()">
+    </step-autorefresh-toggle>
   </step-btn-group>
 </section>
 
