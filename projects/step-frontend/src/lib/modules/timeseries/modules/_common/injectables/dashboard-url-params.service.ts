@@ -74,7 +74,10 @@ export class DashboardUrlParamsService {
 
   private decodeUrlFilters(params: Params): UrlFilterAttribute[] {
     return Object.entries(params)
-      .filter(([key]) => key.startsWith(TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX))
+      .filter(
+        ([key, value]) =>
+          key.startsWith(TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX) && value !== undefined && value !== '',
+      )
       .map(([key, value]) => {
         key = key.substring(TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX.length);
 
