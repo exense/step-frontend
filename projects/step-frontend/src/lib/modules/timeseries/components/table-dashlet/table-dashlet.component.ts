@@ -54,7 +54,7 @@ export interface TableEntry {
   maxDiff?: number;
   pcl80Diff?: number;
   pcl90Diff?: number;
-  pcl99Diff?: number;
+  pcl95Diff?: number;
   tpsDiff?: number;
   tphDiff?: number;
 }
@@ -158,7 +158,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private getLabelUnit(
-    column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_99' | 'TPS' | 'TPH',
+    column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_95' | 'TPS' | 'TPH',
   ): string {
     switch (column) {
       case 'COUNT':
@@ -239,7 +239,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       groupDimensions: this.getGroupDimensions(context),
       oqlFilter: oql,
       numberOfBuckets: 1,
-      percentiles: [80, 90, 99],
+      percentiles: [80, 90, 95],
     };
     return this._timeSeriesService
       .getTimeSeries(request)
@@ -321,7 +321,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         maxDiff: this.percentageBetween(baseBucket?.max, compareBucket?.max),
         pcl80Diff: this.percentageBetween(baseBucket?.pclValues?.[80], compareBucket?.pclValues?.[80]),
         pcl90Diff: this.percentageBetween(baseBucket?.pclValues?.[90], compareBucket?.pclValues?.[90]),
-        pcl99Diff: this.percentageBetween(baseBucket?.pclValues?.[99], compareBucket?.pclValues?.[99]),
+        pcl95Diff: this.percentageBetween(baseBucket?.pclValues?.[95], compareBucket?.pclValues?.[95]),
         tpsDiff: this.percentageBetween(baseBucket?.tps, compareBucket?.tps),
         tphDiff: this.percentageBetween(baseBucket?.tph, compareBucket?.tph),
       };
@@ -481,9 +481,9 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[90])
       .addSortNumberPredicate('PCL_90_comp', (item) => item.compare?.pclValues?.[90])
       .addSortNumberPredicate('PCL_90_diff', (item) => item.pcl90Diff)
-      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[99])
-      .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[99])
-      .addSortNumberPredicate('PCL_99_diff', (item) => item.pcl99Diff)
+      .addSortNumberPredicate('PCL_95', (item) => item.base?.pclValues?.[95])
+      .addSortNumberPredicate('PCL_95_comp', (item) => item.compare?.pclValues?.[95])
+      .addSortNumberPredicate('PCL_95_diff', (item) => item.pcl95Diff)
       .addSortNumberPredicate('TPS', (item) => item.base?.tps)
       .addSortNumberPredicate('TPS_comp', (item) => item.compare?.tps)
       .addSortNumberPredicate('TPS_diff', (item) => item.tpsDiff)
@@ -531,7 +531,7 @@ const ColumnsValueFunctions = {
   [TableColumnType.MAX]: (b: ProcessedBucket) => b?.max,
   [TableColumnType.PCL_80]: (b: ProcessedBucket) => b?.pclValues?.[80],
   [TableColumnType.PCL_90]: (b: ProcessedBucket) => b?.pclValues?.[90],
-  [TableColumnType.PCL_99]: (b: ProcessedBucket) => b?.pclValues?.[99],
+  [TableColumnType.PCL_95]: (b: ProcessedBucket) => b?.pclValues?.[95],
   [TableColumnType.TPS]: (b: ProcessedBucket) => b?.tps,
   [TableColumnType.TPH]: (b: ProcessedBucket) => b?.tph,
 };
@@ -544,7 +544,7 @@ const ColumnsDiffFunctions: Record<TableColumnType, (entry: TableEntry) => numbe
   [TableColumnType.MAX]: (entry: TableEntry) => entry.maxDiff,
   [TableColumnType.PCL_80]: (entry: TableEntry) => entry.pcl80Diff,
   [TableColumnType.PCL_90]: (entry: TableEntry) => entry.pcl90Diff,
-  [TableColumnType.PCL_99]: (entry: TableEntry) => entry.pcl99Diff,
+  [TableColumnType.PCL_95]: (entry: TableEntry) => entry.pcl95Diff,
   [TableColumnType.TPS]: (entry: TableEntry) => entry.tpsDiff,
   [TableColumnType.TPH]: (entry: TableEntry) => entry.tphDiff,
 };
@@ -557,7 +557,7 @@ const ColumnsLabels = {
   [TableColumnType.MAX]: 'Max',
   [TableColumnType.PCL_80]: 'Pcl. 80',
   [TableColumnType.PCL_90]: 'Pcl. 90',
-  [TableColumnType.PCL_99]: 'Pcl. 99',
+  [TableColumnType.PCL_95]: 'Pcl. 95',
   [TableColumnType.TPS]: 'Tps',
   [TableColumnType.TPH]: 'Tph',
 };
