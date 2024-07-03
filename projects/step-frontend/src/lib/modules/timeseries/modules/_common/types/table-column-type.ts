@@ -5,8 +5,8 @@ export enum TableColumnType {
   MIN = 'MIN',
   MAX = 'MAX',
   PCL_80 = 'PCL_80',
-  PCL_90 = 'PCL_90',
   PCL_95 = 'PCL_95',
+  PCL_99 = 'PCL_99',
   TPS = 'TPS',
   TPH = 'TPH',
 }
