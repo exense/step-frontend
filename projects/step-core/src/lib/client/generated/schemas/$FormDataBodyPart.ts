@@ -30,17 +30,17 @@ export const $FormDataBodyPart = {
     providers: {
       type: 'Providers',
     },
-    name: {
-      type: 'string',
-    },
-    value: {
-      type: 'string',
-    },
     simple: {
       type: 'boolean',
     },
     formDataContentDisposition: {
       type: 'FormDataContentDisposition',
+    },
+    name: {
+      type: 'string',
+    },
+    value: {
+      type: 'string',
     },
     parameterizedHeaders: {
       type: 'dictionary',

@@ -18,9 +18,9 @@ export type FormDataBodyPart = {
   messageBodyWorkers?: MessageBodyWorkers;
   parent?: MultiPart;
   providers?: Providers;
-  name?: string;
-  value?: string;
   simple?: boolean;
   formDataContentDisposition?: FormDataContentDisposition;
+  name?: string;
+  value?: string;
   parameterizedHeaders?: Record<string, Array<ParameterizedHeader>>;
 };

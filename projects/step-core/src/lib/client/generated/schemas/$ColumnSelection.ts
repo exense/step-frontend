@@ -7,12 +7,12 @@ export const $ColumnSelection = {
       type: 'Enum',
       isRequired: true,
     },
-    pclValue: {
-      type: 'number',
-      format: 'int32',
-    },
     selected: {
       type: 'boolean',
+    },
+    type: {
+      type: 'string',
+      isRequired: true,
     },
   },
 } as const;

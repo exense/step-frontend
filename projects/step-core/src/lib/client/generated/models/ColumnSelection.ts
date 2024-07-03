@@ -4,6 +4,6 @@
 
 export type ColumnSelection = {
   column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_99' | 'TPS' | 'TPH';
-  pclValue?: number;
   selected?: boolean;
+  type: string;
 };

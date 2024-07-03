@@ -1,5 +1,12 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { ColumnSelection, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import {
+  ColumnSelection,
+  DashboardItem,
+  MetricAttribute,
+  MetricType,
+  PclColumnSelection,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -10,6 +17,7 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
+import { PclColumnSelectionPipe } from '../../modules/_common/pipes/pcl-column-selection.pipe';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -21,7 +29,7 @@ export interface ChartDashletSettingsData {
   templateUrl: './table-dashlet-settings.component.html',
   styleUrls: ['./table-dashlet-settings.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, FilterBarItemComponent],
+  imports: [COMMON_IMPORTS, FilterBarItemComponent, PclColumnSelectionPipe],
 })
 export class TableDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
@@ -72,14 +80,15 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   onColumnPclValueChange(column: ColumnSelection, value: string) {
-    const oldValue = column.pclValue;
+    const pclColumn = column as PclColumnSelection;
+    const oldValue = pclColumn.pclValue;
     let parsedNumber: number = parseFloat(value);
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
     if (validPclValue) {
-      column.pclValue = parsedNumber;
+      pclColumn.pclValue = parsedNumber;
     } else {
-      column.pclValue = 0;
-      setTimeout(() => (column.pclValue = oldValue), 100);
+      pclColumn.pclValue = 0;
+      setTimeout(() => (pclColumn.pclValue = oldValue), 100);
     }
   }
 

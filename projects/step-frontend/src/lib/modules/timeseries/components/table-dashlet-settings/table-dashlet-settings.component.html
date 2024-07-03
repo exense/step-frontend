@@ -131,17 +131,18 @@
         } @else {
           <div class="info-txt">Settings inherited from the master dashlet</div>
         }
+
         <mat-divider />
         <step-label>Columns</step-label>
         <div class="columns-container">
           @for (column of item.tableSettings!.columns; track column) {
-            @if (column.pclValue) {
+            @if ((column | pclColumnSelection).pclValue) {
               <div class="pcl-column-container">
                 <mat-checkbox color="primary" [(ngModel)]="column.selected" [ngModelOptions]="{ standalone: true }">
                 </mat-checkbox>
                 <span>PCL</span>
                 <step-editable-label
-                  [ngModel]="column.pclValue"
+                  [ngModel]="(column | pclColumnSelection).pclValue"
                   class="pcl-editable-label"
                   [ngModelOptions]="{ standalone: true }"
                   (ngModelChange)="onColumnPclValueChange(column, $event)"

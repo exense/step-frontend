@@ -9,7 +9,7 @@ export const $AxesSettings = {
     },
     pclValue: {
       type: 'number',
-      format: 'int32',
+      format: 'double',
     },
     displayType: {
       type: 'Enum',

@@ -26,6 +26,7 @@ import {
   FetchBucketsRequest,
   MarkerType,
   MetricAttribute,
+  PclColumnSelection,
   TableDashletSettings,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
@@ -131,8 +132,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   baseRequestOql: string = '';
   compareRequestOql: string = '';
 
-  readonly MarkerType = MarkerType;
-
   ngOnInit(): void {
     if (!this.item) {
       throw new Error('Dashlet item cannot be undefined');
@@ -158,12 +157,12 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState() {
     this.item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
+    this.columnsDefinition = this.item.tableSettings!.columns!.map((column: ColumnSelection) => {
       return {
         id: column.column!,
         label: this.getColumnLabel(column),
         isVisible: column.selected!,
-        pclValue: column.pclValue,
+        pclValue: (column as PclColumnSelection).pclValue,
         mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
       };
@@ -195,14 +194,15 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       case TableColumnType.PCL_80:
       case TableColumnType.PCL_90:
       case TableColumnType.PCL_99:
-        label += ` ${column.pclValue || 90}`;
+        const pcl = (column as PclColumnSelection).pclValue;
+        label += ` ${pcl || 90}`;
     }
 
     return label + this.getLabelUnit(column.column);
   }
 
   private getBucketMapFunction(column: ColumnSelection) {
-    const pclValue = column.pclValue;
+    const pclValue = (column as PclColumnSelection).pclValue;
     if (pclValue) {
       return (b: ProcessedBucket) => b?.pclValues![this.getPclWithDecimals(pclValue)];
     } else {
@@ -267,7 +267,8 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
     if (validPclValue) {
       column.pclValue = parsedNumber;
-      this.item.tableSettings!.columns.find((c) => c.column === column.id)!.pclValue = parsedNumber;
+      (this.item.tableSettings!.columns.find((c) => c.column === column.id)! as PclColumnSelection).pclValue =
+        parsedNumber;
       this.prepareState();
       this.refresh(true).subscribe(() => {
         if (this.compareModeEnabled) {

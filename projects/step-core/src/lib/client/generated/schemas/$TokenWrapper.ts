@@ -18,16 +18,16 @@ export const $TokenWrapper = {
     currentOwner: {
       type: 'TokenWrapperOwner',
     },
-    attributes: {
-      type: 'dictionary',
-      contains: {
-        type: 'string',
-      },
-    },
     interests: {
       type: 'dictionary',
       contains: {
         type: 'Interest',
+      },
+    },
+    attributes: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
       },
     },
   },
