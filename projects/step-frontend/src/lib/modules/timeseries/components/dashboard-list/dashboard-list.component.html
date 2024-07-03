@@ -4,6 +4,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
+          stepTestId="create-dashboard-btn"
           mat-mini-fab
           color="primary"
           matTooltip="Create Dashboard"
@@ -28,6 +29,7 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <a
+          stepTestId="go-to-dashboard-btn"
           matTooltip="Go to dashboard"
           matTooltipPosition="below"
           [routerLink]="['/', 'dashboards', element.id]"
@@ -62,6 +64,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
+            stepTestId="view-dashboard-btn"
             mat-icon-button
             matTooltip="View dashboard"
             [disabled]="!('dashboard-write' | hasRight | async)"
@@ -79,6 +82,7 @@
           </button>
           @if (!element.customFields?.locked && !element.metadata?.isLegacy) {
             <a
+              stepTestId="edit-dashboard-btn"
               mat-icon-button
               matTooltip="Edit dashboard"
               [disabled]="!('dashboard-write' | hasRight | async)"
@@ -89,6 +93,7 @@
               <step-icon name="edit" />
             </a>
             <button
+              stepTestId="delete-dashboard-btn"
               mat-icon-button
               matTooltip="Delete dashboard"
               [disabled]="!('dashboard-delete' | hasRight | async)"

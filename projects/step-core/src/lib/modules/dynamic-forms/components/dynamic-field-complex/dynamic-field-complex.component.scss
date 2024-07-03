@@ -1,0 +1,47 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-dynamic-field-complex {
+  step-form-field {
+    margin-bottom: 1rem;
+  }
+
+  .complex-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .complex-field-header {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+
+      .complex-field-label {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+      }
+    }
+
+    .complex-field-editor {
+      margin-bottom: 1rem;
+      position: relative;
+      &:before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        border-left: solid 0.1rem var.$gray-500;
+        top: -1rem;
+        left: 0.9rem;
+        bottom: 0.5rem;
+      }
+      step-dynamic-field-object-editor,
+      step-dynamic-field-array-editor {
+        display: block;
+        padding-left: 2rem;
+      }
+    }
+  }
+}

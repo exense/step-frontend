@@ -1,3 +1,6 @@
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
+import { DynamicValueArray, DynamicValueObject } from '../../../client/step-client-module';
 
-export type DynamicFieldGroupValue = Record<string, DynamicValueString | DynamicValueBoolean | DynamicValueInteger>;
+export type DynamicFieldObjectValue = Required<DynamicValueObject>['value'];
+export type DynamicFieldArrayValue = Required<DynamicValueArray>['value'];
+
+export type DynamicFieldGroupValue = DynamicFieldObjectValue | DynamicFieldArrayValue;
