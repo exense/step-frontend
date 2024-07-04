@@ -1,6 +1,7 @@
 <section class="header">
   <step-btn-group>
-    <step-autorefresh-toggle [interval]="5000" (refresh)="loadTable()"> </step-autorefresh-toggle>
+    <step-autorefresh-toggle stepTestId="agent-auto-refresh" [interval]="5000" (refresh)="loadTable()">
+    </step-autorefresh-toggle>
   </step-btn-group>
 </section>
 <step-table [dataSource]="searchableAgent" matSort [matSortDisableClear]="true">
@@ -28,6 +29,7 @@
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
         <button
+          stepTestId="pause-agent-btn"
           mat-icon-button
           matTooltip="Pause agent and enter maintenance mode"
           [disabled]="!('token-manage' | hasRight | async)"
@@ -36,6 +38,7 @@
           <step-icon name="pause"></step-icon>
         </button>
         <button
+          stepTestId="resume-agent-btn"
           mat-icon-button
           matTooltip="Resume agent and exit maintenance mode"
           [disabled]="!('token-manage' | hasRight | async)"
@@ -44,6 +47,7 @@
           <step-icon name="play"></step-icon>
         </button>
         <button
+          stepTestId="remove-errors-btn"
           mat-icon-button
           matTooltip="Remove all token errors"
           [disabled]="!('token-manage' | hasRight | async)"
