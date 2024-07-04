@@ -2,6 +2,8 @@ import { defaultIfEmpty, forkJoin, merge, Observable, of, Subject, switchMap, ta
 import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
+import { TimeRangeSettings } from './time-range-settings';
+import { TimeRangeType } from './time-range-type';
 
 export class DashboardStateEngine {
   private terminator$ = new Subject<void>();
@@ -83,8 +85,28 @@ export class DashboardStateEngine {
    * Handle full range interval changes, not selection changes.
    */
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
+    const oldSettings = this.state.context.getTimeRangeSettings();
+    let newSettings: TimeRangeSettings;
+    switch (params.selection.type) {
+      case 'FULL':
+        const fullRange = {
+          from: oldSettings.defaultFullRange.from,
+          to: oldSettings.defaultFullRange.to || new Date().getTime(),
+        };
+        newSettings = {
+          type: TimeRangeType.FULL,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: fullRange,
+          selectedRange: fullRange,
+        };
+        break;
+      case 'ABSOLUTE':
+        break;
+      case 'RELATIVE':
+        break;
+    }
     const state = this.state;
-    const range = this.getTimeRangeFromTimeSelection(params.selection);
+    const range = this.getFullRangeFromTimeSelection(params.selection);
     state.timeRangeSelection = params.selection;
     state.context.updateFullRange(range, false);
     state.context.updateSelectedRange(range, false);
@@ -121,7 +143,7 @@ export class DashboardStateEngine {
     return this.state.getFilterBar().timeSelection!.refreshRanger();
   }
 
-  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
+  private getFullRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
     const timeRangeSettings = this.state.context.getTimeRangeSettings();
     switch (selection.type) {
       case 'FULL':
