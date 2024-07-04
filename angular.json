@@ -49,6 +49,7 @@
               "projects/step-app/src/assets",
               "projects/step-app/src/favicon.png",
               "projects/step-app/src/step-variables.css",
+              "projects/step-app/src/step-variables-internal.css",
               {
                 "glob": "**/*",
                 "input": "dist/step-frontend/images",

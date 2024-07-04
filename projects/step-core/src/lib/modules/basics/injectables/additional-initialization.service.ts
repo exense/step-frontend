@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, map, Observable, of, shareReplay, tap } from 'rxjs';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
-export type InitializationStep = () => Observable<boolean>;
+export type InitializationStep = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => Observable<boolean>;
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ export class AdditionalInitializationService {
     return this;
   }
 
-  initialize(): Observable<boolean> {
+  initialize(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     if (this.initialized$) {
       return this.initialized$;
     }
@@ -26,7 +27,7 @@ export class AdditionalInitializationService {
       return this.initialized$;
     }
 
-    const runningSteps = this.initializationSteps.map((step) => step());
+    const runningSteps = this.initializationSteps.map((step) => step(route, state));
     this.initialized$ = forkJoin(runningSteps).pipe(
       map((initializeResults) => initializeResults.every((item) => !!item)),
       shareReplay(1),
