@@ -2,6 +2,7 @@ import { DataPoolConfiguration, DynamicValueBoolean, DynamicValueInteger, Dynami
 
 export interface DataSourceConf extends DataPoolConfiguration {
   file: DynamicValueString;
+  delimiter: DynamicValueString;
 
   worksheet: DynamicValueString;
   headers: DynamicValueBoolean;

@@ -1,7 +1,8 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 .page-container {
-  padding: 0 2rem;
+  padding: 0 1.2rem;
+  position: relative;
 }
 
 .resolution-select-container {
@@ -81,13 +82,33 @@
   width: 20rem !important;
 }
 
-.dashboard-name {
+.dashboard-title {
   font-size: 1.8rem;
   min-width: 10rem;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: center;
-  align-self: center;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-grow: 1;
+
+  .name {
+    max-width: 30rem;
+  }
+
+  .description {
+    font-size: 1.2rem;
+    opacity: 0.7;
+    max-width: 50%;
+    flex-grow: 1;
+  }
+}
+
+.floating-settings-btn {
+  position: absolute;
+  top: -64px;
+  right: 52px;
+  z-index: 100;
 }
 
 .no-charts-message {

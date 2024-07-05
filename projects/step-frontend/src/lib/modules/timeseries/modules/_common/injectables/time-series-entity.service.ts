@@ -30,7 +30,6 @@ export class TimeSeriesEntityService {
     }
     const cachedResults: { [key: string]: string } = {};
     const idsToFetch: string[] = [];
-    console.log(this.cache);
     // Separate cached IDs from those that need to be fetched
     ids.forEach((id) => {
       if (this.cache.has(id)) {
@@ -121,7 +120,7 @@ export class TimeSeriesEntityService {
   }
 
   getExecutions(ids: string[]): Observable<Execution[]> {
-    return this._executionService.getExecutionsByIds(ids);
+    return this._executionService.searchByIds(ids);
   }
 
   getPlans(ids: string[]): Observable<Plan[]> {

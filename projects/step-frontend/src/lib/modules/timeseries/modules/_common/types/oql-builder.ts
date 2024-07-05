@@ -23,6 +23,13 @@ export class OQLBuilder {
     return this;
   }
 
+  conditionalAppend(condition: boolean, clause?: string) {
+    if (condition) {
+      this.append(clause);
+    }
+    return this;
+  }
+
   lt(attribute: string, value: number) {
     this.append(`(${attribute} < ${value})`);
     return this;
