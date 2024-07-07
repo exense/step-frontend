@@ -19,7 +19,18 @@
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
       >
-        @for (item of dropdownItems; track item) {
+        <mat-option>
+          <ngx-mat-select-search
+            [formControl]="filterMultiControl"
+            name="filterMultiControl"
+            ngDefaultControl
+            placeholderLabel="Search..."
+            noEntriesFoundLabel="No matching entries found"
+          >
+            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+          </ngx-mat-select-search>
+        </mat-option>
+        @for (item of dropdownItemsFiltered; track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
