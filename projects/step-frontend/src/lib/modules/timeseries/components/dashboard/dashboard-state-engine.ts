@@ -42,16 +42,21 @@ export class DashboardStateEngine {
     if ((state.refreshInProgress || state.context.getChartsLockedState()) && !force) {
       return;
     }
-    let newRange: TimeRange;
     const timeRangeSettings = state.context.getTimeRangeSettings();
-    if (timeRangeSettings.type === 'FULL' && timeRangeSettings.defaultFullRange?.from) {
-      const defaultFullTimeRange = timeRangeSettings.defaultFullRange!;
-      newRange = { from: defaultFullTimeRange.from!, to: defaultFullTimeRange.to || new Date().getTime() };
-    } else {
-      newRange = TimeSeriesUtils.convertSelectionToTimeRange(state.timeRangeSelection);
+    switch (timeRangeSettings.type) {
+      case 'FULL':
+        if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
+          // to has to be set to now
+          timeRangeSettings.fullRange.to = new Date().getTime();
+        }
+        break;
+      case 'ABSOLUTE':
+        break;
+      case 'RELATIVE':
+        const now = new Date().getTime();
+        timeRangeSettings.fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
+        break;
     }
-
-    this.updateFullAndSelectedRange(newRange);
     this.refreshAllCharts(true, force);
   }
 
@@ -90,8 +95,8 @@ export class DashboardStateEngine {
     switch (params.selection.type) {
       case 'FULL':
         const fullRange = {
-          from: oldSettings.defaultFullRange.from,
-          to: oldSettings.defaultFullRange.to || new Date().getTime(),
+          from: oldSettings.defaultFullRange!.from!,
+          to: oldSettings.defaultFullRange?.to || new Date().getTime(),
         };
         newSettings = {
           type: TimeRangeType.FULL,
@@ -101,15 +106,28 @@ export class DashboardStateEngine {
         };
         break;
       case 'ABSOLUTE':
+        newSettings = {
+          type: TimeRangeType.ABSOLUTE,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: params.selection.absoluteSelection!,
+          selectedRange: params.selection.absoluteSelection!,
+        };
         break;
       case 'RELATIVE':
+        const relativeSelection = params.selection.relativeSelection!;
+        let now = new Date().getTime();
+        const from = now - relativeSelection!.timeInMs!;
+        newSettings = {
+          type: TimeRangeType.RELATIVE,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: { from: from, to: now },
+          selectedRange: { from: from, to: now },
+          relativeSelection: relativeSelection,
+        };
         break;
     }
     const state = this.state;
-    const range = this.getFullRangeFromTimeSelection(params.selection);
-    state.timeRangeSelection = params.selection;
-    state.context.updateFullRange(range, false);
-    state.context.updateSelectedRange(range, false);
+    state.context.updateTimeRangeSettings(newSettings);
     this.refreshRanger().subscribe();
     this.refreshAllCharts(true, true);
   }

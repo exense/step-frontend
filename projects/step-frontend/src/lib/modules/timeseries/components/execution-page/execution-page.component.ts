@@ -71,6 +71,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
+      console.log(executionChange);
       this.executionRange = this.getExecutionRange(this.execution);
       this.dashboard.refresh();
     }

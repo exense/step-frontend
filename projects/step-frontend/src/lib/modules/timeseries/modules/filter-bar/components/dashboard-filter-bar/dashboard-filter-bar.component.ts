@@ -124,7 +124,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.activeGrouping = this.context.getGroupDimensions();
     }
     this._internalFilters = this.context.getFilteringSettings().filterItems;
-
+    this.activeTimeRange;
     this.context
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))

@@ -113,7 +113,7 @@
             [context]="mainEngine.state.context"
             (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
             [timeRangeOptions]="timeRangeOptions"
-            [activeTimeRange]="mainEngine.state.timeRangeSelection"
+            [activeTimeRange]="mainEngine.state.context.timeRangeSettings"
             [compactView]="compareModeEnabled"
           />
         </div>
@@ -125,7 +125,7 @@
               [context]="compareEngine!.state.context"
               (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
               [timeRangeOptions]="timeRangeOptions"
-              [activeTimeRange]="compareEngine!.state.timeRangeSelection"
+              [activeTimeRange]="compareEngine!.state.context.timeRangeSettings"
               [compactView]="compareModeEnabled"
             />
           </div>

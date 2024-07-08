@@ -37,7 +37,7 @@ export class TimeSeriesContext {
 
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private readonly selectedTimeRangeChange$ = new Subject<TimeRange>();
-  private readonly timeRangeSettings: TimeRangeSettings;
+  timeRangeSettings: TimeRangeSettings;
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
@@ -104,6 +104,12 @@ export class TimeSeriesContext {
 
   updateRefreshInterval(value: number) {
     this.refreshInterval$.next(value);
+  }
+
+  updateTimeRangeSettings(settings: TimeRangeSettings) {
+    this.timeRangeSettings = settings;
+    this.stateChangeInternal$.next();
+    // this.fullTimeRangeChange$.next(settings.fullRange);
   }
 
   onRefreshIntervalChange(): Observable<number> {

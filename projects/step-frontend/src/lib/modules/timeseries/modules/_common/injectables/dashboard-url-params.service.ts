@@ -9,6 +9,7 @@ import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { min } from 'rxjs';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
+import { TimeRangeSettings } from '../../../components/dashboard/time-range-settings';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -144,11 +145,11 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(context: TimeSeriesContext, timeSelection: TimeRangeSelection, refreshInterval: number) {
-    const params = this.convertContextToUrlParams(context, timeSelection);
+  updateUrlParams(context: TimeSeriesContext) {
+    const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
-    mergedParams['refreshInterval'] = refreshInterval;
+    mergedParams['refreshInterval'] = context.getRefreshInterval();
     const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
       accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
       return accumulator;
@@ -162,17 +163,18 @@ export class DashboardUrlParamsService {
 
   private convertContextToUrlParams(
     context: TimeSeriesContext,
-    timeSelection: TimeRangeSelection,
+    timeRangeSettings: TimeRangeSettings,
   ): Record<string, any> {
     const params: Record<string, any> = {
       grouping: context.getGroupDimensions().join(','),
-      rangeType: timeSelection.type,
+      rangeType: timeRangeSettings.type,
     };
-    if (timeSelection.type === TimeRangeType.ABSOLUTE) {
-      params['from'] = timeSelection.absoluteSelection!.from;
-      params['to'] = timeSelection.absoluteSelection!.to;
-    } else if (timeSelection.type === TimeRangeType.RELATIVE) {
-      params['relativeRange'] = timeSelection.relativeSelection!.timeInMs;
+    console.log(timeRangeSettings);
+    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
+      params['from'] = timeRangeSettings.absoluteSelection!.from;
+      params['to'] = timeRangeSettings.absoluteSelection!.to;
+    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
     }
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();

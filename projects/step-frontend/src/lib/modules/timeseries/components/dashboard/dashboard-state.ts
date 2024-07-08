@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 
 export interface DashboardState {
   context: TimeSeriesContext;
-  timeRangeSelection: TimeRangePickerSelection;
   getDashlets: () => QueryList<ChartDashlet>;
   getFilterBar: () => DashboardFilterBarComponent;
   refreshInProgress: boolean;
