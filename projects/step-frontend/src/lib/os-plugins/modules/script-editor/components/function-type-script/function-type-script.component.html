@@ -2,8 +2,19 @@
   <step-label>Script language</step-label>
 
   <mat-select [formControl]="formGroup.controls.scriptLanguage">
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="filterMultiControl"
+        name="filterMultiControl"
+        ngDefaultControl
+        placeholderLabel="Search..."
+        noEntriesFoundLabel="No matching entries found"
+      >
+        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+      </ngx-mat-select-search>
+    </mat-option>
     <mat-option
-      *ngFor="let functionTypeScriptOption of functionTypeScriptOptions"
+      *ngFor="let functionTypeScriptOption of dropdownItemsFiltered"
       [value]="functionTypeScriptOption.scriptLanguage"
     >
       {{ functionTypeScriptOption.label }}
