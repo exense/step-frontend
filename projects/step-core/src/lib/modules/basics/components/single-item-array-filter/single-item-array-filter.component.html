@@ -1,7 +1,18 @@
 <step-form-field>
   <mat-select [formControl]="filterControl">
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="filterNgxMultiControl"
+        name="filterMultiControl"
+        ngDefaultControl
+        placeholderLabel="Search..."
+        noEntriesFoundLabel="No matching entries found"
+      >
+        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+      </ngx-mat-select-search>
+    </mat-option>
     <mat-option value=""></mat-option>
-    <mat-option *ngFor="let item of displayItems; trackBy: trackByKeyValue" [value]="item.key">
+    <mat-option *ngFor="let item of dropdownItemsFiltered; trackBy: trackByKeyValue" [value]="item.key">
       {{ item.value }}
     </mat-option>
   </mat-select>

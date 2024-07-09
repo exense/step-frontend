@@ -56,9 +56,10 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
