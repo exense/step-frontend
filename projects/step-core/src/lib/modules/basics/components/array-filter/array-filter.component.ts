@@ -98,5 +98,6 @@ export class ArrayFilterComponent<T = unknown>
       const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
       return { key, value };
     });
+    this.dropdownItemsFiltered = [...this.displayItems];
   }
 }
