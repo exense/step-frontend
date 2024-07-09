@@ -47,14 +47,31 @@ export class DashboardStateEngine {
       case 'FULL':
         if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
           // to has to be set to now
-          timeRangeSettings.fullRange.to = new Date().getTime();
+          timeRangeSettings.fullRange.to = new Date().getTime() - 5000;
         }
         break;
       case 'ABSOLUTE':
         break;
       case 'RELATIVE':
-        const now = new Date().getTime();
-        timeRangeSettings.fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
+        const now = new Date().getTime() - 5000;
+        let isFullTimeSelection =
+          timeRangeSettings.selectedRange.from === timeRangeSettings.fullRange.from &&
+          timeRangeSettings.selectedRange.to === timeRangeSettings.fullRange.to;
+        const fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
+        timeRangeSettings.fullRange = fullRange;
+        if (isFullTimeSelection) {
+          timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange };
+        } else {
+          // we have a custom selection. has to be cropped if needed
+          const currentSelection = timeRangeSettings.selectedRange;
+          const newFrom = Math.max(fullRange.from!, currentSelection.from!);
+          const newTo = Math.min(fullRange.to!, currentSelection.to!);
+          if (newTo - newFrom < 3) {
+            timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange }; // zoom reset when the interval is very small
+          } else {
+            timeRangeSettings.selectedRange = { from: newFrom, to: newTo };
+          }
+        }
         break;
     }
     this.refreshAllCharts(true, force);

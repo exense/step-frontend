@@ -46,10 +46,11 @@ export class DashboardUrlParamsService {
         return acc;
       }, {} as Params);
     const editModeValue = params['edit'];
+    const timeRange = this.extractTimeRange(params);
     return {
       refreshInterval: params['refreshInterval'] ? parseInt(params['refreshInterval']) : undefined,
       editMode: editModeValue === '1',
-      timeRange: this.extractTimeRange(params),
+      timeRange: timeRange,
       selectedTimeRange: this.extractRangeSelection(params),
       grouping: params['grouping']?.split(','),
       filters: this.decodeUrlFilters(params),
