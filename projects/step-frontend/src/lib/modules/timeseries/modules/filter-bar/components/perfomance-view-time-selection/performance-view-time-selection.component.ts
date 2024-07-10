@@ -53,7 +53,6 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
       .onTimeSelectionChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((selection) => {
-        console.log('SELECTION CHANGED', selection, this.context.isFullRangeSelected());
         if (this.context.isFullRangeSelected()) {
           this.rangerComponent.resetSelect();
         } else {
@@ -111,14 +110,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   }
 
   onRangerSelectionChange(event: TimeRange) {
-    console.log('RANGER HAS NEW RANGE');
     // check for full range selection
     this.context.updateSelectedRange(event);
     // the linked charts are automatically updated by the uplot sync feature. if that will be replaced, the charts must subscribe to the state change
   }
 
   onRangerZoomReset() {
-    console.log('zoom reset from ranger');
     this.context.resetZoom();
   }
 }

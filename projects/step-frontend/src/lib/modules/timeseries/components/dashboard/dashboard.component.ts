@@ -210,7 +210,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
 
   handleRefreshIntervalChange(interval: number) {
     this.refreshInterval = interval;
-    this.updateUrl();
+    this.mainEngine.state.context.updateRefreshInterval(interval);
     this.mainEngine.triggerRefresh();
   }
 

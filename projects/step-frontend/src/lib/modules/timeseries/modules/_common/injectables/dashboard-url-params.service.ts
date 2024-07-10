@@ -170,7 +170,6 @@ export class DashboardUrlParamsService {
       grouping: context.getGroupDimensions().join(','),
       rangeType: timeRangeSettings.type,
     };
-    console.log(timeRangeSettings);
     if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
       params['from'] = timeRangeSettings.absoluteSelection!.from;
       params['to'] = timeRangeSettings.absoluteSelection!.to;
@@ -186,6 +185,7 @@ export class DashboardUrlParamsService {
     if (customResolution > 0) {
       params['resolution'] = customResolution;
     }
+    params['refreshInterval'] = context.getRefreshInterval();
 
     return params;
   }
