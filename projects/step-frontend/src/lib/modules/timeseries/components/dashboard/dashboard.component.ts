@@ -661,9 +661,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    // this._timeSeriesContextFactory.destroyContext(this.mainEngine.state.context.id);
-    // this._timeSeriesContextFactory.destroyContext(this.compareEngine?.state.context.id);
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
+    if (!this.storageId) {
+      this.mainEngine.state.context.destroy();
+      this.compareEngine?.state.context.destroy();
+    }
   }
 }

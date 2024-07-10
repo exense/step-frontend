@@ -16,21 +16,18 @@ export class DashboardStateEngine {
   destroy() {
     this.terminator$.next();
     this.terminator$.complete();
-    // this.state.context.destroy();
   }
 
   subscribeForContextChange(): void {
     const context = this.state.context;
-    merge(context.onFilteringChange(), context.onChartsResolutionChange())
+    merge(
+      context.onGroupingChange(),
+      context.onFilteringChange(),
+      context.onChartsResolutionChange(),
+      context.onTimeSelectionChange(),
+    )
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
-        console.log('SUBSCRIBE 1');
-        this.refreshAllCharts(true, true);
-      });
-    merge(context.onGroupingChange(), context.onTimeSelectionChange())
-      .pipe(takeUntil(this.terminator$))
-      .subscribe(() => {
-        console.log('SUBSCRIBE 2');
         this.refreshAllCharts(false, true);
       });
   }
