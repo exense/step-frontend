@@ -213,7 +213,7 @@ export class TimeSeriesContext {
   }
 
   onChartsResolutionChange(): Observable<number> {
-    return this.chartsResolution$.asObservable();
+    return this.chartsResolution$.asObservable().pipe(skip(1));
   }
 
   updateChartsResolution(ms: number): void {

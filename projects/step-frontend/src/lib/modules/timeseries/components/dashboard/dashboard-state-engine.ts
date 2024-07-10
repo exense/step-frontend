@@ -1,4 +1,4 @@
-import { defaultIfEmpty, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
@@ -21,14 +21,16 @@ export class DashboardStateEngine {
 
   subscribeForContextChange(): void {
     const context = this.state.context;
-    merge(
-      context.onFilteringChange(),
-      context.onGroupingChange(),
-      context.onChartsResolutionChange(),
-      context.onTimeSelectionChange(),
-    )
+    merge(context.onFilteringChange(), context.onChartsResolutionChange())
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
+        console.log('SUBSCRIBE 1');
+        this.refreshAllCharts(true, true);
+      });
+    merge(context.onGroupingChange(), context.onTimeSelectionChange())
+      .pipe(takeUntil(this.terminator$))
+      .subscribe(() => {
+        console.log('SUBSCRIBE 2');
         this.refreshAllCharts(false, true);
       });
   }

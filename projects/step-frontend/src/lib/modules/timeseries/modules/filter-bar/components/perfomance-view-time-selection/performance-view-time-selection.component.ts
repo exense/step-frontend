@@ -11,7 +11,13 @@ import {
 } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../_common';
+import {
+  COMMON_IMPORTS,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesUtils,
+  TsFilteringSettings,
+} from '../../../_common';
 import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
@@ -68,10 +74,12 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
   }
 
   createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
+    const customFiltering = JSON.parse(JSON.stringify(this.context.getFilteringSettings())) as TsFilteringSettings;
+    customFiltering.filterItems = []; // ignore visible filters.
     const request = new FindBucketsRequestBuilder()
       .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
-      .withFilteringSettings(this.context.getFilteringSettings())
+      .withFilteringSettings(customFiltering)
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
