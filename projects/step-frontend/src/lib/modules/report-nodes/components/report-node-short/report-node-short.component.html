@@ -61,7 +61,7 @@
 </div>
 <!-- Assert -->
 <div *ngIf="node?.resolvedArtefact?._class === 'Assert'">
-  <div *ngIf="node?.message" class="detail">
+  <div *ngIf="node?.message && !node?.error" class="detail">
     {{ node!.message }}
   </div>
 </div>
