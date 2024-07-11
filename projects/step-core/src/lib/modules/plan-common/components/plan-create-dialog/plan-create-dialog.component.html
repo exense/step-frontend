@@ -4,7 +4,18 @@
     <step-form-field>
       <step-label>Editor</step-label>
       <mat-select [(ngModel)]="planType">
-        <mat-option *ngFor="let item of _planTypes; trackBy: trackByItemInfo" [value]="item.type">
+        <mat-option>
+          <ngx-mat-select-search
+            [formControl]="filterMultiControl"
+            name="filterMultiControl"
+            ngDefaultControl
+            placeholderLabel="Search..."
+            noEntriesFoundLabel="No matching entries found"
+          >
+            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+          </ngx-mat-select-search>
+        </mat-option>
+        <mat-option *ngFor="let item of dropdownItemsFiltered; trackBy: trackByItemInfo" [value]="item.type">
           {{ item.label }}
         </mat-option>
       </mat-select>
@@ -12,7 +23,18 @@
     <step-form-field>
       <step-label>Plan type</step-label>
       <mat-select [(ngModel)]="template">
-        <mat-option *ngFor="let item of artefactTypes$ | async" [value]="item">
+        <mat-option>
+          <ngx-mat-select-search
+            [formControl]="filterMultiTypeControl"
+            name="filterMultiTypeControl"
+            ngDefaultControl
+            placeholderLabel="Search..."
+            noEntriesFoundLabel="No matching entries found"
+          >
+            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+          </ngx-mat-select-search>
+        </mat-option>
+        <mat-option *ngFor="let item of dropdownItemsTypeFiltered$ | async" [value]="item">
           {{ item }}
         </mat-option>
       </mat-select>
