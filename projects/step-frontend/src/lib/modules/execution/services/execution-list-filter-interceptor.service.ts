@@ -23,6 +23,7 @@ const STATUS_FIELD_MAP = {
   [Status.PASSED]: FIELD_RESULT,
   [Status.INTERRUPTED]: FIELD_RESULT,
   [Status.SKIPPED]: FIELD_RESULT,
+  [Status.IMPORT_ERROR]: FIELD_RESULT,
 };
 
 type FieldValue = keyof typeof STATUS_FIELD_MAP;
