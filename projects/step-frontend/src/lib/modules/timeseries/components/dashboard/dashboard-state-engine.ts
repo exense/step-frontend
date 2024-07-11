@@ -42,18 +42,17 @@ export class DashboardStateEngine {
       return;
     }
     const timeRangeSettings = state.context.getTimeRangeSettings();
+    const now = new Date().getTime() - 5000;
     switch (timeRangeSettings.type) {
       case 'FULL':
         if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
-          // to has to be set to now
-          timeRangeSettings.fullRange.to = new Date().getTime() - 5000;
+          timeRangeSettings.fullRange.to = now;
         }
         break;
       case 'ABSOLUTE':
         break;
       case 'RELATIVE':
-        const now = new Date().getTime() - 5000;
-        let isFullTimeSelection =
+        const isFullTimeSelection =
           timeRangeSettings.selectedRange.from === timeRangeSettings.fullRange.from &&
           timeRangeSettings.selectedRange.to === timeRangeSettings.fullRange.to;
         const fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
@@ -65,7 +64,8 @@ export class DashboardStateEngine {
           const currentSelection = timeRangeSettings.selectedRange;
           const newFrom = Math.max(fullRange.from!, currentSelection.from!);
           const newTo = Math.min(fullRange.to!, currentSelection.to!);
-          if (newTo - newFrom < 3) {
+          const minimumIntervalSize = 3; // a bug from uPlot used to throw intervals with size 1 and 2 from time to time, even if it is empty
+          if (newTo - newFrom < minimumIntervalSize) {
             timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange }; // zoom reset when the interval is very small
           } else {
             timeRangeSettings.selectedRange = { from: newFrom, to: newTo };
@@ -131,7 +131,7 @@ export class DashboardStateEngine {
         break;
       case 'RELATIVE':
         const relativeSelection = params.selection.relativeSelection!;
-        let now = new Date().getTime();
+        const now = new Date().getTime();
         const from = now - relativeSelection!.timeInMs!;
         newSettings = {
           type: TimeRangeType.RELATIVE,
@@ -142,8 +142,7 @@ export class DashboardStateEngine {
         };
         break;
     }
-    const state = this.state;
-    state.context.updateTimeRangeSettings(newSettings);
+    this.state.context.updateTimeRangeSettings(newSettings);
     this.refreshRanger().subscribe();
     this.refreshAllCharts(true, true);
   }
@@ -191,7 +190,7 @@ export class DashboardStateEngine {
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
       case 'RELATIVE':
-        let now = new Date().getTime();
+        const now = new Date().getTime();
         return { from: now - selection.relativeSelection!.timeInMs!, to: now };
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);
