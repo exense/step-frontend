@@ -1,6 +1,13 @@
 <div class="header-with-button">
   <div class="header-text">User</div>
-  <button type="button" mat-flat-button color="primary" (click)="changePwd()" [disabled]="!canChangePassword">
+  <button
+    stepTestId="password-btn"
+    type="button"
+    mat-flat-button
+    color="primary"
+    (click)="changePwd()"
+    [disabled]="!canChangePassword"
+  >
     Change password
   </button>
 </div>
@@ -28,6 +35,7 @@
     </step-description-hint>
   </div>
   <button
+    stepTestId="generate-key-btn"
     type="button"
     mat-flat-button
     color="primary"
@@ -61,7 +69,12 @@
       <ng-container matColumnDef="actions">
         <th class="actions" mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button matTooltip="Revoke token" (click)="revokeAPIToken(element.id)">
+          <button
+            stepTestId="revoke-api-btn"
+            mat-icon-button
+            matTooltip="Revoke token"
+            (click)="revokeAPIToken(element.id)"
+          >
             <step-icon name="trash-2"></step-icon>
           </button>
         </td>
@@ -82,7 +95,7 @@
 <div>
   <step-table [dataSource]="preferences$">
     <section class="header" *stepAdditionalHeader="'add-preference'">
-      <button type="button" mat-mini-fab color="primary" (click)="addPreference()">
+      <button stepTestId="add-preference-btn" type="button" mat-mini-fab color="primary" (click)="addPreference()">
         <step-icon name="plus"></step-icon>
       </button>
     </section>
@@ -90,7 +103,7 @@
       <th mat-header-cell *matHeaderCellDef>Key</th>
       <td mat-cell *matCellDef="let element">
         <step-form-field>
-          <input [(ngModel)]="element.key" placeholder="Key" (blur)="savePreferences()" />
+          <input stepTestId="key-input" [(ngModel)]="element.key" placeholder="Key" (blur)="savePreferences()" />
         </step-form-field>
       </td>
     </ng-container>
@@ -98,14 +111,19 @@
       <th mat-header-cell *matHeaderCellDef>Value</th>
       <td mat-cell *matCellDef="let element">
         <step-form-field>
-          <input [(ngModel)]="element.value" placeholder="Value" (blur)="savePreferences()" />
+          <input stepTestId="value-input" [(ngModel)]="element.value" placeholder="Value" (blur)="savePreferences()" />
         </step-form-field>
       </td>
     </ng-container>
     <ng-container matColumnDef="actions">
       <th class="actions" mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button matTooltip="Delete preference" (click)="removePreference(element)">
+        <button
+          stepTestId="delete-preference-btn"
+          mat-icon-button
+          matTooltip="Delete preference"
+          (click)="removePreference(element)"
+        >
           <step-icon name="trash-2"></step-icon>
         </button>
       </td>
