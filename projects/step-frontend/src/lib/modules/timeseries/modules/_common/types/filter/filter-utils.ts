@@ -52,7 +52,7 @@ export class FilterUtils {
    * Method to convert FE filters to a valid OQL
    */
   static filtersToOQL(
-    items: FilterBarItem[],
+    items?: FilterBarItem[],
     attributesPrefix?: string,
     attributeProcessFn?: (attribute: string) => string,
   ): string {

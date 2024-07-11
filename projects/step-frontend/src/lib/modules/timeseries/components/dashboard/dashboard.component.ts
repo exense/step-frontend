@@ -56,7 +56,7 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 //@ts-ignore
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
-import { TimeSeriesEntityService } from '../../modules/_common/injectables/time-series-entity.service';
+import { TimeSeriesEntityService } from '../../modules/_common';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -90,7 +90,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
   @Input() editable: boolean = true;
@@ -99,6 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
+  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -193,6 +193,12 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
   }
 
+  handleDashboardDescriptionChange(description: string) {
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    modifiedDashboard.description = description;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
   handleRefreshIntervalChange(interval: number) {
     this.refreshInterval = interval;
     this.updateUrl();
@@ -257,10 +263,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
       tableSettings: {
         columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
       },
     };
+    this.filterBar!.addUniqueFilterItems(
+      tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
+    );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
@@ -279,6 +290,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: false,
       inheritGlobalFilters: true,
       inheritGlobalGrouping: true,
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
@@ -355,7 +368,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     );
     const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
 
-    const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
+    const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
+      urlFilters,
+      dashboard.filters,
+      this.hiddenFilters,
+    );
     this.fetchFilterEntities(visibleFilters);
     return this._timeSeriesContextFactory.createContext({
       id: dashboard.id!,
@@ -367,13 +384,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       filteringSettings: {
         mode: TsFilteringMode.STANDARD,
         filterItems: visibleFilters,
+        hiddenFilters: this.hiddenFilters,
       },
       resolution: this.resolution,
       metrics: this.metricTypes,
     });
   }
 
-  private mergeFilters(
+  private mergeAndExcludeHiddenFilters(
     urlFilters: FilterBarItem[],
     dashboardFilters: TimeSeriesFilterItem[],
     hiddenFilters: FilterBarItem[],
@@ -394,7 +412,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       f.isHidden = true;
       visibleFilters = visibleFilters.filter((v) => v.attributeName !== f.attributeName);
     });
-    return [...hiddenFilters, ...visibleFilters];
+    return visibleFilters;
   }
 
   private fetchFilterEntities(items: FilterBarItem[]): void {
@@ -478,8 +496,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
     if (itemToDelete.type === 'TABLE') {
       this.dashboard.dashlets
-        .filter((d) => d.masterChartId === itemToDelete.id)
-        .forEach((i) => (i.masterChartId = undefined));
+        .filter((dashboardItem) => dashboardItem.masterChartId === itemToDelete.id)
+        .forEach((dashboardItem) => (dashboardItem.masterChartId = undefined));
     }
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
@@ -532,7 +550,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const clonedSettings: TsFilteringSettings = JSON.parse(
       JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
     );
-    clonedSettings.filterItems.forEach((item) => (item.isHidden = false)); // make everything visible in compare mode
+    const hiddenFilters = clonedSettings.hiddenFilters || [];
+    clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
+    clonedSettings.filterItems.forEach((item) => (item.isHidden = false));
+    clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
 

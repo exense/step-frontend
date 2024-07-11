@@ -1,25 +1,54 @@
-<step-dynamic-field-group
+<step-dynamic-field-object-editor
   [primaryFieldsLabel]="primaryFieldsLabel ?? 'Inputs (required)'"
   [optionalFieldsLabel]="optionalFieldsLabel ?? 'Inputs (optional)'"
   [addFieldBtnLabel]="addFieldBtnLabel ?? 'Add input'"
-  [schema]="schema"
+  [schema]="schema()"
   [value]="internalValue"
   (valueChange)="handleChange($event)"
   [isDisabled]="isDisabled"
->
-</step-dynamic-field-group>
+  [complexObjectTemplate]="complexObjectFieldTemplate"
+  [complexArrayTemplate]="complexArrayFieldTemplate"
+/>
+<ng-template #complexObjectFieldTemplate let-fieldCtx>
+  <step-dynamic-field-object-editor
+    addFieldBtnLabel="Add property"
+    [schema]="fieldCtx.fieldSchema()"
+    [value]="fieldCtx.value()"
+    (valueChange)="fieldCtx.handleValueChange($event)"
+    [isDisabled]="fieldCtx.isDisabled()"
+    [tabIndex]="fieldCtx.tabIndex()"
+    (blur)="fieldCtx.handleBlur()"
+    [complexObjectTemplate]="fieldCtx.fieldObjectTemplate()"
+    [complexArrayTemplate]="fieldCtx.fieldArrayTemplate()"
+    [isChildNode]="true"
+  />
+</ng-template>
+<ng-template #complexArrayFieldTemplate let-fieldCtx>
+  <step-dynamic-field-array-editor
+    addFieldBtnLabel="Add item"
+    [schema]="fieldCtx.fieldSchema()"
+    [value]="fieldCtx.value()"
+    (valueChange)="fieldCtx.handleValueChange($event)"
+    [isDisabled]="fieldCtx.isDisabled()"
+    [tabIndex]="fieldCtx.tabIndex()"
+    (blur)="fieldCtx.handleBlur()"
+    [complexObjectTemplate]="fieldCtx.fieldObjectTemplate()"
+    [complexArrayTemplate]="fieldCtx.fieldArrayTemplate()"
+    [isChildNode]="true"
+  />
+</ng-template>
 <div class="toggle-bar" (click)="showJson = !showJson">
   <div>
-    <step-icon name="code"></step-icon>
+    <step-icon name="code" />
     <span>{{ jsonFieldsLabel ?? 'Input (raw JSON)' }}</span>
   </div>
-  <step-icon [name]="showJson ? 'chevron-up' : 'chevron-down'"></step-icon>
+  <step-icon [name]="showJson ? 'chevron-up' : 'chevron-down'" />
 </div>
-<step-json-raw-editor
-  *ngIf="showJson"
-  [ngModel]="internalValue"
-  (ngModelChange)="handleChange($event)"
-  (blur)="blur.emit()"
-  [disabled]="!!isDisabled"
->
-</step-json-raw-editor>
+@if (showJson) {
+  <step-json-raw-editor
+    [ngModel]="internalValue"
+    (ngModelChange)="handleChange($event)"
+    (blur)="blur.emit()"
+    [disabled]="!!isDisabled"
+  />
+}
