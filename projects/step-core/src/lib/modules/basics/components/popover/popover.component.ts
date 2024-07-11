@@ -29,7 +29,7 @@ export class PopoverComponent {
   @ViewChild(TriggerPopoverDirective, { static: true })
   private triggerPopoverDirective!: TriggerPopoverDirective;
   private toggled = false;
-  private tooltipTimeout?: number;
+  private tooltipTimeout?: ReturnType<typeof setTimeout>;
 
   protected isMouseOverPopover = false;
 
