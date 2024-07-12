@@ -167,9 +167,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private collectUnusedAttributes(): MetricAttribute[] {
+    const hiddenFilters = this.context.getFilteringSettings().hiddenFilters || [];
     return this.context
       .getAllAttributes()
-      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
+      .filter(
+        (attr) =>
+          !this._internalFilters.find((item) => attr.name === item.attributeName) &&
+          !hiddenFilters.find((item) => attr.name === item.attributeName),
+      );
   }
 
   getValidFilters(): FilterBarItem[] {
@@ -269,7 +274,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   handleFilterChange(index: number, item: FilterBarItem) {
     this._internalFilters[index] = item;
-    const existingItems = this._internalFilters.filter((i) => i.attributeName === item.attributeName);
+    if (!item.attributeName) {
+      this.removeFilterItem(index);
+      return;
+    }
+    const existingItems = this._internalFilters.filter((filterItem) => filterItem.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
@@ -315,10 +324,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(item: MetricAttribute) {
-    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.name);
+  addFilterItem(metricAttribute: MetricAttribute) {
+    const filterIndex = this._internalFilters.findIndex(
+      (filterItem) => filterItem.attributeName === metricAttribute.name,
+    );
     if (filterIndex < 0) {
-      this.addFilter(FilterUtils.createFilterItemFromAttribute(item));
+      this.addFilter(FilterUtils.createFilterItemFromAttribute(metricAttribute));
     }
   }
 
