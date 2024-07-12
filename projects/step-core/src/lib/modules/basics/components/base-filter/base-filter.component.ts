@@ -2,7 +2,6 @@ import { FormBuilder, FormControl } from '@angular/forms';
 import { ChangeDetectorRef, DestroyRef, Directive, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { distinctUntilChanged, map, Observable, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { stat } from 'ng-packagr/lib/utils/fs';
 
 @Directive({})
 export abstract class BaseFilterComponent<T, CV = T> implements OnInit {
@@ -14,8 +13,13 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit {
 
   readonly invalidFilterMessage$ = this.filterControl.statusChanges.pipe(
     startWith(this.filterControl.status),
+    map((status) => {
+      if (status !== 'INVALID') {
+        return '';
+      }
+      return this.filterControl.hasError('invalidRegex') ? 'Invalid regular expression' : 'Invalid filter value';
+    }),
     distinctUntilChanged(),
-    map((status) => (status === 'INVALID' ? 'Invalid filter value' : '')),
     takeUntilDestroyed(),
   );
 
