@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostBinding, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AugmentedScreenService, Input as StInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
@@ -6,7 +6,8 @@ import { DynamicLabelCustomFormInputComponent } from '../custom-form-input/dynam
 import { CustomFormInputModelPipe } from '../../pipes/custom-form-input-model.pipe';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
 import { ActivatedRoute } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { BehaviorSubject, debounceTime, filter, map, tap } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'step-custom-forms',
@@ -20,11 +21,13 @@ import { filter, map } from 'rxjs';
     CustomFormInputModelPipe,
   ],
 })
-export class CustomFormComponent implements OnInit {
+export class CustomFormComponent implements OnInit, OnDestroy {
   private _screensService = inject(AugmentedScreenService);
   private _activatedRoute = inject(ActivatedRoute);
   private _screenDataMeta = inject(ScreenDataMetaService);
   private _objectUtils = inject(ObjectUtilsService);
+
+  private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
 
   @HostBinding('class.editable-label-mode') @Input() stEditableLabelMode = false;
   @Input() stScreen!: string;
@@ -41,32 +44,32 @@ export class CustomFormComponent implements OnInit {
 
   ngOnInit(): void {
     this._screenDataMeta.checkMetaInformationAboutScreenInRoute(this.stScreen, this._activatedRoute);
-    this.updateInputs();
-  }
-
-  protected updateInputs() {
-    this._screensService
-      .getScreenInputsByScreenIdWithCache(this.stScreen)
+    this.valueChange$
       .pipe(
-        map(
-          (screenInputs) =>
-            screenInputs
-              .map((screenInput) => screenInput.input)
-              .filter((input) => !!input && !this.stExcludeFields.includes(input.id!)) as StInput[],
-        ),
+        debounceTime(500),
+        tap((valueChange) => {
+          if (!valueChange) {
+            return;
+          }
+          this._objectUtils.setObjectFieldValue(this.stModel, valueChange.inputId, valueChange.value);
+          this.stModelChange.emit({
+            ...this.stModel,
+          });
+        }),
+        switchMap(() => this._screensService.getInputsForScreenPost(this.stScreen, this.stModel)),
+        map((screenInputs) => screenInputs.filter((input) => !!input && !this.stExcludeFields.includes(input.id!))),
         filter((updatedInputs) => JSON.stringify(this.inputs) !== JSON.stringify(updatedInputs)),
       )
-      .subscribe((inputs) => {
-        this.inputs = inputs;
-      });
+      .subscribe((inputs) => (this.inputs = inputs));
+  }
+
+  ngOnDestroy(): void {
+    this.valueChange$.complete();
   }
 
   protected onInputValueChange(input: StInput, value: string): void {
-    this._objectUtils.setObjectFieldValue(this.stModel, input.id!, value);
-    this.stModelChange.emit({
-      ...this.stModel,
-    });
-    this.updateInputs();
+    const inputId = input.id!;
+    this.valueChange$.next({ inputId, value });
   }
 
   protected onCustomInputTouched(): void {
