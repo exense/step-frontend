@@ -1,4 +1,4 @@
-<step-form-field>
+<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <mat-select [multiple]="true" [formControl]="filterControl">
     <mat-option *ngFor="let item of displayItems; trackBy: trackByKeyValue" [value]="item.key">
       {{ item.value }}

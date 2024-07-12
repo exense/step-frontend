@@ -1,4 +1,4 @@
-<step-form-field>
+<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <mat-select multiple [formControl]="filterControl">
     <mat-option *ngFor="let item of _functionTypes; trackBy: trackByItemInfo" [value]="item.type">
       {{ item.label }}
