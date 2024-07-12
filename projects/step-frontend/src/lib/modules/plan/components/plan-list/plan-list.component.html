@@ -4,6 +4,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group class="import-export">
         <a
+          stepTestId="import-plan-btn"
           type="button"
           mat-icon-button
           matTooltip="Import plan"
@@ -14,6 +15,7 @@
           <step-icon name="download" />
         </a>
         <a
+          stepTestId="export-plans-btn"
           type="button"
           mat-icon-button
           matTooltip="Export all plans"
@@ -26,6 +28,7 @@
       </step-btn-group>
       <step-btn-group>
         <a
+          stepTestId="add-plan-btn"
           type="button"
           mat-mini-fab
           color="primary"
@@ -69,6 +72,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <a
+            stepTestId="execute-plan-btn"
             mat-icon-button
             matTooltip="Execute plan"
             [disabled]="!('plan-execute' | hasRight | async)"
@@ -78,6 +82,7 @@
             <step-icon name="play-circle" />
           </a>
           <button
+            stepTestId="duplicate-plan-btn"
             mat-icon-button
             matTooltip="Duplicate plan"
             [disabled]="!('plan-write' | hasRight | async)"
@@ -86,6 +91,7 @@
             <step-icon name="copy" />
           </button>
           <button
+            stepTestId="delete-plan-btn"
             mat-icon-button
             matTooltip="Delete plan"
             [disabled]="!('plan-delete' | hasRight | async)"
@@ -108,6 +114,7 @@
       Edit plan
     </a>
     <a
+      stepTestId="export-plan-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
       [routerLink]="['/', 'plans', 'list', 'export', element.id]"
@@ -116,6 +123,7 @@
       Export plan
     </a>
     <button
+      stepTestId="find-usages-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
