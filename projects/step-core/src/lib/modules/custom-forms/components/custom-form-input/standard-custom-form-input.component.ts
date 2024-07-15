@@ -1,4 +1,13 @@
-import { AfterContentInit, Component, DestroyRef, forwardRef, inject, Input } from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  DestroyRef,
+  forwardRef,
+  inject,
+  Input,
+  SimpleChange,
+  SimpleChanges,
+} from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
@@ -28,6 +37,13 @@ export class StandardCustomFormInputComponent extends BaseCustomFormInputCompone
 
   filterMultiControl: FormControl<string | null> = new FormControl<string>('');
   dropdownItemsFiltered: string[] = [...this.dropdownItems];
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const items = changes['dropdownItems'] as SimpleChange;
+    if (items && items.previousValue !== items.currentValue && items.currentValue) {
+      this.dropdownItemsFiltered = [...items.currentValue];
+    }
+  }
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.dropdownItems];
