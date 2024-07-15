@@ -1,36 +1,32 @@
-<mat-card>
-  <mat-card-content>
-    <step-form-field>
-      <step-label>
-        Enable scheduler
-        <step-icon
-          name="help-circle"
-          matTooltip="Used to enable or disable the scheduler globally accross all projects. Manual schedule execution remains possible."
-        ></step-icon>
-      </step-label>
-      <mat-slide-toggle
-        color="primary"
-        [ngModel]="schedulerEnableToggle"
-        (ngModelChange)="handleSchedulerEnableChange($event)"
-        [disabled]="!('scheduler-manage' | hasRight | async)"
-      >
-      </mat-slide-toggle>
-    </step-form-field>
-    <step-form-field>
-      <step-label>
-        User
-        <step-icon
-          name="help-circle"
-          matTooltip="The username of the user under which executions triggered by the schedule should be executed. Leave empty to run it under the username of the user who configured the schedule"
-        ></step-icon>
-      </step-label>
-      <input
-        stepTestId="user-input"
-        type="text"
-        [(ngModel)]="executionUser"
-        (blur)="saveUserName()"
-        [disabled]="!('scheduler-manage' | hasRight | async)"
-      />
-    </step-form-field>
-  </mat-card-content>
-</mat-card>
+<step-form-field>
+  <step-label>
+    Enable scheduler
+    <step-icon
+      name="help-circle"
+      matTooltip="Used to enable or disable the scheduler globally accross all projects. Manual schedule execution remains possible."
+    ></step-icon>
+  </step-label>
+  <mat-slide-toggle
+    color="primary"
+    [ngModel]="schedulerEnableToggle"
+    (ngModelChange)="handleSchedulerEnableChange($event)"
+    [disabled]="!('scheduler-manage' | hasRight | async)"
+  >
+  </mat-slide-toggle>
+</step-form-field>
+<step-form-field>
+  <step-label>
+    User
+    <step-icon
+      name="help-circle"
+      matTooltip="The username of the user under which executions triggered by the schedule should be executed. Leave empty to run it under the username of the user who configured the schedule"
+    ></step-icon>
+  </step-label>
+  <input
+    stepTestId="user-input"
+    type="text"
+    [(ngModel)]="executionUser"
+    (blur)="saveUserName()"
+    [disabled]="!('scheduler-manage' | hasRight | async)"
+  />
+</step-form-field>
