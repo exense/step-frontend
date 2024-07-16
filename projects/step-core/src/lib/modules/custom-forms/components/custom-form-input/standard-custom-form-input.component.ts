@@ -38,13 +38,6 @@ export class StandardCustomFormInputComponent extends BaseCustomFormInputCompone
   filterMultiControl: FormControl<string | null> = new FormControl<string>('');
   dropdownItemsFiltered: string[] = [...this.dropdownItems];
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const items = changes['dropdownItems'] as SimpleChange;
-    if (items && items.previousValue !== items.currentValue && items.currentValue) {
-      this.dropdownItemsFiltered = [...items.currentValue];
-    }
-  }
-
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.dropdownItems];
     this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
@@ -56,5 +49,9 @@ export class StandardCustomFormInputComponent extends BaseCustomFormInputCompone
         this.dropdownItemsFiltered = [...this.dropdownItems];
       }
     });
+  }
+
+  loadItems() {
+    this.dropdownItemsFiltered = [...this.dropdownItems];
   }
 }

@@ -18,6 +18,7 @@
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
+        (click)="loadItems()"
       >
         <mat-option>
           <ngx-mat-select-search
