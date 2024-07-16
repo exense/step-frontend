@@ -6,9 +6,10 @@ import {
   BaseFilterComponent,
   SearchValue,
   FilterCondition,
+  isValidRegex,
 } from '@exense/step-core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { debounceTime, map, Observable, of, switchMap } from 'rxjs';
+import { debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'step-function-package-search',
@@ -38,6 +39,7 @@ export class FunctionPackageSearchComponent
   protected createControlChangeStream(control: FormControl<string>): Observable<SearchValue> {
     return control.valueChanges.pipe(
       debounceTime(200),
+      filter((searchValue) => isValidRegex(searchValue)),
       switchMap((searchValue) => {
         const searchPackageName = (searchValue || '').trim();
         if (!searchPackageName) {

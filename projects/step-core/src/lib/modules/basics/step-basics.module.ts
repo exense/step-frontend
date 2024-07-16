@@ -236,6 +236,7 @@ export * from './types/validators/json-validator';
 export * from './types/validators/number-validator';
 export * from './types/validators/boolean-validator';
 export * from './types/validators/coma-split-array-validator';
+export * from './types/validators/is-regex-validator';
 export * from './types/is-used-by-dialog-data';
 export * from './types/is-used-by-search-type';
 export * from './injectables/multiple-projects.service';
