@@ -9,8 +9,10 @@ import {
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, map, of } from 'rxjs';
+import { combineLatest, map, of, switchMap } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -30,6 +32,8 @@ export class ParameterEditDialogComponent implements OnInit {
   private _api = inject(AugmentedParametersService);
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
+  private _snackBar = inject(MatSnackBar);
+  private isAfterSave = false;
 
   protected parameter = this._dialogData.entity;
 
@@ -59,6 +63,30 @@ export class ParameterEditDialogComponent implements OnInit {
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
+  }
+
+  saveAndNext() {
+    this._api
+      .saveParameter(this.parameter)
+      .pipe(
+        switchMap((data) => {
+          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok');
+          return this._api.newParameter();
+        }),
+      )
+      .subscribe((parameter) => {
+        this.parameter = {
+          ...this.parameter,
+          id: parameter.id,
+          lastModificationDate: parameter.lastModificationDate,
+          lastModificationUser: parameter.lastModificationUser,
+        };
+        this.isAfterSave = true;
+      });
+  }
+
+  close() {
+    this._matDialogRef.close({ isSuccess: this.isAfterSave });
   }
 
   selectScope(scopeItem: ScopeItem): void {
