@@ -52,6 +52,10 @@
             <step-icon name="download" />
             <span>Export Raw Measurements</span>
           </button>
+          <button mat-menu-item (click)="resetDashboard()">
+            <step-icon name="refresh-cw" />
+            <span>Reset dashboard</span>
+          </button>
         </mat-menu>
       </div>
       <div class="header-buttons-container">
@@ -113,7 +117,7 @@
             [context]="mainEngine.state.context"
             (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
             [timeRangeOptions]="timeRangeOptions"
-            [activeTimeRange]="mainEngine.state.timeRangeSelection"
+            [activeTimeRange]="mainEngine.state.context.timeRangeSettings"
             [compactView]="compareModeEnabled"
           />
         </div>
@@ -125,7 +129,7 @@
               [context]="compareEngine!.state.context"
               (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
               [timeRangeOptions]="timeRangeOptions"
-              [activeTimeRange]="compareEngine!.state.timeRangeSelection"
+              [activeTimeRange]="compareEngine!.state.context.timeRangeSettings"
               [compactView]="compareModeEnabled"
             />
           </div>

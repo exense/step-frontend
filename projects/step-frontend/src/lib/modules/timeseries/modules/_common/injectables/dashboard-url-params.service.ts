@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
-import { TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
+import { TimeRange, TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
 import { TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
@@ -9,6 +9,7 @@ import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { min } from 'rxjs';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
+import { TimeRangeSettings } from '../../../components/dashboard/time-range-settings';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -16,6 +17,7 @@ const MAX_SUFFIX = '_max';
 export interface DashboardUrlParams {
   refreshInterval?: number;
   timeRange?: TimeRangeSelection;
+  selectedTimeRange?: TimeRange;
   grouping?: string[];
   filters: UrlFilterAttribute[];
   relativeRange?: string;
@@ -44,14 +46,26 @@ export class DashboardUrlParamsService {
         return acc;
       }, {} as Params);
     const editModeValue = params['edit'];
+    const timeRange = this.extractTimeRange(params);
     return {
       refreshInterval: params['refreshInterval'] ? parseInt(params['refreshInterval']) : undefined,
       editMode: editModeValue === '1',
-      timeRange: this.extractTimeRange(params),
+      timeRange: timeRange,
+      selectedTimeRange: this.extractRangeSelection(params),
       grouping: params['grouping']?.split(','),
       filters: this.decodeUrlFilters(params),
       resolution: params['resolution'],
     };
+  }
+
+  private extractRangeSelection(params: Params): TimeRange | undefined {
+    const from = parseInt(params['select_from']);
+    const to = parseInt(params['select_to']);
+    if (from && to) {
+      return { from, to };
+    } else {
+      return undefined;
+    }
   }
 
   private extractTimeRange(params: Params): TimeRangeSelection | undefined {
@@ -132,11 +146,11 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(context: TimeSeriesContext, timeSelection: TimeRangeSelection, refreshInterval: number) {
-    const params = this.convertContextToUrlParams(context, timeSelection);
+  updateUrlParams(context: TimeSeriesContext) {
+    const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
-    mergedParams['refreshInterval'] = refreshInterval;
+    mergedParams['refreshInterval'] = context.getRefreshInterval();
     const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
       accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
       return accumulator;
@@ -150,22 +164,28 @@ export class DashboardUrlParamsService {
 
   private convertContextToUrlParams(
     context: TimeSeriesContext,
-    timeSelection: TimeRangeSelection,
+    timeRangeSettings: TimeRangeSettings,
   ): Record<string, any> {
     const params: Record<string, any> = {
       grouping: context.getGroupDimensions().join(','),
-      rangeType: timeSelection.type,
+      rangeType: timeRangeSettings.type,
     };
-    if (timeSelection.type === TimeRangeType.ABSOLUTE) {
-      params['from'] = timeSelection.absoluteSelection!.from;
-      params['to'] = timeSelection.absoluteSelection!.to;
-    } else if (timeSelection.type === TimeRangeType.RELATIVE) {
-      params['relativeRange'] = timeSelection.relativeSelection!.timeInMs;
+    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
+      params['from'] = timeRangeSettings.absoluteSelection!.from;
+      params['to'] = timeRangeSettings.absoluteSelection!.to;
+    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
+    }
+    if (!context.isFullRangeSelected()) {
+      const selectedTimeRange = context.getSelectedTimeRange();
+      params['select_from'] = selectedTimeRange.from;
+      params['select_to'] = selectedTimeRange.to;
     }
     const customResolution = context.getChartsResolution();
     if (customResolution > 0) {
       params['resolution'] = customResolution;
     }
+    params['refreshInterval'] = context.getRefreshInterval();
 
     return params;
   }
