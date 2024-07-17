@@ -4,6 +4,7 @@ import { FormControl, NgControl } from '@angular/forms';
 import { NUMBER_CHARS_POSITIVE_ONLY } from '../../shared/constants';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KeyValue } from '@angular/common';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-time-raw-input',
@@ -26,14 +27,16 @@ export class TimeRawInputComponent extends TimeInputComponent {
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.measureItems];
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this.measureItems.filter((item) =>
-          item.value.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this.measureItems];
-      }
-    });
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this.measureItems.filter((item) => item.value.toLowerCase().includes(value)) : [...this.measureItems],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 }

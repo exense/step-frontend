@@ -106,15 +106,19 @@ export class FunctionConfigurationDialogComponent implements OnInit, AfterConten
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.functionTypeItemInfos];
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this.functionTypeItemInfos.filter((item) =>
-          item.label.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this.functionTypeItemInfos];
-      }
-    });
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value
+            ? this.functionTypeItemInfos.filter((item) => item.label.toLowerCase().includes(value))
+            : [...this.functionTypeItemInfos],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   protected get functionType(): string {

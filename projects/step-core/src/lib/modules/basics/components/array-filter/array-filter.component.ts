@@ -43,15 +43,17 @@ export class ArrayFilterComponent<T = unknown>
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.displayItems];
-    this.filterNgxMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this.displayItems.filter((item) =>
-          item.value.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this.displayItems];
-      }
-    });
+    this.filterNgxMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this.displayItems.filter((item) => item.value.toLowerCase().includes(value)) : [...this.displayItems],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {

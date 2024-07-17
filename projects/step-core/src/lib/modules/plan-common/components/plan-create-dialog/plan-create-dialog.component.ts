@@ -1,5 +1,5 @@
 import { AfterContentInit, Component, DestroyRef, HostListener, inject, TrackByFunction } from '@angular/core';
-import { map, Observable, share, shareReplay, switchMap, tap } from 'rxjs';
+import { combineLatest, debounceTime, map, Observable, share, shareReplay, startWith, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CustomFormComponent } from '../../../custom-forms';
@@ -40,26 +40,32 @@ export class PlanCreateDialogComponent implements AfterContentInit {
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this._planTypes];
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this._planTypes.filter((item) =>
-          item.label.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this._planTypes];
-      }
-    });
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this._planTypes.filter((item) => item.label.toLowerCase().includes(value)) : [...this._planTypes],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
 
-    this.dropdownItemsTypeFiltered$ = this.artefactTypes$.pipe(share());
-    this.filterMultiTypeControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsTypeFiltered$ = this.artefactTypes$.pipe(
-          map((list) => list.filter((item) => item.toLowerCase().includes(value.toLowerCase()))),
-        );
-      } else {
-        this.dropdownItemsTypeFiltered$ = this.artefactTypes$.pipe(share());
-      }
-    });
+    this.dropdownItemsTypeFiltered$ = combineLatest([
+      this.artefactTypes$,
+      this.filterMultiTypeControl.valueChanges.pipe(startWith(this.filterMultiTypeControl.value)),
+    ]).pipe(
+      takeUntilDestroyed(this._destroyRef),
+      map(([artefactTypes, filterValue]) => {
+        if (filterValue) {
+          return artefactTypes.filter((item) => item.toLowerCase().includes(filterValue.toLowerCase()));
+        } else {
+          return artefactTypes;
+        }
+      }),
+      share(),
+    );
   }
 
   save(editAfterSave?: boolean): void {

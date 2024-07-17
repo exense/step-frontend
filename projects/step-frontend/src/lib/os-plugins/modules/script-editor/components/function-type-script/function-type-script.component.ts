@@ -15,6 +15,7 @@ import {
   functionTypeScriptFormSetValueToModel,
 } from './function-type-script.form';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-function-type-script',
@@ -41,15 +42,19 @@ export class FunctionTypeScriptComponent
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.functionTypeScriptOptions];
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this.functionTypeScriptOptions.filter((item) =>
-          item.label.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this.functionTypeScriptOptions];
-      }
-    });
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value
+            ? this.functionTypeScriptOptions.filter((item) => item.label.toLowerCase().includes(value))
+            : [...this.functionTypeScriptOptions],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   override setValueToForm(): void {

@@ -13,6 +13,7 @@ import { BaseCustomFormInputComponent } from './base-custom-form-input.component
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-standard-custom-form-inputs',
@@ -40,15 +41,17 @@ export class StandardCustomFormInputComponent extends BaseCustomFormInputCompone
 
   ngAfterContentInit(): void {
     this.dropdownItemsFiltered = [...this.dropdownItems];
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.dropdownItemsFiltered = this.dropdownItems.filter((item) =>
-          item.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.dropdownItemsFiltered = [...this.dropdownItems];
-      }
-    });
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this.dropdownItems.filter((item) => item.toLowerCase().includes(value)) : [...this.dropdownItems],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   loadItems() {

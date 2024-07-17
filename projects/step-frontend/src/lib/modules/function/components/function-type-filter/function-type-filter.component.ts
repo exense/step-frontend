@@ -2,6 +2,7 @@ import { AfterViewInit, Component, forwardRef, inject, TrackByFunction } from '@
 import { ArrayFilterComponent, BaseFilterComponent, FunctionTypeRegistryService, ItemInfo } from '@exense/step-core';
 import { FormControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-function-type-filter',
@@ -24,14 +25,19 @@ export class FunctionTypeFilterComponent
   functionTypesFiltered: ItemInfo[] = [...this._functionTypes];
 
   ngAfterViewInit(): void {
-    this.filterMultiControl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      if (value) {
-        this.functionTypesFiltered = this._functionTypes.filter((type) =>
-          type.label.toLowerCase().includes(value.toLowerCase()),
-        );
-      } else {
-        this.functionTypesFiltered = [...this._functionTypes];
-      }
-    });
+    this.functionTypesFiltered = [...this._functionTypes];
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value
+            ? this._functionTypes.filter((item) => item.label.toLowerCase().includes(value))
+            : [...this._functionTypes],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.functionTypesFiltered = displayItemsFiltered;
+      });
   }
 }
