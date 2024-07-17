@@ -12,8 +12,8 @@
       </ngx-mat-select-search>
     </mat-option>
     <mat-option value=""></mat-option>
-    <mat-option *ngFor="let item of dropdownItemsFiltered; trackBy: trackByKeyValue" [value]="item.key">
-      {{ item.value }}
-    </mat-option>
+    @for (item of dropdownItemsFiltered; track trackByKeyValue) {
+      <mat-option [value]="item.key">{{ item.value }}</mat-option>
+    }
   </mat-select>
 </step-form-field>

@@ -49,9 +49,9 @@
               <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
             </ngx-mat-select-search>
           </mat-option>
-          <mat-option *ngFor="let itemInfo of dropdownItemsFiltered" [value]="itemInfo.type">
-            {{ itemInfo.label }}
-          </mat-option>
+          @for (itemInfo of dropdownItemsFiltered; track itemInfo) {
+            <mat-option [value]="itemInfo.type">{{ itemInfo.label }}</mat-option>
+          }
         </mat-select>
       </step-form-field>
 

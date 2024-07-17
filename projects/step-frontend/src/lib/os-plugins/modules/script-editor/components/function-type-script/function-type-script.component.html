@@ -13,12 +13,9 @@
         <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
       </ngx-mat-select-search>
     </mat-option>
-    <mat-option
-      *ngFor="let functionTypeScriptOption of dropdownItemsFiltered"
-      [value]="functionTypeScriptOption.scriptLanguage"
-    >
-      {{ functionTypeScriptOption.label }}
-    </mat-option>
+    @for (functionTypeScriptOption of dropdownItemsFiltered; track functionTypeScriptOption) {
+      <mat-option [value]="functionTypeScriptOption.scriptLanguage">{{ functionTypeScriptOption.label }}</mat-option>
+    }
   </mat-select>
 </step-form-field>
 
