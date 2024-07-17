@@ -10,33 +10,31 @@ import { TimeSeriesContextParams } from '../types/time-series/time-series-contex
   providedIn: 'root',
 })
 export class TimeSeriesContextsFactory {
-  private executionsContexts: { [key: string]: TimeSeriesContext } = {};
+  private storage: { [key: string]: TimeSeriesContext } = {};
 
-  createContext(params: TimeSeriesContextParams): TimeSeriesContext {
-    const id = params.id;
-    if (this.executionsContexts[id]) {
-      throw new Error('Execution already exists for id: ' + id);
+  createContext(params: TimeSeriesContextParams, storageId?: string): TimeSeriesContext {
+    if (storageId && this.storage[storageId]) {
+      throw new Error('Execution already exists for id: ' + storageId);
     }
     let context = new TimeSeriesContext(params);
-    this.executionsContexts[id] = context;
+    if (storageId) {
+      this.storage[storageId] = context;
+    }
     return context;
   }
 
-  /**
-   * The method will create a new context if it doesn't exist yet.
-   */
-  getContext(contextId: string): TimeSeriesContext {
-    if (!contextId) {
-      throw new Error('Context id must be specified!');
+  getContext(storageId: string): TimeSeriesContext {
+    if (!storageId) {
+      throw new Error('Storage id must be specified!');
     }
-    return this.executionsContexts[contextId];
+    return this.storage[storageId];
   }
 
   destroyContext(id: string | undefined) {
     if (id === undefined) {
       return;
     }
-    this.executionsContexts[id]?.destroy();
-    delete this.executionsContexts[id];
+    this.storage[id]?.destroy();
+    delete this.storage[id];
   }
 }

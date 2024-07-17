@@ -1,5 +1,5 @@
-import { AfterViewInit, DestroyRef, Directive, inject, Input } from '@angular/core';
-import { BaseFilterComponent } from '../../basics/step-basics.module';
+import { AfterViewInit, DestroyRef, Directive, inject, Input, OnDestroy } from '@angular/core';
+import { BaseFilterComponent, isRegexValidator } from '../../basics/step-basics.module';
 import { SearchValue } from '../shared/search-value';
 import { FilterCondition } from '../shared/filter-condition';
 import { map } from 'rxjs';
@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Directive({
   selector: '[stepFilterConnect]',
 })
-export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit {
+export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, OnDestroy {
   private _destroyRef = inject(DestroyRef);
   private _filterConditionFactory = inject(FilterConditionFactoryService);
   private _searchCol = inject(SearchColumnAccessor, { optional: true });
@@ -27,6 +27,11 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit {
   ngAfterViewInit(): void {
     this.setupValueChanges();
     this.setupFilterChanges();
+    this.setupFilterValidation();
+  }
+
+  ngOnDestroy(): void {
+    this.destroyFilterValidation();
   }
 
   private setupValueChanges(): void {
@@ -52,6 +57,23 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit {
       map((filterValue) => this.convertToSearchValue(filterValue)),
       takeUntilDestroyed(this._destroyRef),
     ).subscribe((searchValue) => this._searchCol!.search(searchValue));
+  }
+
+  private setupFilterValidation(): void {
+    if (!this.isConnected) {
+      console.warn('[stepFilterConnect] not connected');
+      return;
+    }
+    if (this.useRegex || !this.createConditionFn) {
+      this._filter?.filterControl.addValidators(isRegexValidator);
+    }
+  }
+
+  private destroyFilterValidation(): void {
+    if (!this.isConnected) {
+      return;
+    }
+    this._filter?.filterControl.removeValidators(isRegexValidator);
   }
 
   private convertToSearchValue(value: T): SearchValue {

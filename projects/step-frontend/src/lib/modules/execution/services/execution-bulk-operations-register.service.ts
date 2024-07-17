@@ -12,12 +12,12 @@ export class ExecutionBulkOperationsRegisterService {
     this._entityBulkOperationRegister
       .register('executions', {
         type: BulkOperationType.RESTART,
-        permission: 'plan-execute',
+        permission: 'plan-bulk-execute',
         operation: (requestBody) => this._api.restartExecutions(requestBody),
       })
       .register('executions', {
         type: BulkOperationType.STOP,
-        permission: 'plan-execute',
+        permission: 'plan-bulk-execute',
         operation: (requestBody) => this._api.stopExecutions(requestBody),
       });
   }
