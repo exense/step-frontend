@@ -69,6 +69,10 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
   }
 
+  handleFilterItemChange(index: number, item: FilterBarItem) {
+    this.filterItems[index] = item;
+  }
+
   addCustomFilter(type: FilterBarItemType) {
     this.filterItems.push({
       attributeName: '',

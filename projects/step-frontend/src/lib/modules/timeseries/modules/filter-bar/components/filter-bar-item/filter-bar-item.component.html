@@ -177,15 +177,15 @@
     </div>
 
     <div *ngSwitchCase="'NUMERIC'">
-      <mat-form-field *ngIf="!item.isLocked" class="w-100">
+      <mat-form-field *ngIf="!itemDraft.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
         <input
           type="text"
           autocomplete="off"
-          [readonly]="item.isLocked"
+          [readonly]="itemDraft.isLocked"
           matInput
           name="attributeName"
-          [(ngModel)]="item.attributeName"
+          [(ngModel)]="itemDraft.attributeName"
           stepFocusable
         />
       </mat-form-field>
@@ -215,15 +215,15 @@
     </div>
 
     <div *ngSwitchCase="'DATE'">
-      <mat-form-field *ngIf="!item.isLocked" class="w-100">
+      <mat-form-field *ngIf="!itemDraft.isLocked" class="w-100">
         <mat-label>Attribute name</mat-label>
         <input
           type="text"
           autocomplete="off"
-          [readonly]="item.isLocked"
+          [readonly]="itemDraft.isLocked"
           matInput
           name="attributeName"
-          [(ngModel)]="item.attributeName"
+          [(ngModel)]="itemDraft.attributeName"
           stepFocusable
         />
       </mat-form-field>

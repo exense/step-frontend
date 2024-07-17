@@ -48,6 +48,7 @@
               <step-ts-filter-bar-item
                 [item]="item"
                 (removeItem)="filterItems.splice(i, 1)"
+                (filterChange)="handleFilterItemChange(i, $event)"
                 [removable]="true"
                 [updateTimeRangeOption]="false"
               />

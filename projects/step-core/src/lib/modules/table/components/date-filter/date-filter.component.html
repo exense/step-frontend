@@ -1,4 +1,4 @@
-<step-form-field>
+<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <step-label *ngIf="label">{{ label }}</step-label>
   <input type="text" [stepDatePicker]="picker" [formControl]="filterControl" />
   <step-suffix class="icon-suffix">

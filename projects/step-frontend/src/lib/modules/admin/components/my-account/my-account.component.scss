@@ -3,16 +3,23 @@
 step-my-account {
   min-width: 600px;
   display: flex;
+  padding: 1rem;
   flex-direction: column;
-  gap: 3rem;
 
-  .mat-card-header-text {
-    margin: 0 !important;
+  .header-text {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
   }
 
   .header-with-button {
     display: flex;
     justify-content: space-between;
+
+    &:nth-of-type(n + 2) {
+      margin-top: 4rem;
+    }
   }
 
   .credentials {

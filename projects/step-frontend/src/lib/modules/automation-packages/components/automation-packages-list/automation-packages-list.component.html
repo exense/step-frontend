@@ -5,6 +5,7 @@
       <section class="header" *stepAdditionalHeader="'automation-package-header'">
         <step-btn-group>
           <button
+            stepTestId="upload-package-btn"
             type="button"
             mat-flat-button
             color="primary"
@@ -48,6 +49,7 @@
         <td mat-cell *matCellDef="let element" class="cell-actions">
           <step-btn-group>
             <button
+              stepTestId="edit-package-btn"
               type="button"
               mat-icon-button
               matTooltip="Edit package"
@@ -57,6 +59,7 @@
               <step-icon name="tool" />
             </button>
             <button
+              stepTestId="delete-package-btn"
               type="button"
               mat-icon-button
               matTooltip="Delete package"
@@ -66,6 +69,7 @@
               <step-icon name="trash-2" />
             </button>
             <button
+              stepTestId="more-packages-btn"
               *ngIf="entityMenu.hasContent"
               mat-icon-button
               [matMenuTriggerFor]="entityMenu.menu!"

@@ -129,6 +129,8 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   }
 
   onRelativeSelectionSelected(option: TimeRangePickerSelection) {
+    this.fromDateString = undefined;
+    this.toDateString = undefined;
     if (option.type === 'FULL') {
       this.onFullRangeSelect();
       return;
