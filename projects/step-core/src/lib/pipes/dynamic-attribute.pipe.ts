@@ -1,17 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../client/step-client-module';
+import { DynamicValue } from '../client/step-client-module';
 
 @Pipe({
   name: 'dynamicAttribute',
 })
 export class DynamicAttributePipe implements PipeTransform {
-  transform(attribute?: DynamicValueString): string | boolean | number | undefined {
+  transform(attribute?: DynamicValue): string | boolean | number | undefined {
     return DynamicAttributePipe.transform(attribute);
   }
 
-  static transform(
-    attribute?: DynamicValueString | DynamicValueBoolean | DynamicValueInteger
-  ): string | boolean | number | undefined {
+  static transform(attribute?: DynamicValue): string | boolean | number | undefined {
     if (!attribute) {
       return '';
     }
@@ -20,6 +18,11 @@ export class DynamicAttributePipe implements PipeTransform {
       return attribute.expression;
     }
 
-    return attribute.value;
+    const value = attribute.value;
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+
+    return value?.toString();
   }
 }

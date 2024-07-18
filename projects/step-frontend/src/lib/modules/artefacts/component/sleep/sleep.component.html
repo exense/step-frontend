@@ -1,9 +1,27 @@
 <form #form="ngForm">
-  <step-dynamic-time-input
-    label="Duration"
-    [(ngModel)]="context.artefact!.duration"
-    [disabled]="context.readonly"
-    name="duration"
-  />
+  @if (!context.artefact!.unit?.dynamic) {
+    <step-dynamic-time-input
+      label="Duration"
+      [(ngModel)]="context.artefact!.duration"
+      [disabled]="context.readonly"
+      name="duration"
+    />
+    @if (context.artefact!.duration.dynamic && context.artefact!.unit.value) {
+      <step-dynamic-textfield label="Unit" [(ngModel)]="context.artefact!.unit" [disabled]="true" name="unit" />
+    }
+  } @else {
+    <step-dynamic-textfield
+      [isNumber]="true"
+      label="Duration"
+      [(ngModel)]="context.artefact!.duration"
+      [disabled]="context.readonly"
+      name="duration"
+    />
+    <step-dynamic-textfield label="Unit" [(ngModel)]="context.artefact!.unit" [disabled]="true" name="unit" />
+    <step-alert [type]="AlertType.DEFAULT">
+      <step-icon name="alert-circle" />
+      <span>Dynamic units can only be edited in plain text editor or automation package yaml</span>
+    </step-alert>
+  }
   <step-waiting-artefacts-advanced [context]="context" />
 </form>

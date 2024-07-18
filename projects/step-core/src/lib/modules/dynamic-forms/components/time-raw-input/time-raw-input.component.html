@@ -19,6 +19,7 @@
     (ngModelChange)="handleDisplayValueChange($event)"
     (blur)="handleBlur()"
     [stepAllowChars]="allowedChars"
+    [disabled]="!!isDisabled || !!parentControl?.disabled"
     min="0"
   />
   <step-suffix>
@@ -26,6 +27,7 @@
       [ngModel]="internalDisplayMeasure"
       (ngModelChange)="handleDisplayMeasureChange($event)"
       (blur)="handleBlur()"
+      [disabled]="!!isDisabled || !!parentControl?.disabled"
     >
       @for (item of measureItems; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>

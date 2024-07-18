@@ -29,6 +29,7 @@ export class PopoverComponent {
   @ViewChild(TriggerPopoverDirective, { static: true })
   private triggerPopoverDirective!: TriggerPopoverDirective;
   private toggled = false;
+  private tooltipTimeout?: ReturnType<typeof setTimeout>;
 
   protected isMouseOverPopover = false;
 
@@ -56,8 +57,10 @@ export class PopoverComponent {
     if (this.displayByClick) {
       return;
     }
-    this.isMouseOverPopover = true;
-    this.triggerPopoverDirective.openMenu();
+    this.tooltipTimeout = setTimeout(() => {
+      this.isMouseOverPopover = true;
+      this.triggerPopoverDirective.openMenu();
+    }, 300);
   }
 
   @HostListener('mouseleave')
@@ -65,6 +68,7 @@ export class PopoverComponent {
     if (this.displayByClick) {
       return;
     }
+    clearTimeout(this.tooltipTimeout);
     this.isMouseOverPopover = false;
     this.closePopover();
   }

@@ -20,34 +20,27 @@
           </step-form-field>
         </div>
         <mat-divider />
-        <div>
-          <step-label>Filters and grouping</step-label>
-        </div>
-        <div class="filters-container">
-          @for (item of filterItems; track item; let i = $index) {
-            <step-ts-filter-bar-item
-              [item]="item"
-              (removeItem)="filterItems.splice(i, 1)"
-              [removable]="true"
-              [updateTimeRangeOption]="false"
-            />
-          }
-          <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
-        </div>
-        <mat-menu #typesMenu="matMenu">
-          @for (attribute of item.attributes; track attribute.name) {
-            <button mat-menu-item (click)="addFilterItem(attribute)">
-              {{ attribute.displayName }}
-            </button>
-          }
-          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
-          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
-          <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
-        </mat-menu>
-        <div class="form-row">
-          <div>
+        <step-label>Filters</step-label>
+        @if (!item?.masterChartId) {
+          <div class="filters-container">
+            @for (item of filterItems; track item; let i = $index) {
+              <step-ts-filter-bar-item
+                [item]="item"
+                (removeItem)="filterItems.splice(i, 1)"
+                [removable]="true"
+                [updateTimeRangeOption]="false"
+              />
+            }
+            <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
+          </div>
+          <div class="form-row">
             <step-form-field>
-              <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalFilters" name="inheritGlobalFilters">
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="item.inheritGlobalFilters"
+                (ngModelChange)="item.inheritSpecificFiltersOnly = false"
+                name="inheritGlobalFilters"
+              >
                 <span>Inherit global filters</span>
                 <step-icon
                   class="help-icon"
@@ -56,29 +49,87 @@
                 ></step-icon>
               </mat-checkbox>
             </step-form-field>
-            <step-form-field>
-              <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalGrouping" name="inheritGlobalGrouping">
-                <span>Inherit global grouping</span>
-                <step-icon
-                  class="help-icon"
-                  matTooltip="The grouping will be inherited from the dashboard level"
-                  name="help-circle"
-                ></step-icon>
-              </mat-checkbox>
-            </step-form-field>
+            @if (item.inheritGlobalFilters) {
+              <step-form-field>
+                <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="item.inheritSpecificFiltersOnly"
+                  name="inheritSpecificFiltersOnly"
+                >
+                  <span>Inherit specific fields only</span>
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
+                    name="help-circle"
+                  ></step-icon>
+                </mat-checkbox>
+              </step-form-field>
+            }
           </div>
-          <div></div>
+          @if (item.inheritGlobalFilters && item.inheritSpecificFiltersOnly) {
+            <step-form-field>
+              <step-label>Inherited attributes</step-label>
+              <mat-select [(ngModel)]="item.specificFiltersToInherit" multiple name="grouping">
+                @for (attr of allAttributes; track attr) {
+                  <mat-option [value]="attr.name">{{ attr.displayName }}</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          }
+          <mat-menu #typesMenu="matMenu">
+            @for (attribute of item.attributes; track attribute) {
+              <button mat-menu-item (click)="addFilterItem(attribute)">
+                {{ attribute.displayName }}
+              </button>
+            }
+            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+            <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
+          </mat-menu>
+        }
+        <mat-divider />
+        <div>
+          <step-label>Grouping</step-label>
         </div>
-
-        @if (!item.inheritGlobalGrouping) {
-          <step-form-field>
-            <step-label>Grouping</step-label>
-            <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
-              @for (attr of item.attributes; track attr.name) {
-                <mat-option [value]="attr.name">{{ attr.displayName }}</mat-option>
-              }
-            </mat-select>
-          </step-form-field>
+        @if (!item?.masterChartId) {
+          <div class="form-row">
+            <div>
+              <step-form-field>
+                <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalGrouping" name="inheritGlobalGrouping">
+                  <span>Inherit global grouping</span>
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="The grouping will be inherited from the dashboard level"
+                    name="help-circle"
+                  ></step-icon>
+                </mat-checkbox>
+              </step-form-field>
+            </div>
+            <div>
+              <step-form-field>
+                <mat-checkbox color="primary" [(ngModel)]="item.readonlyGrouping" name="readonlyGrouping">
+                  <span>Readonly grouping</span>
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="The users will not be able to change the grouping of this dashlet"
+                    name="help-circle"
+                  ></step-icon>
+                </mat-checkbox>
+              </step-form-field>
+            </div>
+          </div>
+          @if (!item.inheritGlobalGrouping) {
+            <step-form-field>
+              <step-label>Grouping Attributes</step-label>
+              <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
+                @for (attr of item.attributes; track attr) {
+                  <mat-option [value]="attr.name">{{ attr.displayName }} </mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          }
+        } @else {
+          <div class="info-txt">Settings inherited from the master dashlet</div>
         }
         <mat-divider />
         <step-label>Columns</step-label>

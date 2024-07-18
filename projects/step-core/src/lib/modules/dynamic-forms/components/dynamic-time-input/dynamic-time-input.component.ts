@@ -1,8 +1,8 @@
 import { NgControl } from '@angular/forms';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
 import { DynamicValueInteger } from '../../../../client/step-client-module';
-import { DialogsService, TimeUnit, TimeUnitDictionary } from '../../../basics/step-basics.module';
+import { TimeUnit, TimeUnitDictionary } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-time-input',
@@ -10,8 +10,6 @@ import { DialogsService, TimeUnit, TimeUnitDictionary } from '../../../basics/st
   styleUrls: ['./dynamic-time-input.component.scss'],
 })
 export class DynamicTimeInputComponent extends DynamicValueBaseComponent<DynamicValueInteger> {
-  private _dialogsService = inject(DialogsService);
-
   @Input() allowedMeasures: TimeUnit[] = [
     TimeUnit.MILLISECOND,
     TimeUnit.SECOND,
