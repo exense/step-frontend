@@ -21,10 +21,10 @@ import {
   ViewStateService,
   BookmarkService,
   MENU_ITEMS,
-  AugmentedBookmarksService,
+  BookmarkNavigatorService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { combineLatest, map } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -43,6 +43,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkService = inject(BookmarkService);
+  private _bookmarkNavigator = inject(BookmarkNavigatorService);
   private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
@@ -55,37 +56,8 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
-    map(([menuItems, dynamicMenuItems]) =>
-      menuItems.concat(
-        dynamicMenuItems!
-          .map((element) => {
-            const menuEntry = {
-              title: element.customFields!['label'],
-              id: element.customFields!['link'],
-              icon: element.customFields!['icon'],
-              position: element.customFields!['position'] || 100,
-              parentId: 'bookmarks-root',
-              weight: 1000 + dynamicMenuItems!.length,
-              isEnabledFct(): boolean {
-                return true;
-              },
-            };
-            return menuEntry;
-          })
-          .sort((a: any, b: any) => {
-            const posA = a.position;
-            const posB = b.position;
-            if (posA < posB) {
-              return -1;
-            } else if (posB < posA) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }),
-      ),
-    ),
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuItems$]).pipe(
+    map(([menuItems, bookmarkMenuItems]) => menuItems.concat(bookmarkMenuItems)),
   );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
@@ -148,8 +120,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
-  navigateTo(viewId: string, $event: MouseEvent): void {
+  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean): void {
     const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
+
+    if (isBookmark) {
+      this._bookmarkNavigator.navigateBookmark(viewId, isOpenInSeparateTab);
+      return;
+    }
 
     switch (viewId) {
       case 'home':
