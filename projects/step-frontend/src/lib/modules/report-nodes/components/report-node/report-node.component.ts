@@ -52,7 +52,11 @@ export class ReportNodeComponent implements OnChanges {
     this._api
       .getReportNodeRootPlan(this.node!.id!)
       .pipe(
-        switchMap((plan) => this._router.navigateByUrl(this._commonEntitiesUrls.planEditorUrl(plan)!)),
+        switchMap((plan) =>
+          this._router.navigateByUrl(
+            this._commonEntitiesUrls.planEditorUrl(plan)! + '?artefactId=' + this.node!.artefactID,
+          ),
+        ),
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);

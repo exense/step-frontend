@@ -38,12 +38,27 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-icon-button matTooltip="Rename Label" (click)="renameBookmark(element)">
+        <button
+          stepTestId="rename-label-btn"
+          mat-icon-button
+          matTooltip="Rename Label"
+          (click)="renameBookmark(element)"
+        >
           <step-icon name="edit"></step-icon></button
-        ><button mat-icon-button matTooltip="Delete Bookmark" (click)="deleteBookmark(element)">
+        ><button
+          stepTestId="delete-bookmark-btn"
+          mat-icon-button
+          matTooltip="Delete Bookmark"
+          (click)="deleteBookmark(element)"
+        >
           <step-icon name="trash-2"></step-icon>
         </button>
-        <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
+        <step-entity-menu-button
+          stepTestId="bookmarks-entity-menu-btn"
+          [entityItem]="element"
+          [entityMenu]="entityMenu"
+          stepHighlightTableRow
+        >
           <step-icon name="more-horizontal"></step-icon>
         </step-entity-menu-button>
       </step-btn-group>

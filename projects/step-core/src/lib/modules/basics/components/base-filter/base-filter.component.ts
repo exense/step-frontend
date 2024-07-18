@@ -1,6 +1,6 @@
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ChangeDetectorRef, DestroyRef, Directive, EventEmitter, inject, OnInit, Output } from '@angular/core';
-import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, Observable, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({})
@@ -10,6 +10,18 @@ export abstract class BaseFilterComponent<T, CV = T> implements OnInit {
   protected _destroyRef = inject(DestroyRef);
 
   readonly filterControl = this.createControl(this._formBuilder);
+
+  readonly invalidFilterMessage$ = this.filterControl.statusChanges.pipe(
+    startWith(this.filterControl.status),
+    map((status) => {
+      if (status !== 'INVALID') {
+        return '';
+      }
+      return this.filterControl.hasError('invalidRegex') ? 'Invalid regular expression' : 'Invalid filter value';
+    }),
+    distinctUntilChanged(),
+    takeUntilDestroyed(),
+  );
 
   protected abstract createControl(fb: FormBuilder): FormControl<CV>;
   protected abstract createControlChangeStream(control: FormControl<CV>): Observable<T>;

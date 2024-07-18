@@ -5,6 +5,7 @@
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
       <step-btn-group>
         <a
+          stepTestId="upload-package-btn"
           mat-flat-button
           color="primary"
           class="header-btn"
@@ -48,6 +49,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
           <button
+            stepTestId="refresh-package-btn"
             type="button"
             mat-icon-button
             matTooltip="Refresh package"
@@ -57,6 +59,7 @@
             <step-icon name="refresh-cw"></step-icon>
           </button>
           <a
+            stepTestId="edit-package-btn"
             mat-icon-button
             matTooltip="Edit package"
             [disabled]="isRefreshing || !('kw-write' | hasRight | async)"
@@ -65,6 +68,7 @@
             <step-icon name="tool"></step-icon>
           </a>
           <button
+            stepTestId="delete-package-btn"
             type="button"
             mat-icon-button
             matTooltip="Delete package"
@@ -73,7 +77,12 @@
           >
             <step-icon name="trash-2">delete</step-icon>
           </button>
-          <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
+          <step-entity-menu-button
+            stepTestId="entity-menu-btn"
+            [entityItem]="element"
+            [entityMenu]="entityMenu"
+            stepHighlightTableRow
+          >
             <step-icon name="more-horizontal"></step-icon>
           </step-entity-menu-button>
         </step-btn-group>
