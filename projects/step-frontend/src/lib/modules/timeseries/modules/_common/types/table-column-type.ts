@@ -6,7 +6,7 @@ export enum TableColumnType {
   MAX = 'MAX',
   TPS = 'TPS',
   TPH = 'TPH',
-  PCL_80 = 'PCL_80',
-  PCL_90 = 'PCL_90',
-  PCL_99 = 'PCL_99',
+  PCL_1 = 'PCL_1',
+  PCL_2 = 'PCL_2',
+  PCL_3 = 'PCL_3',
 }

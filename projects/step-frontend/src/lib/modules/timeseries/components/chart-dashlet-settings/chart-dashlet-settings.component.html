@@ -166,9 +166,9 @@
               [matMenuTriggerFor]="aggregateMenu"
               mat-button
             >
-              {{ item.chartSettings!.primaryAxes.aggregation }}
-              @if (item.chartSettings!.primaryAxes.aggregation === ChartAggregation.PERCENTILE) {
-                {{ item.chartSettings!.primaryAxes.pclValue }}
+              {{ item.chartSettings!.primaryAxes.aggregation.type }}
+              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.primaryAxes?.aggregation?.params?.['pclValue'] }}
               }
             </button>
           </step-form-field>
@@ -183,7 +183,7 @@
           <mat-menu #aggregateMenu="matMenu">
             <step-timeseries-aggregate-picker
               [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
-              [pclValue]="item.chartSettings!.primaryAxes.pclValue"
+              [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
               (aggregateChange)="handlePrimaryAggregationChange($event)"
             />
           </mat-menu>
@@ -211,16 +211,16 @@
               [matMenuTriggerFor]="secondaryAggregateMenu"
               mat-button
             >
-              {{ item.chartSettings!.secondaryAxes?.aggregation }}
-              @if (item.chartSettings!.secondaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
-                {{ item.chartSettings!.secondaryAxes?.pclValue }}
+              {{ item.chartSettings!.secondaryAxes?.aggregation?.type }}
+              @if (item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue'] }}
               }
             </button>
             <mat-menu #secondaryAggregateMenu="matMenu">
               <step-timeseries-aggregate-picker
                 [selectedAggregate]="$any(item.chartSettings!.secondaryAxes?.aggregation)"
                 [allowEmptyAggregate]="true"
-                [pclValue]="item.chartSettings!.secondaryAxes?.pclValue"
+                [pclValue]="item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue']"
                 (aggregateChange)="handleSecondaryAggregationChange($event)"
               />
             </mat-menu>

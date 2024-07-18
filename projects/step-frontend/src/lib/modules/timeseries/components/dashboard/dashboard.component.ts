@@ -15,6 +15,7 @@ import {
 import {
   AugmentedTimeSeriesService,
   AuthService,
+  type ColumnSelection,
   DashboardItem,
   DashboardsService,
   DashboardView,
@@ -59,6 +60,7 @@ import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
 import { TimeRangeSettings } from './time-range-settings';
+import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -271,15 +273,28 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: true,
       inheritSpecificFiltersOnly: false,
       specificFiltersToInherit: [],
-      tableSettings: {
-        columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true, type: '' })),
-      },
+      tableSettings: { columns: this.getInitialTableColumns() },
     };
     this.filterBar!.addUniqueFilterItems(
       tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
     );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
+  }
+
+  private getInitialTableColumns(): ColumnSelection[] {
+    return [
+      { column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'SUM', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'AVG', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'MIN', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'MAX', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'PCL_1', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'PCL_2', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'PCL_3', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'TPS', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'TPH', aggregation: { type: ChartAggregation.COUNT } },
+    ];
   }
 
   addChartDashlet(metric: MetricType) {

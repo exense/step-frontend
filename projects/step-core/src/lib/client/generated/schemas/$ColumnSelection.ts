@@ -7,12 +7,12 @@ export const $ColumnSelection = {
       type: 'Enum',
       isRequired: true,
     },
+    aggregation: {
+      type: 'MetricAggregation',
+      isRequired: true,
+    },
     selected: {
       type: 'boolean',
-    },
-    type: {
-      type: 'string',
-      isRequired: true,
     },
   },
 } as const;

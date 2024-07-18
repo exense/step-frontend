@@ -136,13 +136,13 @@
         <step-label>Columns</step-label>
         <div class="columns-container">
           @for (column of item.tableSettings!.columns; track column) {
-            @if ((column | pclColumnSelection).pclValue) {
+            @if (column.aggregation.params?.['pclValue']) {
               <div class="pcl-column-container">
                 <mat-checkbox color="primary" [(ngModel)]="column.selected" [ngModelOptions]="{ standalone: true }">
                 </mat-checkbox>
                 <span>PCL</span>
                 <step-editable-label
-                  [ngModel]="(column | pclColumnSelection).pclValue"
+                  [ngModel]="column.aggregation.params?.['pclValue']"
                   class="pcl-editable-label"
                   [ngModelOptions]="{ standalone: true }"
                   (ngModelChange)="onColumnPclValueChange(column, $event)"

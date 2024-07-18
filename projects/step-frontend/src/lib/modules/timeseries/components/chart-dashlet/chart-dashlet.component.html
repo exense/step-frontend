@@ -99,7 +99,7 @@
   <mat-menu #aggregateMenu="matMenu">
     <step-timeseries-aggregate-picker
       [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
-      [pclValue]="item.chartSettings!.primaryAxes.pclValue"
+      [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
       (aggregateChange)="handleAggregateChange($event)"
     />
   </mat-menu>

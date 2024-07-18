@@ -14,6 +14,6 @@ export type TokenWrapper = {
   tokenHealth?: TokenHealth;
   state?: 'FREE' | 'IN_USE' | 'ERROR' | 'MAINTENANCE_REQUESTED' | 'MAINTENANCE';
   currentOwner?: TokenWrapperOwner;
-  interests?: Record<string, Interest>;
   attributes?: Record<string, string>;
+  interests?: Record<string, Interest>;
 };

@@ -4,12 +4,8 @@
 export const $AxesSettings = {
   properties: {
     aggregation: {
-      type: 'Enum',
+      type: 'MetricAggregation',
       isRequired: true,
-    },
-    pclValue: {
-      type: 'number',
-      format: 'double',
     },
     displayType: {
       type: 'Enum',

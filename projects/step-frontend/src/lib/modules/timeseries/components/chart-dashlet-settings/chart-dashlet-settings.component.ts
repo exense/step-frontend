@@ -96,8 +96,10 @@ export class ChartDashletSettingsComponent implements OnInit {
   }
 
   handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
-    this.item.chartSettings!.primaryAxes.aggregation = change.aggregate!;
-    this.item.chartSettings!.primaryAxes.pclValue = change.pclValue;
+    this.item.chartSettings!.primaryAxes.aggregation = {
+      type: change.aggregate!,
+      params: { pclValue: change.pclValue },
+    };
     this.primaryAggregateMenuTrigger?.closeMenu();
   }
 
@@ -107,15 +109,13 @@ export class ChartDashletSettingsComponent implements OnInit {
     if (newAggregate) {
       if (!this.item.chartSettings!.secondaryAxes) {
         this.item.chartSettings!.secondaryAxes = {
-          aggregation: newAggregate,
-          pclValue: newPcl,
+          aggregation: { type: newAggregate, params: { pclValue: newPcl } },
           displayType: 'BAR_CHART',
           colorizationType: 'STROKE',
           unit: '',
         };
       } else {
-        this.item.chartSettings!.secondaryAxes.aggregation = newAggregate;
-        this.item.chartSettings!.secondaryAxes.pclValue = newPcl;
+        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: { pclValue: newPcl } };
       }
     } else {
       this.item.chartSettings!.secondaryAxes = undefined;
