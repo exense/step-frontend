@@ -1,7 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AlertType, StepBasicsModule } from '../../../basics/step-basics.module';
 import { InfoBannerService } from '../../injectables/info-banner.service';
+import { KeyValue } from '@angular/common';
+import { AuthService } from '../../../auth/injectables/auth.service';
 
 @Component({
   selector: 'step-info-banner',
@@ -11,19 +13,22 @@ import { InfoBannerService } from '../../injectables/info-banner.service';
   standalone: true,
 })
 export class InfoBannerComponent {
+  private _auth = inject(AuthService);
   private _infoBannerService = inject(InfoBannerService);
   private _domSanitizer = inject(DomSanitizer);
 
   protected readonly AlertType = AlertType;
-  protected readonly info = computed(() => {
-    const info = this._infoBannerService.actualInfo();
-    if (!info) {
-      return undefined;
-    }
-    return this._domSanitizer.bypassSecurityTrustHtml(info);
+  protected readonly infos = computed(() => {
+    const infos = this._infoBannerService.actualInfos();
+    return infos
+      .filter((info) => !info.permission || this._auth.hasRight(info.permission))
+      .map(({ id, info }) => {
+        const value = this._domSanitizer.bypassSecurityTrustHtml(info);
+        return { key: id, value } as KeyValue<string, SafeHtml>;
+      });
   });
 
-  closeBanner(): void {
-    this._infoBannerService.hideInfoForActualView().subscribe();
+  closeBanner(id: string): void {
+    this._infoBannerService.hideInfoInActualView(id);
   }
 }

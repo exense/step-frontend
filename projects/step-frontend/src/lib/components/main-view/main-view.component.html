@@ -22,9 +22,7 @@
       </section>
     </header>
     <div id="step-main-scrollable-content">
-      @if ('admin-ui-menu' | hasRight | async) {
-        <step-info-banner />
-      }
+      <step-info-banner />
       <step-dashlet itemKey="projectAlerts" />
       @for (alert of adminAlerts; track alert.id) {
         <step-dashlet [itemKey]="alert.template" />

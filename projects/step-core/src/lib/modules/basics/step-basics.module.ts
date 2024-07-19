@@ -257,6 +257,7 @@ export * from './injectables/object-utils.service';
 export * from './injectables/dialogs.service';
 export * from './types/bulk-operation-type.enum';
 export * from './types/string-array-regex';
+export * from './types/string-hash';
 export * from './injectables/dialog-parent.service';
 export * from './injectables/alerts.service';
 export * from './injectables/quick-access-route.service';

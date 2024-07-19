@@ -1,19 +1,27 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { iif, map, Observable, of, switchMap, tap, timer } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { InfoBanner } from '../types/info-banner';
+import { stringHash } from '../../basics/types/string-hash';
+import { LOCAL_STORAGE } from '../../basics/types/storage.token';
 
 interface StackItem {
   view: string;
-  info: string;
+  infos: InfoBanner[];
 }
+
+const INFO_BANNER_HIDDEN_MESSAGES_KEY = 'info_banner_hidden_messages_key';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InfoBannerService {
-  private _api = inject(InfoBannerApiMockService);
-  private data = new Map<string, string>();
+  private _localStorage = inject(LOCAL_STORAGE);
 
-  private hiddenViews?: Set<string>;
+  private data = new Map<string, InfoBanner[]>();
+  private registeredIds = new Set<string>();
+
+  private hiddenMessagesIds?: Set<string>;
+  private isStorageCleanedUp = false;
 
   private viewStack = signal<StackItem[]>([]);
   private viewStackTop = computed(() => {
@@ -22,16 +30,17 @@ export class InfoBannerService {
   });
 
   private actualPath = computed(() => this.viewStackTop()?.view ?? '');
-  readonly actualInfo = computed(() => this.viewStackTop()?.info ?? '');
+  readonly actualInfos = computed(() => this.viewStackTop()?.infos ?? []);
 
-  register(view: string, bannerText: string): void;
-  register(data: Record<string, string>): void;
-  register(viewOrData: string | Record<string, string>, bannerText?: string): void {
-    if (typeof viewOrData === 'string') {
-      this.data.set(viewOrData, bannerText ?? '');
-      return;
+  register(view: string, bannerText: string, permission?: string): this {
+    if (!this.data.has(view)) {
+      this.data.set(view, []);
     }
-    Object.entries(viewOrData).forEach(([key, value]) => this.data.set(key, value));
+    const id = `${view}:${stringHash(bannerText)}`;
+    const info = bannerText;
+    this.registeredIds.add(id);
+    this.data.get(view)!.push({ id, info, permission });
+    return this;
   }
 
   hasInfo(view: string): boolean {
@@ -46,67 +55,67 @@ export class InfoBannerService {
   }
 
   displayInfo(view: string): Observable<boolean> {
-    return this.getHiddenViews().pipe(
-      tap((hiddenViews) => {
-        const info = hiddenViews.has(view) ? '' : this.data.get(view) ?? '';
-        this.viewStack.update((viewStack) => [...viewStack, { view, info }]);
-      }),
-      map(() => true),
-    );
+    if (!this.isStorageCleanedUp) {
+      this.cleanupStorage();
+      this.isStorageCleanedUp = true;
+    }
+    const hiddenMessages = this.getHiddenMessagedIds();
+    const infos = (this.data.get(view) ?? []).filter((info) => !hiddenMessages.has(info.id));
+
+    this.viewStack.update((viewStack) => [...viewStack, { view, infos }]);
+    return of(true);
   }
 
-  hideInfoForActualView(): Observable<boolean> {
-    const view = this.actualPath();
-
-    const hide$ = this.getHiddenViews().pipe(
-      tap((views) => views.add(view)),
-      tap(() => {
-        this.viewStack.update((viewStack) => {
-          if (viewStack.length <= 0) {
-            return viewStack;
-          }
-          let lastItem = viewStack.pop()!;
-          // Object reference should be also change for proper signal update
-          lastItem = { ...lastItem, info: '' };
-          return [...viewStack, lastItem];
-        });
-      }),
-      map(() => true),
-    );
-
-    return this._api.hideBannerForView(view).pipe(switchMap((result) => iif(() => result, hide$, of(result))));
+  hideInfoInActualView(id: string): void {
+    if (!id.startsWith(this.actualPath())) {
+      return;
+    }
+    const hiddenMessagesIds = this.getHiddenMessagedIds();
+    hiddenMessagesIds.add(id);
+    this.syncWithStorage();
+    this.viewStack.update((viewStack) => {
+      if (viewStack.length <= 0) {
+        return viewStack;
+      }
+      let lastItem = viewStack.pop()!;
+      // Object reference should be also change for proper signal update
+      lastItem = {
+        view: lastItem.view,
+        infos: lastItem.infos.filter((info) => info.id !== id),
+      };
+      return [...viewStack, lastItem];
+    });
   }
 
-  private getHiddenViews(): Observable<Set<string>> {
-    return !!this.hiddenViews
-      ? of(this.hiddenViews)
-      : this._api.getHiddenViews().pipe(
-          map((list) => new Set(list)),
-          tap((hiddenViews) => (this.hiddenViews = hiddenViews)),
-        );
+  private getHiddenMessagedIds(): Set<string> {
+    if (this.hiddenMessagesIds) {
+      return this.hiddenMessagesIds;
+    }
+    const hiddenMessagesStr = this._localStorage.getItem(INFO_BANNER_HIDDEN_MESSAGES_KEY) ?? '[]';
+    try {
+      this.hiddenMessagesIds = new Set(JSON.parse(hiddenMessagesStr) as string[]);
+    } catch (err) {
+      this.hiddenMessagesIds = new Set<string>();
+    }
+    return this.hiddenMessagesIds;
   }
 
-  private isViewHidden(view: string): Observable<boolean> {
-    return this.getHiddenViews().pipe(map((hiddenViews) => hiddenViews.has(view)));
-  }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class InfoBannerApiMockService {
-  // TODO this service emulated backend API for info banner functionality, and should be removed in the near future
-
-  private hiddenBanners = new Set<string>();
-
-  hideBannerForView(view: string): Observable<boolean> {
-    return timer(100).pipe(
-      tap(() => this.hiddenBanners.add(view)),
-      map(() => true),
-    );
+  private syncWithStorage(): void {
+    const hiddenMessagesIds = this.getHiddenMessagedIds();
+    this._localStorage.setItem(INFO_BANNER_HIDDEN_MESSAGES_KEY, JSON.stringify(Array.from(hiddenMessagesIds)));
   }
 
-  getHiddenViews(): Observable<string[]> {
-    return timer(100).pipe(map(() => Array.from(this.hiddenBanners)));
+  private cleanupStorage(): void {
+    const hiddenMessagesIds = this.getHiddenMessagedIds();
+    let isModified = false;
+    hiddenMessagesIds.forEach((hiddenKey) => {
+      if (!this.registeredIds.has(hiddenKey)) {
+        hiddenMessagesIds.delete(hiddenKey);
+        isModified = true;
+      }
+    });
+    if (isModified) {
+      this.syncWithStorage();
+    }
   }
 }
