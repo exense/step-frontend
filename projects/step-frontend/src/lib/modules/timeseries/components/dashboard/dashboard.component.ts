@@ -32,6 +32,7 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
+  RelativeTimeSelection,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
   TimeRangePickerSelection,
@@ -51,7 +52,6 @@ import {
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
-import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -373,36 +373,58 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     if (existingSettings) {
       return this.updateRelativeRangeIfNeeded(existingSettings);
     }
+    const now = new Date().getTime() - 5000;
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
+      // no custom selection in the URL
+      let fullRange = {
+        from: this.defaultFullTimeRange!.from,
+        to: this.defaultFullTimeRange!.to || now,
+      };
       return {
         type: 'FULL',
-        absoluteSelection: {
-          from: this.defaultFullTimeRange!.from,
-          to: this.defaultFullTimeRange!.to || new Date().getTime(),
-        },
+        fullRange: fullRange,
+        defaultFullRange: this.defaultFullTimeRange,
+        selectedRange: urlParams.selectedTimeRange || fullRange,
       };
     }
-    let timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+    let timeRangeSelection: TimeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-      const foundRelativeOption = this.timeRangeOptions.find((o) => {
+      let foundRelativeOption: RelativeTimeSelection = this.timeRangeOptions.find((o) => {
         return timeInMs === o.relativeSelection?.timeInMs;
-      });
-      timeRangeSelection = foundRelativeOption || {
+      })?.relativeSelection || {
+        label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+        timeInMs: timeInMs,
+      };
+      let range = { from: now - foundRelativeOption.timeInMs, to: now };
+      return {
         type: 'RELATIVE',
-        relativeSelection: {
-          label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
-          timeInMs: timeInMs,
-        },
+        fullRange: range,
+        selectedRange: range,
+        relativeSelection: foundRelativeOption,
+        defaultFullRange: this.defaultFullTimeRange,
       };
     } else if (timeRangeSelection.type === 'ABSOLUTE') {
       // absolute
-      timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
+      return {
+        type: 'ABSOLUTE',
+        fullRange: timeRangeSelection.absoluteSelection!,
+        selectedRange: urlParams.selectedTimeRange || timeRangeSelection.absoluteSelection!,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     } else {
       // FULL
-      timeRangeSelection = { type: 'FULL' };
+      if (!this.defaultFullTimeRange) {
+        throw new Error('Default time range must be specified when using a FULL range');
+      }
+      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
+      return {
+        type: 'FULL',
+        fullRange: range,
+        selectedRange: urlParams.selectedTimeRange || range,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     }
-    return timeRangeSelection;
   }
 
   createContext(

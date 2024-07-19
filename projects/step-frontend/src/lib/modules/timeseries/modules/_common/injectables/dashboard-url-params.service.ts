@@ -7,7 +7,6 @@ import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
 import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
-import { min } from 'rxjs';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
 
