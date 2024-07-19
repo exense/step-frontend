@@ -18,6 +18,7 @@ import {
   DashletRegistryService,
   EntityRegistry,
   preloadScreenDataResolver,
+  quickAccessRoute,
   schedulePlanRoute,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -162,11 +163,13 @@ export class ExecutionModule {
   }
 
   private registerRoutes(): void {
-    this._viewRegistry.registerRoute({
-      path: 'repository',
-      component: RepositoryComponent,
-      children: [schedulePlanRoute()],
-    });
+    this._viewRegistry.registerRoute(
+      quickAccessRoute('repository', {
+        path: 'repository',
+        component: RepositoryComponent,
+        children: [schedulePlanRoute()],
+      }),
+    );
 
     this._viewRegistry.registerRoute({
       path: 'executions',
