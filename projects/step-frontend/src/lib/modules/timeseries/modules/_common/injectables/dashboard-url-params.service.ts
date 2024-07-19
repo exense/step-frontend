@@ -9,7 +9,7 @@ import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { min } from 'rxjs';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
-import { TimeRangeSettings } from '../../../components/dashboard/time-range-settings';
+import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -147,6 +147,7 @@ export class DashboardUrlParamsService {
   }
 
   updateUrlParams(context: TimeSeriesContext) {
+    console.log(context.getTimeRangeSettings());
     const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
@@ -164,15 +165,15 @@ export class DashboardUrlParamsService {
 
   private convertContextToUrlParams(
     context: TimeSeriesContext,
-    timeRangeSettings: TimeRangeSettings,
+    timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
     const params: Record<string, any> = {
       grouping: context.getGroupDimensions().join(','),
       rangeType: timeRangeSettings.type,
     };
     if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
-      params['from'] = timeRangeSettings.absoluteSelection!.from;
-      params['to'] = timeRangeSettings.absoluteSelection!.to;
+      params['from'] = timeRangeSettings.fullRange.from;
+      params['to'] = timeRangeSettings.fullRange.to;
     } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
       params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
     }

@@ -38,6 +38,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
@@ -59,7 +60,7 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
-import { TimeRangeSettings } from './time-range-settings';
+import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 @Component({
@@ -164,8 +165,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
-    const timeRangeSelection = this.computeTimeRange(existingContext?.getTimeRangeSettings(), dashboard, pageParams);
-    const context = existingContext || this.createContext(this.dashboard, pageParams, timeRangeSelection);
+    const context = existingContext || this.createContext(this.dashboard, pageParams, existingContext);
     this.resolution = context.getChartsResolution();
     this.refreshInterval = context.getRefreshInterval();
     const state: DashboardState = {
@@ -344,19 +344,35 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private computeTimeRange(
-    existingSettings: TimeRangeSettings | undefined,
+  /**
+   * If there is a cached context, which has a RELATIVE time settings, the fullRange has to be updated to the current time.
+   * @param settings
+   * @private
+   */
+  private updateRelativeRangeIfNeeded(settings: DashboardTimeRangeSettings): DashboardTimeRangeSettings {
+    const wasFullSelection = TimeSeriesUtils.intervalsEqual(settings.fullRange, settings.selectedRange);
+    if (settings.type === 'RELATIVE') {
+      const now = new Date().getTime() - 5000;
+      const newFullRange = { from: now - settings.relativeSelection!.timeInMs, to: now };
+      let newSelection: TimeRange = newFullRange;
+      if (!wasFullSelection) {
+        newSelection = TimeSeriesUtils.cropInterval(settings.selectedRange, newFullRange) || newFullRange;
+      }
+      return { ...settings, fullRange: newFullRange, selectedRange: newSelection };
+    } else {
+      return settings;
+    }
+  }
+
+  private computeTimeRangeSettings(
+    existingSettings: DashboardTimeRangeSettings | undefined,
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
-  ): TimeRangeSelection {
-    if (existingSettings) {
-      return {
-        type: existingSettings.type,
-        absoluteSelection: existingSettings.fullRange,
-        relativeSelection: existingSettings.relativeSelection,
-      };
-    }
+  ): DashboardTimeRangeSettings {
     // priority of time ranges property: 1. existingCustomSelection 2. URL 3. Default full selection 4. Dashboard
+    if (existingSettings) {
+      return this.updateRelativeRangeIfNeeded(existingSettings);
+    }
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
       return {
         type: 'FULL',
@@ -392,13 +408,18 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   createContext(
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
-    timeRangeSelection: TimeRangeSelection,
+    existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
+    const timeRangeSettings = this.computeTimeRangeSettings(
+      existingContext?.getTimeRangeSettings(),
+      dashboard,
+      urlParams,
+    );
     const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
+    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSettings);
 
     const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
@@ -410,14 +431,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       {
         id: dashboard.id!,
         dashlets: this.dashboard.dashlets,
-        timeRangeSettings: {
-          type: timeRangeSelection.type,
-          defaultFullRange: this.defaultFullTimeRange,
-          fullRange: timeRange,
-          absoluteSelection: timeRangeSelection.absoluteSelection,
-          relativeSelection: timeRangeSelection.relativeSelection,
-          selectedRange: urlParams.selectedTimeRange || timeRange,
-        },
+        // timeRangeSettings: {
+        //   type: timeRangeSettings.type,
+        //   defaultFullRange: this.defaultFullTimeRange,
+        //   fullRange: timeRange,
+        //   relativeSelection: timeRangeSettings.relativeSelection,
+        //   selectedRange: urlParams.selectedTimeRange || timeRange,
+        // },
+        timeRangeSettings: timeRangeSettings,
         selectedTimeRange: urlParams.selectedTimeRange,
         attributes: metricAttributes,
         grouping: urlParams.grouping || dashboard.grouping || [],
