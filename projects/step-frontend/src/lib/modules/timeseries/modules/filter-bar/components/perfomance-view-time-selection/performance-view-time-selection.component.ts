@@ -11,7 +11,13 @@ import {
 } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { TimeRange, TimeSeriesAPIResponse, TimeSeriesService } from '@exense/step-core';
-import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../_common';
+import {
+  COMMON_IMPORTS,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesUtils,
+  TsFilteringSettings,
+} from '../../../_common';
 import { TSRangerSettings } from '../ranger/ts-ranger-settings';
 import { TSRangerComponent } from '../ranger/ts-ranger.component';
 import { FindBucketsRequestBuilder } from '../../types/find-buckets-request-builder';
@@ -42,7 +48,7 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
     if (!this.context) {
       throw new Error('Context input is required');
     }
-    this.createRanger(this.context.getFullTimeRange()).subscribe(() => this.rangerLoaded.next());
+    this.createRanger(this.context).subscribe(() => this.rangerLoaded.next());
     this.context
       .onTimeSelectionChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
@@ -58,27 +64,21 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((range) => {
         // this.settings.timeRange = range;
-        let customSelection = undefined;
-        if (!this.context.isFullRangeSelected()) {
-          customSelection = this.context.getSelectedTimeRange();
-        }
-        this.createRanger(this.context.getFullTimeRange(), customSelection).subscribe();
+        this.createRanger(this.context).subscribe();
       });
   }
 
   refreshRanger(): Observable<TimeSeriesAPIResponse> {
-    const selection = this.context.getSelectedTimeRange();
-    return this.createRanger(
-      this.context.getFullTimeRange(),
-      this.context.isFullRangeSelected() ? undefined : selection,
-    );
+    return this.createRanger(this.context);
   }
 
-  createRanger(fullTimeRange: TimeRange, selection?: TimeRange): Observable<TimeSeriesAPIResponse> {
+  createRanger(context: TimeSeriesContext): Observable<TimeSeriesAPIResponse> {
+    const customFiltering = JSON.parse(JSON.stringify(this.context.getFilteringSettings())) as TsFilteringSettings;
+    customFiltering.filterItems = []; // ignore visible filters.
     const request = new FindBucketsRequestBuilder()
-      .withRange(fullTimeRange)
+      .withRange(context.getFullTimeRange())
       .addAttribute(TimeSeriesConfig.METRIC_TYPE_KEY, TimeSeriesConfig.METRIC_TYPE_RESPONSE_TIME)
-      .withFilteringSettings(this.context.getFilteringSettings())
+      .withFilteringSettings(customFiltering)
       .withNumberOfBuckets(TimeSeriesConfig.MAX_BUCKETS_IN_CHART)
       .withFilterAttributesMask(TimeSeriesConfig.RANGER_FILTER_FIELDS)
       .withSkipCustomOQL(true)
@@ -90,10 +90,10 @@ export class PerformanceViewTimeSelectionComponent implements OnInit {
         if (response.matrix[0]) {
           avgData = response.matrix[0].map((b) => b?.throughputPerHour || 0);
         }
-
+        const customSelection = context.isFullRangeSelected() ? undefined : context.getSelectedTimeRange();
         this.rangerSettings = {
           xValues: this.timeLabels,
-          selection: selection,
+          selection: customSelection,
           series: [
             {
               id: 'avg',

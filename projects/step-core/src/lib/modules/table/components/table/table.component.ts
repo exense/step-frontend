@@ -53,6 +53,7 @@ import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
+import { isValidRegex } from '../../../basics/step-basics.module';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
@@ -423,11 +424,19 @@ export class TableComponent<T>
   onSearch(column: string, value: string, regex?: boolean): void;
   onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
     const search = { ...this.search$.value };
+    let searchCol: SearchValue;
     if (typeof searchValue === 'string') {
-      search[column] = regex ? { value: searchValue, regex } : searchValue;
+      searchCol = regex ? { value: searchValue, regex } : searchValue;
     } else {
-      search[column] = searchValue;
+      searchCol = searchValue;
     }
+    type RegexSearchValue = { regex?: boolean; value: string };
+    if ((searchCol as RegexSearchValue)?.regex) {
+      if (!isValidRegex((searchCol as RegexSearchValue).value)) {
+        return;
+      }
+    }
+    search[column] = searchCol;
     this.search$.next(search);
   }
 

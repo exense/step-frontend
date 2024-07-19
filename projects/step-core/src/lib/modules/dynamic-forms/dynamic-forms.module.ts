@@ -7,7 +7,7 @@ import { StepMaterialModule } from '../step-material/step-material.module';
 import { DynamicTextfieldComponent } from './components/dynamic-textfield/dynamic-textfield.component';
 import { ExpressionInputComponent } from './components/expression-input/expression-input.component';
 import { DynamicFieldComponent } from './components/dynamic-field/dynamic-field.component';
-import { DynamicFieldGroupEditorComponent } from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
+import { DynamicFieldObjectEditorComponent } from './components/dynamic-field-object-editor/dynamic-field-object-editor.component';
 import { AddFieldButtonComponent } from './components/add-field-button/add-field-button.component';
 import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/dynamic-field-editor.component';
 import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-checkbox.component';
@@ -19,13 +19,17 @@ import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dia
 import { TimeRawInputComponent } from './components/time-raw-input/time-raw-input.component';
 import { DynamicTimeInputComponent } from './components/dynamic-time-input/dynamic-time-input.component';
 import { DynamicFieldIsExpressionEditorAllowedPipe } from './pipes/dynamic-field-is-expression-allowed.pipe';
+import { DynamicFieldComplexComponent } from './components/dynamic-field-complex/dynamic-field-complex.component';
+import { DynamicFieldArrayEditorComponent } from './components/dynamic-field-array-editor/dynamic-field-array-editor.component';
 
 @NgModule({
   declarations: [
     DynamicTextfieldComponent,
     ExpressionInputComponent,
     DynamicFieldComponent,
-    DynamicFieldGroupEditorComponent,
+    DynamicFieldComplexComponent,
+    DynamicFieldObjectEditorComponent,
+    DynamicFieldArrayEditorComponent,
     AddFieldButtonComponent,
     DynamicFieldEditorComponent,
     DynamicCheckboxComponent,
@@ -52,7 +56,7 @@ import { DynamicFieldIsExpressionEditorAllowedPipe } from './pipes/dynamic-field
     ExpressionInputComponent,
     DynamicFieldComponent,
     DynamicFieldEditorComponent,
-    DynamicFieldGroupEditorComponent,
+    DynamicFieldObjectEditorComponent,
     DynamicCheckboxComponent,
     AddFieldSchemaButtonComponent,
     DynamicJsonComponent,
@@ -65,7 +69,7 @@ export class DynamicFormsModule {}
 export * from './components/dynamic-textfield/dynamic-textfield.component';
 export * from './components/expression-input/expression-input.component';
 export * from './components/dynamic-field/dynamic-field.component';
-export * from './components/dynamic-field-group-editor/dynamic-field-group-editor.component';
+export * from './components/dynamic-field-object-editor/dynamic-field-object-editor.component';
 export * from './components/dynamic-field-editor/dynamic-field-editor.component';
 export * from './components/dynamic-checkbox/dynamic-checkbox.component';
 export * from './components/dynamic-json/dynamic-json.component';

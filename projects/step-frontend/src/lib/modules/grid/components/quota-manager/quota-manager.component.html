@@ -1,6 +1,7 @@
 <section>
-  <step-autorefresh-toggle [interval]="5000" (refresh)="load()"> </step-autorefresh-toggle>
+  <step-autorefresh-toggle stepTestId="quota-auto-refresh" [interval]="5000" (refresh)="load()">
+  </step-autorefresh-toggle>
   <step-form-field>
-    <textarea rows="10" readonly [ngModel]="statusText"> </textarea>
+    <textarea stepTestId="textarea-input" rows="10" readonly [ngModel]="statusText"> </textarea>
   </step-form-field>
 </section>

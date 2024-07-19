@@ -69,6 +69,7 @@ import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-para
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
+import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { TAB_EXPORTS } from './modules/tabs';
@@ -109,6 +110,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     LockColumnContainerComponent,
     LockColumnComponent,
     DashboardNavigationParamsPipe,
+    TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
@@ -212,6 +214,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    TestIdDirective,
     TAB_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
@@ -346,5 +349,6 @@ export * from './modules/drag-drop';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
+export { TestIdDirective } from './directives/test-id.directive';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
