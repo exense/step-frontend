@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -17,6 +17,7 @@ import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
   EntityRegistry,
+  NavigatorService,
   preloadScreenDataResolver,
   quickAccessRoute,
   schedulePlanRoute,
@@ -73,6 +74,9 @@ import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
 import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
+import { altExecutionGuard } from './guards/alt-execution.guard';
+import { executionGuard } from './guards/execution.guard';
+import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 
 @NgModule({
   declarations: [
@@ -238,6 +242,8 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'executions',
+      canActivate: [executionGuard],
+      canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
@@ -273,6 +279,12 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,
+      canActivate: [altExecutionGuard],
+      resolve: {
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
+      },
+      canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
       children: [
         {
           path: '',
@@ -352,6 +364,18 @@ export class ExecutionModule {
               component: AltKeywordDrilldownComponent,
             },
             schedulePlanRoute('modal'),
+            {
+              path: 'viz',
+              redirectTo: 'analytics',
+            },
+            {
+              path: 'steps',
+              redirectTo: 'report',
+            },
+            {
+              path: 'errors',
+              redirectTo: 'report',
+            },
           ],
         },
       ],

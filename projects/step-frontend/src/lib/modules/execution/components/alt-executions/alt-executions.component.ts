@@ -1,10 +1,11 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { CustomMenuEntriesService, IS_ALT_EXECUTION_MODE, IS_SMALL_SCREEN } from '@exense/step-core';
+import { CustomMenuEntriesService, IS_SMALL_SCREEN } from '@exense/step-core';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { filter, map, of, startWith, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
 
 const URL_PREFIX = 'alt-executions';
 const MAX_OPENED_EXECUTIONS = 5;
@@ -14,10 +15,7 @@ const MAX_OPENED_EXECUTIONS = 5;
   templateUrl: './alt-executions.component.html',
   styleUrl: './alt-executions.component.scss',
   providers: [
-    {
-      provide: IS_ALT_EXECUTION_MODE,
-      useValue: true,
-    },
+    provideExecutionViewMode(),
     {
       provide: ExecutionTabManagerService,
       useExisting: AltExecutionsComponent,
