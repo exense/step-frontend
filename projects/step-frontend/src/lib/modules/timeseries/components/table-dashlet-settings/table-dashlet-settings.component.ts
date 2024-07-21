@@ -72,8 +72,8 @@ export class TableDashletSettingsComponent implements OnInit {
   }
 
   onColumnPclValueChange(column: ColumnSelection, value: string) {
-    const aggregateParams = column.aggregation.params?.['pclValue'] || {};
-    const oldValue = aggregateParams;
+    const aggregateParams = column.aggregation.params || {};
+    const oldValue = aggregateParams['pclValue'];
     let parsedNumber: number = parseFloat(value);
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
     if (validPclValue) {
