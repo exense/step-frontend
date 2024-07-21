@@ -377,10 +377,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private getSecondAxesLabel(): string | undefined {
-    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation.type;
-    switch (aggregation) {
+    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation!;
+    switch (aggregation?.type) {
       case ChartAggregation.RATE:
         return 'Total Hits/' + this.selectedRateUnit.unitLabel;
+      case ChartAggregation.PERCENTILE:
+        return 'Overall PCL ' + aggregation.params?.['pclValue'];
       default:
         return 'Overall ' + aggregation;
     }
