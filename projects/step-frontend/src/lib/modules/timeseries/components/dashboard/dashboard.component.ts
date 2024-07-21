@@ -132,15 +132,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     if (this.defaultFullTimeRange?.from) {
       this.timeRangeOptions.push({ type: 'FULL' });
     }
-    const pageParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
-    this.resolution = pageParams.resolution;
+    const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     const metrics$ = this._timeSeriesService.getMetricTypes();
     const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);
     forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
       this.metricTypes = metrics;
-      this.initState(pageParams, dashboard);
+      this.initState(urlParams, dashboard);
     });
   }
 
@@ -162,10 +162,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
    * 2. Stored state
    * 3. Dashboard object
    */
-  initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
+  initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
-    const context = existingContext || this.createContext(this.dashboard, pageParams, existingContext);
+    const context = existingContext || this.createContext(this.dashboard, urlParams, existingContext);
     this.resolution = context.getChartsResolution();
     this.refreshInterval = context.getRefreshInterval();
     const state: DashboardState = {
@@ -182,7 +182,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       this.updateUrl();
     });
 
-    if (pageParams.editMode && this.hasWritePermission && this.editable) {
+    if (urlParams.editMode && this.hasWritePermission && this.editable) {
       this.enableEditMode();
     }
   }
@@ -285,15 +285,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private getInitialTableColumns(): ColumnSelection[] {
     return [
       { column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'SUM', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'AVG', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'MIN', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'MAX', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'PCL_1', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'PCL_2', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'PCL_3', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'TPS', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'TPH', aggregation: { type: ChartAggregation.COUNT } },
+      { column: 'SUM', aggregation: { type: ChartAggregation.SUM } },
+      { column: 'AVG', aggregation: { type: ChartAggregation.AVG } },
+      { column: 'MIN', aggregation: { type: ChartAggregation.MIN } },
+      { column: 'MAX', aggregation: { type: ChartAggregation.MAX } },
+      { column: 'PCL_1', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 80 } } },
+      { column: 'PCL_2', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 90 } } },
+      { column: 'PCL_3', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 99 } } },
+      { column: 'TPS', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 's' } } },
+      { column: 'TPH', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 'h' } } },
     ];
   }
 
@@ -376,7 +376,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const now = new Date().getTime() - 5000;
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
       // no custom selection in the URL
-      let fullRange = {
+      const fullRange = {
         from: this.defaultFullTimeRange!.from,
         to: this.defaultFullTimeRange!.to || now,
       };
@@ -396,11 +396,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
         timeInMs: timeInMs,
       };
-      let range = { from: now - foundRelativeOption.timeInMs, to: now };
+      const fullRange = { from: now - foundRelativeOption.timeInMs, to: now };
       return {
         type: 'RELATIVE',
-        fullRange: range,
-        selectedRange: range,
+        fullRange: fullRange,
+        selectedRange: urlParams.selectedTimeRange
+          ? TimeSeriesUtils.cropInterval(urlParams.selectedTimeRange, fullRange) || fullRange
+          : fullRange,
         relativeSelection: foundRelativeOption,
         defaultFullRange: this.defaultFullTimeRange,
       };
@@ -432,7 +434,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     urlParams: DashboardUrlParams,
     existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
-    const timeRangeSettings = this.computeTimeRangeSettings(
+    const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
       dashboard,
       urlParams,
@@ -441,7 +443,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSettings);
 
     const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
@@ -453,13 +454,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       {
         id: dashboard.id!,
         dashlets: this.dashboard.dashlets,
-        // timeRangeSettings: {
-        //   type: timeRangeSettings.type,
-        //   defaultFullRange: this.defaultFullTimeRange,
-        //   fullRange: timeRange,
-        //   relativeSelection: timeRangeSettings.relativeSelection,
-        //   selectedRange: urlParams.selectedTimeRange || timeRange,
-        // },
         timeRangeSettings: timeRangeSettings,
         selectedTimeRange: urlParams.selectedTimeRange,
         attributes: metricAttributes,

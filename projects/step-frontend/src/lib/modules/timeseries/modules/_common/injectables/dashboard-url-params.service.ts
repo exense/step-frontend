@@ -146,7 +146,6 @@ export class DashboardUrlParamsService {
   }
 
   updateUrlParams(context: TimeSeriesContext) {
-    console.log(context.getTimeRangeSettings());
     const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
@@ -167,9 +166,12 @@ export class DashboardUrlParamsService {
     timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
     const params: Record<string, any> = {
-      grouping: context.getGroupDimensions().join(','),
       rangeType: timeRangeSettings.type,
     };
+    if (context.getGroupDimensions().length > 0) {
+      params['grouping'] = context.getGroupDimensions().join(',');
+    }
+    console.log(context.getGroupDimensions());
     if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
       params['from'] = timeRangeSettings.fullRange.from;
       params['to'] = timeRangeSettings.fullRange.to;
