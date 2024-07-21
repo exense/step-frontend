@@ -1,0 +1,10 @@
+.binding-condition {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+
+  step-form-field {
+    flex-grow: 1;
+  }
+}

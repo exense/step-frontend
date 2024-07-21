@@ -6,11 +6,13 @@ import {
   DateFormat,
   DialogRouteResult,
   Parameter,
+  ScreensService,
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, map, of } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { combineLatest, map, of, switchMap, take } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
+import { ParameterConditionDialogComponent } from '../parameter-condition-dialog/parameter-condition-dialog.component';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -30,6 +32,8 @@ export class ParameterEditDialogComponent implements OnInit {
   private _api = inject(AugmentedParametersService);
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
+  private _matDialog = inject(MatDialog);
+  private _screenService = inject(ScreensService);
 
   protected parameter = this._dialogData.entity;
 
@@ -59,6 +63,27 @@ export class ParameterEditDialogComponent implements OnInit {
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
+  }
+
+  addCondition(type?: string) {
+    this._screenService
+      .getScreenInputsByScreenId('executionParameters')
+      .pipe(
+        take(1),
+        switchMap((inputs) => {
+          const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
+            data: { type, inputs },
+            width: '70rem',
+          });
+
+          return dialogRef.afterClosed();
+        }),
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.parameter.activationExpression!.script! = 'test';
+        }
+      });
   }
 
   selectScope(scopeItem: ScopeItem): void {
