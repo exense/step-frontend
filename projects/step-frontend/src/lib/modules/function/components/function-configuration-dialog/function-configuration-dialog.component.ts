@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import {
+  AfterContentInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -10,7 +11,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AlertType,
@@ -29,6 +30,7 @@ import {
   FunctionTypeComponent,
   FunctionTypeFormComponent,
   DialogRouteResult,
+  ItemInfo,
 } from '@exense/step-core';
 import { map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -45,7 +47,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     },
   ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
+export class FunctionConfigurationDialogComponent implements OnInit, AfterContentInit, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
@@ -76,6 +78,9 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   @ViewChild('functionTypeComponent', { static: true })
   private functionTypeChild!: FunctionTypeComponent;
 
+  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
+  dropdownItemsFiltered: ItemInfo[] = [];
+
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
       this._formBuilder,
@@ -97,6 +102,23 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
     }
 
     this.initStepFunction();
+  }
+
+  ngAfterContentInit(): void {
+    this.dropdownItemsFiltered = [...this.functionTypeItemInfos];
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value
+            ? this.functionTypeItemInfos.filter((item) => item.label.toLowerCase().includes(value))
+            : [...this.functionTypeItemInfos],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   protected get functionType(): string {

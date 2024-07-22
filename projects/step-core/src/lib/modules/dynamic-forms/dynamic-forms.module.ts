@@ -21,6 +21,7 @@ import { DynamicTimeInputComponent } from './components/dynamic-time-input/dynam
 import { DynamicFieldIsExpressionEditorAllowedPipe } from './pipes/dynamic-field-is-expression-allowed.pipe';
 import { DynamicFieldComplexComponent } from './components/dynamic-field-complex/dynamic-field-complex.component';
 import { DynamicFieldArrayEditorComponent } from './components/dynamic-field-array-editor/dynamic-field-array-editor.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { DynamicFieldArrayEditorComponent } from './components/dynamic-field-arr
     ReactiveFormsModule,
     ResourceInputModule,
     DynamicFieldIsExpressionEditorAllowedPipe,
+    NgxMatSelectSearchModule,
   ],
   exports: [
     AddFieldButtonComponent,
