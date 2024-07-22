@@ -171,7 +171,6 @@ export class DashboardUrlParamsService {
     if (context.getGroupDimensions().length > 0) {
       params['grouping'] = context.getGroupDimensions().join(',');
     }
-    console.log(context.getGroupDimensions());
     if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
       params['from'] = timeRangeSettings.fullRange.from;
       params['to'] = timeRangeSettings.fullRange.to;

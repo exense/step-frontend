@@ -54,7 +54,6 @@ export class TimeSeriesContext {
   private indexedMetrics: Record<string, MetricType> = {};
 
   constructor(params: TimeSeriesContextParams) {
-    console.log('initial grouping', params.grouping);
     this.id = params.id;
     this.dashlets = params.dashlets;
     params.syncGroups?.forEach((group) => (this.syncGroups[group.id] = group));
@@ -324,7 +323,6 @@ export class TimeSeriesContext {
   }
 
   updateGrouping(grouping: string[]) {
-    console.log('updating grouping', grouping);
     this.activeGroupings$.next(grouping);
   }
 

@@ -344,7 +344,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       const labelItems = this.getGroupDimensions(hasOnlyCompareData ? this.compareContext! : this.context).map(
         (a) => (baseBucket || compareBucket).attributes[a],
       );
-      console.log(labelItems);
       return {
         name: keyword,
         pclValues: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
