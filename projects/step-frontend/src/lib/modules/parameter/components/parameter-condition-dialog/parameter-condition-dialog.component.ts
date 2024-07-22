@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ArrayItemLabelValueExtractor } from '@exense/step-core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
-import { RulesFormConditionPredicateType } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/alerting/types/rules-form-condition-predicate-type.enum';
 
 interface ParameterConditionDialogData {
   type: string;
@@ -53,7 +52,6 @@ export class ParameterConditionDialogComponent implements OnInit {
     getValue: (item: string) => item,
     getLabel: (item: string) => item,
   };
-  readonly RulesFormConditionPredicateType = RulesFormConditionPredicateType;
 
   conditionForm!: FormGroup;
   modalTitle: string = '';
