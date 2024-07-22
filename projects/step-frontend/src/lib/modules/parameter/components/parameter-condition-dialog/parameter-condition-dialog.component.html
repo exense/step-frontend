@@ -13,16 +13,13 @@
           </step-form-field>
           <step-form-field>
             <mat-select formControlName="predicate">
-              @for (predicate of _predicates; track predicate.key) {
+              @for (predicate of _predicates; track predicate) {
                 <mat-option [value]="predicate.key">{{ predicate.value }}</mat-option>
               }
             </mat-select>
           </step-form-field>
           @if (conditionForm.controls['predicate'].value; as predicateValue) {
-            @if (
-              predicateValue !== RulesFormConditionPredicateType.EXISTS &&
-              predicateValue !== RulesFormConditionPredicateType.NOT_EXISTS
-            ) {
+            @if (predicateValue !== PRED.EXISTS && predicateValue !== PRED.NOT_EXISTS) {
               <step-form-field>
                 <input type="text" placeholder="Value" formControlName="value" />
               </step-form-field>

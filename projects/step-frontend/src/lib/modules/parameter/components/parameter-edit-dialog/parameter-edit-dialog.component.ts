@@ -80,10 +80,8 @@ export class ParameterEditDialogComponent implements OnInit {
         }),
       )
       .subscribe((result) => {
-        console.log(result);
         const script = this.createGroovyExpression(result);
         let tempScript = '';
-        console.log(script);
         if (result) {
           switch (type) {
             case 'OR':
