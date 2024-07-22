@@ -1,13 +1,24 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ArrayItemLabelValueExtractor } from '@exense/step-core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { RULES_CONDITION_PREDICATES } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/alerting/injectables/rules-condition-predicates.token';
 import { RulesFormConditionPredicateType } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/alerting/types/rules-form-condition-predicate-type.enum';
 
 interface ParameterConditionDialogData {
   type: string;
   inputs: any[];
+}
+
+function valueValidator(control: AbstractControl): ValidationErrors | null {
+  const predicate = control.get('predicate')?.value;
+  const value = control.get('value')?.value;
+
+  if (predicate != 'exists' && predicate != 'not_exists' && !value) {
+    return { valueRequired: true };
+  }
+
+  return null;
 }
 
 @Component({
@@ -38,11 +49,14 @@ export class ParameterConditionDialogComponent implements OnInit {
       this._bindingKeys.push(input.input.id);
     });
 
-    this.conditionForm = this._fb.group({
-      predicate: ['equals', Validators.required],
-      key: ['', Validators.required],
-      value: ['', Validators.required],
-    });
+    this.conditionForm = this._fb.group(
+      {
+        predicate: ['equals', Validators.required],
+        key: ['', Validators.required],
+        value: [''],
+      },
+      { validators: valueValidator },
+    );
 
     switch (this._dialogData.type) {
       case 'OR':

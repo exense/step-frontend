@@ -80,10 +80,53 @@ export class ParameterEditDialogComponent implements OnInit {
         }),
       )
       .subscribe((result) => {
+        console.log(result);
+        const script = this.createGroovyExpression(result);
+        let tempScript = '';
+        console.log(script);
         if (result) {
-          this.parameter.activationExpression!.script! = 'test';
+          switch (type) {
+            case 'OR':
+              tempScript = this.parameter.activationExpression!.script!;
+              this.parameter.activationExpression!.script! = `(${tempScript}) || ${script}`;
+              break;
+            case 'AND':
+              tempScript = this.parameter.activationExpression!.script!;
+              this.parameter.activationExpression!.script! = `(${tempScript}) && ${script}`;
+              break;
+            default:
+              this.parameter.activationExpression!.script! = script;
+          }
         }
       });
+  }
+
+  createGroovyExpression(input: any) {
+    let result = '';
+    const { key, predicate, value } = input;
+
+    switch (predicate) {
+      case 'equals':
+        result = `${key} == ${value}`;
+        break;
+      case 'not_equals':
+        result = `${key} != ${value}`;
+        break;
+      case 'matches':
+        result = `${key} =~ ${value}`;
+        break;
+      case 'not_matches':
+        result = `${key} !~ ${value}`;
+        break;
+      case 'exists':
+        result = `${key}`;
+        break;
+      case 'not_exists':
+        result = `!${key}`;
+        break;
+    }
+
+    return result;
   }
 
   selectScope(scopeItem: ScopeItem): void {
