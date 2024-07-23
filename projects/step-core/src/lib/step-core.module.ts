@@ -73,7 +73,6 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
-import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 
 @NgModule({
   declarations: [
@@ -148,7 +147,6 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     EXECUTION_COMMON_EXPORTS,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
-    INFO_BANNER_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -216,7 +214,6 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
     TestIdDirective,
-    INFO_BANNER_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -347,6 +344,5 @@ export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
-export * from './modules/info-banner';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';

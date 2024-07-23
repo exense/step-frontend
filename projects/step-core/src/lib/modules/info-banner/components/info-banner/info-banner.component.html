@@ -1,8 +1,0 @@
-@for (item of infos(); track item.key) {
-  <step-alert [type]="AlertType.SUCCESS">
-    <section class="info-container">
-      <div class="message" [innerHTML]="item.value"></div>
-      <step-icon class="close" name="x" (click)="closeBanner(item.key)" />
-    </section>
-  </step-alert>
-}

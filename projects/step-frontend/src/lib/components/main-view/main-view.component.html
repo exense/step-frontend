@@ -22,7 +22,6 @@
       </section>
     </header>
     <div id="step-main-scrollable-content">
-      <step-info-banner />
       <step-dashlet itemKey="projectAlerts" />
       @for (alert of adminAlerts; track alert.id) {
         <step-dashlet [itemKey]="alert.template" />
