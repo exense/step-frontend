@@ -82,7 +82,7 @@ export class ParameterEditDialogComponent implements OnInit {
           this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok');
           return this._api.newParameter();
         }),
-        delay(100),
+        delay(300),
       )
       .subscribe((parameter) => {
         this.animationState = 'visible';
