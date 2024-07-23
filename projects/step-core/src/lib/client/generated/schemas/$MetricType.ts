@@ -31,7 +31,7 @@ export const $MetricType = {
       type: 'string',
     },
     defaultAggregation: {
-      type: 'Enum',
+      type: 'MetricAggregation',
       isRequired: true,
     },
     defaultGroupingAttributes: {

@@ -2,12 +2,12 @@ import { DashboardItem, MetricAttribute, MetricType, TimeRange } from '@exense/s
 import { TimeseriesColorsPool } from './timeseries-colors-pool';
 import { TsFilteringSettings } from '../filter/ts-filtering-settings';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
-import { TimeRangeSettings } from '../../../../components/dashboard/time-range-settings';
+import { DashboardTimeRangeSettings } from '../../../../components/dashboard/dashboard-time-range-settings';
 
 export interface TimeSeriesContextParams {
   id: string;
   dashlets: DashboardItem[];
-  timeRangeSettings: TimeRangeSettings;
+  timeRangeSettings: DashboardTimeRangeSettings;
   selectedTimeRange?: TimeRange; // ranger selection
   metrics?: MetricType[];
   attributes?: MetricAttribute[];
