@@ -76,7 +76,7 @@
             (intervalChange)="handleRefreshIntervalChange($event)"
           />
         }
-        @if (hasWritePermission && editable && !dashboard?.customFields?.['locked']) {
+        @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
           @if (editMode) {
             <step-alert class="edit-alert" type="WARNING"
               >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert

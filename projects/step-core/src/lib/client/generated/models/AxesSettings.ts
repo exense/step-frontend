@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { MetricAggregation } from './MetricAggregation';
 import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
 export type AxesSettings = {
-  aggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
-  pclValue?: number;
+  aggregation: MetricAggregation;
   displayType: 'LINE' | 'BAR_CHART';
   unit: string;
   renderingSettings?: MetricRenderingSettings;

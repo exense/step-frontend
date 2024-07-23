@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import { ColumnSelection, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -69,6 +69,19 @@ export class TableDashletSettingsComponent implements OnInit {
       removable: true,
       searchEntities: [],
     });
+  }
+
+  onColumnPclValueChange(column: ColumnSelection, value: string) {
+    const aggregateParams = column.aggregation.params || {};
+    const oldValue = aggregateParams['pclValue'];
+    let parsedNumber: number = parseFloat(value);
+    const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
+    if (validPclValue) {
+      aggregateParams['pclValue'] = parsedNumber;
+    } else {
+      aggregateParams['pclValue'] = 0;
+      setTimeout(() => (aggregateParams['pclValue'] = oldValue), 100);
+    }
   }
 
   @HostListener('keydown.enter')

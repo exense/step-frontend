@@ -9,7 +9,7 @@ import { TimeSeriesUtils } from './time-series-utils';
 import { OQLBuilder } from '../oql-builder';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
 import { SeriesStroke } from './series-stroke';
-import { TimeRangeSettings } from '../../../../components/dashboard/time-range-settings';
+import { DashboardTimeRangeSettings } from '../../../../components/dashboard/dashboard-time-range-settings';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -37,7 +37,7 @@ export class TimeSeriesContext {
 
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private readonly selectedTimeRangeChange$ = new Subject<TimeRange>();
-  timeRangeSettings: TimeRangeSettings;
+  timeRangeSettings: DashboardTimeRangeSettings;
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
@@ -106,7 +106,7 @@ export class TimeSeriesContext {
     this.refreshInterval$.next(value);
   }
 
-  updateTimeRangeSettings(settings: TimeRangeSettings) {
+  updateTimeRangeSettings(settings: DashboardTimeRangeSettings) {
     this.timeRangeSettings = settings;
     this.stateChangeInternal$.next();
     // this.fullTimeRangeChange$.next(settings.fullRange);

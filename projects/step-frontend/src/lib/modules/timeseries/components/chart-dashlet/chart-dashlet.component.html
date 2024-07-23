@@ -46,7 +46,12 @@
     @if (
       (!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE'
     ) {
-      <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
+      <button
+        mat-icon-button
+        matTooltip="Settings"
+        [matMenuTriggerFor]="settingsMenu"
+        #settingsMenuTrigger="matMenuTrigger"
+      >
         <step-icon name="settings"></step-icon>
       </button>
     }
@@ -92,34 +97,10 @@
   </mat-menu>
 
   <mat-menu #aggregateMenu="matMenu">
-    @for (aggregate of AGGREGATES; track aggregate) {
-      <button
-        (click)="switchAggregate(aggregate)"
-        mat-menu-item
-        class="selected-menu-item"
-        [class.selected-menu-item]="aggregate === selectedAggregate"
-      >
-        {{ aggregate }}
-      </button>
-    }
-    <button
-      mat-menu-item
-      [matMenuTriggerFor]="pclMenu"
-      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE"
-    >
-      PERCENTILE
-    </button>
-  </mat-menu>
-
-  <mat-menu #pclMenu="matMenu">
-    @for (pcl of PCL_VALUES; track pcl) {
-      <button
-        (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl)"
-        [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && selectedPclValue === pcl"
-        mat-menu-item
-      >
-        {{ pcl }}th
-      </button>
-    }
+    <step-timeseries-aggregate-picker
+      [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+      [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+      (aggregateChange)="handleAggregateChange($event)"
+    />
   </mat-menu>
 </div>
