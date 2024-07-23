@@ -82,7 +82,13 @@
         <step-drag-column-caption>Value</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element.value.dynamic ? element.value.expression : element.value.value }}
+        @if (element.value.dynamic) {
+          <step-icon class="icon-small" name="zap-circle" matTooltip="dynamic expression" matTooltipPosition="above">
+          </step-icon>
+          {{ element.value.expression }}
+        } @else {
+          {{ element.value.value }}
+        }
       </td>
     </ng-container>
     <ng-container matColumnDef="description" stepActivityCol="Description" stepSearchCol [isHiddenByDefault]="true">

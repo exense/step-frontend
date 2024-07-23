@@ -65,7 +65,7 @@ export class ParameterEditDialogComponent implements OnInit {
     if (!this.parameter) {
       return;
     }
-    this.parameter.scopeEntity = '';
+    this.parameter.scopeEntity = undefined;
     this.parameter.scope = scopeItem.scope;
     this.selectedScope = scopeItem;
   }

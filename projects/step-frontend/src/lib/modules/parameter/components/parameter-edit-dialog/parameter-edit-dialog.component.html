@@ -50,8 +50,8 @@
         </step-form-field>
 
         <step-form-field>
-          <step-label>Value</step-label>
           @if (parameter.protectedValue) {
+            <step-label>Value</step-label>
             <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value" />
           } @else {
             <step-dynamic-textfield label="Value" [(ngModel)]="parameter.value" name="value" />

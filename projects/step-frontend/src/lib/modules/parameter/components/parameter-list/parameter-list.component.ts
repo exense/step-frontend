@@ -14,9 +14,9 @@ import {
 import { filter, switchMap } from 'rxjs';
 
 @Component({
-  selector: 'step-parameters-list',
-  templateUrl: './parameters-list.component.html',
-  styleUrls: ['./parameters-list.component.scss'],
+  selector: 'step-parameter-list',
+  templateUrl: './parameter-list.component.html',
+  styleUrls: ['./parameter-list.component.scss'],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedParametersService.PARAMETERS_TABLE_ID,
@@ -25,11 +25,11 @@ import { filter, switchMap } from 'rxjs';
     ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: DialogParentService,
-      useExisting: forwardRef(() => ParametersListComponent),
+      useExisting: forwardRef(() => ParameterListComponent),
     },
   ],
 })
-export class ParametersListComponent implements DialogParentService {
+export class ParameterListComponent implements DialogParentService {
   private _dialogs = inject(DialogsService);
   private _parametersService = inject(AugmentedParametersService);
 
