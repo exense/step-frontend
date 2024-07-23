@@ -1,10 +1,19 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges, TrackByFunction } from '@angular/core';
+import {
+  AfterContentInit,
+  Component,
+  forwardRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  TrackByFunction,
+} from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
 import { arrayToRegex, regexToArray } from '../../types/string-array-regex';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-array-filter',
@@ -17,7 +26,10 @@ import { arrayToRegex, regexToArray } from '../../types/string-array-regex';
     },
   ],
 })
-export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown> implements OnChanges {
+export class ArrayFilterComponent<T = unknown>
+  extends BaseFilterComponent<string, unknown>
+  implements OnChanges, AfterContentInit
+{
   protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
 
   protected displayItems: KeyValue<unknown, string>[] = [];
@@ -25,6 +37,24 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
   @Input() items: T[] | ReadonlyArray<T> = [];
 
   @Input() extractor?: ArrayItemLabelValueExtractor<T, unknown>;
+
+  filterNgxMultiControl: FormControl<string | null> = new FormControl<string>('');
+  dropdownItemsFiltered: KeyValue<unknown, string>[] = [];
+
+  ngAfterContentInit(): void {
+    this.dropdownItemsFiltered = [...this.displayItems];
+    this.filterNgxMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this.displayItems.filter((item) => item.value.toLowerCase().includes(value)) : [...this.displayItems],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cItems = changes['items'];
@@ -70,5 +100,6 @@ export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<strin
       const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
       return { key, value };
     });
+    this.dropdownItemsFiltered = [...this.displayItems];
   }
 }
