@@ -12,6 +12,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -22,8 +23,16 @@ interface ParameterEditDialogData {
   selector: 'step-parameter-edit-dialog',
   templateUrl: './parameter-edit-dialog.component.html',
   styleUrls: ['./parameter-edit-dialog.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      state('visible', style({ opacity: 1 })),
+      state('hidden', style({ opacity: 0 })),
+      transition('hidden <=> visible', animate('300ms ease-in-out')),
+    ]),
+  ],
 })
 export class ParameterEditDialogComponent implements OnInit {
+  animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
   private _authService = inject(AuthService);
   private _allScopeItems = inject(SCOPE_ITEMS);
@@ -65,6 +74,7 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   saveAndNext() {
+    this.animationState = 'hidden';
     this._api
       .saveParameter(this.parameter)
       .pipe(
@@ -74,6 +84,7 @@ export class ParameterEditDialogComponent implements OnInit {
         }),
       )
       .subscribe((parameter) => {
+        this.animationState = 'visible';
         this.parameter = {
           ...this.parameter,
           id: parameter.id,

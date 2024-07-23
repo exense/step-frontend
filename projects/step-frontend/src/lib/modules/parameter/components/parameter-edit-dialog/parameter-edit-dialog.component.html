@@ -1,4 +1,4 @@
-<step-modal-window [title]="modalTitle">
+<step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
   <div step-modal-window-body>
     @if (parameter) {
       <div class="step-form-fields">
@@ -92,6 +92,7 @@
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="close()">Cancel</button>
     <button
+      [hidden]="isEditMode"
       [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
       type="button"
       mat-flat-button
