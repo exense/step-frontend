@@ -283,16 +283,16 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
 
   private getInitialTableColumns(): ColumnSelection[] {
     return [
-      { column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
-      { column: 'SUM', aggregation: { type: ChartAggregation.SUM } },
-      { column: 'AVG', aggregation: { type: ChartAggregation.AVG } },
-      { column: 'MIN', aggregation: { type: ChartAggregation.MIN } },
-      { column: 'MAX', aggregation: { type: ChartAggregation.MAX } },
-      { column: 'PCL_1', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 80 } } },
-      { column: 'PCL_2', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 90 } } },
-      { column: 'PCL_3', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 99 } } },
-      { column: 'TPS', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 's' } } },
-      { column: 'TPH', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 'h' } } },
+      { selected: true, column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
+      { selected: true, column: 'SUM', aggregation: { type: ChartAggregation.SUM } },
+      { selected: true, column: 'AVG', aggregation: { type: ChartAggregation.AVG } },
+      { selected: true, column: 'MIN', aggregation: { type: ChartAggregation.MIN } },
+      { selected: true, column: 'MAX', aggregation: { type: ChartAggregation.MAX } },
+      { selected: true, column: 'PCL_1', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 80 } } },
+      { selected: true, column: 'PCL_2', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 90 } } },
+      { selected: true, column: 'PCL_3', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 99 } } },
+      { selected: true, column: 'TPS', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 's' } } },
+      { selected: true, column: 'TPH', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 'h' } } },
     ];
   }
 
