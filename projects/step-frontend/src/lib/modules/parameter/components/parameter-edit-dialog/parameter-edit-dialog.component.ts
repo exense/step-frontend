@@ -9,7 +9,7 @@ import {
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, map, of, switchMap } from 'rxjs';
+import { combineLatest, delay, map, of, switchMap } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -82,6 +82,7 @@ export class ParameterEditDialogComponent implements OnInit {
           this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok');
           return this._api.newParameter();
         }),
+        delay(100),
       )
       .subscribe((parameter) => {
         this.animationState = 'visible';
