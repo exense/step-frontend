@@ -54,7 +54,7 @@
           @if (parameter.protectedValue) {
             <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value" />
           } @else {
-            <textarea placeholder="Value" rows="5" [(ngModel)]="parameter.value"> </textarea>
+            <step-dynamic-textfield label="Value" [(ngModel)]="parameter.value" name="value" />
           }
         </step-form-field>
 
