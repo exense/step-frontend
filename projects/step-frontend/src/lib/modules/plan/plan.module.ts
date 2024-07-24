@@ -11,8 +11,8 @@ import {
   PlanCreateDialogComponent,
   PlanLinkComponent,
   preloadScreenDataResolver,
+  quickAccessRoute,
   schedulePlanRoute,
-  stepRouteAdditionalConfig,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -47,12 +47,6 @@ export class PlanModule {
         planScreenData: preloadScreenDataResolver('plan'),
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
-      canActivate: [
-        () => {
-          console.log('PLANS CAN ACTIVATE');
-          return true;
-        },
-      ],
       component: SimpleOutletComponent,
       children: [
         {
@@ -113,50 +107,44 @@ export class PlanModule {
             },
           ],
         },
-        stepRouteAdditionalConfig(
-          {
-            quickAccessAlias: 'plansEditor',
-            infoBannerKey: 'plansEditor',
-          },
-          {
-            path: 'editor/:id',
-            component: PlanEditorComponent,
-            canActivate: [
-              checkEntityGuardFactory({
-                entityType: 'plan',
-                getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
-                getEditorUrl: (id, route) => {
-                  const planEditLink = inject(CommonEntitiesUrlsService).planEditorUrl(id);
-                  const artefactId = route.queryParams['artefactId'];
+        quickAccessRoute('plansEditor', {
+          path: 'editor/:id',
+          component: PlanEditorComponent,
+          canActivate: [
+            checkEntityGuardFactory({
+              entityType: 'plan',
+              getEntity: (id) => inject(AugmentedPlansService).getPlanByIdCached(id),
+              getEditorUrl: (id, route) => {
+                const planEditLink = inject(CommonEntitiesUrlsService).planEditorUrl(id);
+                const artefactId = route.queryParams['artefactId'];
 
-                  const editLinkParams = !artefactId
-                    ? planEditLink
-                    : {
-                        url: planEditLink,
-                        search: { ['artefactId']: artefactId },
-                      };
-                  return editLinkParams;
-                },
-              }),
-            ],
-            resolve: {
-              plan: (route: ActivatedRouteSnapshot) => {
-                const id = route.params['id'];
-                if (!id) {
-                  return undefined;
-                }
-                return inject(AugmentedPlansService).getPlanByIdCached(id);
+                const editLinkParams = !artefactId
+                  ? planEditLink
+                  : {
+                      url: planEditLink,
+                      search: { ['artefactId']: artefactId },
+                    };
+                return editLinkParams;
               },
+            }),
+          ],
+          resolve: {
+            plan: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              if (!id) {
+                return undefined;
+              }
+              return inject(AugmentedPlansService).getPlanByIdCached(id);
             },
-            canDeactivate: [
-              () => {
-                inject(AugmentedPlansService).cleanupCache();
-                return true;
-              },
-            ],
-            children: [schedulePlanRoute()],
           },
-        ),
+          canDeactivate: [
+            () => {
+              inject(AugmentedPlansService).cleanupCache();
+              return true;
+            },
+          ],
+          children: [schedulePlanRoute()],
+        }),
       ],
     });
   }
