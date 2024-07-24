@@ -64,21 +64,6 @@
     @if (!item.readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
     }
-    @if (selectedAggregate === 'RATE') {
-      <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
-    }
-  </mat-menu>
-
-  <mat-menu #rateUnitMenu="matMenu">
-    @for (rate of RATE_UNITS; track rate.tphMultiplier) {
-      <button
-        mat-menu-item
-        [class.selected-menu-item]="rate.tphMultiplier === selectedRateUnit.tphMultiplier"
-        (click)="switchRateUnit(rate)"
-      >
-        {{ rate.menuLabel }}
-      </button>
-    }
   </mat-menu>
 
   <mat-menu #groupingMenu="matMenu">

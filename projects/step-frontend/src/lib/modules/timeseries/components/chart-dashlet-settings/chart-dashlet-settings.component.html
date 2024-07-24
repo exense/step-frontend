@@ -182,7 +182,7 @@
           </step-form-field>
           <mat-menu #aggregateMenu="matMenu">
             <step-timeseries-aggregate-picker
-              [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+              [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
               [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
               (aggregateChange)="handlePrimaryAggregationChange($event)"
             />

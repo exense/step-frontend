@@ -52,6 +52,7 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = JSON.parse(JSON.stringify(this._inputData.item));
+    console.log(this.item);
     this.tableDashlets = this._inputData.context.getDashlets().filter((i) => i.type === 'TABLE');
     if (this.item.masterChartId) {
       this.masterDashlet = this.tableDashlets.find((d) => d.id === this.item.masterChartId);

@@ -6,15 +6,22 @@
     (click)="switchAggregate(agr)"
     mat-menu-item
     class="selected-menu-item"
-    [class.selected-menu-item]="agr === selectedAggregate"
+    [class.selected-menu-item]="agr === selectedAggregate?.type"
   >
     {{ agr }}
   </button>
 }
 <button
   mat-menu-item
+  [matMenuTriggerFor]="rateUnitMenu"
+  [class.selected-menu-item]="selectedAggregate?.type === ChartAggregation.RATE"
+>
+  RATE
+</button>
+<button
+  mat-menu-item
   [matMenuTriggerFor]="pclMenu"
-  [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE"
+  [class.selected-menu-item]="selectedAggregate?.type === ChartAggregation.PERCENTILE"
 >
   PERCENTILE
 </button>
@@ -22,7 +29,7 @@
   @for (pcl of PCL_VALUES; track pcl) {
     <button
       (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl); customPclValueInput = undefined"
-      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && pclValue === pcl"
+      [class.selected-menu-item]="selectedAggregate?.type === ChartAggregation.PERCENTILE && pclValue === pcl"
       mat-menu-item
     >
       {{ pcl }}th
@@ -47,4 +54,12 @@
       Apply
     </button>
   </div>
+</mat-menu>
+
+<mat-menu #rateUnitMenu="matMenu">
+  @for (rate of RATE_UNITS; track rate.tphMultiplier) {
+    <button mat-menu-item (click)="selectRateAggregate(rate)">
+      {{ rate.menuLabel }}
+    </button>
+  }
 </mat-menu>
