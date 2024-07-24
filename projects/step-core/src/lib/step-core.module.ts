@@ -74,6 +74,7 @@ import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
+import { MarkdownComponent } from './components/markdown/markdown.component';
 
 @NgModule({
   declarations: [
@@ -113,6 +114,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    MarkdownComponent,
   ],
   imports: [
     CommonModule,
@@ -219,6 +221,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     INFO_BANNER_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    MarkdownComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -350,3 +353,4 @@ export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
+export * from './components/markdown/markdown.component';
