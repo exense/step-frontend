@@ -58,7 +58,11 @@
 
 <mat-menu #rateUnitMenu="matMenu">
   @for (rate of RATE_UNITS; track rate.tphMultiplier) {
-    <button mat-menu-item (click)="selectRateAggregate(rate)">
+    <button
+      mat-menu-item
+      (click)="selectRateAggregate(rate)"
+      [class.selected-menu-item]="rate.unitLabel === selectedAggregate?.params?.['rateUnit']"
+    >
       {{ rate.menuLabel }}
     </button>
   }
