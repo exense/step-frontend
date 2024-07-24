@@ -95,8 +95,7 @@
       [hidden]="isEditMode"
       [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
       type="button"
-      mat-flat-button
-      color="primary"
+      mat-stroked-button
       (click)="saveAndNext()"
     >
       Save & next
