@@ -24,9 +24,10 @@ import { ParametersBulkOperationsRegisterService } from './services/parameters-b
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
 import { ParameterConditionDialogComponent } from './components/parameter-condition-dialog/parameter-condition-dialog.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule],
+  imports: [StepCoreModule, StepCommonModule, NgxMatSelectSearchModule],
   exports: [ParametersListComponent, ParameterSelectionComponent],
   declarations: [
     ParametersListComponent,

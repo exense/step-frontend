@@ -73,7 +73,7 @@ export class ParameterEditDialogComponent implements OnInit {
         switchMap((inputs) => {
           const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
             data: { type, inputs },
-            width: '70rem',
+            width: '50rem',
           });
 
           return dialogRef.afterClosed();

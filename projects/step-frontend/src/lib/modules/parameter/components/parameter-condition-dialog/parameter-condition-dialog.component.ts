@@ -1,7 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ArrayItemLabelValueExtractor } from '@exense/step-core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 interface ParameterConditionDialogData {
   type: string;
@@ -52,10 +54,14 @@ export class ParameterConditionDialogComponent implements OnInit {
     getValue: (item: string) => item,
     getLabel: (item: string) => item,
   };
+  protected _destroyRef = inject(DestroyRef);
 
   conditionForm!: FormGroup;
   modalTitle: string = '';
   inputs: string[] = [];
+
+  filterPredicateControl: FormControl<string | null> = new FormControl<string>('');
+  dropdownItemsFiltered: Array<{ key: string; value: string }> = [];
 
   ngOnInit(): void {
     this._dialogData.inputs.forEach((input) => {
@@ -81,6 +87,19 @@ export class ParameterConditionDialogComponent implements OnInit {
       default:
         this.modalTitle = 'Add condition';
     }
+
+    this.dropdownItemsFiltered = [...this._predicates];
+    this.filterPredicateControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this._predicates.filter((item) => item.value.toLowerCase().includes(value)) : [...this._predicates],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
   }
 
   save(): void {

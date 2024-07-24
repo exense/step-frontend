@@ -13,7 +13,18 @@
           </step-form-field>
           <step-form-field>
             <mat-select formControlName="predicate">
-              @for (predicate of _predicates; track predicate) {
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="filterPredicateControl"
+                  name="filterMultiControl"
+                  ngDefaultControl
+                  placeholderLabel="Search..."
+                  noEntriesFoundLabel="No matching entries found"
+                >
+                  <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                </ngx-mat-select-search>
+              </mat-option>
+              @for (predicate of dropdownItemsFiltered; track predicate) {
                 <mat-option [value]="predicate.key">{{ predicate.value }}</mat-option>
               }
             </mat-select>
