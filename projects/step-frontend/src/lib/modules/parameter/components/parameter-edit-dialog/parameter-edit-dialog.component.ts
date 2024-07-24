@@ -86,11 +86,11 @@ export class ParameterEditDialogComponent implements OnInit {
           switch (type) {
             case 'OR':
               tempScript = this.parameter.activationExpression!.script!;
-              this.parameter.activationExpression!.script! = `(${tempScript}) || ${script}`;
+              this.parameter.activationExpression!.script! = `${tempScript} || ${script}`;
               break;
             case 'AND':
               tempScript = this.parameter.activationExpression!.script!;
-              this.parameter.activationExpression!.script! = `(${tempScript}) && ${script}`;
+              this.parameter.activationExpression!.script! = `${tempScript} && ${script}`;
               break;
             default:
               this.parameter.activationExpression!.script! = script;
