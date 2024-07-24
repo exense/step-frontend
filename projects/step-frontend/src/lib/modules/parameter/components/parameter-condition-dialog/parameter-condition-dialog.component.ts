@@ -61,7 +61,9 @@ export class ParameterConditionDialogComponent implements OnInit {
   inputs: string[] = [];
 
   filterPredicateControl: FormControl<string | null> = new FormControl<string>('');
+  filterKeyControl: FormControl<string | null> = new FormControl<string>('');
   dropdownItemsFiltered: Array<{ key: string; value: string }> = [];
+  dropdownKeysFiltered: Array<{ key: string; value: string }> = [];
 
   ngOnInit(): void {
     this._dialogData.inputs.forEach((input) => {
@@ -87,6 +89,19 @@ export class ParameterConditionDialogComponent implements OnInit {
       default:
         this.modalTitle = 'Add condition';
     }
+
+    this.dropdownKeysFiltered = [...this._bindingKeys];
+    this.filterKeyControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? this._bindingKeys.filter((item) => item.toLowerCase().includes(value)) : [...this._bindingKeys],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownKeysFiltered = displayItemsFiltered;
+      });
 
     this.dropdownItemsFiltered = [...this._predicates];
     this.filterPredicateControl.valueChanges

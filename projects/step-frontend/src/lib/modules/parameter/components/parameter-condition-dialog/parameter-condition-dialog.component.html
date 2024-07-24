@@ -4,19 +4,17 @@
       <div [formGroup]="conditionForm">
         <div class="binding-condition">
           <step-form-field>
-            <step-autocomplete-input
-              placeHolder="Key"
-              formControlName="key"
-              [possibleItems]="_bindingKeys"
-              [valueLabelExtractor]="bindingKeyExtractor"
-            />
-          </step-form-field>
-          <step-form-field>
-            <mat-select formControlName="predicate">
+            <!--            <step-autocomplete-input-->
+            <!--              placeHolder="Key"-->
+            <!--              formControlName="key"-->
+            <!--              [possibleItems]="_bindingKeys"-->
+            <!--              [valueLabelExtractor]="bindingKeyExtractor"-->
+            <!--            />-->
+            <mat-select formControlName="key" placeholder="Key">
               <mat-option>
                 <ngx-mat-select-search
-                  [formControl]="filterPredicateControl"
-                  name="filterMultiControl"
+                  [formControl]="filterKeyControl"
+                  name="filterKeyControl"
                   ngDefaultControl
                   placeholderLabel="Search..."
                   noEntriesFoundLabel="No matching entries found"
@@ -24,11 +22,33 @@
                   <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
                 </ngx-mat-select-search>
               </mat-option>
-              @for (predicate of dropdownItemsFiltered; track predicate) {
-                <mat-option [value]="predicate.key">{{ predicate.value }}</mat-option>
+              @for (key of dropdownKeysFiltered; track key) {
+                <mat-option [value]="key">{{ key }}</mat-option>
               }
             </mat-select>
           </step-form-field>
+          <div class="predicate-flex">
+            <span class="predicate-line"></span>
+            <step-form-field class="predicate">
+              <mat-select formControlName="predicate">
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="filterPredicateControl"
+                    name="filterPredicateControl"
+                    ngDefaultControl
+                    placeholderLabel="Search..."
+                    noEntriesFoundLabel="No matching entries found"
+                  >
+                    <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                  </ngx-mat-select-search>
+                </mat-option>
+                @for (predicate of dropdownItemsFiltered; track predicate) {
+                  <mat-option [value]="predicate.key">{{ predicate.value }}</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+            <span class="predicate-line"></span>
+          </div>
           @if (conditionForm.controls['predicate'].value; as predicateValue) {
             @if (predicateValue !== PRED.EXISTS && predicateValue !== PRED.NOT_EXISTS) {
               <step-form-field>

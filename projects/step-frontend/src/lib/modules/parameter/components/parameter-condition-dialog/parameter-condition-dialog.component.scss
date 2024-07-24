@@ -5,7 +5,28 @@
   gap: 1rem;
   margin-top: 2rem;
 
+  .predicate-flex {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
   step-form-field {
     flex-grow: 1;
+  }
+
+  step-form-field.predicate {
+    flex-grow: 0;
+    width: 50%;
+    align-self: center;
+  }
+
+  .predicate-line {
+    display: flex;
+    height: 2px;
+    flex-grow: 1;
+    background-color: #d0d5dd;
+    align-self: center;
   }
 }
