@@ -38,9 +38,20 @@
           (ngModelChange)="fetchStepFunction($event)"
           [ngModelOptions]="{ standalone: true }"
         >
-          <mat-option *ngFor="let itemInfo of functionTypeItemInfos" [value]="itemInfo.type">
-            {{ itemInfo.label }}
+          <mat-option>
+            <ngx-mat-select-search
+              [formControl]="filterMultiControl"
+              name="filterMultiControl"
+              ngDefaultControl
+              placeholderLabel="Search..."
+              noEntriesFoundLabel="No matching entries found"
+            >
+              <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+            </ngx-mat-select-search>
           </mat-option>
+          @for (itemInfo of dropdownItemsFiltered; track itemInfo) {
+            <mat-option [value]="itemInfo.type">{{ itemInfo.label }}</mat-option>
+          }
         </mat-select>
       </step-form-field>
 

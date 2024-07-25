@@ -20,7 +20,9 @@ import {
 } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
+  AggregatorType,
   BucketResponse,
+  ColumnSelection,
   DashboardItem,
   FetchBucketsRequest,
   MarkerType,
@@ -39,6 +41,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
+import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+
+interface TableColumn {
+  id: string;
+  // type: TableColumnType;
+  label: string;
+  subLabel?: string;
+  pclValue?: number;
+  mapValue: (bucket: ProcessedBucket) => any;
+  mapDiffValue: (entry: TableEntry) => number | undefined;
+  isVisible: boolean;
+}
 
 export interface TableEntry {
   name: string; // series id
@@ -46,15 +60,16 @@ export interface TableEntry {
   base?: ProcessedBucket;
   compare?: ProcessedBucket;
   stroke: SeriesStroke;
+  pclValues: number[];
   isSelected?: boolean;
   countDiff?: number;
   sumDiff?: number;
   avgDiff?: number;
   minDiff?: number;
   maxDiff?: number;
-  pcl80Diff?: number;
-  pcl90Diff?: number;
-  pcl99Diff?: number;
+  pcl1Diff?: number;
+  pcl2Diff?: number;
+  pcl3Diff?: number;
   tpsDiff?: number;
   tphDiff?: number;
 }
@@ -118,8 +133,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   baseRequestOql: string = '';
   compareRequestOql: string = '';
 
-  readonly MarkerType = MarkerType;
-
   ngOnInit(): void {
     if (!this.item) {
       throw new Error('Dashlet item cannot be undefined');
@@ -145,34 +158,61 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private prepareState() {
     this.item.attributes?.forEach((attr) => (this.attributesByIds[attr.name] = attr));
-    this.columnsDefinition = this.item.tableSettings!.columns!.map((column) => {
+    this.columnsDefinition = this.item.tableSettings!.columns!.map((column: ColumnSelection) => {
       return {
         id: column.column!,
-        label: ColumnsLabels[column.column] + this.getLabelUnit(column.column),
-        isVisible: column.selected,
-        mapValue: ColumnsValueFunctions[column.column!],
+        label: this.getColumnLabel(column),
+        isVisible: column.selected!,
+        pclValue: column.aggregation.params?.['pclValue'],
+        mapValue: this.getBucketMapFunction(column),
         mapDiffValue: ColumnsDiffFunctions[column.column!],
-      } as TableColumn;
+      };
     });
     this.updateVisibleColumns();
   }
 
-  private getLabelUnit(
-    column: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' | 'PCL_80' | 'PCL_90' | 'PCL_99' | 'TPS' | 'TPH',
-  ): string {
-    switch (column) {
-      case 'COUNT':
-      case 'TPS':
-      case 'TPH':
-        return '';
-      default:
-        const unit = this.context.getMetric(this.item.metricKey).unit;
-        if (unit === '1') {
-          return '';
-        } else {
-          return ` (${unit})`;
+  private getColumnLabel(column: ColumnSelection): string {
+    switch (column.aggregation.type) {
+      case ChartAggregation.PERCENTILE:
+        const pcl = column.aggregation.params?.['pclValue'];
+        return `Pcl. ${pcl || 90}`;
+      case ChartAggregation.RATE:
+        const rateUnit = column.aggregation.params?.['rateUnit'];
+        switch (rateUnit) {
+          case 's':
+            return 'Tps';
+          case 'h':
+            return 'Tph';
+          default:
+            return 'Throughput';
         }
+      default:
+        return AggregateLabels[column.aggregation.type];
     }
+  }
+
+  private getBucketMapFunction(column: ColumnSelection): (bucket: ProcessedBucket) => any {
+    switch (column.aggregation.type) {
+      case 'PERCENTILE':
+        const pcl = column.aggregation.params?.['pclValue'];
+        return (b: ProcessedBucket) => b?.pclValues![this.getPclWithDecimals(pcl)];
+      case 'RATE':
+        const rateUnit = column.aggregation.params?.['rateUnit'];
+        switch (rateUnit) {
+          case 's':
+            return (b: ProcessedBucket) => b?.tps;
+          case 'h':
+          default:
+            return (b: ProcessedBucket) => b?.tph;
+        }
+      default:
+        return ColumnsValueFunctions[column.aggregation.type];
+    }
+  }
+
+  private getPclWithDecimals(value: number) {
+    if (Math.floor(value) === value) return value.toFixed(1);
+    return value;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -218,7 +258,27 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   onColumnVisibilityChange(column: TableColumn): void {
     const newVisible = !column.isVisible;
     // update the chart settings
-    this.settings.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
+    this.settings?.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
+  }
+
+  onColumnPclValueChange(column: TableColumn, value: string) {
+    const oldValue = column.pclValue;
+    let parsedNumber: number = parseFloat(value);
+    const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
+    if (validPclValue) {
+      column.pclValue = parsedNumber;
+      this.item.tableSettings!.columns.find((c) => c.column === column.id)!.aggregation!.params!['pclValue'] =
+        parsedNumber;
+      this.prepareState();
+      this.refresh(true).subscribe(() => {
+        if (this.compareModeEnabled) {
+          this.refreshCompareData().subscribe();
+        }
+      });
+    } else {
+      column.pclValue = 0;
+      setTimeout(() => (column.pclValue = oldValue), 100);
+    }
   }
 
   private getGroupDimensions(context: TimeSeriesContext): string[] {
@@ -239,7 +299,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       groupDimensions: this.getGroupDimensions(context),
       oqlFilter: oql,
       numberOfBuckets: 1,
-      percentiles: [80, 90, 99],
+      percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
     };
     return this._timeSeriesService
       .getTimeSeries(request)
@@ -253,27 +313,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         this.truncated = response.truncated;
       }),
     );
-  }
-
-  private getFilterItems(context: TimeSeriesContext): FilterBarItem[] {
-    const metricItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${this.item.metricKey}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
-    if (this.item.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        context.getFilteringSettings().filterItems,
-        this.item.filters,
-      );
-    } else {
-      filterItems = this.item.filters.map(FilterUtils.convertApiFilterItem);
-    }
-    filterItems.push(metricItem);
-    return filterItems;
   }
 
   private mergeBaseAndCompareData(): TableEntry[] {
@@ -297,6 +336,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       ...new Set([...Object.keys(baseBucketsByIds), ...(compareBuckets ? Object.keys(compareBucketsByIds) : [])]),
     ];
     allSeriesIds = allSeriesIds.sort();
+    const pclValues: number[] = this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!);
     const entries: TableEntry[] = allSeriesIds.map((keyword) => {
       const baseBucket: ProcessedBucket = baseBucketsByIds[keyword];
       const compareBucket: ProcessedBucket = compareBucketsByIds[keyword];
@@ -306,6 +346,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       );
       return {
         name: keyword,
+        pclValues: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
         base: baseBucket,
         compare: compareBucket,
         groupingLabels: labelItems,
@@ -319,9 +360,18 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
         minDiff: this.percentageBetween(baseBucket?.min, compareBucket?.min),
         maxDiff: this.percentageBetween(baseBucket?.max, compareBucket?.max),
-        pcl80Diff: this.percentageBetween(baseBucket?.pclValues?.[80], compareBucket?.pclValues?.[80]),
-        pcl90Diff: this.percentageBetween(baseBucket?.pclValues?.[90], compareBucket?.pclValues?.[90]),
-        pcl99Diff: this.percentageBetween(baseBucket?.pclValues?.[99], compareBucket?.pclValues?.[99]),
+        pcl80Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[0]],
+          compareBucket?.pclValues?.[pclValues[0]],
+        ),
+        pcl90Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[1]],
+          compareBucket?.pclValues?.[pclValues[1]],
+        ),
+        pcl99Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[pclValues[2]],
+          compareBucket?.pclValues?.[pclValues[2]],
+        ),
         tpsDiff: this.percentageBetween(baseBucket?.tps, compareBucket?.tps),
         tphDiff: this.percentageBetween(baseBucket?.tph, compareBucket?.tph),
       };
@@ -475,15 +525,24 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('MAX', (item) => item.base?.max)
       .addSortNumberPredicate('MAX_comp', (item) => item.compare?.max)
       .addSortNumberPredicate('MAX_diff', (item) => item.maxDiff)
-      .addSortNumberPredicate('PCL_80', (item) => item.base?.pclValues?.[80])
-      .addSortNumberPredicate('PCL_80_comp', (item) => item.compare?.pclValues?.[80])
-      .addSortNumberPredicate('PCL_80_diff', (item) => item.pcl80Diff)
-      .addSortNumberPredicate('PCL_90', (item) => item.base?.pclValues?.[90])
-      .addSortNumberPredicate('PCL_90_comp', (item) => item.compare?.pclValues?.[90])
-      .addSortNumberPredicate('PCL_90_diff', (item) => item.pcl90Diff)
-      .addSortNumberPredicate('PCL_99', (item) => item.base?.pclValues?.[99])
-      .addSortNumberPredicate('PCL_99_comp', (item) => item.compare?.pclValues?.[99])
-      .addSortNumberPredicate('PCL_99_diff', (item) => item.pcl99Diff)
+      .addSortNumberPredicate('PCL_1', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])])
+      .addSortNumberPredicate(
+        'PCL_80_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])],
+      )
+      .addSortNumberPredicate('PCL_1_diff', (item) => item.pcl1Diff)
+      .addSortNumberPredicate('PCL_2', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])])
+      .addSortNumberPredicate(
+        'PCL_90_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])],
+      )
+      .addSortNumberPredicate('PCL_2_diff', (item) => item.pcl2Diff)
+      .addSortNumberPredicate('PCL_3', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])])
+      .addSortNumberPredicate(
+        'PCL_99_comp',
+        (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])],
+      )
+      .addSortNumberPredicate('PCL_3_diff', (item) => item.pcl3Diff)
       .addSortNumberPredicate('TPS', (item) => item.base?.tps)
       .addSortNumberPredicate('TPS_comp', (item) => item.compare?.tps)
       .addSortNumberPredicate('TPS_diff', (item) => item.tpsDiff)
@@ -513,51 +572,31 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 }
 
-interface TableColumn {
-  id: string;
-  // type: TableColumnType;
-  label: string;
-  subLabel?: string;
-  mapValue: (bucket: BucketResponse) => any;
-  mapDiffValue: (entry: TableEntry) => number | undefined;
-  isVisible: boolean;
-}
-
-const ColumnsValueFunctions = {
-  [TableColumnType.COUNT]: (b: ProcessedBucket) => b?.count,
-  [TableColumnType.SUM]: (b: ProcessedBucket) => b?.sum,
-  [TableColumnType.AVG]: (b: ProcessedBucket) => b?.avg,
-  [TableColumnType.MIN]: (b: ProcessedBucket) => b?.min,
-  [TableColumnType.MAX]: (b: ProcessedBucket) => b?.max,
-  [TableColumnType.PCL_80]: (b: ProcessedBucket) => b?.pclValues?.[80],
-  [TableColumnType.PCL_90]: (b: ProcessedBucket) => b?.pclValues?.[90],
-  [TableColumnType.PCL_99]: (b: ProcessedBucket) => b?.pclValues?.[99],
-  [TableColumnType.TPS]: (b: ProcessedBucket) => b?.tps,
-  [TableColumnType.TPH]: (b: ProcessedBucket) => b?.tph,
+const ColumnsValueFunctions: Record<string, any> = {
+  [ChartAggregation.COUNT]: (b: ProcessedBucket) => b?.count,
+  [ChartAggregation.SUM]: (b: ProcessedBucket) => b?.sum,
+  [ChartAggregation.AVG]: (b: ProcessedBucket) => b?.avg,
+  [ChartAggregation.MIN]: (b: ProcessedBucket) => b?.min,
+  [ChartAggregation.MAX]: (b: ProcessedBucket) => b?.max,
 };
 
-const ColumnsDiffFunctions: Record<TableColumnType, (entry: TableEntry) => number | undefined> = {
+const ColumnsDiffFunctions: Record<string, (entry: TableEntry) => number | undefined> = {
   [TableColumnType.COUNT]: (entry: TableEntry) => entry.countDiff,
   [TableColumnType.SUM]: (entry: TableEntry) => entry.sumDiff,
   [TableColumnType.AVG]: (entry: TableEntry) => entry.avgDiff,
+  [TableColumnType.PCL_1]: (entry: TableEntry) => entry.pcl1Diff,
+  [TableColumnType.PCL_2]: (entry: TableEntry) => entry.pcl2Diff,
+  [TableColumnType.PCL_3]: (entry: TableEntry) => entry.pcl3Diff,
   [TableColumnType.MIN]: (entry: TableEntry) => entry.minDiff,
   [TableColumnType.MAX]: (entry: TableEntry) => entry.maxDiff,
-  [TableColumnType.PCL_80]: (entry: TableEntry) => entry.pcl80Diff,
-  [TableColumnType.PCL_90]: (entry: TableEntry) => entry.pcl90Diff,
-  [TableColumnType.PCL_99]: (entry: TableEntry) => entry.pcl99Diff,
   [TableColumnType.TPS]: (entry: TableEntry) => entry.tpsDiff,
   [TableColumnType.TPH]: (entry: TableEntry) => entry.tphDiff,
 };
 
-const ColumnsLabels = {
-  [TableColumnType.COUNT]: 'Count',
-  [TableColumnType.SUM]: 'Sum',
-  [TableColumnType.AVG]: 'Avg',
-  [TableColumnType.MIN]: 'Min',
-  [TableColumnType.MAX]: 'Max',
-  [TableColumnType.PCL_80]: 'Pcl. 80',
-  [TableColumnType.PCL_90]: 'Pcl. 90',
-  [TableColumnType.PCL_99]: 'Pcl. 99',
-  [TableColumnType.TPS]: 'Tps',
-  [TableColumnType.TPH]: 'Tph',
+const AggregateLabels: Record<string, string> = {
+  [ChartAggregation.COUNT]: 'Count',
+  [ChartAggregation.SUM]: 'Sum',
+  [ChartAggregation.AVG]: 'Avg',
+  [ChartAggregation.MIN]: 'Min',
+  [ChartAggregation.MAX]: 'Max',
 };

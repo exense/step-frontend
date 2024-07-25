@@ -2,7 +2,7 @@ import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchM
 import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
-import { TimeRangeSettings } from './time-range-settings';
+import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { TimeRangeType } from './time-range-type';
 
 export class DashboardStateEngine {
@@ -52,23 +52,21 @@ export class DashboardStateEngine {
       case 'ABSOLUTE':
         break;
       case 'RELATIVE':
-        const isFullTimeSelection =
-          timeRangeSettings.selectedRange.from === timeRangeSettings.fullRange.from &&
-          timeRangeSettings.selectedRange.to === timeRangeSettings.fullRange.to;
+        const isFullTimeSelection = TimeSeriesUtils.intervalsEqual(
+          timeRangeSettings.selectedRange,
+          timeRangeSettings.fullRange,
+        );
         const fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
         timeRangeSettings.fullRange = fullRange;
         if (isFullTimeSelection) {
           timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange };
         } else {
           // we have a custom selection. has to be cropped if needed
-          const currentSelection = timeRangeSettings.selectedRange;
-          const newFrom = Math.max(fullRange.from!, currentSelection.from!);
-          const newTo = Math.min(fullRange.to!, currentSelection.to!);
-          const minimumIntervalSize = 3; // a bug from uPlot used to throw intervals with size 1 and 2 from time to time, even if it is empty
-          if (newTo - newFrom < minimumIntervalSize) {
-            timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange }; // zoom reset when the interval is very small
+          const croppedSelection = TimeSeriesUtils.cropInterval(timeRangeSettings.selectedRange, fullRange);
+          if (croppedSelection) {
+            timeRangeSettings.selectedRange = croppedSelection;
           } else {
-            timeRangeSettings.selectedRange = { from: newFrom, to: newTo };
+            timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange }; // zoom reset when the interval is very small
           }
         }
         break;
@@ -107,7 +105,7 @@ export class DashboardStateEngine {
    */
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
     const oldSettings = this.state.context.getTimeRangeSettings();
-    let newSettings: TimeRangeSettings;
+    let newSettings: DashboardTimeRangeSettings;
     switch (params.selection.type) {
       case 'FULL':
         const fullRange = {

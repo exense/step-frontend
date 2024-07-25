@@ -12,6 +12,9 @@ export class TimeSeriesConfig {
   static readonly SECONDARY_AXES_KEY = 'z';
   static readonly SERIES_DEFAULT_COLOR = '#138aff';
 
+  static readonly PCL_VALUE_PARAM = 'pclValue';
+  static readonly RATE_UNIT_PARAM = 'rateUnit';
+
   static readonly RESPONSE_TIME_CHART_TITLE = 'Response Times';
   static readonly STATUS_ATTRIBUTE = 'rnStatus';
   static readonly ATTRIBUTES_PREFIX = 'attributes';

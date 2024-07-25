@@ -20,15 +20,18 @@ export class TimeSeriesUtils {
   }
 
   /**
-   * If the intervals do not overlap, this method will return indefined.
-   * @param boundaries
+   * If the intervals do not overlap, this method will return undefined.
+   * @param cropBounds
    * @param interval
    */
-  static cropInterval(boundaries: TimeRange, interval: TimeRange): TimeRange | undefined {
-    if (!this.intervalsOverlap(boundaries, interval)) {
+  static cropInterval(interval: TimeRange, cropBounds: TimeRange): TimeRange | undefined {
+    const from = Math.max(interval.from, cropBounds.from);
+    const to = Math.min(interval.to, cropBounds.to);
+    const minimumIntervalSize = 3; // a bug from uPlot used to throw intervals with size 1 and 2 from time to time, even if it is empty
+    if (to - from < minimumIntervalSize) {
       return undefined;
     }
-    return { from: Math.max(boundaries.from!, interval.from!), to: Math.min(boundaries.to!, interval.to!) };
+    return { from: from, to: to };
   }
 
   static intervalsOverlap(range1: TimeRange, range2: TimeRange) {
