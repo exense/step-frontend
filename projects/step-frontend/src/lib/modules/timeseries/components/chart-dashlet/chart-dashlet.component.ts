@@ -170,7 +170,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;
-    // this.selectedAggregatePcl = params.pclValue;
     this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe();
   }
