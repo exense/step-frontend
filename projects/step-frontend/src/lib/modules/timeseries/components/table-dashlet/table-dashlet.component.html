@@ -50,20 +50,40 @@
     }
     <mat-menu #columnsMenu="matMenu">
       @for (column of columnsDefinition; track column.id) {
-        <button
-          mat-menu-item
-          (click)="column.isVisible = !column.isVisible; updateVisibleColumns(); $event.stopPropagation()"
-        >
-          <div class="flex flex-row" style="gap: 12px; align-items: center">
+        @if (column.pclValue) {
+          <div class="pcl-label" (click)="$event.stopPropagation()">
             <mat-checkbox
               color="primary"
               [ngModel]="column.isVisible"
               (ngModelChange)="onColumnVisibilityChange(column)"
             >
-              <span>{{ column.label }}</span>
             </mat-checkbox>
+            <span>Pcl</span>
+            <step-editable-label
+              (keydown)="$event.stopPropagation()"
+              [ngModel]="column.pclValue"
+              class="pcl-editable-label"
+              (ngModelChange)="onColumnPclValueChange(column, $event)"
+            >
+            </step-editable-label>
+            <span>(ms)</span>
           </div>
-        </button>
+        } @else {
+          <button
+            mat-menu-item
+            (click)="column.isVisible = !column.isVisible; updateVisibleColumns(); $event.stopPropagation()"
+          >
+            <div class="flex flex-row" style="gap: 12px; align-items: center">
+              <mat-checkbox
+                color="primary"
+                [ngModel]="column.isVisible"
+                (ngModelChange)="onColumnVisibilityChange(column)"
+              >
+                <div>{{ column.label }}</div>
+              </mat-checkbox>
+            </div>
+          </button>
+        }
       }
     </mat-menu>
   </div>
@@ -79,14 +99,16 @@
   >
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <mat-checkbox
-          color="primary"
-          (click)="$event.stopPropagation()"
-          [(ngModel)]="allSeriesChecked"
-          (change)="onAllSeriesCheckboxClick($event.checked)"
-        >
+        <div class="element-name">
+          <mat-checkbox
+            color="primary"
+            (click)="$event.stopPropagation()"
+            [(ngModel)]="allSeriesChecked"
+            (change)="onAllSeriesCheckboxClick($event.checked)"
+          >
+          </mat-checkbox>
           <span>Name</span>
-        </mat-checkbox>
+        </div>
       </th>
       <td mat-cell *matCellDef="let element">
         <div class="color-cell">
@@ -108,14 +130,14 @@
       <ng-container [matColumnDef]="column.id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <div>
-            <div>{{ column.label }}</div>
+            <div class="no-text-wrap">{{ column.label }}</div>
             <div *ngIf="compareModeEnabled" class="subtitle">Base</div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
           <div class="flex justify-between">
             <div>
-              {{ column.mapValue(element.base) }}
+              {{ column?.mapValue(element.base) }}
             </div>
           </div>
         </td>
@@ -124,7 +146,7 @@
       <ng-container [matColumnDef]="column.id + COMPARE_COLUMN_ID_SUFFIX">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <div>
-            <div>{{ column.label }}</div>
+            <div class="no-text-wrap">{{ column.label }}</div>
             <div *ngIf="compareModeEnabled" class="subtitle compare-value">
               <span>Compare</span>
             </div>
@@ -139,7 +161,7 @@
       <!--    Diff Column-->
       <ng-container [matColumnDef]="column.id + DIFF_COLUMN_ID_SUFFIX">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="right-separator">
-          <div>Diff %</div>
+          <div class="no-text-wrap">Diff %</div>
         </th>
         <td mat-cell *matCellDef="let element" class="right-separator">
           <div class="compare-diff">{{ column.mapDiffValue(element) | comparePercentage }}</div>

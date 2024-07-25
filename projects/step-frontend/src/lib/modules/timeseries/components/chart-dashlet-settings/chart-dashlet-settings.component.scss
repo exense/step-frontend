@@ -20,6 +20,14 @@ div[step-modal-window-body] > form {
   }
 }
 
+.aggregate-select-container {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  width: 100%;
+  padding: 0 1.6rem;
+  justify-content: flex-start;
+}
+
 .info-txt {
   padding: 1rem;
   background: var.$gray-50;

@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { MetricAggregation } from './MetricAggregation';
 import type { MetricAttribute } from './MetricAttribute';
 import type { MetricRenderingSettings } from './MetricRenderingSettings';
 
@@ -12,7 +13,7 @@ export type MetricType = {
   description?: string;
   attributes: Array<MetricAttribute>;
   unit?: string;
-  defaultAggregation: 'SUM' | 'AVG' | 'MAX' | 'MIN' | 'COUNT' | 'RATE' | 'MEDIAN' | 'PERCENTILE';
+  defaultAggregation: MetricAggregation;
   defaultGroupingAttributes: Array<string>;
   renderingSettings: MetricRenderingSettings;
   id?: string;
