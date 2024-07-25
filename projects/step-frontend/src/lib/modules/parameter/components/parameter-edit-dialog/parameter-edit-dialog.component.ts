@@ -13,6 +13,7 @@ import { combineLatest, delay, map, of, switchMap } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { DialogCommunicationService } from '../../services/dialog-communication.service';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -41,7 +42,7 @@ export class ParameterEditDialogComponent implements OnInit {
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
   private _snackBar = inject(MatSnackBar);
-  private isAfterSave = false;
+  private _dialogCommunicationService = inject(DialogCommunicationService);
 
   protected parameter = this._dialogData.entity;
 
@@ -79,7 +80,9 @@ export class ParameterEditDialogComponent implements OnInit {
       .saveParameter(this.parameter)
       .pipe(
         switchMap((data) => {
-          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok');
+          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok', {
+            duration: 5000,
+          });
           return this._api.newParameter();
         }),
         delay(300),
@@ -92,12 +95,8 @@ export class ParameterEditDialogComponent implements OnInit {
           lastModificationDate: parameter.lastModificationDate,
           lastModificationUser: parameter.lastModificationUser,
         };
-        this.isAfterSave = true;
+        this._dialogCommunicationService.triggerDialogAction();
       });
-  }
-
-  close() {
-    this._matDialogRef.close({ isSuccess: this.isAfterSave });
   }
 
   selectScope(scopeItem: ScopeItem): void {

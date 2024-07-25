@@ -90,7 +90,7 @@
     }
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button (click)="close()">Cancel</button>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
     <button
       [hidden]="isEditMode"
       [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
