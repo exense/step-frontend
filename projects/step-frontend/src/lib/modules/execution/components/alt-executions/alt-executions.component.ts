@@ -8,6 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
 
 const URL_PREFIX = 'alt-executions';
+const MENU_ENTRY_ID = 'executions';
 const MAX_OPENED_EXECUTIONS = 5;
 
 @Component({
@@ -89,7 +90,11 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
           const tabToClose = this._activeExecutionsService.activeExecutionIds()[0];
           this.handleTabClose(tabToClose);
         }
-        this._customMenuEntries.add(URL_PREFIX, `${URL_PREFIX}/${executionId}`, execution.description ?? executionId);
+        this._customMenuEntries.add(
+          MENU_ENTRY_ID,
+          `${URL_PREFIX}/${executionId}`,
+          execution.description ?? executionId,
+        );
       });
   }
 }
