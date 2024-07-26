@@ -50,7 +50,7 @@
                     (stepSideBarClick)="navigateTo(entry.id, $event)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
-                    <span class="sidebar-aligned-subtext">{{ entry.title }} </span>
+                    <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
                   </div>
                   <div class="sidebar-subtab-content">
                     @for (subEntry of menuItems | menuFilter: entry.id; track subEntry.id) {
