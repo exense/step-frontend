@@ -15,6 +15,7 @@ import {
 import {
   AugmentedTimeSeriesService,
   AuthService,
+  type ColumnSelection,
   DashboardItem,
   DashboardsService,
   DashboardView,
@@ -31,12 +32,14 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
+  RelativeTimeSelection,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
@@ -49,7 +52,6 @@ import {
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
-import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -58,7 +60,8 @@ import { forkJoin, map, Observable, tap } from 'rxjs';
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
-import { TimeRangeSettings } from './time-range-settings';
+import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
+import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -129,15 +132,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     if (this.defaultFullTimeRange?.from) {
       this.timeRangeOptions.push({ type: 'FULL' });
     }
-    const pageParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
-    this.resolution = pageParams.resolution;
+    const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     const metrics$ = this._timeSeriesService.getMetricTypes();
     const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);
     forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
       this.metricTypes = metrics;
-      this.initState(pageParams, dashboard);
+      this.initState(urlParams, dashboard);
     });
   }
 
@@ -159,11 +162,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
    * 2. Stored state
    * 3. Dashboard object
    */
-  initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
+  initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
-    const timeRangeSelection = this.computeTimeRange(existingContext?.getTimeRangeSettings(), dashboard, pageParams);
-    const context = existingContext || this.createContext(this.dashboard, pageParams, timeRangeSelection);
+    const context = existingContext || this.createContext(this.dashboard, urlParams, existingContext);
     this.resolution = context.getChartsResolution();
     this.refreshInterval = context.getRefreshInterval();
     const state: DashboardState = {
@@ -180,7 +182,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       this.updateUrl();
     });
 
-    if (pageParams.editMode && this.hasWritePermission && this.editable) {
+    if (urlParams.editMode && this.hasWritePermission && this.editable) {
       this.enableEditMode();
     }
   }
@@ -270,15 +272,28 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: true,
       inheritSpecificFiltersOnly: false,
       specificFiltersToInherit: [],
-      tableSettings: {
-        columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
-      },
+      tableSettings: { columns: this.getInitialTableColumns() },
     };
     this.filterBar!.addUniqueFilterItems(
       tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
     );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
+  }
+
+  private getInitialTableColumns(): ColumnSelection[] {
+    return [
+      { selected: true, column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
+      { selected: true, column: 'SUM', aggregation: { type: ChartAggregation.SUM } },
+      { selected: true, column: 'AVG', aggregation: { type: ChartAggregation.AVG } },
+      { selected: true, column: 'MIN', aggregation: { type: ChartAggregation.MIN } },
+      { selected: true, column: 'MAX', aggregation: { type: ChartAggregation.MAX } },
+      { selected: true, column: 'PCL_1', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 80 } } },
+      { selected: true, column: 'PCL_2', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 90 } } },
+      { selected: true, column: 'PCL_3', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 99 } } },
+      { selected: true, column: 'TPS', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 's' } } },
+      { selected: true, column: 'TPH', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 'h' } } },
+    ];
   }
 
   addChartDashlet(metric: MetricType) {
@@ -328,61 +343,105 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private computeTimeRange(
-    existingSettings: TimeRangeSettings | undefined,
+  /**
+   * If there is a cached context, which has a RELATIVE time settings, the fullRange has to be updated to the current time.
+   * @param settings
+   * @private
+   */
+  private updateRelativeRangeIfNeeded(settings: DashboardTimeRangeSettings): DashboardTimeRangeSettings {
+    const wasFullSelection = TimeSeriesUtils.intervalsEqual(settings.fullRange, settings.selectedRange);
+    if (settings.type === 'RELATIVE') {
+      const now = new Date().getTime() - 5000;
+      const newFullRange = { from: now - settings.relativeSelection!.timeInMs, to: now };
+      let newSelection: TimeRange = newFullRange;
+      if (!wasFullSelection) {
+        newSelection = TimeSeriesUtils.cropInterval(settings.selectedRange, newFullRange) || newFullRange;
+      }
+      return { ...settings, fullRange: newFullRange, selectedRange: newSelection };
+    } else {
+      return settings;
+    }
+  }
+
+  private computeTimeRangeSettings(
+    existingSettings: DashboardTimeRangeSettings | undefined,
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
-  ): TimeRangeSelection {
-    if (existingSettings) {
-      return {
-        type: existingSettings.type,
-        absoluteSelection: existingSettings.fullRange,
-        relativeSelection: existingSettings.relativeSelection,
-      };
-    }
+  ): DashboardTimeRangeSettings {
     // priority of time ranges property: 1. existingCustomSelection 2. URL 3. Default full selection 4. Dashboard
+    if (existingSettings) {
+      return this.updateRelativeRangeIfNeeded(existingSettings);
+    }
+    const now = new Date().getTime() - 5000;
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
+      // no custom selection in the URL
+      const fullRange = {
+        from: this.defaultFullTimeRange!.from,
+        to: this.defaultFullTimeRange!.to || now,
+      };
       return {
         type: 'FULL',
-        absoluteSelection: {
-          from: this.defaultFullTimeRange!.from,
-          to: this.defaultFullTimeRange!.to || new Date().getTime(),
-        },
+        fullRange: fullRange,
+        defaultFullRange: this.defaultFullTimeRange,
+        selectedRange: urlParams.selectedTimeRange || fullRange,
       };
     }
-    let timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+    let timeRangeSelection: TimeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-      const foundRelativeOption = this.timeRangeOptions.find((o) => {
+      let foundRelativeOption: RelativeTimeSelection = this.timeRangeOptions.find((o) => {
         return timeInMs === o.relativeSelection?.timeInMs;
-      });
-      timeRangeSelection = foundRelativeOption || {
+      })?.relativeSelection || {
+        label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+        timeInMs: timeInMs,
+      };
+      const fullRange = { from: now - foundRelativeOption.timeInMs, to: now };
+      return {
         type: 'RELATIVE',
-        relativeSelection: {
-          label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
-          timeInMs: timeInMs,
-        },
+        fullRange: fullRange,
+        selectedRange: urlParams.selectedTimeRange
+          ? TimeSeriesUtils.cropInterval(urlParams.selectedTimeRange, fullRange) || fullRange
+          : fullRange,
+        relativeSelection: foundRelativeOption,
+        defaultFullRange: this.defaultFullTimeRange,
       };
     } else if (timeRangeSelection.type === 'ABSOLUTE') {
       // absolute
-      timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
+      return {
+        type: 'ABSOLUTE',
+        fullRange: timeRangeSelection.absoluteSelection!,
+        selectedRange: urlParams.selectedTimeRange || timeRangeSelection.absoluteSelection!,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     } else {
       // FULL
-      timeRangeSelection = { type: 'FULL' };
+      if (!this.defaultFullTimeRange) {
+        throw new Error('Default time range must be specified when using a FULL range');
+      }
+      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
+      return {
+        type: 'FULL',
+        fullRange: range,
+        selectedRange: urlParams.selectedTimeRange || range,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     }
-    return timeRangeSelection;
   }
 
   createContext(
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
-    timeRangeSelection: TimeRangeSelection,
+    existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
+    const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
+      existingContext?.getTimeRangeSettings(),
+      dashboard,
+      urlParams,
+    );
     const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
 
     const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
@@ -394,14 +453,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       {
         id: dashboard.id!,
         dashlets: this.dashboard.dashlets,
-        timeRangeSettings: {
-          type: timeRangeSelection.type,
-          defaultFullRange: this.defaultFullTimeRange,
-          fullRange: timeRange,
-          absoluteSelection: timeRangeSelection.absoluteSelection,
-          relativeSelection: timeRangeSelection.relativeSelection,
-          selectedRange: urlParams.selectedTimeRange || timeRange,
-        },
+        timeRangeSettings: timeRangeSettings,
         selectedTimeRange: urlParams.selectedTimeRange,
         attributes: metricAttributes,
         grouping: urlParams.grouping || dashboard.grouping || [],

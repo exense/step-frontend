@@ -1,4 +1,13 @@
 <mat-select [multiple]="true" [ngModel]="selectedItems" (blur)="handleBlur()" [disabled]="isDisabled">
+  <mat-option>
+    <ngx-mat-select-search
+      [formControl]="filterMultiControl"
+      placeholderLabel="Search..."
+      noEntriesFoundLabel="No matching entries found"
+    >
+      <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+    </ngx-mat-select-search>
+  </mat-option>
   @for (plainItem of plainItems(); track plainItem.key) {
     <mat-option
       class="step-multi-level-plain-item"

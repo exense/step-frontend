@@ -21,7 +21,7 @@
         </div>
         <mat-divider />
         <step-label>Filters</step-label>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
               <step-ts-filter-bar-item
@@ -91,7 +91,7 @@
         <div>
           <step-label>Grouping</step-label>
         </div>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="form-row">
             <div>
               <step-form-field>
@@ -131,18 +131,34 @@
         } @else {
           <div class="info-txt">Settings inherited from the master dashlet</div>
         }
+
         <mat-divider />
         <step-label>Columns</step-label>
         <div class="columns-container">
-          @for (column of item.tableSettings!.columns; track column.column) {
-            <mat-checkbox
-              color="primary"
-              [(ngModel)]="column.selected"
-              [ngModelOptions]="{ standalone: true }"
-              class="item"
-            >
-              <span>{{ column.column }}</span>
-            </mat-checkbox>
+          @for (column of item.tableSettings!.columns; track column) {
+            @if (column.aggregation.params?.['pclValue']) {
+              <div class="pcl-column-container">
+                <mat-checkbox color="primary" [(ngModel)]="column.selected" [ngModelOptions]="{ standalone: true }">
+                </mat-checkbox>
+                <span>PCL</span>
+                <step-editable-label
+                  [ngModel]="column.aggregation.params?.['pclValue']"
+                  class="pcl-editable-label"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onColumnPclValueChange(column, $event)"
+                >
+                </step-editable-label>
+              </div>
+            } @else {
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="column.selected"
+                [ngModelOptions]="{ standalone: true }"
+                class="item"
+              >
+                <span>{{ column.column }}</span>
+              </mat-checkbox>
+            }
           }
         </div>
         <mat-divider />

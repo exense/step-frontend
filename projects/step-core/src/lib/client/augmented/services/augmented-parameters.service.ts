@@ -31,6 +31,7 @@ export class AugmentedParametersService extends ParametersService implements Htt
       activationExpressionScript: 'activationExpression.script',
       lastModificationDate: 'lastModificationDate',
       priority: 'priority',
+      automationPackage: 'customFields.automationPackageId',
     });
   }
 

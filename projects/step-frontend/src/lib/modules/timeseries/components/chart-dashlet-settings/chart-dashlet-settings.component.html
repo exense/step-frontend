@@ -42,7 +42,7 @@
         </div>
         <mat-divider />
         <step-label>Filters</step-label>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
               <step-ts-filter-bar-item
@@ -113,7 +113,7 @@
         <div>
           <step-label>Grouping</step-label>
         </div>
-        @if (!item?.masterChartId) {
+        @if (!item.masterChartId) {
           <div class="form-row">
             <div>
               <step-form-field>
@@ -160,22 +160,18 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
+            <button
+              class="aggregate-select-container"
+              #primaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="aggregateMenu"
+              mat-button
+            >
+              {{ item.chartSettings!.primaryAxes.aggregation.type }}
+              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.primaryAxes?.aggregation?.params?.['pclValue'] }}
               }
-            </mat-select>
+            </button>
           </step-form-field>
-          @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          }
           <step-form-field>
             <step-label>Unit</step-label>
             <input
@@ -184,6 +180,13 @@
               [(ngModel)]="item.chartSettings!.primaryAxes.unit"
             />
           </step-form-field>
+          <mat-menu #aggregateMenu="matMenu">
+            <step-timeseries-aggregate-picker
+              [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+              [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+              (aggregateChange)="handlePrimaryAggregationChange($event)"
+            />
+          </mat-menu>
         </div>
         <step-form-field>
           <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
@@ -202,28 +205,27 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <mat-select
-              [value]="item.chartSettings!.secondaryAxes?.aggregation"
-              (valueChange)="onSecondaryAggregateSelect($event)"
+            <button
+              class="aggregate-select-container"
+              #secondaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="secondaryAggregateMenu"
+              mat-button
             >
-              <mat-option [value]="undefined">-</mat-option>
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
+              {{ item.chartSettings!.secondaryAxes?.aggregation?.type }}
+              @if (item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue'] }}
               }
-            </mat-select>
+            </button>
+            <mat-menu #secondaryAggregateMenu="matMenu">
+              <step-timeseries-aggregate-picker
+                [selectedAggregate]="$any(item.chartSettings!.secondaryAxes?.aggregation)"
+                [allowEmptyAggregate]="true"
+                [pclValue]="item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue']"
+                (aggregateChange)="handleSecondaryAggregationChange($event)"
+              />
+            </mat-menu>
           </step-form-field>
-          @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          } @else {
-            <div></div>
-          }
+          <div></div>
         </div>
         <mat-divider />
         <step-label>Visual settings</step-label>
