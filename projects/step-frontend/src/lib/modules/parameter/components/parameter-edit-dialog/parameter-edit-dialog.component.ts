@@ -6,11 +6,13 @@ import {
   DateFormat,
   DialogRouteResult,
   Parameter,
+  ScreensService,
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, map, of } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { combineLatest, map, of, switchMap, take } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
+import { ParameterConditionDialogComponent } from '../parameter-condition-dialog/parameter-condition-dialog.component';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -30,6 +32,8 @@ export class ParameterEditDialogComponent implements OnInit {
   private _api = inject(AugmentedParametersService);
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
+  private _matDialog = inject(MatDialog);
+  private _screenService = inject(ScreensService);
 
   protected parameter = this._dialogData.entity;
 
@@ -59,6 +63,68 @@ export class ParameterEditDialogComponent implements OnInit {
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
+  }
+
+  addCondition(type?: string) {
+    this._screenService
+      .getScreenInputsByScreenId('executionParameters')
+      .pipe(
+        take(1),
+        switchMap((inputs) => {
+          const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
+            data: { type, inputs },
+            width: '50rem',
+          });
+
+          return dialogRef.afterClosed();
+        }),
+      )
+      .subscribe((result) => {
+        const script = this.createGroovyExpression(result);
+        let tempScript = '';
+        if (result) {
+          switch (type) {
+            case 'OR':
+              tempScript = this.parameter.activationExpression!.script!;
+              this.parameter.activationExpression!.script! = `${tempScript} || ${script}`;
+              break;
+            case 'AND':
+              tempScript = this.parameter.activationExpression!.script!;
+              this.parameter.activationExpression!.script! = `${tempScript} && ${script}`;
+              break;
+            default:
+              this.parameter.activationExpression!.script! = script;
+          }
+        }
+      });
+  }
+
+  createGroovyExpression(input: any) {
+    let result = '';
+    const { key, predicate, value } = input;
+
+    switch (predicate) {
+      case 'equals':
+        result = `${key} == ${value}`;
+        break;
+      case 'not_equals':
+        result = `${key} != ${value}`;
+        break;
+      case 'matches':
+        result = `${key} =~ ${value}`;
+        break;
+      case 'not_matches':
+        result = `${key} !~ ${value}`;
+        break;
+      case 'exists':
+        result = `${key}`;
+        break;
+      case 'not_exists':
+        result = `!${key}`;
+        break;
+    }
+
+    return result;
   }
 
   selectScope(scopeItem: ScopeItem): void {
