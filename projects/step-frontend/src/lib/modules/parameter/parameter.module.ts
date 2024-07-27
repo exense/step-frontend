@@ -25,6 +25,8 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
 import { ParameterConditionDialogComponent } from './components/parameter-condition-dialog/parameter-condition-dialog.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { InputTypePipe } from './pipes/input-type.pipe';
+import { InputOptionsPipe } from './pipes/input-options.pipe';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule, NgxMatSelectSearchModule],
@@ -38,6 +40,8 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     ParameterEditDialogComponent,
     ParameterUrlPipe,
     ParameterConditionDialogComponent,
+    InputTypePipe,
+    InputOptionsPipe,
   ],
 })
 export class ParameterModule {

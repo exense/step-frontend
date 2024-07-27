@@ -4,12 +4,6 @@
       <div [formGroup]="conditionForm">
         <div class="binding-condition">
           <step-form-field>
-            <!--            <step-autocomplete-input-->
-            <!--              placeHolder="Key"-->
-            <!--              formControlName="key"-->
-            <!--              [possibleItems]="_bindingKeys"-->
-            <!--              [valueLabelExtractor]="bindingKeyExtractor"-->
-            <!--            />-->
             <mat-select formControlName="key" placeholder="Key">
               <mat-option>
                 <ngx-mat-select-search
@@ -51,9 +45,41 @@
           </div>
           @if (conditionForm.controls['predicate'].value; as predicateValue) {
             @if (predicateValue !== PRED.EXISTS && predicateValue !== PRED.NOT_EXISTS) {
-              <step-form-field>
-                <input type="text" placeholder="Value" formControlName="value" />
-              </step-form-field>
+              @switch (conditionForm.controls['key'].value | inputType: inputs) {
+                @case ('dropdown') {
+                  <step-autocomplete-input
+                    placeHolder="value"
+                    formControlName="value"
+                    [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
+                    [valueLabelExtractor]="bindingKeyExtractor"
+                  />
+                }
+                @case ('checkbox') {
+                  <step-form-field>
+                    <mat-select formControlName="value">
+                      <mat-option>
+                        <ngx-mat-select-search
+                          [formControl]="filterValueControl"
+                          name="filterValueControl"
+                          ngDefaultControl
+                          placeholderLabel="Search..."
+                          noEntriesFoundLabel="No matching entries found"
+                        >
+                          <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                        </ngx-mat-select-search>
+                      </mat-option>
+                      @for (val of dropdownValuesFiltered; track val) {
+                        <mat-option [value]="val.key">{{ val.value }}</mat-option>
+                      }
+                    </mat-select>
+                  </step-form-field>
+                }
+                @default {
+                  <step-form-field>
+                    <input type="text" placeholder="Value" formControlName="value" />
+                  </step-form-field>
+                }
+              }
             }
           }
         </div>

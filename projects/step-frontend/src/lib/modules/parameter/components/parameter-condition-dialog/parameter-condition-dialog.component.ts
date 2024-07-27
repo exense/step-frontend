@@ -1,34 +1,12 @@
 import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ArrayItemLabelValueExtractor } from '@exense/step-core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
-
-interface ParameterConditionDialogData {
-  type: string;
-  inputs: any[];
-}
-
-enum PREDICATE {
-  EQUALS = 'equals',
-  NOT_EQUALS = 'not_equals',
-  MATCHES = 'matches',
-  NOT_MATCHES = 'not_matches',
-  EXISTS = 'exists',
-  NOT_EXISTS = 'not_exists',
-}
-
-function valueValidator(control: AbstractControl): ValidationErrors | null {
-  const predicate = control.get('predicate')?.value;
-  const value = control.get('value')?.value;
-
-  if (predicate != 'exists' && predicate != 'not_exists' && !value) {
-    return { valueRequired: true };
-  }
-
-  return null;
-}
+import { map, startWith } from 'rxjs';
+import { valueValidator } from '../../validators/value.validator';
+import { PREDICATE } from '../../types/predicate.enum';
+import { ParameterConditionDialogData } from '../../types/parameter-condition.type';
 
 @Component({
   selector: 'step-parameter-condition-dialog',
@@ -58,16 +36,19 @@ export class ParameterConditionDialogComponent implements OnInit {
 
   conditionForm!: FormGroup;
   modalTitle: string = '';
-  inputs: string[] = [];
+  inputs: any[] = [];
 
   filterPredicateControl: FormControl<string | null> = new FormControl<string>('');
   filterKeyControl: FormControl<string | null> = new FormControl<string>('');
+  filterValueControl: FormControl<string | null> = new FormControl<string>('');
   dropdownItemsFiltered: Array<{ key: string; value: string }> = [];
   dropdownKeysFiltered: Array<{ key: string; value: string }> = [];
+  dropdownValuesFiltered: Array<{ key: string; value: string }> = [];
 
   ngOnInit(): void {
     this._dialogData.inputs.forEach((input) => {
       this._bindingKeys.push(input.input.id);
+      this.inputs.push(input.input);
     });
 
     this.conditionForm = this._fb.group(
@@ -90,9 +71,17 @@ export class ParameterConditionDialogComponent implements OnInit {
         this.modalTitle = 'Add condition';
     }
 
+    this.conditionForm
+      .get('key')
+      ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => {
+        this.conditionForm.get('value')?.reset();
+      });
+
     this.dropdownKeysFiltered = [...this._bindingKeys];
     this.filterKeyControl.valueChanges
       .pipe(
+        startWith(this.filterKeyControl.value),
         map((value) => value?.toLowerCase()),
         map((value) =>
           value ? this._bindingKeys.filter((item) => item.toLowerCase().includes(value)) : [...this._bindingKeys],
@@ -106,6 +95,7 @@ export class ParameterConditionDialogComponent implements OnInit {
     this.dropdownItemsFiltered = [...this._predicates];
     this.filterPredicateControl.valueChanges
       .pipe(
+        startWith(this.filterPredicateControl.value),
         map((value) => value?.toLowerCase()),
         map((value) =>
           value ? this._predicates.filter((item) => item.value.toLowerCase().includes(value)) : [...this._predicates],
@@ -114,6 +104,24 @@ export class ParameterConditionDialogComponent implements OnInit {
       )
       .subscribe((displayItemsFiltered) => {
         this.dropdownItemsFiltered = displayItemsFiltered;
+      });
+
+    const valuesArray = [
+      { key: 'true', value: 'TRUE' },
+      { key: 'false', value: 'FALSE' },
+    ];
+    this.dropdownValuesFiltered = [...valuesArray];
+    this.filterValueControl.valueChanges
+      .pipe(
+        startWith(this.filterValueControl.value),
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value ? valuesArray.filter((item) => item.value.toLowerCase().includes(value)) : [...valuesArray],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownValuesFiltered = displayItemsFiltered;
       });
   }
 
