@@ -61,7 +61,7 @@ export class PlanListComponent implements DialogParentService {
         this.updateDataSourceAfterChange,
       )
       .subscribe((data) => {
-        if (typeof data === 'object' && data !== null && 'id' in data && event.ctrlKey === true) {
+        if (typeof data === 'object' && data !== null && 'id' in data && (event.ctrlKey === true || event.metaKey)) {
           this._router.navigateByUrl(`/plans/editor/${(data as Plan).id}`);
         }
       });

@@ -106,6 +106,7 @@ export { Crop } from './svg/crop';
 export { CornerUpRight } from './svg/corner-up-right';
 export { Crosshair } from './svg/crosshair';
 export { CreditCard } from './svg/credit-card';
+export { CursorClick } from './svg/cursor-click';
 export { Database } from './svg/database';
 export { DivideCircle } from './svg/divide-circle';
 export { Disc } from './svg/disc';

@@ -106,6 +106,7 @@ import { Crop } from './svg/crop';
 import { CornerUpRight } from './svg/corner-up-right';
 import { Crosshair } from './svg/crosshair';
 import { CreditCard } from './svg/credit-card';
+import { CursorClick } from './svg/cursor-click';
 import { Database } from './svg/database';
 import { DivideCircle } from './svg/divide-circle';
 import { Disc } from './svg/disc';
@@ -422,6 +423,7 @@ export const allIcons = {
   CornerUpRight,
   Crosshair,
   CreditCard,
+  CursorClick,
   Database,
   DivideCircle,
   Disc,
