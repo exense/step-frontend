@@ -11,7 +11,10 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-import { TimeseriesAggregatePickerComponent } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
+import {
+  AggregateParams,
+  TimeseriesAggregatePickerComponent,
+} from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 import { MatMenuTrigger } from '@angular/material/menu';
 
 export interface ChartDashletSettingsData {
@@ -95,27 +98,26 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._dialogRef.close({ ...this.item });
   }
 
-  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
     this.item.chartSettings!.primaryAxes.aggregation = {
       type: change.aggregate!,
-      params: { pclValue: change.pclValue },
+      params: change.params,
     };
     this.primaryAggregateMenuTrigger?.closeMenu();
   }
 
-  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
     const newAggregate = change.aggregate;
-    const newPcl = change.pclValue;
     if (newAggregate) {
       if (!this.item.chartSettings!.secondaryAxes) {
         this.item.chartSettings!.secondaryAxes = {
-          aggregation: { type: newAggregate, params: { pclValue: newPcl } },
+          aggregation: { type: newAggregate, params: change.params },
           displayType: 'BAR_CHART',
           colorizationType: 'STROKE',
           unit: '',
         };
       } else {
-        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: { pclValue: newPcl } };
+        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
       }
     } else {
       this.item.chartSettings!.secondaryAxes = undefined;
