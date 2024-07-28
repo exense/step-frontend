@@ -9,6 +9,11 @@
   flex-direction: column;
   gap: 0.8rem;
 
+  .button-no-outline {
+    outline: none;
+    border: none;
+  }
+
   .agent-token-selection-criteria-header {
     display: flex;
     align-items: center;

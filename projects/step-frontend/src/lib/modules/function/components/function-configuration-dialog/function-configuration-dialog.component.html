@@ -60,7 +60,7 @@
       <ng-container *ngIf="!lightForm">
         <mat-expansion-panel>
           <mat-expansion-panel-header>
-            <mat-panel-title>Advanced</mat-panel-title>
+            <mat-panel-title class="advanced-label">Advanced</mat-panel-title>
           </mat-expansion-panel-header>
 
           <step-dynamic-time-input
@@ -68,13 +68,15 @@
             [formControl]="formGroup!.controls.callTimeout"
           ></step-dynamic-time-input>
 
-          <mat-checkbox color="primary" [formControl]="formGroup!.controls.executeLocally">
-            Execute on controller&nbsp;
-            <step-icon
-              name="help-circle"
-              matTooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
-            ></step-icon>
-          </mat-checkbox>
+          <section class="execute-slider">
+            <mat-slide-toggle color="primary" name="active" [formControl]="formGroup!.controls.executeLocally">
+              Execute on controller&nbsp;
+              <step-icon
+                name="help-circle"
+                matTooltip="Defines if the Keyword has to be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
+              ></step-icon>
+            </mat-slide-toggle>
+          </section>
 
           <ng-container *ngIf="!executeLocally">
             <step-agent-token-selection-criteria
