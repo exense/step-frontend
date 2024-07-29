@@ -43,9 +43,7 @@
         <div>{{ requestOql }}</div>
       </div>
     </mat-menu>
-    @if (
-      (!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE'
-    ) {
+    @if ((!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate) {
       <button
         mat-icon-button
         matTooltip="Settings"
