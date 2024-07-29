@@ -123,8 +123,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
-    this._internalFilters = this.context.getFilteringSettings().filterItems;
-
+    let contextFiltering = this.context.getFilteringSettings();
+    this.oqlValue = contextFiltering.oql || '';
+    this.activeMode = contextFiltering.mode;
+    this._internalFilters = contextFiltering.filterItems;
+    this.activeTimeRange;
     this.context
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
@@ -240,7 +243,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   emitFiltersChange() {
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
-      filterItems: this.getValidFilters(),
+      filterItems: JSON.parse(JSON.stringify(this._internalFilters)),
       hiddenFilters: this.context.getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };

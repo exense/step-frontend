@@ -28,8 +28,8 @@ export type ReportNode = {
   error?: Error;
   customAttributes?: Record<string, string>;
   resolvedArtefact?: AbstractArtefact;
-  orphan?: boolean;
   contributingError?: boolean;
+  orphan?: boolean;
   id?: string;
   _class: string;
 };
