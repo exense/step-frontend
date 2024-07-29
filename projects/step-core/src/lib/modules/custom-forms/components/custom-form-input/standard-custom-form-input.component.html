@@ -19,7 +19,7 @@
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
       >
-        @if (withUnset) {
+        @if (withUnset && value) {
           <mat-option class="unset" [value]="undefined"><a>Unset</a></mat-option>
         }
         @for (item of dropdownItems; track item) {

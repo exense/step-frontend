@@ -2,9 +2,12 @@
   pointer-events: none;
 }
 
-::ng-deep .unset span {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  border-bottom: 1px solid #d0d5dd;
+::ng-deep .unset {
+  min-height: 2rem;
+
+  span {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
 }

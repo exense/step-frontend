@@ -18,7 +18,7 @@
     <step-form-field>
       <mat-select [ngModel]="value" (ngModelChange)="onValueChange($event)" (openedChange)="onOpenedChange($event)">
         <ng-container [stepZIndex]="1050">
-          @if (withUnset) {
+          @if (withUnset && value) {
             <mat-option class="unset" [value]="undefined"><a>Unset</a></mat-option>
           }
           @for (item of items; track item) {
