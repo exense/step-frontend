@@ -34,6 +34,7 @@ type ItemTemplateRef<T> = TemplateRef<{ $implicit: T }>;
 })
 export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   @Input() items!: T[];
+  @Input() withUnset: boolean = false;
 
   /** @Input('itemTemplate') **/
   itemTemplateInput = input<ItemTemplateRef<T> | undefined>(undefined, {

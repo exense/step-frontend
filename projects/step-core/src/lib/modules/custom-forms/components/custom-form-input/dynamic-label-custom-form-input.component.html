@@ -13,6 +13,7 @@
     <ng-template #dropdownItemTemplate let-item>{{ item }}</ng-template>
     <step-editable-dropdown-label
       [labelTemplate]="labelTemplate"
+      [withUnset]="withUnset"
       [items]="dropdownItems"
       [itemTemplate]="dropdownItemTemplate"
       [tooltip]="input?.label || ''"

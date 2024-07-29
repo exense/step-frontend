@@ -2,6 +2,7 @@
   <step-dynamic-label-custom-form-inputs
     *ngFor="let input of inputs"
     [stInput]="input"
+    [withUnset]="true"
     [disabled]="stDisabled"
     [required]="required"
     [ngModel]="stModel | stepCustomFormInputModel: input"
@@ -12,6 +13,7 @@
   @for (input of inputs; track input.id) {
     <step-standard-custom-form-inputs
       [stInput]="input"
+      [withUnset]="true"
       [disabled]="stDisabled"
       [required]="required"
       [ngModel]="stModel | stepCustomFormInputModel: input"
