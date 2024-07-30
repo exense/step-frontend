@@ -1,5 +1,6 @@
 <step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <mat-select [multiple]="true" [formControl]="filterControl">
+    <mat-option class="unset" [value]="''"><i>Unset</i></mat-option>
     <mat-option *ngFor="let item of displayItems; trackBy: trackByKeyValue" [value]="item.key">
       {{ item.value }}
     </mat-option>
