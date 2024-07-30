@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import {
   AutoDeselectStrategy,
   Parameter,
@@ -12,6 +12,8 @@ import {
   tableColumnsConfigProvider,
 } from '@exense/step-core';
 import { filter, switchMap } from 'rxjs';
+import { DialogCommunicationService } from '../../services/dialog-communication.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-parameters-list',
@@ -29,15 +31,23 @@ import { filter, switchMap } from 'rxjs';
     },
   ],
 })
-export class ParametersListComponent implements DialogParentService {
+export class ParametersListComponent implements DialogParentService, OnInit {
   private _dialogs = inject(DialogsService);
   private _parametersService = inject(AugmentedParametersService);
+  private _dialogCommunicationService = inject(DialogCommunicationService);
+  private destroyRef = inject(DestroyRef);
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
   readonly returnParentUrl = '/parameters';
 
   readonly dataSource = this._parametersService.createDataSource();
+
+  ngOnInit(): void {
+    this._dialogCommunicationService.dialogAction$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.dataSource.reload();
+    });
+  }
 
   duplicateParameter(parameter: Parameter): void {
     this._parametersService.cloneParameter(parameter.id!).subscribe(() => this.dataSource.reload());
