@@ -43,7 +43,12 @@
         <div>{{ requestOql }}</div>
       </div>
     </mat-menu>
-    @if ((!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate) {
+    @if (
+      (!item.readonlyGrouping && !item.inheritGlobalGrouping) ||
+      !item.readonlyAggregate ||
+      item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+        item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE
+    ) {
       <button
         mat-icon-button
         matTooltip="Settings"
@@ -61,6 +66,21 @@
     }
     @if (!item.readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
+    }
+    @if (
+      item.readonlyAggregate &&
+      (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+        item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE)
+    ) {
+      <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
+    }
+  </mat-menu>
+
+  <mat-menu #rateUnitMenu="matMenu">
+    @for (rate of RATE_UNITS; track rate.unitKey) {
+      <button mat-menu-item (click)="switchRateUnit(rate)">
+        {{ rate.menuLabel }}
+      </button>
     }
   </mat-menu>
 

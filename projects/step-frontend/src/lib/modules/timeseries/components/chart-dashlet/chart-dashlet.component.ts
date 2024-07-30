@@ -41,8 +41,7 @@ interface MetricAttributeSelection extends MetricAttribute {
 
 interface RateUnit {
   menuLabel: string;
-  unitLabel: string;
-  tphMultiplier: number;
+  unitKey: string;
 }
 
 @Component({
@@ -55,6 +54,12 @@ interface RateUnit {
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+
+  readonly RATE_UNITS: RateUnit[] = [
+    { menuLabel: 'Per second', unitKey: 's' },
+    { menuLabel: 'Per minute', unitKey: 'm' },
+    { menuLabel: 'Per hour', unitKey: 'h' },
+  ];
 
   readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
     s: 3600,
@@ -172,6 +177,23 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.selectedAggregate = aggregate;
     this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe();
+  }
+
+  switchRateUnit(unit: RateUnit) {
+    const primaryAggregation: MetricAggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    const secondaryAggregation: MetricAggregation | undefined = this.item.chartSettings!.secondaryAxes?.aggregation;
+    if (primaryAggregation.type === ChartAggregation.RATE) {
+      primaryAggregation.params!['rateUnit'] = unit.unitKey;
+    }
+    if (secondaryAggregation?.type === ChartAggregation.RATE) {
+      secondaryAggregation!.params!['rateUnit'] = unit.unitKey;
+    }
+
+    if (this.cachedResponse) {
+      this.createChart(this.cachedResponse);
+    } else {
+      this.fetchDataAndCreateChart();
+    }
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
@@ -591,4 +613,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   getItem(): DashboardItem {
     return this.item;
   }
+
+  protected readonly ChartAggregation = ChartAggregation;
 }
