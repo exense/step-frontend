@@ -172,6 +172,10 @@ $light-primary-text: var.$white;
   @include step-tooltip.tooltip($text-color);
   @include step-ts-marker.timeseries-marker();
 
+  .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
+    color: var.$blue-600;
+  }
+
   .cdk-overlay-pane {
     z-index: 1050;
     padding-top: 8px;
