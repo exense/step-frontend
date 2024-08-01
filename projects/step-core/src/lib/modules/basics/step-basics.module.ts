@@ -56,6 +56,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
+import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
@@ -113,6 +114,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    BooleanFilterComponent,
   ],
   exports: [
     CommonModule,
@@ -173,6 +175,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    BooleanFilterComponent,
   ],
 })
 export class StepBasicsModule {}
