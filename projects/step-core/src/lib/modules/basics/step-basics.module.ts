@@ -182,6 +182,7 @@ export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/boolean-filter/boolean-filter.component';
 export * from './components/array-filter-advanced/array-filter-advanced.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
