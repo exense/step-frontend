@@ -43,7 +43,11 @@
     <ng-container *ngTemplateOutlet="content" />
   </step-form-field>
 } @else {
-  <step-form-field [showRequiredMarker]="required" alignLabelAddon="near">
+  <step-form-field
+    [showRequiredMarker]="required"
+    alignLabelAddon="near"
+    [class.checkbox-toggle-input]="input?.type === InputType.CHECKBOX"
+  >
     <step-label>{{ input?.label }}</step-label>
     <step-label-addon>
       @if (input?.description; as description) {
