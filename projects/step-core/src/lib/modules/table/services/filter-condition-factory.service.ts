@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
-import { REPOSITORY_PARAMETERS } from '../../basics/step-basics.module';
+import { REPOSITORY_PARAMETERS } from '../../repository-parameters';
 import { FilterCondition } from '../shared/filter-condition';
 import { SingleDateFilterCondition } from '../shared/single-date-filter-condition';
 import { ScopeFilterCondition } from '../shared/scope-filter-condition';

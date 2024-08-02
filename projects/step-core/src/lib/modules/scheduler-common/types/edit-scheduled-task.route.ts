@@ -5,7 +5,7 @@ import { checkEntityGuardFactory } from '../../../guards/check-entity-guard.fact
 import { inject } from '@angular/core';
 import { AugmentedSchedulerService } from '../../../client/augmented/services/augmented-scheduler.service';
 import { EditSchedulerTaskDialogUtilsService } from '../injectables/edit-scheduler-task-dialog-utils.service';
-import { map } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 
 export const editScheduledTaskRoute = ({
   path,
@@ -29,7 +29,7 @@ export const editScheduledTaskRoute = ({
         const taskId = route.params['id'];
         const _api = inject(AugmentedSchedulerService);
         const _dialogs = inject(EditSchedulerTaskDialogUtilsService);
-        return _api.getExecutionTaskByIdCached(taskId).pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
+        return _api.getExecutionTaskByIdCached(taskId).pipe(switchMap((task) => _dialogs.prepareTaskAndConfig(task)));
       },
     },
     canDeactivate: [() => inject(AugmentedSchedulerService).cleanupCache()],

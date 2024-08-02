@@ -56,6 +56,7 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
+import { ListSelectComponent } from './components/list-select/list-select.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
@@ -114,6 +115,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    ListSelectComponent,
   ],
   exports: [
     CommonModule,
@@ -174,6 +176,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    ListSelectComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -227,8 +230,6 @@ export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
 export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
-export * from './types/repository-parameters.token';
-export * from './repository-parameters-initializer';
 export * from './injectables/array-item-label-value-extractor';
 export * from './types/storage-proxy';
 export * from './types/storage.token';
@@ -286,3 +287,4 @@ export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
 export * from './types/time-converter';
 export * from './injectables/time-converters-factory.service';
+export * from './components/list-select/list-select.component';

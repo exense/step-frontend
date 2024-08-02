@@ -130,12 +130,23 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this.isExecutionIsolated = isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   }
 
+  private cloneRepositoryObjectRef(): RepositoryObjectReference | undefined {
+    if (!this.repositoryObjectRef) {
+      return undefined;
+    }
+    const { repositoryID, repositoryParameters } = this.repositoryObjectRef;
+    return {
+      repositoryID,
+      repositoryParameters: repositoryParameters ? { ...repositoryParameters } : undefined,
+    };
+  }
+
   private buildExecutionParams(simulate: boolean, includeUserId = true): ExecutionParameters {
     return this._executionParamsFactory.create({
       simulate,
       includeUserId,
       description: this.description,
-      repositoryObject: this.repositoryObjectRef,
+      repositoryObject: this.cloneRepositoryObjectRef(),
       isolatedExecution: this.isExecutionIsolated,
       includedTestCases: this.includedTestcases ?? undefined,
       customParameters: this.executionParameters,

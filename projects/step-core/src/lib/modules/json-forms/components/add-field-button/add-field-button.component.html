@@ -1,0 +1,28 @@
+@if (!isChildMode()) {
+  <hr />
+}
+@if (!hasPossibleFields() || !showPossibleFields()) {
+  <button class="add-additional" type="button" mat-stroked-button (click)="addOptionalField($event)">
+    <div class="add-additional-content">
+      {{ addLabel() }}
+      <step-icon name="plus" />
+    </div>
+  </button>
+}
+@if (hasPossibleFields() && showPossibleFields()) {
+  <div class="possible-fields-container">
+    @for (item of displayItems(); track item.key) {
+      <button type="button" mat-stroked-button (click)="addPredefinedField(item.key); showPossibleFields.set(false)">
+        {{ item.value }}
+      </button>
+    }
+    @if (addCustomLabel(); as customLabel) {
+      <button type="button" mat-stroked-button (click)="addField.emit(undefined); showPossibleFields.set(false)">
+        {{ customLabel }}
+      </button>
+    }
+  </div>
+}
+@if (!isChildMode()) {
+  <hr />
+}

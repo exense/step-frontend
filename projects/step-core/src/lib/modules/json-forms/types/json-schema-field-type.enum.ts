@@ -1,4 +1,4 @@
-export enum FieldSchemaType {
+export enum JsonSchemaFieldType {
   STRING = 'string',
   NUMBER = 'number',
   BOOLEAN = 'boolean',
