@@ -102,6 +102,9 @@
           </div>
         }
       </div>
+      <section>
+        <mat-slide-toggle color="primary" name="active" [(ngModel)]="task.active">Enable rule</mat-slide-toggle>
+      </section>
       <step-custom-form-wrapper formControlName="customExecutionsParameters" stScreen="executionParameters" />
       @if (!hideUser) {
         <step-form-field alignLabelAddon="near">

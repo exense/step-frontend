@@ -1,116 +1,110 @@
 <step-form-field
   [class.ng-invalid]="!!_ngControl?.invalid"
-  [class.step-force-focus]="forceFocus"
-  [class.editable-label]="canEditLabel"
+  [class.step-force-focus]="forceFocus()"
+  [class.editable-label]="canEditLabel() && hasLabel()"
 >
-  <step-prefix>
-    <div class="dynamic-field-label" stepElementRefMap [key]="elementRefMapKey">
-      @if (canEditLabel) {
-        <input
-          type="text"
-          [disabled]="isDisabled"
-          (click)="fixLabelFocus($event)"
-          [(ngModel)]="label"
-          (blur)="labelChange.emit(label)"
-          [tabindex]="tabIndex"
-          (focusin)="forceFocus = true"
-          (focusout)="forceFocus = false"
-        />
-      } @else {
-        <span [matTooltip]="label || ''">{{ label }}</span>
-      }
-      @if (tooltip) {
-        <step-icon name="help-circle" [matTooltip]="tooltip" />
-      }
-    </div>
-  </step-prefix>
+  @if (hasLabel()) {
+    <step-prefix>
+      <div class="dynamic-field-label" stepElementRefMap [key]="elementRefMapKey()">
+        @if (canEditLabel()) {
+          <input
+            type="text"
+            [disabled]="isDisabled()"
+            (click)="fixLabelFocus($event)"
+            [(ngModel)]="labelModel"
+            (blur)="labelChange.emit(labelModel())"
+            [tabindex]="tabIndex"
+            (focusin)="forceFocus.set(true)"
+            (focusout)="forceFocus.set(false)"
+          />
+        } @else {
+          <span [matTooltip]="label() ?? ''">{{ label() }}</span>
+        }
+        @if (tooltip(); as tooltip) {
+          <step-icon name="help-circle" [matTooltip]="tooltip" />
+        }
+      </div>
+    </step-prefix>
+  }
 
-  @if (!dynamic) {
-    @switch (fieldType) {
-      @case (JsonFieldType.ENUM) {
+  @if (!dynamic()) {
+    @switch (fieldType()) {
+      @case (DynamicFieldType.ENUM) {
         <mat-select
-          [disabled]="isDisabled"
-          [ngModel]="value"
-          (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
-          [tabIndex]="tabIndex"
+          [disabled]="isDisabled()"
+          [ngModel]="value()"
+          (ngModelChange)="handleValueChange($event)"
+          (blur)="handleBlur()"
+          [tabIndex]="tabIndex()"
         >
-          @if (displayEnumExtraValue) {
-            <mat-option [value]="value">{{ value }}</mat-option>
+          @if (displayEnumExtraValue()) {
+            <mat-option [value]="value()">{{ value() }}</mat-option>
           }
-          @for (item of enumItems; track item) {
+          @for (item of enumItems(); track item) {
             <mat-option [value]="item">{{ item }}</mat-option>
           }
         </mat-select>
       }
-      @case (JsonFieldType.BOOLEAN) {
+      @case (DynamicFieldType.BOOLEAN) {
         <mat-radio-group
           aria-label="Select an option"
           color="primary"
-          [ngModel]="value"
-          (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
-          (focusin)="forceFocus = true"
-          (focusout)="forceFocus = false"
+          [ngModel]="value()"
+          (ngModelChange)="handleValueChange($event)"
+          (blur)="handleBlur()"
+          (focusin)="forceFocus.set(true)"
+          (focusout)="forceFocus.set(false)"
         >
-          <mat-radio-button [value]="true" [tabIndex]="tabIndex">True</mat-radio-button>
-          <mat-radio-button [value]="false" [tabIndex]="tabIndex">False</mat-radio-button>
+          <mat-radio-button [value]="true" [tabIndex]="tabIndex()">True</mat-radio-button>
+          <mat-radio-button [value]="false" [tabIndex]="tabIndex()">False</mat-radio-button>
         </mat-radio-group>
       }
-      @case (JsonFieldType.NUMBER) {
+      @case (DynamicFieldType.NUMBER) {
         <input
           type="number"
           step="any"
-          [disabled]="isDisabled"
-          [ngModel]="value"
-          (ngModelChange)="valueChange($event)"
-          (blur)="onTouch()"
-          [tabindex]="tabIndex"
+          [disabled]="isDisabled()"
+          [ngModel]="value()"
+          (ngModelChange)="handleValueChange($event)"
+          (blur)="handleBlur()"
+          [tabindex]="tabIndex()"
         />
       }
-      @case (JsonFieldType.OBJECT) {
+      @case (DynamicFieldType.ARRAY) {
+        <!--
         <input
           type="text"
           [disabled]="isDisabled"
           [ngModel]="value | json"
           (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
+          (blur)="handleBlur()"
           [tabindex]="tabIndex"
         />
-      }
-      @case (JsonFieldType.ARRAY) {
-        <input
-          type="text"
-          [disabled]="isDisabled"
-          [ngModel]="value | json"
-          (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
-          [tabindex]="tabIndex"
-        />
+-->
       }
       @default {
         <input
           type="text"
-          [disabled]="isDisabled"
-          [ngModel]="value"
-          (ngModelChange)="valueChange($event, fieldType)"
-          (blur)="onTouch()"
-          [tabindex]="tabIndex"
+          [disabled]="isDisabled()"
+          [ngModel]="value()"
+          (ngModelChange)="handleValueChange($event)"
+          (blur)="handleBlur()"
+          [tabindex]="tabIndex()"
         />
       }
     }
-    @if (fieldType | dynamicFieldIsExpressionEditorAllowed) {
+    @if (fieldType() | dynamicFieldIsExpressionEditorAllowed) {
       <step-suffix class="button-suffix">
         <button
           type="button"
           mat-stroked-button
           matTooltip="Open texteditor"
           matTooltipPosition="below"
-          [tabindex]="tabIndex"
-          [disabled]="isDisabled"
-          (click)="editValueInModal(fieldType === JsonFieldType.OBJECT ? AceMode.JSON : undefined)"
-          (focusin)="forceFocus = true"
-          (focusout)="forceFocus = false"
+          [tabindex]="tabIndex()"
+          [disabled]="isDisabled()"
+          (click)="editValueInModal()"
+          (focusin)="forceFocus.set(true)"
+          (focusout)="forceFocus.set(false)"
         >
           <step-icon name="edit" />
         </button>
@@ -119,11 +113,11 @@
   } @else {
     <input
       type="text"
-      [disabled]="isDisabled"
-      [ngModel]="expression"
-      (ngModelChange)="expressionChange($event)"
-      (blur)="onTouch()"
-      [tabindex]="tabIndex"
+      [disabled]="isDisabled()"
+      [ngModel]="expression()"
+      (ngModelChange)="handleExpressionChange($event)"
+      (blur)="handleBlur()"
+      [tabindex]="tabIndex()"
     />
     <step-suffix class="button-suffix">
       <button
@@ -131,11 +125,11 @@
         mat-stroked-button
         matTooltip="Open texteditor"
         matTooltipPosition="below"
-        [tabindex]="tabIndex"
-        [disabled]="isDisabled"
+        [tabindex]="tabIndex()"
+        [disabled]="isDisabled()"
         (click)="editExpressionInModal()"
-        (focusin)="forceFocus = true"
-        (focusout)="forceFocus = false"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
       >
         <step-icon name="edit" />
       </button>
@@ -148,28 +142,28 @@
       mat-flat-button
       matTooltip="Toggle dynamic field"
       matTooltipPosition="below"
-      [disabled]="isDisabled"
-      [color]="dynamic ? 'primary' : undefined"
-      [tabindex]="tabIndex"
+      [disabled]="isDisabled()"
+      [color]="dynamic() ? 'primary' : undefined"
+      [tabindex]="tabIndex()"
       (click)="toggleDynamic()"
-      (focusin)="forceFocus = true"
-      (focusout)="forceFocus = false"
+      (focusin)="forceFocus.set(true)"
+      (focusout)="forceFocus.set(false)"
     >
       <step-icon name="zap" />
     </button>
   </step-suffix>
-  @if (canRemove) {
+  @if (canRemove()) {
     <step-suffix class="button-suffix">
       <button
         type="button"
         mat-stroked-button
         matTooltip="Remove"
         matTooltipPosition="below"
-        [disabled]="isDisabled"
-        [tabindex]="tabIndex"
+        [disabled]="isDisabled()"
+        [tabindex]="tabIndex()"
         (click)="remove.emit()"
-        (focusin)="forceFocus = true"
-        (focusout)="forceFocus = false"
+        (focusin)="forceFocus.set(true)"
+        (focusout)="forceFocus.set(false)"
       >
         <step-icon name="x" />
       </button>

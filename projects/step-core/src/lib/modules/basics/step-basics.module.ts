@@ -57,9 +57,10 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
 import { ListSelectComponent } from './components/list-select/list-select.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -237,6 +238,7 @@ export * from './types/validators/json-validator';
 export * from './types/validators/number-validator';
 export * from './types/validators/boolean-validator';
 export * from './types/validators/coma-split-array-validator';
+export * from './types/validators/is-regex-validator';
 export * from './types/is-used-by-dialog-data';
 export * from './types/is-used-by-search-type';
 export * from './injectables/multiple-projects.service';
@@ -257,13 +259,14 @@ export * from './injectables/object-utils.service';
 export * from './injectables/dialogs.service';
 export * from './types/bulk-operation-type.enum';
 export * from './types/string-array-regex';
+export * from './types/string-hash';
 export * from './injectables/dialog-parent.service';
 export * from './injectables/alerts.service';
 export * from './injectables/quick-access-route.service';
 export * from './types/marker-type.enum';
 export * from './types/dialog-route';
 export * from './types/dialog-route-result';
-export * from './types/quick-access-route';
+export * from './types/step-route-additional-config';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './directives/input-model-formatter.directive';

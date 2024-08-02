@@ -19,6 +19,7 @@ import {
   EntityRegistry,
   preloadScreenDataResolver,
   schedulePlanRoute,
+  stepRouteAdditionalConfig,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -165,11 +166,16 @@ export class ExecutionModule {
   }
 
   private registerRoutes(): void {
-    this._viewRegistry.registerRoute({
-      path: 'repository',
-      component: RepositoryComponent,
-      children: [schedulePlanRoute()],
-    });
+    this._viewRegistry.registerRoute(
+      stepRouteAdditionalConfig(
+        { quickAccessAlias: 'repository' },
+        {
+          path: 'repository',
+          component: RepositoryComponent,
+          children: [schedulePlanRoute()],
+        },
+      ),
+    );
 
     this._viewRegistry.registerRoute({
       path: 'executions',

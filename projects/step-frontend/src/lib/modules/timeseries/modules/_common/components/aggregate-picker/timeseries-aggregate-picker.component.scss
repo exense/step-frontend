@@ -1,0 +1,25 @@
+.custom-pcl-container {
+  display: flex;
+  flex-direction: row;
+  padding: 1.2rem;
+
+  input {
+    width: 7rem;
+    max-width: 8rem;
+    outline-width: 0 !important;
+
+    &::placeholder {
+      font-size: 1.2rem;
+    }
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.selected-menu-item {
+  background: rgba(0, 0, 0, 0.04);
+}

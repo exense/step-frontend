@@ -11,10 +11,11 @@ import './components/script-editor/script-editor.component';
 import { FunctionTypeScriptComponent } from './components/function-type-script/function-type-script.component';
 import './components/function-type-script/function-type-script.component';
 import { canDeactivateFn } from './guards/can-deactivate-function';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, NgxMatSelectSearchModule],
   exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {

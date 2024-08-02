@@ -11,6 +11,11 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import {
+  AggregateParams,
+  TimeseriesAggregatePickerComponent,
+} from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -22,7 +27,7 @@ export interface ChartDashletSettingsData {
   templateUrl: './chart-dashlet-settings.component.html',
   styleUrls: ['./chart-dashlet-settings.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, FilterBarItemComponent],
+  imports: [COMMON_IMPORTS, FilterBarItemComponent, TimeseriesAggregatePickerComponent],
 })
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
@@ -33,19 +38,11 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   _attributesByKey: Record<string, MetricAttribute> = {};
 
+  @ViewChild('primaryAggregateMenuTrigger') primaryAggregateMenuTrigger?: MatMenuTrigger;
+  @ViewChild('secondaryAggregateMenuTrigger') secondaryAggregateMenuTrigger?: MatMenuTrigger;
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly AGGREGATE_TYPES: ChartAggregation[] = [
-    ChartAggregation.SUM,
-    ChartAggregation.AVG,
-    ChartAggregation.MAX,
-    ChartAggregation.MIN,
-    ChartAggregation.COUNT,
-    ChartAggregation.RATE,
-    ChartAggregation.MEDIAN,
-    ChartAggregation.PERCENTILE,
-  ];
   readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
@@ -71,22 +68,12 @@ export class ChartDashletSettingsComponent implements OnInit {
       .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
-  onSecondaryAggregateSelect(aggregation: ChartAggregation) {
-    if (!aggregation) {
-      this.item.chartSettings!.secondaryAxes = undefined;
-    } else {
-      this.item.chartSettings!.secondaryAxes = {
-        aggregation: aggregation,
-        unit: '',
-        displayType: 'BAR_CHART',
-        pclValue: this.PCL_VALUES[0],
-        colorizationType: 'STROKE',
-      };
-    }
-  }
-
   addFilterItem(attribute: MetricAttribute) {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
+  }
+
+  handleFilterItemChange(index: number, item: FilterBarItem) {
+    this.filterItems[index] = item;
   }
 
   addCustomFilter(type: FilterBarItemType) {
@@ -111,7 +98,30 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._dialogRef.close({ ...this.item });
   }
 
-  switchAggregate(aggregate: ChartAggregation) {
-    this.item.chartSettings!.primaryAxes.aggregation = aggregate;
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+    this.item.chartSettings!.primaryAxes.aggregation = {
+      type: change.aggregate!,
+      params: change.params,
+    };
+    this.primaryAggregateMenuTrigger?.closeMenu();
+  }
+
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+    const newAggregate = change.aggregate;
+    if (newAggregate) {
+      if (!this.item.chartSettings!.secondaryAxes) {
+        this.item.chartSettings!.secondaryAxes = {
+          aggregation: { type: newAggregate, params: change.params },
+          displayType: 'BAR_CHART',
+          colorizationType: 'STROKE',
+          unit: '',
+        };
+      } else {
+        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
+      }
+    } else {
+      this.item.chartSettings!.secondaryAxes = undefined;
+    }
+    this.secondaryAggregateMenuTrigger?.closeMenu();
   }
 }

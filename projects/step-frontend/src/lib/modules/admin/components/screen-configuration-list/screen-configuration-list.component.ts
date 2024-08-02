@@ -8,7 +8,7 @@ import {
   AugmentedScreenService,
 } from '@exense/step-core';
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
-import { filter, map, of, switchMap } from 'rxjs';
+import { filter, map, of, switchMap, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -84,7 +84,11 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
   }
 
   addScreen(): void {
-    this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new`);
+    this.searchableScreens.total$
+      .pipe(takeUntilDestroyed(this._destroyRef), take(1))
+      .subscribe((data) =>
+        this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new?nextIndex=${data}`),
+      );
   }
 
   editScreen(screen: ScreenInput): void {

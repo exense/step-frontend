@@ -7,50 +7,58 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
-  TrackByFunction,
+  TemplateRef,
 } from '@angular/core';
 import { FormBuilder, NonNullableFormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
-import { DynamicFieldGroupValue } from '../../shared/dynamic-field-group-value';
+import { DynamicValueString } from '../../../../client/generated';
+import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
 import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
+import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
-import { DynamicFieldsSchema } from '../../shared/dynamic-fields-schema';
-import { JsonFieldType } from '../../../json-forms';
+import { DynamicFieldsSchema, SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
+import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
+import { ComplexFieldContext } from '../../services/complex-field-context.service';
+import { DynamicFieldUtilsService } from '../../services/dynamic-field-utils.service';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
 @Component({
-  selector: 'step-dynamic-field-group',
-  templateUrl: './dynamic-field-group-editor.component.html',
-  styleUrls: ['./dynamic-field-group-editor.component.scss'],
+  selector: 'step-dynamic-field-object-editor',
+  templateUrl: './dynamic-field-object-editor.component.html',
+  styleUrls: ['./dynamic-field-object-editor.component.scss'],
 })
-export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
+export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
   private _fb = inject(FormBuilder);
+  private _utils = inject(DynamicFieldUtilsService);
   private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
   private schemaJson: string = '';
 
-  private lastFormValue?: DynamicFieldGroupValue;
+  private lastFormValue?: DynamicFieldObjectValue;
 
   @Input() primaryFieldsLabel?: string;
   @Input() optionalFieldsLabel?: string;
   @Input() primaryFieldsDescription?: string;
   @Input() optionalFieldsDescription?: string;
   @Input() addFieldBtnLabel?: string;
+  @Input() complexObjectTemplate?: TemplateRef<ComplexFieldContext>;
+  @Input() complexArrayTemplate?: TemplateRef<ComplexFieldContext>;
 
   @Input() isDisabled?: boolean;
-  @Input() schema?: DynamicFieldsSchema;
+  @Input() schema?: SchemaObjectField;
   @Input() allowNotSchemaFields: boolean = false;
-  @Input() value?: DynamicFieldGroupValue;
-  @Output() valueChange = new EventEmitter<DynamicFieldGroupValue | undefined>();
+  @Input() value?: DynamicFieldObjectValue;
+  @Output() valueChange = new EventEmitter<DynamicFieldObjectValue | undefined>();
+
+  @Input() isChildNode = false;
+
   protected primaryFields: DynamicFieldMetaData[] = [];
   protected optionalFields: DynamicFieldMetaData[] = [];
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
-  readonly trackByField: TrackByFunction<DynamicFieldMetaData> = (index, item) => item.trackId;
 
   ngOnDestroy(): void {
     this.destroyForm();
@@ -59,7 +67,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     let schemeChanged = false;
     let schema: DynamicFieldsSchema | undefined = undefined;
-    let value: DynamicFieldGroupValue | undefined = undefined;
+    let value: DynamicFieldObjectValue | undefined = undefined;
 
     const cSchema = changes['schema'];
     const cValue = changes['value'];
@@ -79,7 +87,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
     if (schemeChanged) {
       this.buildForm(schema, value);
-    } else if (value && !this.isFieldGroupValueEqual(value, this.lastFormValue)) {
+    } else if (value && !this._utils.areDynamicFieldObjectsEqual(value, this.lastFormValue)) {
       this.assignValueToForm(value);
     }
 
@@ -89,7 +97,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  protected updateLabel(field: DynamicFieldMetaData, label: string): void {
+  protected updateLabel(field: DynamicFieldMetaData, label?: string): void {
     if (field.label === label) {
       return;
     }
@@ -131,7 +139,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     controlNames.forEach((controlName) => this.form.removeControl(controlName));
   }
 
-  private buildForm(schema?: DynamicFieldsSchema, value?: DynamicFieldGroupValue): void {
+  private buildForm(schema?: DynamicFieldsSchema, value?: DynamicFieldObjectValue): void {
     schema = schema || this.schema;
     value = value || this.value;
     this.schemaJson = schema ? JSON.stringify(schema) : '';
@@ -175,20 +183,20 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
 
     this.form.valueChanges
       .pipe(debounceTime(300), takeUntil(this.terminator$))
-      .subscribe((formValue: DynamicFieldGroupValue) => {
+      .subscribe((formValue: DynamicFieldObjectValue) => {
         //remove temp values
         const result = Object.keys(formValue)
           .filter((key) => !key.startsWith('temp_'))
           .reduce((res, key) => {
             res[key] = formValue[key];
             return res;
-          }, {} as DynamicFieldGroupValue);
+          }, {} as DynamicFieldObjectValue);
         this.lastFormValue = result;
         this.valueChange.emit(result);
       });
   }
 
-  private assignValueToForm(value: DynamicFieldGroupValue): void {
+  private assignValueToForm(value: DynamicFieldObjectValue): void {
     this.terminate();
 
     // assign required inputs
@@ -227,13 +235,14 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
   private addFieldInternal(
     schema: DynamicFieldsSchema | undefined,
     field: string,
-    value: DynamicFieldGroupValue = {},
+    value: DynamicFieldObjectValue = {},
     config?: { isRequired?: boolean; isAdditional?: boolean },
   ): void {
     const isRequired = !!config?.isRequired;
     const isAdditional = !!config?.isAdditional;
 
-    let fieldType!: JsonFieldType;
+    let fieldSchema: SchemaField | undefined;
+    let fieldType: DynamicFieldType | undefined;
     let enumItems: string[] = [];
 
     if (!isAdditional) {
@@ -241,37 +250,19 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       if (!fieldDescription) {
         throw new Error('Invalid schema');
       }
-
-      if (fieldDescription.enum) {
-        fieldType = JsonFieldType.ENUM;
-        enumItems = fieldDescription.enum;
-      } else {
-        switch (fieldDescription.type) {
-          case 'string':
-            fieldType = JsonFieldType.STRING;
-            break;
-          case 'number':
-          case 'integer':
-            fieldType = JsonFieldType.NUMBER;
-            break;
-          case 'boolean':
-            fieldType = JsonFieldType.BOOLEAN;
-            break;
-          case 'array':
-            fieldType = JsonFieldType.ARRAY;
-            break;
-          case 'object':
-            fieldType = JsonFieldType.OBJECT;
-            break;
-          default:
-            break;
-        }
-      }
+      const params = this._utils.determineFieldMetaParameters(fieldDescription);
+      fieldType = params.fieldType;
+      fieldSchema = params.fieldSchema;
+      enumItems = params.enumItems;
     } else {
-      fieldType = JsonFieldType.STRING;
+      fieldType = DynamicFieldType.STRING;
     }
 
-    const fieldValue: DynamicValueString | DynamicValueBoolean | DynamicValueInteger = value[field] || {
+    if (!fieldType) {
+      throw new Error('Invalid schema');
+    }
+
+    const fieldValue: DynamicValue = value[field] || {
       ...DEFAULT_FIELD_VALUE,
     };
     if (fieldValue.value === undefined && value[field] === undefined) {
@@ -279,14 +270,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
-    const control = this.formBuilder.control<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>(
-      fieldValue,
-      validator,
-    );
-
-    if (!fieldType) {
-      throw new Error('Invalid schema');
-    }
+    const control = this.formBuilder.control<DynamicValue>(fieldValue, validator);
 
     const meta: DynamicFieldMetaData = {
       trackId: `track_${v4()}`,
@@ -294,6 +278,7 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
       label: field,
       control,
       fieldType,
+      fieldSchema,
       isRequired,
       isAdditional,
       enumItems,
@@ -322,36 +307,5 @@ export class DynamicFieldGroupEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  private isFieldGroupValueEqual(valueA?: DynamicFieldGroupValue, valueB?: DynamicFieldGroupValue): boolean {
-    if (valueA === valueB) {
-      return true;
-    }
-    if (valueA === undefined || valueB === undefined) {
-      return false;
-    }
-    const keysA = Object.keys(valueA || {});
-    const keysB = Object.keys(valueB || {});
-    if (keysA.length !== keysB.length) {
-      return false;
-    }
-    const keysEqual = keysA.every((key) => keysB.includes(key));
-    if (!keysEqual) {
-      return false;
-    }
-
-    for (let key of keysA) {
-      const fieldA = valueA?.[key];
-      const fieldB = valueB?.[key];
-      if (
-        fieldA?.dynamic !== fieldB?.dynamic ||
-        fieldA?.value !== fieldB?.value ||
-        fieldA?.expression !== fieldB?.expression ||
-        fieldA?.expressionType !== fieldB?.expression
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
+  protected readonly DynamicFieldType = DynamicFieldType;
 }
