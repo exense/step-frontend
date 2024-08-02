@@ -6,11 +6,10 @@ import { booleanValidator } from '../../../basics/types/validators/boolean-valid
 import { jsonValidator } from '../../../basics/types/validators/json-validator';
 import { comaSplitArrayValidator } from '../../../basics/types/validators/coma-split-array-validator';
 import { MatDialogRef } from '@angular/material/dialog';
-import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { JsonSchemaFieldType } from '../../../json-forms';
+import { JsonFieldSchemaMeta, JsonSchemaFieldType } from '../../../json-forms';
 
-type DialogRef = MatDialogRef<AddSchemaFieldDialogComponent, FieldSchemaMeta>;
+type DialogRef = MatDialogRef<AddSchemaFieldDialogComponent, JsonFieldSchemaMeta>;
 
 @Component({
   selector: 'step-add-schema-field-dialog',

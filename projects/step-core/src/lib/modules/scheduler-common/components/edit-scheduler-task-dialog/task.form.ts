@@ -26,6 +26,7 @@ export const taskFormCreate = (fb: FormBuilder) => {
     includedRepositoryIds: fb.control<string[]>([]),
     includedRepositoryNames: fb.control<string[]>([]),
     assertionPlan: fb.control<string>(''),
+    active: fb.control<boolean>(false),
   });
 
   form.controls.repositoryId.disable();
@@ -96,6 +97,7 @@ export const taskModel2Form = (task: ExecutiontTaskParameters, form: TaskForm, f
     includedRepositoryNames,
     cronExclusions: [],
     assertionPlan,
+    active: !!task.active,
   });
   (task.cronExclusions ?? []).forEach((exclusion) => {
     form.controls.cronExclusions.push(taskCronExclusionFormCreate(fb, exclusion));
@@ -113,6 +115,7 @@ export const taskForm2Model = (task: ExecutiontTaskParameters, form: TaskForm) =
     cronExclusions,
     repositoryParameters,
     assertionPlan,
+    active,
   } = form.value!;
   const repositoryId = form.controls.repositoryId.value;
 
@@ -155,4 +158,5 @@ export const taskForm2Model = (task: ExecutiontTaskParameters, form: TaskForm) =
     cronExpression: cron ?? '',
     description: description ?? '',
   }));
+  task.active = !!active;
 };
