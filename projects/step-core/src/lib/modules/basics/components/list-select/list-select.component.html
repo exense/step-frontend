@@ -1,3 +1,8 @@
+@if (selectAll() !== SelectAll.NONE) {
+  <mat-checkbox color="primary" [checked]="selectAllValue()" (click)="toggleSelectAll()" [disabled]="isDisabled()">
+    Select All
+  </mat-checkbox>
+}
 @for (item of displayList(); track item.key) {
   <mat-checkbox
     color="primary"

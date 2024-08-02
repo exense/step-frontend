@@ -1,16 +1,17 @@
-import { Component, DestroyRef, effect, HostListener, inject, model, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, model, OnInit, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl } from '@angular/forms';
 import {
   AugmentedControllerService,
   AugmentedSchedulerService,
   ExecutiontTaskParameters,
+  Plan,
   RepositoryObjectReference,
 } from '../../../../client/step-client-module';
 import { CronEditorTab, CronService } from '../../../cron/cron.module';
 import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.constant';
 import { CustomFormWrapperComponent } from '../../../custom-forms';
-import { DialogRouteResult } from '../../../basics/step-basics.module';
+import { DialogRouteResult, SelectAll } from '../../../basics/step-basics.module';
 import { SelectPlanComponent } from '../../../plan-common';
 import {
   EXCLUSION_ID,
@@ -27,7 +28,6 @@ import {
   distinctUntilChanged,
   map,
   of,
-  partition,
   shareReplay,
   startWith,
   switchMap,
@@ -43,6 +43,7 @@ export interface EditSchedulerTaskDialogConfig {
   disablePlan?: boolean;
   disableUser?: boolean;
   hideUser?: boolean;
+  plan?: Plan;
 }
 
 export interface EditSchedulerTaskDialogData {
@@ -159,7 +160,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     if (this.config?.disableUser) {
       this.taskForm.controls.userID.disable();
     }
-    taskModel2Form(this.task, this.taskForm, this._fb);
+    taskModel2Form(this.task, this.taskForm, this._fb, this.config?.plan);
     const repositoryId = this.taskForm.controls.repositoryId.value;
     this.isNew.set(!this.taskForm.controls.name.value);
     this.isLocal.set(repositoryId === LOCAL_REPOSITORY_ID);
@@ -249,4 +250,6 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       takeUntilDestroyed(this._destroyRef),
     );
   }
+
+  protected readonly SelectAll = SelectAll;
 }

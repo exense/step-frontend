@@ -21,13 +21,21 @@
       @if (testCasesWithIds(); as testCases) {
         <step-form-field>
           <step-label>Test cases</step-label>
-          <step-list-select [items]="$any(testCases)" formControlName="includedRepositoryIds" />
+          <step-list-select
+            [selectAll]="SelectAll.EMPTY_LIST_WHEN_ALL_SELECTED"
+            [items]="$any(testCases)"
+            formControlName="includedRepositoryIds"
+          />
         </step-form-field>
       }
       @if (testCasesNamesOnly(); as testCases) {
         <step-form-field>
           <step-label>Test cases</step-label>
-          <step-list-select [items]="$any(testCases)" formControlName="includedRepositoryNames" />
+          <step-list-select
+            [selectAll]="SelectAll.EMPTY_LIST_WHEN_ALL_SELECTED"
+            [items]="$any(testCases)"
+            formControlName="includedRepositoryNames"
+          />
         </step-form-field>
       }
       <step-form-field [showRequiredMarker]="true" alignLabelAddon="near">

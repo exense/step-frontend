@@ -23,8 +23,8 @@ export const taskFormCreate = (fb: FormBuilder) => {
     cronExclusions: fb.array<TaskCronExclusionForm>([]),
     customExecutionsParameters: fb.control<Record<string, string>>({}),
     userID: fb.control<string>(''),
-    includedRepositoryIds: fb.control<string[]>([]),
-    includedRepositoryNames: fb.control<string[]>([]),
+    includedRepositoryIds: fb.control<string[] | undefined | null>(null),
+    includedRepositoryNames: fb.control<string[] | undefined | null>(null),
     assertionPlan: fb.control<string>(''),
     active: fb.control<boolean>(false),
   });
@@ -43,24 +43,19 @@ export const taskCronExclusionFormCreate = (fb: FormBuilder, initialValue?: Cron
   return form;
 };
 
-export const taskModel2Form = (task: ExecutiontTaskParameters, form: TaskForm, fb: FormBuilder) => {
+export const taskModel2Form = (
+  task: ExecutiontTaskParameters,
+  form: TaskForm,
+  fb: FormBuilder,
+  plan: Partial<Plan> | null = null,
+) => {
   const name = task.attributes?.['name'] ?? '';
   const repositoryObject = task?.executionsParameters?.repositoryObject;
   const repositoryId = repositoryObject?.repositoryID ?? 'local';
   const repositoryParameters = repositoryObject?.repositoryParameters ?? {};
   const assertionPlan = task.assertionPlan ?? '';
 
-  let plan: Partial<Plan> | null = null;
-
   const isLocal = repositoryId === 'local';
-  if (isLocal) {
-    const id = repositoryParameters?.['planid'];
-    const name = task.executionsParameters?.description ?? '';
-    if (id) {
-      plan = { id, attributes: { name } };
-    }
-    delete repositoryParameters?.['planid'];
-  }
   const cron = task.cronExpression ?? '';
   const description = task.attributes?.['description'] ?? '';
   const customExecutionsParameters = task?.executionsParameters?.customParameters ?? {};
@@ -68,8 +63,8 @@ export const taskModel2Form = (task: ExecutiontTaskParameters, form: TaskForm, f
 
   form.controls.plan.setValidators(isLocal ? [Validators.required] : null);
 
-  let includedRepositoryIds: string[] = [];
-  let includedRepositoryNames: string[] = [];
+  let includedRepositoryIds: string[] | null = null;
+  let includedRepositoryNames: string[] | null = null;
   const artefactsFilter = task.executionsParameters?.artefactFilter;
   if (artefactsFilter) {
     switch (artefactsFilter.class) {
@@ -136,19 +131,20 @@ export const taskForm2Model = (task: ExecutiontTaskParameters, form: TaskForm) =
   }
 
   const includedIds = form.controls.includedRepositoryIds.value;
-  if (includedIds?.length) {
+  const includedNames = form.controls.includedRepositoryNames.value;
+
+  if (includedIds) {
     task.executionsParameters.artefactFilter = {
       class: ArtefactFilterType.TEST_CASES_ID,
       includedIds,
     } as ArtefactFilter;
-  }
-
-  const includedNames = form.controls.includedRepositoryNames.value;
-  if (includedNames?.length) {
+  } else if (includedNames) {
     task.executionsParameters.artefactFilter = {
       class: ArtefactFilterType.TEST_CASES,
       includedNames,
     } as ArtefactFilter;
+  } else {
+    task.executionsParameters.artefactFilter = undefined;
   }
 
   task.cronExpression = cron!;

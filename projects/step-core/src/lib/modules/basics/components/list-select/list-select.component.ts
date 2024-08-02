@@ -5,6 +5,12 @@ import { KeyValue } from '@angular/common';
 type OnChange = <T>(value?: T[]) => void;
 type OnTouch = () => void;
 
+export enum SelectAll {
+  NONE,
+  EMPTY_LIST_WHEN_ALL_SELECTED,
+  FILLED_LIST_WHEN_ALL_SELECTED,
+}
+
 @Component({
   selector: 'step-list-select',
   templateUrl: './list-select.component.html',
@@ -24,6 +30,15 @@ export class ListSelectComponent<T> implements ControlValueAccessor {
 
   private selected = signal<T[] | undefined>(undefined);
   protected isDisabled = signal(false);
+
+  protected readonly SelectAll = SelectAll;
+
+  readonly selectAll = input(SelectAll.NONE);
+  protected selectAllValue = computed(() => {
+    const selected = this.selected();
+    const items = this.items();
+    return selected?.length === items.length;
+  });
 
   /**
    * @Input()
@@ -46,7 +61,7 @@ export class ListSelectComponent<T> implements ControlValueAccessor {
   });
 
   writeValue(value?: T[]): void {
-    this.selected.set(value);
+    this.assignModel(value);
   }
 
   registerOnChange(onChange?: OnChange): void {
@@ -61,7 +76,7 @@ export class ListSelectComponent<T> implements ControlValueAccessor {
     this.isDisabled.set(isDisabled);
   }
 
-  toggleItem(key: T, isSelected: boolean): void {
+  protected toggleItem(key: T, isSelected: boolean): void {
     if (this.isDisabled()) {
       return;
     }
@@ -82,7 +97,44 @@ export class ListSelectComponent<T> implements ControlValueAccessor {
       }
     }
     this.selected.set(selected);
-    this.onChange?.(selected);
+    this.emitModelChange(selected);
     this.onTouch?.();
+  }
+
+  protected toggleSelectAll(): void {
+    if (this.isDisabled()) {
+      return;
+    }
+    const currentSelection = this.selectAllValue();
+    const selected = currentSelection ? [] : this.items().map((item) => item.key);
+    this.selected.set(selected);
+    this.emitModelChange(selected);
+    this.onTouch?.();
+  }
+
+  private assignModel(value?: T[]): void {
+    if (this.selectAll() !== SelectAll.EMPTY_LIST_WHEN_ALL_SELECTED) {
+      this.selected.set(value);
+      return;
+    }
+
+    if (!value) {
+      this.selected.set(this.items().map((item) => item.key));
+    } else {
+      this.selected.set(value);
+    }
+  }
+
+  private emitModelChange(value?: T[]): void {
+    if (this.selectAll() !== SelectAll.EMPTY_LIST_WHEN_ALL_SELECTED) {
+      this.onChange?.(value);
+      return;
+    }
+
+    if (value?.length === this.items().length) {
+      this.onChange?.(undefined);
+    } else {
+      this.onChange?.(value);
+    }
   }
 }

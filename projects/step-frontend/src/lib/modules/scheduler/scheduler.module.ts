@@ -24,7 +24,7 @@ import { SchedulerConfigurationComponent } from './components/scheduler-configur
 import './components/scheduler-configuration/scheduler-configuration.component';
 import { ScheduledTaskBulkOperationsRegisterService } from './services/scheduled-task-bulk-operations-register.service';
 import { CronExpressionCellComponent } from './components/cron-expression-cell/cron-expression-cell.component';
-import { map } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
@@ -81,7 +81,7 @@ export class SchedulerModule {
                 taskAndConfig: () => {
                   const _api = inject(AugmentedSchedulerService);
                   const _dialogs = inject(EditSchedulerTaskDialogUtilsService);
-                  return _api.createExecutionTask().pipe(map((task) => _dialogs.prepareTaskAndConfig(task)));
+                  return _api.createExecutionTask().pipe(switchMap((task) => _dialogs.prepareTaskAndConfig(task)));
                 },
               },
             }),
