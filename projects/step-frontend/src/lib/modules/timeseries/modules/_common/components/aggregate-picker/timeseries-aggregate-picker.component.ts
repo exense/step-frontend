@@ -1,6 +1,18 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { ChartAggregation } from '../../types/chart-aggregation';
+import { MetricAggregation } from '@exense/step-core';
+
+interface RateUnit {
+  menuLabel: string;
+  unitLabel: string;
+  tphMultiplier: number;
+}
+
+export interface AggregateParams {
+  pclValue?: number;
+  rateUnit?: string;
+}
 
 @Component({
   selector: 'step-timeseries-aggregate-picker',
@@ -12,11 +24,18 @@ import { ChartAggregation } from '../../types/chart-aggregation';
 export class TimeseriesAggregatePickerComponent implements OnChanges {
   protected readonly ChartAggregation = ChartAggregation;
 
-  @Input() selectedAggregate!: ChartAggregation;
+  @Input() selectedAggregate: MetricAggregation | undefined;
   @Input() pclValue?: number;
   @Input() allowEmptyAggregate: boolean = false;
 
-  @Output() aggregateChange: EventEmitter<{ aggregate?: ChartAggregation; pclValue?: number }> = new EventEmitter();
+  @Output() aggregateChange: EventEmitter<{ aggregate?: ChartAggregation; params?: AggregateParams }> =
+    new EventEmitter();
+
+  readonly RATE_UNITS: RateUnit[] = [
+    { menuLabel: 'Per second', unitLabel: 's', tphMultiplier: 1 / 3600 },
+    { menuLabel: 'Per minute', unitLabel: 'm', tphMultiplier: 1 / 60 },
+    { menuLabel: 'Per hour', unitLabel: 'h', tphMultiplier: 1 },
+  ];
 
   readonly PCL_VALUES = [80, 90, 99];
   readonly AGGREGATES: ChartAggregation[] = [
@@ -25,7 +44,6 @@ export class TimeseriesAggregatePickerComponent implements OnChanges {
     ChartAggregation.MAX,
     ChartAggregation.MIN,
     ChartAggregation.COUNT,
-    ChartAggregation.RATE,
     ChartAggregation.MEDIAN,
   ];
 
@@ -49,6 +67,10 @@ export class TimeseriesAggregatePickerComponent implements OnChanges {
   }
 
   switchAggregate(aggregate?: ChartAggregation, pclValue?: number) {
-    this.aggregateChange.emit({ aggregate, pclValue });
+    this.aggregateChange.emit({ aggregate, params: { pclValue } });
+  }
+
+  selectRateAggregate(unit: RateUnit) {
+    this.aggregateChange.emit({ aggregate: ChartAggregation.RATE, params: { rateUnit: unit.unitLabel } });
   }
 }

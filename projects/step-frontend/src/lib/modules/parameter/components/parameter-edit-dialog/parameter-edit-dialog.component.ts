@@ -9,8 +9,11 @@ import {
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, map, of } from 'rxjs';
+import { combineLatest, delay, map, of, switchMap } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { DialogCommunicationService } from '../../services/dialog-communication.service';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -21,8 +24,16 @@ interface ParameterEditDialogData {
   selector: 'step-parameter-edit-dialog',
   templateUrl: './parameter-edit-dialog.component.html',
   styleUrls: ['./parameter-edit-dialog.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      state('visible', style({ opacity: 1 })),
+      state('hidden', style({ opacity: 0 })),
+      transition('hidden <=> visible', animate('300ms ease-in-out')),
+    ]),
+  ],
 })
 export class ParameterEditDialogComponent implements OnInit {
+  animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
   private _authService = inject(AuthService);
   private _allScopeItems = inject(SCOPE_ITEMS);
@@ -30,6 +41,8 @@ export class ParameterEditDialogComponent implements OnInit {
   private _api = inject(AugmentedParametersService);
   private _screenApi = inject(AugmentedScreenService);
   private _parameterScopeRenderer = inject(ParameterScopeRendererService);
+  private _snackBar = inject(MatSnackBar);
+  private _dialogCommunicationService = inject(DialogCommunicationService);
 
   protected parameter = this._dialogData.entity;
 
@@ -59,6 +72,31 @@ export class ParameterEditDialogComponent implements OnInit {
     this._api.saveParameter(this.parameter).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
+  }
+
+  saveAndNext() {
+    this.animationState = 'hidden';
+    this._api
+      .saveParameter(this.parameter)
+      .pipe(
+        switchMap((data) => {
+          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok', {
+            duration: 5000,
+          });
+          return this._api.newParameter();
+        }),
+        delay(300),
+      )
+      .subscribe((parameter) => {
+        this.animationState = 'visible';
+        this.parameter = {
+          ...this.parameter,
+          id: parameter.id,
+          lastModificationDate: parameter.lastModificationDate,
+          lastModificationUser: parameter.lastModificationUser,
+        };
+        this._dialogCommunicationService.triggerDialogAction();
+      });
   }
 
   selectScope(scopeItem: ScopeItem): void {

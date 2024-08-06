@@ -23,9 +23,10 @@ import { ParameterEditDialogComponent } from './components/parameter-edit-dialog
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule],
+  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule],
   exports: [ParameterListComponent, ParameterSelectionComponent],
   declarations: [
     ParameterListComponent,
