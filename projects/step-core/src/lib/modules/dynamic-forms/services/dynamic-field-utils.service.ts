@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SchemaField } from '../shared/dynamic-fields-schema';
+import { SchemaField, SchemaSimpleField } from '../shared/dynamic-fields-schema';
 import { DynamicFieldType } from '../shared/dynamic-field-type';
 import { DynamicValue } from '../../../client/augmented/models/dynamic-value-complex-types';
 import { DynamicFieldArrayValue, DynamicFieldObjectValue } from '../shared/dynamic-field-group-value';
@@ -19,9 +19,9 @@ export class DynamicFieldUtilsService {
     let fieldType: DynamicFieldType | undefined;
     let enumItems: string[] = [];
 
-    if (!fieldDescription.type && fieldDescription.enum) {
+    if ((fieldDescription as SchemaSimpleField).enum) {
       fieldType = DynamicFieldType.ENUM;
-      enumItems = fieldDescription.enum;
+      enumItems = (fieldDescription as SchemaSimpleField).enum!;
     } else {
       switch (fieldDescription.type) {
         case 'string':
