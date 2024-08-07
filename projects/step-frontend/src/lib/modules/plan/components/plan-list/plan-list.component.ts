@@ -10,6 +10,7 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
   tableColumnsConfigProvider,
+  ToastService,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
 
@@ -34,7 +35,7 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
 export class PlanListComponent implements DialogParentService {
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
-
+  private toast = inject(ToastService);
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -58,7 +59,7 @@ export class PlanListComponent implements DialogParentService {
         switchMap((clone) => this._plansApiService.savePlan(clone)),
         this.updateDataSourceAfterChange,
       )
-      .subscribe();
+      .subscribe(() => this.toast.showToast('Plan successfully duplicated', [], 3000));
   }
 
   deletePlan(plan: Plan): void {

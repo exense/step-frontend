@@ -1,0 +1,14 @@
+@if (message) {
+  <div class="toast">
+    <span class="success-icon">&#10003;</span>
+    <p class="toast-message">{{ message }}</p>
+    <div class="toast-actions">
+      @for (action of actions; track action) {
+        <a (click)="action.handler()" class="action-btn" type="button" color="primary">
+          {{ action.label }}
+        </a>
+      }
+    </div>
+    <button class="dismiss-btn" (click)="closeToast()">&#x2715;</button>
+  </div>
+}

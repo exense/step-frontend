@@ -1,0 +1,5 @@
+<div class="toast-container">
+  @for (toast of toasts; track toast) {
+    <step-toast [message]="toast.message" [actions]="toast.actions" [duration]="toast.duration"> </step-toast>
+  }
+</div>
