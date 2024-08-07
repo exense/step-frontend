@@ -309,6 +309,7 @@ export { X } from './svg/x';
 export { ZapOff } from './svg/zap-off';
 export { CheckSquare } from './svg/check-square';
 export { Zap } from './svg/zap';
+export { ZapCircle } from './svg/zap-circle';
 export { ZoomIn } from './svg/zoom-in';
 export { ChevronDown } from './svg/chevron-down';
 export { ZoomOut } from './svg/zoom-out';

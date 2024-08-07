@@ -17,7 +17,7 @@ import { ParameterScopeComponent } from './components/parameter-scope/parameter-
 import './components/parameter-selection/parameter-selection.component';
 import { ParameterSelectionComponent } from './components/parameter-selection/parameter-selection.component';
 import { ParametersKeyComponent } from './components/parameters-key/parameters-key.component';
-import { ParametersListComponent } from './components/parameters-list/parameters-list.component';
+import { ParameterListComponent } from './components/parameter-list/parameter-list.component';
 import { ParameterLastModificationComponent } from './components/parameter-last-modification/parameter-last-modification.component';
 import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
@@ -27,9 +27,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule],
-  exports: [ParametersListComponent, ParameterSelectionComponent],
+  exports: [ParameterListComponent, ParameterSelectionComponent],
   declarations: [
-    ParametersListComponent,
+    ParameterListComponent,
     ParametersKeyComponent,
     ParameterScopeComponent,
     ParameterSelectionComponent,
@@ -55,7 +55,7 @@ export class ParameterModule {
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
     _vewRegistry.registerRoute({
       path: 'parameters',
-      component: ParametersListComponent,
+      component: ParameterListComponent,
       children: [
         {
           path: 'editor',
