@@ -6,7 +6,7 @@
     <a href="#" (click)="hideMeasures = !hideMeasures; (false)">Measurments ({{ node.measures.length }})</a>
   </div>
   <div *ngIf="!hideMeasures" class="node-detail-text">
-    <step-table [dataSource]="node.measures" matSort>
+    <step-table [dataSource]="measuresDataSource" matSort>
       <ng-container matColumnDef="begin">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Begin</th>
         <td mat-cell *matCellDef="let measure">
