@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DateFormat, Execution, Measure, ReportNode } from '@exense/step-core';
+import { DateFormat, Execution, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 
@@ -14,6 +14,8 @@ export class CallFunctionReportNodeComponent implements OnChanges {
   @Input() node!: ReportNode | any | { measures: Measure[] };
   @Input() children!: ReportNode[];
 
+  protected measuresDataSource?: TableLocalDataSource<Measure>;
+
   displayChildren: ReportNode[] = [];
 
   hideMeasures: boolean = false;
@@ -25,6 +27,11 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     const cChildren = changes['children'];
     if (cChildren?.previousValue !== cChildren?.currentValue || cChildren?.firstChange) {
       this.filterChildren(cChildren?.currentValue);
+    }
+
+    const cNode = changes['node'];
+    if (cNode?.previousValue !== cNode?.currentValue || cNode?.firstChange) {
+      this.setupMeasuresDataSource(cNode.currentValue.measures);
     }
   }
 
@@ -51,6 +58,15 @@ export class CallFunctionReportNodeComponent implements OnChanges {
       ([ReportNodeType.ASSERT_REPORT_NODE, ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE] as string[]).includes(
         child._class,
       ),
+    );
+  }
+
+  private setupMeasuresDataSource(measures?: Measure[]): void {
+    this.measuresDataSource = new TableLocalDataSource<Measure>(
+      measures ?? [],
+      TableLocalDataSource.configBuilder<Measure>()
+        .addSortNumberPredicate('duration', (item: Measure) => item.duration)
+        .build(),
     );
   }
 }
