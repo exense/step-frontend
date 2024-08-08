@@ -51,7 +51,7 @@
             <div
               class="sidebar-subtab"
               [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
-              (stepSideBarClick)="navigateTo(entry.id, $event)"
+              (stepSideBarClick)="navigateTo(entry.id, $event, entry.isBookmark)"
             >
               <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>
               <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
