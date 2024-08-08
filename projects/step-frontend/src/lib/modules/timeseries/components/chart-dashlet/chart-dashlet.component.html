@@ -44,7 +44,10 @@
       </div>
     </mat-menu>
     @if (
-      (!item.readonlyGrouping && !item.inheritGlobalGrouping) || !item.readonlyAggregate || selectedAggregate === 'RATE'
+      (!item.readonlyGrouping && !item.inheritGlobalGrouping) ||
+      !item.readonlyAggregate ||
+      item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+      item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE
     ) {
       <button
         mat-icon-button
@@ -64,18 +67,18 @@
     @if (!item.readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
     }
-    @if (selectedAggregate === 'RATE') {
+    @if (
+      item.readonlyAggregate &&
+      (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+        item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE)
+    ) {
       <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
     }
   </mat-menu>
 
   <mat-menu #rateUnitMenu="matMenu">
-    @for (rate of RATE_UNITS; track rate.tphMultiplier) {
-      <button
-        mat-menu-item
-        [class.selected-menu-item]="rate.tphMultiplier === selectedRateUnit.tphMultiplier"
-        (click)="switchRateUnit(rate)"
-      >
+    @for (rate of RATE_UNITS; track rate.unitKey) {
+      <button mat-menu-item (click)="switchRateUnit(rate)">
         {{ rate.menuLabel }}
       </button>
     }

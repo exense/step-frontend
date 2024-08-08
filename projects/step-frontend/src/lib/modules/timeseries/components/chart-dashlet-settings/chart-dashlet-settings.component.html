@@ -170,6 +170,9 @@
               @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
                 {{ item.chartSettings!.primaryAxes?.aggregation?.params?.['pclValue'] }}
               }
+              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE) {
+                (/{{ item.chartSettings!.primaryAxes?.aggregation?.params?.['rateUnit'] }})
+              }
             </button>
           </step-form-field>
           <step-form-field>
@@ -182,7 +185,7 @@
           </step-form-field>
           <mat-menu #aggregateMenu="matMenu">
             <step-timeseries-aggregate-picker
-              [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+              [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
               [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
               (aggregateChange)="handlePrimaryAggregationChange($event)"
             />
