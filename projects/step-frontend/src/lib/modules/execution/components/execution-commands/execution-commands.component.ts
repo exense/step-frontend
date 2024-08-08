@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   AugmentedExecutionsService,
   AugmentedScreenService,
@@ -18,6 +28,7 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
   selector: 'step-execution-commands',
   templateUrl: './execution-commands.component.html',
   styleUrls: ['./execution-commands.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionCommandsComponent implements OnInit, OnChanges {
   private _executionTabManager = inject(ExecutionTabManagerService, { optional: true });
@@ -33,6 +44,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() isolateExecution?: boolean;
   @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
+  @Input() displayParametersForm = true;
 
   @Output() refresh = new EventEmitter<void>();
   @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();

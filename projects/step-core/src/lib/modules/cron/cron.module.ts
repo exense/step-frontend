@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CronEditorComponent } from './components/cron-editor/cron-editor.component';
 import { StepBasicsModule } from '../basics/step-basics.module';
 import { StepMaterialModule } from '../step-material/step-material.module';
-import { TabsModule } from '../tabs/tabs.module';
 import { MinutesEditorComponent } from './components/minutes-editor/minutes-editor.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -24,6 +23,7 @@ import { DayOfWeekSelectorComponent } from './components/week-selector/day-of-we
 import { WeeklyTimeRangeEditorComponent } from './components/weekly-time-range-editor/weekly-time-range-editor.component';
 import { AnyDateRangeEditorComponent } from './components/any-date-range-editor/any-date-range-editor.component';
 import { DatePickerModule } from '../date-picker/date-picker.module';
+import { TAB_EXPORTS } from '../tabs';
 
 @NgModule({
   declarations: [
@@ -49,12 +49,12 @@ import { DatePickerModule } from '../date-picker/date-picker.module';
   ],
   imports: [
     StepBasicsModule,
-    TabsModule,
     StepMaterialModule,
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
     DatePickerModule,
+    TAB_EXPORTS,
   ],
   exports: [ValidateCronDirective],
 })

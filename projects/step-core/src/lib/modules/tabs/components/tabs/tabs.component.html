@@ -1,11 +1,30 @@
-<nav mat-tab-nav-bar [disablePagination]="disablePagination" [tabPanel]="tabPanel">
-  <ng-container *ngFor="let tab of tabs; trackBy: trackByTab">
-    <a href="#" mat-tab-link [active]="tab.id === activeTabId" (click)="selectTab(tab); (false)">
-      <ng-template #label>{{ tab.label }}</ng-template>
-      <ng-container *ngIf="tabTemplate; else label">
-        <ng-container *ngTemplateOutlet="tabTemplate; context: { $implicit: tab }"></ng-container>
-      </ng-container>
-    </a>
-  </ng-container>
+<nav mat-tab-nav-bar [disablePagination]="disablePagination()" [tabPanel]="tabPanel">
+  @if (userRouteLinks()) {
+    @for (tab of tabs(); track tab.id) {
+      <a
+        mat-tab-link
+        [routerLink]="tab.link!"
+        [relativeTo]="_activatedRoute"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [active]="rla.isActive"
+      >
+        <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />
+      </a>
+    }
+  } @else {
+    @for (tab of tabs(); track tab.id) {
+      <a href="#" mat-tab-link [active]="tab.id === activeTabId()" (click)="selectTab(tab); (false)">
+        <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />
+      </a>
+    }
+  }
 </nav>
-<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+<mat-tab-nav-panel #tabPanel />
+<ng-template #renderTab let-tab>
+  @if (tabTemplate(); as tabTemplate) {
+    <ng-container *ngTemplateOutlet="tabTemplate; context: { $implicit: tab }" />
+  } @else {
+    {{ tab.label }}
+  }
+</ng-template>

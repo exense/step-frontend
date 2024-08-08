@@ -1,0 +1,23 @@
+<ng-template #statusGroup let-group>
+  <div class="status-group">
+    @for (item of group; track item.status) {
+      <div
+        class="step-node-aggregated-status"
+        [class]="item.className"
+        [matTooltip]="item.tooltipMessage"
+        matTooltipPosition="below"
+      >
+        {{ item.count }}x
+      </div>
+    }
+  </div>
+</ng-template>
+@if (errorStatusGroup(); as group) {
+  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
+}
+@if (successStatusGroup(); as group) {
+  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
+}
+@if (runningStatusGroup(); as group) {
+  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
+}

@@ -14,6 +14,8 @@ export class PaginatorComponent {
     transform: (value?: number[] | null) => value ?? [],
   });
 
+  protected areOptionsEditable = computed(() => this.pageSizeOptions().length > 1);
+
   protected effectSetSizeOptions = effect(
     () => {
       const options = this.pageSizeOptions();

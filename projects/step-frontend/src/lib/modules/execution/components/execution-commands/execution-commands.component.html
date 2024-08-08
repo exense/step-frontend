@@ -1,84 +1,34 @@
-<step-custom-forms *ngIf="executionParameters" [stModel]="executionParameters" stScreen="executionParameters">
-</step-custom-forms>
-
-<div class="main-container" role="toolbar" aria-label="...">
-  <div class="sub-container">
-    <div class="flex">
-      <button
-        type="button"
-        mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
-        aria-label="Left Align"
-        matTooltip="Simulate execution"
-        (click)="execute(true)"
-      >
-        <step-icon name="check-circle" aria-hidden="true"></step-icon>
-      </button>
-      <button
-        type="button"
-        mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
-        aria-label="Left Align"
-        matTooltip="New execution"
-        (click)="execute(false)"
-      >
-        <step-icon name="play-circle" aria-hidden="true"></step-icon>
-      </button>
-      <button
-        type="button"
-        mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
-        aria-label="Left Align"
-        matTooltip="Schedule"
-        (click)="schedule()"
-      >
-        <step-icon name="clock" aria-hidden="true"></step-icon>
-      </button>
-    </div>
-    <div
-      class="flex"
-      *ngIf="
-        execution &&
-        execution.status !== 'ENDED' &&
-        execution.status !== 'ABORTING' &&
-        execution.status !== 'FORCING_ABORT'
-      "
-    >
-      <button
-        type="button"
-        mat-icon-button
-        aria-label="Left Align"
-        matTooltip="Stop"
-        [disabled]="!('plan-execute' | hasRight | async)"
-        (click)="stop()"
-      >
-        <step-icon name="stop-circle" aria-hidden="true"></step-icon>
-      </button>
-    </div>
-    <div class="flex" *ngIf="execution && execution.status === 'ABORTING'">
-      <button
-        type="button"
-        mat-icon-button
-        class="warning"
-        aria-label="Left Align"
-        matTooltip="Force stop"
-        [disabled]="!('plan-execute' | hasRight | async)"
-        (click)="forceStop()"
-      >
-        <step-icon name="stop-circle" aria-hidden="true"></step-icon>
-      </button>
-    </div>
-  </div>
-  <div class="flex">
-    <button
-      type="button"
-      mat-icon-button
-      aria-label="Left Align"
-      [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated"
-      matTooltip="Copy start request as curl command to clipboard"
-      (click)="copyExecutionServiceAsCurlToClipboard()"
-    >
-      <step-icon name="link" aria-hidden="true"></step-icon>
-    </button>
-  </div>
-</div>
+@if (displayParametersForm) {
+  @if (executionParameters) {
+    <step-custom-forms [stModel]="executionParameters" stScreen="executionParameters" />
+  }
+  <step-execution-actions
+    [execution]="execution"
+    [isExecutionIsolated]="isExecutionIsolated"
+    (execute)="execute($event)"
+    (schedule)="schedule()"
+    (stop)="stop()"
+    (forceStop)="forceStop()"
+    (copyLink)="copyExecutionServiceAsCurlToClipboard()"
+  />
+} @else {
+  <step-execution-actions
+    [execution]="execution"
+    [isExecutionIsolated]="isExecutionIsolated"
+    [allowExecuteWithContent]="!!executionParameters"
+    (execute)="execute($event)"
+    (schedule)="schedule()"
+    (stop)="stop()"
+    (forceStop)="forceStop()"
+    (copyLink)="copyExecutionServiceAsCurlToClipboard()"
+  >
+    <step-execution-actions-execute-content>
+      @if (executionParameters) {
+        <section class="execution-params-popover">
+          <step-custom-forms [stModel]="executionParameters" stScreen="executionParameters" />
+          <button type="button" mat-flat-button color="primary" (click)="execute(false)">Execute</button>
+        </section>
+      }
+    </step-execution-actions-execute-content>
+  </step-execution-actions>
+}

@@ -6,6 +6,7 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { IS_SMALL_SCREEN } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
 
 const ID_LIST = 'list';
 const ID_OPEN = 'open';
@@ -15,6 +16,7 @@ const ID_OPEN = 'open';
   templateUrl: './executions.component.html',
   styleUrls: ['./executions.component.scss'],
   providers: [
+    provideExecutionViewMode(),
     {
       provide: ExecutionTabManagerService,
       useExisting: ExecutionsComponent,

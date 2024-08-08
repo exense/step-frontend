@@ -1,6 +1,7 @@
 import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { DateField } from '../types/date-field';
 import { DateAdapterService } from './date-adapter.service';
+import { TimeOption } from '../types/time-option';
 
 @Injectable()
 export class DateFieldContainerService<D> implements DateField<D>, OnDestroy {
@@ -36,6 +37,14 @@ export class DateFieldContainerService<D> implements DateField<D>, OnDestroy {
 
   withTime(): boolean {
     return !!this.dateField?.withTime();
+  }
+
+  withRelativeTime(): boolean {
+    return !!this.dateField?.withRelativeTime();
+  }
+
+  handleRelativeOptionChange(timeOption?: TimeOption): void {
+    this.dateField?.handleRelativeOptionChange(timeOption);
   }
 
   ngOnDestroy(): void {

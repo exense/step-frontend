@@ -1,0 +1,19 @@
+@function custom-menu-selector($name) {
+  $selector: 'span.mat-mdc-menu-item.' + $name;
+  @return $selector;
+}
+
+@mixin custom-menu($name) {
+  $selector: custom-menu-selector($name);
+  #{$selector} {
+    height: auto;
+    font-size: inherit;
+    line-height: initial;
+    font-weight: initial;
+
+    &.cdk-program-focused:not([disabled]),
+    &:hover:not([disabled]) {
+      background: transparent;
+    }
+  }
+}
