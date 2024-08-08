@@ -12,6 +12,7 @@
   @case (InputType.DROPDOWN) {
     <ng-template #dropdownItemTemplate let-item>{{ item }}</ng-template>
     <step-editable-dropdown-label
+      [useUnsetItem]="true"
       [labelTemplate]="labelTemplate"
       [items]="dropdownItems"
       [itemTemplate]="dropdownItemTemplate"

@@ -27,10 +27,13 @@ import { map, Observable } from 'rxjs';
 })
 export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterComponent<string[], unknown> {
   /** @Input() **/
-  items = input<T[] | ReadonlyArray<T>>([]);
+  readonly items = input<T[] | ReadonlyArray<T>>([]);
 
   /** @Input() **/
-  extractor = input<ArrayItemLabelValueExtractor<T, unknown> | undefined>(undefined);
+  readonly extractor = input<ArrayItemLabelValueExtractor<T, unknown> | undefined>(undefined);
+
+  /** @Input() **/
+  readonly useUnsetItem = input(false);
 
   protected displayItems = computed<KeyValue<unknown, string>[]>(() => {
     const items = this.items();
