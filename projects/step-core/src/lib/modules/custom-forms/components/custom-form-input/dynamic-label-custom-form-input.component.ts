@@ -1,4 +1,4 @@
-import { Component, forwardRef } from '@angular/core';
+import { Component, forwardRef, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 import { EditableDropdownLabelComponent, EditableLabelComponent } from '../../../editable-labels';
@@ -17,5 +17,6 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
   ],
   standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS, EditableLabelComponent, EditableDropdownLabelComponent],
+  encapsulation: ViewEncapsulation.None,
 })
 export class DynamicLabelCustomFormInputComponent extends BaseCustomFormInputComponent {}

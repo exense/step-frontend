@@ -1,0 +1,6 @@
+<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
+  <mat-select [multiple]="true" [formControl]="filterControl">
+    <mat-option [value]="true">true</mat-option>
+    <mat-option [value]="false">false</mat-option>
+  </mat-select>
+</step-form-field>
