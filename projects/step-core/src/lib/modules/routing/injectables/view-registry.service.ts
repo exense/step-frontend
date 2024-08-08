@@ -21,6 +21,7 @@ export interface MenuEntry {
   icon: string;
   weight?: number;
   parentId?: string;
+  isBookmark?: boolean;
 
   isEnabledFct(): boolean;
 }

@@ -19,6 +19,21 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Project</th>
     <td mat-cell *matCellDef="let element">{{ element.customFields?.tenant }}</td>
   </ng-container>
+  <ng-container matColumnDef="position">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
+    <td mat-cell *matCellDef="let element">
+      <step-form-field>
+        <input
+          type="number"
+          (keypress)="numberOnly($event)"
+          min="1"
+          max="100"
+          [value]="element.customFields?.position || ''"
+          (focusout)="setPosition($event, element)"
+        />
+      </step-form-field>
+    </td>
+  </ng-container>
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
