@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as m;
 
 :host {
   position: relative;
@@ -36,3 +37,5 @@
     background: var.$gray-50;
   }
 }
+
+@include m.unset-item;

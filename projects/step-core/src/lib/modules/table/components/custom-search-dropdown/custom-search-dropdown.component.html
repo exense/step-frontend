@@ -1,1 +1,6 @@
-<step-array-filter stepFilterConnect [items]="options" (filterChange)="onItemsChange($event)"> </step-array-filter>
+<step-array-filter-advanced
+  stepFilterConnect
+  [createConditionFn]="_filterConditionsFactory.arrayFilterCondition"
+  [items]="options"
+  [useUnsetItem]="true"
+/>

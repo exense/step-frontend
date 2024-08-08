@@ -20,7 +20,7 @@ export class ArrayFilterCondition extends FilterCondition<string[]> {
     const children = valueArray.map((value) => ({
       field,
       type: CompareCondition.EQUALS,
-      expectedValue: value,
+      expectedValue: value === 'null' ? null : value,
     }));
 
     const arrayFilter: TableCollectionFilter = {
