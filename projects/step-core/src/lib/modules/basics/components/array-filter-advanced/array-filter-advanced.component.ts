@@ -14,6 +14,8 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
 
+export const UNSET_VALUE = 'unset';
+
 @Component({
   selector: 'step-array-filter-advanced',
   templateUrl: './array-filter-advanced.component.html',
@@ -34,6 +36,8 @@ export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterCompone
 
   /** @Input() **/
   readonly useUnsetItem = input(false);
+
+  protected readonly UNSET_VALUE = UNSET_VALUE;
 
   protected displayItems = computed<KeyValue<unknown, string>[]>(() => {
     const items = this.items();

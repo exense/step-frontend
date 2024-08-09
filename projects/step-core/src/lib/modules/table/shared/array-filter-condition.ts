@@ -1,4 +1,4 @@
-import { CompareCondition } from '../../basics/step-basics.module';
+import { CompareCondition, UNSET_VALUE } from '../../basics/step-basics.module';
 import { TableCollectionFilter, TableRequestFilter } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
 import { FilterConditionType } from './filter-condition-type.enum';
@@ -20,7 +20,7 @@ export class ArrayFilterCondition extends FilterCondition<string[]> {
     const children = valueArray.map((value) => ({
       field,
       type: CompareCondition.EQUALS,
-      expectedValue: value === 'null' ? null : value,
+      expectedValue: value === UNSET_VALUE ? null : value,
     }));
 
     const arrayFilter: TableCollectionFilter = {

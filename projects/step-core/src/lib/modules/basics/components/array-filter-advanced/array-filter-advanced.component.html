@@ -1,7 +1,9 @@
 <step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <mat-select [multiple]="true" [formControl]="filterControl">
     @if (useUnsetItem()) {
-      <mat-option class="unset-item" value="null">unset</mat-option>
+      <mat-option class="unset-item" [value]="UNSET_VALUE">
+        <span class="unset-content">unset</span>
+      </mat-option>
     }
     @for (item of displayItems(); track item.key) {
       <mat-option [value]="item.key">{{ item.value }}</mat-option>

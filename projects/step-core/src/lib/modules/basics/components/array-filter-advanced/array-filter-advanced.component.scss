@@ -1,7 +1,12 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 .unset-item {
-  text-decoration: underline;
-  font-style: italic;
-  color: var.$blue-650;
+  border-bottom: solid 0.1rem;
+}
+
+.unset-content::before {
+  content: '(';
+}
+.unset-content::after {
+  content: ')';
 }
