@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  forwardRef,
-  input,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, computed, forwardRef, input, Input } from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
