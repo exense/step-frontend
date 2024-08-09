@@ -29,7 +29,7 @@
         </step-resource-input>
       </mat-card-content>
     </mat-card>
-    <mat-expansion-panel [(expanded)]="showCustomAttributes" [class.hidden]="!customAttributesForm.inputs.length">
+    <mat-expansion-panel [(expanded)]="showCustomAttributes" [class.hidden]="!customAttributesForm.inputs().length">
       <mat-expansion-panel-header>
         <mat-panel-title>
           <span>Custom attributes</span>

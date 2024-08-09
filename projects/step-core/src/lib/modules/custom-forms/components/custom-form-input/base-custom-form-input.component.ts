@@ -1,6 +1,9 @@
-import { Component, EventEmitter, HostBinding, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, computed, effect, HostBinding, inject, input, output } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Input as StInput, ScreensService } from '../../../../client/step-client-module';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs/operators';
+import { of, shareReplay } from 'rxjs';
 
 export enum InputType {
   TEXT = 'TEXT',
@@ -14,12 +17,64 @@ export type OnTouch = () => void;
 @Component({
   template: '',
 })
-export abstract class BaseCustomFormInputComponent implements ControlValueAccessor, OnInit {
-  @Input() stScreen?: string;
-  @Input() stInput?: StInput;
-  @Input() stInputId?: string;
+export abstract class BaseCustomFormInputComponent implements ControlValueAccessor {
+  private _screensService = inject(ScreensService);
 
-  @Output() touch = new EventEmitter<void>();
+  /** @Input() **/
+  readonly stScreen = input<string | undefined>(undefined);
+
+  /** @Input() **/
+  readonly stInputId = input<string | undefined>(undefined);
+
+  /** @Input() **/
+  readonly stInput = input<StInput | undefined>(undefined);
+
+  /** @Output **/
+  readonly touch = output();
+
+  protected screenAndId = computed(() => {
+    const stScreen = this.stScreen();
+    const stInputId = this.stInputId();
+    if (!stScreen || !stInputId) {
+      return undefined;
+    }
+    return { stScreen, stInputId };
+  });
+
+  private remoteInput$ = toObservable(this.screenAndId).pipe(
+    switchMap((screenAndId) => {
+      if (!screenAndId) {
+        return of(undefined);
+      }
+      return this._screensService.getInputForScreen(screenAndId.stScreen, screenAndId.stInputId);
+    }),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  private remoteInput = toSignal(this.remoteInput$);
+
+  protected input = computed(() => {
+    const stInput = this.stInput();
+    const remoteInput = this.remoteInput();
+    return stInput || remoteInput;
+  });
+
+  private effectInitDefaultValue = effect(() => {
+    const input = this.input();
+    if (!input?.defaultValue || !!this.value) {
+      return;
+    }
+    this.onValueChange(input.defaultValue);
+  });
+
+  protected dropdownItems = computed(() => {
+    const input = this.input();
+    if (!input?.options) {
+      return [];
+    }
+    return input.options.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0)).map((item) => item.value);
+  });
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -28,25 +83,7 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
 
   value?: string;
   @HostBinding('class.disabled') isDisabled?: boolean;
-  input?: StInput;
-  dropdownItems: string[] = [];
   checkboxItems: string[] = ['true', 'false'];
-
-  protected _screensService = inject(ScreensService);
-
-  ngOnInit(): void {
-    if (!this.stInput) {
-      this._screensService.getInputForScreen(this.stScreen!, this.stInputId!).subscribe((input) => {
-        this.input = input;
-        this.initDefaultValue(this.input);
-        this.initDropdownItems(this.input);
-      });
-    } else {
-      this.input = this.stInput;
-      this.initDefaultValue(this.input);
-      this.initDropdownItems(this.input);
-    }
-  }
 
   writeValue(value: string): void {
     this.value = value;
@@ -72,19 +109,5 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
   invokeTouch(): void {
     this.onTouch?.();
     this.touch.emit();
-  }
-
-  private initDefaultValue(input: StInput): void {
-    if (!input.defaultValue) {
-      return;
-    }
-
-    this.onValueChange(input.defaultValue);
-  }
-
-  private initDropdownItems(input: StInput): void {
-    this.dropdownItems = input.options
-      ? input.options.sort((a, b) => a.priority! - b.priority!).map((option) => option.value!)
-      : [];
   }
 }
