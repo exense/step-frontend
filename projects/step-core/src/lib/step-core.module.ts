@@ -74,6 +74,8 @@ import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
+import { ToastComponent } from './components/toast/toast.component';
+import { ToastContainerComponent } from './components/toast-container/toast-container.component';
 
 @NgModule({
   declarations: [
@@ -113,6 +115,8 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ToastComponent,
+    ToastContainerComponent,
   ],
   imports: [
     CommonModule,
@@ -219,6 +223,8 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     INFO_BANNER_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ToastComponent,
+    ToastContainerComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -350,3 +356,7 @@ export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
+export * from './services/toast.service';
+export * from './components/toast/toast.component';
+export * from './components/toast-container/toast-container.component';
+export * from './shared/toast-type.enum';
