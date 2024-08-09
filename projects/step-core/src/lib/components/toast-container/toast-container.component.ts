@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastService } from '../../services/toast.service';
 import { NotificationAction } from '../../shared/toast-action.interface';
 import { ToastType } from '../../shared/toast-type.enum';
+import { Entity } from '../../modules/entity/types/entity';
 
 @Component({
   selector: 'step-toast-container',
@@ -13,6 +14,8 @@ export class ToastContainerComponent implements OnInit {
     type: ToastType;
     message: string;
     values: string[];
+    entity?: Entity;
+    entityName?: string;
     actions?: NotificationAction[];
     autoClose?: boolean;
     duration?: number;

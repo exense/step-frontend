@@ -75,6 +75,8 @@ export class PlanListComponent implements DialogParentService {
           ToastType.SUCCESS,
           `{0} successfully duplicated`,
           values,
+          clonedPlan,
+          'plans',
           [{ label: 'Edit', handler: () => this._router.navigateByUrl(`/plans/editor/${clonedPlan.id}`) }],
           false,
         ),

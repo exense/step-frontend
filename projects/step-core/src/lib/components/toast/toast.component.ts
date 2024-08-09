@@ -2,6 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { ToastService } from '../../services/toast.service';
 import { NotificationAction } from '../../shared/toast-action.interface';
 import { ToastType } from '../../shared/toast-type.enum';
+import { Entity } from '../../modules/entity/types/entity';
 
 @Component({
   selector: 'step-toast',
@@ -15,6 +16,8 @@ export class ToastComponent implements OnInit {
   @Input() duration: number | undefined = 3000;
   @Input() autoClose: boolean = true;
   @Input() values: string[] = [];
+  @Input() entity?: Entity;
+  @Input() entityName?: string;
   private _toastService = inject(ToastService);
   private timer: any;
   toastType = ToastType;
