@@ -1,5 +1,13 @@
 <div class="toast-container">
   @for (toast of toasts; track toast) {
-    <step-toast [message]="toast.message" [actions]="toast.actions" [duration]="toast.duration"> </step-toast>
+    <step-toast
+      [type]="toast.type"
+      [message]="toast.message"
+      [values]="toast.values"
+      [actions]="toast.actions"
+      [autoClose]="!!toast.autoClose"
+      [duration]="toast.duration"
+    >
+    </step-toast>
   }
 </div>

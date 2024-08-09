@@ -359,3 +359,4 @@ export * from './pipes/extract-query-params.pipe';
 export * from './services/toast.service';
 export * from './components/toast/toast.component';
 export * from './components/toast-container/toast-container.component';
+export * from './shared/toast-type.enum';

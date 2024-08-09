@@ -3,34 +3,58 @@
   align-items: center;
   background-color: #fff;
   border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 0.5rem;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-}
+  flex-direction: column;
+  gap: 0.5rem;
 
-.success-icon {
-  margin-right: 10px;
-  color: #4caf50;
-}
+  .action-icons {
+    padding: 0 0.2rem;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
 
-.toast-message {
-  flex: 1;
-}
+  .success-icon {
+    margin-right: 10px;
+    color: #4caf50;
+  }
 
-.toast-actions {
-  display: flex;
-  gap: 5px;
-}
+  .error-icon,
+  .warning-icon {
+    margin-right: 10px;
+    color: red;
+  }
 
-.dismiss-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+  .info-icon {
+    margin-right: 10px;
+    color: #000;
+  }
 
-.action-btn {
-  margin-left: 1rem;
-  cursor: pointer;
+  .toast-message {
+    flex: 1;
+    padding: 0 2rem;
+  }
+
+  .toast-actions {
+    display: flex;
+    width: 100%;
+    padding: 0 0.2rem;
+    justify-content: end;
+    gap: 1rem;
+
+    .action-btn {
+      font-size: 12px;
+      cursor: pointer;
+    }
+  }
+
+  .dismiss-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
 }
