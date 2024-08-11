@@ -37,7 +37,7 @@ export class ToastComponent implements OnInit {
   }
 
   closeToast(): void {
-    this._toastService.removeToast(this.message);
+    this._toastService.removeToast(this.message, this.values);
   }
 
   private formatMessage(): void {

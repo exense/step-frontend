@@ -36,7 +36,14 @@ export class ToastService {
     );
   }
 
-  removeToast(message: string): void {
-    this.toastsInternal.update((toasts) => toasts.filter((toast) => toast.message !== message));
+  removeToast(message: string, values: string[]): void {
+    this.toastsInternal.update((toasts) =>
+      toasts.filter((toast) => toast.message !== message || !this.arraysEqual(toast.values, values)),
+    );
+  }
+
+  private arraysEqual(arr1: string[], arr2: string[]): boolean {
+    if (arr1.length !== arr2.length) return false;
+    return arr1.every((value, index) => value === arr2[index]);
   }
 }
