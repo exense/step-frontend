@@ -1,0 +1,37 @@
+@if (message) {
+  <div class="toast">
+    <div class="action-icons">
+      @switch (type) {
+        @case (toastType.SUCCESS) {
+          <span class="success-icon">&#10003;</span>
+        }
+        @case (toastType.ERROR) {
+          <span class="error-icon">&#10060;</span>
+        }
+        @case (toastType.WARNING) {
+          <span class="warning-icon">&#9888;</span>
+        }
+        @case (toastType.INFO) {
+          <span class="info-icon">&#8505;</span>
+        }
+      }
+      <button class="dismiss-btn" (click)="closeToast()">&#x2715;</button>
+    </div>
+    <div class="toast-message">
+      @if (entity) {
+        <entity-icon [entity]="entity" [entityName]="entityName" />&nbsp;
+      }
+      <ng-container *ngFor="let part of messageParts">
+        <span *ngIf="part.isPlaceholder" [matTooltip]="part.originalValue">{{ part.displayValue }}</span>
+        <span *ngIf="!part.isPlaceholder">{{ part }}</span>
+      </ng-container>
+    </div>
+    <div class="toast-actions">
+      @for (action of actions; track action.label) {
+        <a (click)="action.handler()" class="action-btn" type="button" color="primary">
+          {{ action.label }}
+        </a>
+      }
+    </div>
+  </div>
+}

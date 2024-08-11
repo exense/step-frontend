@@ -4,14 +4,17 @@ import {
   AutoDeselectStrategy,
   DialogParentService,
   DialogsService,
-  Plan,
   IsUsedByDialogService,
+  Plan,
   selectionCollectionProvider,
   STORE_ALL,
-  tablePersistenceConfigProvider,
   tableColumnsConfigProvider,
+  tablePersistenceConfigProvider,
+  ToastService,
+  ToastType,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-plan-list',
@@ -34,7 +37,8 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
 export class PlanListComponent implements DialogParentService {
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
-
+  private toast = inject(ToastService);
+  private _router = inject(Router);
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
@@ -52,13 +56,31 @@ export class PlanListComponent implements DialogParentService {
   }
 
   duplicatePlan(id: string): void {
+    let clonedPlan: Plan;
+    const values: Array<string> = [];
     this._plansApiService
       .clonePlan(id)
       .pipe(
-        switchMap((clone) => this._plansApiService.savePlan(clone)),
+        switchMap((clone) => {
+          clonedPlan = clone;
+          if (clonedPlan.root?.attributes!['name']) {
+            values.push(clonedPlan.root?.attributes!['name']);
+          }
+          return this._plansApiService.savePlan(clone);
+        }),
         this.updateDataSourceAfterChange,
       )
-      .subscribe();
+      .subscribe(() =>
+        this.toast.showToast(
+          ToastType.SUCCESS,
+          `{0} successfully duplicated`,
+          values,
+          clonedPlan,
+          'plans',
+          [{ label: 'Edit', handler: () => this._router.navigateByUrl(`/plans/editor/${clonedPlan.id}`) }],
+          false,
+        ),
+      );
   }
 
   deletePlan(plan: Plan): void {

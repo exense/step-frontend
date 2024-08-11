@@ -1,0 +1,62 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+.toast {
+  display: flex;
+  align-items: center;
+  background-color: var.$white;
+  border: 1px solid var.$light-white-gray;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.1);
+  position: relative;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .action-icons {
+    padding: 0 0.2rem;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .success-icon {
+    margin-right: 10px;
+    color: var.$green-650;
+  }
+
+  .error-icon,
+  .warning-icon {
+    margin-right: 10px;
+    color: var.$red-100;
+  }
+
+  .info-icon {
+    margin-right: 10px;
+    color: black;
+  }
+
+  .toast-message {
+    flex: 1;
+    padding: 0 2rem;
+  }
+
+  .toast-actions {
+    display: flex;
+    width: 100%;
+    padding: 0 0.2rem;
+    justify-content: end;
+    gap: 1rem;
+
+    .action-btn {
+      font-size: 12px;
+      cursor: pointer;
+    }
+  }
+
+  .dismiss-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+}
