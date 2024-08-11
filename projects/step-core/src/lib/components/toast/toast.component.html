@@ -27,7 +27,7 @@
       </ng-container>
     </div>
     <div class="toast-actions">
-      @for (action of actions; track action) {
+      @for (action of actions; track action.label) {
         <a (click)="action.handler()" class="action-btn" type="button" color="primary">
           {{ action.label }}
         </a>
