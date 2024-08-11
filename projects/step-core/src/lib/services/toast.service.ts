@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 import { NotificationAction } from '../shared/toast-action.interface';
 import { ToastType } from '../shared/toast-type.enum';
 import { Entity } from '../modules/entity/types/entity';
@@ -8,7 +7,7 @@ import { Entity } from '../modules/entity/types/entity';
   providedIn: 'root',
 })
 export class ToastService {
-  private toastSubject = new Subject<
+  private toastsInternal = signal<
     {
       type: ToastType;
       message: string;
@@ -19,18 +18,8 @@ export class ToastService {
       autoClose?: boolean;
       duration?: number;
     }[]
-  >();
-  toastMessages = this.toastSubject.asObservable();
-  private toasts: {
-    type: ToastType;
-    message: string;
-    values: string[];
-    entity?: Entity;
-    entityName?: string;
-    actions?: NotificationAction[];
-    autoClose?: boolean;
-    duration?: number;
-  }[] = [];
+  >([]);
+  readonly toastMessages = this.toastsInternal.asReadonly();
 
   showToast(
     type: ToastType,
@@ -38,25 +27,16 @@ export class ToastService {
     values: string[],
     entity?: Entity,
     entityName?: string,
-    actions?: NotificationAction[],
-    auto?: boolean,
-    duration?: number,
+    actions: NotificationAction[] = [],
+    autoClose: boolean = true,
+    duration: number = 3000,
   ): void {
-    this.toasts.push({
-      type,
-      message,
-      values,
-      entity,
-      entityName,
-      actions: actions || [],
-      autoClose: !!auto,
-      duration: duration || 3000,
-    });
-    this.toastSubject.next(this.toasts);
+    this.toastsInternal.update((toasts) =>
+      toasts.concat({ type, message, values, entity, entityName, actions, autoClose, duration }),
+    );
   }
 
   removeToast(message: string): void {
-    this.toasts = this.toasts.filter((toast) => toast.message !== message);
-    this.toastSubject.next(this.toasts);
+    this.toastsInternal.update((toasts) => toasts.filter((toast) => toast.message !== message));
   }
 }
