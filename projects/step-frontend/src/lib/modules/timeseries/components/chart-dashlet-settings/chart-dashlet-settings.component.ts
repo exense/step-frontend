@@ -11,11 +11,12 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
-import { MatMenuTrigger } from '@angular/material/menu';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -32,7 +33,7 @@ export interface ChartDashletSettingsData {
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
   readonly ChartAggregation = ChartAggregation;
 
@@ -43,7 +44,6 @@ export class ChartDashletSettingsComponent implements OnInit {
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
@@ -74,6 +74,16 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   handleFilterItemChange(index: number, item: FilterBarItem) {
     this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 
   addCustomFilter(type: FilterBarItemType) {
