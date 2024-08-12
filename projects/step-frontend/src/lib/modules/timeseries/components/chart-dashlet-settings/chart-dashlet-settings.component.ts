@@ -12,6 +12,8 @@ import {
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 export interface ChartDashletSettingsData {
   item: DashboardItem;
   context: TimeSeriesContext;
@@ -27,7 +29,7 @@ export interface ChartDashletSettingsData {
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
   readonly ChartAggregation = ChartAggregation;
 
@@ -47,6 +49,7 @@ export class ChartDashletSettingsComponent implements OnInit {
     ChartAggregation.PERCENTILE,
   ];
   readonly PCL_VALUES = [80, 90, 99];
+
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
@@ -91,6 +94,16 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   handleFilterItemChange(index: number, item: FilterBarItem) {
     this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 
   addCustomFilter(type: FilterBarItemType) {
