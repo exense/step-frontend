@@ -22,8 +22,17 @@ $default-color: dc.default-colors();
     $config: step-define-header-config();
   }
 
+  .header-read-only {
+    &::after {
+      content: '';
+      border-top: 0.3rem solid #fec105;
+      border-left: 0.3rem solid #fec105;
+    }
+  }
+
   header.app-header {
     background-color: map.get($config, main-background-color);
+    position: relative;
 
     section.content {
       display: flex;

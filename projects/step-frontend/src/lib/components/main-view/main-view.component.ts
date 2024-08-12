@@ -19,7 +19,6 @@ export class MainViewComponent {
   readonly _authService = inject(AuthService);
 
   readonly navBarRightMenuItems = this._viewRegistry.getDashlets('menu/navbar/right');
-  readonly adminAlerts = this._viewRegistry.getDashlets('admin/alerts');
 
   addBookmark(): void {
     this._matDialog.open(BookmarkCreateDialogComponent);

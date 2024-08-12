@@ -6,3 +6,21 @@
 .icon-bookmark {
   cursor: pointer;
 }
+
+.projects-read-only {
+  border-left: 0.3rem solid #fec105;
+  padding-top: 1.5rem;
+}
+
+.message {
+  position: absolute;
+  background-color: #feefd6;
+  color: black;
+  top: 32px;
+  right: 12%;
+  padding: 0.5rem 1rem;
+  border-bottom-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  border: 0.3rem solid #fec105;
+  box-shadow: 0 2px 5px rgba(120, 20, 220, 0.4);
+}

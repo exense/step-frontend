@@ -2,7 +2,7 @@
   <step-dashlet id="project-select" itemKey="projectSelect" />
   <step-sidebar />
   <div id="main">
-    <header class="app-header">
+    <header class="app-header" [ngClass]="{ 'header-read-only': !('plan-write' | hasRight | async) }">
       <section class="content">
         <div></div>
         <div class="app-header-nav">
@@ -20,15 +20,16 @@
           </a>
         </div>
       </section>
+      @if (!('plan-write' | hasRight | async)) {
+        <div class="message">
+          <step-icon name="alertTriangle" /> The content is read-only until a project is selected
+        </div>
+      }
     </header>
     <div id="step-main-scrollable-content">
       <step-info-banner />
-      <step-dashlet itemKey="projectAlerts" />
-      @for (alert of adminAlerts; track alert.id) {
-        <step-dashlet [itemKey]="alert.template" />
-      }
       <step-alerts-container />
-      <div id="mainView">
+      <div id="mainView" [ngClass]="{ 'projects-read-only': !('plan-write' | hasRight | async) }">
         <router-outlet />
       </div>
     </div>
