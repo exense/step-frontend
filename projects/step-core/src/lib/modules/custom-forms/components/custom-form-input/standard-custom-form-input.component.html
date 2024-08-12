@@ -1,8 +1,8 @@
 <step-form-field [showRequiredMarker]="required">
   @if (!hideLabel) {
-    <step-label>{{ input?.label }}</step-label>
+    <step-label>{{ input()?.label }}</step-label>
   }
-  @switch (input?.type) {
+  @switch (input()?.type) {
     @case (InputType.TEXT) {
       <input
         type="text"
@@ -31,7 +31,7 @@
             <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
           </ngx-mat-select-search>
         </mat-option>
-        @for (item of dropdownItemsFiltered; track item) {
+        @for (item of dropdownItemsFiltered(); track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
