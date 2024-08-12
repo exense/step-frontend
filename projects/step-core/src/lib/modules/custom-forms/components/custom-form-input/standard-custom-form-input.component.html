@@ -30,6 +30,9 @@
             <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
           </ngx-mat-select-search>
         </mat-option>
+        @if (!!value) {
+          <mat-option class="unset-item" [value]="null">unset</mat-option>
+        }
         @for (item of dropdownItemsFiltered(); track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
