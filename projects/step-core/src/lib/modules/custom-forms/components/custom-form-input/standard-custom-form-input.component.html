@@ -1,8 +1,8 @@
 <step-form-field [showRequiredMarker]="required">
   @if (!hideLabel) {
-    <step-label>{{ input?.label }}</step-label>
+    <step-label>{{ input()?.label }}</step-label>
   }
-  @switch (input?.type) {
+  @switch (input()?.type) {
     @case (InputType.TEXT) {
       <input
         type="text"
@@ -22,7 +22,7 @@
         @if (!!value) {
           <mat-option class="unset-item" [value]="null">unset</mat-option>
         }
-        @for (item of dropdownItems; track item) {
+        @for (item of dropdownItems(); track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
