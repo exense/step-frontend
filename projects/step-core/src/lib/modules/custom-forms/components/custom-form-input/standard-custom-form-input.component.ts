@@ -1,17 +1,8 @@
-import {
-  AfterContentInit,
-  Component,
-  DestroyRef,
-  forwardRef,
-  inject,
-  Input,
-  SimpleChange,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, computed, forwardRef, Input } from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { map } from 'rxjs';
 
@@ -29,32 +20,24 @@ import { map } from 'rxjs';
   standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS, ReactiveFormsModule, FormsModule, NgxMatSelectSearchModule],
 })
-export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent implements AfterContentInit {
+export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {
   @Input() hideLabel?: boolean;
   @Input() hint?: string;
   @Input() required: boolean = false;
 
-  protected _destroyRef = inject(DestroyRef);
+  readonly filterMultiControl: FormControl<string | null> = new FormControl<string>('');
 
-  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
-  dropdownItemsFiltered: string[] = [...this.dropdownItems];
+  private filterValue = toSignal(
+    this.filterMultiControl.valueChanges.pipe(
+      map((value) => value?.toLowerCase() ?? ''),
+      takeUntilDestroyed(),
+    ),
+    { initialValue: '' },
+  );
 
-  ngAfterContentInit(): void {
-    this.dropdownItemsFiltered = [...this.dropdownItems];
-    this.filterMultiControl.valueChanges
-      .pipe(
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value ? this.dropdownItems.filter((item) => item.toLowerCase().includes(value)) : [...this.dropdownItems],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownItemsFiltered = displayItemsFiltered;
-      });
-  }
-
-  loadItems() {
-    this.dropdownItemsFiltered = [...this.dropdownItems];
-  }
+  protected readonly dropdownItemsFiltered = computed(() => {
+    const dropdownItems = this.dropdownItems();
+    const filterValue = this.filterValue();
+    return !filterValue ? dropdownItems : dropdownItems.filter((item) => item?.toLowerCase().includes(filterValue));
+  });
 }
