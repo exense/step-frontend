@@ -11,8 +11,12 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
-import { TimeseriesAggregatePickerComponent } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  AggregateParams,
+  TimeseriesAggregatePickerComponent,
+} from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -29,7 +33,7 @@ export interface ChartDashletSettingsData {
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
   readonly ChartAggregation = ChartAggregation;
 
@@ -40,7 +44,6 @@ export class ChartDashletSettingsComponent implements OnInit {
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
@@ -71,6 +74,16 @@ export class ChartDashletSettingsComponent implements OnInit {
 
   handleFilterItemChange(index: number, item: FilterBarItem) {
     this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 
   addCustomFilter(type: FilterBarItemType) {
@@ -95,27 +108,26 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._dialogRef.close({ ...this.item });
   }
 
-  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
     this.item.chartSettings!.primaryAxes.aggregation = {
       type: change.aggregate!,
-      params: { pclValue: change.pclValue },
+      params: change.params,
     };
     this.primaryAggregateMenuTrigger?.closeMenu();
   }
 
-  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; pclValue?: number }) {
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
     const newAggregate = change.aggregate;
-    const newPcl = change.pclValue;
     if (newAggregate) {
       if (!this.item.chartSettings!.secondaryAxes) {
         this.item.chartSettings!.secondaryAxes = {
-          aggregation: { type: newAggregate, params: { pclValue: newPcl } },
+          aggregation: { type: newAggregate, params: change.params },
           displayType: 'BAR_CHART',
           colorizationType: 'STROKE',
           unit: '',
         };
       } else {
-        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: { pclValue: newPcl } };
+        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
       }
     } else {
       this.item.chartSettings!.secondaryAxes = undefined;

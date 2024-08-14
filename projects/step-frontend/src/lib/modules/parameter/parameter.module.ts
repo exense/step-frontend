@@ -27,9 +27,10 @@ import { ParameterConditionDialogComponent } from './components/parameter-condit
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InputTypePipe } from './pipes/input-type.pipe';
 import { InputOptionsPipe } from './pipes/input-options.pipe';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule, NgxMatSelectSearchModule],
+  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule, NgxMatSelectSearchModule],
   exports: [ParametersListComponent, ParameterSelectionComponent],
   declarations: [
     ParametersListComponent,

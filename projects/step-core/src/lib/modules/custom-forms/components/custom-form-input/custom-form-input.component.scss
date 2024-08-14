@@ -1,3 +1,7 @@
+@use 'projects/step-core/styles/core-mixins' as m;
+
 :host.disabled {
   pointer-events: none;
 }
+
+@include m.unset-item;

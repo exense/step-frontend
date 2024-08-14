@@ -5,7 +5,13 @@
       <step-icon name="help-circle" [matTooltip]="tooltip"></step-icon>
     </label>
 
-    <button type="button" (click)="addCriterion()" mat-stroked-button>
+    <button
+      type="button"
+      class="button-no-outline"
+      matTooltip="Add selection criteria"
+      (click)="addCriterion()"
+      mat-stroked-button
+    >
       <step-icon name="plus"></step-icon>
     </button>
   </div>
@@ -23,7 +29,13 @@
         <input type="text" placeholder="Value" [formControl]="tokenSelectionCriterion.controls.value" />
       </step-form-field>
 
-      <button type="button" (click)="removeCriterion(i)" mat-stroked-button>
+      <button
+        type="button"
+        class="button-no-outline"
+        matTooltip="Remove selection criteria"
+        (click)="removeCriterion(i)"
+        mat-stroked-button
+      >
         <step-icon name="trash-2"></step-icon>
       </button>
     </div>

@@ -25,7 +25,7 @@ export class BookmarkCreateDialogComponent implements OnInit {
   private _bookmarkService = inject(BookmarkService);
   private _userApi = inject(UserService);
   private user: Partial<User> = {};
-  readonly _data = inject<{ id: string; label: string } | undefined>(MAT_DIALOG_DATA);
+  readonly _data = inject<Bookmark | undefined>(MAT_DIALOG_DATA);
   readonly _menuItems$ = inject(MENU_ITEMS);
 
   protected bookmark: Partial<Bookmark> = {};
@@ -37,16 +37,16 @@ export class BookmarkCreateDialogComponent implements OnInit {
     this._userApi.getMyUser().subscribe((user) => {
       this.user = user || {};
     });
-    const tenant = this._multipleProjects.currentProject()?.name;
+    const tenant = this._data?.customFields?.tenant || this._multipleProjects.currentProject()?.name;
     const slashIndex = this._router.url.indexOf('/');
-    const link = this._router.url.slice(slashIndex + 1);
+    const link = this._data?.customFields?.link || this._router.url.slice(slashIndex + 1);
     const initBookmark = this.getIconAndPage(link);
     this.bookmark = {
-      label: this._data?.label ?? '',
-      page: initBookmark?.page,
+      label: this._data?.customFields?.label ?? '',
+      page: this._data?.customFields?.page || initBookmark?.page,
       link,
       tenant,
-      icon: initBookmark?.icon,
+      icon: this._data?.customFields?.icon || initBookmark?.icon,
     };
   }
 
@@ -63,12 +63,11 @@ export class BookmarkCreateDialogComponent implements OnInit {
         url: this.bookmark.link!,
         customFields: { ...this.bookmark },
       };
-      this._api.saveUserBookmark(bookmark).subscribe();
+      this._api.saveUserBookmark(bookmark).subscribe((data) => this._bookmarkService.refreshBookmarks());
     } else {
       const bookmark = { userId: this.user.id!, url: this.bookmark.link!, customFields: { ...this.bookmark } };
-      this._api.saveUserBookmark(bookmark).subscribe();
+      this._api.saveUserBookmark(bookmark).subscribe((data) => this._bookmarkService.refreshBookmarks());
     }
-    this._bookmarkService.refreshBookmarks();
     this._matDialogRef.close();
   }
 

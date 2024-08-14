@@ -124,7 +124,7 @@
         </div>
       </div>
       <section>
-        <mat-slide-toggle color="primary" name="active" [(ngModel)]="task.active">Enable rule</mat-slide-toggle>
+        <mat-slide-toggle color="primary" name="active" [(ngModel)]="task.active">Enable Schedule</mat-slide-toggle>
       </section>
 
       <step-custom-forms
@@ -158,7 +158,7 @@
       <step-dashlet itemKey="taskAddon" [context]="task"></step-dashlet>
       <mat-expansion-panel [(expanded)]="showParameters">
         <mat-expansion-panel-header>
-          <mat-panel-title>Advanced</mat-panel-title>
+          <mat-panel-title class="advanced-label">Advanced</mat-panel-title>
         </mat-expansion-panel-header>
         <section class="advanced-body">
           <step-form-field>
