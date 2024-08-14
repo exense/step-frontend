@@ -1,9 +1,9 @@
-<ng-template #labelTemplate>{{ input?.label }}</ng-template>
-@switch (input?.type) {
+<ng-template #labelTemplate>{{ input()?.label }}</ng-template>
+@switch (input()?.type) {
   @case (InputType.TEXT) {
     <step-editable-label
       [labelTemplate]="labelTemplate"
-      [tooltip]="input?.label || ''"
+      [tooltip]="input()?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="invokeTouch()"
@@ -12,10 +12,11 @@
   @case (InputType.DROPDOWN) {
     <ng-template #dropdownItemTemplate let-item>{{ item }}</ng-template>
     <step-editable-dropdown-label
+      [useUnsetItem]="true"
       [labelTemplate]="labelTemplate"
-      [items]="dropdownItems"
+      [items]="dropdownItems()"
       [itemTemplate]="dropdownItemTemplate"
-      [tooltip]="input?.label || ''"
+      [tooltip]="input()?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="invokeTouch()"
@@ -28,7 +29,7 @@
       [labelTemplate]="labelTemplate"
       [items]="checkboxItems"
       [itemTemplate]="checkboxItemTemplate"
-      [tooltip]="input?.label || ''"
+      [tooltip]="input()?.label || ''"
       [ngModel]="value"
       (ngModelChange)="onValueChange($event)"
       (stateChange)="invokeTouch()"

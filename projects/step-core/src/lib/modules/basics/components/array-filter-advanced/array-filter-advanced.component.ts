@@ -1,18 +1,11 @@
-import {
-  Component,
-  computed,
-  forwardRef,
-  input,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { Component, computed, forwardRef, input, Input } from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
+
+export const UNSET_VALUE = 'unset';
 
 @Component({
   selector: 'step-array-filter-advanced',
@@ -27,10 +20,15 @@ import { map, Observable } from 'rxjs';
 })
 export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterComponent<string[], unknown> {
   /** @Input() **/
-  items = input<T[] | ReadonlyArray<T>>([]);
+  readonly items = input<T[] | ReadonlyArray<T>>([]);
 
   /** @Input() **/
-  extractor = input<ArrayItemLabelValueExtractor<T, unknown> | undefined>(undefined);
+  readonly extractor = input<ArrayItemLabelValueExtractor<T, unknown> | undefined>(undefined);
+
+  /** @Input() **/
+  readonly useUnsetItem = input(false);
+
+  protected readonly UNSET_VALUE = UNSET_VALUE;
 
   protected displayItems = computed<KeyValue<unknown, string>[]>(() => {
     const items = this.items();
