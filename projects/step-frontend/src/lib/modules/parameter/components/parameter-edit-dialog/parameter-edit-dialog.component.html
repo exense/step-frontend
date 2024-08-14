@@ -76,7 +76,7 @@
           <step-label>Activation script</step-label>
           <step-label-addon>
             <div [matMenuTriggerFor]="activationMenu">
-              <button mat-raised-button color="primary">Wizard</button>
+              <button mat-flat-button color="primary">Wizard</button>
               <mat-menu #activationMenu="matMenu">
                 <button [disabled]="!!parameter?.activationExpression?.script" mat-menu-item (click)="addCondition()">
                   {{ 'Add condition' }}

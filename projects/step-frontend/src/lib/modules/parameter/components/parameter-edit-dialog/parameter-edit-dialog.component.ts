@@ -105,16 +105,16 @@ export class ParameterEditDialogComponent implements OnInit {
 
     switch (predicate) {
       case 'equals':
-        result = `${key} == ${value}`;
+        result = `${key} == "${value}"`;
         break;
       case 'not_equals':
-        result = `${key} != ${value}`;
+        result = `${key} != "${value}"`;
         break;
       case 'matches':
-        result = `${key} =~ ${value}`;
+        result = `${key} =~ "${value}"`;
         break;
       case 'not_matches':
-        result = `${key} !~ ${value}`;
+        result = `${key} !~ "${value}"`;
         break;
       case 'exists':
         result = `${key}`;

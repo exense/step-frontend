@@ -44,11 +44,16 @@
             <span class="predicate-line"></span>
           </div>
           @if (conditionForm.controls['predicate'].value; as predicateValue) {
-            @if (predicateValue !== PRED.EXISTS && predicateValue !== PRED.NOT_EXISTS) {
+            @if (
+              predicateValue !== PRED.EXISTS &&
+              predicateValue !== PRED.NOT_EXISTS &&
+              predicateValue !== PRED.MATCHES &&
+              predicateValue !== PRED.NOT_MATCHES
+            ) {
               @switch (conditionForm.controls['key'].value | inputType: inputs) {
                 @case ('dropdown') {
                   <step-autocomplete-input
-                    placeHolder="value"
+                    placeHolder="Value"
                     formControlName="value"
                     [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
                     [valueLabelExtractor]="bindingKeyExtractor"
@@ -80,6 +85,11 @@
                   </step-form-field>
                 }
               }
+            }
+            @if (predicateValue === PRED.MATCHES || predicateValue === PRED.NOT_MATCHES) {
+              <step-form-field>
+                <input type="text" placeholder="Value" formControlName="value" />
+              </step-form-field>
             }
           }
         </div>
