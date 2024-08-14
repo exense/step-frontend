@@ -1,5 +1,5 @@
 <ng-template #content>
-  @switch (input?.type) {
+  @switch (input()?.type) {
     @case (InputType.TEXT) {
       <input
         type="text"
@@ -16,7 +16,10 @@
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
       >
-        @for (item of dropdownItems; track item) {
+        @if (!!value) {
+          <mat-option class="unset-item" [value]="null">unset</mat-option>
+        }
+        @for (item of dropdownItems(); track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
@@ -46,11 +49,11 @@
   <step-form-field
     [showRequiredMarker]="required"
     alignLabelAddon="near"
-    [class.checkbox-toggle-input]="input?.type === InputType.CHECKBOX"
+    [class.checkbox-toggle-input]="input()?.type === InputType.CHECKBOX"
   >
-    <step-label>{{ input?.label }}</step-label>
+    <step-label>{{ input()?.label }}</step-label>
     <step-label-addon>
-      @if (input?.description; as description) {
+      @if (input()?.description; as description) {
         <step-icon name="help-circle" [matTooltip]="description" matTooltipPosition="above" />
       }
     </step-label-addon>

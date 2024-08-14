@@ -1,8 +1,11 @@
+@use 'projects/step-core/styles/core-mixins' as m;
+
 step-standard-custom-form-inputs,
 step-dynamic-label-custom-form-inputs {
   &.disabled {
     pointer-events: none;
   }
+  @include m.unset-item;
 }
 
 step-standard-custom-form-inputs {
