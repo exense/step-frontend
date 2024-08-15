@@ -1,4 +1,4 @@
-import { Component, computed, effect, HostBinding, inject, input, output } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, HostBinding, inject, input, output } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Input as StInput, ScreensService } from '../../../../client/step-client-module';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -17,7 +17,7 @@ export type OnTouch = () => void;
 @Component({
   template: '',
 })
-export abstract class BaseCustomFormInputComponent implements ControlValueAccessor {
+export abstract class BaseCustomFormInputComponent implements ControlValueAccessor, AfterViewInit {
   private _screensService = inject(ScreensService);
 
   /** @Input() **/
@@ -31,6 +31,12 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
 
   /** @Output **/
   readonly touch = output();
+
+  ngAfterViewInit(): void {
+    if (this.input()?.type === InputType.CHECKBOX) {
+      this.onValueChange(this.value ? 'true' : 'false');
+    }
+  }
 
   protected screenAndId = computed(() => {
     const stScreen = this.stScreen();
