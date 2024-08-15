@@ -34,7 +34,7 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
 
   ngAfterViewInit(): void {
     if (this.input()?.type === InputType.CHECKBOX) {
-      this.onValueChange(this.value ? 'true' : 'false');
+      this.onValueChange(this.value === 'true' ? 'true' : 'false');
     }
   }
 
