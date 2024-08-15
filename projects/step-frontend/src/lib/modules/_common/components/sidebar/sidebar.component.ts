@@ -80,14 +80,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     takeUntilDestroyed(),
   );
 
-  readonly displayMenuItems$ = combineLatest([
-    this._menuItems$,
-    this._customMenuEntries.customMenuEntries$,
-    this._bookmarkMenuItems$,
-  ]).pipe(map(([items, customItems, bookmarks]) => [...items, ...customItems, ...bookmarks]));
-
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-
   readonly isOpened$ = this._sideBarState.isOpened$;
 
   ngAfterViewInit(): void {
