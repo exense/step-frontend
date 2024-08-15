@@ -17,6 +17,17 @@ export interface CustomView {
   isStaticView?: boolean;
 }
 
+export interface MenuEntry {
+  id: string;
+  title: string;
+  icon: string;
+  weight?: number;
+  parentId?: string;
+  isBookmark?: boolean;
+
+  isEnabledFct(): boolean;
+}
+
 export interface Dashlet {
   label: string;
   template: string;

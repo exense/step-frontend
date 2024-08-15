@@ -21,6 +21,7 @@ import {
   ViewStateService,
   BookmarkService,
   MENU_ITEMS,
+  BookmarkNavigatorService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, map, startWith, SubscriptionLike } from 'rxjs';
@@ -42,6 +43,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkService = inject(BookmarkService);
+  private _bookmarkNavigator = inject(BookmarkNavigatorService);
   private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
@@ -54,6 +56,10 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _sideBarState = inject(SidebarStateService);
   private _customMenuEntries = inject(CustomMenuEntriesService);
   private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
+  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuItems$]).pipe(
+    map(([menuItems, bookmarkMenuItems]) => menuItems.concat(bookmarkMenuItems)),
+  );
   private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
     startWith([]),
     map((bookmarks) =>
@@ -141,8 +147,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
-  navigateTo(viewId: string, $event: MouseEvent): void {
+  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean): void {
     const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
+
+    if (isBookmark) {
+      this._bookmarkNavigator.navigateBookmark(viewId, isOpenInSeparateTab);
+      return;
+    }
 
     switch (viewId) {
       case 'home':

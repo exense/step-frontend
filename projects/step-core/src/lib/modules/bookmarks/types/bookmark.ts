@@ -5,4 +5,12 @@ export type Bookmark = {
   link?: string;
   tenant?: string;
   icon?: string;
+  customFields?: {
+    icon?: string;
+    label?: string;
+    link?: string;
+    page?: string;
+    tenant?: string;
+    position?: string;
+  };
 };
