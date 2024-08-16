@@ -96,12 +96,22 @@ $border-radius: 8px;
         display: none;
       }
 
-      &.align-left {
+      &.align-left,
+      &.align-fill {
         & > .label-addon {
           order: 1;
         }
         & > .required-marker-container {
           order: 2;
+        }
+      }
+
+      &.align-fill {
+        & > .label-addon {
+          flex-grow: 1;
+        }
+        & > .required-marker-container {
+          flex-grow: 0;
         }
       }
 

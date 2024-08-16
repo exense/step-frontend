@@ -57,6 +57,7 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { SimpleObjectInputComponent } from './components/simple-object-input/simple-object-input.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -114,6 +115,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
   ],
   exports: [
     CommonModule,
@@ -174,6 +176,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -286,3 +289,4 @@ export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
 export * from './types/time-converter';
 export * from './injectables/time-converters-factory.service';
+export * from './components/simple-object-input/simple-object-input.component';

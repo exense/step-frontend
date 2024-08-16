@@ -14,6 +14,6 @@ export class FormFieldComponent {
   @ContentChild(NgControl)
   control?: NgControl;
 
-  @Input() alignLabelAddon: 'separate' | 'near' = 'separate';
+  @Input() alignLabelAddon: 'separate' | 'near' | 'fill' = 'separate';
   @Input() showRequiredMarker?: boolean;
 }

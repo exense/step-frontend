@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  column-gap: 1rem;
+  row-gap: 1rem;
+
+  step-btn-group {
+    gap: 0.5em;
+  }
+  button {
+    min-width: 4rem;
+    width: 4rem;
+  }
+}
