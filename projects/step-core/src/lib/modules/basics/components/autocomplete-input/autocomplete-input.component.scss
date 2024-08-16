@@ -1,10 +1,20 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-autocomplete-input {
   display: block;
 
   input {
-    border: none;
-    padding: 0 !important;
     margin: 0;
     width: 100%;
+    padding: 10px 10px 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    border-width: thin;
+    border-color: var.$blue-600;
   }
 }
