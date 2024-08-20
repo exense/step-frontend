@@ -12,6 +12,6 @@ export class ExecutionOpenerComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this._activatedRoute.snapshot.params['id'];
-    this._router.navigate(['.', id], { relativeTo: this._activatedRoute.parent });
+    this._router.navigate(['.', id, 'steps'], { relativeTo: this._activatedRoute.parent, replaceUrl: true });
   }
 }
