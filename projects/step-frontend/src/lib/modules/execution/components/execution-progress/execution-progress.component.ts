@@ -13,6 +13,7 @@ import {
   IS_SMALL_SCREEN,
   Operation,
   PrivateViewPluginService,
+  RegistrationStrategy,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,
@@ -80,7 +81,13 @@ interface RefreshParams {
     },
     SingleExecutionPanelsService,
     ExecutionTreePagingService,
-    ...selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
+    ...selectionCollectionProvider(
+      {
+        selectionKeyProperty: 'artefactID',
+        registrationStrategy: RegistrationStrategy.MANUAL,
+      },
+      AutoDeselectStrategy.KEEP_SELECTION,
+    ),
     TreeStateService,
   ],
 })
@@ -404,6 +411,7 @@ export class ExecutionProgressComponent
         const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
+        this._testCasesSelection.registerPossibleSelectionManually(this.testCases);
         if (updateSelection !== UpdateSelection.NONE) {
           this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
         }
