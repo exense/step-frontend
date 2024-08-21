@@ -45,6 +45,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 
 @NgModule({
   declarations: [
@@ -197,6 +198,10 @@ export class ExecutionModule {
           // when the user navigates from one execution to another
           path: 'open/:id',
           component: ExecutionOpenerComponent,
+        },
+        {
+          path: 'schedules/:schedule_id',
+          component: ScheduleOverviewComponent,
         },
         {
           matcher: (url) => {
