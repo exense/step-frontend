@@ -180,7 +180,7 @@
         </section>
       </mat-expansion-panel>
       <section>
-        <a [href]="'#/executions/schedules/' + task.executionsParameters!['id']">Open cross-execution dashboard</a>
+        <a [routerLink]="'/executions/schedules/' + task.id">Open cross-execution dashboard</a>
       </section>
     </form>
   </div>

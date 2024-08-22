@@ -78,6 +78,7 @@ import { ScheduleOverviewComponent } from './components/schedule-overview/schedu
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -200,7 +201,7 @@ export class ExecutionModule {
           component: ExecutionOpenerComponent,
         },
         {
-          path: 'schedules/:schedule_id',
+          path: 'schedules/:id',
           component: ScheduleOverviewComponent,
         },
         {
