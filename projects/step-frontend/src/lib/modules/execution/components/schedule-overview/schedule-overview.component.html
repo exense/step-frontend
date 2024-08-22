@@ -1,5 +1,5 @@
 <div *ngIf="task && task.attributes">
-  <entity-icon [entityName]="'task'" [entity]="task.attributes"></entity-icon>
+  <entity-icon entityName="tasks" [entity]="task"></entity-icon>
   <h1>{{ task.attributes?.['name'] }}</h1>
 </div>
 <div *ngIf="!task">
