@@ -31,7 +31,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule, NgxMatSelectSearchModule],
-  exports: [ParametersListComponent, ParameterSelectionComponent],
+  exports: [ParameterListComponent, ParameterSelectionComponent],
   declarations: [
     ParameterListComponent,
     ParametersKeyComponent,
