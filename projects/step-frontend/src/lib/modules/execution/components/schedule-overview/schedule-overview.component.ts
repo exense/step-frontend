@@ -8,7 +8,7 @@ import { AugmentedSchedulerService, ExecutiontTaskParameters } from '@exense/ste
   styleUrls: ['./schedule-overview.component.scss'],
 })
 export class ScheduleOverviewComponent implements OnInit {
-  private _api = inject(AugmentedSchedulerService);
+  private _scheduleApi = inject(AugmentedSchedulerService);
   private taskId?: string;
   private _taskData?: ExecutiontTaskParameters;
 
@@ -22,7 +22,7 @@ export class ScheduleOverviewComponent implements OnInit {
       segments[segments.length - 1].path;
       this.taskId = segments[segments.length - 1].path;
       if (this.taskId) {
-        this._api.getExecutionTaskById(this.taskId).subscribe({
+        this._scheduleApi.getExecutionTaskById(this.taskId).subscribe({
           next: (task) => (this.task = task),
           error: () => {
             this.error = 'Invalid Task Id or server error.';
