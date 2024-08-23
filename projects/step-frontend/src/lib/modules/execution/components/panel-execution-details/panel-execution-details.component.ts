@@ -8,6 +8,6 @@ import { Panels } from '../../shared/panels.enum';
   styleUrls: ['./panel-execution-details.component.scss'],
 })
 export class PanelExecutionDetailsComponent {
+  readonly _state = inject(ExecutionStateService);
   readonly Panels = Panels;
-  public _state = inject(ExecutionStateService);
 }

@@ -38,7 +38,7 @@ import { TableRequestData, TableParameters, StepDataSource } from '../../../../c
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
-import { ItemsPerPageService } from '../../services/items-per-page.service';
+import { ItemsPerPageDefaultService } from '../../services/items-per-page-default.service';
 import { HasFilter } from '../../../entities-selection/services/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
@@ -54,6 +54,7 @@ import { TableColumnsDefinitionService } from '../../services/table-columns-defi
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
 import { isValidRegex } from '../../../basics/step-basics.module';
+import { ItemsPerPageService } from '../../services/items-per-page.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -205,7 +206,10 @@ export class TableComponent<T>
    * **/
   private customRemoteColumns = viewChild(CustomColumnsComponent);
 
-  readonly pageSizeOptions = inject(ItemsPerPageService).getItemsPerPage((userPreferredItemsPerPage) =>
+  protected _itemsPerPageService =
+    inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
+
+  readonly pageSizeOptions = this._itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage) =>
     this.page.pageSize.set(userPreferredItemsPerPage),
   );
 

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -17,6 +17,7 @@ import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
   EntityRegistry,
+  NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
   stepRouteAdditionalConfig,
@@ -45,6 +46,37 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
+import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
+import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
+import { AltExecutionAnalyticsComponent } from './components/alt-execution-analytics/alt-execution-analytics.component';
+import { AltReportNodeSummaryComponent } from './components/alt-report-node-summary/alt-report-node-summary.component';
+import { AltReportNodeListComponent } from './components/alt-report-node-list/alt-report-node-list.component';
+import { AltExecutionTimeComponent } from './components/alt-execution-time/alt-execution-time.component';
+import { ExecutionActionsComponent } from './components/execution-actions/execution-actions.component';
+import { AltReportPerformanceOverviewChartComponent } from './components/alt-report-performance-overview-chart/alt-report-performance-overview-chart.component';
+import { AltReportCurrentOperationsComponent } from './components/alt-report-current-operations/alt-report-current-operations.component';
+import { AltReportWidgetComponent } from './components/alt-report-widget/alt-report-widget.component';
+import { AltReportWidgetFilterDirective } from './directives/alt-report-widget-filter.directive';
+import { AltReportWidgetContentDirective } from './directives/alt-report-widget-content.directive';
+import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
+import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
+import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
+import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
+import { AppliedStatusPipe } from './pipes/applied-status.pipe';
+import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
+import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
+import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
+import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
+import { ViewMode } from './shared/view-mode';
+import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
+import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
+import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
+import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
+import { altExecutionGuard } from './guards/alt-execution.guard';
+import { executionGuard } from './guards/execution.guard';
+import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 
 @NgModule({
   declarations: [
@@ -60,6 +92,7 @@ import { ExecutionDurationComponent } from './components/execution-duration/exec
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
     RepositoryComponent,
+    ExecutionActionsComponent,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     DashletExecutionStepComponent,
@@ -77,6 +110,32 @@ import { ExecutionDurationComponent } from './components/execution-duration/exec
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    AltExecutionsComponent,
+    AltExecutionTabsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionReportControlsComponent,
+    AltExecutionAnalyticsComponent,
+    AltReportNodeSummaryComponent,
+    AltReportNodeListComponent,
+    AltExecutionTimeComponent,
+    AltReportPerformanceOverviewChartComponent,
+    AltReportCurrentOperationsComponent,
+    AltReportWidgetComponent,
+    AltReportWidgetFilterDirective,
+    AltReportWidgetContentDirective,
+    AltReportNodeKeywordsComponent,
+    AltReportNodesTestcasesComponent,
+    AltExecutionTreeComponent,
+    AltKeywordDrilldownComponent,
+    AltExecutionRangePickerComponent,
+    AltExecutionRangePrintComponent,
+    ExecutionDetailsComponent,
+    AggregatedTreeStatusComponent,
+    AggregatedTreeNodeComponent,
+    AppliedStatusPipe,
+    TreeNodeDescriptionPipe,
+    ExecutionActionsExecuteContentDirective,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [
@@ -92,6 +151,13 @@ import { ExecutionDurationComponent } from './components/execution-duration/exec
     ExecutionSelectionTableComponent,
     ExecutionDurationComponent,
     StatusComponent,
+    AltExecutionsComponent,
+    AltExecutionProgressComponent,
+    AltExecutionReportComponent,
+    AltExecutionReportControlsComponent,
+    AltExecutionAnalyticsComponent,
+    AltExecutionTreeComponent,
+    AltKeywordDrilldownComponent,
   ],
 })
 export class ExecutionModule {
@@ -179,6 +245,8 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'executions',
+      canActivate: [executionGuard],
+      canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
@@ -207,6 +275,111 @@ export class ExecutionModule {
           },
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
+        },
+      ],
+    });
+
+    this._viewRegistry.registerRoute({
+      path: 'alt-executions',
+      component: AltExecutionsComponent,
+      canActivate: [altExecutionGuard],
+      resolve: {
+        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
+      },
+      canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
+      children: [
+        {
+          path: '',
+          redirectTo: 'list',
+        },
+        {
+          path: 'list',
+          component: ExecutionListComponent,
+        },
+        {
+          path: ':id',
+          component: AltExecutionProgressComponent,
+          children: [
+            {
+              path: '',
+              redirectTo: 'report',
+            },
+            {
+              path: 'report',
+              data: {
+                mode: ViewMode.VIEW,
+              },
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionReportComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionReportControlsComponent,
+                  outlet: 'controls',
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
+                },
+              ],
+            },
+            {
+              path: 'report-print',
+              data: {
+                mode: ViewMode.PRINT,
+              },
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionReportComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePrintComponent,
+                  outlet: 'rangePicker',
+                },
+              ],
+            },
+            {
+              path: 'tree',
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionTreeComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
+                },
+              ],
+            },
+            {
+              path: 'analytics',
+              component: AltExecutionAnalyticsComponent,
+            },
+            {
+              path: `keyword-drilldown/:keywordId`,
+              component: AltKeywordDrilldownComponent,
+            },
+            schedulePlanRoute('modal'),
+            {
+              path: 'viz',
+              redirectTo: 'analytics',
+            },
+            {
+              path: 'steps',
+              redirectTo: 'report',
+            },
+            {
+              path: 'errors',
+              redirectTo: 'report',
+            },
+          ],
         },
       ],
     });

@@ -1,0 +1,19 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+step-form-field {
+  --form-field-border-radius: 1.6rem;
+  input {
+    text-align: right;
+    width: auto;
+  }
+}
+
+@media screen {
+  :host {
+    visibility: hidden;
+  }
+}

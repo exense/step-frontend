@@ -4,6 +4,8 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AggregatedReportView } from '../models/AggregatedReportView';
+import type { AggregatedReportViewRequest } from '../models/AggregatedReportViewRequest';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Execution } from '../models/Execution';
 import type { ExecutionParameters } from '../models/ExecutionParameters';
@@ -109,6 +111,44 @@ export class ExecutionsService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Returns the full aggregated report view for the provided execution.
+   * @param id
+   * @returns AggregatedReportView default response
+   * @throws ApiError
+   */
+  public getFullAggregatedReportView(id: string): Observable<AggregatedReportView> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/report/aggregated',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Returns the aggregated report view for the provided execution.
+   * @param id
+   * @param requestBody
+   * @returns AggregatedReportView default response
+   * @throws ApiError
+   */
+  public getAggregatedReportView(
+    id: string,
+    requestBody?: AggregatedReportViewRequest,
+  ): Observable<AggregatedReportView> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/{id}/report/aggregated',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

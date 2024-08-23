@@ -1,0 +1,100 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+step-alt-execution-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: 0 3.2rem;
+
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: 'title controls ranger';
+    gap: 1.5rem;
+    align-items: flex-start;
+
+    &.small-screen {
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        'title title'
+        'controls ranger';
+    }
+
+    .title {
+      grid-area: title;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      justify-content: flex-end;
+
+      .sub-title {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 3rem;
+        line-height: 3.8rem;
+      }
+
+      .user {
+        font-weight: 400;
+        color: var.$gray-550;
+      }
+    }
+
+    .range-picker {
+      grid-area: ranger;
+      justify-self: flex-end;
+    }
+
+    .controls {
+      grid-area: controls;
+      justify-self: flex-end;
+      display: flex;
+      align-items: center;
+      align-content: flex-end;
+      gap: 1rem;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  @media screen {
+    .print-execution-details {
+      display: none;
+    }
+  }
+
+  @media print {
+    padding: 0 !important;
+    .header {
+      .details-hint,
+      .controls {
+        display: none;
+      }
+    }
+
+    .print-execution-details {
+      margin-bottom: 2rem;
+    }
+
+    .plan-link,
+    .simulate-icon {
+      display: none;
+    }
+  }
+}
+
+@include common.executions-menu;

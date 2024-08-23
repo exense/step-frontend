@@ -28,10 +28,15 @@ import { CallKeywordComponent } from './component/call-keyword/call-keyword.comp
 import { ScriptComponent } from './component/script/script.component';
 import { AssertionPlanComponent } from './component/assertion-plan/assertion-plan.component';
 import { AssertPerformanceComponent } from './component/assert-performance/assert-performance.component';
+import { ArtefactInlineFieldComponent } from './component/artefact-inline-field/artefact-inline-field.component';
+import { EchoInlineComponent } from './component/echo-inline/echo-inline.component';
+import { ArtefactInlineFieldListComponent } from './component/artefact-inline-field-list/artefact-inline-field-list.component';
+import { CallKeywordInlineComponent } from './component/call-keyword-inline/call-keyword-inline.component';
 
 @NgModule({
   declarations: [
     EchoComponent,
+    EchoInlineComponent,
     ThreadGroupComponent,
     AssertComponent,
     PlaceholderComponent,
@@ -55,13 +60,17 @@ import { AssertPerformanceComponent } from './component/assert-performance/asser
     ForEachComponent,
     CallPlanComponent,
     CallKeywordComponent,
+    CallKeywordInlineComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
+    ArtefactInlineFieldComponent,
+    ArtefactInlineFieldListComponent,
   ],
   imports: [StepCommonModule, RichEditorComponent],
   exports: [
     EchoComponent,
+    EchoInlineComponent,
     ThreadGroupComponent,
     AssertComponent,
     PlaceholderComponent,
@@ -85,9 +94,12 @@ import { AssertPerformanceComponent } from './component/assert-performance/asser
     ForEachComponent,
     CallPlanComponent,
     CallKeywordComponent,
+    CallKeywordInlineComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
+    ArtefactInlineFieldComponent,
+    ArtefactInlineFieldListComponent,
   ],
 })
 export class ArtefactsModule {
@@ -118,6 +130,7 @@ export class ArtefactsModule {
     this._artefactService.register('CallKeyword', {
       icon: 'keyword',
       component: CallKeywordComponent,
+      inlineComponent: CallKeywordInlineComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });
@@ -168,6 +181,7 @@ export class ArtefactsModule {
     this._artefactService.register('Echo', {
       icon: 'zoom-in',
       component: EchoComponent,
+      inlineComponent: EchoInlineComponent,
       description: 'Used to print data in the report nodes of a plan, mostly for debugging or information purposes',
     });
     this._artefactService.register('If', {
