@@ -217,7 +217,7 @@ export class ExecutionProgressComponent
     this.keywordSearch = escapeRegExp(error);
   }
 
-  selectTab(tabId: string): void {
+  selectTab(tabId: string, isInitialize?: boolean): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
     const routeUrl = this._activatedRoute.snapshot.url;
@@ -227,7 +227,7 @@ export class ExecutionProgressComponent
     }
     const relativePath = routeUrl.length === 1 ? '.' : '..';
     const relativeTo = this._activatedRoute;
-    this._router.navigate([relativePath, tabId], { relativeTo });
+    this._router.navigate([relativePath, tabId], { relativeTo, replaceUrl: isInitialize });
   }
 
   closeExecution(openList: boolean = true): void {
@@ -311,7 +311,7 @@ export class ExecutionProgressComponent
       }
     }
 
-    this.selectTab(tabToSelect);
+    this.selectTab(tabToSelect, true);
   }
 
   private determineDefaultSelection(testCases?: ReportNode[]): void {
