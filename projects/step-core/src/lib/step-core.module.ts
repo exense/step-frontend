@@ -35,7 +35,6 @@ import { EntitiesSelectionModule } from './modules/entities-selection/entities-s
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
-import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
@@ -74,6 +73,8 @@ import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
+import { TAB_EXPORTS } from './modules/tabs';
+import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 
 @NgModule({
   declarations: [
@@ -113,6 +114,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -126,7 +128,6 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
@@ -149,6 +150,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
     INFO_BANNER_EXPORTS,
+    TAB_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -165,7 +167,6 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
@@ -217,8 +218,10 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
     MULTI_LEVEL_SELECT_EXPORTS,
     TestIdDirective,
     INFO_BANNER_EXPORTS,
+    TAB_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -272,6 +275,7 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
@@ -293,7 +297,7 @@ export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
-export * from './modules/tabs/tabs.module';
+export * from './modules/tabs';
 export * from './modules/tree/tree.module';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
@@ -329,6 +333,8 @@ export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
 export * from './modules/execution-common';
 export * from './components/base-artefact/base-artefact.component';
+export * from './components/base-artefact/base-inline-artefact.component';
+export * from './components/base-artefact/artefact-inline-item';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';

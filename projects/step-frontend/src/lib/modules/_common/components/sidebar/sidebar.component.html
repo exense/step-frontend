@@ -7,7 +7,7 @@
   <div id="sidebar-logo-and-burgermenu">
     <span class="visible-when-collapsed">
       <label (click)="toggleOpenClose()">
-        <step-icon name="menu"></step-icon>
+        <step-icon name="menu" />
       </label>
     </span>
     <span class="sidebar-logo-container">
@@ -15,58 +15,78 @@
     </span>
   </div>
   <div id="sidebar-home-and-settings">
-    <span
-      *ngIf="isOpened$ | async"
-      class="visible-when-collapsed sidebar-home-button"
-      (stepSideBarClick)="navigateTo('home', $event)"
-    >
-      <step-icon name="home"></step-icon>
-    </span>
-    <ng-container *ngIf="('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)">
-      <step-settings-button class="sidebar-home-and-settings-icon"></step-settings-button>
-    </ng-container>
+    @if (isOpened$ | async) {
+      <span class="visible-when-collapsed sidebar-home-button" (stepSideBarClick)="navigateTo('home', $event)">
+        <step-icon name="home" />
+      </span>
+    }
+    @if (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) {
+      <step-settings-button class="sidebar-home-and-settings-icon" />
+    }
   </div>
   <div id="sidebar-categories">
     <div id="sidebar-categories-tabs" #tabs>
-      <div
-        class="sidebar-collapsable-tab"
-        *ngFor="let mainMenuEntry of _menuItems$ | async | menuFilter: 'root'; trackBy: trackByMenuEntry"
-      >
-        <input
-          #mainMenuCheckBox
-          [name]="mainMenuEntry.id"
-          id="collapsable-tab-{{ mainMenuEntry.title }}"
-          type="checkbox"
-          (change)="toggleMenuItem(mainMenuCheckBox)"
-        />
-        <label for="collapsable-tab-{{ mainMenuEntry.title }}">
-          <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon"></step-icon>
-          <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
-          <span><step-icon class="chevron" name="chevron-right"></step-icon></span>
-        </label>
-        <div class="content">
-          <section
-            *ngFor="let entry of displayMenuItems$ | async | menuFilter: mainMenuEntry.id; trackBy: trackByMenuEntry"
-          >
-            <div
-              class="sidebar-subtab"
-              [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
-              (stepSideBarClick)="navigateTo(entry.id, $event, entry.isBookmark)"
-            >
-              <step-icon class="visible-when-collapsed" [name]="entry.icon"></step-icon>
-              <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
+      @if (displayMenuItems$ | async; as menuItems) {
+        @for (mainMenuEntry of menuItems | menuFilter: 'root'; track mainMenuEntry.id) {
+          <div class="sidebar-collapsable-tab">
+            <input
+              #mainMenuCheckBox
+              [name]="mainMenuEntry.id"
+              id="collapsable-tab-{{ mainMenuEntry.title }}"
+              type="checkbox"
+              (change)="toggleMenuItem(mainMenuCheckBox)"
+            />
+            <label for="collapsable-tab-{{ mainMenuEntry.title }}">
+              <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
+              <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+              <span><step-icon class="chevron" name="chevron-right" /></span>
+            </label>
+            <div class="content">
+              @for (entry of menuItems | menuFilter: mainMenuEntry.id; track entry.id) {
+                <section>
+                  <div
+                    class="sidebar-subtab"
+                    [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
+                    (stepSideBarClick)="navigateTo(entry.id, $event)"
+                  >
+                    <step-icon class="visible-when-collapsed" [name]="entry.icon" />
+                    <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
+                  </div>
+                  <div class="sidebar-subtab-content">
+                    @for (subEntry of menuItems | menuFilter: entry.id; track subEntry.id) {
+                      <section>
+                        <div
+                          class="sidebar-sub-subtab"
+                          [class.sidebar-highlighted-subtab]="subEntry.id | isMenuItemActive | async"
+                          (mouseup)="navigateTo(entry.id, $event, entry.isBookmark)"
+                        >
+                          <step-icon class="visible-when-collapsed" [name]="subEntry.icon || 'minus'" />
+                          <span class="sidebar-aligned-sub-subtext" [matTooltip]="subEntry.title">
+                            {{ subEntry.title }}
+                          </span>
+                          @if (subEntry.isCustom) {
+                            <span>
+                              <step-icon name="x" (mousedown)="removeCustomEntry(subEntry.id, $event)" />
+                            </span>
+                          }
+                        </div>
+                      </section>
+                    }
+                  </div>
+                </section>
+              }
             </div>
-          </section>
-        </div>
-      </div>
-      <ng-container *ngIf="!(isOpened$ | async)">
+          </div>
+        }
+      }
+      @if (!(isOpened$ | async)) {
         <div class="sidebar-collapsable-tab" (stepSideBarClick)="navigateTo('home', $event)">
           <label>
-            <step-icon class="visible-when-collapsed" name="home"></step-icon>
+            <step-icon class="visible-when-collapsed" name="home" />
             <span class="sidebar-aligned-text">Home</span>
           </label>
         </div>
-      </ng-container>
+      }
     </div>
   </div>
 

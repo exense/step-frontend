@@ -10,7 +10,7 @@ import {
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
-interface KeywordArtefact extends AbstractArtefact {
+export interface KeywordArtefact extends AbstractArtefact {
   description: string;
   argument: DynamicValueString;
   resultMap: DynamicValueString;
