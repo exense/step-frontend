@@ -5,13 +5,15 @@
   $primary-color: #0082cb,
   $primary-text-color: #293e50,
   $border-color: #d0d5dd,
-  $error-color: #ff0000
+  $error-color: #ff0000,
+  $warning-color: #ff8f4b
 ) {
   $config: (
     primary-color: $primary-color,
     primary-text-color: $primary-text-color,
     border-color: $border-color,
     error-color: $error-color,
+    warning-color: $warning-color,
   );
 
   @return $config;
@@ -46,11 +48,56 @@ $border-radius: 8px;
   border-bottom-right-radius: $border-radius;
 }
 
+@mixin highlight($highlight-color) {
+  mat-select,
+  input,
+  pre,
+  step-array-input,
+  step-autocomplete-input,
+  mat-date-range-input,
+  step-rich-editor,
+  textarea {
+    border-color: $highlight-color;
+  }
+
+  & > .label-container {
+    & > label,
+    & > .required-marker-container {
+      color: $highlight-color;
+    }
+  }
+
+  & > .form-field-content {
+    & > mat-select,
+    & > step-multi-level-select,
+    & > input,
+    & > pre,
+    & > step-array-input,
+    & > step-autocomplete-input,
+    & > mat-date-range-input,
+    & > textarea {
+      border-color: $highlight-color;
+    }
+
+    & > step-suffix,
+    & > step-prefix {
+      border-color: $highlight-color;
+    }
+    & > step-suffix.icon-suffix,
+    & > step-prefix.icon-prefix {
+      step-icon {
+        color: $highlight-color;
+      }
+    }
+  }
+}
+
 @mixin step-form-field($config) {
   $primary-color: map.get($config, primary-color);
   $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
+  $warning-color: map.get($config, warning-color);
 
   step-label {
     &[show-required-marker]::after {
@@ -163,47 +210,11 @@ $border-radius: 8px;
     }
 
     &.ng-invalid.ng-touched {
-      mat-select,
-      input,
-      pre,
-      step-array-input,
-      step-autocomplete-input,
-      mat-date-range-input,
-      step-rich-editor,
-      textarea {
-        border-color: $error-color;
-      }
+      @include highlight($error-color);
+    }
 
-      & > .label-container {
-        & > label,
-        & > .required-marker-container {
-          color: $error-color;
-        }
-      }
-
-      & > .form-field-content {
-        & > mat-select,
-        & > step-multi-level-select,
-        & > input,
-        & > pre,
-        & > step-array-input,
-        & > step-autocomplete-input,
-        & > mat-date-range-input,
-        & > textarea {
-          border-color: $error-color;
-        }
-
-        & > step-suffix,
-        & > step-prefix {
-          border-color: $error-color;
-        }
-        & > step-suffix.icon-suffix,
-        & > step-prefix.icon-prefix {
-          step-icon {
-            color: $error-color;
-          }
-        }
-      }
+    &.step-has-warnings:not(.ng-invalid).ng-touched {
+      @include highlight($warning-color);
     }
 
     .form-field-content {
@@ -327,6 +338,7 @@ $border-radius: 8px;
     }
 
     .form-field-error,
+    .form-field-warning,
     .form-field-hint {
       font-size: 1.2rem;
 
@@ -335,12 +347,19 @@ $border-radius: 8px;
       }
     }
 
+    .form-field-warning {
+      color: $warning-color;
+    }
+
     .form-field-error {
       color: $error-color;
     }
 
-    .form-field-error:not(:empty) + .form-field-hint {
-      display: none;
+    .form-field-warning,
+    .form-field-error {
+      &:not(:empty) ~ .form-field-hint {
+        display: none;
+      }
     }
   }
 }
