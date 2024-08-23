@@ -7,7 +7,7 @@ import {
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
-interface EchoArtefact extends AbstractArtefact {
+export interface EchoArtefact extends AbstractArtefact {
   text: DynamicValueString;
 }
 
