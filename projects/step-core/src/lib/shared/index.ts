@@ -9,3 +9,4 @@ export * from './function-type-script-options.token';
 export * from './auto-refresh-model.interface';
 export * from './aggregator-type.enum';
 export * from './assert-operator-type.enum';
+export * from './aggregated-artefact-info';

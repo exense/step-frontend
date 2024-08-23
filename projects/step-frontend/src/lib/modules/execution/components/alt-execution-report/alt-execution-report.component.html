@@ -1,0 +1,38 @@
+<section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
+  @if (keywordsSummary$ | async; as keywordsSummary) {
+    <step-alt-report-node-summary title="Summary: Steps" [summary]="keywordsSummary" />
+  }
+  @if (_mode === ViewMode.VIEW) {
+    <step-alt-report-node-keywords
+      class="keywords"
+      (openKeywordDrilldown)="handleOpenKeywordDrilldown($event)"
+      (openKeywordInTreeView)="handleOpenKeywordInTreeView($event)"
+    />
+  }
+  @if (_state.testCases$ | async) {
+    <step-alt-report-nodes-testcases />
+  }
+  @if (testCasesSummary$ | async; as testCasesSummary) {
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+  }
+  @if (_state.executionId$ | async; as executionId) {
+    <step-alt-report-performance-overview-chart
+      [executionId]="executionId"
+      [timeRange]="(_state.timeRange$ | async)!"
+      (timeRangeChange)="_state.updateRange($event)"
+      [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
+      (fullRange)="_state.selectFullRange()"
+    />
+  }
+  @if (_state.currentOperations$ | async; as currentOperations) {
+    <step-alt-report-current-operations [operations]="currentOperations" />
+  }
+  @if (_mode === ViewMode.PRINT) {
+    <div class="print-footer"></div>
+  }
+</section>
+@if (_mode === ViewMode.PRINT) {
+  <div class="print-overlay">
+    <h2>Print in progress</h2>
+  </div>
+}

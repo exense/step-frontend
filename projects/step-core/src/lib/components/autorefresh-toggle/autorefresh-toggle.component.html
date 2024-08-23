@@ -1,22 +1,36 @@
-<button
-  mat-icon-button
-  [matMenuTriggerFor]="menu"
-  [matTooltip]="selectedInterval.label"
-  class="refresh-btn"
-  [disabled]="disableAutoRefreshButton"
->
-  <step-icon name="refresh-cw"></step-icon>
-  <div *ngIf="model.interval === 0" class="refresh-off">
-    <span [class.disabled]="disableAutoRefreshButton">off</span>
-  </div>
-</button>
+@switch (buttonType) {
+  @case ('icon') {
+    <button
+      mat-icon-button
+      [disabled]="disableAutoRefreshButton"
+      [matMenuTriggerFor]="menu"
+      [matTooltip]="selectedInterval.label"
+    >
+      <ng-container *ngTemplateOutlet="btnContent" />
+    </button>
+  }
+  @case ('stroke') {
+    <button
+      mat-stroked-button
+      [disabled]="disableAutoRefreshButton"
+      [matMenuTriggerFor]="menu"
+      [matTooltip]="selectedInterval.label"
+    >
+      <ng-container *ngTemplateOutlet="btnContent" />
+    </button>
+  }
+  @default {}
+}
+<ng-template #btnContent>
+  <step-icon name="refresh-cw" />
+  @if (model.interval === 0) {
+    <div class="refresh-off" [class.disabled]="disableAutoRefreshButton"><span>off</span></div>
+  }
+</ng-template>
 <mat-menu #menu="matMenu">
-  <button
-    *ngFor="let p of presets"
-    (click)="changeRefreshInterval(p)"
-    mat-menu-item
-    [class.active]="p.value === selectedInterval.value"
-  >
-    {{ p.label }}
-  </button>
+  @for (p of presets; track p.value) {
+    <button mat-menu-item [class.active]="p.value === selectedInterval.value" (click)="changeRefreshInterval(p)">
+      {{ p.label }}
+    </button>
+  }
 </mat-menu>

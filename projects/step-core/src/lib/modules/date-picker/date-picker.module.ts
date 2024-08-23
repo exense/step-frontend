@@ -7,6 +7,7 @@ import { DateRangePickerDirective } from './directives/date-range-picker.directi
 import { SingleTimePickerComponent } from './components/single-time-picker/single-time-picker.component';
 import { RangeTimePickerComponent } from './components/range-time-picker/range-time-picker.component';
 import { TimePickerComponent } from './components/time-picker/time-picker.component';
+import { RelativeTimePickerComponent } from './components/relative-time-picker/relative-time-picker.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { TimePickerComponent } from './components/time-picker/time-picker.compon
     SingleTimePickerComponent,
     RangeTimePickerComponent,
     TimePickerComponent,
+    RelativeTimePickerComponent,
   ],
   imports: [StepBasicsModule],
   exports: [DatePickerComponent, DatePickerDirective, DateRangePickerDirective],
@@ -27,4 +29,14 @@ export * from './components/date-picker/date-picker.component';
 export * from './directives/date-picker.directive';
 export * from './directives/date-range-picker.directive';
 export * from './types/date-range';
-export { StepDateFormatConfig, STEP_DATE_FORMAT_CONFIG } from './injectables/step-date-format-config.providers';
+export * from './types/time-option';
+export * from './injectables/default-relative-time-options.token';
+export * from './injectables/relative-time-options.token';
+export * from './injectables/date-utils.service';
+export * from './injectables/date-single-adapter.service';
+export * from './injectables/date-range-adapter.service';
+export {
+  StepDateFormatConfig,
+  STEP_DATE_FORMAT_CONFIG,
+  STEP_DATE_TIME_FORMAT_PROVIDERS,
+} from './injectables/step-date-format-config.providers';

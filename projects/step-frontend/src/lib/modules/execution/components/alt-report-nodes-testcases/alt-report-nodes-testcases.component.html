@@ -1,0 +1,24 @@
+<step-alt-report-node-list title="Test Cases" [mode]="_mode">
+  <step-table #table [dataSource]="(dataSource$ | async)!" class="paddingless-full no-highlight no-border hide-header">
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <step-status [status]="element.status" class="full-width" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="operations">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        @if (element.status === 'RUNNING') {
+          <step-current-operations [reportNodeId]="element.id" [(showAll)]="showAllOperations" />
+        }
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td class="name" mat-cell *matCellDef="let element">
+        {{ element.name }}
+      </td>
+    </ng-container>
+  </step-table>
+</step-alt-report-node-list>

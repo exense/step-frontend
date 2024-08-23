@@ -1,0 +1,5 @@
+<step-tree [dragDisabled]="true" [forceFocus]="true">
+  <div *stepTreeNodeTemplate="let node" class="node-name">
+    <step-aggregated-tree-node [nodeId]="node.id" />
+  </div>
+</step-tree>

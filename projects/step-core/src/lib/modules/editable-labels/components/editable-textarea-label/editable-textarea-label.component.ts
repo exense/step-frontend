@@ -1,8 +1,9 @@
-import { Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent, EditableComponentState } from '../editable-component/editable.component';
 import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-common-imports.constant';
 import { EditableActionsComponent } from '../editable-actions/editable-actions.component';
+import { TextSerializeService } from '../../injectables/text-serialize.service';
 
 const DEFAULT_TEXTAREA_ROWS = 4;
 const LINE_HEIGHT = 18;
@@ -22,20 +23,26 @@ const BORDER_WIDTH = 1;
   ],
   standalone: true,
   imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent],
+  encapsulation: ViewEncapsulation.None,
 })
 export class EditableTextareaLabelComponent extends EditableComponent<string> {
+  private _textSerialize = inject(TextSerializeService);
+
   @ViewChild('textarea') textarea?: ElementRef<HTMLElement>;
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
 
   protected override onCancel(): void {
-    this.value = this.serializeValue(this.value);
+    this.value = this._textSerialize.serializeValue(this.value);
     super.onCancel();
   }
 
   protected override onLabelClick(): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.recalculateTextareaRows();
-    this.value = this.deserializeValue(this.value);
+    this.value = this._textSerialize.deserializeValue(this.value);
     super.onLabelClick();
     this.textarea!.nativeElement.focus();
     this.focusedElement = this.textarea!.nativeElement;
@@ -46,7 +53,7 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   }
 
   override writeValue(value: string): void {
-    this.value = this.serializeValue(value);
+    this.value = this._textSerialize.serializeValue(value);
     this.newValue = this.value;
   }
 
@@ -55,12 +62,12 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
     this.stateChange.emit(this.state);
 
     if (this.newValue === this.value) {
-      this.value = this.serializeValue(this.value);
+      this.value = this._textSerialize.serializeValue(this.value);
       return;
     }
 
-    this.value = this.serializeValue(this.newValue);
-    this.onChange?.(this.value);
+    this.value = this._textSerialize.serializeValue(this.newValue);
+    this.onChange?.(this._textSerialize.undecorateLine(this.value));
   }
 
   onInput(): void {
@@ -75,25 +82,5 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
     const { height } = this._elementRef.nativeElement.getBoundingClientRect();
 
     this.textareaRows = (height - 2 * PADDING_TOP_BOTTOM) / LINE_HEIGHT;
-  }
-
-  private deserializeValue(value?: string): string {
-    let deserializedValue = value ? value.replace(/<br \/>/g, '\n') : '';
-
-    if (deserializedValue.endsWith('\n')) {
-      deserializedValue = deserializedValue.replace(/\n$/g, '');
-    }
-
-    return deserializedValue;
-  }
-
-  private serializeValue(value?: string): string {
-    let serializedValue = value ? value.replace(/\n/g, '<br />') : '';
-
-    if (serializedValue.endsWith('<br />')) {
-      serializedValue += '<br />';
-    }
-
-    return serializedValue;
   }
 }

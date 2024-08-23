@@ -14,10 +14,10 @@
     <div class="no-data-tag">Chart is unavailable for current settings</div>
   }
 </div>
-
 @if (
   !chartIsUnavailable &&
   !chartIsEmpty &&
+  legendSettings.show &&
   (legendSettings.items.length || legendSettings.zAxisLabel || settings.truncated)
 ) {
   <div class="ts-chart-legend">
@@ -27,29 +27,27 @@
       [matTooltip]="legendSettings.expanded ? 'Collapse' : 'Expand'"
       (click)="legendSettings.expanded = !legendSettings.expanded"
     ></div>
-    @if (legendSettings.show) {
-      <div class="left-section">
-        @if (settings.truncated) {
-          <div class="truncated">
-            <step-icon
-              name="alert-circle"
-              matTooltip="Maximum number of series reached, excess series can’t be shown"
-              matTooltipPosition="below"
-            />
-          </div>
-        }
-        <div class="legend-items" [class.expanded]="legendSettings.expanded">
-          @for (item of legendSettings.items; track item.label) {
-            @if (item.isVisible) {
-              <div class="item">
-                <step-marker [markerType]="item.strokeType" [color]="item.color" />
-                <div class="item-label" [title]="item.label">{{ item.label }}</div>
-              </div>
-            }
-          }
+    <div class="left-section">
+      @if (settings.truncated) {
+        <div class="truncated">
+          <step-icon
+            name="alert-circle"
+            matTooltip="Maximum number of series reached, excess series can’t be shown"
+            matTooltipPosition="below"
+          />
         </div>
+      }
+      <div class="legend-items" [class.expanded]="legendSettings.expanded">
+        @for (item of legendSettings.items; track item.label) {
+          @if (item.isVisible) {
+            <div class="item">
+              <step-marker [markerType]="item.strokeType" [color]="item.color" />
+              <div class="item-label" [title]="item.label">{{ item.label }}</div>
+            </div>
+          }
+        }
       </div>
-    }
+    </div>
     @if (legendSettings.zAxisLabel) {
       <div class="aggregate-section">
         <step-icon name="bar-chart-2" class="total-value-icon" />

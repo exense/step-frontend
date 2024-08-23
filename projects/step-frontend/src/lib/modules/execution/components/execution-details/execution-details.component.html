@@ -1,0 +1,60 @@
+@if (showStatus()) {
+  <step-status [status]="status()" />
+}
+<ul class="list-unstyled">
+  @if (showPlan()) {
+    <li>
+      <strong>Plan</strong>
+      <span>
+        @if (execution()?.executionParameters?.['isolatedExecution']) {
+          {{ execution()?.description }}
+        } @else {
+          <a routerLink="/plans/editor/{{ execution()?.planId }}">
+            {{ execution()?.description }}
+          </a>
+        }
+      </span>
+    </li>
+  }
+  @if (execution()?.executionParameters?.customParameters; as execParams) {
+    @for (item of execParams | keyvalue; track item.key) {
+      <li>
+        <strong>{{ item.key }}</strong
+        >&nbsp;<span>{{ item.value }}</span>
+      </li>
+    }
+  }
+  @if (showMode()) {
+    <li>
+      <strong>Mode</strong>&nbsp;<span>{{ execution()?.executionParameters?.mode }}</span>
+    </li>
+  }
+  @if (showUser()) {
+    <li>
+      <strong>User</strong>&nbsp;<span>{{ execution()?.executionParameters?.userID }}</span>
+    </li>
+  }
+  @if (showDates()) {
+    <li>
+      <strong>Start</strong>&nbsp;<span>{{ execution()?.startTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+    </li>
+    <li>
+      <strong>End</strong>&nbsp;<span>{{ execution()?.endTime | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+    </li>
+  }
+  @if (showExecutionId()) {
+    <li>
+      <strong>Execution ID</strong>&nbsp;<span>{{ execution()?.id }}</span>
+    </li>
+  }
+  <li>
+    <strong>Origin</strong>&nbsp;<span
+      >Repository={{ execution()?.executionParameters?.repositoryObject?.repositoryID }}</span
+    >
+    @if (execution()?.executionParameters?.repositoryObject?.repositoryParameters; as repoParams) {
+      @for (item of repoParams | keyvalue; track item.key) {
+        <span> {{ item.key }}={{ item.value }} </span>
+      }
+    }
+  </li>
+</ul>

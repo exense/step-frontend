@@ -13,4 +13,7 @@ export interface TSChartSettings {
   showLegend?: boolean; // default true
   hooks?: Hooks.Arrays; // if some hooks have to be override
   truncated?: boolean;
+  showCursor?: boolean;
+  showTimeAxes?: boolean;
+  zoomEnabled?: boolean;
 }

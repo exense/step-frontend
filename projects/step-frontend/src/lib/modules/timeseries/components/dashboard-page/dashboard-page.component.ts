@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { COMMON_IMPORTS, ResolutionPickerComponent, TimeRangePickerComponent } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ActivatedRoute } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
+import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
 
 @Component({
   selector: 'step-dashboard-page',
@@ -20,6 +20,7 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
     TimeRangePickerComponent,
     TableDashletComponent,
     DashboardComponent,
+    StandaloneChartComponent,
   ],
 })
 export class DashboardPageComponent implements OnInit {

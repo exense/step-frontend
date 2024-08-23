@@ -8,23 +8,13 @@ import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predi
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
 import { QuickAccessRouteService } from '../../basics/step-basics.module';
+import { MenuEntry } from '../types/menu-entry';
 import { InfoBannerRegisterService } from '../../info-banner';
 
 export interface CustomView {
   template: string;
   isPublicView: boolean;
   isStaticView?: boolean;
-}
-
-export interface MenuEntry {
-  id: string;
-  title: string;
-  icon: string;
-  weight?: number;
-  parentId?: string;
-  isBookmark?: boolean;
-
-  isEnabledFct(): boolean;
 }
 
 export interface Dashlet {

@@ -60,6 +60,9 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   }
 
   protected override onLabelClick(): void {
+    if (this.isDisabled) {
+      return;
+    }
     super.onLabelClick();
     this.focusedElement = this.matSelectElementRef!.nativeElement;
     this.focusedElement.focus();

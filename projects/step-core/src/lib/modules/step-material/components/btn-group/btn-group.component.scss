@@ -3,36 +3,50 @@
 step-btn-group {
   display: inline-flex;
 
+  &.without-borders,
   &.with-borders {
-    border-radius: 8px;
-    border: 1px solid var.$gray-300;
-
     .mat-mdc-outlined-button {
       border: 0;
       border-radius: 0;
-      padding: 0 12px;
-      height: 36px;
-      line-height: 36px;
+      padding: 0 1.2rem;
+      height: 3.6rem;
+      line-height: 3.6rem;
       min-width: auto;
 
       step-icon {
         display: flex;
       }
+    }
+  }
+
+  &.without-borders {
+    .mat-mdc-outlined-button {
+      border-radius: 2.8rem;
+      width: 3.6rem;
+    }
+  }
+
+  &.with-borders {
+    border-radius: 0.8rem;
+    border: 1px solid var.$gray-300;
+
+    .mat-mdc-outlined-button {
+      border-radius: 0;
 
       &:not(:last-of-type):first-of-type {
-        border-radius: 8px 0 0 8px;
+        border-radius: 0.8rem 0 0 0.8rem;
       }
 
       &:not(:first-of-type):last-of-type {
-        border-radius: 0 8px 8px 0;
+        border-radius: 0 0.8rem 0.8rem 0;
       }
 
       &:only-of-type {
-        border-radius: 8px;
+        border-radius: 0.8rem;
       }
 
       &:not(:last-of-type) {
-        border-right: 1px solid var.$gray-300;
+        border-right: 0.1rem solid var.$gray-300;
       }
     }
   }

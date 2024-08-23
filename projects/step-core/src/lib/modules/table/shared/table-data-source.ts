@@ -24,4 +24,6 @@ export interface TableDataSource<T> extends StepDataSource<T> {
   getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined;
   reload(reloadOptions?: { hideProgress: boolean }): void;
   exportAsCSV(fields: string[], params?: TableParameters): void;
+  sharable(): this;
+  destroy(): void;
 }

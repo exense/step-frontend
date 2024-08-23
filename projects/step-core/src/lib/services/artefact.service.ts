@@ -1,16 +1,18 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Type } from '@angular/core';
 import { map } from 'rxjs';
 import { PlansService } from '../client/step-client-module';
 import {
   CustomRegistryType,
   CustomRegistryService,
   CustomRegistryItem,
+  CustomComponent,
 } from '../modules/custom-registeries/custom-registries.module';
 
 export interface ArtefactType extends CustomRegistryItem {
   icon: string;
   description?: string;
   isSelectable?: boolean;
+  inlineComponent?: Type<CustomComponent>;
 }
 
 @Injectable({
@@ -26,7 +28,7 @@ export class ArtefactService {
       return artefactNames
         .map((artefactName) => this.getArtefactType(artefactName))
         .filter((artefact) => !!artefact?.isSelectable);
-    })
+    }),
   );
 
   readonly defaultIcon = 'check_box_outline_blank';
