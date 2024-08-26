@@ -3,7 +3,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated()"
+      [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       matTooltip="Simulate execution"
       (click)="execute.emit(true)"
@@ -24,7 +24,7 @@
       <button
         type="button"
         mat-icon-button
-        [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated()"
+        [disabled]="!('plan-execute' | hasRight | async)"
         aria-label="Left Align"
         matTooltip="New execution with parameters"
         [matMenuTriggerFor]="executionContent"
@@ -45,7 +45,7 @@
     <button
       type="button"
       mat-icon-button
-      [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated()"
+      [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       matTooltip="Schedule"
       (click)="schedule.emit()"
@@ -84,7 +84,7 @@
     type="button"
     mat-icon-button
     aria-label="Left Align"
-    [disabled]="!('plan-execute' | hasRight | async) || isExecutionIsolated()"
+    [disabled]="!('plan-execute' | hasRight | async)"
     matTooltip="Copy start request as curl command to clipboard"
     (click)="copyLink.emit()"
   >
