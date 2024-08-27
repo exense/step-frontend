@@ -158,6 +158,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .getScreenInputsByScreenIdWithCache(this.stScreen)
       .pipe(
         map((screenInputs) => screenInputs.map((sInput) => sInput.input!)),
+        tap((screenInputs) => this.setDefaultBooleanValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
       .subscribe((schema) => {
@@ -205,5 +206,21 @@ export class CustomFormComponent implements OnInit, OnDestroy {
         filter((visibilityFlags) => JSON.stringify(visibilityFlags) !== this.visibilityFlagsJson()),
       )
       .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
+  }
+
+  private setDefaultBooleanValues(inputs: StInput[]): void {
+    let valueHasBeenChanged = false;
+    inputs
+      .filter(
+        (input) =>
+          input.type === 'CHECKBOX' && this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined,
+      )
+      .forEach((input) => {
+        this._objectUtils.setObjectFieldValue(this.stModel, input.id!, false);
+        valueHasBeenChanged = true;
+      });
+    if (valueHasBeenChanged) {
+      this.stModelChange.emit(this.stModel);
+    }
   }
 }

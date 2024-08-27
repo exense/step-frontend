@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
@@ -16,6 +16,7 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
   ],
   standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS],
+  encapsulation: ViewEncapsulation.None,
 })
 export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {
   @Input() hideLabel?: boolean;
