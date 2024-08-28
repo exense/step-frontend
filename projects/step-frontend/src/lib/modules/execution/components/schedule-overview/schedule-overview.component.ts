@@ -1,36 +1,37 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AugmentedSchedulerService, ExecutiontTaskParameters, Plan } from '@exense/step-core';
+import { ScheduleCrossExecutionStateService } from '../../services/schedule-cross-execution-state.service';
 
 @Component({
   selector: 'step-schedule-overview',
   templateUrl: './schedule-overview.component.html',
   styleUrls: ['./schedule-overview.component.scss'],
+  providers: [ScheduleCrossExecutionStateService],
 })
 export class ScheduleOverviewComponent implements OnInit {
-  private _scheduleApi = inject(AugmentedSchedulerService);
+  private readonly _scheduleApi = inject(AugmentedSchedulerService);
+  private readonly _activatedRoute = inject(ActivatedRoute);
+  protected readonly _state = inject(ScheduleCrossExecutionStateService);
+
   private taskId?: string;
   private _taskData?: ExecutiontTaskParameters;
 
   protected task = this._taskData;
-
   protected plan?: Partial<Plan>;
-
   protected error = '';
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
 
-  constructor(private route: ActivatedRoute) {}
-
   ngOnInit(): void {
-    this.route.url.subscribe((segments) => {
-      segments[segments.length - 1].path;
+    this._activatedRoute.url.subscribe((segments) => {
       this.taskId = segments[segments.length - 1].path;
       if (this.taskId) {
         this._scheduleApi.getExecutionTaskById(this.taskId).subscribe({
           next: (task) => {
             this.task = task;
             this.initializeTask();
+            this.initializeDateRange();
           },
           error: () => {
             this.error = 'Invalid Task Id or server error.';
@@ -71,5 +72,10 @@ export class ScheduleOverviewComponent implements OnInit {
           repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
       }
     }
+  }
+
+  private initializeDateRange(): void {
+    this._state.updateRelativeTime();
+    this._state.selectFullRange();
   }
 }
