@@ -20,7 +20,7 @@ export class WarningContainer {
   }
 }
 
-export const decorateWithWarnings = (control: AbstractControl, destroyRef: DestroyRef): AbstractControl => {
+export const decorateWithWarnings = <T extends AbstractControl>(control: T, destroyRef: DestroyRef): T => {
   const container = new WarningContainer();
   control.valueChanges
     .pipe(debounceTime(300), takeUntilDestroyed(destroyRef))
