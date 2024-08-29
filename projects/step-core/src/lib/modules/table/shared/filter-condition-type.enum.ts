@@ -9,4 +9,5 @@ export enum FilterConditionType {
   BOOLEAN,
   DATE_RANGE,
   ARRAY,
+  BOOLEAN_ARRAY,
 }
