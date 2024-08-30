@@ -5,7 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 
-import { ExecutiontTaskParameters, SchedulerService } from '../../generated';
+import { Execution, ExecutiontTaskParameters, SchedulerService } from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -88,5 +88,33 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
 
   cleanupCache(): void {
     this.cachedTask = undefined;
+  }
+
+  getExecutionsByTaskId(executionTaskID: string): Observable<{
+    recordsTotal: number;
+    recordsFiltered: number;
+    data: any[];
+  }> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/table/executions',
+      body: {
+        filters: [
+          {
+            field: 'executionTaskID',
+            value: executionTaskID,
+            regex: false,
+          },
+        ],
+        skip: 0,
+        limit: 0,
+        sort: {
+          field: 'string',
+          direction: 'ASCENDING',
+        },
+        performEnrichment: true,
+        calculateCounts: true,
+      },
+    });
   }
 }

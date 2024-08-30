@@ -1,12 +1,10 @@
 <section class="header">
-  <div class="title">
-    @if (task && task.attributes) {
-      <div *ngIf="task && task.attributes">
-        <entity-icon entityName="tasks" [entity]="task"></entity-icon>
-        <h1>{{ task.attributes?.['name'] }}</h1>
-      </div>
-    }
-  </div>
+  @if (task && task.attributes) {
+    <div class="title" *ngIf="task && task.attributes">
+      <entity-icon entityName="tasks" [entity]="task"></entity-icon>
+      <h1>{{ task.attributes?.['name'] }}</h1>
+    </div>
+  }
   <div class="range-picker">
     <step-form-field>
       <step-prefix class="icon-prefix">
@@ -15,15 +13,15 @@
       <input
         type="text"
         placeholder="From - To"
-        [formControl]="_state.dateRangeCtrl"
+        [formControl]="dateRangeCtrl"
         [stepDateRangePicker]="picker"
         [showRelativeTime]="true"
-        (relativeOptionChange)="_state.updateRelativeTime($event)"
+        (relativeOptionChange)="updateRelativeTime($event)"
         [matTooltip]="rangePicker.formattedValue()"
         matTooltipPosition="before"
         #rangePicker="DateRangePicker"
       />
-      <ng-container *ngIf="!(_state.isFullRangeSelected$ | async)">
+      <ng-container *ngIf="!(isFullRangeSelected$ | async)">
         <step-suffix class="icon-suffix">
           <step-icon name="alert-circle" class="full-range-warn" matTooltip="Not full range is selected" />
         </step-suffix>
@@ -31,4 +29,9 @@
     </step-form-field>
     <step-date-picker #picker></step-date-picker>
   </div>
+</section>
+<section class="body">
+  @if (summary$ | async; as summary) {
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
+  }
 </section>

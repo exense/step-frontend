@@ -302,13 +302,6 @@ export class ExecutionModule {
         {
           path: 'schedules/:id',
           component: ScheduleOverviewComponent,
-          children: [
-            {
-              path: '',
-              component: AltExecutionRangePickerComponent,
-              outlet: 'rangePicker',
-            },
-          ],
         },
         {
           path: ':id',
