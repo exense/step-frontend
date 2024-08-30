@@ -90,7 +90,11 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
     this.cachedTask = undefined;
   }
 
-  getExecutionsByTaskId(executionTaskID: string): Observable<{
+  getExecutionsByTaskId(
+    executionTaskID: string,
+    start?: number,
+    end?: number,
+  ): Observable<{
     recordsTotal: number;
     recordsFiltered: number;
     data: any[];
@@ -103,6 +107,16 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
           {
             field: 'executionTaskID',
             value: executionTaskID,
+            regex: false,
+          },
+          {
+            field: 'start',
+            value: start,
+            regex: false,
+          },
+          {
+            field: 'end',
+            value: end,
             regex: false,
           },
         ],

@@ -1,6 +1,6 @@
 <section class="header">
-  @if (task && task.attributes) {
-    <div class="title" *ngIf="task && task.attributes">
+  @if (task$ | async; as task) {
+    <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       <h1>{{ task.attributes?.['name'] }}</h1>
     </div>

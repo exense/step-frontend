@@ -24,12 +24,13 @@ import {
   forkJoin,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
   tap,
 } from 'rxjs';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
@@ -62,30 +63,112 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   private _executionStorage = inject(AltExecutionStorageService);
   private _viewAllService = inject(AltExecutionViewAllService);
   private _destroyRef = inject(DestroyRef);
+  private _fb = inject(FormBuilder);
 
   private relativeTime?: number;
 
   private readonly _isFullRangeSelected$ = new BehaviorSubject<boolean>(false);
   readonly isFullRangeSelected$ = this._isFullRangeSelected$.asObservable();
-  readonly dateRangeCtrl = new FormControl<DateRange | null | undefined>(null);
+  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
-  private _taskData?: ExecutiontTaskParameters;
-
-  protected task = this._taskData;
-  protected taskId = this.task?.id;
   protected plan?: Partial<Plan>;
   protected error = '';
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
 
-  readonly executionId$ = this._activatedRoute.params.pipe(
+  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
+    startWith(this.dateRangeCtrl.value),
+    map((range) => range ?? undefined),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly timeRange$ = this.dateRange$.pipe(
+    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly taskId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),
     filter((id) => !!id),
   );
 
-  readonly activeExecutions$ = this.executionId$.pipe(map((id) => this._scheduleApi.getExecutionsByTaskId(id)));
+  readonly activeTask$ = this.taskId$.pipe(
+    switchMap((id) => {
+      return this._scheduleApi.getExecutionTaskById(id);
+    }),
+  );
 
-  readonly executions$ = this.activeExecutions$.pipe(switchMap((executionsObservable) => executionsObservable));
+  readonly task$ = this.activeTask$.pipe(
+    map((task) => {
+      if (!task) {
+        return null;
+      }
+
+      task.attributes = task.attributes || {};
+      task.executionsParameters = task.executionsParameters || {};
+      task.executionsParameters.customParameters = task.executionsParameters.customParameters || {};
+
+      const repository = task.executionsParameters.repositoryObject;
+
+      if (repository?.repositoryID === 'local') {
+        const planId = repository.repositoryParameters?.['planid'];
+        if (planId) {
+          const name = task.executionsParameters.description ?? '';
+          this.plan = {
+            id: planId,
+            attributes: { name },
+          };
+        }
+      } else {
+        this.repositoryId = repository?.repositoryID;
+        this.repositoryPlanId =
+          repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
+      }
+
+      return task;
+    }),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  //   readonly executions$ = this.taskId$.pipe(
+  //     switchMap((id) => {
+  //       const dateRange = this.dateRangeCtrl.value;
+  //       if (dateRange && dateRange.start && dateRange.end) {
+  //         return this._scheduleApi.getExecutionsByTaskId(id, dateRange.start.millisecond, dateRange.end.millisecond);
+  //       } else {
+  //         return this._scheduleApi.getExecutionsByTaskId(id);
+  //       }
+  //     }),
+  //     shareReplay(1),
+  //     takeUntilDestroyed(),
+  //   );
+  readonly executions$ = combineLatest([
+    this.taskId$,
+    this.dateRangeCtrl.valueChanges.pipe(startWith(this.dateRangeCtrl.value)),
+  ]).pipe(
+    switchMap(([id, dateRange]) =>
+      this._scheduleApi.getExecutionsByTaskId(id).pipe(
+        map((executions) => {
+          if (dateRange?.start && dateRange?.end) {
+            const start = dateRange.start.toMillis();
+            const end = dateRange.end.toMillis();
+
+            return {
+              ...executions,
+              data: executions.data.filter((execution) => execution.startTime >= start && execution.endTime <= end),
+            };
+          } else {
+            return executions;
+          }
+        }),
+      ),
+    ),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   private summaryInProgressInternal$ = new BehaviorSubject(false);
 
@@ -119,23 +202,6 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   );
 
   ngOnInit(): void {
-    this._activatedRoute.url.subscribe((segments) => {
-      this.taskId = segments[segments.length - 1].path;
-      if (this.taskId) {
-        this._scheduleApi.getExecutionTaskById(this.taskId).subscribe({
-          next: (task) => {
-            this.task = task;
-            this.initializeTask();
-            this.initializeDateRange();
-          },
-          error: () => {
-            this.error = 'Invalid Task Id or server error.';
-          },
-        });
-      } else {
-        this.error = 'Task Id not found in the URL.';
-      }
-    });
     const isIgnoreFilter$ = this._viewAllService.isViewAll$;
     combineLatest([this.executions$, isIgnoreFilter$])
       .pipe(takeUntilDestroyed(this._destroyRef))
@@ -144,63 +210,12 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
       });
   }
 
-  private initializeTask(): void {
-    if (this.task) {
-      if (!this.task.attributes) {
-        this.task.attributes = {};
-      }
-      if (!this.task.executionsParameters) {
-        this.task.executionsParameters = {};
-      }
-      if (!this.task.executionsParameters.customParameters) {
-        this.task.executionsParameters.customParameters = {};
-      }
-
-      const repository = this.task?.executionsParameters?.repositoryObject;
-      if (repository?.repositoryID === 'local') {
-        const planId = repository?.repositoryParameters?.['planid'];
-        if (planId) {
-          const id = planId;
-          const name = this.task.executionsParameters.description ?? '';
-          this.plan = {
-            id,
-            attributes: { name },
-          };
-        }
-      } else {
-        this.repositoryId = repository?.repositoryID;
-        this.repositoryPlanId =
-          repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
-      }
-    }
-  }
-
-  private initializeDateRange(): void {
-    this.updateRelativeTime();
-    this.selectFullRange();
-  }
-
-  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
-    startWith(this.dateRangeCtrl.value),
-    map((range) => range ?? undefined),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
   updateRange(timeRange?: TimeRange | null): void {
     this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
   }
 
   updateRelativeTime(time?: number): void {
-    if (time !== undefined) {
-      console.log(`Relative time updated to: ${time}`);
-    }
+    this.relativeTime = time;
   }
 
   selectFullRange(): void {
@@ -211,23 +226,8 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     let start: DateTime;
     let end: DateTime;
 
-    if (execution.endTime) {
-      const storedRange = useStorage ? this._executionStorage.getItem(rangeKey(execution.id!)) : undefined;
-      if (storedRange) {
-        const parsed = JSON.parse(storedRange) as { start?: number; end?: number };
-        start = DateTime.fromMillis(parsed.start ?? execution.startTime!);
-        end = DateTime.fromMillis(parsed.end ?? execution.endTime);
-      } else {
-        start = DateTime.fromMillis(execution.startTime!);
-        end = DateTime.fromMillis(execution.endTime);
-      }
-    } else if (this.relativeTime) {
-      end = DateTime.now();
-      start = end.set({ millisecond: end.millisecond - this.relativeTime });
-    } else {
-      start = DateTime.fromMillis(execution.startTime!);
-      end = DateTime.now();
-    }
+    start = DateTime.fromMillis(execution.startTime!);
+    end = DateTime.now();
 
     return { start, end };
   }
