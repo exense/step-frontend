@@ -1,0 +1,22 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-alt-report-node-list {
+  step-alt-report-widget-filter {
+    step-form-field {
+      flex: 1;
+    }
+
+    .search-input {
+      border-left: none;
+      padding-left: 0;
+    }
+  }
+
+  step-alt-report-widget-content > div {
+    color: var.$gray-500;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+}

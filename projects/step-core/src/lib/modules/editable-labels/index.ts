@@ -9,6 +9,7 @@ export * from './components/editable-textarea-label/editable-textarea-label.comp
 export * from './components/editable-dropdown-label/editable-dropdown-label.component';
 export * from './directives/editable-label-template.directive';
 export * from './directives/editable-list-item-template.directive';
+export * from './injectables/text-serialize.service';
 
 export const EDITABLE_LABELS_EXPORTS = [
   EditableLabelComponent,

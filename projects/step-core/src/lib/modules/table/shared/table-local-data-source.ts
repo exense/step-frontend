@@ -43,6 +43,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   private _source$!: Observable<T[]>;
 
   private _request$ = new BehaviorSubject<Request>({});
+  private isSharable = false;
 
   readonly inProgress$: Observable<boolean> = of(false);
 
@@ -215,6 +216,17 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {
+    if (!this.isSharable) {
+      this.destroy();
+    }
+  }
+
+  sharable(): this {
+    this.isSharable = true;
+    return this;
+  }
+
+  destroy(): void {
     this._terminator$.next();
     this._terminator$.complete();
     this._request$.complete();

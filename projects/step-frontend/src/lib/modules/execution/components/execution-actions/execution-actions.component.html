@@ -1,0 +1,93 @@
+<step-btn-group class="without-borders" role="toolbar" aria-label="...">
+  <div>
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="!('plan-execute' | hasRight | async)"
+      aria-label="Left Align"
+      matTooltip="Simulate execution"
+      (click)="execute.emit(true)"
+    >
+      <step-icon name="check-circle" aria-hidden="true" />
+    </button>
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="!('plan-execute' | hasRight | async)"
+      aria-label="Left Align"
+      matTooltip="New execution"
+      (click)="execute.emit(false)"
+    >
+      <step-icon name="play-circle" aria-hidden="true" />
+    </button>
+    @if (allowExecuteWithContent()) {
+      <button
+        type="button"
+        mat-icon-button
+        [disabled]="!('plan-execute' | hasRight | async)"
+        aria-label="Left Align"
+        matTooltip="New execution with parameters"
+        [matMenuTriggerFor]="executionContent"
+      >
+        <step-icon name="plus-circle" aria-hidden="true" />
+      </button>
+      <mat-menu #executionContent="matMenu">
+        <span
+          class="execution-content"
+          mat-menu-item
+          [disableRipple]="true"
+          (click)="$event.stopImmediatePropagation()"
+        >
+          <ng-content select="step-execution-actions-execute-content" />
+        </span>
+      </mat-menu>
+    }
+    <button
+      type="button"
+      mat-icon-button
+      [disabled]="!('plan-execute' | hasRight | async)"
+      aria-label="Left Align"
+      matTooltip="Schedule"
+      (click)="schedule.emit()"
+    >
+      <step-icon name="clock" aria-hidden="true" />
+    </button>
+    @if (execution()?.status; as status) {
+      @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {
+        <button
+          type="button"
+          mat-icon-button
+          aria-label="Left Align"
+          matTooltip="Stop"
+          [disabled]="!('plan-execute' | hasRight | async)"
+          (click)="stop.emit()"
+        >
+          <step-icon name="stop-circle" aria-hidden="true" />
+        </button>
+      }
+      @if (status === 'ABORTING') {
+        <button
+          type="button"
+          mat-icon-button
+          class="warning"
+          aria-label="Left Align"
+          matTooltip="Force stop"
+          [disabled]="!('plan-execute' | hasRight | async)"
+          (click)="forceStop.emit()"
+        >
+          <step-icon name="stop-circle" aria-hidden="true" />
+        </button>
+      }
+    }
+  </div>
+  <button
+    type="button"
+    mat-icon-button
+    aria-label="Left Align"
+    [disabled]="!('plan-execute' | hasRight | async)"
+    matTooltip="Copy start request as curl command to clipboard"
+    (click)="copyLink.emit()"
+  >
+    <step-icon name="link" aria-hidden="true" />
+  </button>
+</step-btn-group>

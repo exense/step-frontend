@@ -1,0 +1,7 @@
+<button type="button" mat-icon-button matTooltip="Print report" matTooltipPosition="below" [matMenuTriggerFor]="menu">
+  <step-icon name="file-text" />
+</button>
+<mat-menu #menu="matMenu">
+  <button type="button" mat-menu-item (click)="_printService.printFiltered()">Print Filtered</button>
+  <button type="button" mat-menu-item (click)="_printService.printAll()">Print All</button>
+</mat-menu>
