@@ -11,7 +11,7 @@ import {
 import { CronEditorTab, CronService } from '../../../cron/cron.module';
 import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.constant';
 import { CustomFormWrapperComponent } from '../../../custom-forms';
-import { DialogRouteResult, SelectAll } from '../../../basics/step-basics.module';
+import { DialogRouteResult } from '../../../basics/step-basics.module';
 import { SelectPlanComponent } from '../../../plan-common';
 import {
   EXCLUSION_ID,
@@ -36,6 +36,7 @@ import {
 import { KeyValue } from '@angular/common';
 import { JSON_FORM_EXPORTS, JsonFieldSchema, JsonFieldUtilsService } from '../../../json-forms';
 import { RepositoryParametersSchemasService } from '../../../repository-parameters';
+import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -60,7 +61,13 @@ const LOCAL_REPOSITORY_ID = 'local';
   templateUrl: './edit-scheduler-task-dialog.component.html',
   styleUrls: ['./edit-scheduler-task-dialog.component.scss'],
   standalone: true,
-  imports: [SCHEDULER_COMMON_IMPORTS, CustomFormWrapperComponent, SelectPlanComponent, JSON_FORM_EXPORTS],
+  imports: [
+    SCHEDULER_COMMON_IMPORTS,
+    CustomFormWrapperComponent,
+    SelectPlanComponent,
+    JSON_FORM_EXPORTS,
+    LIST_SELECTION_EXPORTS,
+  ],
 })
 export class EditSchedulerTaskDialogComponent implements OnInit {
   // readonly rawValueModelOptions: NgModel['options'] = { updateOn: 'blur' };

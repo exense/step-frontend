@@ -56,7 +56,6 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
-import { ListSelectComponent } from './components/list-select/list-select.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
@@ -117,7 +116,6 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
-    ListSelectComponent,
     BigNumberPipe,
     BooleanFilterComponent,
   ],
@@ -180,7 +178,6 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
-    ListSelectComponent,
     BigNumberPipe,
     BooleanFilterComponent,
   ],
@@ -295,5 +292,4 @@ export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
 export * from './types/time-converter';
 export * from './injectables/time-converters-factory.service';
-export * from './components/list-select/list-select.component';
 export * from './injectables/statuses-colors.token';

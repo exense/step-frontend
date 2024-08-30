@@ -76,6 +76,7 @@ import { REPOSITORY_PARAMETERS_INITIALIZER } from './modules/repository-paramete
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
+import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 
 @NgModule({
   declarations: [
@@ -152,6 +153,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     MULTI_LEVEL_SELECT_EXPORTS,
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -220,6 +222,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     TestIdDirective,
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
@@ -351,6 +354,7 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './modules/list-selection';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';

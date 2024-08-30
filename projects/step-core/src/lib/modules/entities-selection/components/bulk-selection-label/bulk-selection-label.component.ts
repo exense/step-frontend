@@ -16,16 +16,26 @@ export class BulkSelectionLabelComponent<KEY, ENTITY> {
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() selectionType?: BulkSelectionType;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
+  @Input() isDisabled = false;
 
   clearSelection(): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.selectionTypeChange.emit(BulkSelectionType.NONE);
   }
 
   selectAll(): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.selectionTypeChange.emit(BulkSelectionType.ALL);
   }
 
   selectFiltered(): void {
+    if (this.isDisabled) {
+      return;
+    }
     this.selectionTypeChange.emit(BulkSelectionType.FILTERED);
   }
 }

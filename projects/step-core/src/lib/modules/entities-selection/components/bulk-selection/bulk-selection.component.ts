@@ -32,6 +32,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() showLabel: boolean = true;
   @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
+  @Input() isDisabled: boolean = false;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   protected isChecked: boolean = false;
