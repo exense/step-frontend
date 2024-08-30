@@ -29,6 +29,7 @@
                 (removeItem)="filterItems.splice(i, 1)"
                 [removable]="true"
                 [updateTimeRangeOption]="false"
+                (filterChange)="handleFilterChange(i, $event)"
               />
             }
             <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>

@@ -1,9 +1,17 @@
 <div cdkTrapFocus role="dialog" [attr.aria-modal]="true">
   <mat-card>
     <mat-card-content>
-      <mat-calendar [selected]="selected" [startAt]="startAt" (selectedChange)="handleSelectionChange($event)">
-      </mat-calendar>
-      <step-time-picker *ngIf="withTime" [model]="model" (timeChange)="handleTimeChange($event)"> </step-time-picker>
+      <mat-calendar [selected]="selected" [startAt]="startAt" (selectedChange)="handleSelectionChange($event)" />
+      @if (withTime) {
+        <step-time-picker [model]="model" (timeChange)="handleTimeChange($event)" />
+      }
+      @if (withRelativeTime) {
+        <step-relative-time-picker
+          [relativeTimes]="(_relativeTimeOptions$ | async)!"
+          (rangeChange)="handleRelativeRangeChange($event)"
+          (relativeOptionChange)="handleRelativeOptionChange($event)"
+        />
+      }
     </mat-card-content>
   </mat-card>
 </div>

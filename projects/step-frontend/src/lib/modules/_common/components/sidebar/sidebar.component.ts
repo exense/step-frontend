@@ -7,13 +7,13 @@ import {
   NgZone,
   OnDestroy,
   QueryList,
-  TrackByFunction,
   ViewChild,
   ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
+  CustomMenuEntriesService,
   IS_SMALL_SCREEN,
   MenuEntry,
   NavigatorService,
@@ -21,10 +21,10 @@ import {
   ViewStateService,
   BookmarkService,
   MENU_ITEMS,
-  AugmentedBookmarksService,
+  BookmarkNavigatorService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { combineLatest, map, Subject, SubscriptionLike, takeUntil } from 'rxjs';
+import { combineLatest, map, startWith, SubscriptionLike } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -43,6 +43,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkService = inject(BookmarkService);
+  private _bookmarkNavigator = inject(BookmarkNavigatorService);
   private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
@@ -53,30 +54,33 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   });
 
   private _sideBarState = inject(SidebarStateService);
-  readonly _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
+  private _customMenuEntries = inject(CustomMenuEntriesService);
+  private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarks$]).pipe(
-    map(([menuItems, dynamicMenuItems]) =>
-      menuItems.concat(
-        dynamicMenuItems!.map((element) => {
-          const menuEntry = {
-            title: element.customFields!['label'],
-            id: element.customFields!['link'],
-            icon: element.customFields!['icon'],
-            parentId: 'bookmarks-root',
-            weight: 1000 + dynamicMenuItems!.length,
-            isEnabledFct(): boolean {
-              return true;
-            },
-          };
-          return menuEntry;
-        }),
-      ),
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuItems$]).pipe(
+    map(([menuItems, bookmarkMenuItems]) => menuItems.concat(bookmarkMenuItems)),
+  );
+  private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
+    startWith([]),
+    map((bookmarks) =>
+      (bookmarks ?? []).map((element) => {
+        const menuEntry = {
+          title: element.customFields!['label'],
+          id: element.customFields!['link'],
+          icon: element.customFields!['icon'],
+          parentId: 'bookmarks-root',
+          weight: 1000 + bookmarks!.length,
+          isEnabledFct(): boolean {
+            return true;
+          },
+        } as MenuEntry;
+        return menuEntry;
+      }),
     ),
+    takeUntilDestroyed(),
   );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
-  readonly trackByMenuEntry: TrackByFunction<MenuEntry> = (index, item) => item.id;
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
@@ -135,8 +139,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
     this._sideBarState.setMenuItemState(item.getAttribute('name')!, item.checked);
   }
 
-  navigateTo(viewId: string, $event: MouseEvent): void {
+  navigateTo(viewId: string, $event: MouseEvent, isBookmark?: boolean): void {
     const isOpenInSeparateTab = $event.ctrlKey || $event.button === MIDDLE_BUTTON || $event.metaKey;
+
+    if (isBookmark) {
+      this._bookmarkNavigator.navigateBookmark(viewId, isOpenInSeparateTab);
+      return;
+    }
 
     switch (viewId) {
       case 'home':
@@ -146,6 +155,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
         this._navigator.navigate(viewId, isOpenInSeparateTab);
         break;
     }
+  }
+
+  removeCustomEntry(id: string, $event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
+    this._customMenuEntries.remove(id);
   }
 
   toggleOpenClose() {

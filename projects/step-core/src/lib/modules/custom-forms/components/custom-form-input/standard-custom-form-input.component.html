@@ -1,8 +1,5 @@
-<step-form-field [showRequiredMarker]="required">
-  @if (!hideLabel) {
-    <step-label>{{ input?.label }}</step-label>
-  }
-  @switch (input?.type) {
+<ng-template #content>
+  @switch (input()?.type) {
     @case (InputType.TEXT) {
       <input
         type="text"
@@ -18,7 +15,6 @@
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
-        (click)="loadItems()"
       >
         <mat-option>
           <ngx-mat-select-search
@@ -31,22 +27,22 @@
             <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
           </ngx-mat-select-search>
         </mat-option>
-        @for (item of dropdownItemsFiltered; track item) {
+        @if (!!value) {
+          <mat-option class="unset-item" [value]="null">unset</mat-option>
+        }
+        @for (item of dropdownItemsFiltered(); track item) {
           <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
     }
     @case (InputType.CHECKBOX) {
-      <mat-select
+      <mat-slide-toggle
+        color="primary"
         [required]="required"
-        [ngModel]="value"
-        (ngModelChange)="onValueChange($event)"
+        [ngModel]="value === 'true'"
+        (ngModelChange)="onValueChange($event.toString())"
         (blur)="invokeTouch()"
-      >
-        @for (item of checkboxItems; track item) {
-          <mat-option [value]="item">{{ item }}</mat-option>
-        }
-      </mat-select>
+      />
     }
     @default {}
   }
@@ -55,4 +51,23 @@
       <step-icon name="help-circle" [matTooltip]="hint" />
     </step-suffix>
   }
-</step-form-field>
+</ng-template>
+@if (hideLabel) {
+  <step-form-field [showRequiredMarker]="required">
+    <ng-container *ngTemplateOutlet="content" />
+  </step-form-field>
+} @else {
+  <step-form-field
+    [showRequiredMarker]="required"
+    alignLabelAddon="near"
+    [class.checkbox-toggle-input]="input()?.type === InputType.CHECKBOX"
+  >
+    <step-label>{{ input()?.label }}</step-label>
+    <step-label-addon>
+      @if (input()?.description; as description) {
+        <step-icon name="help-circle" [matTooltip]="description" matTooltipPosition="above" />
+      }
+    </step-label-addon>
+    <ng-container *ngTemplateOutlet="content" />
+  </step-form-field>
+}

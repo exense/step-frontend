@@ -1,0 +1,77 @@
+<section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
+  <div class="title">
+    @if (execution$ | async; as execution) {
+      <h3>
+        {{ execution?.description }}
+        @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
+          <a
+            class="plan-link"
+            routerLink="/plans/editor/{{ execution.planId }}"
+            matTooltip="Navigate to plan"
+            matTooltipPosition="right"
+          >
+            <step-icon name="external-link" />
+          </a>
+        }
+      </h3>
+      <div class="sub-title">
+        <step-alt-execution-time [execution]="execution" />
+        @if (displayStatus$ | async; as status) {
+          <step-status [status]="status" />
+        }
+        <div class="user">{{ execution.executionParameters?.userID }}</div>
+        <step-popover class="details-hint" yPosition="below">
+          <step-icon name="help-circle" />
+          <step-popover-content>
+            <step-execution-details
+              [execution]="execution"
+              [showPlan]="false"
+              [showMode]="false"
+              [showUser]="false"
+              [showExecutionId]="false"
+              [showDates]="false"
+            />
+          </step-popover-content>
+        </step-popover>
+        @if (execution?.executionParameters?.mode === 'SIMULATION') {
+          <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
+        }
+      </div>
+    }
+  </div>
+  <div class="controls">
+    @if (execution$ | async; as execution) {
+      <step-execution-commands
+        [displayParametersForm]="false"
+        [description]="execution.description"
+        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+        [execution]="execution"
+        (refresh)="manualRefresh()"
+        (scheduleTask)="handleTaskSchedule($event)"
+      />
+    }
+    <step-btn-group class="without-borders">
+      @if (!(isExecutionCompleted$ | async)) {
+        @if (activeExecution$ | async; as activeExecution) {
+          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+        }
+      }
+      <router-outlet name="controls" />
+    </step-btn-group>
+  </div>
+  <div class="range-picker">
+    <router-outlet name="rangePicker" />
+  </div>
+</section>
+<section class="main">
+  <step-alt-execution-tabs />
+  @if (execution$ | async; as execution) {
+    <step-alt-report-widget class="print-execution-details">
+      <step-alt-report-widget-content>
+        <step-execution-details [execution]="execution" [showPlan]="false" [showUser]="false" />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  }
+  <router-outlet />
+</section>
+<router-outlet name="modal" />

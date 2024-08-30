@@ -1,0 +1,31 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+step-execution-actions {
+  step-btn-group {
+    width: 100%;
+    flex-wrap: nowrap;
+
+    & > div {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+  }
+
+  button.warning {
+    color: var.$red-50;
+  }
+}
+
+@include common.custom-menu('execution-content');
+$menu-selector: common.custom-menu-selector('execution-content');
+
+#{$menu-selector} {
+  .execution-params-popover {
+    min-width: 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+}

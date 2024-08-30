@@ -74,6 +74,30 @@
         </step-form-field>
         <step-form-field>
           <step-label>Activation script</step-label>
+          <step-label-addon>
+            <div [matMenuTriggerFor]="activationMenu">
+              <button mat-flat-button color="primary">Wizard</button>
+              <mat-menu #activationMenu="matMenu">
+                <button [disabled]="!!parameter?.activationExpression?.script" mat-menu-item (click)="addCondition()">
+                  {{ 'Add condition' }}
+                </button>
+                <button
+                  [disabled]="!parameter?.activationExpression?.script"
+                  mat-menu-item
+                  (click)="addCondition('OR')"
+                >
+                  {{ 'Add OR condition' }}
+                </button>
+                <button
+                  [disabled]="!parameter?.activationExpression?.script"
+                  mat-menu-item
+                  (click)="addCondition('AND')"
+                >
+                  {{ 'Add AND condition' }}
+                </button>
+              </mat-menu>
+            </div>
+          </step-label-addon>
           <input type="text" [(ngModel)]="parameter.activationExpression!.script!" />
         </step-form-field>
         <step-form-field>

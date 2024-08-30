@@ -60,3 +60,14 @@
     margin-bottom: 0;
   }
 }
+
+@mixin unset-item {
+  .unset-item {
+    text-decoration: underline;
+    font-style: italic;
+    color: var.$blue-650;
+    min-height: 3rem;
+    font-size: 1.4rem;
+    padding-left: calc(100% - 5rem);
+  }
+}

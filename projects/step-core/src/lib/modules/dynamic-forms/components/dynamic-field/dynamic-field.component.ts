@@ -28,7 +28,7 @@ export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimp
     if (fieldType !== JsonFieldType.ENUM) {
       return false;
     }
-    return enumItemsSet.has(value ? value.toString() : '');
+    return !enumItemsSet.has(value ? value.toString() : '');
   });
 
   constructor(@Optional() _ngControl?: NgControl) {

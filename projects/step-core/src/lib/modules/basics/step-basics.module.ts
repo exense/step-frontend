@@ -58,6 +58,8 @@ import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
 import { ListSelectComponent } from './components/list-select/list-select.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { BigNumberPipe } from './pipes/big-number.pipe';
+import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -116,6 +118,8 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     GetObjectFieldPipe,
     StatusCommonComponent,
     ListSelectComponent,
+    BigNumberPipe,
+    BooleanFilterComponent,
   ],
   exports: [
     CommonModule,
@@ -177,12 +181,15 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     GetObjectFieldPipe,
     StatusCommonComponent,
     ListSelectComponent,
+    BigNumberPipe,
+    BooleanFilterComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/boolean-filter/boolean-filter.component';
 export * from './components/array-filter-advanced/array-filter-advanced.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
@@ -207,6 +214,7 @@ export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
+export * from './pipes/big-number.pipe';
 export * from './pipes/array-item-label.pipe';
 export * from './injectables/item-by-id-cache.service';
 export * from './injectables/cron-presets.token';
@@ -288,3 +296,4 @@ export * from './injectables/screen-data-meta.service';
 export * from './types/time-converter';
 export * from './injectables/time-converters-factory.service';
 export * from './components/list-select/list-select.component';
+export * from './injectables/statuses-colors.token';
