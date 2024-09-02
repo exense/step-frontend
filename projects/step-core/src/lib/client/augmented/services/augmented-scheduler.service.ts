@@ -99,36 +99,37 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
     recordsFiltered: number;
     data: any[];
   }> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/table/executions',
-      body: {
-        filters: [
-          {
-            field: 'executionTaskID',
-            value: executionTaskID,
-            regex: false,
+    return this.httpRequest
+      .request({
+        method: 'POST',
+        url: '/table/executions',
+        body: {
+          filters: [
+            {
+              field: 'executionTaskID',
+              value: executionTaskID,
+              regex: false,
+            },
+          ],
+          skip: 0,
+          limit: 0,
+          sort: {
+            field: 'string',
+            direction: 'ASCENDING',
           },
-          {
-            field: 'start',
-            value: start,
-            regex: false,
-          },
-          {
-            field: 'end',
-            value: end,
-            regex: false,
-          },
-        ],
-        skip: 0,
-        limit: 0,
-        sort: {
-          field: 'string',
-          direction: 'ASCENDING',
+          performEnrichment: true,
+          calculateCounts: true,
         },
-        performEnrichment: true,
-        calculateCounts: true,
-      },
-    });
+      })
+      .pipe(
+        map((response: any) => {
+          if (start !== undefined && end !== undefined) {
+            response.data = response.data.filter((execution: any) => {
+              return execution.startTime >= start && execution.endTime <= end;
+            });
+          }
+          return response;
+        }),
+      );
   }
 }

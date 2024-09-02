@@ -1,18 +1,13 @@
-import { Component, computed, DestroyRef, inject, input, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
-  AugmentedExecutionsService,
   AugmentedSchedulerService,
   DateRange,
   DateUtilsService,
   Execution,
   ExecutionSummaryDto,
-  ExecutiontTaskParameters,
   Plan,
   PrivateViewPluginService,
-  ReportNode,
-  TableDataSource,
-  TableLocalDataSource,
   TimeRange,
 } from '@exense/step-core';
 import { ScheduleCrossExecutionStateService } from '../../services/schedule-cross-execution-state.service';
@@ -24,21 +19,18 @@ import {
   forkJoin,
   map,
   Observable,
-  of,
   shareReplay,
   startWith,
   switchMap,
+  take,
   tap,
 } from 'rxjs';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DateTime } from 'luxon';
-import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
-
-const rangeKey = (executionId: string) => `${executionId}_range`;
 
 @Component({
   selector: 'step-schedule-overview',
@@ -60,15 +52,10 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   private _activatedRoute = inject(ActivatedRoute);
   private _dateUtils = inject(DateUtilsService);
   private _viewService = inject(PrivateViewPluginService);
-  private _executionStorage = inject(AltExecutionStorageService);
-  private _viewAllService = inject(AltExecutionViewAllService);
-  private _destroyRef = inject(DestroyRef);
   private _fb = inject(FormBuilder);
 
   private relativeTime?: number;
 
-  private readonly _isFullRangeSelected$ = new BehaviorSubject<boolean>(false);
-  readonly isFullRangeSelected$ = this._isFullRangeSelected$.asObservable();
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
   protected plan?: Partial<Plan>;
@@ -133,41 +120,31 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     takeUntilDestroyed(),
   );
 
-  //   readonly executions$ = this.taskId$.pipe(
-  //     switchMap((id) => {
-  //       const dateRange = this.dateRangeCtrl.value;
-  //       if (dateRange && dateRange.start && dateRange.end) {
-  //         return this._scheduleApi.getExecutionsByTaskId(id, dateRange.start.millisecond, dateRange.end.millisecond);
-  //       } else {
-  //         return this._scheduleApi.getExecutionsByTaskId(id);
-  //       }
-  //     }),
-  //     shareReplay(1),
-  //     takeUntilDestroyed(),
-  //   );
   readonly executions$ = combineLatest([
     this.taskId$,
     this.dateRangeCtrl.valueChanges.pipe(startWith(this.dateRangeCtrl.value)),
   ]).pipe(
     switchMap(([id, dateRange]) =>
-      this._scheduleApi.getExecutionsByTaskId(id).pipe(
+      this._scheduleApi.getExecutionsByTaskId(id, dateRange?.start?.toMillis(), dateRange?.end?.toMillis()).pipe(
         map((executions) => {
-          if (dateRange?.start && dateRange?.end) {
-            const start = dateRange.start.toMillis();
-            const end = dateRange.end.toMillis();
-
-            return {
-              ...executions,
-              data: executions.data.filter((execution) => execution.startTime >= start && execution.endTime <= end),
-            };
-          } else {
-            return executions;
-          }
+          return executions;
         }),
       ),
     ),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  readonly executionFulLRange$ = this.executions$.pipe(
+    map((execution) => this.getDefaultRangeForExecution(execution.data[0])),
+  );
+
+  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
+    map(([selectedRange, fullRange]) => {
+      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
+      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
+      return startEq && endEq;
+    }),
   );
 
   private summaryInProgressInternal$ = new BehaviorSubject(false);
@@ -202,12 +179,9 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   );
 
   ngOnInit(): void {
-    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    combineLatest([this.executions$, isIgnoreFilter$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, isIgnoreFilter]) => {
-        this.applyDefaultRange(execution.data[0], !isIgnoreFilter);
-      });
+    this.executions$.pipe(take(1)).subscribe((execution) => {
+      this.applyDefaultRange(execution.data[0]);
+    });
   }
 
   updateRange(timeRange?: TimeRange | null): void {
@@ -219,15 +193,22 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   }
 
   selectFullRange(): void {
-    this._isFullRangeSelected$.next(true);
+    this.executions$.pipe(take(1)).subscribe((execution) => {
+      this.applyDefaultRange(execution.data[0]);
+    });
   }
 
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
     let start: DateTime;
     let end: DateTime;
 
-    start = DateTime.fromMillis(execution.startTime!);
-    end = DateTime.now();
+    if (this.relativeTime) {
+      end = DateTime.now();
+      start = end.set({ millisecond: end.millisecond - this.relativeTime });
+    } else {
+      start = DateTime.fromMillis(execution.startTime!);
+      end = DateTime.now();
+    }
 
     return { start, end };
   }
