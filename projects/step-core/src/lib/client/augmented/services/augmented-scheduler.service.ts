@@ -5,7 +5,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 
-import { Execution, ExecutiontTaskParameters, SchedulerService } from '../../generated';
+import { Execution, ExecutiontTaskParameters, FieldFilter, SchedulerService } from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -17,6 +17,7 @@ import { map } from 'rxjs';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { AugmentedExecutionsService } from './augmented-executions.service';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedSchedulerService extends SchedulerService implements HttpOverrideResponseInterceptor {
@@ -91,7 +92,7 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
   }
 
   getExecutionsByTaskId(
-    executionTaskID: string,
+    id: string,
     start?: number,
     end?: number,
   ): Observable<{
@@ -99,30 +100,15 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
     recordsFiltered: number;
     data: any[];
   }> {
-    return this.httpRequest
-      .request({
-        method: 'POST',
-        url: '/table/executions',
-        body: {
-          filters: [
-            {
-              field: 'executionTaskID',
-              value: executionTaskID,
-              regex: false,
-            },
-          ],
-          skip: 0,
-          limit: 0,
-          sort: {
-            field: 'string',
-            direction: 'ASCENDING',
-          },
-          performEnrichment: true,
-          calculateCounts: true,
-        },
-      })
+    const runningFilter: FieldFilter = {
+      field: 'executionTaskID',
+      regex: false,
+      value: id,
+    };
+    return this._tableApiWrapper
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
       .pipe(
-        map((response: any) => {
+        map((response) => {
           if (start !== undefined && end !== undefined) {
             response.data = response.data.filter((execution: any) => {
               return execution.startTime >= start && execution.endTime <= end;
