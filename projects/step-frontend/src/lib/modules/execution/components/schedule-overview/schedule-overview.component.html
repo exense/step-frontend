@@ -5,6 +5,10 @@
       <h1>{{ task.attributes?.['name'] }}</h1>
     </div>
   }
+  @if (latestExecution$ | async; as latestExecution) {
+    <p>{{ latestExecution.date }}</p>
+    <p>{{ latestExecution.result }}</p>
+  }
   <div class="range-picker">
     <step-form-field>
       <step-prefix class="icon-prefix">

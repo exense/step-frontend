@@ -135,6 +135,17 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     takeUntilDestroyed(),
   );
 
+  readonly latestExecution$ = this.executions$.pipe(
+    map((executions) => {
+      const data = executions.data;
+      return data.length > 0
+        ? { result: data[data.length - 1].result, date: new Date(data[data.length - 1].startTime).toUTCString() }
+        : null;
+    }),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   readonly executionFulLRange$ = this.executions$.pipe(
     map((execution) => this.getDefaultRangeForExecution(execution.data[0])),
   );
