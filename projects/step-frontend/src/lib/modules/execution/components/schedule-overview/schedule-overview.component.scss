@@ -5,7 +5,6 @@
   width: 100%;
   margin: 1em;
   padding: 1em;
-  align-items: flex-start;
 
   .title {
     display: flex;
@@ -16,6 +15,17 @@
       margin: 0;
       font-size: 3rem;
       line-height: 3.8rem;
+    }
+
+    .latest-execution {
+      padding: 1rem;
+      border: 1px solid black;
+      border-radius: 10px;
+
+      p {
+        margin: 3px;
+        text-align: center;
+      }
     }
   }
 

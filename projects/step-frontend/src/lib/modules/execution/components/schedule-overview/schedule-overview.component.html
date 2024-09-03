@@ -3,11 +3,14 @@
     <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       <h1>{{ task.attributes?.['name'] }}</h1>
+
+      @if (latestExecution$ | async; as latestExecution) {
+        <div class="latest-execution">
+          <p>{{ latestExecution.date.formattedDate }} - {{ latestExecution.date.formattedTime }}</p>
+          <p>{{ latestExecution.result }}</p>
+        </div>
+      }
     </div>
-  }
-  @if (latestExecution$ | async; as latestExecution) {
-    <p>{{ latestExecution.date }}</p>
-    <p>{{ latestExecution.result }}</p>
   }
   <div class="range-picker">
     <step-form-field>

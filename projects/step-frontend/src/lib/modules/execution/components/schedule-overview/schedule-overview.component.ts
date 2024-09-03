@@ -138,9 +138,19 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   readonly latestExecution$ = this.executions$.pipe(
     map((executions) => {
       const data = executions.data;
-      return data.length > 0
-        ? { result: data[data.length - 1].result, date: new Date(data[data.length - 1].startTime).toUTCString() }
-        : null;
+      const lastExecution = data[data.length - 1];
+
+      const date = new Date(lastExecution.startTime);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear() % 100;
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+
+      const formattedDate = `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year.toString().padStart(2, '0')}`;
+      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+      return data.length > 0 ? { result: lastExecution.result, date: { formattedDate, formattedTime } } : null;
     }),
     shareReplay(1),
     takeUntilDestroyed(),
