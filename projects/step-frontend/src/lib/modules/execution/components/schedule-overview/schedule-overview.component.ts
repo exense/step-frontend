@@ -63,6 +63,10 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
 
+  chartAction() {
+    console.log('action');
+  }
+
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
     map((range) => range ?? undefined),

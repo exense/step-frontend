@@ -39,6 +39,6 @@
 </section>
 <section class="body">
   @if (summary$ | async; as summary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" [action]="chartAction" />
   }
 </section>
