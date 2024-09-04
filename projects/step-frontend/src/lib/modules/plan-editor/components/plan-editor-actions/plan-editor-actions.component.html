@@ -103,6 +103,9 @@
     >
       <step-icon name="play-circle" />
     </button>
+    @for (editorAction of _planExecutionActions; track editorAction.id) {
+      <step-dashlet [itemKey]="editorAction.template" [context]="planContext" />
+    }
   </step-btn-group>
 }
 
