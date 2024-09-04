@@ -3,7 +3,7 @@
     <step-label>Plan</step-label>
     <input type="text" [readonly]="true" [ngModel]="planName" />
     <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button (click)="gotoPlan()">
+      <button type="button" mat-stroked-button matTooltip="Edit referenced plan" (click)="gotoPlan()">
         <step-icon name="edit-2" />
       </button>
     </step-suffix>
