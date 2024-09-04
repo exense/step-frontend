@@ -1,14 +1,36 @@
-div {
+.header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin: 1em;
+  padding: 1em;
 
-  entity-icon {
-    margin-left: 1em;
-    margin-right: 1em;
+  .title {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+      font-size: 3rem;
+      line-height: 3.8rem;
+    }
+
+    .latest-execution {
+      padding: 1rem;
+      border: 1px solid black;
+      border-radius: 10px;
+
+      p {
+        margin: 3px;
+        text-align: center;
+      }
+    }
   }
 
-  h1 {
-    margin: 0;
+  .range-picker {
+    grid-area: ranger;
+    justify-self: flex-end;
   }
 }

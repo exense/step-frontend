@@ -269,10 +269,6 @@ export class ExecutionModule {
           component: ExecutionOpenerComponent,
         },
         {
-          path: 'schedules/:id',
-          component: ScheduleOverviewComponent,
-        },
-        {
           matcher: (url) => {
             if (url[0].path === 'list' || url[0].path === 'open') {
               return null;
@@ -302,6 +298,10 @@ export class ExecutionModule {
         {
           path: 'list',
           component: ExecutionListComponent,
+        },
+        {
+          path: 'schedules/:id',
+          component: ScheduleOverviewComponent,
         },
         {
           path: ':id',
