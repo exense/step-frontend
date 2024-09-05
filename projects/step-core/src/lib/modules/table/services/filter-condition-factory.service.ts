@@ -16,8 +16,8 @@ import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
 import { DateRange } from '../../date-picker/date-picker.module';
 import { ArrayFilterCondition } from '../shared/array-filter-condition';
-import { FilterConditionConfigurerService } from './filter-condition-configurer.service';
 import { REQUEST_FILTERS_INTERCEPTORS } from './request-filter-interceptors.token';
+import { BooleanArrayFilterCondition } from '../shared/boolean-array-filter-condition';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +40,10 @@ export class FilterConditionFactoryService {
 
   arrayFilterCondition(items?: string[]): FilterCondition {
     return this.configureCondition(new ArrayFilterCondition(items));
+  }
+
+  booleanArrayFilterCondition(items?: (string | boolean)[]): FilterCondition {
+    return this.configureCondition(new BooleanArrayFilterCondition(items));
   }
 
   scopeFilterCondition(value?: string): FilterCondition {
@@ -94,6 +98,8 @@ export class FilterConditionFactoryService {
         return this.arrayFilterCondition(filterCondition?.sourceObject);
       case FilterConditionType.BOOLEAN:
         return this.booleanFilterCondition(filterCondition?.sourceObject);
+      case FilterConditionType.BOOLEAN_ARRAY:
+        return this.booleanArrayFilterCondition(filterCondition?.sourceObject);
       default:
         return undefined;
     }
