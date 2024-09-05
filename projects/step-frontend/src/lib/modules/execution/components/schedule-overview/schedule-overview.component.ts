@@ -161,7 +161,7 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   );
 
   readonly executionFulLRange$ = this.executions$.pipe(
-    map((execution) => this.getDefaultRangeForExecution(execution.data[0])),
+    map((execution) => this.getDefaultRangeForTask(execution.data[0])),
   );
 
   readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
@@ -223,7 +223,7 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     });
   }
 
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
+  private getDefaultRangeForTask(execution: Execution): DateRange {
     let start: DateTime;
     let end: DateTime;
 
@@ -238,7 +238,7 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     return { start, end };
   }
 
-  private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
+  private applyDefaultRange(execution: Execution): void {
+    this.dateRangeCtrl.setValue(this.getDefaultRangeForTask(execution));
   }
 }
