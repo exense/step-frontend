@@ -1,18 +1,18 @@
 import { inject, Injectable } from '@angular/core';
 import { CalendarStrategyService } from './calendar-strategy.service';
 import { DateTime } from 'luxon';
-import { DateSingleAdapterService } from './date-single-adapter.service';
 import { DateRange } from '../types/date-range';
 import { DateRange as MatDateRange } from '@angular/material/datepicker';
 import { TimeRange } from '../types/time-range';
 import { Time } from '../types/time';
 import { extractTime } from '../types/extract-time';
+import { DateUtilsService } from './date-utils.service';
 
 const END_RANGE_TIME: Time = { hour: 23, minute: 59, second: 59 };
 
 @Injectable()
 export class CalendarRangeStrategyService implements CalendarStrategyService<DateRange, TimeRange> {
-  private _adapter = inject(DateSingleAdapterService);
+  private _dateUtils = inject(DateUtilsService);
 
   private lastEndDate: DateTime | null = null;
   private lastEndTime?: Time;
@@ -35,9 +35,9 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
         end = start.set(END_RANGE_TIME);
       }
     } else if (
-      (!end || this._adapter.compareWithoutTime(start, end) === 0) &&
+      (!end || this._dateUtils.compareWithoutTime(start, end) === 0) &&
       date &&
-      this._adapter.compare(date, start) >= 0
+      this._dateUtils.compare(date, start) >= 0
     ) {
       if (!keepTime) {
         end = date;
@@ -96,6 +96,10 @@ export class CalendarRangeStrategyService implements CalendarStrategyService<Dat
     }
 
     return currentSelection;
+  }
+
+  pickRelativeTime(range: DateRange): DateRange | undefined | null {
+    return range;
   }
 
   getStartAt(selection?: DateRange | null): DateTime | undefined | null {

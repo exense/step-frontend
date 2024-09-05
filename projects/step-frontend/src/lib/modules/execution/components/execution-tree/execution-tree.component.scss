@@ -20,4 +20,11 @@ step-execution-tree {
     display: block;
     margin-left: 0.8rem;
   }
+
+  .node-name {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    align-items: center;
+  }
 }

@@ -107,7 +107,7 @@
 }
 
 <mat-menu #executionMenu="matMenu">
-  <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+  <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <step-execution-commands
       [description]="description"
       [repositoryObjectRef]="repositoryObjectRef"
@@ -116,7 +116,7 @@
   </span>
 </mat-menu>
 <mat-menu #interactiveSessionMenu="matMenu">
-  <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+  <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
       @if (_interactiveSession.executionParameters) {
         <step-custom-forms [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters" />

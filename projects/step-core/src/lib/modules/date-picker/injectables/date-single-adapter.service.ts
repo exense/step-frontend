@@ -1,13 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { DateAdapterService } from './date-adapter.service';
-import { DateObjectUnits, DateTime } from 'luxon';
+import { DateTime, HourNumbers, SecondNumbers } from 'luxon';
 import { STEP_DATE_TIME_DELIMITER, STEP_FORMAT_DATE, STEP_FORMAT_TIME } from './step-date-format-config.providers';
+import { DateUtilsService } from './date-utils.service';
 
 @Injectable()
 export class DateSingleAdapterService implements DateAdapterService<DateTime> {
   private _formatDate = inject(STEP_FORMAT_DATE);
   private _formatTime = inject(STEP_FORMAT_TIME);
   private _dateTimeDelimiter = inject(STEP_DATE_TIME_DELIMITER);
+  private _dateUtils = inject(DateUtilsService);
 
   format(date: DateTime | null | undefined, withTime: boolean): string {
     if (!date) {
@@ -31,10 +33,9 @@ export class DateSingleAdapterService implements DateAdapterService<DateTime> {
     const [datePartStr, timePartStr] = dateStr.split(this._dateTimeDelimiter).map((part) => part.trim());
     let date = this.parseDatePart(datePartStr);
     if (date) {
-      const time = DateTime.fromFormat(timePartStr, this._formatTime);
-      if (time.isValid) {
-        const { hour, minute, second } = time;
-        date = date.set({ hour, minute, second });
+      const time = this.parseTime(timePartStr);
+      if (time) {
+        date = date.set(time);
       }
     }
 
@@ -42,20 +43,16 @@ export class DateSingleAdapterService implements DateAdapterService<DateTime> {
   }
 
   areEqual(a: DateTime | null | undefined, b: DateTime | null | undefined): boolean {
-    return a === b || this.compare(a, b) === 0;
+    return this._dateUtils.areDatesEqual(a, b);
   }
 
-  compare(a: DateTime | null | undefined, b: DateTime | null | undefined): number {
-    const aMillis = a?.toMillis() ?? 0;
-    const bMillis = b?.toMillis() ?? 0;
-    return aMillis - bMillis;
-  }
-
-  compareWithoutTime(a: DateTime | null | undefined, b: DateTime | null | undefined): number {
-    const zeroTime: DateObjectUnits = { hour: 0, minute: 0, second: 0, millisecond: 0 };
-    const aMillis = a?.set(zeroTime)?.toMillis() ?? 0;
-    const bMillis = b?.set(zeroTime)?.toMillis() ?? 0;
-    return aMillis - bMillis;
+  parseTime(timePartStr: string): { hour: HourNumbers; minute: SecondNumbers; second: SecondNumbers } | undefined {
+    const time = DateTime.fromFormat(timePartStr, this._formatTime);
+    if (!time.isValid) {
+      return undefined;
+    }
+    const { hour, minute, second } = time;
+    return { hour, minute, second };
   }
 
   private parseDatePart(dateStr: string): DateTime | null | undefined {

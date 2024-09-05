@@ -50,6 +50,9 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
     () => (this.itemTemplateDirective()?.templateRef as ItemTemplateRef<T>) ?? this.itemTemplateInput(),
   );
 
+  /** @Input() **/
+  readonly useUnsetItem = input(false);
+
   protected override onValueChange(value: T): void {
     super.onValueChange(value);
     this.focusedElement = this.matSelectElementRef!.nativeElement;
@@ -57,6 +60,9 @@ export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   }
 
   protected override onLabelClick(): void {
+    if (this.isDisabled) {
+      return;
+    }
     super.onLabelClick();
     this.focusedElement = this.matSelectElementRef!.nativeElement;
     this.focusedElement.focus();

@@ -19,8 +19,6 @@
   @return $config;
 }
 
-$border-radius: 8px;
-
 @mixin border-base {
   border-top-style: solid;
   border-bottom-style: solid;
@@ -33,7 +31,7 @@ $border-radius: 8px;
   border-left-style: solid;
 }
 
-@mixin left-border-round {
+@mixin left-border-round($border-radius) {
   border-top-left-radius: $border-radius;
   border-bottom-left-radius: $border-radius;
 }
@@ -43,7 +41,7 @@ $border-radius: 8px;
   border-right-style: solid;
 }
 
-@mixin right-border-round {
+@mixin right-border-round($border-radius) {
   border-top-right-radius: $border-radius;
   border-bottom-right-radius: $border-radius;
 }
@@ -108,6 +106,8 @@ $border-radius: 8px;
   }
 
   step-form-field {
+    --form-field-border-radius: 0.8rem;
+
     display: flex;
     flex-direction: column;
     line-height: 1;
@@ -276,10 +276,10 @@ $border-radius: 8px;
       }
 
       & > *:first-child {
-        @include left-border-round;
+        @include left-border-round(var(--form-field-border-radius));
       }
       & > *:last-child {
-        @include right-border-round;
+        @include right-border-round(var(--form-field-border-radius));
       }
 
       step-prefix,
@@ -326,13 +326,13 @@ $border-radius: 8px;
       step-prefix.button-prefix:first-child {
         & > button,
         & > a {
-          @include left-border-round;
+          @include left-border-round(var(--form-field-border-radius));
         }
       }
       step-suffix.button-suffix:last-child {
         & > button,
         & > a {
-          @include right-border-round;
+          @include right-border-round(var(--form-field-border-radius));
         }
       }
     }
