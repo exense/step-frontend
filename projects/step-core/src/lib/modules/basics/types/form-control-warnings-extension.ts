@@ -1,6 +1,6 @@
 import { AbstractControl } from '@angular/forms';
 import { computed, DestroyRef, signal } from '@angular/core';
-import { debounceTime } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const warningsContainerKey = Symbol('WarningsContainerKey');
@@ -20,11 +20,18 @@ export class WarningContainer {
   }
 }
 
-export const decorateWithWarnings = <T extends AbstractControl>(control: T, destroyRef: DestroyRef): T => {
+export const decorateWithWarnings = <T extends AbstractControl>(
+  control: T,
+  destroyRefOrTerminator: DestroyRef | Subject<unknown>,
+): T => {
   const container = new WarningContainer();
-  control.valueChanges
-    .pipe(debounceTime(300), takeUntilDestroyed(destroyRef))
-    .subscribe(() => container.clearWarnings());
+
+  const destroy =
+    destroyRefOrTerminator instanceof DestroyRef
+      ? takeUntilDestroyed(destroyRefOrTerminator)
+      : takeUntil(destroyRefOrTerminator);
+
+  control.valueChanges.pipe(debounceTime(300), destroy).subscribe(() => container.clearWarnings());
   (control as any)[warningsContainerKey] = container;
   return control;
 };
