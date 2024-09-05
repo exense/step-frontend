@@ -77,7 +77,7 @@ export class PlanListComponent implements DialogParentService {
           values,
           clonedPlan,
           'plans',
-          [{ label: 'Edit', handler: () => this._router.navigateByUrl(`/plans/editor/${clonedPlan.id}`) }],
+          [{ label: 'edit', handler: () => this._router.navigateByUrl(`/plans/editor/${clonedPlan.id}`) }],
           false,
         ),
       );

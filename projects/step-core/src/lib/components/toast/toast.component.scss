@@ -37,19 +37,29 @@
 
   .toast-message {
     flex: 1;
-    padding: 0 2rem;
+    padding: 1rem 2rem 1rem 1rem;
   }
 
-  .toast-actions {
+  .toast-bottom {
     display: flex;
     width: 100%;
-    padding: 0 0.2rem;
-    justify-content: end;
-    gap: 1rem;
+    justify-content: space-between;
 
-    .action-btn {
-      font-size: 12px;
-      cursor: pointer;
+    .toast-actions {
+      display: flex;
+      width: 100%;
+      padding: 0 0.2rem;
+      justify-content: start;
+      padding-left: 1rem;
+      gap: 1rem;
+
+      .action-btn {
+        cursor: pointer;
+      }
+    }
+
+    .toast-close {
+      padding-right: 1rem;
     }
   }
 
