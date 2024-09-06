@@ -51,6 +51,7 @@
   input,
   pre,
   step-array-input,
+  step-simple-object-input,
   step-autocomplete-input,
   mat-date-range-input,
   step-rich-editor,
@@ -71,6 +72,7 @@
     & > input,
     & > pre,
     & > step-array-input,
+    & > step-simple-object-input,
     & > step-autocomplete-input,
     & > mat-date-range-input,
     & > textarea {
@@ -192,6 +194,7 @@
         & > input,
         & > pre,
         & > step-array-input,
+        & > step-simple-object-input,
         & > step-autocomplete-input,
         & > textarea,
         step-rich-editor,
@@ -230,6 +233,7 @@
       & > input,
       & > pre,
       & > step-array-input,
+      & > step-simple-object-input,
       & > step-autocomplete-input,
       & > textarea {
         border-color: $border-color;
@@ -261,6 +265,7 @@
       & > input,
       pre,
       step-array-input,
+      step-simple-object-input,
       step-autocomplete-input,
       step-rich-editor,
       textarea {

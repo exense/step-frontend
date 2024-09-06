@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, input, signal, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl, NgModel } from '@angular/forms';
 
 type OnChange = (value: Record<string, string>) => void;
@@ -14,6 +14,7 @@ interface ObjectField {
   selector: 'step-simple-object-input',
   templateUrl: './simple-object-input.component.html',
   styleUrl: './simple-object-input.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class SimpleObjectInputComponent implements ControlValueAccessor {
   private onChange?: OnChange;
