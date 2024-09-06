@@ -1,0 +1,35 @@
+@mixin print-sidebar {
+  step-sidebar > .sidebar {
+    display: none !important;
+    width: 0 !important;
+  }
+  #main {
+    margin-left: 0 !important;
+    height: auto !important;
+  }
+}
+
+@mixin print-root {
+  step-root {
+    height: auto;
+  }
+}
+
+@mixin print-header {
+  header.app-header {
+    display: none !important;
+  }
+}
+
+@mixin print-overrides {
+  @media print {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    #step-main-scrollable-content {
+      overflow: hidden !important;
+    }
+    @include print-sidebar;
+    @include print-root;
+    @include print-header;
+  }
+}

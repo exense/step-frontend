@@ -185,7 +185,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, AfterConten
       this.fetchStepFunction(this.keyword.type);
     } else {
       this.keyword = this._functionConfigurationDialogData.keyword;
-
       functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword, this._formBuilder);
     }
   }
@@ -217,7 +216,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, AfterConten
       )
       .subscribe((keyword) => {
         this.keyword = keyword;
-
         functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword, this._formBuilder);
       });
   }

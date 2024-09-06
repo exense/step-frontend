@@ -10,6 +10,7 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -27,6 +28,7 @@ export class TableDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
   allAttributes: MetricAttribute[] = [];
   _attributesByKey: Record<string, MetricAttribute> = {};
@@ -93,5 +95,19 @@ export class TableDashletSettingsComponent implements OnInit {
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close(this.item);
+  }
+
+  handleFilterChange(index: number, item: FilterBarItem) {
+    this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 }

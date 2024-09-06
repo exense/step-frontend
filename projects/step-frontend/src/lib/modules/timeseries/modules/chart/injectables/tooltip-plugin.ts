@@ -124,7 +124,6 @@ export class TooltipPlugin {
             if (chartIsLocked()) {
               return;
             }
-            showTooltip();
           };
 
           over.onmouseleave = () => {
@@ -298,8 +297,10 @@ export class TooltipPlugin {
     const leftContainer = this.createElementWithClass('div', 'left');
     const nameDiv = this.createElementWithClass('div', 'name');
     nameDiv.textContent = `${row.name} `;
-    const marker = this.createMarker(row.stroke);
-    leftContainer.appendChild(marker);
+    if (row.stroke) {
+      const marker = this.createMarker(row.stroke);
+      leftContainer.appendChild(marker);
+    }
     leftContainer.appendChild(nameDiv);
     return leftContainer;
   }

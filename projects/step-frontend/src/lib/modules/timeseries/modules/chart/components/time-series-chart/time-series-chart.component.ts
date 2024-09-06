@@ -112,11 +112,13 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
    */
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
+    this.legendSettings.show = settings.showLegend ?? true;
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
     this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
+      show: this.settings.showCursor ?? true,
       lock: settings.tooltipOptions.useExecutionLinks,
       y: false,
       bind: {
@@ -174,22 +176,24 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       }
     }
     this.chartIsEmpty = noData;
+
     const opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
       legend: { show: false },
       cursor: cursorOpts,
+      // @ts-ignore
+      select: { show: settings.zoomEnabled ?? true },
       scales: {
         x: {
           time: true,
           // min: this.selection?.from,
           // max: this.selection?.to,
         },
-        // y: {auto: true},
       },
       plugins: this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [],
-      axes: [{}, ...(settings.axes || [])],
+      axes: [{ show: settings.showTimeAxes ?? true }, ...(settings.axes || [])],
       series: [
         {
           label: 'Timestamp',

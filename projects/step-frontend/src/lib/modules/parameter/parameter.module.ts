@@ -23,10 +23,14 @@ import { ParameterEditDialogComponent } from './components/parameter-edit-dialog
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
+import { ParameterConditionDialogComponent } from './components/parameter-condition-dialog/parameter-condition-dialog.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { InputTypePipe } from './pipes/input-type.pipe';
+import { InputOptionsPipe } from './pipes/input-options.pipe';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule],
+  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule, NgxMatSelectSearchModule],
   exports: [ParametersListComponent, ParameterSelectionComponent],
   declarations: [
     ParametersListComponent,
@@ -36,6 +40,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ParameterLastModificationComponent,
     ParameterEditDialogComponent,
     ParameterUrlPipe,
+    ParameterConditionDialogComponent,
+    InputTypePipe,
+    InputOptionsPipe,
   ],
 })
 export class ParameterModule {
