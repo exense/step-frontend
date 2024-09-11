@@ -58,6 +58,8 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   }
 
   changeType(selectionType: BulkSelectionType): void {
+    this.selectionType = selectionType;
+
     if (this.selectionCollector) {
       switch (selectionType) {
         case BulkSelectionType.ALL:
