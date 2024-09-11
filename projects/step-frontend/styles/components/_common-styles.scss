@@ -76,7 +76,8 @@
 
   #step-main-scrollable-content {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
+    padding-top: 1.6rem;
   }
 
   .danger-warning {
