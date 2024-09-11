@@ -26,6 +26,7 @@ import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  finalize,
   map,
   of,
   shareReplay,
@@ -37,6 +38,7 @@ import { KeyValue } from '@angular/common';
 import { JSON_FORM_EXPORTS, JsonFieldSchema, JsonFieldUtilsService } from '../../../json-forms';
 import { RepositoryParametersSchemasService } from '../../../repository-parameters';
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
+import { catchError } from 'rxjs/operators';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -90,6 +92,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   protected hideUser = this.config?.hideUser;
 
+  protected showProgress = signal(false);
   protected isNew = signal(true);
   protected error = signal('');
 
@@ -223,7 +226,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
         if (!repositoryRef) {
           return of(undefined);
         }
-        return this._controllerApi.getReport(repositoryRef);
+        this.showProgress.set(true);
+        return this._controllerApi.getReport(repositoryRef).pipe(
+          catchError(() => of(undefined)),
+          finalize(() => this.showProgress.set(false)),
+        );
       }),
       map((items) => (!items?.runs?.length ? undefined : items)),
       map((overview) =>

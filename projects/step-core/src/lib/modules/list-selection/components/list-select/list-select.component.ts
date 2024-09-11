@@ -18,7 +18,7 @@ import {
   SelectionCollector,
 } from '../../../entities-selection/entities-selection.module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
-import { TableColumnsConfig, TableModule } from '../../../table/table.module';
+import { TableColumnsConfig, TableModule, TablePersistenceConfig } from '../../../table/table.module';
 import { skip, Subject, takeUntil } from 'rxjs';
 
 type OnChange = <T>(value?: T[]) => void;
@@ -45,6 +45,10 @@ export enum SelectAll {
     },
     {
       provide: TableColumnsConfig,
+      useValue: null,
+    },
+    {
+      provide: TablePersistenceConfig,
       useValue: null,
     },
     ...selectionCollectionProvider<unknown, KeyValue<unknown, string>>({

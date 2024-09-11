@@ -1,4 +1,4 @@
-<step-modal-window [title]="isNew() ? 'New schedule' : 'Edit schedule'">
+<step-modal-window [title]="isNew() ? 'New schedule' : 'Edit schedule'" [showSpinner]="showProgress()">
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger">
