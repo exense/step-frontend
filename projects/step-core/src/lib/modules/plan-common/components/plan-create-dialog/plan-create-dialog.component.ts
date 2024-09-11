@@ -1,11 +1,11 @@
-import { Component, HostListener, inject, TrackByFunction } from '@angular/core';
+import { Component, HostListener, inject, viewChild } from '@angular/core';
 import { shareReplay, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CustomFormComponent } from '../../../custom-forms';
 import { StepBasicsModule, DialogRouteResult } from '../../../basics/step-basics.module';
 import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
-import { ItemInfo, PlanTypeRegistryService } from '../../../custom-registeries/custom-registries.module';
+import { PlanTypeRegistryService } from '../../../custom-registeries/custom-registries.module';
 
 @Component({
   selector: 'step-plan-create-dialog',
@@ -19,10 +19,10 @@ export class PlanCreateDialogComponent {
   private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _router = inject(Router);
 
+  private customForm = viewChild(CustomFormComponent);
+
   protected template: string = 'TestCase';
   protected plan: Partial<Plan> = { attributes: {} };
-
-  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly _planTypes = inject(PlanTypeRegistryService).getItemInfos();
   protected planType = this._planTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
@@ -30,9 +30,10 @@ export class PlanCreateDialogComponent {
   readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
 
   save(editAfterSave?: boolean): void {
-    this._api
-      .newPlan(this.planType, this.template)
+    this.customForm()!
+      .readyToProceed()
       .pipe(
+        switchMap(() => this._api.newPlan(this.planType, this.template)),
         tap((createdPlan) => {
           createdPlan.attributes = this.plan.attributes;
           if (createdPlan.root) {
