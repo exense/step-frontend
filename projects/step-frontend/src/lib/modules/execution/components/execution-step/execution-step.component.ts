@@ -102,11 +102,8 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   }
 
   private terminateSelectionChanges(): void {
-    if (!this.selectionTerminator$) {
-      return;
-    }
-    this.selectionTerminator$.next();
-    this.selectionTerminator$.complete();
+    this.selectionTerminator$?.next();
+    this.selectionTerminator$?.complete();
     this.selectionTerminator$ = undefined;
   }
 
@@ -123,10 +120,6 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
         testcases: this.panelService.isPanelEnabled(Panels.TEST_CASES) ? testcases : undefined,
       })),
       takeUntil(this.selectionTerminator$),
-    );
-
-    this._testCasesSelection!.selected$.pipe(takeUntil(this.selectionTerminator$)).subscribe((selected) =>
-      this.determineSelectionType(undefined, selected),
     );
   }
 
@@ -153,9 +146,9 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     );
   }
 
-  private determineSelectionType(testCases?: ReportNode[], selected?: readonly string[]): void {
+  private determineSelectionType(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases ?? [];
-    selected = selected ?? this._testCasesSelection.selected ?? [];
+    const selected = this._testCasesSelection.selected ?? [];
     if (testCases.length > 0 && testCases.length === selected.length) {
       const isAllIncluded = testCases.reduce(
         (result, testCase) => result && selected!.includes(testCase.artefactID!),
