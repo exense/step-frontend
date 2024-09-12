@@ -158,6 +158,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .getScreenInputsByScreenIdWithCache(this.stScreen)
       .pipe(
         map((screenInputs) => screenInputs.map((sInput) => sInput.input!)),
+        map((screenInputs) => screenInputs.filter((input) => !!input && !this.stExcludeFields.includes(input.id!))),
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
@@ -214,8 +215,10 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .filter((input) => this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined)
       .forEach((input) => {
         const defaultValue = input.type === 'CHECKBOX' ? input.defaultValue ?? false : input.defaultValue;
-        this._objectUtils.setObjectFieldValue(this.stModel, input.id!, defaultValue);
-        valueHasBeenChanged = true;
+        if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
+          this._objectUtils.setObjectFieldValue(this.stModel, input.id!, defaultValue);
+          valueHasBeenChanged = true;
+        }
       });
     if (valueHasBeenChanged) {
       this.stModelChange.emit(this.stModel);
