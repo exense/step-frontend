@@ -98,6 +98,8 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     }
     this.editor.on('change', this.handleChanges);
     this.editor.on('blur', this.handleBlur);
+
+    console.log('initialized ACE', this.editor.getValue());
   }
 
   ngOnDestroy(): void {
@@ -108,5 +110,13 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
 
   focusOnText(): void {
     this.editor?.focus();
+  }
+
+  resize(): void {
+    this.editor?.resize();
+  }
+
+  clearSelection(): void {
+    this.editor?.clearSelection();
   }
 }
