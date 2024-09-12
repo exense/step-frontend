@@ -119,7 +119,11 @@
   <span class="plan-execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
       @if (_interactiveSession.executionParameters) {
-        <step-custom-forms [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters" />
+        <step-custom-forms
+          #interactiveSessionCustomForm
+          [stModel]="_interactiveSession.executionParameters"
+          stScreen="executionParameters"
+        />
       }
       <step-btn-group>
         <button

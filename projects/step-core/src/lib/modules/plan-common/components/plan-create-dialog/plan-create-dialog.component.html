@@ -1,20 +1,20 @@
 <step-modal-window title="New Plan">
   <div step-modal-window-body>
-    <step-custom-forms [(stModel)]="plan" stScreen="plan"> </step-custom-forms>
+    <step-custom-forms [(stModel)]="plan" stScreen="plan" />
     <step-form-field>
       <step-label>Editor</step-label>
       <mat-select [(ngModel)]="planType">
-        <mat-option *ngFor="let item of _planTypes; trackBy: trackByItemInfo" [value]="item.type">
-          {{ item.label }}
-        </mat-option>
+        @for (item of _planTypes; track item.type) {
+          <mat-option [value]="item.type">{{ item.label }}</mat-option>
+        }
       </mat-select>
     </step-form-field>
     <step-form-field>
       <step-label>Plan type</step-label>
       <mat-select [(ngModel)]="template">
-        <mat-option *ngFor="let item of artefactTypes$ | async" [value]="item">
-          {{ item }}
-        </mat-option>
+        @for (item of artefactTypes$ | async; track item) {
+          <mat-option>{{ item }}</mat-option>
+        }
       </mat-select>
     </step-form-field>
   </div>

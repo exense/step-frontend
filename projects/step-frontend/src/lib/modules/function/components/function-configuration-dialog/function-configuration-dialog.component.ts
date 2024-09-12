@@ -6,9 +6,8 @@ import {
   forwardRef,
   HostListener,
   inject,
-  OnDestroy,
   OnInit,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -29,8 +28,9 @@ import {
   FunctionTypeComponent,
   FunctionTypeFormComponent,
   DialogRouteResult,
+  CustomFormWrapperComponent,
 } from '@exense/step-core';
-import { map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -73,8 +73,8 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
-  @ViewChild('functionTypeComponent', { static: true })
-  private functionTypeChild!: FunctionTypeComponent;
+  private functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
+  private customForm = viewChild(CustomFormWrapperComponent);
 
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
@@ -116,13 +116,15 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
       this.formGroup!.markAllAsTouched();
       return;
     }
-    functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
-    (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
-
-    this._api
-      .saveFunction(this.keyword!)
+    this.customForm()!
+      .readyToProceed()
       .pipe(
+        tap(() => {
+          functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
+          (this.functionTypeChild()!.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
+        }),
+        switchMap(() => this._api.saveFunction(this.keyword!)),
         switchMap((keyword) => {
           const isSuccess = !!keyword;
 
