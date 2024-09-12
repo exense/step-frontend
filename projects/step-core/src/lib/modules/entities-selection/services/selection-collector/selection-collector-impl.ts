@@ -20,7 +20,7 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
 
   private autoDeselectStrategy!: AutoDeselectStrategy;
 
-  private registrationStrategy!: RegistrationStrategy;
+  private registrationStrategyInternal!: RegistrationStrategy;
 
   setup(
     selectionKeyProperty: string,
@@ -29,7 +29,7 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
   ): void {
     this.selectionKeyProperty = selectionKeyProperty;
     this.autoDeselectStrategy = autoDeselectStrategy;
-    this.registrationStrategy = registrationStrategy;
+    this.registrationStrategyInternal = registrationStrategy;
     this.unregister$
       .pipe(
         filter((x) => !!x),
@@ -52,6 +52,10 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
     return this.possibleSelections.size;
   }
 
+  get registrationStrategy(): RegistrationStrategy {
+    return this.registrationStrategyInternal;
+  }
+
   clear(): void {
     this.selectedPossible = false;
     this._selected$.next([]);
@@ -63,21 +67,21 @@ export class SelectionCollectorImpl<KEY, ENTITY> implements SelectionCollector<K
   }
 
   registerPossibleSelectionManually(items: ENTITY[]): void {
-    if (this.registrationStrategy !== RegistrationStrategy.MANUAL) {
+    if (this.registrationStrategyInternal !== RegistrationStrategy.MANUAL) {
       throw new Error('This method can be invoked with MANUAL registration strategy only');
     }
     this.possibleSelections = new Set(items);
   }
 
   registerPossibleSelection(item: ENTITY): void {
-    if (this.registrationStrategy !== RegistrationStrategy.AUTO) {
+    if (this.registrationStrategyInternal !== RegistrationStrategy.AUTO) {
       return;
     }
     this.possibleSelections.add(item);
   }
 
   unregisterPossibleSelection(item: ENTITY): void {
-    if (this.registrationStrategy !== RegistrationStrategy.AUTO) {
+    if (this.registrationStrategyInternal !== RegistrationStrategy.AUTO) {
       return;
     }
     this.possibleSelections.delete(item);
