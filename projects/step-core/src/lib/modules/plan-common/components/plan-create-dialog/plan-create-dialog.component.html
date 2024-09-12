@@ -1,6 +1,6 @@
 <step-modal-window title="New Plan">
   <div step-modal-window-body>
-    <step-custom-forms [(stModel)]="plan" stScreen="plan"> </step-custom-forms>
+    <step-custom-forms [(stModel)]="plan" stScreen="plan" />
     <step-form-field>
       <step-label>Editor</step-label>
       <mat-select [(ngModel)]="planType">
@@ -15,7 +15,7 @@
             <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
           </ngx-mat-select-search>
         </mat-option>
-        @for (item of dropdownItemsFiltered; track trackByItemInfo) {
+        @for (item of dropdownItemsFiltered; track item.type) {
           <mat-option [value]="item.type">{{ item.label }}</mat-option>
         }
       </mat-select>
