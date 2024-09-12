@@ -1,4 +1,4 @@
-import { Component, computed, effect, HostBinding, inject, input, output } from '@angular/core';
+import { Component, computed, HostBinding, inject, input, output } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Input as StInput, ScreensService } from '../../../../client/step-client-module';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -58,14 +58,6 @@ export abstract class BaseCustomFormInputComponent implements ControlValueAccess
     const stInput = this.stInput();
     const remoteInput = this.remoteInput();
     return stInput || remoteInput;
-  });
-
-  private effectInitDefaultValue = effect(() => {
-    const input = this.input();
-    if (!input?.defaultValue || !!this.value) {
-      return;
-    }
-    this.onValueChange(input.defaultValue);
   });
 
   protected dropdownItems = computed(() => {
