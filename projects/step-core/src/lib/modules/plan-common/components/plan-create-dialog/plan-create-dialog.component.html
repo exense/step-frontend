@@ -13,7 +13,7 @@
       <step-label>Plan type</step-label>
       <mat-select [(ngModel)]="template">
         @for (item of artefactTypes$ | async; track item) {
-          <mat-option>{{ item }}</mat-option>
+          <mat-option [value]="item">{{ item }}</mat-option>
         }
       </mat-select>
     </step-form-field>
