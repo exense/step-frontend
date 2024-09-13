@@ -95,11 +95,10 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     }
     if (this.isDisabled !== undefined) {
       this.editor.setReadOnly(this.isDisabled);
+      setTimeout(() => this.clearSelection(), 100);
     }
     this.editor.on('change', this.handleChanges);
     this.editor.on('blur', this.handleBlur);
-
-    console.log('initialized ACE', this.editor.getValue());
   }
 
   ngOnDestroy(): void {
