@@ -171,6 +171,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     return {
       attributes: { name },
       executionsParameters,
+      active: true,
     };
   }
 }
