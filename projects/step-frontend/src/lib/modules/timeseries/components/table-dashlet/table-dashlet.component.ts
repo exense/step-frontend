@@ -42,6 +42,7 @@ import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-d
 import { TableEntryFormatPipe } from './table-entry-format.pipe';
 import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { MatTooltip } from '@angular/material/tooltip';
 
 interface TableColumn {
   id: string;
@@ -94,7 +95,7 @@ interface ProcessedBucketResponse {
   styleUrls: ['./table-dashlet.component.scss'],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe],
+  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';
@@ -123,6 +124,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   attributesByIds: Record<string, MetricAttribute> = {};
 
   allSeriesChecked: boolean = true;
+  showHigherResolutionWarning = false;
 
   compareModeEnabled: boolean = false;
   compareContext: TimeSeriesContext | undefined;
@@ -388,6 +390,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucketResponse {
+    this.showHigherResolutionWarning = response.higherResolutionUsed;
     const syncGroup = context.getSyncGroup(this.item.id);
     const buckets = response.matrix.map((series, i) => {
       if (series.length != 1) {

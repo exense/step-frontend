@@ -32,6 +32,7 @@ import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
+import { MatTooltip } from '@angular/material/tooltip';
 
 declare const uPlot: any;
 
@@ -49,7 +50,13 @@ interface RateUnit {
   templateUrl: './chart-dashlet.component.html',
   styleUrls: ['./chart-dashlet.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent, TimeseriesAggregatePickerComponent],
+  imports: [
+    COMMON_IMPORTS,
+    ChartSkeletonComponent,
+    TimeSeriesChartComponent,
+    TimeseriesAggregatePickerComponent,
+    MatTooltip,
+  ],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -95,6 +102,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
+  showHigherResolutionWarning = false;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -443,6 +451,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
+        this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.cachedResponse = response;
         this.createChart(response);
       }),

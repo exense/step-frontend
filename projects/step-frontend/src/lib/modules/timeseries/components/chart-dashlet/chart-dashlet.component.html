@@ -13,6 +13,15 @@
   }
 </div>
 
+@if (showHigherResolutionWarning) {
+  <div class="resolution-warning">
+    <step-icon
+      name="alert-triangle"
+      matTooltip="Higher resolution was used to compose this chart. Data may be not completely accurate."
+    />
+  </div>
+}
+
 <div class="settings-container">
   <div class="edit-buttons" *ngIf="editMode">
     <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
