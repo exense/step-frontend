@@ -27,22 +27,35 @@
   <div id="sidebar-categories">
     <div id="sidebar-categories-tabs" #tabs>
       @if (displayMenuItems$ | async; as menuItems) {
-        @for (mainMenuEntry of menuItems | menuFilter: 'root'; track mainMenuEntry.id) {
+        @for (mainMenuEntry of menuItems; track mainMenuEntry.id) {
           <div class="sidebar-collapsable-tab">
-            <input
-              #mainMenuCheckBox
-              [name]="mainMenuEntry.id"
-              id="collapsable-tab-{{ mainMenuEntry.title }}"
-              type="checkbox"
-              (change)="toggleMenuItem(mainMenuCheckBox)"
-            />
-            <label for="collapsable-tab-{{ mainMenuEntry.title }}">
-              <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-              <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
-              <span><step-icon class="chevron" name="chevron-right" /></span>
-            </label>
+            @if (mainMenuEntry.hasChildren) {
+              <input
+                #mainMenuCheckBox
+                [name]="mainMenuEntry.id"
+                id="collapsable-tab-{{ mainMenuEntry.title }}"
+                type="checkbox"
+                (change)="toggleMenuItem(mainMenuCheckBox)"
+              />
+              <label for="collapsable-tab-{{ mainMenuEntry.title }}">
+                <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
+                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                <span><step-icon class="chevron" name="chevron-right" /></span>
+              </label>
+            } @else {
+              <label
+                class="no-children"
+                [class.active-primary-item]="mainMenuEntry.id | isMenuItemActive | async"
+                (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
+              >
+                <div>
+                  <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
+                  <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                </div>
+              </label>
+            }
             <div class="content">
-              @for (entry of menuItems | menuFilter: mainMenuEntry.id; track entry.id) {
+              @for (entry of mainMenuEntry.children; track entry.id) {
                 <section>
                   <div
                     class="sidebar-subtab"
@@ -53,7 +66,7 @@
                     <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
                   </div>
                   <div class="sidebar-subtab-content">
-                    @for (subEntry of menuItems | menuFilter: entry.id; track subEntry.id) {
+                    @for (subEntry of entry.children; track subEntry.id) {
                       <section>
                         <div
                           class="sidebar-sub-subtab"

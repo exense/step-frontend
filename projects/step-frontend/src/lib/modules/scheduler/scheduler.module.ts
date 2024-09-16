@@ -140,21 +140,17 @@ export class SchedulerModule {
   }
 
   private registerSettings(): void {
-    const register = (parentPath: string) => {
-      this._viewRegistry.registerRoute(
-        {
-          path: 'scheduler',
-          component: SchedulerConfigurationComponent,
-        },
-        {
-          parentPath,
-          label: 'Scheduler',
-          weight: 0,
-          accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
-        },
-      );
-    };
-    register('settings');
-    register('admin/controller');
+    this._viewRegistry.registerRoute(
+      {
+        path: 'scheduler',
+        component: SchedulerConfigurationComponent,
+      },
+      {
+        parentPath: 'admin/controller',
+        label: 'Scheduler',
+        weight: 0,
+        accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+      },
+    );
   }
 }

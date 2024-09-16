@@ -4,7 +4,7 @@ import { SpecialLinksService } from '../../services/special-links.service';
 
 @Component({
   selector: 'step-my-account-button',
-  template: `<step-icon name="settings"></step-icon> My account`,
+  template: `<step-icon name="settings" /> User Settings`,
   styleUrls: ['./my-account-button.component.scss'],
 })
 export class MyAccountButtonComponent extends LinkButtonComponent {

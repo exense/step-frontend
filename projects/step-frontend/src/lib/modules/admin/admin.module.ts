@@ -8,6 +8,7 @@ import {
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
+  AuthService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { MyAccountComponent } from './components/my-account/my-account.component';
@@ -16,8 +17,9 @@ import { ScreenInputEditDialogComponent } from './components/screen-input-edit-d
 import { ScreenInputDropdownOptionsComponent } from './components/screen-input-dropdown-options/screen-input-dropdown-options.component';
 import { RenderOptionsPipe } from './pipes/render-options.pipe';
 import { UserSelectionComponent } from './components/user-selection/user-selection.component';
-import { ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
+import { first, map } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -39,24 +41,40 @@ import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
 })
 export class AdminModule {
   constructor(
-    _entityRegistry: EntityRegistry,
+    private _entityRegistry: EntityRegistry,
     private _viewRegistry: ViewRegistryService,
+    private _auth: AuthService,
   ) {
-    _entityRegistry.register('users', 'User', { icon: 'user', component: UserSelectionComponent });
+    this.registerEntities();
+    this.registerMenuEntries();
+    this.registerCommonSettingsRoutes();
+    this.registerAdminSettingsRoutes();
+  }
 
-    this.registerSettingsSubRoutes('settings');
-    this.registerSettingsSubRoutes('admin/controller');
+  private registerEntities(): void {
+    this._entityRegistry.register('users', 'User', { icon: 'user', component: UserSelectionComponent });
+  }
 
-    _viewRegistry.registerRoute({
+  private registerCommonSettingsRoutes(): void {
+    this._viewRegistry.registerRoute({
       path: 'settings',
       component: SettingsComponent,
       data: {
         resolveChildFor: 'settings',
       },
     });
-  }
 
-  private registerSettingsSubRoutes(parentPath: string): void {
+    this._viewRegistry.registerRoute(
+      {
+        path: 'my-account',
+        component: MyAccountComponent,
+      },
+      {
+        parentPath: 'settings',
+        label: 'User Settings',
+      },
+    );
+
     this._viewRegistry.registerRoute(
       {
         path: 'screens',
@@ -105,21 +123,52 @@ export class AdminModule {
         ],
       },
       {
-        parentPath,
+        parentPath: 'settings',
         label: 'Screens',
         accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
       },
     );
+  }
 
-    this._viewRegistry.registerRoute(
-      {
-        path: 'my-account',
-        component: MyAccountComponent,
-      },
-      {
-        parentPath,
-        label: 'My Account',
-      },
-    );
+  private registerAdminSettingsRoutes(): void {
+    this._viewRegistry.registerRoute({
+      path: 'admin',
+      component: SimpleOutletComponent,
+      canActivate: [
+        () => {
+          const _authService = inject(AuthService);
+          const _router = inject(Router);
+          return _authService.initialize$.pipe(
+            first(),
+            map(() => {
+              if (_authService.hasRight('admin-ui-menu')) {
+                return true;
+              }
+              return _router.parseUrl('/');
+            }),
+          );
+        },
+      ],
+      children: [
+        {
+          path: '',
+          redirectTo: 'controller',
+        },
+        {
+          path: 'controller',
+          component: SettingsComponent,
+          data: {
+            resolveChildFor: 'admin/controller',
+          },
+        },
+      ],
+    });
+  }
+
+  private registerMenuEntries(): void {
+    this._viewRegistry.registerMenuEntry('Admin Settings', 'admin', 'settings', {
+      weight: 90,
+      isEnabledFct: () => this._auth.hasRight('admin-ui-menu'),
+    });
   }
 }
