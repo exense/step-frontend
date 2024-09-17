@@ -229,17 +229,17 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
         this.showProgress.set(true);
         return this._controllerApi.getReport(repositoryRef).pipe(
           catchError(() => of(undefined)),
+          map((items) => (!items?.runs?.length ? undefined : items)),
+          map((overview) =>
+            overview?.runs?.map((item) => {
+              const key = repositoryRef.repositoryID === LOCAL_REPOSITORY_ID ? item.id : undefined;
+              const value = item.testplanName;
+              return { key, value } as KeyValue<string, string>;
+            }),
+          ),
           finalize(() => this.showProgress.set(false)),
         );
       }),
-      map((items) => (!items?.runs?.length ? undefined : items)),
-      map((overview) =>
-        overview?.runs?.map((item) => {
-          const key = item.id;
-          const value = item.testplanName;
-          return { key, value } as KeyValue<string, string>;
-        }),
-      ),
       tap((items) => {
         if (!items?.length) {
           this.taskForm.controls.includedRepositoryIds.setValue(null, { emitEvent: false });
