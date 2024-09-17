@@ -24,7 +24,7 @@ import {
   BookmarkNavigatorService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { combineLatest, map, startWith, SubscriptionLike } from 'rxjs';
+import { combineLatest, first, map, startWith } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -42,8 +42,31 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
-  private _bookmarkService = inject(BookmarkService);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
+  private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
+    startWith([]),
+    map(
+      (bookmarks) =>
+        (bookmarks ?? [])
+          .map((element) => {
+            const menuEntry = {
+              title: element.customFields!['label'],
+              id: element.customFields!['link'],
+              icon: element.customFields!['icon'],
+              position: element.customFields!['position'] || 100,
+              parentId: 'bookmarks-root',
+              weight: 1000 + bookmarks!.length,
+              isBookmark: true,
+              isEnabledFct(): boolean {
+                return true;
+              },
+            };
+            return menuEntry;
+          })
+          .sort((a, b) => a.position - b.position) as MenuEntry[],
+    ),
+    takeUntilDestroyed(),
+  );
   private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
@@ -57,34 +80,15 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _customMenuEntries = inject(CustomMenuEntriesService);
   private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuItems$]).pipe(
+  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkMenuItems$]).pipe(
     map(([menuItems, bookmarkMenuItems]) => menuItems.concat(bookmarkMenuItems)),
-  );
-  private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
-    startWith([]),
-    map((bookmarks) =>
-      (bookmarks ?? []).map((element) => {
-        const menuEntry = {
-          title: element.customFields!['label'],
-          id: element.customFields!['link'],
-          icon: element.customFields!['icon'],
-          parentId: 'bookmarks-root',
-          weight: 1000 + bookmarks!.length,
-          isEnabledFct(): boolean {
-            return true;
-          },
-        } as MenuEntry;
-        return menuEntry;
-      }),
-    ),
-    takeUntilDestroyed(),
   );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
-    this._menuItems$.subscribe(() => {
+    this.displayMenuItems$.pipe(first()).subscribe(() => {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render
