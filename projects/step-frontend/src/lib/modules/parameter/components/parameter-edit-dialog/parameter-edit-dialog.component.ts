@@ -1,4 +1,5 @@
 import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import {
   AugmentedParametersService,
   AugmentedScreenService,
@@ -42,9 +43,15 @@ export class ParameterEditDialogComponent implements OnInit {
 
   readonly modalTitle = `${this.isEditMode ? 'Edit' : 'New'} Parameter`;
 
+  constructor(private location: Location) {}
+
   ngOnInit(): void {
     this.initParameter();
     this.initScopeItems();
+
+    this._matDialogRef.afterClosed().subscribe(() => {
+      this.location.back();
+    });
   }
 
   @HostListener('keydown.enter', ['$event'])
