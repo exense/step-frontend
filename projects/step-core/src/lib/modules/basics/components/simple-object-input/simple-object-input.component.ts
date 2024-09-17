@@ -21,6 +21,7 @@ export class SimpleObjectInputComponent implements ControlValueAccessor {
   private onTouch?: OnTouch;
 
   readonly showAddFieldBtn = input(true);
+  readonly addFieldLabel = input('');
 
   protected isDisabled = signal(false);
   protected fields = signal<ObjectField[]>([]);
