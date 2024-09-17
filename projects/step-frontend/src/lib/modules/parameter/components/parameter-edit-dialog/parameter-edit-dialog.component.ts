@@ -211,7 +211,17 @@ export class ParameterEditDialogComponent implements OnInit {
     this.parameter.key = key;
     const lowerKey = key.toLowerCase();
     if (lowerKey.includes('pwd') || lowerKey.includes('password')) {
-      this.parameter.protectedValue = true;
+      this.setProtectedValue(true);
+    }
+  }
+
+  setProtectedValue(protectedValue: boolean) {
+    this.parameter.protectedValue = protectedValue;
+
+    //as dynamic expressions don't work with protected parameters we have to migrate to value
+    if (this.parameter?.value?.dynamic && protectedValue) {
+      this.parameter.value.value = this.parameter.value.expression;
+      this.parameter.value.dynamic = false;
     }
   }
 }

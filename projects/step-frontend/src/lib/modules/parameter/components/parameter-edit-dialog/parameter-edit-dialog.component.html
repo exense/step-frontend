@@ -52,7 +52,7 @@
         @if (parameter.protectedValue) {
           <step-form-field>
             <step-label>Value</step-label>
-            <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value" />
+            <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value!.value" />
           </step-form-field>
         } @else {
           <step-form-field>
@@ -61,7 +61,12 @@
         }
 
         <step-form-field class="protect-field">
-          <mat-checkbox color="primary" [(ngModel)]="parameter.protectedValue" [disabled]="protectedParameter">
+          <mat-checkbox
+            color="primary"
+            [ngModel]="parameter.protectedValue"
+            (ngModelChange)="setProtectedValue($event)"
+            [disabled]="protectedParameter"
+          >
             <span>Protect parameter value</span>
             &nbsp;
             <step-icon
