@@ -11,6 +11,6 @@ export class MyAccountButtonComponent extends LinkButtonComponent {
   private _specialLinks = inject(SpecialLinksService);
 
   protected override initUrl(): string {
-    return this._specialLinks.myAccount();
+    return this._specialLinks.userSettings();
   }
 }

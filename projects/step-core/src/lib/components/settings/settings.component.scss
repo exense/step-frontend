@@ -1,29 +1,31 @@
-@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as mixins;
 
 step-settings {
-  display: flex;
+  display: grid;
+  grid-template-columns: 15% 1fr;
+  grid-template-rows: auto auto;
+  height: calc(100vh - 10rem);
+
   gap: 3rem;
   padding: 0 3rem 3rem 3rem;
   justify-content: space-between;
 
   mat-nav-list {
-    width: 15%;
+    width: 100%;
+    grid-column: 1;
+    grid-row: 1;
 
-    a.mat-mdc-list-item {
-      font-size: 1.4rem;
-      height: 4rem;
+    @include mixins.nav-link-buttons;
+  }
 
-      &.active-list-item {
-        background: var.$blue-600 !important;
-
-        .mdc-list-item__content > .mdc-list-item__primary-text {
-          color: var.$white !important;
-        }
-      }
-    }
+  .addon {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: flex-end;
   }
 
   .content {
-    flex-grow: 1;
+    grid-column: 2;
+    grid-row: 1/3;
   }
 }
