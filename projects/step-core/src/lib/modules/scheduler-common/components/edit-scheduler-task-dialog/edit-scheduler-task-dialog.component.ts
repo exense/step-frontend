@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostListener, inject, model, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, inject, model, OnInit, signal, viewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl } from '@angular/forms';
 import {
@@ -72,8 +72,6 @@ const LOCAL_REPOSITORY_ID = 'local';
   ],
 })
 export class EditSchedulerTaskDialogComponent implements OnInit {
-  // readonly rawValueModelOptions: NgModel['options'] = { updateOn: 'blur' };
-
   readonly EXCLUSION_HELP_MESSAGE =
     'Optionally provide CRON expression(s) for excluding time ranges. (Example: for a schedule set to run every 5 minutes, you can exclude the execution on weekends with “* * * ? * SAT-SUN” )';
 
@@ -89,6 +87,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
 
   private task = this._dialogData.task;
   private config = this._dialogData.config;
+
+  private customForms = viewChild(CustomFormWrapperComponent);
 
   protected hideUser = this.config?.hideUser;
 
@@ -129,12 +129,15 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     }
     taskForm2Model(this.task, this.taskForm);
     this.error.set('');
-    this._api.saveExecutionTask(this.task).subscribe({
-      next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
-      error: () => {
-        this.error.set('Invalid CRON expression or server error.');
-      },
-    });
+    this.customForms()!
+      .readyToProceed()
+      .pipe(switchMap(() => this._api.saveExecutionTask(this.task)))
+      .subscribe({
+        next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
+        error: () => {
+          this.error.set('Invalid CRON expression or server error.');
+        },
+      });
   }
 
   configureCronExpression(): void {
