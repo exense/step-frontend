@@ -10,6 +10,10 @@ step-settings {
   padding: 0 3rem 3rem 3rem;
   justify-content: space-between;
 
+  .title {
+    font-size: 20px;
+  }
+
   mat-nav-list {
     width: 100%;
     grid-column: 1;

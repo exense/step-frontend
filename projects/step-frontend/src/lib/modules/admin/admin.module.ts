@@ -11,7 +11,7 @@ import {
   AuthService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { MyAccountComponent } from './components/my-account/my-account.component';
+import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 import { ScreenConfigurationListComponent } from './components/screen-configuration-list/screen-configuration-list.component';
 import { ScreenInputEditDialogComponent } from './components/screen-input-edit-dialog/screen-input-edit-dialog.component';
 import { ScreenInputDropdownOptionsComponent } from './components/screen-input-dropdown-options/screen-input-dropdown-options.component';
@@ -25,7 +25,7 @@ import { MatListItem, MatNavList } from '@angular/material/list';
 
 @NgModule({
   declarations: [
-    MyAccountComponent,
+    UserSettingsComponent,
     ScreenConfigurationListComponent,
     ScreenInputEditDialogComponent,
     ScreenInputDropdownOptionsComponent,
@@ -34,7 +34,7 @@ import { MatListItem, MatNavList } from '@angular/material/list';
     CommonSettingsComponent,
   ],
   exports: [
-    MyAccountComponent,
+    UserSettingsComponent,
     ScreenConfigurationListComponent,
     ScreenInputEditDialogComponent,
     UserSelectionComponent,
@@ -63,7 +63,7 @@ export class AdminModule {
   private registerUserSettings(): void {
     this._viewRegistry.registerRoute({
       path: 'user-settings',
-      component: MyAccountComponent,
+      component: UserSettingsComponent,
     });
   }
 

@@ -36,7 +36,7 @@
 </section>
 <mat-menu #sessionMenu>
   <button type="button" mat-menu-item>
-    <step-my-account-button />
+    <step-user-settings-button />
   </button>
   @if (_appConfig.conf?.authentication) {
     @if (_authService.isAuthenticated$ | async) {
