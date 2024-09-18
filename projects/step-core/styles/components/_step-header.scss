@@ -47,11 +47,12 @@ $default-color: dc.default-colors();
     }
 
     &::after {
-      content: ' ';
-      display: block;
-      width: 100%;
-      background-color: map.get($config, alt-background-color);
+      content: '';
+      position: absolute;
+      width: 2em;
       border-top-left-radius: 1.6rem;
+      background-color: transparent;
+      box-shadow: -15px 0 map.get($config, main-background-color);
       height: 1.6rem;
     }
   }
