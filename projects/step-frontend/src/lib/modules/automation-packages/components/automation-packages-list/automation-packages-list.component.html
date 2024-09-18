@@ -3,6 +3,17 @@
     <step-table #table [dataSource]="_dataSource" matSort [matSortDisableClear]="true">
       <step-bulk-operations *stepAdditionalHeader="'automation-package-header'" [entity]="ENTITY_ID" />
       <section class="header" *stepAdditionalHeader="'automation-package-header'">
+        <step-btn-group class="import-export">
+          <button
+            type="button"
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            matTooltip="Automation Package Documentation"
+            matTooltipPosition="below"
+          >
+            <step-icon name="help-circle" />
+          </button>
+        </step-btn-group>
         <step-btn-group>
           <button
             stepTestId="upload-package-btn"
@@ -16,6 +27,16 @@
             Upload package
           </button>
         </step-btn-group>
+        <mat-menu #menu>
+          <a
+            href="https://step.exense.ch/knowledgebase/devops/automation-packages-overview/"
+            target="_blank"
+            mat-menu-item
+          >
+            Documentation
+          </a>
+          <a href="/rest/automation-packages/schema" target="_blank" mat-menu-item> Automation package schema </a>
+        </mat-menu>
       </section>
       <ng-container matColumnDef="bulkSelection">
         <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
