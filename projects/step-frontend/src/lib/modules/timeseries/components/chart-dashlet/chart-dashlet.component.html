@@ -17,7 +17,9 @@
   <div class="resolution-warning">
     <step-icon
       name="alert-triangle"
-      matTooltip="Higher resolution was used to compose this chart. Data may be not completely accurate."
+      matTooltip="Data for requested resolution doesn't exist. Used higher resolution of <{{
+        resolutionLabels[collectionResolutionUsed.toString()] || collectionResolutionUsed
+      }}> instead."
     />
   </div>
 }

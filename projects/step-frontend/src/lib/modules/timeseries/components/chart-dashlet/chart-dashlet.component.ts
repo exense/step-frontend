@@ -45,6 +45,13 @@ interface RateUnit {
   unitKey: string;
 }
 
+const resolutionLabels: Record<string, string> = {
+  '60000': 'Minute',
+  '3600000': 'Hour',
+  '86400000': 'Day',
+  '604800000': 'Week',
+};
+
 @Component({
   selector: 'step-chart-dashlet',
   templateUrl: './chart-dashlet.component.html',
@@ -103,6 +110,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
   showHigherResolutionWarning = false;
+  collectionResolutionUsed: number = 0;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -452,6 +460,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
+        this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
         this.createChart(response);
       }),
@@ -624,4 +633,5 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   protected readonly ChartAggregation = ChartAggregation;
+  protected readonly resolutionLabels = resolutionLabels;
 }

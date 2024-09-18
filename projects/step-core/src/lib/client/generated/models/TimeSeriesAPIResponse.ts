@@ -12,5 +12,6 @@ export type TimeSeriesAPIResponse = {
   matrix: Array<Array<BucketResponse>>;
   matrixKeys: Array<BucketAttributes>;
   truncated: boolean;
+  collectionResolution: number;
   higherResolutionUsed: boolean;
 };
