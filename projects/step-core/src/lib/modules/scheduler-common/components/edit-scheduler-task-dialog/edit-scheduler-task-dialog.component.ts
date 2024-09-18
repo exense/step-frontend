@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm, NgModel } from '@angular/forms';
 import {
@@ -13,6 +13,7 @@ import { SCHEDULER_COMMON_IMPORTS } from '../../types/scheduler-common-imports.c
 import { CustomFormComponent } from '../../../custom-forms';
 import { DialogRouteResult } from '../../../basics/step-basics.module';
 import { SelectPlanComponent } from '../../../plan-common';
+import { switchMap } from 'rxjs';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -47,6 +48,8 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   private _matDialogRef = inject<EditDialogRef>(MatDialogRef);
   private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA);
 
+  private customForms = viewChild(CustomFormComponent);
+
   protected task = this._dialogData.taskAndConfig.task;
   protected config = this._dialogData.taskAndConfig.config;
 
@@ -72,12 +75,15 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       this.form.control.markAllAsTouched();
       return;
     }
-    this._api.saveExecutionTask(this.task).subscribe({
-      next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
-      error: () => {
-        this.error = 'Invalid CRON expression or server error.';
-      },
-    });
+    this.customForms()!
+      .readyToProceed()
+      .pipe(switchMap(() => this._api.saveExecutionTask(this.task)))
+      .subscribe({
+        next: (task) => this._matDialogRef.close({ isSuccess: !!task }),
+        error: () => {
+          this.error = 'Invalid CRON expression or server error.';
+        },
+      });
   }
 
   handlePlanChange(plan: Plan): void {

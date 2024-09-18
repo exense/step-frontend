@@ -17,8 +17,20 @@ import { DynamicLabelCustomFormInputComponent } from '../custom-form-input/dynam
 import { CustomFormInputModelPipe } from '../../pipes/custom-form-input-model.pipe';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, debounceTime, filter, map, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  merge,
+  Observable,
+  of,
+  take,
+  tap,
+} from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 interface CustomFormInputsSchema {
   ids: string[];
@@ -46,6 +58,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
   private valueChangeDebounced$ = this.valueChange$.pipe(debounceTime(500));
+
+  private changeStart$ = this.valueChange$.pipe(map(() => true));
+  private changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
+
+  readonly changeInProgress$ = merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged());
+  readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
 
   @HostBinding('class.editable-label-mode') @Input() stEditableLabelMode = false;
   @Input() stScreen!: string;
@@ -95,6 +113,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.valueChange$.complete();
+  }
+
+  readyToProceed(): Observable<void> {
+    if (!this.changeInProgress()) {
+      return of(undefined);
+    }
+    return this.changeInProgress$.pipe(
+      filter((inProgress) => !inProgress),
+      take(1),
+      map(() => undefined),
+    );
   }
 
   protected onInputValueChange(input: StInput, value: string): void {
@@ -158,7 +187,8 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .getScreenInputsByScreenIdWithCache(this.stScreen)
       .pipe(
         map((screenInputs) => screenInputs.map((sInput) => sInput.input!)),
-        tap((screenInputs) => this.setDefaultBooleanValues(screenInputs)),
+        map((screenInputs) => screenInputs.filter((input) => !!input && !this.stExcludeFields.includes(input.id!))),
+        tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
       .subscribe((schema) => {
@@ -208,16 +238,16 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
   }
 
-  private setDefaultBooleanValues(inputs: StInput[]): void {
+  private setDefaultValues(inputs: StInput[]): void {
     let valueHasBeenChanged = false;
     inputs
-      .filter(
-        (input) =>
-          input.type === 'CHECKBOX' && this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined,
-      )
+      .filter((input) => this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined)
       .forEach((input) => {
-        this._objectUtils.setObjectFieldValue(this.stModel, input.id!, false);
-        valueHasBeenChanged = true;
+        const defaultValue = input.type === 'CHECKBOX' ? input.defaultValue ?? false : input.defaultValue;
+        if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
+          this._objectUtils.setObjectFieldValue(this.stModel, input.id!, defaultValue);
+          valueHasBeenChanged = true;
+        }
       });
     if (valueHasBeenChanged) {
       this.stModelChange.emit(this.stModel);
