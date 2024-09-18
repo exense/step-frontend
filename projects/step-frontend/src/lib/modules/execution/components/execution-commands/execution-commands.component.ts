@@ -7,6 +7,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -19,10 +20,12 @@ import {
   ExecutiontTaskParameters,
   RepositoryObjectReference,
   IncludeTestcases,
+  CustomFormComponent,
 } from '@exense/step-core';
 import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
+import { from, map, Observable, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'step-execution-commands',
@@ -38,6 +41,8 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   private _executionService = inject(AugmentedExecutionsService);
   private _screenTemplates = inject(AugmentedScreenService);
   private _document = inject(DOCUMENT);
+
+  private customForms = viewChild(CustomFormComponent);
 
   @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
@@ -84,13 +89,14 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
 
   execute(simulate: boolean): void {
     const currentEId = this.execution?.id;
-    const executionParams = this.buildExecutionParams(simulate);
-    this._executionService.execute(executionParams).subscribe((eId) => {
-      if (currentEId && this._executionTabManager) {
-        this._executionTabManager.handleTabClose(currentEId, false);
-      }
-      this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(eId, false));
-    });
+    this.buildExecutionParams(simulate)
+      .pipe(switchMap((executionParameters) => this._executionService.execute(executionParameters)))
+      .subscribe((eId) => {
+        if (currentEId && this._executionTabManager) {
+          this._executionTabManager.handleTabClose(currentEId, false);
+        }
+        this._router.navigateByUrl(this._commonEntitiesUrl.executionUrl(eId, false));
+      });
   }
 
   stop(): void {
@@ -102,11 +108,12 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   }
 
   schedule(): void {
-    const task = this.prefillScheduledTask();
-    this.scheduleTask.emit(task);
+    this.prefillScheduledTask().subscribe((task) => {
+      this.scheduleTask.emit(task);
+    });
   }
 
-  copyExecutionServiceAsCurlToClipboard(): Promise<void> {
+  copyExecutionServiceAsCurlToClipboard(): void {
     const { location, navigator } = this._document.defaultView as Window;
 
     const hashIndex = location.href.indexOf('#');
@@ -118,9 +125,12 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     url = url.endsWith('/') ? url : `${url}/`;
     url = `${url}rest/executions/start`;
 
-    const payload = this.buildExecutionParams(false);
-    const cmd = `curl -X POST ${url} -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`;
-    return navigator.clipboard.writeText(cmd);
+    this.buildExecutionParams(false)
+      .pipe(
+        map((payload) => `curl -X POST ${url} -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`),
+        switchMap((cmd) => from(navigator.clipboard.writeText(cmd))),
+      )
+      .subscribe();
   }
 
   private setupExecutionParameters(execution?: Execution): void {
@@ -142,24 +152,34 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this.isExecutionIsolated = isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   }
 
-  private buildExecutionParams(simulate: boolean, includeUserId = true): ExecutionParameters {
-    return this._executionParamsFactory.create({
-      simulate,
-      includeUserId,
-      description: this.description,
-      repositoryObject: this.repositoryObjectRef,
-      isolatedExecution: this.isExecutionIsolated,
-      includedTestCases: this.includedTestcases ?? undefined,
-      customParameters: this.executionParameters,
-    });
+  private buildExecutionParams(simulate: boolean, includeUserId = true): Observable<ExecutionParameters> {
+    const customForms = this.customForms();
+    const isReady$ = !customForms ? of(undefined) : customForms.readyToProceed();
+    return isReady$.pipe(
+      map(() =>
+        this._executionParamsFactory.create({
+          simulate,
+          includeUserId,
+          description: this.description,
+          repositoryObject: this.repositoryObjectRef,
+          isolatedExecution: this.isExecutionIsolated,
+          includedTestCases: this.includedTestcases ?? undefined,
+          customParameters: this.executionParameters,
+        }),
+      ),
+    );
   }
 
-  private prefillScheduledTask(): ExecutiontTaskParameters {
-    const executionsParameters = this.buildExecutionParams(false, false);
-    const name = executionsParameters.description ?? '';
-    return {
-      attributes: { name },
-      executionsParameters,
-    };
+  private prefillScheduledTask(): Observable<ExecutiontTaskParameters> {
+    const executionsParameters$ = this.buildExecutionParams(false, false);
+    return executionsParameters$.pipe(
+      map((executionsParameters) => {
+        const name = executionsParameters.description ?? '';
+        return {
+          attributes: { name },
+          executionsParameters,
+        };
+      }),
+    );
   }
 }
