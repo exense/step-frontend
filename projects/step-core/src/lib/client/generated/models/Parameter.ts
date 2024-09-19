@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { Expression } from './Expression';
+import type { DynamicValueString } from './DynamicValueString';
 
 export type Parameter = {
   customFields?: Record<string, any>;
@@ -10,7 +11,7 @@ export type Parameter = {
   lastModificationDate?: string;
   lastModificationUser?: string;
   key?: string;
-  value?: string;
+  value?: DynamicValueString;
   description?: string;
   activationExpression?: Expression;
   priority?: number;
