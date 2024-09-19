@@ -1,5 +1,4 @@
 <mat-nav-list>
-  <h3 class="title">Project Settings</h3>
   @for (menuItem of _configurationItems; track menuItem.path) {
     <a mat-list-item [routerLink]="menuItem.path" [relativeTo]="_activatedRoute" routerLinkActive="active-list-item">
       {{ menuItem.label }}
