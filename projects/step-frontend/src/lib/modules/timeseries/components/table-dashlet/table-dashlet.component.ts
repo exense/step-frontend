@@ -360,17 +360,17 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
         avgDiff: this.percentageBetween(baseBucket?.avg, compareBucket?.avg),
         minDiff: this.percentageBetween(baseBucket?.min, compareBucket?.min),
         maxDiff: this.percentageBetween(baseBucket?.max, compareBucket?.max),
-        pcl80Diff: this.percentageBetween(
-          baseBucket?.pclValues?.[pclValues[0]],
-          compareBucket?.pclValues?.[pclValues[0]],
+        pcl1Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[this.getPclWithDecimals(pclValues[0])],
+          compareBucket?.pclValues?.[this.getPclWithDecimals(pclValues[0])],
         ),
-        pcl90Diff: this.percentageBetween(
-          baseBucket?.pclValues?.[pclValues[1]],
-          compareBucket?.pclValues?.[pclValues[1]],
+        pcl2Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[this.getPclWithDecimals(pclValues[1])],
+          compareBucket?.pclValues?.[this.getPclWithDecimals(pclValues[1])],
         ),
-        pcl99Diff: this.percentageBetween(
-          baseBucket?.pclValues?.[pclValues[2]],
-          compareBucket?.pclValues?.[pclValues[2]],
+        pcl3Diff: this.percentageBetween(
+          baseBucket?.pclValues?.[this.getPclWithDecimals(pclValues[2])],
+          compareBucket?.pclValues?.[this.getPclWithDecimals(pclValues[2])],
         ),
         tpsDiff: this.percentageBetween(baseBucket?.tps, compareBucket?.tps),
         tphDiff: this.percentageBetween(baseBucket?.tph, compareBucket?.tph),
@@ -527,19 +527,19 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       .addSortNumberPredicate('MAX_diff', (item) => item.maxDiff)
       .addSortNumberPredicate('PCL_1', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])])
       .addSortNumberPredicate(
-        'PCL_80_comp',
+        'PCL_1_comp',
         (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[0])],
       )
       .addSortNumberPredicate('PCL_1_diff', (item) => item.pcl1Diff)
       .addSortNumberPredicate('PCL_2', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])])
       .addSortNumberPredicate(
-        'PCL_90_comp',
+        'PCL_2_comp',
         (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[1])],
       )
       .addSortNumberPredicate('PCL_2_diff', (item) => item.pcl2Diff)
       .addSortNumberPredicate('PCL_3', (item) => item.base?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])])
       .addSortNumberPredicate(
-        'PCL_99_comp',
+        'PCL_3_comp',
         (item) => item.compare?.pclValues?.[this.getPclWithDecimals(item.pclValues[2])],
       )
       .addSortNumberPredicate('PCL_3_diff', (item) => item.pcl3Diff)
