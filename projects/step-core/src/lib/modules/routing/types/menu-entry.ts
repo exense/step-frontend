@@ -5,7 +5,6 @@ export interface MenuEntry {
   weight?: number;
   parentId?: string;
   isCustom?: boolean;
-  isBookmark?: boolean;
 
   isEnabledFct(): boolean;
 }

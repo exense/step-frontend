@@ -17,7 +17,6 @@ import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { ContainsVersionPipe } from './pipes/contains-version.pipe';
 import { IsEmptyJsonPipe } from './pipes/is-empty-json.pipe';
-import { MenuFilterPipe } from './pipes/menu-filter.pipe';
 import { SidebarStateService } from './injectables/sidebar-state.service';
 import { IsMenuItemActivePipe } from './pipes/is-menu-item-active.pipe';
 import { ConnectionErrorInterceptor } from './interceptors/connection-error.interceptor';
@@ -32,7 +31,6 @@ import { SideBarClickDirective } from './directives/side-bar-click.directive';
     ExecutionLinkComponent,
     IsEmptyJsonPipe,
     ContainsVersionPipe,
-    MenuFilterPipe,
     VersionsDialogComponent,
     IsMenuItemActivePipe,
   ],
@@ -43,7 +41,6 @@ import { SideBarClickDirective } from './directives/side-bar-click.directive';
     ExecutionLinkComponent,
     IsEmptyJsonPipe,
     ContainsVersionPipe,
-    MenuFilterPipe,
   ],
   imports: [StepCoreModule],
   providers: [

@@ -248,8 +248,6 @@ export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
 export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
-export * from './types/repository-parameters.token';
-export * from './repository-parameters-initializer';
 export * from './injectables/array-item-label-value-extractor';
 export * from './types/storage-proxy';
 export * from './types/storage.token';

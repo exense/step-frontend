@@ -1,9 +1,16 @@
-<mat-checkbox color="primary" [checked]="isChecked" [indeterminate]="isIntermediate" (click)="handleCheckboxChange()">
+<mat-checkbox
+  color="primary"
+  [checked]="isChecked"
+  [indeterminate]="isIntermediate"
+  (click)="handleCheckboxChange()"
+  [disabled]="isDisabled"
+>
 </mat-checkbox>
 <step-bulk-selection-label
   *ngIf="showLabel"
   [selectionType]="selectionType"
   (selectionTypeChange)="changeType($event)"
   [selectionCollector]="selectionCollector"
+  [isDisabled]="isDisabled"
 >
 </step-bulk-selection-label>

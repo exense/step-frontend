@@ -1,0 +1,34 @@
+<ng-container [formGroup]="form">
+  @for (field of primaryFields(); track field.trackId) {
+    <step-json-field-input
+      [formControl]="field.control"
+      [label]="field.label"
+      (labelChange)="updateLabel(field, $event)"
+      [canEditLabel]="field.isAdditional"
+      [fieldType]="field.fieldType"
+      [canRemove]="false"
+      [enumItems]="field.enumItems"
+      [tooltip]="field.tooltip"
+    />
+  }
+  @for (field of optionalFields(); track field.trackId) {
+    <step-json-field-input
+      [formControl]="field.control"
+      [label]="field.label"
+      (labelChange)="updateLabel(field, $event)"
+      [canEditLabel]="field.isAdditional"
+      [fieldType]="field.fieldType"
+      [canRemove]="true"
+      [enumItems]="field.enumItems"
+      [tooltip]="field.tooltip"
+      (remove)="removeField(field)"
+    />
+  }
+</ng-container>
+@if (!isDisabled() && (!!possibleFieldsToAdd().length || !schema()?.properties || allowedNonSchemaFields())) {
+  <step-add-field-button
+    [addLabel]="addFieldLabel()"
+    [possibleFields]="possibleFieldsToAdd()"
+    (addField)="addOptionalField($event)"
+  />
+}

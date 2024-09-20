@@ -97,6 +97,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Quota Manager', 'grid-quota-manager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Bookmarks
     this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
+
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
@@ -267,7 +268,12 @@ export class ViewRegistryService implements OnDestroy {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(title: string, id: string, icon: string, options?: { weight?: number; parentId?: string }): void {
+  registerMenuEntry(
+    title: string,
+    id: string,
+    icon: string,
+    options?: { weight?: number; parentId?: string; isEnabledFct?: () => boolean },
+  ): void {
     if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
@@ -278,7 +284,7 @@ export class ViewRegistryService implements OnDestroy {
       parentId: options?.parentId,
       icon,
       weight: options?.weight,
-      isEnabledFct: () => true,
+      isEnabledFct: options?.isEnabledFct ?? (() => true),
     });
   }
 

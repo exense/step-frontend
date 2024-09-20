@@ -1,0 +1,8 @@
+@use 'projects/step-core/styles/core-mixins' as mixins;
+
+step-common-settings {
+  mat-nav-list {
+    width: 100%;
+    @include mixins.nav-link-buttons;
+  }
+}

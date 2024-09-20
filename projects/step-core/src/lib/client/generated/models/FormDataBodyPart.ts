@@ -20,7 +20,9 @@ export type FormDataBodyPart = {
   providers?: Providers;
   name?: string;
   value?: string;
-  simple?: boolean;
+  content?: any;
+  fileName?: string;
   formDataContentDisposition?: FormDataContentDisposition;
+  simple?: boolean;
   parameterizedHeaders?: Record<string, Array<ParameterizedHeader>>;
 };
