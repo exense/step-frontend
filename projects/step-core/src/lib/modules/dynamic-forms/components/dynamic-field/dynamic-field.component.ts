@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, input, Optional, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { AceMode } from '../../../rich-editor';
 import { DynamicSimpleValue } from '../../../../client/step-client-module';
 import { DynamicFieldBaseComponent } from '../dynamic-field-base/dynamic-field-base.component';
+import { JsonFieldType } from '../../../json-forms';
 
 @Component({
   selector: 'step-dynamic-field',
@@ -13,7 +13,7 @@ import { DynamicFieldBaseComponent } from '../dynamic-field-base/dynamic-field-b
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimpleValue> {
-  readonly DynamicFieldType = DynamicFieldType;
+  readonly DynamicFieldType = JsonFieldType;
   readonly AceMode = AceMode;
 
   /** @Input() **/
@@ -25,7 +25,7 @@ export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimp
     const fieldType = this.fieldType();
     const enumItemsSet = this.enumItemsSet();
     const value = this.value();
-    if (fieldType !== DynamicFieldType.ENUM) {
+    if (fieldType !== JsonFieldType.ENUM) {
       return false;
     }
     return !enumItemsSet.has(value ? value.toString() : '');

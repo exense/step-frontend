@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { SchemaField, SchemaSimpleField } from '../shared/dynamic-fields-schema';
-import { DynamicValue } from '../../../client/augmented/models/dynamic-value-complex-types';
-import { DynamicFieldArrayValue, DynamicFieldObjectValue } from '../shared/dynamic-field-group-value';
-import { JsonFieldType } from '../../json-forms';
+import { JsonFieldType } from '../types/json-field-type.enum';
+import { JsonFieldProperty } from '../types/json-field-schema';
 
 interface FieldMetaParameters {
-  fieldSchema?: SchemaField;
   fieldType?: JsonFieldType;
   enumItems: string[];
 }
@@ -13,15 +10,14 @@ interface FieldMetaParameters {
 @Injectable({
   providedIn: 'root',
 })
-export class DynamicFieldUtilsService {
-  determineFieldMetaParameters(fieldDescription: SchemaField = {}): FieldMetaParameters {
-    let fieldSchema: SchemaField | undefined;
+export class JsonFieldUtilsService {
+  determineFieldMetaParameters(fieldDescription: JsonFieldProperty = {}): FieldMetaParameters {
     let fieldType: JsonFieldType | undefined;
     let enumItems: string[] = [];
 
-    if ((fieldDescription as SchemaSimpleField).enum) {
+    if (!fieldDescription.type && fieldDescription.enum) {
       fieldType = JsonFieldType.ENUM;
-      enumItems = (fieldDescription as SchemaSimpleField).enum!;
+      enumItems = fieldDescription.enum;
     } else {
       switch (fieldDescription.type) {
         case 'string':
@@ -36,25 +32,27 @@ export class DynamicFieldUtilsService {
           break;
         case 'array':
           fieldType = JsonFieldType.ARRAY;
-          fieldSchema = fieldDescription.items;
           break;
         case 'object':
           fieldType = JsonFieldType.OBJECT;
-          fieldSchema = fieldDescription.properties;
           break;
         default:
           break;
       }
     }
 
-    return { fieldSchema, fieldType, enumItems };
+    return { fieldType, enumItems };
   }
 
-  areDynamicFieldObjectsEqual(objectA?: DynamicFieldObjectValue, objectB?: DynamicFieldObjectValue): boolean {
+  areObjectsEqual<T>(
+    objectA?: Record<string, T> | null,
+    objectB?: Record<string, T> | null,
+    areValuesEqual: (valueA?: T | null, valueB?: T | null) => boolean = (valueA, valueB) => valueA === valueB,
+  ): boolean {
     if (objectA === objectB) {
       return true;
     }
-    if (objectA === undefined || objectB === undefined) {
+    if (!objectA || !objectB) {
       return false;
     }
     const keysA = Object.keys(objectA || {});
@@ -69,18 +67,22 @@ export class DynamicFieldUtilsService {
     for (let key of keysA) {
       const fieldA = objectA?.[key];
       const fieldB = objectB?.[key];
-      if (!this.areDynamicValuesEqual(fieldA, fieldB)) {
+      if (!areValuesEqual(fieldA, fieldB)) {
         return false;
       }
     }
     return true;
   }
 
-  areDynamicFieldArraysEqual(arrayA?: DynamicFieldArrayValue, arrayB?: DynamicFieldArrayValue): boolean {
+  areArraysEqual<T>(
+    arrayA?: T[] | null,
+    arrayB?: T[] | null,
+    areValuesEqual: (valueA?: T | null, valueB?: T | null) => boolean = (valueA, valueB) => valueA === valueB,
+  ): boolean {
     if (arrayA === arrayB) {
       return true;
     }
-    if (arrayA === undefined || arrayB === undefined) {
+    if (!arrayA || !arrayB) {
       return false;
     }
     if (arrayA.length !== arrayB.length) {
@@ -89,19 +91,10 @@ export class DynamicFieldUtilsService {
     for (let i = 0; i < arrayA.length; i++) {
       const itemA = arrayA[i];
       const itemB = arrayB[i];
-      if (!this.areDynamicValuesEqual(itemA, itemB)) {
+      if (!areValuesEqual(itemA, itemB)) {
         return false;
       }
     }
     return true;
-  }
-
-  areDynamicValuesEqual(itemA?: DynamicValue, itemB?: DynamicValue): boolean {
-    return !(
-      itemA?.dynamic !== itemB?.dynamic ||
-      itemA?.value !== itemB?.value ||
-      itemA?.expression !== itemB?.expression ||
-      itemA?.expressionType !== itemB?.expression
-    );
   }
 }
