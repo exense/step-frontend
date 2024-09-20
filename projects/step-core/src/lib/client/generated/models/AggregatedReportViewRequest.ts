@@ -2,4 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type AggregatedReportViewRequest = {};
+import type { Range } from './Range';
+
+export type AggregatedReportViewRequest = {
+  range?: Range;
+};
