@@ -45,7 +45,7 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
-import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
+import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
@@ -105,7 +105,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     PredefinedOptionsInputComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
-    MyAccountButtonComponent,
+    UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
     SettingsComponent,
@@ -200,7 +200,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     ResourceInputModule,
     KeywordsCommonModule,
     AutomationPackageCommonModule,
-    MyAccountButtonComponent,
+    UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
     SettingsComponent,
     CronModule,
@@ -274,7 +274,7 @@ export { PredefinedOptionsInputComponent } from './components/predefined-options
 export * from './components/report-node-status/report-node-status.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
-export * from './components/my-account-button/my-account-button.component';
+export * from './components/user-settings-button/user-settings-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';

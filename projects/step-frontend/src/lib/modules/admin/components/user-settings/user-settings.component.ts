@@ -47,12 +47,12 @@ const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferen
 };
 
 @Component({
-  selector: 'step-my-account',
-  templateUrl: './my-account.component.html',
-  styleUrls: ['./my-account.component.scss'],
+  selector: 'step-user-settings',
+  templateUrl: './user-settings.component.html',
+  styleUrls: ['./user-settings.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class MyAccountComponent implements OnInit, OnChanges, OnDestroy {
+export class UserSettingsComponent implements OnInit, OnChanges, OnDestroy {
   private _userApi = inject(UserService);
   private _authService = inject(AuthService);
   private _credentialsService = inject(CredentialsService);

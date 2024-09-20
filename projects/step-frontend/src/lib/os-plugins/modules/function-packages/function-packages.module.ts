@@ -124,7 +124,7 @@ export class FunctionPackagesModule {
   }
 
   private registerMenuItems(): void {
-    this._viewRegistry.registerMenuEntry('Keyword packages', 'function-packages', 'package', {
+    this._viewRegistry.registerMenuEntry('Keyword Packages', 'function-packages', 'package', {
       weight: 20,
       parentId: 'automation-root',
     });

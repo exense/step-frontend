@@ -1,6 +1,6 @@
-import { Component, inject, TrackByFunction, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SubRouteData, ViewRegistryService } from '../../modules/routing';
+import { ViewRegistryService } from '../../modules/routing';
 import { AuthService } from '../../modules/auth';
 
 @Component({
@@ -18,5 +18,4 @@ export class SettingsComponent {
     .filter(
       (routeData) => !routeData.accessPermissions?.length || this._auth.hasAnyRights(routeData.accessPermissions),
     );
-  readonly trackByFn: TrackByFunction<SubRouteData> = (index, item) => item.path;
 }

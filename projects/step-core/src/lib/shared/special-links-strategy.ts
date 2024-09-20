@@ -1,4 +1,5 @@
 export interface SpecialLinksStrategy {
   settings(): string;
-  myAccount(): string;
+  userSettings(): string;
+  adminSettings(): string;
 }

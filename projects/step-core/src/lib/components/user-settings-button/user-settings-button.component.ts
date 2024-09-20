@@ -3,14 +3,14 @@ import { LinkButtonComponent } from '../link-button/link-button.component';
 import { SpecialLinksService } from '../../services/special-links.service';
 
 @Component({
-  selector: 'step-my-account-button',
-  template: `<step-icon name="settings"></step-icon> My account`,
-  styleUrls: ['./my-account-button.component.scss'],
+  selector: 'step-user-settings-button',
+  template: `<step-icon name="settings" /> User Settings`,
+  styleUrls: ['./user-settings-button.component.scss'],
 })
-export class MyAccountButtonComponent extends LinkButtonComponent {
+export class UserSettingsButtonComponent extends LinkButtonComponent {
   private _specialLinks = inject(SpecialLinksService);
 
   protected override initUrl(): string {
-    return this._specialLinks.myAccount();
+    return this._specialLinks.userSettings();
   }
 }
