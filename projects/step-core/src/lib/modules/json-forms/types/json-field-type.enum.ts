@@ -1,4 +1,4 @@
-export enum DynamicFieldType {
+export enum JsonFieldType {
   STRING = 'string',
   NUMBER = 'number',
   BOOLEAN = 'boolean',

@@ -5,6 +5,7 @@ export const $MetricAggregation = {
   properties: {
     type: {
       type: 'Enum',
+      isRequired: true,
     },
     params: {
       type: 'dictionary',

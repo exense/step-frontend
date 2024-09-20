@@ -36,62 +36,17 @@ export const $TokenHealth = {
                     type: 'number',
                     format: 'int32',
                   },
-                  className: {
-                    type: 'string',
-                  },
                   nativeMethod: {
                     type: 'boolean',
+                  },
+                  className: {
+                    type: 'string',
                   },
                 },
               },
             },
             message: {
               type: 'string',
-            },
-            suppressed: {
-              type: 'array',
-              contains: {
-                properties: {
-                  stackTrace: {
-                    type: 'array',
-                    contains: {
-                      properties: {
-                        classLoaderName: {
-                          type: 'string',
-                        },
-                        moduleName: {
-                          type: 'string',
-                        },
-                        moduleVersion: {
-                          type: 'string',
-                        },
-                        methodName: {
-                          type: 'string',
-                        },
-                        fileName: {
-                          type: 'string',
-                        },
-                        lineNumber: {
-                          type: 'number',
-                          format: 'int32',
-                        },
-                        className: {
-                          type: 'string',
-                        },
-                        nativeMethod: {
-                          type: 'boolean',
-                        },
-                      },
-                    },
-                  },
-                  message: {
-                    type: 'string',
-                  },
-                  localizedMessage: {
-                    type: 'string',
-                  },
-                },
-              },
             },
             localizedMessage: {
               type: 'string',
@@ -121,11 +76,11 @@ export const $TokenHealth = {
                 type: 'number',
                 format: 'int32',
               },
-              className: {
-                type: 'string',
-              },
               nativeMethod: {
                 type: 'boolean',
+              },
+              className: {
+                type: 'string',
               },
             },
           },
@@ -160,11 +115,11 @@ export const $TokenHealth = {
                       type: 'number',
                       format: 'int32',
                     },
-                    className: {
-                      type: 'string',
-                    },
                     nativeMethod: {
                       type: 'boolean',
+                    },
+                    className: {
+                      type: 'string',
                     },
                   },
                 },

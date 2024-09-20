@@ -25,7 +25,7 @@ import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
+import { StepBasicsModule } from './modules/basics/step-basics.module';
 import {
   CustomCellRegistryService,
   CustomRegistriesModule,
@@ -72,9 +72,11 @@ import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
 import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
+import { REPOSITORY_PARAMETERS_INITIALIZER } from './modules/repository-parameters';
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
+import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 
 @NgModule({
   declarations: [
@@ -151,6 +153,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     MULTI_LEVEL_SELECT_EXPORTS,
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -219,6 +222,7 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
     TestIdDirective,
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
@@ -299,6 +303,7 @@ export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs';
 export * from './modules/tree/tree.module';
+export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
@@ -349,6 +354,7 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './modules/list-selection';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
