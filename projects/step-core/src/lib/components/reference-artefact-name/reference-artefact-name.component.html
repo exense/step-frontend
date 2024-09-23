@@ -4,25 +4,6 @@
     (ngModelChange)="onArtefactNameChange($event)"
     [disabled]="isDisabled"
   />
-  @if (referenceMeta) {
-    <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
-      <step-popover>
-        <step-icon [name]="referenceMeta.icon" />
-        {{ referenceMeta.description }}
-        <step-popover-content>
-          @if (referenceMeta.hintFor === hintFor.KEYWORD) {
-            Click on
-            <step-icon name="edit-2" />
-            to specify selection criteria for any keyword
-          } @else if (referenceMeta.hintFor === hintFor.PLAN) {
-            Click on
-            <step-icon name="edit-2" />
-            to specify selection criteria for any plan
-          }
-        </step-popover-content>
-      </step-popover>
-    </div>
-  }
   @if (!isDisabled) {
     <button
       type="button"
@@ -36,6 +17,25 @@
     </button>
   }
 </div>
+@if (referenceMeta) {
+  <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
+    <step-popover>
+      <step-icon [name]="referenceMeta.icon" />
+      {{ referenceMeta.description }}
+      <step-popover-content>
+        @if (referenceMeta.hintFor === hintFor.KEYWORD) {
+          Click on
+          <step-icon name="edit-2" />
+          to specify selection criteria for any keyword
+        } @else if (referenceMeta.hintFor === hintFor.PLAN) {
+          Click on
+          <step-icon name="edit-2" />
+          to specify selection criteria for any plan
+        }
+      </step-popover-content>
+    </step-popover>
+  </div>
+}
 @if (referenceString && referenceString !== artefactName) {
   <div class="references">
     <label>{{ _artefactNameConfig.captions.referenceLabel }}:</label>

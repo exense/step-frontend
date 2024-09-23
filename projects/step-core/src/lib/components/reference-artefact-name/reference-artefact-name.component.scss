@@ -19,6 +19,7 @@ step-reference-artefact-name {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-block: 2.5rem;
 
     &.reference-meta-error {
       step-icon {
