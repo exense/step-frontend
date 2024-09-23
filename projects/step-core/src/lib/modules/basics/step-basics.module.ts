@@ -57,6 +57,10 @@ import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { SimpleObjectInputComponent } from './components/simple-object-input/simple-object-input.component';
+import { WarningDirective } from './directives/warning.directive';
+import { ControlHasWarningsPipe } from './pipes/control-has-warnings.pipe';
+import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 
@@ -80,6 +84,7 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    WarningDirective,
     AlertDirective,
     ValidateJsonDirective,
     ErrorsListComponent,
@@ -116,6 +121,9 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
+    ControlHasWarningsPipe,
+    ControlWarningsPipe,
     BigNumberPipe,
     BooleanFilterComponent,
   ],
@@ -141,6 +149,7 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    WarningDirective,
     AlertDirective,
     ValidateJsonDirective,
     ErrorsListComponent,
@@ -178,6 +187,9 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
+    ControlHasWarningsPipe,
+    ControlWarningsPipe,
     BigNumberPipe,
     BooleanFilterComponent,
   ],
@@ -231,6 +243,7 @@ export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
 export * from './directives/error.directive';
+export * from './directives/warning.directive';
 export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
 export * from './directives/allow-chars.directive';
@@ -291,5 +304,9 @@ export * from './types/date-format.enum';
 export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
 export * from './types/time-converter';
+export * from './types/form-control-warnings-extension';
+export * from './pipes/control-has-warnings.pipe';
+export * from './pipes/control-warnings.pipe';
 export * from './injectables/time-converters-factory.service';
+export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';

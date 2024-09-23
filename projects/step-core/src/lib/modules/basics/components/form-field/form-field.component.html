@@ -2,6 +2,7 @@
   class="label-container"
   [class.show-required-marker]="showRequiredMarker"
   [class.align-left]="alignLabelAddon === 'near'"
+  [class.align-fill]="alignLabelAddon === 'fill'"
   [class.without-children]="!label.children.length && !labelAddon.children.length"
 >
   <label #label>
@@ -19,6 +20,9 @@
 </div>
 <section class="form-field-error">
   <ng-content select="step-error"> </ng-content>
+</section>
+<section class="form-field-warning">
+  <ng-content select="step-warning" />
 </section>
 <section class="form-field-hint">
   <ng-content select="step-hint"> </ng-content>
