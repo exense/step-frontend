@@ -2,5 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export const $AggregatedReportViewRequest = {
-  properties: {},
+  properties: {
+    range: {
+      type: 'Range',
+    },
+  },
 } as const;

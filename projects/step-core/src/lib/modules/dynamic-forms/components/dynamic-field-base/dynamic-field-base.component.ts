@@ -2,7 +2,7 @@ import { computed, Directive, effect, inject, input, model, output, signal } fro
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
+import { JsonFieldType } from '../../../json-forms';
 
 type OnChange<T extends DynamicValue> = (dynamicValue?: T) => void;
 type OnTouch = () => void;
@@ -47,7 +47,7 @@ export abstract class DynamicFieldBaseComponent<T extends DynamicValue> implemen
   );
 
   /** @Input() **/
-  readonly fieldType = input(DynamicFieldType.STRING);
+  readonly fieldType = input(JsonFieldType.STRING);
 
   /** @Input() **/
   readonly canRemove = input(false, {
@@ -169,7 +169,7 @@ export abstract class DynamicFieldBaseComponent<T extends DynamicValue> implemen
     if (!valueStr) {
       return undefined;
     }
-    if (fieldType === DynamicFieldType.OBJECT || fieldType === DynamicFieldType.ARRAY) {
+    if (fieldType === JsonFieldType.OBJECT || fieldType === JsonFieldType.ARRAY) {
       try {
         return JSON.parse(valueStr) as T['value'];
       } catch {

@@ -15,10 +15,10 @@ export const $MediaType = {
         type: 'string',
       },
     },
-    wildcardSubtype: {
+    wildcardType: {
       type: 'boolean',
     },
-    wildcardType: {
+    wildcardSubtype: {
       type: 'boolean',
     },
   },

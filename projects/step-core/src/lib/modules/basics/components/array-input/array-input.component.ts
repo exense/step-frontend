@@ -70,6 +70,7 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
   @Input() possibleItems?: T[];
   @Input() valueLabelExtractor?: ArrayItemLabelValueExtractor<T, string>;
   @Input() preventChars?: string[];
+  @Input() placeholder: string = '';
 
   @ViewChild('inputElement', { static: false }) private inputElement!: ElementRef<HTMLInputElement>;
   @ViewChild('inputElement', { static: false, read: MatAutocompleteTrigger })

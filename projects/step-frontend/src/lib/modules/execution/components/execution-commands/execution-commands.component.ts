@@ -152,6 +152,17 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     this.isExecutionIsolated = isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   }
 
+  private cloneRepositoryObjectRef(): RepositoryObjectReference | undefined {
+    if (!this.repositoryObjectRef) {
+      return undefined;
+    }
+    const { repositoryID, repositoryParameters } = this.repositoryObjectRef;
+    return {
+      repositoryID,
+      repositoryParameters: repositoryParameters ? { ...repositoryParameters } : undefined,
+    };
+  }
+
   private buildExecutionParams(simulate: boolean, includeUserId = true): Observable<ExecutionParameters> {
     const customForms = this.customForms();
     const isReady$ = !customForms ? of(undefined) : customForms.readyToProceed();
@@ -161,7 +172,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
           simulate,
           includeUserId,
           description: this.description,
-          repositoryObject: this.repositoryObjectRef,
+          repositoryObject: this.cloneRepositoryObjectRef(),
           isolatedExecution: this.isExecutionIsolated,
           includedTestCases: this.includedTestcases ?? undefined,
           customParameters: this.executionParameters,
@@ -178,6 +189,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
         return {
           attributes: { name },
           executionsParameters,
+          active: true,
         };
       }),
     );
