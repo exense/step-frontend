@@ -30,9 +30,20 @@ step-reference-artefact-name {
 
   .main-name {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    flex: 1;
     gap: 1rem;
+
+    .dynamic-name {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    step-dynamic-textfield {
+      flex: 1;
+    }
 
     step-editable-label {
       flex: 1;

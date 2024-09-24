@@ -1,21 +1,42 @@
 <div class="main-name" [class.with-meta]="referenceMeta">
-  <step-editable-label
-    [ngModel]="artefactName"
-    (ngModelChange)="onArtefactNameChange($event)"
-    [disabled]="isDisabled"
-  />
-  @if (!isDisabled) {
-    <button
-      type="button"
-      [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
-      matTooltipPosition="below"
-      mat-icon-button
-      [color]="isEditorMode ? 'primary' : undefined"
-      (click)="isEditorMode = !isEditorMode"
-    >
-      <step-icon name="edit-2" />
-    </button>
+  @if (!artefact!.dynamicName!.dynamic) {
+    <div class="dynamic-name">
+      <step-editable-label
+        [ngModel]="artefactName"
+        (ngModelChange)="onArtefactNameChange($event)"
+        [disabled]="isDisabled"
+      />
+      <button
+        type="button"
+        matTooltip="Use an expression to replace dynamically the step name at execution time"
+        matTooltipPosition="below"
+        mat-icon-button
+        [disabled]="readonly"
+        (click)="switchToDynamicName()"
+      >
+        <step-icon name="zap" />
+      </button>
+    </div>
+  } @else {
+    <step-dynamic-textfield
+      label="Name"
+      name="dynamicName"
+      [disabled]="readonly"
+      [(ngModel)]="artefact!.dynamicName"
+      (ngModelChange)="syncName($event)"
+    />
   }
+  <button
+    type="button"
+    [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
+    matTooltipPosition="below"
+    mat-icon-button
+    [disabled]="readonly"
+    [color]="isEditorMode ? 'primary' : undefined"
+    (click)="isEditorMode = !isEditorMode"
+  >
+    <step-icon name="edit-2" />
+  </button>
 </div>
 @if (referenceMeta) {
   <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">

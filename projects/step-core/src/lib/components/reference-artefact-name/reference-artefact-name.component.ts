@@ -76,6 +76,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: A;
+  @Input() readonly: boolean = false;
 
   @Output() onSave = new EventEmitter<unknown>();
 
@@ -131,6 +132,27 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this.createReferenceString(this.artefactReferenceAttributes);
 
     this.onSave.emit();
+  }
+
+  protected syncName(dynamicValue: DynamicValueString): void {
+    if (dynamicValue.dynamic) {
+      return;
+    }
+    this.artefact!.attributes!['name'] = dynamicValue.value ?? '';
+  }
+
+  protected switchToDynamicName(): void {
+    this.artefact!.dynamicName!.expression = this.artefact!.attributes!['name'];
+    this.artefact!.dynamicName!.dynamic = true;
+    this.save();
+  }
+
+  save(): void {
+    if (this.readonly) {
+      return;
+    }
+    this.artefact!.useDynamicName = this.artefact!.dynamicName!.dynamic;
+    this.onSave.emit(this.artefact);
   }
 
   private initArtefactName(artefact?: CallFunction): void {
