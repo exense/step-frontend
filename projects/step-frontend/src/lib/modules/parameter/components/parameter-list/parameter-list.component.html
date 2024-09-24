@@ -77,14 +77,18 @@
         <step-parameters-key [context]="element" />
       </td>
     </ng-container>
-    <ng-container matColumnDef="value.value" stepActivityCol="Value" stepSearchCol>
+    <ng-container matColumnDef="value" stepActivityCol="Value" stepSearchCol>
+      <step-input-filter
+        *stepSearchCellDef
+        stepFilterConnect
+        [createConditionFn]="_filterConditionFactory.dynamicValueFilterCondition"
+      />
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Value</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
         @if (element.value.dynamic) {
-          <step-icon class="icon-small" name="zap-circle" matTooltip="dynamic expression" matTooltipPosition="above">
-          </step-icon>
+          <step-icon class="icon-small" name="zap-circle" matTooltip="dynamic expression" matTooltipPosition="above" />
           {{ element.value.expression }}
         } @else {
           {{ element.value.value }}
