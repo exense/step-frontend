@@ -14,7 +14,7 @@
     }
   } @else {
     @for (tab of tabs(); track tab.id) {
-      <a href="#" mat-tab-link [active]="tab.id === activeTabId()" (click)="selectTab(tab); (false)">
+      <a mat-tab-link [active]="tab.id === activeTabId()" (click)="selectTab(tab); (false)">
         <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />
       </a>
     }
