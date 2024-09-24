@@ -1,8 +1,0 @@
-<step-settings>
-  <mat-nav-list>
-    <a mat-list-item [routerLink]="userSettings">User Settings</a>
-    @if ('admin-ui-menu' | hasRight | async) {
-      <a mat-list-item [routerLink]="adminSettings">Admin Settings</a>
-    }
-  </mat-nav-list>
-</step-settings>

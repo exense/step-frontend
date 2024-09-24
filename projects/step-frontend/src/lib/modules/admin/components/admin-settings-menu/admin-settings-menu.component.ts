@@ -1,20 +1,20 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { AuthService, ViewRegistryService } from '@exense/step-core';
 import { ActivatedRoute } from '@angular/router';
-import { ViewRegistryService } from '../../modules/routing';
-import { AuthService } from '../../modules/auth';
 
 @Component({
-  selector: 'step-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
+  selector: 'step-admin-settings-menu',
+  templateUrl: './admin-settings-menu.component.html',
+  styleUrl: './admin-settings-menu.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class SettingsComponent {
+export class AdminSettingsMenuComponent {
   private _auth = inject(AuthService);
+
   readonly _activatedRoute = inject(ActivatedRoute);
-  private resolveChildFor = this._activatedRoute.snapshot.data['resolveChildFor'];
+
   readonly _configurationItems = inject(ViewRegistryService)
-    .getChildrenRouteInfo(this.resolveChildFor)
+    .getChildrenRouteInfo(this._activatedRoute)
     .filter(
       (routeData) => !routeData.accessPermissions?.length || this._auth.hasAnyRights(routeData.accessPermissions),
     );
