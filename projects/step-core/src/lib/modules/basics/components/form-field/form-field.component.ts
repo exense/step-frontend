@@ -1,5 +1,5 @@
-import { Component, computed, contentChild, ContentChild, Input, ViewEncapsulation } from '@angular/core';
-import { NgControl } from '@angular/forms';
+import { Component, computed, contentChild, input, Input, ViewEncapsulation } from '@angular/core';
+import { AbstractControl, NgControl } from '@angular/forms';
 import { getControlWarningsContainer } from '../../types/form-control-warnings-extension';
 @Component({
   selector: 'step-form-field',
@@ -13,11 +13,25 @@ import { getControlWarningsContainer } from '../../types/form-control-warnings-e
   encapsulation: ViewEncapsulation.None,
 })
 export class FormFieldComponent {
+  /*
+    In some rare cases `step-form-field` content may include more than one controls.
+    In that case value control should be explicitly specified with `control` input.
+    Otherwise, it will be automatically determined by contentChild
+
+    @Input()
+  */
+  readonly explicitControl = input<AbstractControl | undefined>(undefined, { alias: 'control' });
+
   /* @ContentChild(NgControl) */
-  control = contentChild(NgControl);
+  protected contentControl = contentChild(NgControl);
+
+  protected readonly control = computed(() => {
+    const contentControl = this.contentControl()?.control;
+    return this.explicitControl() ?? contentControl;
+  });
 
   protected hasWarnings = computed(() => {
-    const control = this.control()?.control;
+    const control = this.control();
     if (!control) {
       return false;
     }

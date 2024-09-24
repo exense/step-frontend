@@ -61,7 +61,7 @@
 
   & > .label-container {
     & > label,
-    & > .required-marker-container {
+    .required-marker-container {
       color: $highlight-color;
     }
   }
@@ -129,7 +129,7 @@
         display: none;
       }
 
-      & > .required-marker-container {
+      .required-marker-container {
         flex-grow: 1;
         font-size: 1.2rem;
         line-height: 0.2rem;
