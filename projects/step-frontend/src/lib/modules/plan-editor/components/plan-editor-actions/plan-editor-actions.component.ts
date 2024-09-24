@@ -20,6 +20,7 @@ export class PlanEditorActionsComponent {
   protected _interactiveSession = inject(InteractiveSessionService);
 
   readonly _planActions = inject(ViewRegistryService).getDashlets('plan/editorActions');
+  readonly _planExecutionActions = inject(ViewRegistryService).getDashlets('plan/editorExecutionActions');
 
   @Input() planContext?: PlanContext | null;
   @Input() hasUndo?: boolean | null;

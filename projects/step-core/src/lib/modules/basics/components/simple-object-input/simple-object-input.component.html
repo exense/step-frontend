@@ -1,0 +1,53 @@
+@if (showAddFieldBtn()) {
+  <section class="add-fields">
+    @if (addFieldLabel(); as addFieldLabel) {
+      <label>{{ addFieldLabel }}</label>
+    }
+    <button
+      type="button"
+      mat-icon-button
+      (click)="addNewField()"
+      matTooltip="Add new field"
+      matTooltipPosition="below"
+      [disabled]="isDisabled()"
+    >
+      <step-icon name="plus" />
+    </button>
+  </section>
+}
+<section class="fields">
+  @for (field of fields(); track field.id) {
+    <step-form-field [class.ng-invalid]="_ngControl.invalid" [class.ng-touched]="_ngControl.touched">
+      <input
+        type="text"
+        placeholder="Name"
+        [disabled]="isDisabled()"
+        [ngModel]="field.name"
+        (ngModelChange)="changeName(field, $event)"
+        [ngModelOptions]="ngModelOptions"
+      />
+    </step-form-field>
+    <step-form-field [class.ng-invalid]="_ngControl.invalid" [class.ng-touched]="_ngControl.touched">
+      <input
+        type="text"
+        placeholder="Value"
+        [disabled]="isDisabled()"
+        [ngModel]="field.value"
+        (ngModelChange)="changeValue(field, $event)"
+        [ngModelOptions]="ngModelOptions"
+      />
+    </step-form-field>
+    <step-btn-group>
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="removeField(field)"
+        [disabled]="isDisabled()"
+        matTooltip="Remove field"
+        matTooltipPosition="below"
+      >
+        <step-icon name="trash-2" />
+      </button>
+    </step-btn-group>
+  }
+</section>

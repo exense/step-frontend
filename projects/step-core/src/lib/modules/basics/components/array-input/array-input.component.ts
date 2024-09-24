@@ -7,7 +7,6 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  TrackByFunction,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -50,8 +49,6 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
   protected selectedDisplayItems: KeyValue<string, string>[] = [];
   protected filterCtrl = this._fb.control('');
 
-  protected readonly trackByKeyValue: TrackByFunction<KeyValue<string, string>> = (index, item) => item.key;
-
   protected readonly displayItems$ = combineLatest([
     this.availableItems$,
     this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntilDestroyed()),
@@ -70,6 +67,7 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
   @Input() possibleItems?: T[];
   @Input() valueLabelExtractor?: ArrayItemLabelValueExtractor<T, string>;
   @Input() preventChars?: string[];
+  @Input() placeholder: string = '';
 
   @ViewChild('inputElement', { static: false }) private inputElement!: ElementRef<HTMLInputElement>;
   @ViewChild('inputElement', { static: false, read: MatAutocompleteTrigger })

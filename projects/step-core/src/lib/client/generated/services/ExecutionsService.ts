@@ -131,7 +131,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Returns the aggregated report view for the provided execution.
+   * Returns an aggregated report view for the provided execution and aggregation parameters.
    * @param id
    * @param requestBody
    * @returns AggregatedReportView default response
@@ -261,6 +261,35 @@ export class ExecutionsService {
       url: '/executions/{id}/reportnodes-with-errors',
       path: {
         id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
+    });
+  }
+
+  /**
+   * Returns the list of report nodes by execution id and artefact hash
+   * @param id
+   * @param hash
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodesByArtefactHash(
+    id: string,
+    hash: string,
+    skip?: number,
+    limit?: number,
+  ): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/reportnodes-by-hash/{hash}',
+      path: {
+        id: id,
+        hash: hash,
       },
       query: {
         skip: skip,

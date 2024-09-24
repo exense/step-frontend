@@ -16,24 +16,10 @@ export type TokenHealth = {
         methodName?: string;
         fileName?: string;
         lineNumber?: number;
-        className?: string;
         nativeMethod?: boolean;
+        className?: string;
       }>;
       message?: string;
-      suppressed?: Array<{
-        stackTrace?: Array<{
-          classLoaderName?: string;
-          moduleName?: string;
-          moduleVersion?: string;
-          methodName?: string;
-          fileName?: string;
-          lineNumber?: number;
-          className?: string;
-          nativeMethod?: boolean;
-        }>;
-        message?: string;
-        localizedMessage?: string;
-      }>;
       localizedMessage?: string;
     };
     stackTrace?: Array<{
@@ -43,8 +29,8 @@ export type TokenHealth = {
       methodName?: string;
       fileName?: string;
       lineNumber?: number;
-      className?: string;
       nativeMethod?: boolean;
+      className?: string;
     }>;
     message?: string;
     suppressed?: Array<{
@@ -55,8 +41,8 @@ export type TokenHealth = {
         methodName?: string;
         fileName?: string;
         lineNumber?: number;
-        className?: string;
         nativeMethod?: boolean;
+        className?: string;
       }>;
       message?: string;
       localizedMessage?: string;

@@ -1,0 +1,49 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+@mixin settings-menu {
+  display: grid;
+  grid-template-columns: max(15%, 15rem) 1fr;
+  grid-template-rows: 2rem auto auto;
+  height: calc(100vh - 10rem);
+
+  gap: 3rem;
+  padding: 0 3rem 3rem 3rem;
+  justify-content: space-between;
+
+  & > h3 {
+    font-size: 2rem;
+    grid-column: 1;
+    grid-row: 1;
+    white-space: nowrap;
+  }
+
+  mat-nav-list {
+    width: 100%;
+    grid-column: 1;
+    grid-row: 2;
+
+    a.mat-mdc-list-item {
+      font-size: 1.4rem;
+      height: 4rem;
+
+      &.active-list-item {
+        background: var.$blue-600 !important;
+
+        .mdc-list-item__content > .mdc-list-item__primary-text {
+          color: var.$white !important;
+        }
+      }
+    }
+  }
+
+  .addon {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: flex-end;
+  }
+
+  .content {
+    grid-column: 2;
+    grid-row: 1/4;
+  }
+}
