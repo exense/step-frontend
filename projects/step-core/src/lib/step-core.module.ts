@@ -49,7 +49,6 @@ import { UserSettingsButtonComponent } from './components/user-settings-button/u
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
-import { SettingsComponent } from './components/settings/settings.component';
 import { CronModule } from './modules/cron/cron.module';
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
@@ -108,7 +107,6 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
-    SettingsComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
@@ -202,7 +200,6 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
-    SettingsComponent,
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
@@ -281,7 +278,6 @@ export { SplitComponent } from './components/split/split.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
-export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';

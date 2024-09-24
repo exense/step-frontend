@@ -4,7 +4,6 @@ import {
   dialogRoute,
   EntityRegistry,
   ScreenInput,
-  SettingsComponent,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -20,8 +19,9 @@ import { UserSelectionComponent } from './components/user-selection/user-selecti
 import { ActivatedRouteSnapshot, Router, RouterLinkActive } from '@angular/router';
 import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
 import { first, map } from 'rxjs';
-import { CommonSettingsComponent } from './components/common-settings/common-settings.component';
+import { ProjectSettingsMenuComponent } from './components/project-settings-menu/project-settings-menu.component';
 import { MatListItem, MatNavList } from '@angular/material/list';
+import { AdminSettingsMenuComponent } from './components/admin-settings-menu/admin-settings-menu.component';
 
 @NgModule({
   declarations: [
@@ -31,14 +31,16 @@ import { MatListItem, MatNavList } from '@angular/material/list';
     ScreenInputDropdownOptionsComponent,
     RenderOptionsPipe,
     UserSelectionComponent,
-    CommonSettingsComponent,
+    ProjectSettingsMenuComponent,
+    AdminSettingsMenuComponent,
   ],
   exports: [
     UserSettingsComponent,
     ScreenConfigurationListComponent,
     ScreenInputEditDialogComponent,
     UserSelectionComponent,
-    CommonSettingsComponent,
+    ProjectSettingsMenuComponent,
+    AdminSettingsMenuComponent,
   ],
   imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive],
   providers: [RenderOptionsPipe],
@@ -52,7 +54,7 @@ export class AdminModule {
     this.registerEntities();
     this.registerMenuEntries();
     this.registerUserSettings();
-    this.registerCommonSettingsRoutes();
+    this.registerProjectSettingsRoutes();
     this.registerAdminSettingsRoutes();
   }
 
@@ -67,10 +69,10 @@ export class AdminModule {
     });
   }
 
-  private registerCommonSettingsRoutes(): void {
+  private registerProjectSettingsRoutes(): void {
     this._viewRegistry.registerRoute({
       path: 'settings',
-      component: CommonSettingsComponent,
+      component: ProjectSettingsMenuComponent,
       data: {
         resolveChildFor: 'settings',
       },
@@ -179,7 +181,7 @@ export class AdminModule {
         },
         {
           path: 'controller',
-          component: SettingsComponent,
+          component: AdminSettingsMenuComponent,
           data: {
             resolveChildFor: 'admin/controller',
           },

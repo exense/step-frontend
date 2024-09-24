@@ -1,3 +1,4 @@
+<h3>Admin Settings</h3>
 <mat-nav-list>
   @for (menuItem of _configurationItems; track menuItem.path) {
     <a mat-list-item [routerLink]="menuItem.path" [relativeTo]="_activatedRoute" routerLinkActive="active-list-item">
@@ -5,9 +6,6 @@
     </a>
   }
 </mat-nav-list>
-<section class="addon">
-  <ng-content />
-</section>
-<section class="content">
+<div class="content">
   <router-outlet />
-</section>
+</div>

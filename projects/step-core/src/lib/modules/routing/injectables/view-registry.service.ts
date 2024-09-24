@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { Route, Router, Routes } from '@angular/router';
+import { ActivatedRoute, Route, Router, Routes } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { SubRouteData } from '../types/sub-route-data.interface';
@@ -158,7 +158,17 @@ export class ViewRegistryService implements OnDestroy {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
-  getChildrenRouteInfo(parentPath: string): SubRouteData[] {
+  getChildrenRouteInfo(parentPath: string): SubRouteData[];
+  getChildrenRouteInfo(activatedRoute: ActivatedRoute, dataPropertyName?: string): SubRouteData[];
+  getChildrenRouteInfo(
+    pathOrActivatedRoute: string | ActivatedRoute,
+    dataPropertyName: string = 'resolveChildFor',
+  ): SubRouteData[] {
+    const parentPath =
+      typeof pathOrActivatedRoute === 'string'
+        ? pathOrActivatedRoute
+        : pathOrActivatedRoute.snapshot.data[dataPropertyName];
+
     const parentChildren = this.getRouteParentChildren(parentPath);
     return parentChildren
       .map((child) => {
