@@ -87,6 +87,14 @@
       }
     </mat-menu>
   </div>
+  @if (showHigherResolutionWarning) {
+    <div class="resolution-warning">
+      <step-icon
+        name="alert-triangle"
+        matTooltip="Higher resolution was used to compose this chart. Data may be not completely accurate."
+      />
+    </div>
+  }
 </div>
 
 <div class="table-container">
