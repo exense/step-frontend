@@ -7,7 +7,6 @@ import {
   OnChanges,
   OnDestroy,
   SimpleChanges,
-  TrackByFunction,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -49,8 +48,6 @@ export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, O
 
   protected selectedDisplayItems: KeyValue<string, string>[] = [];
   protected filterCtrl = this._fb.control('');
-
-  protected readonly trackByKeyValue: TrackByFunction<KeyValue<string, string>> = (index, item) => item.key;
 
   protected readonly displayItems$ = combineLatest([
     this.availableItems$,

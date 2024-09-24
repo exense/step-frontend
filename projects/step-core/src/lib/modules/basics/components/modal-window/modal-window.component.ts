@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, Input, viewChild } from '@angular/core';
 import { BaseModalWindowComponent } from './base-modal-window.component';
 
 @Component({
@@ -7,8 +7,11 @@ import { BaseModalWindowComponent } from './base-modal-window.component';
   styleUrls: ['./modal-window.component.scss'],
 })
 export class ModalWindowComponent extends BaseModalWindowComponent {
-  @ViewChild('trackFocus', { static: true })
-  private trackFocus!: ElementRef<HTMLInputElement>;
+  /* @ViewChild() */
+  private trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
+
+  /* @ViewChild() */
+  private dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
 
   /**
    * This component has an input "title" which also works as assignment
@@ -23,6 +26,11 @@ export class ModalWindowComponent extends BaseModalWindowComponent {
   @Input() hideButtonsSection = false;
 
   override focusDialog() {
-    this.trackFocus.nativeElement.focus();
+    this.trackFocus()?.nativeElement?.focus();
+  }
+
+  scrollTop(): void {
+    const content = this.dialogContent()?.nativeElement;
+    content?.scrollTo(0, 0);
   }
 }

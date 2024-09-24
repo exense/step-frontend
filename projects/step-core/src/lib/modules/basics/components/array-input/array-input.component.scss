@@ -10,6 +10,9 @@ step-array-input {
     min-height: 2.2rem;
     line-height: 1.8;
     outline: none;
+    &[disabled] {
+      display: none;
+    }
   }
 
   .mat-mdc-chip-list-wrapper {

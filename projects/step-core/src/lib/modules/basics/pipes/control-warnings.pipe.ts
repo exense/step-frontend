@@ -6,7 +6,9 @@ import { getControlWarningsContainer } from '../types/form-control-warnings-exte
   name: 'controlWarnings',
 })
 export class ControlWarningsPipe implements PipeTransform {
-  transform(control?: NgControl | AbstractControl): Signal<Record<string, string> | undefined> | undefined {
+  transform(
+    control?: NgControl | AbstractControl,
+  ): Signal<Record<string, string | undefined | null> | undefined> | undefined {
     if (!control) {
       return undefined;
     }
