@@ -129,7 +129,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
       .pipe(
         map(
           (payload) =>
-            `curl -X POST ${url} -H 'Authorization: Bearer '"$API_KEY" -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`,
+            `curl -X POST ${url} -H 'Authorization: Bearer <REPLACE_WITH_YOUR_API_KEY>' -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`,
         ),
         switchMap((cmd) => from(navigator.clipboard.writeText(cmd))),
       )
