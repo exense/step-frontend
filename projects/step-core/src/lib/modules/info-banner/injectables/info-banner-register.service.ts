@@ -28,6 +28,7 @@ export class InfoBannerRegisterService {
   }
 
   private registerRouteResolver(route: Route, infoBannerKey: string): void {
+    console.log('INFOBANNER', infoBannerKey, route);
     route.canActivate = route.canActivate ?? [];
     route.canActivate.push(infoBannerActivate(infoBannerKey));
 
