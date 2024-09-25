@@ -4,6 +4,7 @@ import { JsonFieldProperty } from '../types/json-field-schema';
 
 interface FieldMetaParameters {
   fieldType?: JsonFieldType;
+  tooltip?: string;
   enumItems: string[];
 }
 
@@ -14,6 +15,7 @@ export class JsonFieldUtilsService {
   determineFieldMetaParameters(fieldDescription: JsonFieldProperty = {}): FieldMetaParameters {
     let fieldType: JsonFieldType | undefined;
     let enumItems: string[] = [];
+    const tooltip = fieldDescription.description;
 
     if (!fieldDescription.type && fieldDescription.enum) {
       fieldType = JsonFieldType.ENUM;
@@ -41,7 +43,7 @@ export class JsonFieldUtilsService {
       }
     }
 
-    return { fieldType, enumItems };
+    return { fieldType, enumItems, tooltip };
   }
 
   areObjectsEqual<T>(

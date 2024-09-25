@@ -34,6 +34,7 @@ export class AddSchemaFieldDialogComponent implements OnInit {
     fieldType: this._fb.control<JsonSchemaFieldType | undefined>(undefined, Validators.required),
     isRequired: this._fb.control(false),
     defaultValue: this._fb.control(''),
+    description: this._fb.control(''),
     enumItems: this._fb.control(''),
   });
 
@@ -56,11 +57,12 @@ export class AddSchemaFieldDialogComponent implements OnInit {
       this.fieldForm.markAllAsTouched();
       return;
     }
-    const { name, fieldType, isRequired } = this.fieldForm.value;
+    const { name, fieldType, isRequired, description } = this.fieldForm.value;
     this._dialogRef.close({
       name: name!,
       type: fieldType!,
       isRequired,
+      description: description?.trim(),
       defaultValue: this.parseDefaultValue(),
       enumItems: this.parseEnumItems(),
     });
