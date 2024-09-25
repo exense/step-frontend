@@ -3,9 +3,9 @@ import { MarkerType } from '@exense/step-core';
 
 const PREDEFINED_COLORS: Record<string, string> = {
   TECHNICAL_ERROR: '#000000',
-  FAILED: '#d9534f',
-  INTERRUPTED: '#f9c038',
-  PASSED: '#5cb85c',
+  FAILED: '#ff595b',
+  INTERRUPTED: '#e1cc01',
+  PASSED: '#01a990',
   SKIPPED: '#a0a0a0',
   NORUN: '#a0a0a0',
   RUNNING: '#337ab7',
