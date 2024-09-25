@@ -1,15 +1,13 @@
 $white: #fff;
-$dark-gray: #555;
 $muted: #777;
 $muted-light: #7c7c7c;
-$on: #35c163;
-$of: #d90606;
+$on: #01a990;
+$of: #ff595b;
 $light-blue: #beebff;
-$light-gray: #a0a0a0;
 $light-white-gray: #ddd;
 $light-blue-gray: #f2f4f7;
 $dark-blue: #0082cb;
-$orange: #ff8f4b;
+$orange: #ff8f15;
 $highlight: #293e500d;
 $glass: #ffffff22;
 
@@ -43,27 +41,27 @@ $blue-700: #293e50;
 //#endregion
 
 //#region Red
-$red-10: #f2dede;
-$red-15: #ebccd1;
-$red-50: #d9534f;
+$red-10: #ffeeee;
+$red-15: #ffcdce;
+$red-50: #ff7a7b;
 $red-100: #ff0000;
-$red-650: #a94442;
+$red-650: #ff595b;
 //#endregion
 
 //#region yellow
 $yellow-5: #fffdb0;
-$yellow-10: #fcf8e3;
-$yellow-15: #faebcc;
-$yellow-20: #ead5bd;
-$yellow-600: #ab793b;
-$yellow-650: #8a6d3b;
+$yellow-10: #fcfae5;
+$yellow-15: #f7eeb3;
+$yellow-20: #ece066;
+$yellow-600: #d4c000;
+$yellow-650: #e1cc01;
 
 //#endregion
 
 //#region-green
-$green-10: #dff0d8;
-$green-15: #d6e9c6;
-$green-650: #3c763d;
+$green-10: #e6f6f5;
+$green-15: #b2e5de;
+$green-650: #01a990;
 //#endregion
 
 //#region Material
@@ -100,11 +98,11 @@ $statuses: (
 );
 
 $tokenstates: (
-  'IN_USE': #65a9e0,
+  'IN_USE': #0082cd,
   'ERROR': black,
-  'FREE': #5cb85c,
-  'MAINTENANCE_REQUESTED': #749dc0,
-  'MAINTENANCE': #fbd544,
+  'FREE': #01a990,
+  'MAINTENANCE_REQUESTED': #66b5e0,
+  'MAINTENANCE': #e1cc01,
 );
 
 $code-font: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Source Code Pro', 'source-code-pro', monospace;
