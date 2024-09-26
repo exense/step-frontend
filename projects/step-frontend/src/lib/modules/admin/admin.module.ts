@@ -8,6 +8,7 @@ import {
   StepCoreModule,
   ViewRegistryService,
   AuthService,
+  InfoBannerService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
@@ -50,12 +51,14 @@ export class AdminModule {
     private _entityRegistry: EntityRegistry,
     private _viewRegistry: ViewRegistryService,
     private _auth: AuthService,
+    private _infoBanner: InfoBannerService,
   ) {
     this.registerEntities();
     this.registerMenuEntries();
     this.registerUserSettings();
     this.registerProjectSettingsRoutes();
     this.registerAdminSettingsRoutes();
+    this.registerInfoBanners();
   }
 
   private registerEntities(): void {
@@ -195,5 +198,16 @@ export class AdminModule {
       weight: 90,
       isEnabledFct: () => this._auth.hasRight('admin-ui-menu'),
     });
+  }
+
+  private registerInfoBanners(): void {
+    this._infoBanner.register(
+      'settings',
+      `<div>
+            <strong>The Settings page has been re-structured</strong>
+            <p>To clarify the distinction between personal, project, and admin settings, they have been separated and organized into different sections. This settings page is dedicated to project-specific settings for the currently selected project. Global settings, applicable to all projects, can be found in the <a href='/#/admin/controller/'>Admin Settings</a>, while your personal settings are available in the <a href='/#/user-settings'>User Settings</a>.</p>
+          </div>`,
+      { hasPermission: 'admin-ui-menu' },
+    );
   }
 }

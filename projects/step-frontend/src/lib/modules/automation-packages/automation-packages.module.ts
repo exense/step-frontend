@@ -6,6 +6,7 @@ import {
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
+  InfoBannerService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { AutomationPackagesListComponent } from './components/automation-packages-list/automation-packages-list.component';
@@ -22,10 +23,12 @@ export class AutomationPackagesModule {
   constructor(
     private _entityRegistry: EntityRegistry,
     private _viewRegistry: ViewRegistryService,
+    private _infoBanner: InfoBannerService,
   ) {
     this.registerEntities();
     this.registerRoutes();
     this.registerMenuEntries();
+    this.registerInfoBanners();
   }
 
   private registerEntities(): void {
@@ -78,5 +81,15 @@ export class AutomationPackagesModule {
       parentId: 'automation-root',
       weight: 100,
     });
+  }
+
+  private registerInfoBanners(): void {
+    this._infoBanner.register(
+      'automation-package',
+      `<div>
+            <strong>Automation Packages</strong>
+            <p>Create automation workflows within your IDE as Automation Packages, a standardized way to deploy and execute automation across the DevOps lifecycle. <a href="https://step.exense.ch/knowledgebase/devops/automation-packages-overview/" target="_blank">read more</a></p>
+          </div>`,
+    );
   }
 }

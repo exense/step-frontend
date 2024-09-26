@@ -142,6 +142,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
     const isAdditional = !!config?.isAdditional;
 
     let fieldType: JsonFieldType | undefined;
+    let tooltip: string | undefined;
     let enumItems: string[] = [];
 
     if (!isAdditional) {
@@ -152,6 +153,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
       const params = this._jsonFieldUtils.determineFieldMetaParameters(fieldDescription);
       fieldType = params.fieldType;
       enumItems = params.enumItems;
+      tooltip = params.tooltip;
     } else {
       fieldType = JsonFieldType.STRING;
     }
@@ -169,6 +171,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
       trackId: `track_${v4()}`,
       key: isAdditional && !field ? this.createTemporaryKey() : field,
       label: field,
+      tooltip,
       control,
       fieldType,
       isRequired,

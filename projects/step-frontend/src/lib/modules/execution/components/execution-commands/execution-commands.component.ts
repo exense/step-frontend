@@ -125,9 +125,12 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
     url = url.endsWith('/') ? url : `${url}/`;
     url = `${url}rest/executions/start`;
 
-    this.buildExecutionParams(false)
+    this.buildExecutionParams(false, false)
       .pipe(
-        map((payload) => `curl -X POST ${url} -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`),
+        map(
+          (payload) =>
+            `curl -X POST ${url} -H 'Authorization: Bearer <REPLACE_WITH_YOUR_API_KEY>' -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`,
+        ),
         switchMap((cmd) => from(navigator.clipboard.writeText(cmd))),
       )
       .subscribe();

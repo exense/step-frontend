@@ -53,6 +53,9 @@ export class AddFieldSchemaButtonComponent {
     if (fieldMeta.defaultValue !== undefined) {
       fieldProperty.default = fieldMeta.defaultValue;
     }
+    if (fieldMeta.description) {
+      fieldProperty.description = fieldMeta.description;
+    }
 
     schema.properties[fieldMeta.name] = fieldProperty;
     if (fieldMeta.isRequired) {

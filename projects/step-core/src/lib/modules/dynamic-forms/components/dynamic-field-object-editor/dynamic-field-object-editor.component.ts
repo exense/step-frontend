@@ -243,6 +243,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
 
     let fieldSchema: SchemaField | undefined;
     let fieldType: JsonFieldType | undefined;
+    let tooltip: string | undefined;
     let enumItems: string[] = [];
 
     if (!isAdditional) {
@@ -253,6 +254,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
       const params = this._utils.determineFieldMetaParameters(fieldDescription);
       fieldType = params.fieldType;
       fieldSchema = params.fieldSchema;
+      tooltip = params.tooltip;
       enumItems = params.enumItems;
     } else {
       fieldType = JsonFieldType.STRING;
@@ -276,6 +278,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
       trackId: `track_${v4()}`,
       key: isAdditional && !field ? this.createTemporaryKey() : field,
       label: field,
+      tooltip,
       control,
       fieldType,
       fieldSchema,
