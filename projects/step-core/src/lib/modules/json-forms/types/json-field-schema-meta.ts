@@ -5,5 +5,6 @@ export interface JsonFieldSchemaMeta {
   type: JsonSchemaFieldType;
   isRequired?: boolean;
   defaultValue?: unknown;
+  description?: string;
   enumItems?: string[];
 }

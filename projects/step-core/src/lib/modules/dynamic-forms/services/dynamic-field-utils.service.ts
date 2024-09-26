@@ -7,6 +7,7 @@ import { JsonFieldType } from '../../json-forms';
 interface FieldMetaParameters {
   fieldSchema?: SchemaField;
   fieldType?: JsonFieldType;
+  tooltip?: string;
   enumItems: string[];
 }
 
@@ -18,6 +19,7 @@ export class DynamicFieldUtilsService {
     let fieldSchema: SchemaField | undefined;
     let fieldType: JsonFieldType | undefined;
     let enumItems: string[] = [];
+    const tooltip = fieldDescription?.description;
 
     if ((fieldDescription as SchemaSimpleField).enum) {
       fieldType = JsonFieldType.ENUM;
@@ -47,7 +49,7 @@ export class DynamicFieldUtilsService {
       }
     }
 
-    return { fieldSchema, fieldType, enumItems };
+    return { fieldSchema, fieldType, tooltip, enumItems };
   }
 
   areDynamicFieldObjectsEqual(objectA?: DynamicFieldObjectValue, objectB?: DynamicFieldObjectValue): boolean {
