@@ -138,7 +138,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
   }
 
   private addFieldInternal(fieldDescription: SchemaField = {}, value?: DynamicValue): void {
-    const { fieldSchema, fieldType, enumItems } = this._utils.determineFieldMetaParameters(fieldDescription);
+    const { fieldSchema, fieldType, enumItems, tooltip } = this._utils.determineFieldMetaParameters(fieldDescription);
 
     if (!fieldType) {
       throw new Error('Invalid schema');
@@ -156,6 +156,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
     const meta: DynamicFieldMetaData = {
       trackId: `track_${v4()}`,
       key: `temp_${v4()}`,
+      tooltip,
       control,
       fieldType,
       fieldSchema,
