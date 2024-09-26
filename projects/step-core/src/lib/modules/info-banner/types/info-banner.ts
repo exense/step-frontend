@@ -1,5 +1,5 @@
 export interface InfoBanner {
   id: string;
   info: string;
-  permission?: string;
+  options?: { hasPermission?: string; hasNotPermission?: string };
 }
