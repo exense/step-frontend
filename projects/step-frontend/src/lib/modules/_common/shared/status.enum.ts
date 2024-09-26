@@ -43,12 +43,19 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
 ];
 
 export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
-  ...[Status.INITIALIZING, Status.IMPORTING, Status.ESTIMATING, Status.RUNNING, Status.ABORTING, Status.EXPORTING].map(
-    (key) => ({
-      key,
-      value: key,
-    }),
-  ),
+  ...[
+    Status.INITIALIZING,
+    Status.IMPORTING,
+    Status.ESTIMATING,
+    Status.PROVISIONING,
+    Status.DEPROVISIONING,
+    Status.RUNNING,
+    Status.ABORTING,
+    Status.EXPORTING,
+  ].map((key) => ({
+    key,
+    value: key,
+  })),
   {
     key: Status.ENDED,
     value: Status.ENDED,
