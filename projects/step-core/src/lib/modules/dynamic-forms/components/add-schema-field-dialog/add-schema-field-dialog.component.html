@@ -33,6 +33,10 @@
         </step-error>
       }
     </step-form-field>
+    <step-form-field>
+      <step-label>Description</step-label>
+      <textarea formControlName="description"></textarea>
+    </step-form-field>
     @if (isEnum$ | async) {
       <step-form-field alignLabelAddon="near">
         <step-label>Enum items</step-label>
