@@ -489,6 +489,10 @@ $menu-sub-item-height: 3.2rem;
         padding: 0 12px;
       }
 
+      .sidebar-collapsable-tab label.no-children {
+        padding: 0;
+      }
+
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN BEGIN
       .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text,
       .sidebar-subtab:hover > .sidebar-aligned-subtext,
