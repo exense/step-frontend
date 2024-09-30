@@ -20,6 +20,9 @@
     &:hover:not([disabled]) {
       background: inherit;
     }
+    &.no-padding {
+      padding: 0;
+    }
   }
 
   .default-theme .cdk-overlay-pane {
