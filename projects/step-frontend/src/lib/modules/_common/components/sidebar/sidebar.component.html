@@ -48,10 +48,8 @@
                 [class.active-primary-item]="mainMenuEntry.id | isMenuItemActive | async"
                 (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
               >
-                <div>
-                  <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                  <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
-                </div>
+                <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
+                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
               </label>
             }
             <div class="content">
