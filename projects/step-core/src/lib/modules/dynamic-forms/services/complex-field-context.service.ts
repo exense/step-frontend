@@ -1,6 +1,6 @@
-import { SchemaField } from '../shared/dynamic-fields-schema';
-import { DynamicValue } from '../../../client/augmented/step-augmented-client.module';
 import { Signal, TemplateRef } from '@angular/core';
+import { DynamicValue } from '../../../client/augmented/step-augmented-client.module';
+import { SchemaField } from '../../json-forms';
 
 export type ComplexFieldContext = {
   $implicit: ComplexFieldContextService;
