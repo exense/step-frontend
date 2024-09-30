@@ -11,7 +11,7 @@
         matTooltip="Use an expression to replace dynamically the step name at execution time"
         matTooltipPosition="below"
         mat-icon-button
-        [disabled]="readonly"
+        [disabled]="isDisabled"
         (click)="switchToDynamicName()"
       >
         <step-icon name="zap" />
@@ -21,9 +21,9 @@
     <step-dynamic-textfield
       label="Name"
       name="dynamicName"
-      [disabled]="readonly"
       [(ngModel)]="artefact!.dynamicName"
       (ngModelChange)="syncName($event)"
+      [disabled]="isDisabled"
     />
   }
   <button
@@ -31,7 +31,6 @@
     [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
     matTooltipPosition="below"
     mat-icon-button
-    [disabled]="readonly"
     [color]="isEditorMode ? 'primary' : undefined"
     (click)="isEditorMode = !isEditorMode"
   >
