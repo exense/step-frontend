@@ -137,7 +137,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     if (dynamicValue.dynamic) {
       return;
     }
-    this.artefact!.attributes!['name'] = dynamicValue.value ?? '';
+    this.artefact!.attributes!['name'] = this.artefactName = dynamicValue.value ?? '';
     this.save();
   }
 
