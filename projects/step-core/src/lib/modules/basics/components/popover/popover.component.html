@@ -6,6 +6,7 @@
       (keydown.tab)="$event.stopPropagation()"
       (click)="$event.stopPropagation()"
       class="mat-popover"
+      [class.no-padding]="noPadding"
     >
       <div (mouseenter)="onPopoverMouseEnter()" (mouseleave)="onPopoverMouseLeave()">
         <ng-content select="step-popover-content"></ng-content>
