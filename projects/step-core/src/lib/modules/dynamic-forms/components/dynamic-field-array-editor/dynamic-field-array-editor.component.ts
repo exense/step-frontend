@@ -4,11 +4,8 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { DynamicValue, DynamicValueArray } from '../../../../client/step-client-module';
 import { DynamicFieldArrayValue } from '../../shared/dynamic-field-group-value';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
-import { SchemaField } from '../../shared/dynamic-fields-schema';
-import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
 import { v4 } from 'uuid';
-import { DynamicFieldUtilsService } from '../../services/dynamic-field-utils.service';
-import { JsonFieldType } from '../../../json-forms';
+import { JsonFieldMetaData, SchemaField, JsonFieldType, JsonFieldUtilsService } from '../../../json-forms';
 
 const DEFAULT_FIELD_VALUE: DynamicValueArray = { value: undefined, dynamic: false };
 
@@ -20,7 +17,7 @@ const DEFAULT_FIELD_VALUE: DynamicValueArray = { value: undefined, dynamic: fals
 export class DynamicFieldArrayEditorComponent implements OnDestroy {
   private _fb = inject(FormBuilder);
   private _fbNonNullable = this._fb.nonNullable;
-  private _utils = inject(DynamicFieldUtilsService);
+  private _utils = inject(JsonFieldUtilsService);
 
   private terminator$?: Subject<void>;
 
@@ -55,7 +52,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
   /** @Output() **/
   readonly valueChange = output<DynamicFieldArrayValue | undefined>();
 
-  protected fields = signal<DynamicFieldMetaData[]>([]);
+  protected fields = signal<JsonFieldMetaData<DynamicValue>[]>([]);
   protected form = this._fb.group({
     items: this._fbNonNullable.array<DynamicValue>([]),
   });
@@ -71,12 +68,23 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
       const schemaChanged = JSON.stringify(schema) !== this.schemaJson;
       if (schemaChanged) {
         this.buildForm(schema, value);
-      } else if (value && !this._utils.areDynamicFieldArraysEqual(value, this.lastFormValue)) {
+      } else if (value && !this.areDynamicFieldArraysEqual(value, this.lastFormValue)) {
         this.assignValueToForm(value);
       }
     },
     { allowSignalWrites: true },
   );
+
+  private areDynamicFieldArraysEqual(a?: DynamicFieldArrayValue, b?: DynamicFieldArrayValue): boolean {
+    return this._utils.areArraysEqual(a, b, (valueA, valueB) => {
+      return !(
+        valueA?.dynamic !== valueB?.dynamic ||
+        valueA?.value !== valueB?.value ||
+        valueA?.expression !== valueB?.expression ||
+        valueA?.expressionType !== valueB?.expressionType
+      );
+    });
+  }
 
   ngOnDestroy(): void {
     this.destroyForm();
@@ -86,7 +94,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
     this.addFieldInternal(this.schema());
   }
 
-  protected removeField(field: DynamicFieldMetaData): void {
+  protected removeField(field: JsonFieldMetaData<DynamicValue>): void {
     const hasField = this.fields().includes(field);
     if (!hasField) {
       return;
@@ -153,7 +161,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
 
     const control = this._fbNonNullable.control<DynamicValue>(fieldValue);
 
-    const meta: DynamicFieldMetaData = {
+    const meta: JsonFieldMetaData<DynamicValue> = {
       trackId: `track_${v4()}`,
       key: `temp_${v4()}`,
       tooltip,

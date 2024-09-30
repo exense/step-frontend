@@ -2,8 +2,15 @@ import { Component, inject } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AddSchemaFieldDialogComponent } from '../add-schema-field-dialog/add-schema-field-dialog.component';
-import { SchemaField, SchemaArrayField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
-import { JsonFieldSchema, JsonFieldSchemaMeta, JsonFieldType, JsonSchemaFieldType } from '../../../json-forms';
+import {
+  SchemaArrayField,
+  SchemaField,
+  JsonFieldsSchema,
+  JsonFieldSchemaMeta,
+  JsonFieldType,
+  SchemaObjectField,
+  JsonSchemaFieldType,
+} from '../../../json-forms';
 
 @Component({
   selector: 'step-add-field-schema-button',
@@ -27,7 +34,7 @@ export class AddFieldSchemaButtonComponent {
   }
 
   private addField(fieldMeta: JsonFieldSchemaMeta): void {
-    const schema: JsonFieldSchema = { ...(this._ngControl!.value ?? {}) };
+    const schema: JsonFieldsSchema = { ...(this._ngControl!.value ?? {}) };
     if (!schema.properties) {
       schema.properties = {};
     }

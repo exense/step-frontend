@@ -292,6 +292,7 @@ export * from './modules/async-operations/async-operations.module';
 export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
 export * from './modules/dynamic-forms/dynamic-forms.module';
+export * from './modules/json-forms';
 export * from './modules/entities-selection/entities-selection.module';
 export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';

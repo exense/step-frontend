@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ScreensService } from '../../../client/step-client-module';
 import { map, Observable } from 'rxjs';
-import { DynamicFieldsSchema } from '../shared/dynamic-fields-schema';
+import { JsonFieldsSchema } from '../../json-forms';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ import { DynamicFieldsSchema } from '../shared/dynamic-fields-schema';
 export class SchemasFactoryService {
   private _screenApi = inject(ScreensService);
 
-  buildAttributesSchemaForScreen(screenId: string): Observable<DynamicFieldsSchema> {
+  buildAttributesSchemaForScreen(screenId: string): Observable<JsonFieldsSchema> {
     return this._screenApi.getInputsForScreenPost(screenId).pipe(
       map((inputs) =>
         inputs
@@ -32,9 +32,9 @@ export class SchemasFactoryService {
               }
               return res;
             },
-            { properties: {} } as DynamicFieldsSchema
-          )
-      )
+            { properties: {} } as JsonFieldsSchema,
+          ),
+      ),
     );
   }
 }

@@ -5,8 +5,8 @@ import {
   BaseArtefactComponent,
   DynamicValueBoolean,
   DynamicValueString,
-  DynamicFieldsSchema,
   ArtefactFormChangeHelperService,
+  JsonFieldsSchema,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
@@ -31,10 +31,10 @@ export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact>
   protected showTokenSelectionParameters = false;
 
   protected keyword?: Keyword;
-  protected schema?: DynamicFieldsSchema;
+  protected schema?: JsonFieldsSchema;
 
   protected onUpdateKeyword(keyword?: Keyword): void {
     this.keyword = keyword;
-    this.schema = keyword?.schema as unknown as DynamicFieldsSchema | undefined;
+    this.schema = keyword?.schema as unknown as JsonFieldsSchema | undefined;
   }
 }
