@@ -33,7 +33,9 @@
     @if (!!artefactMeta?.component) {
       @if (isPlan || isKeyword) {
         <section class="editor plan-or-keyword" [ngClass]="{ 'call-plan': isPlan, 'call-direct-plan': isDirectPlan }">
-          <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label" />
+          @if (!artefact.dynamicName!.dynamic) {
+            <step-icon class="artefact-hint" [name]="artefactMeta?.icon" [matTooltip]="artefactMeta!.label" />
+          }
           <step-custom-item-render
             id="call-name-input"
             [artefactId]="artefact.id"
