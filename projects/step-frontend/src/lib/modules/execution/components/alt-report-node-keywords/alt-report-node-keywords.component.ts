@@ -23,6 +23,8 @@ import { AltExecutionStateService } from '../../services/alt-execution-state.ser
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _executionState = inject(AltExecutionStateService);
 
+  protected readonly _keywordsState = inject(AltKeywordNodesStateService);
+
   protected tableSearch = viewChild('table', { read: TableSearch });
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
@@ -32,4 +34,8 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   /** @Output() **/
   openKeywordDrilldown = output<ReportNode>();
+
+  toggleDetail(node: ReportNode): void {
+    this._keywordsState.toggleDetail(node);
+  }
 }
