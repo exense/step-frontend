@@ -77,6 +77,7 @@ import { ExecutionActionsExecuteContentDirective } from './directives/execution-
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
+import { AltKeywordInlineDrilldownComponent } from './components/alt-keyword-inline-drilldown/alt-keyword-inline-drilldown.component';
 
 @NgModule({
   declarations: [
@@ -130,6 +131,7 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     AltKeywordDrilldownComponent,
     AltExecutionRangePickerComponent,
     AltExecutionRangePrintComponent,
+    AltKeywordInlineDrilldownComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -158,6 +160,7 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
+    AltKeywordInlineDrilldownComponent,
   ],
 })
 export class ExecutionModule {
