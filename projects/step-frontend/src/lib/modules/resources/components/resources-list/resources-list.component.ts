@@ -1,4 +1,5 @@
 import { Component, forwardRef, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router'; // Import de ActivatedRoute
 import {
   AugmentedParametersService,
   AugmentedResourcesService,
@@ -33,10 +34,15 @@ export class ResourcesListComponent implements DialogParentService {
   private _resourceDialogs = inject(ResourceDialogsService);
   private _resourcesService = inject(AugmentedResourcesService);
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
+  private route = inject(ActivatedRoute); // Injection de ActivatedRoute
 
   readonly dataSource = this._resourcesService.createDataSource();
-
   readonly returnParentUrl = '/resources';
+
+  isTenantAll(): boolean {
+    const tenant = this.route.snapshot.queryParams['tenant'];
+    return tenant == '[All]';
+  }
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
