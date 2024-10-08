@@ -42,17 +42,17 @@
   "private": false,
   "dependencies": {
     "@angular-architects/module-federation": "17.0.1",
-    "@angular/animations": "17.3.0",
+    "@angular/animations": "18.2.7",
     "@angular/cdk": "17.3.0",
-    "@angular/common": "17.3.0",
-    "@angular/compiler": "17.3.0",
-    "@angular/core": "17.3.0",
-    "@angular/forms": "17.3.0",
+    "@angular/common": "18.2.7",
+    "@angular/compiler": "18.2.7",
+    "@angular/core": "18.2.7",
+    "@angular/forms": "18.2.7",
     "@angular/material": "17.3.0",
     "@angular/material-luxon-adapter": "17.3.0",
-    "@angular/platform-browser": "17.3.0",
-    "@angular/platform-browser-dynamic": "17.3.0",
-    "@angular/router": "17.3.0",
+    "@angular/platform-browser": "18.2.7",
+    "@angular/platform-browser-dynamic": "18.2.7",
+    "@angular/router": "18.2.7",
     "@fontsource/roboto": "4.5.8",
     "ace-builds": "1.17.0",
     "angular-split": "17.1.1",
@@ -66,18 +66,18 @@
     "uuid": "8.3.2",
     "chart.js": "4.4.3",
     "chartjs-plugin-datalabels": "2.2.0",
-    "zone.js": "0.14.3"
+    "zone.js": "0.14.10"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "17.3.0",
-    "@angular-devkit/schematics": "17.3.0",
+    "@angular-devkit/build-angular": "18.2.7",
+    "@angular-devkit/schematics": "18.2.7",
     "@angular-eslint/builder": "17.3.0",
     "@angular-eslint/eslint-plugin": "17.3.0",
     "@angular-eslint/eslint-plugin-template": "17.3.0",
     "@angular-eslint/schematics": "17.3.0",
     "@angular-eslint/template-parser": "17.3.0",
-    "@angular/cli": "17.3.0",
-    "@angular/compiler-cli": "17.3.0",
+    "@angular/cli": "18.2.7",
+    "@angular/compiler-cli": "18.2.7",
     "@schematics/angular": "17.1.1",
     "@types/luxon": "3.4.2",
     "@types/node": "20.9.0",
@@ -87,16 +87,16 @@
     "copyfiles": "2.4.1",
     "eslint": "^8.53.0",
     "husky": "7.0.4",
-    "ng-packagr": "^17.1.2",
-    "ngx-build-plus": "17.0.0",
+    "ng-packagr": "^18.2.1",
+    "ngx-build-plus": "18.0.0",
     "npm-run-all": "4.1.5",
     "openapi-typescript-codegen": "^0.23.0",
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "shelljs": "0.8.5",
-    "typescript": "5.2.2"
+    "typescript": "5.5.4"
   },
   "engines": {
-    "node": ">=18.15.0"
+    "node": ">=18.19.0"
   }
 }
