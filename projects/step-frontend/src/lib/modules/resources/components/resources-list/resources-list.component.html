@@ -18,6 +18,7 @@
           color="primary"
           matTooltip="New resource"
           matTooltipPosition="below"
+          [disabled]="isTenantAll()"
           [routerLink]="'new' | resourceUrl"
         >
           <step-icon name="plus"></step-icon>
