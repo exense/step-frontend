@@ -2,7 +2,11 @@ import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { Observable } from 'rxjs';
 import { SearchValue } from './search-value';
-import { StepDataSource, TableRequestData } from '../../../client/table/step-table-client.module';
+import {
+  StepDataSource,
+  StepDataSourceReloadOptions,
+  TableRequestData,
+} from '../../../client/table/step-table-client.module';
 import { TableParameters } from '../../../client/generated';
 
 export interface TableFilterOptions {
@@ -22,7 +26,7 @@ export interface TableDataSource<T> extends StepDataSource<T> {
   readonly forceNavigateToFirstPage$: Observable<unknown>;
   getTableData(options?: TableGetDataOptions): void;
   getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined;
-  reload(reloadOptions?: { hideProgress: boolean }): void;
+  reload(reloadOptions?: StepDataSourceReloadOptions): void;
   exportAsCSV(fields: string[], params?: TableParameters): void;
   sharable(): this;
   destroy(): void;

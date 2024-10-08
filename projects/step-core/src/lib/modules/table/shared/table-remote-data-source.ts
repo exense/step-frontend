@@ -22,6 +22,7 @@ import {
   TableRequestFilter,
   OQLFilter,
   TableParameters,
+  StepDataSourceReloadOptions,
 } from '../../../client/step-client-module';
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
@@ -107,15 +108,17 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
   return result;
 };
 
+interface RequestContainer extends StepDataSourceReloadOptions {
+  request: TableRequestInternal;
+}
+
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
   private _inProgress$ = new BehaviorSubject<boolean>(false);
   readonly inProgress$ = this._inProgress$.asObservable();
   private isSharable = false;
   private isSkipOngoingRequest?: boolean;
-  private _request$ = new BehaviorSubject<{ request: TableRequestInternal; hideProgress?: boolean } | undefined>(
-    undefined,
-  );
+  private _request$ = new BehaviorSubject<RequestContainer | undefined>(undefined);
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     tap((x) => {
       this.isSkipOngoingRequest = false;
@@ -123,10 +126,19 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     filter((x) => !!x),
     debounceTime(500),
     map((x) => {
-      return { request: convertTableRequest(x!.request), hideProgress: x?.hideProgress };
+      const request = convertTableRequest(x!.request);
+
+      // Don't show progress bar, when immediateHideProgress flag is passed
+      // or hideProgress is passed and there is no in progress current operation
+      let inProgress = true;
+      if (!!x?.immediateHideProgress || (!!x?.hideProgress && !this._inProgress$.value)) {
+        inProgress = false;
+      }
+
+      return { request, inProgress };
     }),
     tap((x) => {
-      this._inProgress$.next(!x.hideProgress);
+      this._inProgress$.next(x.inProgress);
     }),
     exhaustMap((x) =>
       this._rest.requestTable<T>(this._tableId, x.request).pipe(
@@ -253,9 +265,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._requestColumnsMap[key] = value;
   }
 
-  reload(reloadOptions?: { hideProgress: boolean }) {
+  reload(reloadOptions?: StepDataSourceReloadOptions) {
     let val = this._request$.value ?? { request: {} as TableRequestInternal };
     val.hideProgress = reloadOptions?.hideProgress;
+    val.immediateHideProgress = reloadOptions?.immediateHideProgress;
     this._request$.next(val);
   }
 
