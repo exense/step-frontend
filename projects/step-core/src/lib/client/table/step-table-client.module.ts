@@ -1,10 +1,7 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
-@NgModule({
-  imports: [HttpClientModule],
-  providers: [],
-})
+@NgModule({ imports: [], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class StepTableClientModule {}
 
 export { TableApiWrapperService } from './services/table-api-wrapper.service';

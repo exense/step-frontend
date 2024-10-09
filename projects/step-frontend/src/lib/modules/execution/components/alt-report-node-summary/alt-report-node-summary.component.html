@@ -3,7 +3,7 @@
     <section class="chart-container">
       <div class="total-value">
         <span>
-          @if (summary()?.total; as total) {
+          @if (summary().total; as total) {
             {{ total | bigNumber }}
           } @else {
             0
