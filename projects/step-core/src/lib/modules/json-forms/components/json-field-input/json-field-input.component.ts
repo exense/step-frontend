@@ -78,7 +78,7 @@ export class JsonFieldInputComponent implements ControlValueAccessor {
     return enumItemsSet.has(fieldValue ? fieldValue.toString() : '');
   });
 
-  constructor(@Optional() protected _ngControl: NgControl) {
+  constructor(@Optional() protected _ngControl?: NgControl) {
     if (this._ngControl) {
       this._ngControl.valueAccessor = this;
     }

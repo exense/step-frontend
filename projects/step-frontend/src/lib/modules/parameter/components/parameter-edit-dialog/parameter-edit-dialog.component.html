@@ -85,18 +85,14 @@
             <div [matMenuTriggerFor]="activationMenu">
               <button mat-flat-button color="primary">Wizard</button>
               <mat-menu #activationMenu="matMenu">
-                <button [disabled]="!!parameter?.activationExpression?.script" mat-menu-item (click)="addCondition()">
+                <button [disabled]="!!parameter.activationExpression?.script" mat-menu-item (click)="addCondition()">
                   {{ 'Add condition' }}
                 </button>
-                <button
-                  [disabled]="!parameter?.activationExpression?.script"
-                  mat-menu-item
-                  (click)="addCondition('OR')"
-                >
+                <button [disabled]="!parameter.activationExpression?.script" mat-menu-item (click)="addCondition('OR')">
                   {{ 'Add OR condition' }}
                 </button>
                 <button
-                  [disabled]="!parameter?.activationExpression?.script"
+                  [disabled]="!parameter.activationExpression?.script"
                   mat-menu-item
                   (click)="addCondition('AND')"
                 >

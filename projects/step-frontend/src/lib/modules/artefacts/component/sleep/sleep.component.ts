@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 
 interface SleepArtefact extends WaitingArtefactsAdvancedArtefact {
   duration: DynamicValueInteger;
-  unit: DynamicValueString;
+  unit?: DynamicValueString;
 }
 
 const TIME_UNIT_DICTIONARY = {
