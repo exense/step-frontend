@@ -16,7 +16,7 @@ import {
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
-import { TableRequestData, TableParameters } from '../../../client/step-client-module';
+import { TableRequestData, TableParameters, StepDataSourceReloadOptions } from '../../../client/step-client-module';
 import { FilterCondition } from './filter-condition';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
@@ -240,7 +240,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this._request$.next(request);
   }
 
-  reload(reloadOptions?: { hideProgress: boolean }): void {
+  reload(reloadOptions?: StepDataSourceReloadOptions): void {
     this._request$.next(this._request$.value);
   }
 
