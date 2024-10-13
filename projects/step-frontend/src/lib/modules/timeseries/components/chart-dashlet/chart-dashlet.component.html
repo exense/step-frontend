@@ -13,16 +13,26 @@
   }
 </div>
 
-@if (showHigherResolutionWarning) {
-  <div class="resolution-warning">
-    <step-icon
-      name="alert-triangle"
-      matTooltip="Data for requested resolution doesn't exist. Used higher resolution of <{{
-        resolutionLabels[collectionResolutionUsed.toString()] || collectionResolutionUsed
-      }}> instead."
-    />
-  </div>
-}
+<div class="warnings-container">
+  @if (showMissingTTLWarning) {
+    <div>
+      <step-icon
+        name="alert-triangle"
+        matTooltip="Requested range is out of the current TTL (time to live) configuration"
+      />
+    </div>
+  }
+  @if (showHigherResolutionWarning) {
+    <div>
+      <step-icon
+        name="alert-triangle"
+        matTooltip="Data for requested resolution doesn't exist. Used higher resolution of <{{
+          resolutionLabels[collectionResolutionUsed.toString()] || collectionResolutionUsed
+        }}> instead."
+      />
+    </div>
+  }
+</div>
 
 <div class="settings-container">
   <div class="edit-buttons" *ngIf="editMode">
