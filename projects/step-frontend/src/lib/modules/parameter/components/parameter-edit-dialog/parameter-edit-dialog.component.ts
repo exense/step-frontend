@@ -10,12 +10,14 @@ import {
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { combineLatest, delay, map, of, switchMap, take } from 'rxjs';
+import { combineLatest, delay, map, Observable, of, switchMap, take, throwError } from 'rxjs';
 import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
 import { ParameterConditionDialogComponent } from '../parameter-condition-dialog/parameter-condition-dialog.component';
+import { catchError } from 'rxjs/operators';
+import { NgForm } from '@angular/forms';
 
 interface ParameterEditDialogData {
   entity: Parameter;
@@ -56,6 +58,7 @@ export class ParameterEditDialogComponent implements OnInit {
   protected scopeItems: ScopeItem[] = [];
   protected selectedScope?: ScopeItem;
   protected protectedParameter = false;
+  protected error?: string;
 
   readonly modalTitle = `${this.isEditMode ? 'Edit' : 'New'} Parameter`;
 
@@ -64,18 +67,51 @@ export class ParameterEditDialogComponent implements OnInit {
     this.initScopeItems();
   }
 
-  @HostListener('keydown.enter', ['$event'])
-  save(event?: KeyboardEvent): void {
+  saveInternal(form: NgForm, event?: KeyboardEvent): Observable<Parameter> {
     if (
-      (!!event?.target && event.target instanceof HTMLTextAreaElement) ||
+      (!!event?.target && event?.target instanceof HTMLTextAreaElement) ||
       (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write'))
     ) {
-      return;
+      this.error = 'No permission to write global parameter';
+      return throwError(() => new Error(this.error));
     }
 
-    this._api.saveParameter(this.parameter).subscribe((parameter) => {
+    return this._api.saveParameter(this.parameter);
+  }
+
+  @HostListener('keydown.enter', ['$event'])
+  save(form: NgForm, event?: KeyboardEvent): void {
+    this.saveInternal(form, event).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
+  }
+
+  saveAndNext(form: NgForm) {
+    this.animationState = 'hidden';
+    this.saveInternal(form)
+      .pipe(
+        catchError((error: any) => {
+          this.animationState = 'visible';
+          return throwError(() => new Error(error));
+        }),
+        switchMap((data) => {
+          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok', {
+            duration: 5000,
+          });
+          return this._api.newParameter();
+        }),
+        delay(300),
+      )
+      .subscribe((parameter) => {
+        this.animationState = 'visible';
+        this.parameter = {
+          ...this.parameter,
+          id: parameter.id,
+          lastModificationDate: parameter.lastModificationDate,
+          lastModificationUser: parameter.lastModificationUser,
+        };
+        this._dialogCommunicationService.triggerDialogAction();
+      });
   }
 
   addCondition(type?: string) {
@@ -138,31 +174,6 @@ export class ParameterEditDialogComponent implements OnInit {
     }
 
     return result;
-  }
-
-  saveAndNext() {
-    this.animationState = 'hidden';
-    this._api
-      .saveParameter(this.parameter)
-      .pipe(
-        switchMap((data) => {
-          this._snackBar.open(`Parameter ${this.parameter.key} was created succesfully`, 'Ok', {
-            duration: 5000,
-          });
-          return this._api.newParameter();
-        }),
-        delay(300),
-      )
-      .subscribe((parameter) => {
-        this.animationState = 'visible';
-        this.parameter = {
-          ...this.parameter,
-          id: parameter.id,
-          lastModificationDate: parameter.lastModificationDate,
-          lastModificationUser: parameter.lastModificationUser,
-        };
-        this._dialogCommunicationService.triggerDialogAction();
-      });
   }
 
   selectScope(scopeItem: ScopeItem): void {
