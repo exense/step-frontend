@@ -78,6 +78,7 @@ import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 import { AltKeywordInlineDrilldownComponent } from './components/alt-keyword-inline-drilldown/alt-keyword-inline-drilldown.component';
+import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree-node-details/aggregated-tree-node-details.component';
 
 @NgModule({
   declarations: [
@@ -138,6 +139,7 @@ import { AltKeywordInlineDrilldownComponent } from './components/alt-keyword-inl
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
+    AggregatedTreeNodeDetailsComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
   exports: [

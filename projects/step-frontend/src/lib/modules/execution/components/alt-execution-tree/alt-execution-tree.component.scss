@@ -23,6 +23,9 @@ step-alt-execution-tree {
 
   step-tree-node-name {
     width: 100%;
+    &.not-selectable {
+      background: none !important;
+    }
   }
 
   .node-name {

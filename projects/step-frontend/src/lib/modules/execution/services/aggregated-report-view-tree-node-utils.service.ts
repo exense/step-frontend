@@ -24,12 +24,12 @@ export class AggregatedReportViewTreeNodeUtilsService
     const { parentId, isParentVisuallySkipped } = params ?? {};
     const name = originalArtefact.attributes?.['name'] ?? '';
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
-    const expandable = (item?.children?.length ?? -1) > 0;
+    const expandable = true;
     const children = (item.children ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
     );
 
-    // children.unshift(this.createDetailsNode(item));
+    children.unshift(this.createDetailsNode(item));
 
     const result = {
       id,
@@ -42,7 +42,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       parentId,
       originalArtefact,
       countByStatus: item.countByStatus,
-      nodeType: AggregatedTreeNodeType.KEYWORD,
+      nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
     };
     return result;
   }
@@ -62,7 +62,6 @@ export class AggregatedReportViewTreeNodeUtilsService
     return false;
   }
 
-  /*
   private createDetailsNode(item: AggregatedReportView): AggregatedTreeNode {
     const originalArtefact = item.artefact!;
     const artefactId = originalArtefact.id!;
@@ -85,6 +84,7 @@ export class AggregatedReportViewTreeNodeUtilsService
           id: `details_data_${artefactId}`,
           parentId: id,
           originalArtefact,
+          artefactHash: item.artefactHash,
           nodeType: AggregatedTreeNodeType.DETAILS_DATA,
           isSkipped: false,
           isVisuallySkipped: false,
@@ -93,5 +93,4 @@ export class AggregatedReportViewTreeNodeUtilsService
       ],
     };
   }
-*/
 }
