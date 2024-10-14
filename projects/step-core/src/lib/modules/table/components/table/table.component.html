@@ -5,7 +5,7 @@
 }
 @for (additionalHeaderGroup of additionalHeaderGroups; track additionalHeaderGroup) {
   <div class="additional-header" [class.additional-header-flex]="!!additionalHeaderGroup[1]">
-    @for (additionalHeader of additionalHeaderGroup; track additionalHeader.headerGroupId) {
+    @for (additionalHeader of additionalHeaderGroup; track additionalHeader.headerId) {
       <ng-container *ngTemplateOutlet="additionalHeader!.template" />
     }
   </div>
