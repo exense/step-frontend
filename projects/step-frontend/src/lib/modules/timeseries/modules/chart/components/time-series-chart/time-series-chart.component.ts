@@ -113,7 +113,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
     this.legendSettings.show = settings.showLegend ?? true;
-    console.log(this.legendSettings);
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
     this.chartMetadata = [[]];
@@ -165,7 +164,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
           label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });
-        console.log('pushed legend item', series.id, series.show);
       }
     });
     this.sortLegend();
