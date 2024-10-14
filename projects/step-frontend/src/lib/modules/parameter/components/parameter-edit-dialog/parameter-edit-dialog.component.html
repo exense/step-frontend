@@ -1,5 +1,5 @@
-<step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
-  <form #parameterForm="ngForm">
+<form #parameterForm="ngForm">
+  <step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
     <div step-modal-window-body>
       @if (error) {
         <step-alert type="danger">{{ error }}</step-alert>
@@ -12,6 +12,7 @@
                 [ngClass]="selectedScope?.cssClass"
                 [ngModel]="selectedScope"
                 (ngModelChange)="selectScope($event)"
+                name="scope"
               >
                 @for (item of scopeItems; track item.scope) {
                   <mat-option [value]="item">
@@ -29,12 +30,13 @@
                 stScreen="keyword"
                 stInputId="attributes.application"
                 [(ngModel)]="parameter.scopeEntity"
+                name="scopeEntityApplication"
                 hint="The name of the application this parameter is restricted to"
                 [hideLabel]="true"
               />
             } @else if (parameter.scope === 'FUNCTION') {
               <step-form-field class="scope-entity">
-                <input type="text" [(ngModel)]="parameter.scopeEntity" />
+                <input type="text" [(ngModel)]="parameter.scopeEntity" name="scopeEntityFunction" />
                 <step-suffix class="icon-suffix">
                   <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to" />
                 </step-suffix>
@@ -58,7 +60,13 @@
           @if (parameter.protectedValue) {
             <step-form-field>
               <step-label>Value</step-label>
-              <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value!.value" />
+              <input
+                title="Value"
+                type="password"
+                placeholder="Value"
+                [(ngModel)]="parameter.value!.value"
+                name="protectedValue"
+              />
             </step-form-field>
           } @else {
             <step-form-field>
@@ -72,6 +80,7 @@
               [ngModel]="parameter.protectedValue"
               (ngModelChange)="setProtectedValue($event)"
               [disabled]="protectedParameter"
+              name="protected"
             >
               <span>Protect parameter value</span>
               &nbsp;
@@ -83,8 +92,9 @@
           </step-form-field>
           <step-form-field>
             <step-label>Description</step-label>
-            <input type="text" [(ngModel)]="parameter.description" />
+            <input type="text" [(ngModel)]="parameter.description" name="description" />
           </step-form-field>
+
           <step-form-field>
             <step-label>Activation script</step-label>
             <step-label-addon>
@@ -111,11 +121,12 @@
                 </mat-menu>
               </div>
             </step-label-addon>
-            <input type="text" [(ngModel)]="parameter.activationExpression!.script!" />
+            <input type="text" [(ngModel)]="parameter.activationExpression!.script!" name="activationScript" />
           </step-form-field>
+
           <step-form-field>
             <step-label>Priority</step-label>
-            <input type="number" [(ngModel)]="parameter.priority" />
+            <input type="number" [(ngModel)]="parameter.priority" name="priority" />
           </step-form-field>
         </div>
         @if (parameter.lastModificationDate) {
@@ -150,5 +161,5 @@
         Save
       </button>
     </div>
-  </form>
-</step-modal-window>
+  </step-modal-window>
+</form>

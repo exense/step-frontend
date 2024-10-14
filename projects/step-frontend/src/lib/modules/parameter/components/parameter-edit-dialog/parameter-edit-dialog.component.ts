@@ -76,6 +76,14 @@ export class ParameterEditDialogComponent implements OnInit {
       return throwError(() => new Error(this.error));
     }
 
+    if (form.invalid) {
+      Object.keys(form.form.controls).forEach((field) => {
+        const control = form.form.get(field);
+        control?.markAsTouched({ onlySelf: true });
+      });
+      return throwError(() => new Error(this.error));
+    }
+
     return this._api.saveParameter(this.parameter);
   }
 
