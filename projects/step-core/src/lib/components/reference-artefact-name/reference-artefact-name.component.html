@@ -33,6 +33,7 @@
     mat-icon-button
     [color]="isEditorMode ? 'primary' : undefined"
     (click)="isEditorMode = !isEditorMode"
+    [ngClass]="{ 'dynamic-on': artefact?.dynamicName?.dynamic === true }"
   >
     <step-icon name="edit-2" />
   </button>
