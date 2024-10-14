@@ -23,9 +23,11 @@ export class AltExecutionTreeComponent implements OnInit {
         map((params) => params['artefactId']),
         filter((artefactId) => !!artefactId),
         takeUntilDestroyed(this._destroyRef),
-        map((artefactId) => `details_data_${artefactId}`),
-        switchMap((nodeId) => this._treeState.expandNode(nodeId)),
+        switchMap((nodeId) => {
+          return this._treeState.expandNode(nodeId).pipe(map((isExpanded) => (isExpanded ? nodeId : undefined)));
+        }),
+        filter((nodeId) => !!nodeId),
       )
-      .subscribe();
+      .subscribe((nodeId) => this._treeState.selectNode(nodeId));
   }
 }

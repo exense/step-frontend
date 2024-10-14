@@ -5,6 +5,7 @@ import {
   ExecutionParameters,
   ExecutionsService,
   FieldFilter,
+  ReportNode,
   TableBulkOperationRequest,
 } from '../../generated';
 import { map, Observable, OperatorFunction } from 'rxjs';
@@ -19,11 +20,11 @@ import { CompareCondition } from '../../../modules/basics/types/compare-conditio
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
-import { TokenProvisioningStatus } from '../shared/token-provisioning-status';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService implements HttpOverrideResponseInterceptor {
   static readonly EXECUTIONS_TABLE_ID = 'executions';
+  static readonly REPORTS_TABLE_ID = 'reports';
 
   private _httpClient = inject(HttpClient);
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
@@ -46,6 +47,18 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       status: 'status',
       result: 'result',
     });
+  }
+
+  getReportNodeDataSource(artefactHash?: string): StepDataSource<ReportNode> {
+    return this._dataSourceFactory.createDataSource(
+      AugmentedExecutionsService.REPORTS_TABLE_ID,
+      {
+        name: 'name',
+        status: 'status',
+        executionTime: 'executionTime',
+      },
+      artefactHash ? { artefactHash: [artefactHash] } : undefined,
+    );
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {
