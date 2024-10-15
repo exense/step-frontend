@@ -37,7 +37,7 @@ interface ParameterEditDialogData {
   ],
 })
 export class ParameterEditDialogComponent implements OnInit {
-  @ViewChild('parameterForm', { read: NgForm, static: true }) form!: NgForm;
+  private form = viewChild('parameterForm', { read: NgForm });
 
   animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
@@ -78,8 +78,9 @@ export class ParameterEditDialogComponent implements OnInit {
       return throwError(() => new Error(this.error));
     }
 
-    if (this.form.invalid) {
-      this.form.form.markAllAsTouched();
+    const form = this.form();
+    if (form?.invalid) {
+      form.form.markAllAsTouched();
       return throwError(() => new Error(this.error));
     }
 
