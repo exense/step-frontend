@@ -1,8 +1,9 @@
 import { SearchValue } from '../shared/search-value';
 import { TablePersistenceUrlParamsSerializerService } from './table-persistence-url-params-serializer.service';
 import { inject, Injectable } from '@angular/core';
-import { FilterCondition, FilterConditionFactoryService } from '@exense/step-core';
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
+import { FilterConditionFactoryService } from './filter-condition-factory.service';
+import { FilterCondition } from '../shared/filter-condition';
 
 @Injectable({
   providedIn: 'root',
