@@ -147,7 +147,7 @@
         [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
         type="button"
         mat-stroked-button
-        (click)="saveAndNext(parameterForm)"
+        (click)="saveAndNext()"
       >
         Save & next
       </button>
@@ -156,7 +156,7 @@
         type="button"
         mat-flat-button
         color="primary"
-        (click)="save(parameterForm)"
+        (click)="save()"
       >
         Save
       </button>

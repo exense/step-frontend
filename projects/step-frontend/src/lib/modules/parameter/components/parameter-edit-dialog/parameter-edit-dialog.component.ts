@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ViewChild, viewChild } from '@angular/core';
 import {
   AugmentedParametersService,
   AugmentedScreenService,
@@ -37,6 +37,8 @@ interface ParameterEditDialogData {
   ],
 })
 export class ParameterEditDialogComponent implements OnInit {
+  @ViewChild('parameterForm', { read: NgForm, static: true }) form!: NgForm;
+
   animationState: 'visible' | 'hidden' = 'visible';
   private _dialogData = inject<ParameterEditDialogData>(MAT_DIALOG_DATA);
   private _authService = inject(AuthService);
@@ -67,7 +69,7 @@ export class ParameterEditDialogComponent implements OnInit {
     this.initScopeItems();
   }
 
-  saveInternal(form: NgForm, event?: KeyboardEvent): Observable<Parameter> {
+  saveInternal(event?: KeyboardEvent): Observable<Parameter> {
     if (
       (!!event?.target && event?.target instanceof HTMLTextAreaElement) ||
       (this.parameter?.scope === 'GLOBAL' && !this._authService.hasRight('param-global-write'))
@@ -76,11 +78,8 @@ export class ParameterEditDialogComponent implements OnInit {
       return throwError(() => new Error(this.error));
     }
 
-    if (form.invalid) {
-      Object.keys(form.form.controls).forEach((field) => {
-        const control = form.form.get(field);
-        control?.markAsTouched({ onlySelf: true });
-      });
+    if (this.form.invalid) {
+      this.form.form.markAllAsTouched();
       return throwError(() => new Error(this.error));
     }
 
@@ -88,15 +87,15 @@ export class ParameterEditDialogComponent implements OnInit {
   }
 
   @HostListener('keydown.enter', ['$event'])
-  save(form: NgForm, event?: KeyboardEvent): void {
-    this.saveInternal(form, event).subscribe((parameter) => {
+  save(event?: KeyboardEvent): void {
+    this.saveInternal(event).subscribe((parameter) => {
       this._matDialogRef.close({ isSuccess: !!parameter });
     });
   }
 
-  saveAndNext(form: NgForm) {
+  saveAndNext() {
     this.animationState = 'hidden';
-    this.saveInternal(form)
+    this.saveInternal()
       .pipe(
         catchError((error: any) => {
           this.animationState = 'visible';
