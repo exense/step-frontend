@@ -42,6 +42,7 @@ export class TableColumnsService {
 
   readonly hasChanges = this.hasChangesInternal.asReadonly();
 
+  private originalSettings?: TableSettings;
   private settings = signal<TableSettings | undefined>(undefined);
 
   readonly hiddenColumns = computed(() =>
@@ -52,7 +53,10 @@ export class TableColumnsService {
   );
 
   initialize(): void {
-    this.getTableSettings().subscribe((settings) => this.settings.set(settings));
+    this.getTableSettings().subscribe((settings) => {
+      this.originalSettings = settings;
+      this.settings.set(settings);
+    });
   }
 
   showColumn(columnId: string): void {
@@ -107,7 +111,18 @@ export class TableColumnsService {
     const tableSettings = this.settings();
     this._tableApi
       .saveTableSettings(this._columnsConfig.entityTableRemoteId, { tableSettings, scope })
-      .subscribe(() => this.hasChangesInternal.set(false));
+      .subscribe(() => {
+        this.originalSettings = this.settings();
+        this.hasChangesInternal.set(false);
+      });
+  }
+
+  resetSettings(): void {
+    if (!this.hasChanges()) {
+      return;
+    }
+    this.settings.set(this.originalSettings);
+    this.hasChangesInternal.set(false);
   }
 
   private getTableSettings(): Observable<TableSettings> {
@@ -204,12 +219,17 @@ export class TableColumnsService {
       return;
     }
     const tableSettings = this.settings();
-    const column = (tableSettings?.columnSettingList ?? []).find((col) => col.columnId === columnId);
-    if (!column) {
+    const columnSettingList = [...(tableSettings?.columnSettingList ?? [])];
+    const columnIndex = columnSettingList.findIndex((col) => col.columnId === columnId);
+    if (columnIndex < 0) {
       return;
     }
-    column.visible = visibility === VisibilityState.VISIBLE;
-    this.settings.set({ ...tableSettings });
+
+    columnSettingList[columnIndex] = {
+      ...columnSettingList[columnIndex],
+      visible: visibility === VisibilityState.VISIBLE,
+    };
+    this.settings.set({ ...tableSettings, columnSettingList });
     this.hasChangesInternal.set(true);
   }
 
