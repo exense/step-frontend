@@ -1,9 +1,10 @@
-import { Component, computed, forwardRef, input, Input } from '@angular/core';
+import { Component, computed, forwardRef, inject, input, Input } from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { map, Observable } from 'rxjs';
+import { debounceTime, map, Observable, startWith } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 export const UNSET_VALUE = 'unset';
 
@@ -19,6 +20,8 @@ export const UNSET_VALUE = 'unset';
   ],
 })
 export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterComponent<string[], unknown> {
+  private _fb = inject(FormBuilder);
+
   /** @Input() **/
   readonly items = input<T[] | ReadonlyArray<T>>([]);
 
@@ -30,15 +33,32 @@ export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterCompone
 
   protected readonly UNSET_VALUE = UNSET_VALUE;
 
+  protected readonly searchCtrl = this._fb.control('');
+
+  private searchCtrlValue = toSignal(
+    this.searchCtrl.valueChanges.pipe(
+      map((value) => value?.toLowerCase()),
+      takeUntilDestroyed(),
+    ),
+    { initialValue: this.searchCtrl.value ?? '' },
+  );
+
   protected displayItems = computed<KeyValue<unknown, string>[]>(() => {
     const items = this.items();
     const extractor = this.extractor();
+    const searchCtrlValue = this.searchCtrlValue();
 
-    return (items || []).map((item) => {
+    const result = (items || []).map((item) => {
       const key = extractor ? extractor.getValue(item) : item;
       const value = extractor ? extractor.getLabel(item) : item?.toString() ?? '';
       return { key, value };
     });
+
+    if (!searchCtrlValue) {
+      return result;
+    }
+
+    return result.filter((item) => item.value.toLowerCase().includes(searchCtrlValue));
   });
 
   @Input() remapValues?: Record<string, string>;
