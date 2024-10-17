@@ -6,4 +6,5 @@ export enum AceMode {
   JSON = 'ace/mode/json',
   XML = 'ace/mode/xml',
   JAVA = 'ace/mode/java',
+  LOG = 'ace/mode/sh',
 }

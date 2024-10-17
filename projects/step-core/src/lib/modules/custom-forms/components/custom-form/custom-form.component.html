@@ -12,10 +12,10 @@
 } @else {
   @for (input of inputs(); track input.id) {
     <step-standard-custom-form-inputs
-      [stInput]="input"
       [disabled]="stDisabled"
       [required]="required"
       [ngModel]="stModel | stepCustomFormInputModel: input"
+      [stInput]="input"
       (ngModelChange)="onInputValueChange(input, $event)"
       (touch)="onCustomInputTouched()"
     />

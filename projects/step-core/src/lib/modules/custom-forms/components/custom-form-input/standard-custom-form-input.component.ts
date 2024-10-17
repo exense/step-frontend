@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, Input } from '@angular/core';
+import { Component, computed, forwardRef, Input, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { BaseCustomFormInputComponent } from './base-custom-form-input.component';
 import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-imports.contant';
@@ -19,6 +19,7 @@ import { map } from 'rxjs';
   ],
   standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS, ReactiveFormsModule, FormsModule, NgxMatSelectSearchModule],
+  encapsulation: ViewEncapsulation.None,
 })
 export class StandardCustomFormInputComponent extends BaseCustomFormInputComponent {
   @Input() hideLabel?: boolean;

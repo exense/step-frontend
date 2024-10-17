@@ -11,7 +11,7 @@
 @mixin reportNodeLink() {
   .report-node-link,
   .report-node-link > a {
-    color: var.$dark-gray;
+    color: var.$gray-525;
     font-size: 12px;
     font-style: italic;
   }
@@ -19,7 +19,7 @@
 
 @mixin reportNodeText() {
   .report-node-text {
-    color: var.$dark-gray;
+    color: var.$gray-525;
     font-size: 12px !important;
     overflow-wrap: anywhere;
     -ms-word-wrap: anywhere;

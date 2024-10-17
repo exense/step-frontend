@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { Route, Router, Routes } from '@angular/router';
+import { ActivatedRoute, Route, Router, Routes } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { SubRouteData } from '../types/sub-route-data.interface';
@@ -97,6 +97,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Quota Manager', 'grid-quota-manager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Bookmarks
     this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
+
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
@@ -157,7 +158,17 @@ export class ViewRegistryService implements OnDestroy {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
-  getChildrenRouteInfo(parentPath: string): SubRouteData[] {
+  getChildrenRouteInfo(parentPath: string): SubRouteData[];
+  getChildrenRouteInfo(activatedRoute: ActivatedRoute, dataPropertyName?: string): SubRouteData[];
+  getChildrenRouteInfo(
+    pathOrActivatedRoute: string | ActivatedRoute,
+    dataPropertyName: string = 'resolveChildFor',
+  ): SubRouteData[] {
+    const parentPath =
+      typeof pathOrActivatedRoute === 'string'
+        ? pathOrActivatedRoute
+        : pathOrActivatedRoute.snapshot.data[dataPropertyName];
+
     const parentChildren = this.getRouteParentChildren(parentPath);
     return parentChildren
       .map((child) => {
@@ -267,7 +278,12 @@ export class ViewRegistryService implements OnDestroy {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(title: string, id: string, icon: string, options?: { weight?: number; parentId?: string }): void {
+  registerMenuEntry(
+    title: string,
+    id: string,
+    icon: string,
+    options?: { weight?: number; parentId?: string; isEnabledFct?: () => boolean },
+  ): void {
     if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
@@ -278,7 +294,7 @@ export class ViewRegistryService implements OnDestroy {
       parentId: options?.parentId,
       icon,
       weight: options?.weight,
-      isEnabledFct: () => true,
+      isEnabledFct: options?.isEnabledFct ?? (() => true),
     });
   }
 

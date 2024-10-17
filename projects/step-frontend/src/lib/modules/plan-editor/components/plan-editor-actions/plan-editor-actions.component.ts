@@ -1,12 +1,14 @@
-import { Component, EventEmitter, inject, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, viewChild, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   PlanContext,
   RepositoryObjectReference,
   ViewRegistryService,
   ExecutiontTaskParameters,
+  CustomFormComponent,
 } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'step-plan-editor-actions',
@@ -18,6 +20,7 @@ export class PlanEditorActionsComponent {
   protected _interactiveSession = inject(InteractiveSessionService);
 
   readonly _planActions = inject(ViewRegistryService).getDashlets('plan/editorActions');
+  readonly _planExecutionActions = inject(ViewRegistryService).getDashlets('plan/editorExecutionActions');
 
   @Input() planContext?: PlanContext | null;
   @Input() hasUndo?: boolean | null;
@@ -41,6 +44,8 @@ export class PlanEditorActionsComponent {
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
 
+  private customForm = viewChild('interactiveSessionCustomForm', { read: CustomFormComponent });
+
   protected readonly captions = {
     revertAll: 'Revert all changes',
     undo: 'Undo (Ctrl + Z)',
@@ -56,8 +61,12 @@ export class PlanEditorActionsComponent {
   };
 
   protected startInteractiveSession(): void {
-    this.interactiveSessionTrigger?.closeMenu();
-    this.startInteractive.emit();
+    const customForm = this.customForm();
+    const isReady$ = !customForm ? of(undefined) : customForm.readyToProceed();
+    isReady$.subscribe(() => {
+      this.interactiveSessionTrigger?.closeMenu();
+      this.startInteractive.emit();
+    });
   }
 
   protected toggleInteractiveSession(): void {

@@ -1,0 +1,32 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-simple-object-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+
+  .add-fields {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    label {
+      color: var.$blue-700;
+    }
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    column-gap: 1rem;
+    row-gap: 1rem;
+
+    step-btn-group {
+      gap: 0.5em;
+    }
+    button {
+      min-width: 4rem;
+      width: 4rem;
+    }
+  }
+}

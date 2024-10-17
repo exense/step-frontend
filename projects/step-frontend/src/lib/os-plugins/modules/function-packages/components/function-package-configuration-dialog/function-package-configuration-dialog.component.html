@@ -83,7 +83,7 @@
             <step-form-field>
               <input type="text" placeholder="Value" [(ngModel)]="criterion.value" (blur)="saveRoutingCriteria()" />
             </step-form-field>
-            <button type="button" mat-flat-button color="accent" (click)="removeRoutingCriteria(criterion)">
+            <button type="button" mat-stroked-button (click)="removeRoutingCriteria(criterion)">
               <step-icon name="trash-2"></step-icon>
             </button>
           </ng-container>
