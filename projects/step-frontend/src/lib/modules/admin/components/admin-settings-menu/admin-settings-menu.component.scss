@@ -1,0 +1,5 @@
+@use 'projects/step-frontend/styles/common-mixins' as mixins;
+
+step-admin-settings-menu {
+  @include mixins.settings-menu;
+}

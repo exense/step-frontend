@@ -2,15 +2,8 @@ import { Component, inject } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AddSchemaFieldDialogComponent } from '../add-schema-field-dialog/add-schema-field-dialog.component';
-import { FieldSchemaMeta } from '../../shared/field-schema-meta.interface';
-import {
-  SchemaField,
-  DynamicFieldsSchema,
-  SchemaArrayField,
-  SchemaObjectField,
-} from '../../shared/dynamic-fields-schema';
-import { FieldSchemaType } from '../../shared/field-schema-type.enum';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
+import { SchemaField, SchemaArrayField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
+import { JsonFieldSchema, JsonFieldSchemaMeta, JsonFieldType, JsonSchemaFieldType } from '../../../json-forms';
 
 @Component({
   selector: 'step-add-field-schema-button',
@@ -23,7 +16,7 @@ export class AddFieldSchemaButtonComponent {
 
   openAddFieldDialog(): void {
     this._matDialog
-      .open<AddSchemaFieldDialogComponent, unknown, FieldSchemaMeta>(AddSchemaFieldDialogComponent)
+      .open<AddSchemaFieldDialogComponent, unknown, JsonFieldSchemaMeta>(AddSchemaFieldDialogComponent)
       .afterClosed()
       .subscribe((fieldMeta) => {
         if (!fieldMeta || !this._ngControl) {
@@ -33,24 +26,24 @@ export class AddFieldSchemaButtonComponent {
       });
   }
 
-  private addField(fieldMeta: FieldSchemaMeta): void {
-    const schema: DynamicFieldsSchema = { ...(this._ngControl!.value ?? {}) };
+  private addField(fieldMeta: JsonFieldSchemaMeta): void {
+    const schema: JsonFieldSchema = { ...(this._ngControl!.value ?? {}) };
     if (!schema.properties) {
       schema.properties = {};
     }
 
     let fieldProperty: SchemaField = {};
 
-    if (fieldMeta.type === FieldSchemaType.ENUM) {
+    if (fieldMeta.type === JsonSchemaFieldType.ENUM) {
       fieldProperty.enum = fieldMeta.enumItems;
-    } else if (fieldMeta.type === FieldSchemaType.ARRAY) {
+    } else if (fieldMeta.type === JsonSchemaFieldType.ARRAY) {
       fieldProperty = {
-        type: DynamicFieldType.ARRAY,
-        items: { type: DynamicFieldType.STRING },
+        type: JsonFieldType.ARRAY,
+        items: { type: JsonFieldType.STRING },
       } as SchemaArrayField;
-    } else if (fieldMeta.type === FieldSchemaType.OBJECT) {
+    } else if (fieldMeta.type === JsonSchemaFieldType.OBJECT) {
       fieldProperty = {
-        type: DynamicFieldType.OBJECT,
+        type: JsonFieldType.OBJECT,
         properties: {},
       } as SchemaObjectField;
     } else {
@@ -59,6 +52,9 @@ export class AddFieldSchemaButtonComponent {
 
     if (fieldMeta.defaultValue !== undefined) {
       fieldProperty.default = fieldMeta.defaultValue;
+    }
+    if (fieldMeta.description) {
+      fieldProperty.description = fieldMeta.description;
     }
 
     schema.properties[fieldMeta.name] = fieldProperty;

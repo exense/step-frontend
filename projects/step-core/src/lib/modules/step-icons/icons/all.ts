@@ -309,6 +309,7 @@ import { X } from './svg/x';
 import { ZapOff } from './svg/zap-off';
 import { CheckSquare } from './svg/check-square';
 import { Zap } from './svg/zap';
+import { ZapCircle } from './svg/zap-circle';
 import { ZoomIn } from './svg/zoom-in';
 import { ChevronDown } from './svg/chevron-down';
 import { ZoomOut } from './svg/zoom-out';
@@ -625,6 +626,7 @@ export const allIcons = {
   ZapOff,
   CheckSquare,
   Zap,
+  ZapCircle,
   ZoomIn,
   ChevronDown,
   ZoomOut,

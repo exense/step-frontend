@@ -6,9 +6,9 @@ import { DynamicFieldArrayValue } from '../../shared/dynamic-field-group-value';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
 import { SchemaField } from '../../shared/dynamic-fields-schema';
 import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { v4 } from 'uuid';
 import { DynamicFieldUtilsService } from '../../services/dynamic-field-utils.service';
+import { JsonFieldType } from '../../../json-forms';
 
 const DEFAULT_FIELD_VALUE: DynamicValueArray = { value: undefined, dynamic: false };
 
@@ -27,7 +27,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
   private schemaJson = '';
   private lastFormValue?: DynamicFieldArrayValue;
 
-  protected readonly DynamicFieldType = DynamicFieldType;
+  protected readonly DynamicFieldType = JsonFieldType;
 
   /** @Input() **/
   readonly addFieldBtnLabel = input('', {
@@ -138,7 +138,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
   }
 
   private addFieldInternal(fieldDescription: SchemaField = {}, value?: DynamicValue): void {
-    const { fieldSchema, fieldType, enumItems } = this._utils.determineFieldMetaParameters(fieldDescription);
+    const { fieldSchema, fieldType, enumItems, tooltip } = this._utils.determineFieldMetaParameters(fieldDescription);
 
     if (!fieldType) {
       throw new Error('Invalid schema');
@@ -156,6 +156,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
     const meta: DynamicFieldMetaData = {
       trackId: `track_${v4()}`,
       key: `temp_${v4()}`,
+      tooltip,
       control,
       fieldType,
       fieldSchema,

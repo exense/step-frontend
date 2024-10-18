@@ -77,6 +77,7 @@
   #step-main-scrollable-content {
     flex: 1;
     overflow: auto;
+    padding-top: 1.6rem;
   }
 
   .danger-warning {
@@ -134,6 +135,6 @@
     -ms-transform: scaleX(-1);
   }
   body {
-    --status-passed: #5cb85c;
+    --status-passed: #01a990;
   }
 }

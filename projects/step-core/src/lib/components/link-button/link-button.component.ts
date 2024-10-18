@@ -26,6 +26,9 @@ export abstract class LinkButtonComponent implements OnInit {
       return;
     }
 
-    from(this._router.navigateByUrl('/')).subscribe(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }));
+    // force refresh by navigating away and back, added timeout to solve race-condition
+    from(this._router.navigateByUrl('/')).subscribe(() =>
+      setTimeout(() => this._router.navigateByUrl(this.url!, { replaceUrl: true }), 0),
+    );
   }
 }

@@ -1,0 +1,11 @@
+<h3>Admin Settings</h3>
+<mat-nav-list>
+  @for (menuItem of _configurationItems; track menuItem.path) {
+    <a mat-list-item [routerLink]="menuItem.path" [relativeTo]="_activatedRoute" routerLinkActive="active-list-item">
+      {{ menuItem.label }}
+    </a>
+  }
+</mat-nav-list>
+<div class="content">
+  <router-outlet />
+</div>

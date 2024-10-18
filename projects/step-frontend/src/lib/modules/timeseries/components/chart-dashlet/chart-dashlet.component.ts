@@ -32,6 +32,7 @@ import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
+import { MatTooltip } from '@angular/material/tooltip';
 
 declare const uPlot: any;
 
@@ -44,12 +45,25 @@ interface RateUnit {
   unitKey: string;
 }
 
+const resolutionLabels: Record<string, string> = {
+  '60000': 'Minute',
+  '3600000': 'Hour',
+  '86400000': 'Day',
+  '604800000': 'Week',
+};
+
 @Component({
   selector: 'step-chart-dashlet',
   templateUrl: './chart-dashlet.component.html',
   styleUrls: ['./chart-dashlet.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent, TimeseriesAggregatePickerComponent],
+  imports: [
+    COMMON_IMPORTS,
+    ChartSkeletonComponent,
+    TimeSeriesChartComponent,
+    TimeseriesAggregatePickerComponent,
+    MatTooltip,
+  ],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -95,6 +109,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
+  showHigherResolutionWarning = false;
+  collectionResolutionUsed: number = 0;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -365,7 +381,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           yAxisUnit: yAxesUnit,
           useExecutionLinks: this.showExecutionLinks,
         },
-        showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+        showLegend: true,
         axes: axes,
         truncated: response.truncated,
       };
@@ -443,6 +459,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
+        this.showHigherResolutionWarning = response.higherResolutionUsed;
+        this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
         this.createChart(response);
       }),
@@ -615,4 +633,5 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   protected readonly ChartAggregation = ChartAggregation;
+  protected readonly resolutionLabels = resolutionLabels;
 }
