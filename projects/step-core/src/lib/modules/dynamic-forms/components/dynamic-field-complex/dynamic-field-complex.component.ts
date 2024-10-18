@@ -11,9 +11,9 @@ import { DynamicFieldBaseComponent } from '../dynamic-field-base/dynamic-field-b
 import { DynamicComplexValue } from '../../../../client/step-client-module';
 import { NgControl } from '@angular/forms';
 import { ComplexFieldContext, ComplexFieldContextService } from '../../services/complex-field-context.service';
-import { DynamicFieldType } from '../../shared/dynamic-field-type';
 import { AceMode } from '../../../rich-editor';
 import { SchemaField } from '../../shared/dynamic-fields-schema';
+import { JsonFieldType } from '../../../json-forms';
 
 @Component({
   selector: 'step-dynamic-field-complex',
@@ -45,6 +45,6 @@ export class DynamicFieldComplexComponent
     this.fieldContext = undefined;
   }
 
-  protected readonly DynamicFieldType = DynamicFieldType;
+  protected readonly DynamicFieldType = JsonFieldType;
   protected readonly AceMode = AceMode;
 }

@@ -24,11 +24,19 @@ import {
   BookmarkNavigatorService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
-import { combineLatest, map, startWith, SubscriptionLike } from 'rxjs';
+import { combineLatest, first, map, startWith } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MIDDLE_BUTTON = 1;
+
+export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom'> & {
+  isBookmark?: boolean;
+  hasChildren?: boolean;
+  children?: DisplayMenuEntry[];
+};
+
+const BOOKMARKS_ROOT = 'bookmarks-root';
 
 @Component({
   selector: 'step-sidebar',
@@ -42,8 +50,30 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _zone = inject(NgZone);
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
-  private _bookmarkService = inject(BookmarkService);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
+  private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
+    startWith([]),
+    map(
+      (bookmarks) =>
+        (bookmarks ?? [])
+          .map((element) => {
+            const menuEntry = {
+              title: element.customFields!['label'],
+              id: element.customFields!['link'],
+              icon: element.customFields!['icon'],
+              position: element.customFields!['position'] || 100,
+              parentId: BOOKMARKS_ROOT,
+              weight: 1000 + bookmarks!.length,
+              isEnabledFct(): boolean {
+                return true;
+              },
+            };
+            return menuEntry;
+          })
+          .sort((a, b) => a.position - b.position) as MenuEntry[],
+    ),
+    takeUntilDestroyed(),
+  );
   private _location = inject(Location);
 
   @ViewChildren('mainMenuCheckBox') mainMenuCheckBoxes?: QueryList<ElementRef>;
@@ -57,34 +87,24 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   private _customMenuEntries = inject(CustomMenuEntriesService);
   private _menuItems$ = inject(MENU_ITEMS).pipe(takeUntilDestroyed());
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly displayMenuItems$ = combineLatest([this._menuItems$, this._bookmarkService.bookmarkMenuItems$]).pipe(
-    map(([menuItems, bookmarkMenuItems]) => menuItems.concat(bookmarkMenuItems)),
-  );
-  private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
-    startWith([]),
-    map((bookmarks) =>
-      (bookmarks ?? []).map((element) => {
-        const menuEntry = {
-          title: element.customFields!['label'],
-          id: element.customFields!['link'],
-          icon: element.customFields!['icon'],
-          parentId: 'bookmarks-root',
-          weight: 1000 + bookmarks!.length,
-          isEnabledFct(): boolean {
-            return true;
-          },
-        } as MenuEntry;
-        return menuEntry;
-      }),
-    ),
-    takeUntilDestroyed(),
+  readonly displayMenuItems$ = combineLatest([
+    this._menuItems$,
+    this._customMenuEntries.customMenuEntries$,
+    this._bookmarkMenuItems$,
+  ]).pipe(
+    map(([menuItems, customMenuEntries, bookmarkMenuItems]) => [
+      ...menuItems,
+      ...customMenuEntries,
+      ...bookmarkMenuItems,
+    ]),
+    map((menuItems) => this.createMenuItemsTree(menuItems)),
   );
 
   readonly isOpened$ = this._sideBarState.isOpened$;
 
   ngAfterViewInit(): void {
     this._sideBarState.initialize();
-    this._menuItems$.subscribe(() => {
+    this.displayMenuItems$.pipe(first()).subscribe(() => {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render
@@ -177,5 +197,48 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       const scrollTop = ($event.target as HTMLElement).scrollTop;
       this.tabs!.nativeElement.setAttribute('style', `--scrollOffset: -${scrollTop}px`);
     });
+  }
+
+  private createMenuItemsTree(menuItems: MenuEntry[]): DisplayMenuEntry[] {
+    const weightCompare = (a: MenuEntry, b: MenuEntry) => {
+      if (!a.weight) {
+        return 1;
+      }
+      if (!b.weight) {
+        return -1;
+      }
+      return a.weight - b.weight;
+    };
+
+    const convert = ({ id, title, icon, isCustom, parentId }: MenuEntry): DisplayMenuEntry => ({
+      id,
+      title,
+      icon,
+      isCustom,
+      isBookmark: parentId === BOOKMARKS_ROOT,
+    });
+
+    const findChildren = (parent: DisplayMenuEntry) => {
+      const children = menuItems
+        .filter((item) => item?.parentId === parent.id && item.isEnabledFct())
+        .sort(weightCompare)
+        .map(convert);
+
+      const hasChildren = children.length > 0;
+      parent.children = children;
+      parent.hasChildren = hasChildren;
+    };
+
+    const result = menuItems
+      .filter((item) => item && !item.parentId && item.isEnabledFct())
+      .sort(weightCompare)
+      .map(convert);
+
+    result.forEach((parent) => {
+      findChildren(parent);
+      parent.children?.forEach((child) => findChildren(child));
+    });
+
+    return result;
   }
 }

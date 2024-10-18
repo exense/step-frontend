@@ -21,7 +21,11 @@ export class InfoBannerComponent {
   protected readonly infos = computed(() => {
     const infos = this._infoBannerService.actualInfos();
     return infos
-      .filter((info) => !info.permission || this._auth.hasRight(info.permission))
+      .filter(
+        (info) =>
+          (!info.options?.hasPermission || this._auth.hasRight(info.options?.hasPermission)) &&
+          (!info.options?.hasNotPermission || !this._auth.hasRight(info.options?.hasNotPermission)),
+      )
       .map(({ id, info }) => {
         const value = this._domSanitizer.bypassSecurityTrustHtml(info);
         return { key: id, value } as KeyValue<string, SafeHtml>;

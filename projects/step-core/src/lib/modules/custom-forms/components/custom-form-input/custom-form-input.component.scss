@@ -1,7 +1,38 @@
 @use 'projects/step-core/styles/core-mixins' as m;
 
-:host.disabled {
-  pointer-events: none;
+step-standard-custom-form-inputs,
+step-dynamic-label-custom-form-inputs {
+  &.disabled {
+    pointer-events: none;
+  }
+}
+
+step-standard-custom-form-inputs {
+  step-form-field.checkbox-toggle-input {
+    display: grid;
+    grid-template-areas:
+      'toggle label'
+      'error error'
+      'hint hint';
+    grid-template-columns: min-content auto;
+
+    .form-field-content {
+      grid-area: toggle;
+      padding-top: 0.3rem;
+    }
+
+    .label-container {
+      grid-area: label;
+    }
+
+    .form-field-error {
+      grid-area: error;
+    }
+
+    .form-field-hint {
+      grid-area: hint;
+    }
+  }
 }
 
 @include m.unset-item;

@@ -35,7 +35,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   providers: [
     ...selectionCollectionProvider<string, TestRunStatus>({
       selectionKeyProperty: 'id',
-      registrationStrategy: RegistrationStrategy.AUTO,
+      registrationStrategy: RegistrationStrategy.MANUAL,
     }),
   ],
 })
@@ -129,6 +129,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       }),
       map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
       tap(() => this._selectionCollector.clear()),
+      tap((items) => this._selectionCollector.registerPossibleSelectionManually(items)),
     );
   }
 }

@@ -16,7 +16,7 @@
     success: step-define-alert-color(var.$green-10, var.$green-15, var.$green-650),
     info: step-define-alert-color(var.$blue-10, var.$blue-15, var.$blue-650),
     danger: step-define-alert-color(var.$red-10, var.$red-15, var.$red-650),
-    warning: step-define-alert-color(var.$yellow-10, var.$yellow-15, var.$yellow-650),
+    warning: step-define-alert-color(var.$yellow-10, var.$yellow-15, var.$gold),
   );
   @return $config;
 }
@@ -26,7 +26,7 @@
   padding: 1.5rem;
   margin-bottom: 2rem;
   border: 0.1rem solid transparent;
-  border-radius: 0.4rem;
+  /* border-radius: 0.4rem; */
 }
 
 @mixin step-alert-colors($colors) {
@@ -45,6 +45,11 @@
     @each $type, $colors in $config {
       &[type='#{$type}'] {
         @include step-alert-colors($colors);
+
+        a {
+          color: map.get($colors, text);
+          text-decoration: underline;
+        }
       }
     }
     &[type='minimalist'] {

@@ -52,12 +52,14 @@
             ) {
               @switch (conditionForm.controls['key'].value | inputType: inputs) {
                 @case ('dropdown') {
-                  <step-autocomplete-input
-                    placeHolder="Value"
-                    formControlName="value"
-                    [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
-                    [valueLabelExtractor]="bindingKeyExtractor"
-                  />
+                  <step-form-field>
+                    <step-autocomplete-input
+                      placeHolder="Value"
+                      formControlName="value"
+                      [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
+                      [valueLabelExtractor]="bindingKeyExtractor"
+                    />
+                  </step-form-field>
                 }
                 @case ('checkbox') {
                   <step-form-field>

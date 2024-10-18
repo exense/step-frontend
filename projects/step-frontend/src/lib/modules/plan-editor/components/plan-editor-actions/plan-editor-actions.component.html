@@ -93,6 +93,9 @@
 
 @if (showExecuteButton) {
   <step-btn-group class="with-borders">
+    @for (editorAction of _planExecutionActions; track editorAction.id) {
+      <step-dashlet [itemKey]="editorAction.template" [context]="planContext" />
+    }
     <button
       type="button"
       mat-stroked-button
@@ -119,7 +122,11 @@
   <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
       @if (_interactiveSession.executionParameters) {
-        <step-custom-forms [stModel]="_interactiveSession.executionParameters" stScreen="executionParameters" />
+        <step-custom-forms
+          #interactiveSessionCustomForm
+          [stModel]="_interactiveSession.executionParameters"
+          stScreen="executionParameters"
+        />
       }
       <step-btn-group>
         <button

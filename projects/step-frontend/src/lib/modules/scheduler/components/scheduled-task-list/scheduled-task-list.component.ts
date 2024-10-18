@@ -68,10 +68,7 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
-  readonly settingsUrl =
-    this._auth.hasRight('admin-ui-menu') && this._auth.isAuthenticated()
-      ? '/admin/controller/scheduler'
-      : '/settings/scheduler';
+  readonly settingsUrl = '/admin/controller/scheduler';
 
   readonly statusItems: StatusItem[] = [
     { key: true.toString(), value: this.ActiveLabels.ACTIVE },

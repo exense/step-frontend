@@ -32,14 +32,14 @@ export class InfoBannerService {
   private actualPath = computed(() => this.viewStackTop()?.view ?? '');
   readonly actualInfos = computed(() => this.viewStackTop()?.infos ?? []);
 
-  register(view: string, bannerText: string, permission?: string): this {
+  register(view: string, bannerText: string, options?: { hasPermission?: string; hasNotPermission?: string }): this {
     if (!this.data.has(view)) {
       this.data.set(view, []);
     }
     const id = `${view}:${stringHash(bannerText)}`;
     const info = bannerText;
     this.registeredIds.add(id);
-    this.data.get(view)!.push({ id, info, permission });
+    this.data.get(view)!.push({ id, info, options });
     return this;
   }
 

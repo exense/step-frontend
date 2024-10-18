@@ -12,6 +12,7 @@ import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
+import { RegistrationStrategy } from '../../shared/registration.strategy';
 
 @Component({
   selector: 'step-bulk-selection',
@@ -32,6 +33,7 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() showLabel: boolean = true;
   @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
+  @Input() isDisabled: boolean = false;
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   protected isChecked: boolean = false;
@@ -58,7 +60,6 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
 
   changeType(selectionType: BulkSelectionType): void {
     this.selectionType = selectionType;
-    this.selectionTypeChange.emit(selectionType);
 
     if (this.selectionCollector) {
       switch (selectionType) {
@@ -66,6 +67,10 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
         case BulkSelectionType.FILTERED:
         case BulkSelectionType.VISIBLE:
           this.selectionCollector.selectPossibleItems();
+          if (this.selectionCollector.registrationStrategy === RegistrationStrategy.MANUAL) {
+            // In case of manual registration, it's assumed that registered possible items, are the whole list
+            selectionType = BulkSelectionType.ALL;
+          }
           break;
         case BulkSelectionType.NONE:
           this.selectionCollector.clear();
@@ -74,6 +79,9 @@ export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy
           break;
       }
     }
+
+    this.selectionType = selectionType;
+    this.selectionTypeChange.emit(selectionType);
 
     switch (selectionType) {
       case BulkSelectionType.ALL:

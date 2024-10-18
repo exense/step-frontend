@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { SchemaField, SchemaSimpleField } from '../shared/dynamic-fields-schema';
-import { DynamicFieldType } from '../shared/dynamic-field-type';
 import { DynamicValue } from '../../../client/augmented/models/dynamic-value-complex-types';
 import { DynamicFieldArrayValue, DynamicFieldObjectValue } from '../shared/dynamic-field-group-value';
+import { JsonFieldType } from '../../json-forms';
 
 interface FieldMetaParameters {
   fieldSchema?: SchemaField;
-  fieldType?: DynamicFieldType;
+  fieldType?: JsonFieldType;
+  tooltip?: string;
   enumItems: string[];
 }
 
@@ -16,30 +17,31 @@ interface FieldMetaParameters {
 export class DynamicFieldUtilsService {
   determineFieldMetaParameters(fieldDescription: SchemaField = {}): FieldMetaParameters {
     let fieldSchema: SchemaField | undefined;
-    let fieldType: DynamicFieldType | undefined;
+    let fieldType: JsonFieldType | undefined;
     let enumItems: string[] = [];
+    const tooltip = fieldDescription?.description;
 
     if ((fieldDescription as SchemaSimpleField).enum) {
-      fieldType = DynamicFieldType.ENUM;
+      fieldType = JsonFieldType.ENUM;
       enumItems = (fieldDescription as SchemaSimpleField).enum!;
     } else {
       switch (fieldDescription.type) {
         case 'string':
-          fieldType = DynamicFieldType.STRING;
+          fieldType = JsonFieldType.STRING;
           break;
         case 'number':
         case 'integer':
-          fieldType = DynamicFieldType.NUMBER;
+          fieldType = JsonFieldType.NUMBER;
           break;
         case 'boolean':
-          fieldType = DynamicFieldType.BOOLEAN;
+          fieldType = JsonFieldType.BOOLEAN;
           break;
         case 'array':
-          fieldType = DynamicFieldType.ARRAY;
+          fieldType = JsonFieldType.ARRAY;
           fieldSchema = fieldDescription.items;
           break;
         case 'object':
-          fieldType = DynamicFieldType.OBJECT;
+          fieldType = JsonFieldType.OBJECT;
           fieldSchema = fieldDescription.properties;
           break;
         default:
@@ -47,7 +49,7 @@ export class DynamicFieldUtilsService {
       }
     }
 
-    return { fieldSchema, fieldType, enumItems };
+    return { fieldSchema, fieldType, tooltip, enumItems };
   }
 
   areDynamicFieldObjectsEqual(objectA?: DynamicFieldObjectValue, objectB?: DynamicFieldObjectValue): boolean {

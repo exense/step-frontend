@@ -1,25 +1,28 @@
 <mat-chip-grid #chipGrid>
-  <ng-container *ngFor="let item of selectedDisplayItems; trackBy: trackByKeyValue; let i = index">
+  @for (item of selectedDisplayItems; track item.key; let i = $index) {
     <mat-chip-row (removed)="removeItem(i)">
       {{ item.value }}
-      <button *ngIf="!isDisabled" matChipRemove>
-        <step-icon name="x"></step-icon>
-      </button>
+      @if (!isDisabled) {
+        <button matChipRemove>
+          <step-icon name="x" />
+        </button>
+      }
     </mat-chip-row>
-  </ng-container>
+  }
 </mat-chip-grid>
 <input
-  *ngIf="!isDisabled"
   #inputElement
   [stepPreventChars]="preventChars"
   [formControl]="filterCtrl"
+  [placeholder]="!selectedDisplayItems?.length ? placeholder : ''"
   [matAutocomplete]="auto"
   [matChipInputFor]="chipGrid"
   (matChipInputTokenEnd)="add($event)"
   (blur)="handleBlur()"
+  [disabled]="!!isDisabled"
 />
 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
-  <mat-option *ngFor="let item of displayItems$ | async; trackBy: trackByKeyValue" [value]="item.key">
-    {{ item.value }}
-  </mat-option>
+  @for (item of displayItems$ | async; track item.key) {
+    <mat-option [value]="item.key">{{ item.value }}</mat-option>
+  }
 </mat-autocomplete>

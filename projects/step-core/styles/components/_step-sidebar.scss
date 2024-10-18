@@ -318,12 +318,24 @@ $menu-sub-item-height: 3.2rem;
         position: relative; /* required for (f2) position:absolute */
         display: block;
         width: 100%;
-        padding: 14px;
+        padding: 1.4rem;
 
         /* (C2) COSMETICS */
         color: map.get($config, menu-text);
         background: map.get($config, menu-color);
         cursor: pointer;
+
+        &.no-children {
+          padding: 0;
+          & > div {
+            padding: 1.4rem;
+          }
+        }
+
+        &.no-children:hover > div,
+        &.active-primary-item > div {
+          background-color: map.get($config, selection-color);
+        }
       }
 
       .content {
@@ -475,6 +487,10 @@ $menu-sub-item-height: 3.2rem;
       .sidebar-subtab,
       .sidebar-sub-subtab {
         padding: 0 12px;
+      }
+
+      .sidebar-collapsable-tab label.no-children {
+        padding: 0;
       }
 
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN BEGIN

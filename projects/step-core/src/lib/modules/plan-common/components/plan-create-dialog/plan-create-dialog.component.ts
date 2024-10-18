@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, DestroyRef, HostListener, inject, TrackByFunction } from '@angular/core';
+import { AfterContentInit, Component, DestroyRef, HostListener, inject, viewChild } from '@angular/core';
 import { combineLatest, debounceTime, map, Observable, share, shareReplay, startWith, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -23,10 +23,10 @@ export class PlanCreateDialogComponent implements AfterContentInit {
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
 
+  private customForm = viewChild(CustomFormComponent);
+
   protected template: string = 'TestCase';
   protected plan: Partial<Plan> = { attributes: {} };
-
-  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
 
   readonly _planTypes = inject(PlanTypeRegistryService).getItemInfos();
   protected planType = this._planTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
@@ -69,9 +69,10 @@ export class PlanCreateDialogComponent implements AfterContentInit {
   }
 
   save(editAfterSave?: boolean): void {
-    this._api
-      .newPlan(this.planType, this.template)
+    this.customForm()!
+      .readyToProceed()
       .pipe(
+        switchMap(() => this._api.newPlan(this.planType, this.template)),
         tap((createdPlan) => {
           createdPlan.attributes = this.plan.attributes;
           if (createdPlan.root) {

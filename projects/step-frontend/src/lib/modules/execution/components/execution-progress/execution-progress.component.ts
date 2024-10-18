@@ -13,6 +13,7 @@ import {
   IS_SMALL_SCREEN,
   Operation,
   PrivateViewPluginService,
+  RegistrationStrategy,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,
@@ -80,7 +81,13 @@ interface RefreshParams {
     },
     SingleExecutionPanelsService,
     ExecutionTreePagingService,
-    ...selectionCollectionProvider('artefactID', AutoDeselectStrategy.KEEP_SELECTION),
+    ...selectionCollectionProvider(
+      {
+        selectionKeyProperty: 'artefactID',
+        registrationStrategy: RegistrationStrategy.MANUAL,
+      },
+      AutoDeselectStrategy.KEEP_SELECTION,
+    ),
     TreeStateService,
   ],
 })
@@ -217,7 +224,7 @@ export class ExecutionProgressComponent
     this.keywordSearch = escapeRegExp(error);
   }
 
-  selectTab(tabId: string): void {
+  selectTab(tabId: string, isInitialize?: boolean): void {
     this.activeTabId = tabId;
     this.activeTab = this.tabs.find((tab) => tab.id === tabId);
     const routeUrl = this._activatedRoute.snapshot.url;
@@ -227,7 +234,7 @@ export class ExecutionProgressComponent
     }
     const relativePath = routeUrl.length === 1 ? '.' : '..';
     const relativeTo = this._activatedRoute;
-    this._router.navigate([relativePath, tabId], { relativeTo });
+    this._router.navigate([relativePath, tabId], { relativeTo, replaceUrl: isInitialize });
   }
 
   closeExecution(openList: boolean = true): void {
@@ -311,7 +318,7 @@ export class ExecutionProgressComponent
       }
     }
 
-    this.selectTab(tabToSelect);
+    this.selectTab(tabToSelect, true);
   }
 
   private determineDefaultSelection(testCases?: ReportNode[]): void {
@@ -404,6 +411,7 @@ export class ExecutionProgressComponent
         const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
+        this._testCasesSelection.registerPossibleSelectionManually(this.testCases);
         if (updateSelection !== UpdateSelection.NONE) {
           this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
         }

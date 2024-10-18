@@ -4,12 +4,9 @@
       This keyword is part of a keyword package. All changes made will be lost when the package is updated.
     </step-alert>
 
-    <step-custom-form-wrapper
-      [stScreen]="customScreenTable"
-      [ngModel]="formGroup!.value"
-      (ngModelChange)="formGroup!.patchValue($event, { emitEvent: false })"
-    >
-    </step-custom-form-wrapper>
+    @if (keyword) {
+      <step-custom-form-wrapper [stScreen]="customScreenTable" [ngModel]="keyword" (ngModelChange)="keyword = $event" />
+    }
 
     <form [formGroup]="formGroup!">
       <step-form-field>

@@ -23,7 +23,7 @@
     </header>
     <div id="step-main-scrollable-content">
       <step-info-banner />
-      <step-dashlet itemKey="projectAlerts" />
+      <step-dashlet id="project-alerts" itemKey="projectAlerts" />
       @for (alert of adminAlerts; track alert.id) {
         <step-dashlet [itemKey]="alert.template" />
       }
@@ -36,7 +36,7 @@
 </section>
 <mat-menu #sessionMenu>
   <button type="button" mat-menu-item>
-    <step-my-account-button />
+    <step-user-settings-button />
   </button>
   @if (_appConfig.conf?.authentication) {
     @if (_authService.isAuthenticated$ | async) {

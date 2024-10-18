@@ -30,6 +30,9 @@ export const $Plan = {
         type: 'Plan',
       },
     },
+    agents: {
+      type: 'AgentProvisioningConfiguration',
+    },
     visible: {
       type: 'boolean',
     },
