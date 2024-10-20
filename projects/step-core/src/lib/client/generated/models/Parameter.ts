@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Expression } from './Expression';
 import type { DynamicValueString } from './DynamicValueString';
+import type { Expression } from './Expression';
 
 export type Parameter = {
   customFields?: Record<string, any>;
