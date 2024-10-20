@@ -26,7 +26,7 @@ export const $Parameter = {
       type: 'string',
     },
     value: {
-      type: 'string',
+      type: 'DynamicValueString',
     },
     description: {
       type: 'string',
