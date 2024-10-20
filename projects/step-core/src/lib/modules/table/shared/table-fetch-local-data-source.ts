@@ -40,7 +40,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
 
   override destroy(): void {
     super.destroy();
-    this.inProgressInternal$.complete();
+    this.inProgressInternal$?.complete();
     this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;
   }
@@ -80,10 +80,10 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
         // Don't show progress bar, when immediateHideProgress flag is passed
         // or hideProgress is passed and there is no in progress current operation
         let inProgress = true;
-        if (!!immediateHideProgress || (!!hideProgress && !this.inProgressInternal$.value)) {
+        if (!!immediateHideProgress || (!!hideProgress && !inProgressInternal$.value)) {
           inProgress = false;
         }
-        this.inProgressInternal$.next(inProgress);
+        inProgressInternal$.next(inProgress);
       }),
       switchMap(({ request }) => this.retrieveData(request)),
       tap(() => inProgressInternal$.next(false)),

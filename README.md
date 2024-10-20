@@ -1,10 +1,10 @@
-# step Frontend (step FE)
+# Step Frontend (Step FE)
 
-step FE is part of step and requires step BE (https://github.com/exense/step) in order to be used.
+Step FE is part of Step and requires Step BE (https://github.com/exense/step) in order to be used.
 
-Learn more about step in our official documentation on https://step.exense.ch/knowledgebase and download the full step distribution at [step-distribution/releases](https://github.com/exense/step-distribution/releases)
+Learn more about Step in our official documentation on https://step.dev/knowledgebase or download the full Step distribution at [step-distribution/releases](https://github.com/exense/step-distribution/releases)
 
-For support, our enterprise version or our no-maintenance-required SaaS solution check out our website: http://step.exense.ch
+For support, our enterprise version or our no-maintenance-required SaaS solution check out our website: http://step.dev
 
 ## Install dependencies
 
@@ -14,11 +14,11 @@ Run `npm install` to install all necessary dependencies.
 
 Run `npm run start:local` to build and serve step FE & step FE CORE. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Connecting to step BE
+## Connecting to Step BE
 
 Start step BE on your local machine, with the start:local configuration the FE will map BE requests to port 8080
 
-## Build step
+## Build Step
 
 Invoke the command `npm run build` it will assemble the core library and step FE
 
