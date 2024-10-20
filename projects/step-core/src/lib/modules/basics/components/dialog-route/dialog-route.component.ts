@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { map, Subject, switchMap, takeUntil, timer } from 'rxjs';
+import { asyncScheduler, map, observeOn, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { DialogParentService } from '../../injectables/dialog-parent.service';
 import { DialogRouteResult } from '../../types/dialog-route-result';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -57,6 +57,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
           result.canNavigateBack = result.canNavigateBack ?? true;
           return result;
         }),
+        observeOn(asyncScheduler),
         takeUntil(this.dialogCloseTerminator$),
       )
       .subscribe((result) => {
