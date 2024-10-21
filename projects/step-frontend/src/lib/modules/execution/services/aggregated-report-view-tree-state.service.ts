@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { AggregatedReportView, AugmentedExecutionsService, TreeStateService } from '@exense/step-core';
+import { inject, Injectable, signal } from '@angular/core';
+import { AggregatedReportView, AugmentedExecutionsService, ReportNode, TreeStateService } from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 
@@ -17,5 +17,17 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
         return true;
       }),
     );
+  }
+
+  private visibleDetailsInternal = signal<Record<string, boolean>>({});
+
+  readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
+
+  toggleDetail(node: ReportNode): void {
+    const isVisible = !!this.visibleDetailsInternal()[node.id!];
+    this.visibleDetailsInternal.update((value) => ({
+      ...value,
+      [node.id!]: !isVisible,
+    }));
   }
 }

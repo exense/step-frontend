@@ -23,6 +23,9 @@ step-alt-execution-tree {
 
   step-tree-node-name {
     width: 100%;
+    &.not-selectable {
+      background: none !important;
+    }
   }
 
   .node-name {
@@ -35,9 +38,5 @@ step-alt-execution-tree {
 
   .artefact-container {
     padding: 0 1rem;
-  }
-
-  step-tree.in-focus step-tree-node .tree-node.tree-node-selected step-tree-node-name {
-    background: none;
   }
 }

@@ -1,0 +1,37 @@
+<step-table
+  [dataSource]="dataSource()"
+  [tableParams]="keywordParameters()"
+  class="paddingless-full no-border hide-header"
+>
+  <ng-container matColumnDef="isExpanded">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <button mat-icon-button class="details-trigger" (click)="toggleDetail(element)">
+        <step-icon [name]="visibleDetails()[element.id!] ? 'chevron-down' : 'chevron-right'" />
+      </button>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <step-status [status]="element.status" class="full-width details-trigger" (click)="toggleDetail(element)" />
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="time">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let element">
+      <div class="details-trigger" (click)="toggleDetail(element)">
+        {{ element.executionTime | date: 'HH:mm:ss' }}
+      </div>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td class="name" mat-cell *matCellDef="let element">
+      <div class="details-trigger" (click)="toggleDetail(element)">{{ element.name }}</div>
+      @if (visibleDetails()[element.id!]) {
+        <step-alt-keyword-inline-drilldown [node]="element" />
+      }
+    </td>
+  </ng-container>
+</step-table>
