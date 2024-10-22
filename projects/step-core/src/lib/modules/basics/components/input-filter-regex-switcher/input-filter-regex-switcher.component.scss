@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  span {
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .selected {
+    font-weight: 600;
+    text-decoration: underline;
+  }
+}
