@@ -20,21 +20,35 @@ interface CallKeywordReportView extends AggregatedArtefactInfo {
 export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<CallKeywordReportView> {
   protected getArtefactItems(
     info?: CallKeywordReportView,
+    isVertical: boolean = false,
     isResolved: boolean = false,
   ): Observable<ArtefactInlineItem[] | undefined> {
     const keywordArgument = info?.originalArtefact?.argument;
     let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
+
     try {
-      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : undefined;
+      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : {};
     } catch (err) {}
     if (!keywordInputs) {
       return of(undefined);
     }
-    const items = Object.entries(keywordInputs).map(([label, value]) => ({
-      label,
-      value,
-      isResolved,
-    }));
-    return of(items);
+    const inputs = Object.entries(keywordInputs).map(
+      ([label, value]) =>
+        ({
+          label,
+          value,
+          isResolved,
+        }) as ArtefactInlineItem,
+    );
+
+    if (!isVertical) {
+      return of(!inputs.length ? undefined : inputs);
+    }
+
+    if (inputs.length) {
+      inputs.unshift({ label: 'Inputs' });
+    }
+
+    return of(inputs);
   }
 }

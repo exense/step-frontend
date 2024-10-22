@@ -12,12 +12,12 @@ import {
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-interface SleepArtefact extends WaitingArtefactsAdvancedArtefact {
+export interface SleepArtefact extends WaitingArtefactsAdvancedArtefact {
   duration: DynamicValueInteger;
   unit: DynamicValueString;
 }
 
-const TIME_UNIT_DICTIONARY = {
+export const TIME_UNIT_DICTIONARY = {
   ms: TimeUnit.MILLISECOND,
   s: TimeUnit.SECOND,
   m: TimeUnit.MINUTE,

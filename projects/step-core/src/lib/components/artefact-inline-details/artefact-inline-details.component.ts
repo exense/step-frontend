@@ -11,6 +11,13 @@ export class ArtefactInlineDetailsComponent<T extends AggregatedArtefactInfo> {
   private _artefactService = inject(ArtefactService);
 
   readonly info = input.required<T>();
+  readonly isVertical = input(false);
+
+  protected readonly context = computed(() => {
+    const info = this.info();
+    const isVertical = this.isVertical();
+    return { info, isVertical };
+  });
 
   protected componentToRender = computed(() => {
     const artefact = this.info().originalArtefact;

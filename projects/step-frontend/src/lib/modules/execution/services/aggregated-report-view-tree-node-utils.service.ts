@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  AbstractArtefact,
   AggregatedReportView,
   ArtefactService,
   ArtefactTreeNode,
@@ -24,14 +23,12 @@ export class AggregatedReportViewTreeNodeUtilsService
     const { parentId, isParentVisuallySkipped } = params ?? {};
     const name = originalArtefact.attributes?.['name'] ?? '';
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
-    const expandable = true;
+    const expandable = !!item?.children?.length;
     const children = (item.children ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
     );
 
-    children.unshift(this.createDetailsNode(item));
-
-    const result = {
+    return {
       id,
       name,
       isSkipped: false,
@@ -41,10 +38,10 @@ export class AggregatedReportViewTreeNodeUtilsService
       children,
       parentId,
       originalArtefact,
+      artefactHash: item.artefactHash,
       countByStatus: item.countByStatus,
       nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
     };
-    return result;
   }
 
   updateChildren(
@@ -67,30 +64,17 @@ export class AggregatedReportViewTreeNodeUtilsService
     const artefactId = originalArtefact.id!;
     const id = `details_${artefactId}`;
     const parentId = artefactId;
-    const name = 'Details';
-    const icon = 'file-text';
     return {
       id,
-      name,
-      icon,
       parentId,
+      name: '',
+      icon: '',
       isSkipped: false,
       isVisuallySkipped: false,
-      expandable: true,
+      expandable: false,
       nodeType: AggregatedTreeNodeType.DETAILS_NODE,
-      originalArtefact: undefined as any as AbstractArtefact,
-      children: [
-        {
-          id: `details_data_${artefactId}`,
-          parentId: id,
-          originalArtefact,
-          artefactHash: item.artefactHash,
-          nodeType: AggregatedTreeNodeType.DETAILS_DATA,
-          isSkipped: false,
-          isVisuallySkipped: false,
-          expandable: false,
-        } as AggregatedTreeNode,
-      ],
+      originalArtefact,
+      artefactHash: item.artefactHash,
     };
   }
 }

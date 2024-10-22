@@ -1,3 +1,5 @@
-@for (item of items(); track item.label) {
-  <step-artefact-inline-field [item]="item" />
-}
+<section class="list" [class.vertical]="isVertical()">
+  @for (item of items(); track item.label) {
+    <step-artefact-inline-field [item]="item" />
+  }
+</section>

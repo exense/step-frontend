@@ -32,6 +32,9 @@ import { ArtefactInlineFieldComponent } from './component/artefact-inline-field/
 import { EchoInlineComponent } from './component/echo-inline/echo-inline.component';
 import { ArtefactInlineFieldListComponent } from './component/artefact-inline-field-list/artefact-inline-field-list.component';
 import { CallKeywordInlineComponent } from './component/call-keyword-inline/call-keyword-inline.component';
+import { SetInlineComponent } from './component/set-inline/set-inline.component';
+import { ForInlineComponent } from './component/for-inline/for-inline.component';
+import { SleepInlineComponent } from './component/sleep-inline/sleep-inline.component';
 
 @NgModule({
   declarations: [
@@ -46,12 +49,15 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     CaseComponent,
     SwitchComponent,
     SleepComponent,
+    SleepInlineComponent,
     SetComponent,
+    SetInlineComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
@@ -81,11 +87,13 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     SwitchComponent,
     SleepComponent,
     SetComponent,
+    SetInlineComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
@@ -137,6 +145,7 @@ export class ArtefactsModule {
     this._artefactService.register('For', {
       icon: 'cpu',
       component: ForComponent,
+      inlineComponent: ForInlineComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this._artefactService.register('ForEach', {
@@ -196,12 +205,14 @@ export class ArtefactsModule {
     });
     this._artefactService.register('Set', {
       component: SetComponent,
+      inlineComponent: SetInlineComponent,
       icon: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });
     this._artefactService.register('Sleep', {
       icon: 'coffee',
       component: SleepComponent,
+      inlineComponent: SleepInlineComponent,
       description: 'Causes the thread to sleep',
     });
     this._artefactService.register('Script', {

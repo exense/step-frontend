@@ -1,5 +1,6 @@
 :host {
   width: 100%;
+  position: relative;
 }
 
 .aggregated-info {
@@ -7,4 +8,13 @@
   flex-wrap: nowrap;
   gap: 1rem;
   align-items: center;
+  position: absolute;
+  top: -1rem;
+  left: 0;
+  right: 0.5rem;
+}
+
+step-artefact-inline-details {
+  overflow: hidden;
+  width: 100%;
 }

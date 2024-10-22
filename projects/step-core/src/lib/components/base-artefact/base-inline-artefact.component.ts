@@ -6,31 +6,41 @@ import { Observable } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 
+export interface InlineArtefactContext<T extends AggregatedArtefactInfo> {
+  info: T;
+  isVertical?: boolean;
+}
+
 @Component({
   template: '',
 })
 export abstract class BaseInlineArtefactComponent<T extends AggregatedArtefactInfo> implements CustomComponent {
-  private infoInternal = signal<T | undefined>(undefined);
-  protected info = this.infoInternal.asReadonly();
+  private contextInternal = signal<InlineArtefactContext<T> | undefined>(undefined);
+  protected info = computed(() => this.contextInternal()?.info);
+  protected isVertical = computed(() => !!this.contextInternal()?.isVertical);
 
-  private info$ = toObservable(this.info);
-  private items$ = this.info$.pipe(
-    switchMap((info) => {
-      const isResolved = this.isResolved(info);
-      return this.getArtefactItems(info, isResolved);
+  private context$ = toObservable(this.contextInternal);
+  private items$ = this.context$.pipe(
+    switchMap((context) => {
+      const isResolved = this.isResolved(context?.info);
+      return this.getArtefactItems(context?.info, context?.isVertical, isResolved);
     }),
     takeUntilDestroyed(),
   );
 
   protected items = toSignal(this.items$);
 
-  context?: T;
+  context?: InlineArtefactContext<T>;
 
-  contextChange(previousContext?: T, currentContext?: T) {
-    this.infoInternal.set(currentContext);
+  contextChange(previousContext?: InlineArtefactContext<T>, currentContext?: InlineArtefactContext<T>) {
+    this.contextInternal.set(currentContext);
   }
 
-  protected abstract getArtefactItems(info?: T, isResolved?: boolean): Observable<ArtefactInlineItem[] | undefined>;
+  protected abstract getArtefactItems(
+    info?: T,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): Observable<ArtefactInlineItem[] | undefined>;
 
   private isResolved(info?: T): boolean {
     if (!info) {
@@ -42,7 +52,6 @@ export abstract class BaseInlineArtefactComponent<T extends AggregatedArtefactIn
       return false;
     }
 
-    const count = Object.values(info.countByStatus ?? {}).reduce((res, item) => res + item, 0);
-    return count === 1;
+    return true;
   }
 }

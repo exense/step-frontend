@@ -8,7 +8,7 @@ import {
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 
-interface ForArtefact extends AbstractArtefact {
+export interface ForArtefact extends AbstractArtefact {
   dataSource: {
     start: DynamicValueInteger;
     end: DynamicValueInteger;

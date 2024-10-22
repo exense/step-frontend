@@ -19,8 +19,10 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
 
   readonly node = input.required<AggregatedTreeNode>();
 
+  private artefactHash = computed(() => this.node().artefactHash);
+
   protected readonly dataSource = computed(() => {
-    const artefactHash = this.node().artefactHash;
+    const artefactHash = this.artefactHash();
     return this._augmentedExecutionService.getReportNodeDataSource(artefactHash);
   });
 

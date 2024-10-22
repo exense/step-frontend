@@ -2,19 +2,12 @@
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info">
-        <span>{{ node?.name }}</span>
-        <step-aggregated-tree-status [node]="node" />
+        <span (click)="toggleInfo()">{{ node?.name }}</span>
+        <step-aggregated-tree-status [node]="node" (click)="showAggregatedDetails()" />
         <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
         <step-artefact-inline-details [info]="node" />
       </div>
     }
-    @case (AggregateTreeNodeType.DETAILS_NODE) {
-      <span>{{ node?.name }}</span>
-    }
-    @case (AggregateTreeNodeType.DETAILS_DATA) {
-      <section class="artefact-container">
-        <step-aggregated-tree-node-details [node]="node" />
-      </section>
-    }
+    @default {}
   }
 }

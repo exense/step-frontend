@@ -69,4 +69,8 @@ step-tree-node {
   step-icon.toggle-state {
     @include core.step-icon-size(12px);
   }
+
+  .tree-node-details {
+    margin-left: 2.4rem;
+  }
 }

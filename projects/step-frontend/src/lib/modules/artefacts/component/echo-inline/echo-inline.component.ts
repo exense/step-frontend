@@ -15,6 +15,7 @@ interface EchoReportView extends AggregatedArtefactInfo {
 export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoReportView> {
   protected getArtefactItems(
     reportView?: EchoReportView,
+    isVertical?: boolean,
     isResolved: boolean = false,
   ): Observable<ArtefactInlineItem[] | undefined> {
     const echo = reportView?.originalArtefact;
