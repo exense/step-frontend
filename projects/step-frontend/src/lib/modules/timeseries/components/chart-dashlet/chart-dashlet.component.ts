@@ -382,7 +382,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
           yAxisUnit: yAxesUnit,
           useExecutionLinks: this.showExecutionLinks,
         },
-        showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
+        showLegend: true,
         axes: axes,
         truncated: response.truncated,
       };

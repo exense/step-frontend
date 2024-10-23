@@ -5,7 +5,7 @@ import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMa
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Router } from '@angular/router';
 import { AdditionalRightRuleService } from './additional-right-rule.service';
-import { AppConfigContainerService, Mutable } from '../../basics/step-basics.module';
+import { AppConfigContainerService, Mutable, SESSION_STORAGE } from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
 import { NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
@@ -23,6 +23,7 @@ export class AuthService implements OnDestroy {
   private _router = inject(Router);
   private _document = inject(DOCUMENT);
 
+  private _sessionStorage = inject(SESSION_STORAGE);
   private _additionalRightRules = inject(AdditionalRightRuleService);
   private _privateApplicationApi = inject(PrivateApplicationService);
   private _credentialsService = inject(CredentialsService);
@@ -103,6 +104,7 @@ export class AuthService implements OnDestroy {
   }
 
   performPostLogoutActions(): void {
+    this._sessionStorage.clear();
     this.setContext({ userID: ANONYMOUS });
     this._navigator.navigateToRoot();
   }
