@@ -370,6 +370,12 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
     const min = u.posToVal(u.select.left, 'x');
     const max = u.posToVal(u.select.left + u.select.width, 'x');
+    if (min > max) {
+      if (this.previousRange) {
+        this.selectRange(this.previousRange!);
+      }
+      return;
+    }
     if (min != this.previousRange?.from || max !== this.previousRange?.to) {
       const currentRange = { from: min, to: max };
       this.previousRange = currentRange;
