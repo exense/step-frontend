@@ -1,6 +1,7 @@
 import { Component, computed, contentChild, input, Input, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, NgControl } from '@angular/forms';
 import { getControlWarningsContainer } from '../../types/form-control-warnings-extension';
+import { FormFieldFocusAddonDirective } from '../../directives/form-field-focus-addon.directive';
 @Component({
   selector: 'step-form-field',
   templateUrl: './form-field.component.html',
@@ -24,6 +25,11 @@ export class FormFieldComponent {
 
   /* @ContentChild(NgControl) */
   protected contentControl = contentChild(NgControl);
+
+  /* @ContentChild(FormFieldFocusAddonDirective) */
+  private formFieldFocusAddon = contentChild(FormFieldFocusAddonDirective);
+
+  protected readonly hasFocusAddon = computed(() => this.formFieldFocusAddon());
 
   protected readonly control = computed(() => {
     const contentControl = this.contentControl()?.control;

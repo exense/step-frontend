@@ -12,6 +12,10 @@ step-table {
       width: 100%;
       border-collapse: separate;
 
+      th.step-search-cell {
+        overflow: auto !important;
+      }
+
       thead tr {
         &:nth-child(1) {
           top: 0;

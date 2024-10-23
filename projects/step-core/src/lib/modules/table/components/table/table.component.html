@@ -21,7 +21,7 @@
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
     @for (searchCol of searchColumns; track searchCol.colName) {
       <ng-container [matColumnDef]="searchCol.colName">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef class="step-search-cell">
           @if (searchCol.searchName) {
             @if (searchCol.template) {
               <ng-container *ngTemplateOutlet="searchCol.template" />

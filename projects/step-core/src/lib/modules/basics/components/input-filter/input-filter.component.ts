@@ -1,4 +1,14 @@
-import { Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { debounceTime, filter, merge, Observable, of } from 'rxjs';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
@@ -14,8 +24,20 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
     },
   ],
 })
-export class InputFilterComponent extends BaseFilterComponent<string> implements OnChanges {
+export class InputFilterComponent extends BaseFilterComponent<string> implements OnChanges, OnInit {
+  private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  protected useRegexSwitcher = signal(false);
+
   @Input() externalSearchValue?: string;
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+    // The attribute check has been used instead of injection, because
+    // attempt to inject FilterConnect inside InputFilter will cause DI cycle, as
+    // InputFilter has been already injected in FilterConnect directive
+    this.useRegexSwitcher.set(this._elRef.nativeElement.hasAttribute('stepfilterconnect'));
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     const cExternalSearchValue = changes['externalSearchValue'];

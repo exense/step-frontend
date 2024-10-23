@@ -3,6 +3,7 @@
 
 @function step-define-inputs-config(
   $primary-color: #0082cb,
+  $primary-contrast-color: #ffffff,
   $primary-text-color: #293e50,
   $border-color: #d0d5dd,
   $error-color: #ff0000,
@@ -10,6 +11,7 @@
 ) {
   $config: (
     primary-color: $primary-color,
+    primary-contrast-color: $primary-contrast-color,
     primary-text-color: $primary-text-color,
     border-color: $border-color,
     error-color: $error-color,
@@ -90,10 +92,17 @@
       }
     }
   }
+
+  & > .form-field-focus-addon {
+    div {
+      background: $highlight-color;
+    }
+  }
 }
 
 @mixin step-form-field($config) {
   $primary-color: map.get($config, primary-color);
+  $primary-contrast-color: map.get($config, primary-contrast-color);
   $primary-text-color: map.get($config, primary-text-color);
   $border-color: map.get($config, border-color);
   $error-color: map.get($config, error-color);
@@ -114,6 +123,25 @@
     flex-direction: column;
     line-height: 1;
     gap: 0.4rem;
+
+    & > .form-field-focus-addon {
+      display: none;
+      &.has-focus-addon {
+        opacity: 0;
+        display: flex;
+        justify-content: flex-end;
+        margin-top: -1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      & > div {
+        position: absolute;
+        background: $primary-color;
+        color: $primary-contrast-color;
+        border-bottom-left-radius: var(--form-field-border-radius);
+        border-bottom-right-radius: var(--form-field-border-radius);
+        padding: 1.5rem 0.7rem 0.5rem 0.7rem;
+      }
+    }
 
     & > .label-container {
       display: flex;
@@ -210,6 +238,10 @@
           }
         }
       }
+
+      & > .form-field-focus-addon {
+        opacity: 1;
+      }
     }
 
     &.ng-invalid.ng-touched {
@@ -223,6 +255,7 @@
     .form-field-content {
       display: inline-flex;
       width: 100%;
+      z-index: 1;
 
       & > mat-select,
       & > step-multi-level-select,

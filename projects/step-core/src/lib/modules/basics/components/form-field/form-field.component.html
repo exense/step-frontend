@@ -18,6 +18,11 @@
 <div class="form-field-content">
   <ng-content></ng-content>
 </div>
+<div class="form-field-focus-addon" [class.has-focus-addon]="hasFocusAddon()">
+  <div>
+    <ng-content select="step-form-field-focus-addon" />
+  </div>
+</div>
 <section class="form-field-error">
   <ng-content select="step-error"> </ng-content>
 </section>
