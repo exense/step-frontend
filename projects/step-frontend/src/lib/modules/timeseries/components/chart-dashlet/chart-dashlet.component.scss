@@ -12,16 +12,22 @@
   }
 }
 
-.resolution-warning {
+.warnings-container {
   position: absolute;
   left: 0.6rem;
   bottom: 3.4rem;
   padding: 0.4rem;
   cursor: pointer;
-  background: var.$yellow-10;
   color: var.$gray-525;
   border-radius: 6px;
   transform: scale(0.8);
+  display: flex;
+  flex-direction: row;
+  gap: 1.2rem;
+
+  div {
+    background: var.$yellow-10;
+  }
 }
 
 .oql {
