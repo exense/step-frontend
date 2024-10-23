@@ -14,7 +14,7 @@
   #inputElement
   [stepPreventChars]="preventChars"
   [formControl]="filterCtrl"
-  [placeholder]="!selectedDisplayItems?.length ? placeholder : ''"
+  [placeholder]="!selectedDisplayItems.length ? placeholder : ''"
   [matAutocomplete]="auto"
   [matChipInputFor]="chipGrid"
   (matChipInputTokenEnd)="add($event)"
