@@ -365,10 +365,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   emitRangeEventIfChanged() {
     const u = this.uplot;
-    if (u.select.width < 1) {
-      // this is the bug from uplot. See https://github.com/leeoniya/uPlot/issues/766
-      return;
-    }
     // keep these lines below if it's better to have an exact value from the X data
     // let min = u.data[0][u.valToIdx(u.posToVal(u.select.left, 'x'))];
     // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
