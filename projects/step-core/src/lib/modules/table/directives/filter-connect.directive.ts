@@ -64,12 +64,12 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
 
   switchToRegex(): void {
     this.useRegex.set(true);
-    this._filter?.filterControl?.updateValueAndValidity();
+    queueMicrotask(() => this._filter?.filterControl?.updateValueAndValidity());
   }
 
   switchToText() {
     this.useRegex.set(false);
-    this._filter?.filterControl?.updateValueAndValidity();
+    queueMicrotask(() => this._filter?.filterControl?.updateValueAndValidity());
   }
 
   ngAfterViewInit(): void {

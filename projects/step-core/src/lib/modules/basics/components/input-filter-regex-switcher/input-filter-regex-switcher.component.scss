@@ -3,14 +3,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
 
-  span {
-    user-select: none;
-    cursor: pointer;
-  }
+button {
+  border: none;
+  background: inherit;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  cursor: pointer;
+}
 
-  .selected {
-    font-weight: 600;
-    text-decoration: underline;
-  }
+.selected {
+  font-weight: 600;
+  text-decoration: underline;
 }
