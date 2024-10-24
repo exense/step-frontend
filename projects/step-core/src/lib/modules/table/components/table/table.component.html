@@ -60,3 +60,106 @@
   [length]="tableDataSource?.totalFiltered$ | async"
   [pageSizeOptions]="pageSizeOptions"
 />
+
+@if ((tableDataSource?.total$ | async) === 0) {
+  <section class="quick-actions">
+    <div class="wizard-panel">
+      <div>
+        <div class="icon-container">
+          <step-icon name="package" />
+        </div>
+      </div>
+      <div class="wizard-content">
+        <h3>Keywords: The building blocks</h3>
+        <p>
+          Keywords serve as the fundamental building blocks for implementing automation. From a business perspective, a
+          Keyword symbolizes a functionality to be automated. It might represent a fully automated flow or be as simple
+          as a single user action or service call.
+        </p>
+      </div>
+      <div class="wizard-buttons">
+        <button type="button" mat-flat-button (click)="openUrl('https://step.dev/knowledgebase/userdocs/keywords/')">
+          Open Documentation
+        </button>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          [disabled]="!('kw-write' | hasRight | async)"
+          (click)="createKeyword()"
+        >
+          <div class="button-content">
+            <span>Create Keyword</span>
+            <step-icon name="plus"></step-icon>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="wizard-panel even">
+      <div>
+        <div class="icon-container">
+          <step-icon name="packages" />
+        </div>
+      </div>
+      <div class="wizard-content">
+        <h3>The automation scenario</h3>
+        <p>
+          A Plan represents an automated scenario and normally consists of one or more Keywords. It can build up a
+          functional test case, a load test, an RPA routine, or a synthetic monitoring probe.
+        </p>
+      </div>
+      <div class="wizard-buttons">
+        <button type="button" mat-flat-button (click)="openUrl('https://step.dev/knowledgebase/userdocs/plans/')">
+          Open Documentation
+        </button>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          [disabled]="!('kw-write' | hasRight | async)"
+          (click)="createPlan()"
+        >
+          <div class="button-content">
+            <span>Create Plan</span>
+            <step-icon name="plus"></step-icon>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="wizard-panel">
+      <div>
+        <div class="icon-container">
+          <step-icon name="monitor" />
+        </div>
+      </div>
+      <div class="wizard-content">
+        <h3>Setup synthetic monitoring</h3>
+        <p>
+          This wizard helps you setup synthetic monitoring to assess the availability and performance of your
+          application based on an existing Step Plan.
+        </p>
+      </div>
+      <div class="wizard-buttons">
+        <button
+          type="button"
+          mat-flat-button
+          (click)="openUrl('https://step.dev/knowledgebase/userdocs/schedulerview/')"
+        >
+          Open Documentation
+        </button>
+        <button
+          type="button"
+          mat-flat-button
+          color="primary"
+          [disabled]="!('kw-write' | hasRight | async)"
+          (click)="schedulePlan()"
+        >
+          <div class="button-content">
+            <span>Schedule plan</span>
+            <step-icon name="clock"></step-icon>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+}

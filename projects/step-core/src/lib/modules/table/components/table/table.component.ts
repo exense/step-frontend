@@ -55,6 +55,7 @@ import { TableColumnsDictionaryService } from '../../services/table-columns-dict
 import { ColumnInfo } from '../../types/column-info';
 import { isValidRegex } from '../../../basics/step-basics.module';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
+import { Router } from '@angular/router';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -110,6 +111,7 @@ export class TableComponent<T>
     TableHighlightItemContainer,
     TableColumnsDictionaryService
 {
+  private _router = inject(Router);
   private _tableState = inject(TablePersistenceStateService);
   private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
@@ -531,5 +533,29 @@ export class TableComponent<T>
       return;
     }
     this.tableDataSource.exportAsCSV(fields, this.tableParams());
+  }
+
+  createKeyword(): void {
+    this._router.navigate(['functions'], {
+      queryParams: {
+        createNew: '',
+      },
+    });
+  }
+
+  createPlan(): void {
+    this._router.navigate(['plans', 'list', 'new']);
+  }
+
+  schedulePlan(): void {
+    this._router.navigate(['scheduler'], {
+      queryParams: {
+        createNew: '',
+      },
+    });
+  }
+
+  openUrl(url: string) {
+    window.open(url, '_blank');
   }
 }
