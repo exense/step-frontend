@@ -70,16 +70,14 @@
         </div>
       </div>
       <div class="wizard-content">
-        <h3>Keywords: The building blocks</h3>
+        <h3>1. Keywords: The building blocks</h3>
         <p>
-          Keywords serve as the fundamental building blocks for implementing automation. From a business perspective, a
-          Keyword symbolizes a functionality to be automated. It might represent a fully automated flow or be as simple
-          as a single user action or service call.
+          Keywords are the core elements of Steps automation. Each represents a specific function, ranging from a single user action or service call to a complete automated workflow.
         </p>
       </div>
       <div class="wizard-buttons">
         <button type="button" mat-flat-button (click)="openUrl('https://step.dev/knowledgebase/userdocs/keywords/')">
-          Open Documentation
+         Documentation
         </button>
         <button
           type="button"
@@ -102,15 +100,14 @@
         </div>
       </div>
       <div class="wizard-content">
-        <h3>The automation scenario</h3>
+        <h3>2. Plan: Automated Scenario</h3>
         <p>
-          A Plan represents an automated scenario and normally consists of one or more Keywords. It can build up a
-          functional test case, a load test, an RPA routine, or a synthetic monitoring probe.
+          A Plan is an automated scenario made up of one or more Keywords. It can define a functional test case, load test, RPA routine, or synthetic monitoring probe.
         </p>
       </div>
       <div class="wizard-buttons">
         <button type="button" mat-flat-button (click)="openUrl('https://step.dev/knowledgebase/userdocs/plans/')">
-          Open Documentation
+         Documentation
         </button>
         <button
           type="button"
@@ -133,31 +130,18 @@
         </div>
       </div>
       <div class="wizard-content">
-        <h3>Setup synthetic monitoring</h3>
+        <h3>3. Execute Plan</h3>
         <p>
-          This wizard helps you setup synthetic monitoring to assess the availability and performance of your
-          application based on an existing Step Plan.
+          After creating and combining Keywords in a Plan, you can execute it. Next steps include setting up scheduled executions and monitoring as required.
         </p>
       </div>
       <div class="wizard-buttons">
         <button
           type="button"
           mat-flat-button
-          (click)="openUrl('https://step.dev/knowledgebase/userdocs/schedulerview/')"
+          (click)="openUrl('https://step.dev/knowledgebase/userdocs/executions/')"
         >
-          Open Documentation
-        </button>
-        <button
-          type="button"
-          mat-flat-button
-          color="primary"
-          [disabled]="!('kw-write' | hasRight | async)"
-          (click)="schedulePlan()"
-        >
-          <div class="button-content">
-            <span>Schedule plan</span>
-            <step-icon name="clock"></step-icon>
-          </div>
+         Documentation
         </button>
       </div>
     </div>

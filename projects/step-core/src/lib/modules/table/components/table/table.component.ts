@@ -536,24 +536,13 @@ export class TableComponent<T>
   }
 
   createKeyword(): void {
-    this._router.navigate(['functions'], {
-      queryParams: {
-        createNew: '',
-      },
-    });
+    this._router.navigate(['functions','configure', 'new']);
   }
 
   createPlan(): void {
     this._router.navigate(['plans', 'list', 'new']);
   }
 
-  schedulePlan(): void {
-    this._router.navigate(['scheduler'], {
-      queryParams: {
-        createNew: '',
-      },
-    });
-  }
 
   openUrl(url: string) {
     window.open(url, '_blank');
