@@ -34,7 +34,8 @@
         <step-label-addon>
           <step-icon name="help-circle" matTooltip="Defines the default value of this input field (Optional)" />
         </step-label-addon>
-        <input type="text" [(ngModel)]="model.defaultValue" />
+        <input *ngIf="model.type !== 'CHECKBOX'" type="text" [(ngModel)]="model.defaultValue" />
+        <mat-slide-toggle color="primary" *ngIf="model.type === 'CHECKBOX'" [(ngModel)]="model.defaultValue" />
       </step-form-field>
       <step-form-field>
         <step-label>Activation expression</step-label>

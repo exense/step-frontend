@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 div[step-modal-window-body],
 .advanced-body {
@@ -7,4 +8,8 @@ div[step-modal-window-body],
 
 mat-expansion-panel {
   margin-bottom: 1.5rem;
+}
+
+mat-slide-toggle {
+  margin-top: 0.8rem;
 }
