@@ -39,5 +39,14 @@ export const $TimeSeriesAPIResponse = {
       type: 'boolean',
       isRequired: true,
     },
+    collectionResolution: {
+      type: 'number',
+      isRequired: true,
+      format: 'int64',
+    },
+    higherResolutionUsed: {
+      type: 'boolean',
+      isRequired: true,
+    },
   },
 } as const;
