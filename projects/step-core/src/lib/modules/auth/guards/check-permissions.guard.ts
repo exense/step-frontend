@@ -9,7 +9,7 @@ export const checkPermissionsGuard: CanActivateFn = (route: ActivatedRouteSnapsh
   const _router = inject(Router);
 
   const data = route.data[SUB_ROUTE_DATA] as SubRouteData;
-  if (!data?.accessPermissions?.length || _auth.hasAnyRights(data.accessPermissions)) {
+  if (_auth.checkPermissionGroup(data)) {
     return true;
   }
 
