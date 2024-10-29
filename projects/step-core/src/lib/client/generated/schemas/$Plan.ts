@@ -36,6 +36,12 @@ export const $Plan = {
     visible: {
       type: 'boolean',
     },
+    categories: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

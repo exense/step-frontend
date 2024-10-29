@@ -18,6 +18,7 @@
           color="primary"
           matTooltip="New resource"
           matTooltipPosition="below"
+          [disabled]="!('resource-write' | hasRight | async)"
           [routerLink]="'new' | resourceUrl"
         >
           <step-icon name="plus"></step-icon>
@@ -96,6 +97,7 @@
             stepTestId="edit-resource-btn"
             mat-icon-button
             matTooltip="Edit resource"
+            [disabled]="!('resource-write' | hasRight | async)"
             [routerLink]="element | resourceUrl"
           >
             <step-icon name="edit-2"></step-icon>
@@ -104,6 +106,7 @@
             stepTestId="delete-resource-btn"
             mat-icon-button
             matTooltip="Delete resource"
+            [disabled]="!('resource-delete' | hasRight | async)"
             (click)="deleteResource(element.id, element.resourceName)"
           >
             <step-icon name="trash-2">delete</step-icon>
