@@ -108,6 +108,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       setTimeout(() => {
         // zero timout is used, to create a macrotasks
         // that will be invoked after menu render
+        this._sideBarState.initializeProjectsReadOnly();
         if (this._sideBarState.openedMenuItems) {
           this.initializeMainMenuItemsFromState();
         } else {
