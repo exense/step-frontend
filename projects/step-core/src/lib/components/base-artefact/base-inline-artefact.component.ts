@@ -1,48 +1,70 @@
 import { Component, computed, signal } from '@angular/core';
-import { CustomComponent } from '../../modules/custom-registeries/shared/custom-component';
+import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactInlineItem } from './artefact-inline-item';
 import { AggregatedArtefactInfo } from '../../shared';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
+import { ReportNodeExt } from '../../client/step-client-module';
 
-export interface InlineArtefactContext<T extends AggregatedArtefactInfo> {
-  info: T;
+export interface InlineArtefactContext<A extends AggregatedArtefactInfo> {
+  aggregatedInfo?: A;
+  reportInfo?: ReportNodeExt;
   isVertical?: boolean;
 }
 
 @Component({
   template: '',
 })
-export abstract class BaseInlineArtefactComponent<T extends AggregatedArtefactInfo> implements CustomComponent {
-  private contextInternal = signal<InlineArtefactContext<T> | undefined>(undefined);
-  protected info = computed(() => this.contextInternal()?.info);
+export abstract class BaseInlineArtefactComponent<A extends AggregatedArtefactInfo> implements CustomComponent {
+  private contextInternal = signal<InlineArtefactContext<A> | undefined>(undefined);
+  protected info = computed(() => this.contextInternal()?.aggregatedInfo);
   protected isVertical = computed(() => !!this.contextInternal()?.isVertical);
 
   private context$ = toObservable(this.contextInternal);
-  private items$ = this.context$.pipe(
+  private aggregatedInfoItems$ = this.context$.pipe(
     switchMap((context) => {
-      const isResolved = this.isResolved(context?.info);
-      return this.getArtefactItems(context?.info, context?.isVertical, isResolved);
+      if (!context?.aggregatedInfo) {
+        return of(undefined);
+      }
+      const isResolved = this.isResolved(context?.aggregatedInfo);
+      return this.getArtefactItems(context?.aggregatedInfo, context?.isVertical, isResolved);
     }),
     takeUntilDestroyed(),
   );
+  private aggregatedInfoItems = toSignal(this.aggregatedInfoItems$);
 
-  protected items = toSignal(this.items$);
+  private reportInfoItems = computed(() => {
+    const ctx = this.contextInternal();
+    const reportInfo = ctx?.reportInfo;
+    const isVertical = ctx?.isVertical;
+    if (!reportInfo) {
+      return undefined;
+    }
+    return this.getReportNodeItems(reportInfo, isVertical);
+  });
 
-  context?: InlineArtefactContext<T>;
+  protected items = computed(() => {
+    const aggregated = this.aggregatedInfoItems();
+    const report = this.reportInfoItems();
+    return aggregated ?? report;
+  });
 
-  contextChange(previousContext?: InlineArtefactContext<T>, currentContext?: InlineArtefactContext<T>) {
+  context?: InlineArtefactContext<A>;
+
+  contextChange(previousContext?: InlineArtefactContext<A>, currentContext?: InlineArtefactContext<A>) {
     this.contextInternal.set(currentContext);
   }
 
+  protected abstract getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined;
+
   protected abstract getArtefactItems(
-    info?: T,
+    info?: A,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[] | undefined>;
 
-  private isResolved(info?: T): boolean {
+  private isResolved(info?: A): boolean {
     if (!info) {
       return false;
     }

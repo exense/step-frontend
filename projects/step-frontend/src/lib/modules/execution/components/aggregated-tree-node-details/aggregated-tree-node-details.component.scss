@@ -16,6 +16,12 @@ step-table {
 
 .details-trigger {
   cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sort-handler {
+  margin-left: 2.5rem;
 }
 
 button.details-trigger {

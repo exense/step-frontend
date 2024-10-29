@@ -1,5 +1,5 @@
 import { Component, inject, output, viewChild } from '@angular/core';
-import { ItemsPerPageService, ReportNode, TableReload, TableSearch } from '@exense/step-core';
+import { ItemsPerPageService, ReportNode, TableSearch } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';

@@ -8,20 +8,16 @@ import {
   SimpleChanges,
   TrackByFunction,
 } from '@angular/core';
-import { ArtefactService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
+import {
+  ArtefactService,
+  ControllerService,
+  Mutable,
+  ReportNode,
+  ReportNodeExt,
+  ViewerFormat,
+} from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
 import { map, Observable, of } from 'rxjs';
-
-export interface ReportNodeAddon {
-  functionAttributes?: Record<string, string>;
-  input?: string | null;
-  output?: string | null;
-  echo?: string;
-  message?: string;
-  key?: string;
-  value?: string;
-  agentUrl?: string;
-}
 
 type FieldsAccessor = Mutable<Pick<ReportNodeShortComponent, 'headerText' | 'reportNodeId' | 'children'>>;
 
@@ -35,7 +31,7 @@ export class ReportNodeShortComponent implements OnChanges {
   private _reportNodeCommons = inject(ReportNodeCommonsService);
   private _controllerService = inject(ControllerService);
 
-  @Input() node?: ReportNode & ReportNodeAddon;
+  @Input() node?: ReportNodeExt;
   @Input() includeStatus: boolean = false;
   @Input() showDetails: boolean = false;
   @Input() showFooter: boolean = false;
@@ -72,7 +68,7 @@ export class ReportNodeShortComponent implements OnChanges {
     this.hideOutput = !this.hideOutput;
   }
 
-  private determineHeader(node?: ReportNode & ReportNodeAddon): void {
+  private determineHeader(node?: ReportNodeExt): void {
     if (!node) {
       (this as FieldsAccessor).headerText = '';
       return;

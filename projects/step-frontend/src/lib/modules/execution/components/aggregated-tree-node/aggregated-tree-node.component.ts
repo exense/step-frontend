@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedTreeNode, AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -17,6 +17,12 @@ export class AggregatedTreeNodeComponent {
   protected node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
+  });
+
+  protected isHideInlineInfo = computed(() => {
+    const nodeId = this.nodeId();
+    const visibleInfos = this._treeState.visibleInfos();
+    return !!visibleInfos[nodeId];
   });
 
   protected toggleInfo(): void {

@@ -1,28 +1,29 @@
 @if (node(); as node) {
+  <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
+  <!--
   @switch (artefactClass()) {
     @case ('CallKeyword') {
       <section class="col-view">
-        @if (!(node.input | isEmptyJson)) {
+        @if (inputParams(); as inputParams) {
           <div>
             <label>Input</label>
-            <step-json-viewer [json]="node.input" [format]="ViewerFormat.KV" />
+            <step-artefact-inline-field-list [items]="inputParams" [wrap]="true"/>
           </div>
         }
-        @if (!(node.output | isEmptyJson)) {
+        @if (outputParams(); as outputParams) {
           <div>
             <label>Output</label>
-            <step-json-viewer [json]="node.output" [format]="ViewerFormat.KV" />
+            <step-artefact-inline-field-list [items]="outputParams" [wrap]="true"/>
           </div>
         }
       </section>
     }
     @case ('Echo') {
-      @if (node.echo) {
-        <section>
-          <label>Echo</label>
-          <div>{{ node.echo }}</div>
-        </section>
-      }
+      <section>
+        @if (echoParams(); as echoParams) {
+          <step-artefact-inline-field-list [items]="echoParams" [wrap]="true"/>
+        }
+      </section>
     }
     @case ('Assert') {
       @if (!node.error && node.message; as msg) {
@@ -30,9 +31,14 @@
       }
     }
     @case ('Set') {
-      <section>{{ node.key }} = {{ node.value }}</section>
+      <section>
+        @if(setParams(); as setParams) {
+          <step-artefact-inline-field-list [items]="setParams" [wrap]="true"/>
+        }
+      </section>
     }
   }
+-->
   <!--Assertion errors-->
   @if (children()?.length) {
     <section>

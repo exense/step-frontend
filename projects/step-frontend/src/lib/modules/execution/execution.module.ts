@@ -80,6 +80,8 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 import { AltKeywordInlineDrilldownComponent } from './components/alt-keyword-inline-drilldown/alt-keyword-inline-drilldown.component';
 import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree-node-details/aggregated-tree-node-details.component';
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
+import { ArtefactsModule } from '../artefacts/artefacts.module';
+import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 
 @NgModule({
   declarations: [
@@ -126,6 +128,7 @@ import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-no
     AltReportCurrentOperationsComponent,
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
+    AltReportWidgetSortDirective,
     AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -143,7 +146,7 @@ import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-no
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
+  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

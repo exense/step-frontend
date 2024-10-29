@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import {
+  AggregatedArtefactInfo,
+  ArtefactInlineItem,
+  BaseInlineArtefactComponent,
+  ReportNodeExt,
+} from '@exense/step-core';
 import { ForArtefact } from '../for/for.component';
 import { Observable, of } from 'rxjs';
 
@@ -13,6 +18,10 @@ export interface ForReportView extends AggregatedArtefactInfo {
   styleUrl: './for-inline.component.scss',
 })
 export class ForInlineComponent extends BaseInlineArtefactComponent<ForReportView> {
+  protected getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+    return undefined;
+  }
+
   protected getArtefactItems(
     info?: ForReportView,
     isVertical?: boolean,

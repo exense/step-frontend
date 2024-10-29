@@ -1,5 +1,9 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
+:host {
+  font-size: 1.4rem;
+}
+
 label {
   color: var.$muted;
   white-space: nowrap;

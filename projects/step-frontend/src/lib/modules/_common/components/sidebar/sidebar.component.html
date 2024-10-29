@@ -71,7 +71,7 @@
                         <div
                           class="sidebar-sub-subtab"
                           [class.sidebar-highlighted-subtab]="subEntry.id | isMenuItemActive | async"
-                          (mouseup)="navigateTo(entry.id, $event, entry.isBookmark)"
+                          (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark)"
                         >
                           <step-icon class="visible-when-collapsed" [name]="subEntry.icon || 'minus'" />
                           <span class="sidebar-aligned-sub-subtext" [matTooltip]="subEntry.title">

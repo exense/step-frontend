@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import {
+  AggregatedArtefactInfo,
+  ArtefactInlineItem,
+  BaseInlineArtefactComponent,
+  ReportNodeExt,
+} from '@exense/step-core';
 import { SleepArtefact } from '../sleep/sleep.component';
 import { Observable, of } from 'rxjs';
 
@@ -13,6 +18,10 @@ interface SleepReportView extends AggregatedArtefactInfo {
   styleUrl: './sleep-inline.component.scss',
 })
 export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepReportView> {
+  protected getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+    return undefined;
+  }
+
   protected getArtefactItems(
     info?: SleepReportView,
     isVertical?: boolean,

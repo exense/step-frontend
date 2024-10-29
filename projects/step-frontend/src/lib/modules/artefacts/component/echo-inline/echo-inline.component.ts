@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import {
+  AggregatedArtefactInfo,
+  ArtefactInlineItem,
+  BaseInlineArtefactComponent,
+  ReportNodeExt,
+} from '@exense/step-core';
 import { EchoArtefact } from '../echo/echo.component';
 import { Observable, of } from 'rxjs';
 
@@ -13,6 +18,23 @@ interface EchoReportView extends AggregatedArtefactInfo {
   styleUrl: './echo-inline.component.scss',
 })
 export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoReportView> {
+  protected getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+    const echo = info?.echo;
+    if (!echo) {
+      return undefined;
+    }
+    return [
+      {
+        label: 'Text',
+        value: {
+          value: echo,
+          dynamic: false,
+        },
+        isResolved: true,
+      },
+    ];
+  }
+
   protected getArtefactItems(
     reportView?: EchoReportView,
     isVertical?: boolean,

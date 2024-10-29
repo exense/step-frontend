@@ -4,4 +4,7 @@ section.list {
   &.vertical {
     flex-direction: column;
   }
+  &.wrap {
+    flex-wrap: wrap;
+  }
 }

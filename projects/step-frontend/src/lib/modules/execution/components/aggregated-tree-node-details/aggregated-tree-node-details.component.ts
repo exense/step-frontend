@@ -1,9 +1,21 @@
-import { AfterViewInit, Component, computed, ElementRef, inject, input, Renderer2 } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  Renderer2,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { AugmentedExecutionsService, ReportNode } from '@exense/step-core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
+import { MatSort, SortDirection } from '@angular/material/sort';
 
 @Component({
   selector: 'step-aggregated-tree-node-details',
@@ -16,6 +28,16 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
   private _executionState = inject(AltExecutionStateService);
   private _augmentedExecutionService = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
+
+  private matSort = viewChild(MatSort);
+
+  protected sort = signal<SortDirection>('desc');
+
+  private effectSort = effect(() => {
+    const sort = this.sort();
+    const mastSort = this.matSort();
+    mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
+  });
 
   readonly node = input.required<AggregatedTreeNode>();
 
@@ -39,5 +61,9 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
 
   protected toggleDetail(node: ReportNode): void {
     this._treeState.toggleDetail(node);
+  }
+
+  protected toggleSort(): void {
+    this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 }

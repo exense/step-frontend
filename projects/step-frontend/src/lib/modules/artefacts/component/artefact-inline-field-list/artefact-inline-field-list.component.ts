@@ -8,6 +8,7 @@ import { ArtefactInlineItem } from '@exense/step-core';
 })
 export class ArtefactInlineFieldListComponent {
   readonly isVertical = input(false);
+  readonly wrap = input(false);
 
   readonly items = input([], {
     transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],
