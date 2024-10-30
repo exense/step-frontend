@@ -1,7 +1,10 @@
-<div *ngIf="task && task.attributes">
-  <entity-icon entityName="tasks" [entity]="task"></entity-icon>
-  <h1>{{ task.attributes?.['name'] }}</h1>
-</div>
-<div *ngIf="!task">
-  <p>Loading..</p>
-</div>
+@if (task) {
+  <div>
+    <entity-icon entityName="tasks" [entity]="task"></entity-icon>
+    <h1>{{ task?.attributes?.['name'] }}</h1>
+  </div>
+} @else {
+  <div>
+    <p>Loading..</p>
+  </div>
+}
