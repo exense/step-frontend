@@ -6,15 +6,17 @@ import { TimeSeriesConfig } from '../../_common';
 import { TooltipAnchor } from '../types/tooltip-anchor';
 import { inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { ExecutionsService } from '@exense/step-core';
+import { ExecutionsService, MarkerType } from '@exense/step-core';
 import { TooltipPlacementFunction } from './tooltip-placement-function';
 import { TooltipParentContainer } from '../types/tooltip-parent-container';
+import { SeriesStroke } from '../../_common/types/time-series/series-stroke';
 
 @Injectable()
 export class TooltipPlugin {
   private _doc = inject(DOCUMENT);
   private win = this._doc.defaultView!;
   private _executionsService = inject(ExecutionsService);
+  private domParser = new DOMParser();
 
   /**
    * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
@@ -122,7 +124,6 @@ export class TooltipPlugin {
             if (chartIsLocked()) {
               return;
             }
-            showTooltip();
           };
 
           over.onmouseleave = () => {
@@ -175,7 +176,7 @@ export class TooltipPlugin {
                   value: bucketValue,
                   name: series.label || '',
                   // @ts-ignore
-                  color: series._stroke,
+                  stroke: series.strokeConfig,
                   executions: executionIds,
                 });
               }
@@ -184,7 +185,7 @@ export class TooltipPlugin {
             if (series.scale === TimeSeriesConfig.SECONDARY_AXES_KEY && bucketValue != null) {
               summaryRow = {
                 value: bucketValue,
-                color: TimeSeriesConfig.TOTAL_BARS_COLOR,
+                stroke: { color: TimeSeriesConfig.TOTAL_BARS_COLOR, type: MarkerType.SQUARE },
                 name: settings.zAxisLabel || 'Total',
               };
             }
@@ -296,13 +297,29 @@ export class TooltipPlugin {
     const leftContainer = this.createElementWithClass('div', 'left');
     const nameDiv = this.createElementWithClass('div', 'name');
     nameDiv.textContent = `${row.name} `;
-    if (row.color) {
-      const colorDiv = this.createElementWithClass('div', 'color');
-      colorDiv.style.backgroundColor = row.color;
-      leftContainer.appendChild(colorDiv);
+    if (row.stroke) {
+      const marker = this.createMarker(row.stroke);
+      leftContainer.appendChild(marker);
     }
     leftContainer.appendChild(nameDiv);
     return leftContainer;
+  }
+
+  private createMarker(stroke: SeriesStroke): HTMLDivElement {
+    const container = document.createElement('div');
+    container.style.margin = '0 0.4rem';
+    switch (stroke.type) {
+      case MarkerType.SQUARE:
+        container.innerHTML = `<div class="step-marker-filled-square" style="--item-color: ${stroke.color}"></div>`;
+        break;
+      case MarkerType.DOTS:
+        container.innerHTML = `<div class="step-marker-dots" style="--item-color: ${stroke.color}"></div>`;
+        break;
+      case MarkerType.DASHED:
+        container.innerHTML = `<div class="step-marker-dashed-square" style="--item-color: ${stroke.color}"></div>`;
+        break;
+    }
+    return container;
   }
 
   private createSeparator(): HTMLDivElement {

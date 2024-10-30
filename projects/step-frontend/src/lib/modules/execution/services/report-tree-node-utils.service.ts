@@ -21,7 +21,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const id = item.id!;
     const { parentId } = params ?? {};
     const artefact = item.resolvedArtefact;
-    const name = artefact?.attributes?.['name'] || '';
+    const name = item.name ?? '';
     const isSkipped = false;
     const isVisuallySkipped = false;
     const icon = this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;

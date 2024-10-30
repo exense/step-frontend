@@ -8,15 +8,15 @@ import {
   Input,
   OnChanges,
   Output,
+  signal,
   SimpleChanges,
 } from '@angular/core';
 import { DateField } from '../types/date-field';
 import { DatePickerComponent } from '../components/date-picker/date-picker.component';
 import { ControlValueAccessor } from '@angular/forms';
 import { DateAdapterService } from '../injectables/date-adapter.service';
-import { Mutable } from '../../basics/step-basics.module';
+import { TimeOption, TimeOptionRelativeValue } from '../types/time-option';
 
-type FieldAccessor = Mutable<Pick<DatePickerBaseDirective<any>, 'formattedValue'>>;
 type OnChange<D> = (date?: D | null) => void;
 type OnTouch = () => void;
 
@@ -32,13 +32,21 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   picker?: DatePickerComponent;
 
   @Input() showTime: boolean = false;
+  @Input() showRelativeTime: boolean = false;
 
   @HostBinding('attr.disabled')
   protected isDisabled: boolean | null = null;
 
   @Output() dateChange = new EventEmitter<D | null | undefined>();
 
-  readonly formattedValue: string = '';
+  @Output() relativeOptionChange = new EventEmitter<number | undefined>();
+
+  private formattedValueInternal = signal('');
+  readonly formattedValue = this.formattedValueInternal.asReadonly();
+
+  protected get useTimeInParser(): boolean {
+    return this.showTime || this.showRelativeTime;
+  }
 
   writeValue(date?: D | null): void {
     this.modelValue = date;
@@ -88,6 +96,15 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
     return this.showTime;
   }
 
+  withRelativeTime(): boolean {
+    return this.showRelativeTime;
+  }
+
+  handleRelativeOptionChange(timeOption?: TimeOption): void {
+    const msFromNow = (timeOption?.value as TimeOptionRelativeValue)?.msFromNow;
+    this.relativeOptionChange.emit(msFromNow);
+  }
+
   abstract isRangeField(): boolean;
 
   private setupPicker(picker?: DatePickerComponent): void {
@@ -95,16 +112,18 @@ export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChan
   }
 
   private formatValue(value?: D | null): void {
-    (this as FieldAccessor).formattedValue = this._dateAdapter.format(value, this.showTime);
-    this._elRef.nativeElement.value = this.formattedValue;
+    const formattedValue = this._dateAdapter.format(value, this.useTimeInParser);
+    this.formattedValueInternal.set(formattedValue);
+    this._elRef.nativeElement.value = formattedValue;
   }
 
   @HostListener('input', ['$event'])
   private handleInput($event: Event): void {
     const value = ($event.target as HTMLInputElement).value;
-    const date = this._dateAdapter.parse(value, this.showTime);
+    const date = this._dateAdapter.parse(value, this.useTimeInParser);
 
-    (this as FieldAccessor).formattedValue = date ? value : '';
+    const formattedValue = date ? value : '';
+    this.formattedValueInternal.set(formattedValue);
 
     const hasChanges = !this._dateAdapter.areEqual(date, this.modelValue);
 

@@ -1,7 +1,7 @@
-import { TimeUnit } from '../../types/time-unit.enum';
 import { BaseTimeConverterComponent } from './base-time-converter.component';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { NgControl } from '@angular/forms';
+import { TimeConvertersFactoryService } from '../../injectables/time-converters-factory.service';
 
 @Component({
   selector: 'step-per-time-unit-input',
@@ -12,35 +12,9 @@ import { NgControl } from '@angular/forms';
 export class PerTimeUnitInputComponent extends BaseTimeConverterComponent {
   protected override separator = 'per';
 
+  protected override timeConverter = inject(TimeConvertersFactoryService).perTimeConverter();
+
   constructor(_ngControl: NgControl) {
     super(_ngControl);
-  }
-
-  protected override calculateBaseValue(modelValue: number, modelMeasure: TimeUnit): number {
-    return modelValue / modelMeasure;
-  }
-
-  protected override calculateDisplayValue(
-    modelValue: number,
-    modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit,
-  ): number {
-    if (!displayMeasure) {
-      return modelValue;
-    }
-    const units = this.calculateBaseValue(modelValue, modelMeasure);
-    return Math.round(units / displayMeasure);
-  }
-
-  protected override calculateModelValue(
-    displayValue: number,
-    modelMeasure: TimeUnit,
-    displayMeasure?: TimeUnit,
-  ): number {
-    if (!displayMeasure) {
-      return displayValue;
-    }
-    const units = displayValue / displayMeasure;
-    return units * modelMeasure;
   }
 }

@@ -1,24 +1,28 @@
-<hr />
-<button
-  class="add-additional"
-  type="button"
-  mat-stroked-button
-  (click)="addOptionalField($event)"
-  *ngIf="!possibleFields?.length || !showPossibleFields"
->
-  <div class="add-additional-content">
-    {{ addLabel }}
-    <step-icon name="plus"></step-icon>
-  </div>
-</button>
-<div class="possible-fields-container" *ngIf="possibleFields?.length && showPossibleFields">
-  <ng-container *ngFor="let field of possibleFields; trackBy: trackByItem">
-    <button type="button" mat-stroked-button (click)="addPredefinedField(field); showPossibleFields = false">
-      {{ field | arrayItemLabel }}
-    </button>
-  </ng-container>
-  <button *ngIf="addCustomLabel" type="button" mat-stroked-button (click)="addField.emit(); showPossibleFields = false">
-    {{ addCustomLabel }}
+@if (!isChildMode) {
+  <hr />
+}
+@if (!possibleFields?.length || !showPossibleFields) {
+  <button class="add-additional" type="button" mat-stroked-button (click)="addOptionalField($event)">
+    <div class="add-additional-content">
+      {{ addLabel }}
+      <step-icon name="plus"></step-icon>
+    </div>
   </button>
-</div>
-<hr />
+}
+@if (possibleFields.length && showPossibleFields) {
+  <div class="possible-fields-container">
+    <ng-container *ngFor="let field of possibleFields; trackBy: trackByItem">
+      <button type="button" mat-stroked-button (click)="addPredefinedField(field); showPossibleFields = false">
+        {{ field | arrayItemLabel }}
+      </button>
+    </ng-container>
+    @if (addCustomLabel) {
+      <button type="button" mat-stroked-button (click)="addField.emit(); showPossibleFields = false">
+        {{ addCustomLabel }}
+      </button>
+    }
+  </div>
+}
+@if (!isChildMode) {
+  <hr />
+}

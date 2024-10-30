@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { Route, Router, Routes } from '@angular/router';
+import { ActivatedRoute, Route, Router, Routes } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { SubRouteData } from '../types/sub-route-data.interface';
@@ -8,21 +8,13 @@ import { routesPrioritySortPredicate } from '../types/routes-priority-sort-predi
 import { checkPermissionsGuard } from '../../auth/guards/check-permissions.guard';
 import { SubRouterConfig } from '../types/sub-router-config.interface';
 import { QuickAccessRouteService } from '../../basics/step-basics.module';
+import { MenuEntry } from '../types/menu-entry';
+import { InfoBannerRegisterService } from '../../info-banner';
 
 export interface CustomView {
   template: string;
   isPublicView: boolean;
   isStaticView?: boolean;
-}
-
-export interface MenuEntry {
-  id: string;
-  title: string;
-  icon: string;
-  weight?: number;
-  parentId?: string;
-
-  isEnabledFct(): boolean;
 }
 
 export interface Dashlet {
@@ -41,6 +33,7 @@ export class ViewRegistryService implements OnDestroy {
   private _viewIdLinkPrefix = inject(VIEW_ID_LINK_PREFIX);
   private _quickAccessRoute = inject(QuickAccessRouteService);
   private _router = inject(Router);
+  private _infoBannerRegister = inject(InfoBannerRegisterService);
 
   private temporaryRouteChildren = new Map<string, Routes>();
 
@@ -104,6 +97,7 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Quota Manager', 'grid-quota-manager', 'sidebar', { weight: 50, parentId: 'status-root' });
     // Sub Menus Bookmarks
     this.registerMenuEntry('Manage Bookmarks', 'bookmarks', 'edit', { weight: 1, parentId: 'bookmarks-root' });
+
     // Sub Menus Support
     this.registerMenuEntry(
       'Documentation',
@@ -164,7 +158,17 @@ export class ViewRegistryService implements OnDestroy {
     this.registerViewWithConfig(viewId, template, { isPublicView: isPublicView });
   }
 
-  getChildrenRouteInfo(parentPath: string): SubRouteData[] {
+  getChildrenRouteInfo(parentPath: string): SubRouteData[];
+  getChildrenRouteInfo(activatedRoute: ActivatedRoute, dataPropertyName?: string): SubRouteData[];
+  getChildrenRouteInfo(
+    pathOrActivatedRoute: string | ActivatedRoute,
+    dataPropertyName: string = 'resolveChildFor',
+  ): SubRouteData[] {
+    const parentPath =
+      typeof pathOrActivatedRoute === 'string'
+        ? pathOrActivatedRoute
+        : pathOrActivatedRoute.snapshot.data[dataPropertyName];
+
     const parentChildren = this.getRouteParentChildren(parentPath);
     return parentChildren
       .map((child) => {
@@ -217,8 +221,10 @@ export class ViewRegistryService implements OnDestroy {
     return parentChildren;
   }
 
-  registerRoute(route: Route, { parentPath, label, weight, accessPermissions }: SubRouterConfig = {}): void {
+  registerRoute(route: Route, routerConfig?: SubRouterConfig): void {
     this._quickAccessRoute.registerQuickAccessRoutes(route);
+    this._infoBannerRegister.registerInfoBannerRoutes(route);
+
     const root = this.getRootRoute();
     if (!root?.children) {
       return;
@@ -230,7 +236,7 @@ export class ViewRegistryService implements OnDestroy {
       this.temporaryRouteChildren.delete(route.path);
     }
 
-    if (!parentPath) {
+    if (!routerConfig?.parentPath) {
       if (route.path) {
         let path = route.path;
         if (path.includes('/') && path.includes(':')) {
@@ -239,19 +245,12 @@ export class ViewRegistryService implements OnDestroy {
         ViewRegistryService.registeredRoutes.push(path);
       }
 
-      if (weight || label || accessPermissions) {
-        route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
-      }
-
-      if (accessPermissions) {
-        route.canActivate = route.canActivate ?? [];
-        route.canActivate.push(checkPermissionsGuard);
-      }
+      this.configureRoute(route, routerConfig);
       root.children.push(route);
       return;
     }
 
-    const parentChildren = this.getRouteParentChildren(parentPath);
+    const parentChildren = this.getRouteParentChildren(routerConfig.parentPath);
 
     let redirectRoute = parentChildren!.find((route) => route.path === '')!;
     if (!redirectRoute) {
@@ -259,15 +258,7 @@ export class ViewRegistryService implements OnDestroy {
       parentChildren.push(redirectRoute);
     }
 
-    if (weight || label || accessPermissions) {
-      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
-    }
-
-    if (accessPermissions) {
-      route.canActivate = route.canActivate ?? [];
-      route.canActivate.push(checkPermissionsGuard);
-    }
-
+    this.configureRoute(route, routerConfig);
     parentChildren!.push(route);
     const otherRoutes = parentChildren!.filter((route) => route.path !== '').sort(routesPrioritySortPredicate);
 
@@ -287,7 +278,12 @@ export class ViewRegistryService implements OnDestroy {
     this.registeredViews[viewId] = { template: template, isPublicView: isPublicView, isStaticView: isStaticView };
   }
 
-  registerMenuEntry(title: string, id: string, icon: string, options?: { weight?: number; parentId?: string }): void {
+  registerMenuEntry(
+    title: string,
+    id: string,
+    icon: string,
+    options?: { weight?: number; parentId?: string; isEnabledFct?: () => boolean },
+  ): void {
     if (!id || this.registeredMenuIds.includes(id)) {
       return;
     }
@@ -298,7 +294,7 @@ export class ViewRegistryService implements OnDestroy {
       parentId: options?.parentId,
       icon,
       weight: options?.weight,
-      isEnabledFct: () => true,
+      isEnabledFct: options?.isEnabledFct ?? (() => true),
     });
   }
 
@@ -364,5 +360,16 @@ export class ViewRegistryService implements OnDestroy {
     }
 
     return dashlets;
+  }
+
+  private configureRoute(route: Route, { label, weight, accessPermissions }: SubRouterConfig = {}): void {
+    if (weight || label || accessPermissions) {
+      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+    }
+
+    if (accessPermissions) {
+      route.canActivate = route.canActivate ?? [];
+      route.canActivate.push(checkPermissionsGuard);
+    }
   }
 }

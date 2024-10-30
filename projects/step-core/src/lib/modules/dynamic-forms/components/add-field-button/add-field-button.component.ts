@@ -2,6 +2,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostBinding,
   HostListener,
   inject,
   Input,
@@ -21,20 +22,24 @@ import { ArrayItemLabelValueExtractor } from '../../../basics/step-basics.module
     },
   ],
 })
-export class AddFieldButtonComponent<T = string> {
+export class AddFieldButtonComponent<T = string, V = string> {
   private _elRef = inject(ElementRef);
 
   protected showPossibleFields = false;
 
+  @HostBinding('class.child-mode')
+  @Input()
+  isChildMode: boolean = false;
+
   @Input() addLabel: string = 'Add optional field';
   @Input() addCustomLabel?: string;
   @Input() possibleFields: T[] = [];
-  @Input() extractor: ArrayItemLabelValueExtractor<T, unknown> = {
-    getValue: (item: T) => item,
+  @Input() extractor: ArrayItemLabelValueExtractor<T, V> = {
+    getValue: (item: T) => item as unknown as V,
     getLabel: (item: T) => (item as string).toString(),
   };
 
-  @Output() addField = new EventEmitter<T | undefined>();
+  @Output() addField = new EventEmitter<V | undefined>();
 
   readonly trackByItem: TrackByFunction<T> = (index, item) => this.extractor.getValue(item);
 
@@ -48,7 +53,7 @@ export class AddFieldButtonComponent<T = string> {
   }
 
   protected addPredefinedField(fieldItem: T): void {
-    this.addField.emit(this.extractor.getValue(fieldItem) as T);
+    this.addField.emit(this.extractor.getValue(fieldItem));
   }
 
   @HostListener('document:click', ['$event'])

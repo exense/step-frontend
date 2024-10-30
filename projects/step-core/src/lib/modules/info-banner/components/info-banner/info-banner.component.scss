@@ -1,0 +1,12 @@
+.info-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.message {
+  flex: 1;
+}
+
+.close {
+  cursor: pointer;
+}

@@ -17,6 +17,7 @@ import {
 import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
 import { BehaviorSubject, of, switchMap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
+import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 
 @Component({
   selector: 'step-execution-list',
@@ -44,6 +45,7 @@ export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
@@ -58,6 +60,7 @@ export class ExecutionListComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
+    this._timeSeriesEntityService.clearCache();
   }
 
   changeType(selectionType: BulkSelectionType): void {

@@ -1,16 +1,16 @@
 import { KeyValue } from '@angular/common';
 import {
+  AfterContentInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
   forwardRef,
   HostListener,
   inject,
-  OnDestroy,
   OnInit,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AlertType,
@@ -29,8 +29,10 @@ import {
   FunctionTypeComponent,
   FunctionTypeFormComponent,
   DialogRouteResult,
+  ItemInfo,
+  CustomFormWrapperComponent,
 } from '@exense/step-core';
-import { map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -45,7 +47,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     },
   ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
+export class FunctionConfigurationDialogComponent implements OnInit, AfterContentInit, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
@@ -73,8 +75,11 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
   protected isLoading: boolean = false;
   protected tokenSelectionCriteria: KeyValue<string, string>[] = [];
 
-  @ViewChild('functionTypeComponent', { static: true })
-  private functionTypeChild!: FunctionTypeComponent;
+  private functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
+  private customForm = viewChild(CustomFormWrapperComponent);
+
+  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
+  dropdownItemsFiltered: ItemInfo[] = [];
 
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
@@ -99,6 +104,23 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
     this.initStepFunction();
   }
 
+  ngAfterContentInit(): void {
+    this.dropdownItemsFiltered = [...this.functionTypeItemInfos];
+    this.filterMultiControl.valueChanges
+      .pipe(
+        map((value) => value?.toLowerCase()),
+        map((value) =>
+          value
+            ? this.functionTypeItemInfos.filter((item) => item.label.toLowerCase().includes(value))
+            : [...this.functionTypeItemInfos],
+        ),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((displayItemsFiltered) => {
+        this.dropdownItemsFiltered = displayItemsFiltered;
+      });
+  }
+
   protected get functionType(): string {
     return this.formGroup!.controls.type.value;
   }
@@ -116,13 +138,15 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
       this.formGroup!.markAllAsTouched();
       return;
     }
-    functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
 
-    (this.functionTypeChild.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
-
-    this._api
-      .saveFunction(this.keyword!)
+    this.customForm()!
+      .readyToProceed()
       .pipe(
+        tap(() => {
+          functionConfigurationDialogFormSetValueToModel(this.formGroup!, this.keyword!);
+          (this.functionTypeChild()!.componentInstance as FunctionTypeFormComponent<any>).setValueToModel();
+        }),
+        switchMap(() => this._api.saveFunction(this.keyword!)),
         switchMap((keyword) => {
           const isSuccess = !!keyword;
 
@@ -163,7 +187,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
       this.fetchStepFunction(this.keyword.type);
     } else {
       this.keyword = this._functionConfigurationDialogData.keyword;
-
       functionConfigurationDialogFormSetValueToForm(this.formGroup!, this.keyword, this._formBuilder);
     }
   }
@@ -195,7 +218,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, FunctionTyp
       )
       .subscribe((keyword) => {
         this.keyword = keyword;
-
         functionConfigurationDialogFormSetValueToForm(this.formGroup!, keyword, this._formBuilder);
       });
   }

@@ -5,16 +5,6 @@ div[step-modal-window-body] > form {
   @include core.common-dialog-content;
 }
 
-.title {
-  font-weight: 500;
-  margin-left: 0.2rem;
-  margin-bottom: 0.6rem;
-}
-
-.section {
-  margin-top: 1rem;
-}
-
 .help-icon {
   margin-left: 0.4rem;
   transform: scale(0.8);
@@ -33,14 +23,6 @@ div[step-modal-window-body] > form {
 .info-txt {
   padding: 1rem;
   background: var.$gray-50;
-}
-
-.hidden-input {
-  border: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  padding: 0.4rem;
 }
 
 .form-row {
@@ -65,9 +47,31 @@ div[step-modal-window-body] > form {
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
+  justify-content: space-between;
 
   .item {
     width: 45%;
     flex-grow: 1;
+    height: 36px;
+    line-height: 36px;
+  }
+}
+
+.pcl-column-container {
+  display: flex;
+  width: 45%;
+  flex-grow: 1;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pcl-editable-label {
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  max-width: 7rem;
+
+  .editable-label {
+    background: red !important;
   }
 }

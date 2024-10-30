@@ -1,0 +1,10 @@
+:host {
+  > *:last-child {
+    padding-bottom: 0.5rem;
+  }
+}
+
+step-dynamic-field {
+  margin-bottom: 1rem;
+  display: block;
+}

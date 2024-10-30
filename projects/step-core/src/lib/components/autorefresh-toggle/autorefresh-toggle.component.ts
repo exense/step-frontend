@@ -29,6 +29,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
 
   private _autoRefreshModelFactory = inject(AutoRefreshModelFactoryService);
   @Input() model = this._autoRefreshModelFactory.create();
+  @Input() buttonType: 'icon' | 'stroke' = 'icon';
 
   @Input() presets: ReadonlyArray<AutorefreshPreset> = [
     { label: 'OFF', value: 0 },
@@ -43,7 +44,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   @Input() autoIncreaseTo?: number;
   @Input() interval: number = 0;
   @Input() disabled: boolean = false;
-  @Input() buttonDisabled = false;
+  @Input() disableAutoRefreshButton = false;
 
   @Output() disabledChange = new EventEmitter<boolean>();
   @Output() intervalChange = new EventEmitter<number>();

@@ -1,20 +1,21 @@
 @if (stEditableLabelMode) {
-  <step-dynamic-label-custom-form-inputs
-    *ngFor="let input of inputs"
-    [stInput]="input"
-    [disabled]="stDisabled"
-    [required]="required"
-    [ngModel]="stModel | stepCustomFormInputModel: input"
-    (ngModelChange)="onInputValueChange(input, $event)"
-    (touch)="onCustomInputTouched()"
-  />
-} @else {
-  @for (input of inputs; track input.id) {
-    <step-standard-custom-form-inputs
+  @for (input of inputs(); track input.id) {
+    <step-dynamic-label-custom-form-inputs
       [stInput]="input"
       [disabled]="stDisabled"
       [required]="required"
       [ngModel]="stModel | stepCustomFormInputModel: input"
+      (ngModelChange)="onInputValueChange(input, $event)"
+      (touch)="onCustomInputTouched()"
+    />
+  }
+} @else {
+  @for (input of inputs(); track input.id) {
+    <step-standard-custom-form-inputs
+      [disabled]="stDisabled"
+      [required]="required"
+      [ngModel]="stModel | stepCustomFormInputModel: input"
+      [stInput]="input"
       (ngModelChange)="onInputValueChange(input, $event)"
       (touch)="onCustomInputTouched()"
     />

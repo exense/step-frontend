@@ -1,4 +1,4 @@
 <step-report-node-icon [node]="node"> </step-report-node-icon>
 <span class="m-left">{{ node?.name }}: </span>
-<span *ngIf="node?.message" class="report-node-text m-left">{{ node?.message }}</span>
+<span *ngIf="node?.message && !node?.error" class="report-node-text m-left">{{ node?.message }}</span>
 <span *ngIf="node?.error" class="report-node-text m-left">{{ node?.error?.msg }}</span>

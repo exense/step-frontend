@@ -17,24 +17,32 @@ import { ParameterScopeComponent } from './components/parameter-scope/parameter-
 import './components/parameter-selection/parameter-selection.component';
 import { ParameterSelectionComponent } from './components/parameter-selection/parameter-selection.component';
 import { ParametersKeyComponent } from './components/parameters-key/parameters-key.component';
-import { ParametersListComponent } from './components/parameters-list/parameters-list.component';
+import { ParameterListComponent } from './components/parameter-list/parameter-list.component';
 import { ParameterLastModificationComponent } from './components/parameter-last-modification/parameter-last-modification.component';
 import { ParameterEditDialogComponent } from './components/parameter-edit-dialog/parameter-edit-dialog.component';
 import { ParametersBulkOperationsRegisterService } from './services/parameters-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
+import { ParameterConditionDialogComponent } from './components/parameter-condition-dialog/parameter-condition-dialog.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { InputTypePipe } from './pipes/input-type.pipe';
+import { InputOptionsPipe } from './pipes/input-options.pipe';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule],
-  exports: [ParametersListComponent, ParameterSelectionComponent],
+  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule, NgxMatSelectSearchModule],
+  exports: [ParameterListComponent, ParameterSelectionComponent],
   declarations: [
-    ParametersListComponent,
+    ParameterListComponent,
     ParametersKeyComponent,
     ParameterScopeComponent,
     ParameterSelectionComponent,
     ParameterLastModificationComponent,
     ParameterEditDialogComponent,
     ParameterUrlPipe,
+    ParameterConditionDialogComponent,
+    InputTypePipe,
+    InputOptionsPipe,
   ],
 })
 export class ParameterModule {
@@ -54,7 +62,7 @@ export class ParameterModule {
     _cellRegister.registerCell('parameterKey', ParametersKeyComponent);
     _vewRegistry.registerRoute({
       path: 'parameters',
-      component: ParametersListComponent,
+      component: ParameterListComponent,
       children: [
         {
           path: 'editor',

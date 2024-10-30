@@ -1,5 +1,7 @@
 import { Execution, TimeRange } from '@exense/step-core';
 import { TimeRangePickerSelection } from './../time-selection/time-range-picker-selection';
+import { TimeSeriesConfig } from './time-series.config';
+import { ChartAggregation } from '../chart-aggregation';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -18,15 +20,18 @@ export class TimeSeriesUtils {
   }
 
   /**
-   * If the intervals do not overlap, this method will return indefined.
-   * @param boundaries
+   * If the intervals do not overlap, this method will return undefined.
+   * @param cropBounds
    * @param interval
    */
-  static cropInterval(boundaries: TimeRange, interval: TimeRange): TimeRange | undefined {
-    if (!this.intervalsOverlap(boundaries, interval)) {
+  static cropInterval(interval: TimeRange, cropBounds: TimeRange): TimeRange | undefined {
+    const from = Math.max(interval.from, cropBounds.from);
+    const to = Math.min(interval.to, cropBounds.to);
+    const minimumIntervalSize = 3; // a bug from uPlot used to throw intervals with size 1 and 2 from time to time, even if it is empty
+    if (to - from < minimumIntervalSize) {
       return undefined;
     }
-    return { from: Math.max(boundaries.from!, interval.from!), to: Math.min(boundaries.to!, interval.to!) };
+    return { from: from, to: to };
   }
 
   static intervalsOverlap(range1: TimeRange, range2: TimeRange) {
@@ -37,24 +42,36 @@ export class TimeSeriesUtils {
     return range1 && range2 && range1.from! === range2.from! && range1.to! === range2.to!;
   }
 
-  static convertExecutionAndSelectionToTimeRange(
-    execution: Execution,
-    timeRangeSelection: TimeRangePickerSelection,
-  ): TimeRange {
-    const startTime = execution.startTime!;
-    const endTime = execution.endTime ?? new Date().getTime();
+  static getAxesFormatFunction(aggregation: ChartAggregation, unit?: string): (v: number) => string {
+    if (aggregation === ChartAggregation.RATE) {
+      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
+    }
+    if (!unit) {
+      return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
+    }
+    switch (unit) {
+      case '1':
+        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
+      case 'ms':
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time;
+      case '%':
+        return (v) => v.toString() + this.getUnitLabel(aggregation, unit);
+      default:
+        throw new Error('Unit not handled: ' + unit);
+    }
+  }
 
-    switch (timeRangeSelection.type) {
-      case 'FULL':
-        const fullRange = { from: startTime, to: endTime - 5000 };
-        if (fullRange.to - fullRange.from < 0) {
-          fullRange.to = endTime;
-        }
-        return fullRange;
-      case 'ABSOLUTE':
-        return timeRangeSelection.absoluteSelection!;
-      case 'RELATIVE':
-        return { from: endTime - timeRangeSelection.relativeSelection!.timeInMs!, to: endTime };
+  static getUnitLabel(aggregation: ChartAggregation, unit: string): string {
+    if (aggregation === 'RATE') {
+      return '/ h';
+    }
+    switch (unit) {
+      case '%':
+        return '%';
+      case 'ms':
+        return ' ms';
+      default:
+        return '';
     }
   }
 

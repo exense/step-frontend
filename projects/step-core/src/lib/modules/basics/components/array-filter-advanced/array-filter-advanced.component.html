@@ -1,5 +1,20 @@
-<step-form-field>
+<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
   <mat-select [multiple]="true" [formControl]="filterControl">
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="searchCtrl"
+        ngDefaultControl
+        placeholderLabel="Search..."
+        noEntriesFoundLabel="No matchin entries found"
+      >
+        <step-icon name="trash-2" ngxMatSelectSearchClear />
+      </ngx-mat-select-search>
+    </mat-option>
+    @if (useUnsetItem()) {
+      <mat-option class="unset-item" [value]="UNSET_VALUE">
+        <span class="unset-content">unset</span>
+      </mat-option>
+    }
     @for (item of displayItems(); track item.key) {
       <mat-option [value]="item.key">{{ item.value }}</mat-option>
     }

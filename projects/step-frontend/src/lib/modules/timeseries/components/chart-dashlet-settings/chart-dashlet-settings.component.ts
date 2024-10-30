@@ -11,6 +11,12 @@ import {
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  AggregateParams,
+  TimeseriesAggregatePickerComponent,
+} from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -22,36 +28,27 @@ export interface ChartDashletSettingsData {
   templateUrl: './chart-dashlet-settings.component.html',
   styleUrls: ['./chart-dashlet-settings.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, FilterBarItemComponent],
+  imports: [COMMON_IMPORTS, FilterBarItemComponent, TimeseriesAggregatePickerComponent],
 })
 export class ChartDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
   readonly ChartAggregation = ChartAggregation;
 
   _attributesByKey: Record<string, MetricAttribute> = {};
 
+  @ViewChild('primaryAggregateMenuTrigger') primaryAggregateMenuTrigger?: MatMenuTrigger;
+  @ViewChild('secondaryAggregateMenuTrigger') secondaryAggregateMenuTrigger?: MatMenuTrigger;
   @ViewChild('formContainer', { static: true })
   private formContainer!: NgForm;
 
-  readonly AGGREGATE_TYPES: ChartAggregation[] = [
-    ChartAggregation.SUM,
-    ChartAggregation.AVG,
-    ChartAggregation.MAX,
-    ChartAggregation.MIN,
-    ChartAggregation.COUNT,
-    ChartAggregation.RATE,
-    ChartAggregation.MEDIAN,
-    ChartAggregation.PERCENTILE,
-  ];
-  readonly PCL_VALUES = [80, 90, 99];
   readonly FilterBarItemType = FilterBarItemType;
 
   item!: DashboardItem;
   filterItems: FilterBarItem[] = [];
-  metricTypes: MetricType[] = [];
+  allAttributes: MetricAttribute[] = [];
 
   tableDashlets: DashboardItem[] = [];
   masterDashlet?: DashboardItem;
@@ -66,29 +63,27 @@ export class ChartDashletSettingsComponent implements OnInit {
     this.filterItems = this.item.filters.map((item) => {
       return FilterUtils.convertApiFilterItem(item);
     });
-    this.fetchMetricTypes();
-  }
-
-  private fetchMetricTypes() {
-    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
-  }
-
-  onSecondaryAggregateSelect(aggregation: ChartAggregation) {
-    if (!aggregation) {
-      this.item.chartSettings!.secondaryAxes = undefined;
-    } else {
-      this.item.chartSettings!.secondaryAxes = {
-        aggregation: aggregation,
-        unit: '',
-        displayType: 'BAR_CHART',
-        pclValue: this.PCL_VALUES[0],
-        colorizationType: 'STROKE',
-      };
-    }
+    this.allAttributes = this._inputData.context
+      .getAllAttributes()
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
   addFilterItem(attribute: MetricAttribute) {
     this.filterItems.push(FilterUtils.createFilterItemFromAttribute(attribute));
+  }
+
+  handleFilterItemChange(index: number, item: FilterBarItem) {
+    this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 
   addCustomFilter(type: FilterBarItemType) {
@@ -113,7 +108,30 @@ export class ChartDashletSettingsComponent implements OnInit {
     this._dialogRef.close({ ...this.item });
   }
 
-  switchAggregate(aggregate: ChartAggregation) {
-    this.item.chartSettings!.primaryAxes.aggregation = aggregate;
+  handlePrimaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+    this.item.chartSettings!.primaryAxes.aggregation = {
+      type: change.aggregate!,
+      params: change.params,
+    };
+    this.primaryAggregateMenuTrigger?.closeMenu();
+  }
+
+  handleSecondaryAggregationChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+    const newAggregate = change.aggregate;
+    if (newAggregate) {
+      if (!this.item.chartSettings!.secondaryAxes) {
+        this.item.chartSettings!.secondaryAxes = {
+          aggregation: { type: newAggregate, params: change.params },
+          displayType: 'BAR_CHART',
+          colorizationType: 'STROKE',
+          unit: '',
+        };
+      } else {
+        this.item.chartSettings!.secondaryAxes.aggregation = { type: newAggregate, params: change.params };
+      }
+    } else {
+      this.item.chartSettings!.secondaryAxes = undefined;
+    }
+    this.secondaryAggregateMenuTrigger?.closeMenu();
   }
 }

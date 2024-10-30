@@ -36,10 +36,13 @@ export class CronValidatorsFactory {
       new NoSpecificValidator(
         new LWValidator(
           new ArrayValidator(
-            new MultipleValidator(new IncrementValidator(this.daysOfMonths), new RangeValidator(this.daysOfMonths))
-          )
-        )
-      )
+            new MultipleValidator(
+              new IncrementValidator(new RangeValidator(this.daysOfMonths)),
+              new RangeValidator(this.daysOfMonths),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -53,13 +56,13 @@ export class CronValidatorsFactory {
         new LWValidator(
           new ArrayValidator(
             new MultipleValidator(
-              new IncrementValidator(this.weekDays),
+              new IncrementValidator(new RangeValidator(this.weekDays)),
               new RangeValidator(this.weekDays),
-              new NextDayValidator(this.weekDays)
-            )
-          )
-        )
-      )
+              new NextDayValidator(this.weekDays),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -69,7 +72,9 @@ export class CronValidatorsFactory {
 
   private createValidatorWithCommonRules(validator: BaseCronValidator): BaseCronValidator {
     return new AllValidator(
-      new ArrayValidator(new MultipleValidator(new IncrementValidator(validator), new RangeValidator(validator)))
+      new ArrayValidator(
+        new MultipleValidator(new IncrementValidator(new RangeValidator(validator)), new RangeValidator(validator)),
+      ),
     );
   }
 }

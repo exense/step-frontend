@@ -36,6 +36,12 @@ export const $FormDataBodyPart = {
     value: {
       type: 'string',
     },
+    content: {
+      properties: {},
+    },
+    fileName: {
+      type: 'string',
+    },
     formDataContentDisposition: {
       type: 'FormDataContentDisposition',
     },

@@ -1,4 +1,4 @@
-import { Component, HostBinding, inject } from '@angular/core';
+import { Component, HostBinding, inject, viewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionPackageConfigurationDialogData } from '../../types/function-package-configuration-dialog-data.interface';
 import {
@@ -7,6 +7,7 @@ import {
   DialogRouteResult,
   Keyword,
   ResourceInputBridgeService,
+  CustomFormComponent,
 } from '@exense/step-core';
 import { catchError, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
@@ -23,6 +24,8 @@ export class FunctionPackageConfigurationDialogComponent {
   private _matDialogRef = inject<MatDialogRef<FunctionPackageConfigurationDialogData, DialogRouteResult>>(MatDialogRef);
   protected _data = inject<FunctionPackageConfigurationDialogData>(MAT_DIALOG_DATA, { optional: true });
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
+
+  private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
   readonly modalTitle = `${this._data?.functionPackage ? 'Edit' : 'New'} Keyword Package`;
 
@@ -45,8 +48,12 @@ export class FunctionPackageConfigurationDialogComponent {
       return;
     }
 
-    of(this.functionPackage)
+    const customForm = this.customForm();
+    const isReady$ = !customForm ? of(undefined) : customForm.readyToProceed();
+
+    isReady$
       .pipe(
+        map(() => this.functionPackage),
         tap(() => {
           this.isFunctionPackageReady = false;
           this.isLoading = true;

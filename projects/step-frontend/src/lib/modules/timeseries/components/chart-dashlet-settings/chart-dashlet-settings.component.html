@@ -41,21 +41,63 @@
           </step-form-field>
         </div>
         <mat-divider />
-        <div>
-          <step-label>Filters and grouping</step-label>
-        </div>
-        @if (!item?.masterChartId) {
+        <step-label>Filters</step-label>
+        @if (!item.masterChartId) {
           <div class="filters-container">
             @for (item of filterItems; track item; let i = $index) {
               <step-ts-filter-bar-item
                 [item]="item"
                 (removeItem)="filterItems.splice(i, 1)"
+                (filterChange)="handleFilterItemChange(i, $event)"
                 [removable]="true"
                 [updateTimeRangeOption]="false"
               />
             }
             <button mat-button [matMenuTriggerFor]="typesMenu">+ Add Filter</button>
           </div>
+          <div class="form-row">
+            <step-form-field>
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="item.inheritGlobalFilters"
+                (ngModelChange)="item.inheritSpecificFiltersOnly = false"
+                name="inheritGlobalFilters"
+              >
+                <span>Inherit global filters</span>
+                <step-icon
+                  class="help-icon"
+                  matTooltip="The chart filters will be combined with the dashboard filters"
+                  name="help-circle"
+                ></step-icon>
+              </mat-checkbox>
+            </step-form-field>
+            @if (item.inheritGlobalFilters) {
+              <step-form-field>
+                <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="item.inheritSpecificFiltersOnly"
+                  name="inheritSpecificFiltersOnly"
+                >
+                  <span>Inherit specific fields only</span>
+                  <step-icon
+                    class="help-icon"
+                    matTooltip="Chart will inherit only the specified filters if present. Note that while using OQL, all the filters will be inherited"
+                    name="help-circle"
+                  ></step-icon>
+                </mat-checkbox>
+              </step-form-field>
+            }
+          </div>
+          @if (item.inheritGlobalFilters && item.inheritSpecificFiltersOnly) {
+            <step-form-field>
+              <step-label>Inherited attributes</step-label>
+              <mat-select [(ngModel)]="item.specificFiltersToInherit" multiple name="grouping">
+                @for (attr of allAttributes; track attr) {
+                  <mat-option [value]="attr.name">{{ attr.displayName }}</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+          }
           <mat-menu #typesMenu="matMenu">
             @for (attribute of item.attributes; track attribute) {
               <button mat-menu-item (click)="addFilterItem(attribute)">
@@ -66,18 +108,14 @@
             <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
             <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
           </mat-menu>
+        }
+        <mat-divider />
+        <div>
+          <step-label>Grouping</step-label>
+        </div>
+        @if (!item.masterChartId) {
           <div class="form-row">
             <div>
-              <step-form-field>
-                <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalFilters" name="inheritGlobalFilters">
-                  <span>Inherit global filters</span>
-                  <step-icon
-                    class="help-icon"
-                    matTooltip="The chart filters will be combined with the dashboard filters"
-                    name="help-circle"
-                  ></step-icon>
-                </mat-checkbox>
-              </step-form-field>
               <step-form-field>
                 <mat-checkbox color="primary" [(ngModel)]="item.inheritGlobalGrouping" name="inheritGlobalGrouping">
                   <span>Inherit global grouping</span>
@@ -100,21 +138,11 @@
                   ></step-icon>
                 </mat-checkbox>
               </step-form-field>
-              <step-form-field>
-                <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
-                  <span>Readonly aggregate</span>
-                  <step-icon
-                    class="help-icon"
-                    matTooltip="The users will not be able to change the aggregate of this dashlet"
-                    name="help-circle"
-                  ></step-icon>
-                </mat-checkbox>
-              </step-form-field>
             </div>
           </div>
           @if (!item.inheritGlobalGrouping) {
             <step-form-field>
-              <step-label>Grouping</step-label>
+              <step-label>Grouping Attributes</step-label>
               <mat-select [(ngModel)]="item.grouping" multiple name="grouping">
                 @for (attr of item.attributes; track attr) {
                   <mat-option [value]="attr.name">{{ attr.displayName }} </mat-option>
@@ -132,22 +160,21 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <mat-select [(ngModel)]="item.chartSettings!.primaryAxes.aggregation" name="aggregation">
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
+            <button
+              class="aggregate-select-container"
+              #primaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="aggregateMenu"
+              mat-button
+            >
+              {{ item.chartSettings!.primaryAxes.aggregation.type }}
+              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.primaryAxes?.aggregation?.params?.['pclValue'] }}
               }
-            </mat-select>
+              @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE) {
+                (/{{ item.chartSettings!.primaryAxes?.aggregation?.params?.['rateUnit'] }})
+              }
+            </button>
           </step-form-field>
-          @if (item.chartSettings!.primaryAxes?.aggregation === ChartAggregation.PERCENTILE) {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.primaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          }
           <step-form-field>
             <step-label>Unit</step-label>
             <input
@@ -156,7 +183,24 @@
               [(ngModel)]="item.chartSettings!.primaryAxes.unit"
             />
           </step-form-field>
+          <mat-menu #aggregateMenu="matMenu">
+            <step-timeseries-aggregate-picker
+              [selectedAggregate]="item.chartSettings!.primaryAxes.aggregation"
+              [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+              (aggregateChange)="handlePrimaryAggregationChange($event)"
+            />
+          </mat-menu>
         </div>
+        <step-form-field>
+          <mat-checkbox color="primary" [(ngModel)]="item.readonlyAggregate" name="readonlyAggregate">
+            <span>Readonly aggregate</span>
+            <step-icon
+              class="help-icon"
+              matTooltip="The users will not be able to change the aggregate of this dashlet"
+              name="help-circle"
+            ></step-icon>
+          </mat-checkbox>
+        </step-form-field>
         <mat-divider />
         <div>
           <step-label>Secondary Axes</step-label>
@@ -164,28 +208,27 @@
         <div class="form-row">
           <step-form-field>
             <step-label>Aggregate</step-label>
-            <mat-select
-              [value]="item.chartSettings!.secondaryAxes?.aggregation"
-              (valueChange)="onSecondaryAggregateSelect($event)"
+            <button
+              class="aggregate-select-container"
+              #secondaryAggregateMenuTrigger="matMenuTrigger"
+              [matMenuTriggerFor]="secondaryAggregateMenu"
+              mat-button
             >
-              <mat-option [value]="undefined">-</mat-option>
-              @for (attr of AGGREGATE_TYPES; track attr) {
-                <mat-option [value]="attr">{{ attr }}</mat-option>
+              {{ item.chartSettings!.secondaryAxes?.aggregation?.type }}
+              @if (item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.PERCENTILE) {
+                {{ item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue'] }}
               }
-            </mat-select>
+            </button>
+            <mat-menu #secondaryAggregateMenu="matMenu">
+              <step-timeseries-aggregate-picker
+                [selectedAggregate]="$any(item.chartSettings!.secondaryAxes?.aggregation)"
+                [allowEmptyAggregate]="true"
+                [pclValue]="item.chartSettings!.secondaryAxes?.aggregation?.params?.['pclValue']"
+                (aggregateChange)="handleSecondaryAggregationChange($event)"
+              />
+            </mat-menu>
           </step-form-field>
-          @if (item.chartSettings!.secondaryAxes?.aggregation === 'PERCENTILE') {
-            <step-form-field>
-              <step-label>Pcl. value</step-label>
-              <mat-select [(value)]="item.chartSettings!.secondaryAxes!.pclValue">
-                @for (v of PCL_VALUES; track v) {
-                  <mat-option [value]="v">{{ v }}th</mat-option>
-                }
-              </mat-select>
-            </step-form-field>
-          } @else {
-            <div></div>
-          }
+          <div></div>
         </div>
         <mat-divider />
         <step-label>Visual settings</step-label>

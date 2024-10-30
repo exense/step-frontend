@@ -89,7 +89,7 @@ $menu-sub-item-height: 3.2rem;
   step-tenant-selection {
     display: block;
     position: fixed;
-    top: 7rem;
+    top: 6.2rem;
     left: 5.6rem;
     z-index: 3;
     max-width: 15rem;
@@ -318,12 +318,23 @@ $menu-sub-item-height: 3.2rem;
         position: relative; /* required for (f2) position:absolute */
         display: block;
         width: 100%;
-        padding: 14px;
+        padding: 1.4rem;
 
         /* (C2) COSMETICS */
         color: map.get($config, menu-text);
         background: map.get($config, menu-color);
         cursor: pointer;
+
+        &.no-children:hover,
+        &.active-primary-item {
+          &::before {
+            @include overlay(map.get($config, selection-color));
+          }
+        }
+
+        &.no-children:hover .sidebar-aligned-text::after {
+          @include overlay(map.get($config, selection-color));
+        }
       }
 
       .content {
@@ -339,9 +350,17 @@ $menu-sub-item-height: 3.2rem;
         display: flex;
         align-items: center;
         height: $menu-sub-item-height;
-        padding: 0 14px 0 16px;
+        padding: 0 1.4rem 0 1.6rem;
         cursor: pointer;
         color: map.get($config, menu-secondary);
+      }
+
+      .sidebar-sub-subtab {
+        display: flex;
+        align-items: center;
+        height: $menu-sub-item-height;
+        padding: 0 1.4rem 0 4.7rem;
+        cursor: pointer;
       }
 
       input:checked ~ .content {
@@ -371,7 +390,8 @@ $menu-sub-item-height: 3.2rem;
       color: map.get($config, menu-text) !important;
     }
 
-    .sidebar-subtab:hover {
+    .sidebar-subtab:hover,
+    .sidebar-sub-subtab:hover {
       background: map.get($config, selection-color);
     }
 
@@ -385,25 +405,30 @@ $menu-sub-item-height: 3.2rem;
 
     $alignedTextMarginLeft: map.get($config, aligned-text-margin-left);
 
-    .sidebar-aligned-text {
-      // position: absolute;
-      // left: $alignedTextMarginLeft;
-      margin-left: 16px;
-      font-size: 16px;
-      line-height: 24px;
-      font-weight: 400;
+    .sidebar-aligned-text,
+    .sidebar-aligned-subtext,
+    .sidebar-aligned-sub-subtext {
+      margin-left: 1.6rem;
+      font-size: 1.6rem;
+      line-height: 2.4rem;
       white-space: nowrap;
     }
 
+    .sidebar-aligned-text {
+      font-weight: 400;
+    }
+
     .sidebar-aligned-subtext {
-      max-width: 150px;
-      // position: absolute;
-      // left: calc($alignedTextMarginLeft + $elements-text-padding);
-      margin-left: 16px;
-      font-size: 16px;
-      line-height: 24px;
+      max-width: 15rem;
       font-weight: 300;
-      white-space: nowrap;
+    }
+
+    .sidebar-aligned-sub-subtext {
+      margin-left: 0.5rem;
+      max-width: 15rem;
+      font-weight: 200;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .version {
@@ -458,13 +483,15 @@ $menu-sub-item-height: 3.2rem;
         padding-right: 12px;
       }
 
-      .sidebar-subtab {
+      .sidebar-subtab,
+      .sidebar-sub-subtab {
         padding: 0 12px;
       }
 
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN BEGIN
       .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text,
-      .sidebar-subtab:hover > .sidebar-aligned-subtext {
+      .sidebar-subtab:hover > .sidebar-aligned-subtext,
+      .sidebar-sub-subtab:hover > .sidebar-aligned-sub-subtext {
         display: flex;
         background: map.get($config, background-color);
         position: fixed;
@@ -472,6 +499,7 @@ $menu-sub-item-height: 3.2rem;
         border-top-right-radius: 0.8rem;
         border-bottom-right-radius: 0.8rem;
         align-self: start;
+        max-width: fit-content;
         &::before {
           @include overlay(map.get($config, menu-color));
         }
@@ -496,7 +524,8 @@ $menu-sub-item-height: 3.2rem;
           }
         }
       }
-      .sidebar-subtab:hover > .sidebar-aligned-subtext {
+      .sidebar-subtab:hover > .sidebar-aligned-subtext,
+      .sidebar-sub-subtab:hover > .sidebar-aligned-sub-subtext {
         height: $menu-sub-item-height;
         min-width: 16rem;
         left: 5.6rem;

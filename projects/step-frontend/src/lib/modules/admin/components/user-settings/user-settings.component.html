@@ -1,0 +1,132 @@
+<div class="header-with-button">
+  <div class="header-text">User Settings</div>
+  <button
+    stepTestId="password-btn"
+    type="button"
+    mat-flat-button
+    color="primary"
+    (click)="changePwd()"
+    [disabled]="!canChangePassword"
+  >
+    Change password
+  </button>
+</div>
+<div class="credentials">
+  <section>
+    <step-form-field alignLabelAddon="near">
+      <step-label>Username</step-label>
+      <step-label-addon>{{ user.username }}</step-label-addon>
+    </step-form-field>
+  </section>
+  <section>
+    <step-form-field alignLabelAddon="near">
+      <step-label>Role</step-label>
+      <step-label-addon>{{ user.role }}</step-label-addon>
+    </step-form-field>
+  </section>
+</div>
+
+<div class="header-with-button">
+  <div class="header-text title-with-hint">
+    <div>Api key</div>
+    <step-description-hint
+      description="API keys can be used for authentication with the step API (<a href='https://step.dev/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys' target='_blank'>documentation</a>)"
+    >
+    </step-description-hint>
+  </div>
+  <button
+    stepTestId="generate-key-btn"
+    type="button"
+    mat-flat-button
+    color="primary"
+    (click)="invokeShowGenerateApiKeyDialog()"
+    [disabled]="!canGenerateApiKey"
+  >
+    Generate new Key
+  </button>
+</div>
+<div class="role">
+  <section>
+    <step-table [dataSource]="tokensSource">
+      <ng-container matColumnDef="label">
+        <th mat-header-cell *matHeaderCellDef>Label</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.label || element.id }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.creationTime | date }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="expired">
+        <th mat-header-cell *matHeaderCellDef>Expired</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.expiryTime | date }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th class="actions" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            stepTestId="revoke-api-btn"
+            mat-icon-button
+            matTooltip="Revoke token"
+            (click)="revokeAPIToken(element.id)"
+          >
+            <step-icon name="trash-2"></step-icon>
+          </button>
+        </td>
+      </ng-container>
+    </step-table>
+  </section>
+</div>
+
+<div class="header-with-button">
+  <div class="header-text title-with-hint">
+    <div>Preferences</div>
+    <step-description-hint
+      description="Add key/value pairs of custom preferences (<a href='https://step.dev/knowledgebase/userdocs/userpreferences/#preferences' target='_blank'>documentation</a>)"
+    >
+    </step-description-hint>
+  </div>
+</div>
+<div>
+  <step-table [dataSource]="preferences$">
+    <section class="header" *stepAdditionalHeader="'add-preference'">
+      <button stepTestId="add-preference-btn" type="button" mat-mini-fab color="primary" (click)="addPreference()">
+        <step-icon name="plus"></step-icon>
+      </button>
+    </section>
+    <ng-container matColumnDef="key">
+      <th mat-header-cell *matHeaderCellDef>Key</th>
+      <td mat-cell *matCellDef="let element">
+        <step-form-field>
+          <input stepTestId="key-input" [(ngModel)]="element.key" placeholder="Key" (blur)="savePreferences()" />
+        </step-form-field>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="value">
+      <th mat-header-cell *matHeaderCellDef>Value</th>
+      <td mat-cell *matCellDef="let element">
+        <step-form-field>
+          <input stepTestId="value-input" [(ngModel)]="element.value" placeholder="Value" (blur)="savePreferences()" />
+        </step-form-field>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th class="actions" mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <button
+          stepTestId="delete-preference-btn"
+          mat-icon-button
+          matTooltip="Delete preference"
+          (click)="removePreference(element)"
+        >
+          <step-icon name="trash-2"></step-icon>
+        </button>
+      </td>
+    </ng-container>
+  </step-table>
+</div>

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -14,6 +15,7 @@ import {
 import {
   AugmentedTimeSeriesService,
   AuthService,
+  type ColumnSelection,
   DashboardItem,
   DashboardsService,
   DashboardView,
@@ -30,13 +32,14 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
+  RelativeTimeSelection,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
   TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  TimeSeriesUtilityService,
+  TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
@@ -49,14 +52,16 @@ import {
   DashboardUrlParamsService,
 } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
-import { TableColumnType } from '../../modules/_common/types/table-column-type';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
 import { DashboardState } from './dashboard-state';
+import { TimeSeriesEntityService } from '../../modules/_common';
+import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
+import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -83,22 +88,25 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
 
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
   private _dashboardService = inject(DashboardsService);
   private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
+  @Input() storageId?: string;
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
+  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -124,12 +132,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     if (this.defaultFullTimeRange?.from) {
       this.timeRangeOptions.push({ type: 'FULL' });
     }
-    const pageParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
-    this.resolution = pageParams.resolution;
+    const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
-    this._dashboardService.getDashboardById(this.dashboardId).subscribe((dashboard) => {
-      this.initState(pageParams, dashboard);
+    const metrics$ = this._timeSeriesService.getMetricTypes();
+    const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);
+    forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
+      this.metricTypes = metrics;
+      this.initState(urlParams, dashboard);
     });
   }
 
@@ -145,17 +156,20 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  initState(pageParams: DashboardUrlParams, dashboard: DashboardView): void {
+  /**
+   * Parameters of the dashboard are combined from 3 places, in the following order:
+   * 1. URL
+   * 2. Stored state
+   * 3. Dashboard object
+   */
+  initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
-    this.refreshInterval =
-      (pageParams.refreshInterval !== undefined ? pageParams.refreshInterval : this.dashboard.refreshInterval) || 0;
-    this.resolution = pageParams.resolution || this.dashboard.resolution;
-    pageParams.resolution = this.resolution;
-    const timeRangeSelection = this.computeTimeRange(dashboard, pageParams);
-    const context = this.createContext(this.dashboard, pageParams, timeRangeSelection);
-    const state = {
+    const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
+    const context = existingContext || this.createContext(this.dashboard, urlParams, existingContext);
+    this.resolution = context.getChartsResolution();
+    this.refreshInterval = context.getRefreshInterval();
+    const state: DashboardState = {
       context: context,
-      timeRangeSelection: timeRangeSelection,
       getFilterBar: () => this.filterBar!,
       getDashlets: () => this.dashlets,
       refreshInProgress: false,
@@ -168,14 +182,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       this.updateUrl();
     });
 
-    if (pageParams.editMode && this.hasWritePermission && this.editable) {
-      this.fetchMetricTypes();
+    if (urlParams.editMode && this.hasWritePermission && this.editable) {
       this.enableEditMode();
     }
   }
 
   public refresh() {
-    if (!this.compareModeEnabled) {
+    if (!this.compareModeEnabled && this.mainEngine) {
       this.mainEngine.triggerRefresh(false);
       this.compareEngine?.triggerRefresh(false);
     }
@@ -191,9 +204,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
   }
 
+  handleDashboardDescriptionChange(description: string) {
+    const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
+    modifiedDashboard.description = description;
+    this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
   handleRefreshIntervalChange(interval: number) {
     this.refreshInterval = interval;
-    this.updateUrl();
+    this.mainEngine.state.context.updateRefreshInterval(interval);
     this.mainEngine.triggerRefresh();
   }
 
@@ -207,23 +226,12 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private updateUrl(): void {
-    this._urlParamsService.updateUrlParams(
-      this.mainEngine.state.context,
-      this.mainEngine.state.timeRangeSelection,
-      this.refreshInterval,
-    );
+    this._urlParamsService.updateUrlParams(this.mainEngine.state.context);
   }
 
   enableEditMode() {
     this.dashboardBackup = JSON.parse(JSON.stringify(this.dashboard));
     this.editMode = true;
-    if (!this.metricTypes) {
-      this.fetchMetricTypes();
-    }
-  }
-
-  private fetchMetricTypes() {
-    this._timeSeriesService.getMetricTypes().subscribe((metrics) => (this.metricTypes = metrics));
   }
 
   cancelEditMode() {
@@ -234,7 +242,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   saveEditChanges() {
     this.editMode = false;
     this.dashboard.grouping = this.mainEngine.state.context.getGroupDimensions();
-    this.dashboard.timeRange = this.mainEngine.state.timeRangeSelection;
+    this.dashboard.timeRange = this.mainEngine.state.context.getTimeRangeSettings();
     this.dashboard.refreshInterval = this.refreshInterval;
     this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
@@ -262,12 +270,30 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       inheritGlobalFilters: true,
       readonlyAggregate: true,
       readonlyGrouping: true,
-      tableSettings: {
-        columns: Object.keys(TableColumnType).map((k) => ({ column: k as TableColumnType, selected: true })),
-      },
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
+      tableSettings: { columns: this.getInitialTableColumns() },
     };
+    this.filterBar!.addUniqueFilterItems(
+      tableItem.attributes.map((attribute) => FilterUtils.createFilterItemFromAttribute(attribute)),
+    );
     this.dashboard.dashlets.push(tableItem);
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
+  }
+
+  private getInitialTableColumns(): ColumnSelection[] {
+    return [
+      { selected: true, column: 'COUNT', aggregation: { type: ChartAggregation.COUNT } },
+      { selected: true, column: 'SUM', aggregation: { type: ChartAggregation.SUM } },
+      { selected: true, column: 'AVG', aggregation: { type: ChartAggregation.AVG } },
+      { selected: true, column: 'MIN', aggregation: { type: ChartAggregation.MIN } },
+      { selected: true, column: 'MAX', aggregation: { type: ChartAggregation.MAX } },
+      { selected: true, column: 'PCL_1', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 80 } } },
+      { selected: true, column: 'PCL_2', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 90 } } },
+      { selected: true, column: 'PCL_3', aggregation: { type: ChartAggregation.PERCENTILE, params: { pclValue: 99 } } },
+      { selected: true, column: 'TPS', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 's' } } },
+      { selected: true, column: 'TPH', aggregation: { type: ChartAggregation.RATE, params: { rateUnit: 'h' } } },
+    ];
   }
 
   addChartDashlet(metric: MetricType) {
@@ -284,6 +310,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       readonlyGrouping: false,
       inheritGlobalFilters: true,
       inheritGlobalGrouping: true,
+      inheritSpecificFiltersOnly: false,
+      specificFiltersToInherit: [],
       chartSettings: {
         primaryAxes: {
           aggregation: metric.defaultAggregation!,
@@ -315,69 +343,135 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private computeTimeRange(dashboard: DashboardView, urlParams: DashboardUrlParams): TimeRangeSelection {
-    // priority of time ranges property: 1. URL 2. Default full selection 3. Dashboard
+  /**
+   * If there is a cached context, which has a RELATIVE time settings, the fullRange has to be updated to the current time.
+   * @param settings
+   * @private
+   */
+  private updateRelativeRangeIfNeeded(settings: DashboardTimeRangeSettings): DashboardTimeRangeSettings {
+    const wasFullSelection = TimeSeriesUtils.intervalsEqual(settings.fullRange, settings.selectedRange);
+    if (settings.type === 'RELATIVE') {
+      const now = new Date().getTime() - 5000;
+      const newFullRange = { from: now - settings.relativeSelection!.timeInMs, to: now };
+      let newSelection: TimeRange = newFullRange;
+      if (!wasFullSelection) {
+        newSelection = TimeSeriesUtils.cropInterval(settings.selectedRange, newFullRange) || newFullRange;
+      }
+      return { ...settings, fullRange: newFullRange, selectedRange: newSelection };
+    } else {
+      return settings;
+    }
+  }
+
+  private computeTimeRangeSettings(
+    existingSettings: DashboardTimeRangeSettings | undefined,
+    dashboard: DashboardView,
+    urlParams: DashboardUrlParams,
+  ): DashboardTimeRangeSettings {
+    // priority of time ranges property: 1. existingCustomSelection 2. URL 3. Default full selection 4. Dashboard
+    if (existingSettings) {
+      return this.updateRelativeRangeIfNeeded(existingSettings);
+    }
+    const now = new Date().getTime() - 5000;
     if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
+      // no custom selection in the URL
+      const fullRange = {
+        from: this.defaultFullTimeRange!.from,
+        to: this.defaultFullTimeRange!.to || now,
+      };
       return {
         type: 'FULL',
-        absoluteSelection: {
-          from: this.defaultFullTimeRange!.from,
-          to: this.defaultFullTimeRange!.to || new Date().getTime(),
-        },
+        fullRange: fullRange,
+        defaultFullRange: this.defaultFullTimeRange,
+        selectedRange: urlParams.selectedTimeRange || fullRange,
       };
     }
-    let timeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+    let timeRangeSelection: TimeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-      const foundRelativeOption = this.timeRangeOptions.find((o) => {
+      let foundRelativeOption: RelativeTimeSelection = this.timeRangeOptions.find((o) => {
         return timeInMs === o.relativeSelection?.timeInMs;
-      });
-      timeRangeSelection = foundRelativeOption || {
+      })?.relativeSelection || {
+        label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
+        timeInMs: timeInMs,
+      };
+      const fullRange = { from: now - foundRelativeOption.timeInMs, to: now };
+      return {
         type: 'RELATIVE',
-        relativeSelection: {
-          label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
-          timeInMs: timeInMs,
-        },
+        fullRange: fullRange,
+        selectedRange: urlParams.selectedTimeRange
+          ? TimeSeriesUtils.cropInterval(urlParams.selectedTimeRange, fullRange) || fullRange
+          : fullRange,
+        relativeSelection: foundRelativeOption,
+        defaultFullRange: this.defaultFullTimeRange,
       };
     } else if (timeRangeSelection.type === 'ABSOLUTE') {
       // absolute
-      timeRangeSelection = { ...timeRangeSelection, type: timeRangeSelection.type! };
+      return {
+        type: 'ABSOLUTE',
+        fullRange: timeRangeSelection.absoluteSelection!,
+        selectedRange: urlParams.selectedTimeRange || timeRangeSelection.absoluteSelection!,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     } else {
       // FULL
-      timeRangeSelection = { type: 'FULL' };
+      if (!this.defaultFullTimeRange) {
+        throw new Error('Default time range must be specified when using a FULL range');
+      }
+      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
+      return {
+        type: 'FULL',
+        fullRange: range,
+        selectedRange: urlParams.selectedTimeRange || range,
+        defaultFullRange: this.defaultFullTimeRange,
+      };
     }
-    return timeRangeSelection;
   }
 
   createContext(
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
-    timeRangeSelection: TimeRangeSelection,
+    existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
+    const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
+      existingContext?.getTimeRangeSettings(),
+      dashboard,
+      urlParams,
+    );
     const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
       FilterUtils.filterItemIsValid,
     );
-    const timeRange: TimeRange = this.getTimeRangeFromTimeSelection(timeRangeSelection);
 
-    const visibleFilters: FilterBarItem[] = this.mergeFilters(urlFilters, dashboard.filters, this.hiddenFilters);
+    const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
+      urlFilters,
+      dashboard.filters,
+      this.hiddenFilters,
+    );
     this.fetchFilterEntities(visibleFilters);
-    return this._timeSeriesContextFactory.createContext({
-      id: dashboard.id!,
-      dashlets: this.dashboard.dashlets,
-      timeRange: timeRange,
-      defaultFullTimeRange: this.defaultFullTimeRange,
-      attributes: metricAttributes,
-      grouping: urlParams.grouping || dashboard.grouping || [],
-      filteringSettings: {
-        mode: TsFilteringMode.STANDARD,
-        filterItems: visibleFilters,
+    return this._timeSeriesContextFactory.createContext(
+      {
+        id: dashboard.id!,
+        dashlets: this.dashboard.dashlets,
+        timeRangeSettings: timeRangeSettings,
+        selectedTimeRange: urlParams.selectedTimeRange,
+        attributes: metricAttributes,
+        grouping: urlParams.grouping || dashboard.grouping || [],
+        filteringSettings: {
+          mode: TsFilteringMode.STANDARD,
+          filterItems: visibleFilters,
+          hiddenFilters: this.hiddenFilters,
+        },
+        resolution: this.resolution,
+        metrics: this.metricTypes,
+        refreshInterval:
+          urlParams.refreshInterval !== undefined ? urlParams.refreshInterval : this.dashboard.refreshInterval,
       },
-      resolution: this.resolution,
-    });
+      this.storageId,
+    );
   }
 
-  private mergeFilters(
+  private mergeAndExcludeHiddenFilters(
     urlFilters: FilterBarItem[],
     dashboardFilters: TimeSeriesFilterItem[],
     hiddenFilters: FilterBarItem[],
@@ -398,7 +492,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       f.isHidden = true;
       visibleFilters = visibleFilters.filter((v) => v.attributeName !== f.attributeName);
     });
-    return [...hiddenFilters, ...visibleFilters];
+    return visibleFilters;
   }
 
   private fetchFilterEntities(items: FilterBarItem[]): void {
@@ -439,17 +533,17 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       switch (attribute) {
         case TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getExecutions(entitiesByAttributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getExecutions(entitiesByAttributes[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE]),
           );
           break;
         case TimeSeriesConfig.PLAN_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getPlans(entitiesByAttributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getPlans(entitiesByAttributes[TimeSeriesConfig.PLAN_ID_ATTRIBUTE]),
           );
           break;
         case TimeSeriesConfig.TASK_ID_ATTRIBUTE:
           requests$.push(
-            this._timeSeriesUtilityService.getTasks(entitiesByAttributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]),
+            this._timeSeriesEntityService.getTasks(entitiesByAttributes[TimeSeriesConfig.TASK_ID_ATTRIBUTE]),
           );
           break;
         default:
@@ -482,8 +576,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
     if (itemToDelete.type === 'TABLE') {
       this.dashboard.dashlets
-        .filter((d) => d.masterChartId === itemToDelete.id)
-        .forEach((i) => (i.masterChartId = undefined));
+        .filter((dashboardItem) => dashboardItem.masterChartId === itemToDelete.id)
+        .forEach((dashboardItem) => (dashboardItem.masterChartId = undefined));
     }
     this.mainEngine.state.context.updateDashlets(this.dashboard.dashlets);
   }
@@ -536,7 +630,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const clonedSettings: TsFilteringSettings = JSON.parse(
       JSON.stringify(this.mainEngine.state.context.getFilteringSettings()),
     );
-    clonedSettings.filterItems.forEach((item) => (item.isHidden = false)); // make everything visible in compare mode
+    const hiddenFilters = clonedSettings.hiddenFilters || [];
+    clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
+    clonedSettings.filterItems.forEach((item) => (item.isHidden = false));
+    clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
 
@@ -545,19 +642,18 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     const timeRange = JSON.parse(JSON.stringify(mainState.context.getFullTimeRange()));
     const compareModeContext = this._timeSeriesContextFactory.createContext({
       dashlets: JSON.parse(JSON.stringify(this.dashboard.dashlets)), // clone
-      timeRange: timeRange,
+      timeRangeSettings: JSON.parse(JSON.stringify(mainState.context.getTimeRangeSettings())),
       id: new Date().getTime().toString(),
       attributes: this.mainEngine.state.context.getAllAttributes(),
       grouping: mainState.context.getGroupDimensions(),
       filteringSettings: this.createCompareModeFilters(),
       colorsPool: mainState.context.colorsPool,
       syncGroups: mainState.context.getSyncGroups(),
-      defaultFullTimeRange: mainState.context.defaultFullTimeRange,
       resolution: mainState.context.getChartsResolution(),
+      metrics: this.metricTypes,
     });
     const state: DashboardState = {
       context: compareModeContext,
-      timeRangeSelection: JSON.parse(JSON.stringify(mainState.timeRangeSelection)),
       getDashlets: () => this.compareDashlets,
       getFilterBar: () => this.compareFilterBar!,
       refreshInProgress: false,
@@ -595,6 +691,22 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  resetDashboard() {
+    this._timeSeriesContextFactory.destroyContext(this.storageId);
+    this.dashboard = undefined as any;
+    this.dashboardBackup = undefined as any;
+    this.compareModeEnabled = false;
+    this.resolution = undefined;
+    this.mainEngine = undefined as any;
+    this.compareEngine = undefined;
+
+    this._changeDetectorRef.detectChanges();
+
+    this._dashboardService.getDashboardById(this.dashboardId).subscribe((dashboard) => {
+      this.initState({ filters: [] }, dashboard);
+    });
+  }
+
   exportRawData(): void {
     if (this.exportInProgress || !this.mainEngine.state.context) {
       return;
@@ -607,9 +719,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy(): void {
-    this._timeSeriesContextFactory.destroyContext(this.mainEngine.state.context.id);
-    this._timeSeriesContextFactory.destroyContext(this.compareEngine?.state.context.id);
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
+    if (!this.storageId) {
+      this.mainEngine.state.context.destroy();
+      this.compareEngine?.state.context.destroy();
+    }
   }
 }

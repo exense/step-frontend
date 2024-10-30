@@ -25,7 +25,7 @@ import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
-import { REPOSITORY_PARAMETERS_INITIALIZER, StepBasicsModule } from './modules/basics/step-basics.module';
+import { StepBasicsModule } from './modules/basics/step-basics.module';
 import {
   CustomCellRegistryService,
   CustomRegistriesModule,
@@ -35,7 +35,6 @@ import { EntitiesSelectionModule } from './modules/entities-selection/entities-s
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
-import { TabsModule } from './modules/tabs/tabs.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
@@ -46,11 +45,10 @@ import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefact
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
-import { MyAccountButtonComponent } from './components/my-account-button/my-account-button.component';
+import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
-import { SettingsComponent } from './components/settings/settings.component';
 import { CronModule } from './modules/cron/cron.module';
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
 import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
@@ -70,8 +68,14 @@ import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-para
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
+import { TestIdDirective } from './directives/test-id.directive';
 import { ExtractUrlPipe } from './pipes/extract-url.pipe';
 import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
+import { REPOSITORY_PARAMETERS_INITIALIZER } from './modules/repository-parameters';
+import { INFO_BANNER_EXPORTS } from './modules/info-banner';
+import { TAB_EXPORTS } from './modules/tabs';
+import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
+import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 
 @NgModule({
   declarations: [
@@ -100,16 +104,17 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     PredefinedOptionsInputComponent,
     ArtefactDetailsComponent,
     WaitingArtefactsAdvancedComponent,
-    MyAccountButtonComponent,
+    UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
     SimpleOutletComponent,
-    SettingsComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
     DashboardNavigationParamsPipe,
+    TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -123,7 +128,6 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
@@ -145,6 +149,9 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EXECUTION_COMMON_EXPORTS,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    INFO_BANNER_EXPORTS,
+    TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -161,7 +168,6 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TabsModule,
     TooltipImmediateCloseDirective,
     TreeModule,
     AngularSplitModule,
@@ -192,9 +198,8 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     ResourceInputModule,
     KeywordsCommonModule,
     AutomationPackageCommonModule,
-    MyAccountButtonComponent,
+    UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
-    SettingsComponent,
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
@@ -211,8 +216,13 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
     DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
+    TestIdDirective,
+    INFO_BANNER_EXPORTS,
+    TAB_EXPORTS,
+    LIST_SELECTION_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    ArtefactInlineDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -261,13 +271,13 @@ export { PredefinedOptionsInputComponent } from './components/predefined-options
 export * from './components/report-node-status/report-node-status.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
-export * from './components/my-account-button/my-account-button.component';
+export * from './components/user-settings-button/user-settings-button.component';
 export { SplitAreaComponent } from './components/split-area/split-area.component';
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
-export * from './components/settings/settings.component';
 export * from './directives/caps-lock.directive';
 export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
@@ -287,8 +297,9 @@ export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
-export * from './modules/tabs/tabs.module';
+export * from './modules/tabs';
 export * from './modules/tree/tree.module';
+export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
@@ -323,6 +334,8 @@ export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
 export * from './modules/execution-common';
 export * from './components/base-artefact/base-artefact.component';
+export * from './components/base-artefact/base-inline-artefact.component';
+export * from './components/base-artefact/artefact-inline-item';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';
@@ -337,8 +350,11 @@ export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
 export * from './components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
+export * from './modules/list-selection';
 export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
+export { TestIdDirective } from './directives/test-id.directive';
+export * from './modules/info-banner';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';

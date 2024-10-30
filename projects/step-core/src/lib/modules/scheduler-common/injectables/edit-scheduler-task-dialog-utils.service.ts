@@ -1,18 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { ExecutiontTaskParameters } from '../../../client/step-client-module';
-import {
-  EditSchedulerTaskDialogConfig,
-  EditSchedulerTaskDialogData,
-} from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
+import { AugmentedPlansService, ExecutiontTaskParameters } from '../../../client/step-client-module';
+import { EditSchedulerTaskDialogData } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { AuthService } from '../../auth';
+import { map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EditSchedulerTaskDialogUtilsService {
   private _auth = inject(AuthService);
+  private _planApi = inject(AugmentedPlansService);
 
-  prepareTaskAndConfig(task: ExecutiontTaskParameters): EditSchedulerTaskDialogData['taskAndConfig'] {
+  prepareTaskAndConfig(task: ExecutiontTaskParameters): Observable<EditSchedulerTaskDialogData['taskAndConfig']> {
     let hideUser = false;
     let disableUser = false;
     if (!this._auth.isAuthenticated()) {
@@ -39,11 +38,21 @@ export class EditSchedulerTaskDialogUtilsService {
       }
     }
 
-    // TODO: Fill disablePlan flag, when it will be clarified how to fill it
-    const config: EditSchedulerTaskDialogConfig = {
-      hideUser,
-      disableUser,
-    };
-    return { task, config };
+    const repositoryObject = task?.executionsParameters?.repositoryObject;
+    const repositoryId = repositoryObject?.repositoryID ?? 'local';
+    const repositoryParameters = repositoryObject?.repositoryParameters ?? {};
+    const planId = repositoryId === 'local' ? repositoryParameters?.['planid'] : undefined;
+    if (!planId) {
+      // TODO: Fill disablePlan flag, when it will be clarified how to fill it
+      return of({ task, config: { hideUser, disableUser } });
+    }
+
+    return this._planApi.getPlanById(planId).pipe(
+      map((plan) => ({
+        task,
+        // TODO: Fill disablePlan flag, when it will be clarified how to fill it
+        config: { hideUser, disableUser, plan },
+      })),
+    );
   }
 }

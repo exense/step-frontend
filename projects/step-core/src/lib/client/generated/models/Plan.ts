@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { AbstractArtefact } from './AbstractArtefact';
+import type { AgentProvisioningConfiguration } from './AgentProvisioningConfiguration';
 import type { Function } from './Function';
 
 export type Plan = {
@@ -11,7 +12,9 @@ export type Plan = {
   root?: AbstractArtefact;
   functions?: Array<Function>;
   subPlans?: Array<Plan>;
+  agents?: AgentProvisioningConfiguration;
   visible?: boolean;
+  categories?: Array<string>;
   id?: string;
   _class: string;
 };

@@ -2,9 +2,10 @@ step-autocomplete-input {
   display: block;
 
   input {
-    border: none;
-    padding: 0 !important;
     margin: 0;
     width: 100%;
+    border: none;
+    padding: 0;
+    outline: none;
   }
 }

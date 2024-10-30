@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import { ColumnSelection, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -10,6 +10,7 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;
@@ -27,7 +28,9 @@ export class TableDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
+  private _snackbar = inject(MatSnackBar);
 
+  allAttributes: MetricAttribute[] = [];
   _attributesByKey: Record<string, MetricAttribute> = {};
 
   @ViewChild('formContainer', { static: true })
@@ -46,6 +49,9 @@ export class TableDashletSettingsComponent implements OnInit {
       return FilterUtils.convertApiFilterItem(item);
     });
     this.fetchMetricTypes();
+    this.allAttributes = this._inputData.context
+      .getAllAttributes()
+      .sort((a1, a2) => (a1.displayName > a2.displayName ? 1 : -1));
   }
 
   private fetchMetricTypes() {
@@ -67,6 +73,19 @@ export class TableDashletSettingsComponent implements OnInit {
     });
   }
 
+  onColumnPclValueChange(column: ColumnSelection, value: string) {
+    const aggregateParams = column.aggregation.params || {};
+    const oldValue = aggregateParams['pclValue'];
+    let parsedNumber: number = parseFloat(value);
+    const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
+    if (validPclValue) {
+      aggregateParams['pclValue'] = parsedNumber;
+    } else {
+      aggregateParams['pclValue'] = 0;
+      setTimeout(() => (aggregateParams['pclValue'] = oldValue), 100);
+    }
+  }
+
   @HostListener('keydown.enter')
   save(): void {
     if (this.formContainer.invalid) {
@@ -76,5 +95,19 @@ export class TableDashletSettingsComponent implements OnInit {
     this.item.filters = this.filterItems.filter(FilterUtils.filterItemIsValid).map(FilterUtils.convertToApiFilterItem);
     this.item.attributes = this.item.attributes.filter((a) => a.name && a.displayName); // keep only non null attributes
     this._dialogRef.close(this.item);
+  }
+
+  handleFilterChange(index: number, item: FilterBarItem) {
+    this.filterItems[index] = item;
+    if (!item.attributeName) {
+      return;
+    }
+    const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
+    if (existingItems.length > 1) {
+      // the filter is duplicated
+      this._snackbar.open('Filter not applied', 'dismiss');
+      this.filterItems.splice(index, 1);
+      return;
+    }
   }
 }

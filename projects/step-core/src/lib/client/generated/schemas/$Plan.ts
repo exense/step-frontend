@@ -30,8 +30,17 @@ export const $Plan = {
         type: 'Plan',
       },
     },
+    agents: {
+      type: 'AgentProvisioningConfiguration',
+    },
     visible: {
       type: 'boolean',
+    },
+    categories: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
     },
     id: {
       type: 'string',

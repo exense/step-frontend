@@ -3,7 +3,8 @@ import { SpecialLinksStrategy } from '../shared/special-links-strategy';
 
 const DEFAULT_STRATEGY: SpecialLinksStrategy = {
   settings: () => '/settings',
-  myAccount: () => '/settings/my-account',
+  userSettings: () => '/user-settings',
+  adminSettings: () => '/admin/controller',
 };
 
 @Injectable({
@@ -20,7 +21,11 @@ export class SpecialLinksService implements SpecialLinksStrategy {
     return this.strategy.settings();
   }
 
-  myAccount(): string {
-    return this.strategy.myAccount();
+  userSettings(): string {
+    return this.strategy.userSettings();
+  }
+
+  adminSettings(): string {
+    return this.strategy.adminSettings();
   }
 }

@@ -48,7 +48,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Input() settings!: TSChartSettings;
   @Input() syncKey: string | undefined; // all the charts with the same syncKey in the app will be synced
   @Input() height: number = 300;
-  @Input() legendMarker: MarkerType = MarkerType.DOTS;
+  @Input() legendMarker: MarkerType = MarkerType.SQUARE;
 
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
@@ -112,11 +112,13 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
    */
   createChart(settings: TSChartSettings): void {
     this.legendSettings.items = [];
+    this.legendSettings.show = settings.showLegend ?? true;
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
     this.chartMetadata = [[]];
 
     const cursorOpts: uPlot.Cursor = {
+      show: this.settings.showCursor ?? true,
       lock: settings.tooltipOptions.useExecutionLinks,
       y: false,
       bind: {
@@ -149,11 +151,16 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       }
       series.label = this.mergeLabelItems(series.labelItems);
       this.chartMetadata.push(series.metadata || []);
-      if (series.stroke) {
-        // aggregate series don't have stroke (e.g total)
+      // aggregate series don't have stroke (e.g total)
+      if (series.scale !== 'z') {
+        series.stroke = series.strokeConfig?.color || series.stroke || DEFAULT_STROKE_COLOR;
+        if (series.stroke.length === 7) {
+          series.stroke += 'cc'; // lower the opacity for more clarity
+        }
         this.legendSettings.items.push({
           seriesId: series.id,
-          color: (series.stroke as string) || DEFAULT_STROKE_COLOR,
+          color: series.strokeConfig?.color || series.stroke || DEFAULT_STROKE_COLOR,
+          strokeType: series.strokeConfig?.type || MarkerType.SQUARE,
           label: this.mergeLabelItems(series.labelItems),
           isVisible: series.show ?? true,
         });
@@ -169,22 +176,24 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       }
     }
     this.chartIsEmpty = noData;
+
     const opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
       legend: { show: false },
       cursor: cursorOpts,
+      // @ts-ignore
+      select: { show: settings.zoomEnabled ?? true },
       scales: {
         x: {
           time: true,
           // min: this.selection?.from,
           // max: this.selection?.to,
         },
-        // y: {auto: true},
       },
       plugins: this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [],
-      axes: [{}, ...(settings.axes || [])],
+      axes: [{ show: settings.showTimeAxes ?? true }, ...(settings.axes || [])],
       series: [
         {
           label: 'Timestamp',
@@ -433,5 +442,6 @@ interface LegendItem {
   seriesId: string;
   label: string;
   color: string;
+  strokeType: MarkerType;
   isVisible: boolean;
 }

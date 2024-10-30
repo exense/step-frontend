@@ -1,0 +1,62 @@
+$circle-size: 0.4rem;
+
+@mixin timeseries-marker {
+  .step-marker-filled-square {
+    background: var(--item-color);
+    display: flex;
+    width: 1.6rem;
+    height: 0.3rem;
+  }
+
+  .step-marker-dots {
+    width: $circle-size;
+    height: $circle-size;
+    background: var(--item-color);
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 50%;
+    left: 0.6rem;
+    margin-right: 1.2rem;
+
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: -0.6rem;
+      background: var(--item-color);
+      width: $circle-size;
+      height: $circle-size;
+      border-radius: 50%;
+    }
+
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      right: -0.6rem;
+      background: var(--item-color);
+      width: $circle-size;
+      height: $circle-size;
+      border-radius: 50%;
+    }
+  }
+
+  .step-marker-dashed-square {
+    width: 1.6rem;
+    height: 0.2rem;
+    background: linear-gradient(
+      to right,
+      var(--item-color) 0,
+      var(--item-color) 26%,
+      transparent 26%,
+      transparent 37%,
+      var(--item-color) 37%,
+      var(--item-color) 63%,
+      transparent 63%,
+      transparent 74%,
+      var(--item-color) 74%,
+      var(--item-color) 100%
+    );
+  }
+}

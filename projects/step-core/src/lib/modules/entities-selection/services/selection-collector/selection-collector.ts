@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { RegistrationStrategy } from '../../shared/registration.strategy';
 
 export abstract class SelectionCollector<KEY, ENTITY> {
   abstract readonly selected$: Observable<ReadonlyArray<KEY>>;
@@ -8,6 +9,7 @@ export abstract class SelectionCollector<KEY, ENTITY> {
   abstract readonly length: number;
 
   abstract readonly possibleLength: number;
+  abstract readonly registrationStrategy: RegistrationStrategy;
 
   abstract isSelected(item: ENTITY): boolean;
   abstract isSelectedById(id: KEY): boolean;

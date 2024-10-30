@@ -10,6 +10,7 @@ const MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN = 'main-when-sidebar-closed-small-sc
 const TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED = 'tenant-selector-when-sidebar-closed';
 const IS_MENU_OPENED = 'IS_MENU_OPENED';
 const OPENED_MENU_ITEMS = 'OPENED_MENU_ITEMS';
+const PROJECTS_READ_ONLY_WHEN_SIDEBAR_CLOSED = 'projects-read-only-when-sidebar-closed';
 
 type MutableOpenedMenuItems = Record<string, boolean>;
 type OpenedMenuItems = Readonly<Record<string, boolean>>;
@@ -70,6 +71,13 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
     this._menuStorage.setItem(OPENED_MENU_ITEMS, JSON.stringify(this.openedMenuItems!));
   }
 
+  initializeProjectsReadOnly() {
+    if (!this.isOpened) {
+      const projectsReadOnly = this._document.querySelector('#projects-read-only');
+      projectsReadOnly?.classList?.add(PROJECTS_READ_ONLY_WHEN_SIDEBAR_CLOSED);
+    }
+  }
+
   private setupSmallScreenChange(): void {
     this._isSmallScreen$
       .pipe(
@@ -90,6 +98,7 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
     combineLatest([this.isOpened$, this._isSmallScreen$]).subscribe(([isOpened, isSmallScreen]) => {
       const main = this._document.querySelector('#main');
       const tenantSelection = this._document.querySelector('#project-select');
+      const projectsReadOnly = this._document.querySelector('#projects-read-only');
 
       if (!isOpened) {
         if (isSmallScreen) {
@@ -100,10 +109,12 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
           main!.classList.add(MAIN_WHEN_SIDEBAR_CLOSED);
         }
         tenantSelection?.classList?.add?.(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
+        projectsReadOnly?.classList?.add(PROJECTS_READ_ONLY_WHEN_SIDEBAR_CLOSED);
       } else {
         main!.classList.remove(MAIN_WHEN_SIDEBAR_CLOSED);
         main!.classList.remove(MAIN_WHEN_SIDEBAR_CLOSED_SMALL_SCREEN);
         tenantSelection?.classList?.remove?.(TENANT_SELECTOR_WHEN_SIDEBAR_CLOSED);
+        projectsReadOnly?.classList?.remove?.(PROJECTS_READ_ONLY_WHEN_SIDEBAR_CLOSED);
       }
     });
   }

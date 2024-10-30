@@ -1,7 +1,12 @@
 @use 'components/ts-tooltip';
 @use 'components/common-styles';
 @use 'components/ts-filter-bar';
+@use 'components/executions-menu';
+@use 'components/settings-menu';
 
 @forward 'components/ts-tooltip';
 @forward 'components/common-styles';
 @forward 'components/ts-filter-bar';
+@forward 'components/executions-menu';
+@forward 'components/custom-menu';
+@forward 'components/settings-menu';

@@ -1,0 +1,107 @@
+<step-modal-window [title]="modalTitle">
+  <div step-modal-window-body>
+    <section>
+      <div [formGroup]="conditionForm">
+        <div class="binding-condition">
+          <step-form-field>
+            <mat-select formControlName="key" placeholder="Key">
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="filterKeyControl"
+                  name="filterKeyControl"
+                  ngDefaultControl
+                  placeholderLabel="Search..."
+                  noEntriesFoundLabel="No matching entries found"
+                >
+                  <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                </ngx-mat-select-search>
+              </mat-option>
+              @for (key of dropdownKeysFiltered; track key) {
+                <mat-option [value]="key">{{ key }}</mat-option>
+              }
+            </mat-select>
+          </step-form-field>
+          <div class="predicate-flex">
+            <span class="predicate-line"></span>
+            <step-form-field class="predicate">
+              <mat-select formControlName="predicate">
+                <mat-option>
+                  <ngx-mat-select-search
+                    [formControl]="filterPredicateControl"
+                    name="filterPredicateControl"
+                    ngDefaultControl
+                    placeholderLabel="Search..."
+                    noEntriesFoundLabel="No matching entries found"
+                  >
+                    <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                  </ngx-mat-select-search>
+                </mat-option>
+                @for (predicate of dropdownItemsFiltered; track predicate) {
+                  <mat-option [value]="predicate.key">{{ predicate.value }}</mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+            <span class="predicate-line"></span>
+          </div>
+          @if (conditionForm.controls['predicate'].value; as predicateValue) {
+            @if (
+              predicateValue !== PRED.EXISTS &&
+              predicateValue !== PRED.NOT_EXISTS &&
+              predicateValue !== PRED.MATCHES &&
+              predicateValue !== PRED.NOT_MATCHES
+            ) {
+              @switch (conditionForm.controls['key'].value | inputType: inputs) {
+                @case ('dropdown') {
+                  <step-form-field>
+                    <step-autocomplete-input
+                      placeHolder="Value"
+                      formControlName="value"
+                      [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
+                      [valueLabelExtractor]="bindingKeyExtractor"
+                    />
+                  </step-form-field>
+                }
+                @case ('checkbox') {
+                  <step-form-field>
+                    <mat-select formControlName="value">
+                      <mat-option>
+                        <ngx-mat-select-search
+                          [formControl]="filterValueControl"
+                          name="filterValueControl"
+                          ngDefaultControl
+                          placeholderLabel="Search..."
+                          noEntriesFoundLabel="No matching entries found"
+                        >
+                          <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+                        </ngx-mat-select-search>
+                      </mat-option>
+                      @for (val of dropdownValuesFiltered; track val) {
+                        <mat-option [value]="val.key">{{ val.value }}</mat-option>
+                      }
+                    </mat-select>
+                  </step-form-field>
+                }
+                @default {
+                  <step-form-field>
+                    <input type="text" placeholder="Value" formControlName="value" />
+                  </step-form-field>
+                }
+              }
+            }
+            @if (predicateValue === PRED.MATCHES || predicateValue === PRED.NOT_MATCHES) {
+              <step-form-field>
+                <input type="text" placeholder="Value" formControlName="value" />
+              </step-form-field>
+            }
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" [disabled]="conditionForm.invalid" (click)="save()">
+      Add
+    </button>
+  </div>
+</step-modal-window>

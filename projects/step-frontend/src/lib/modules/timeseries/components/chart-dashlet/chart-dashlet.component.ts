@@ -1,32 +1,38 @@
 import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
+  AxesSettings,
   BucketResponse,
   DashboardItem,
   FetchBucketsRequest,
+  MarkerType,
+  MetricAggregation,
   MetricAttribute,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
-  FilterUtils,
-  OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesUtilityService,
+  TimeSeriesEntityService,
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { forkJoin, Observable, of, Subscription, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { TimeSeriesSyncGroup } from '../../modules/_common/types/time-series/time-series-sync-group';
+import { SeriesStroke } from '../../modules/_common/types/time-series/series-stroke';
+import { MatMenuTrigger } from '@angular/material/menu';
+import {
+  AggregateParams,
+  TimeseriesAggregatePickerComponent,
+} from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
+import { MatTooltip } from '@angular/material/tooltip';
 
 declare const uPlot: any;
 
@@ -34,30 +40,51 @@ interface MetricAttributeSelection extends MetricAttribute {
   selected: boolean;
 }
 
+interface RateUnit {
+  menuLabel: string;
+  unitKey: string;
+}
+
+const resolutionLabels: Record<string, string> = {
+  '60000': 'Minute',
+  '3600000': 'Hour',
+  '86400000': 'Day',
+  '604800000': 'Week',
+};
+
 @Component({
   selector: 'step-chart-dashlet',
   templateUrl: './chart-dashlet.component.html',
   styleUrls: ['./chart-dashlet.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
+  imports: [
+    COMMON_IMPORTS,
+    ChartSkeletonComponent,
+    TimeSeriesChartComponent,
+    TimeseriesAggregatePickerComponent,
+    MatTooltip,
+  ],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
-  readonly AGGREGATES: ChartAggregation[] = [
-    ChartAggregation.SUM,
-    ChartAggregation.AVG,
-    ChartAggregation.MAX,
-    ChartAggregation.MIN,
-    ChartAggregation.COUNT,
-    ChartAggregation.RATE,
-    ChartAggregation.MEDIAN,
+  readonly RATE_UNITS: RateUnit[] = [
+    { menuLabel: 'Per second', unitKey: 's' },
+    { menuLabel: 'Per minute', unitKey: 'm' },
+    { menuLabel: 'Per hour', unitKey: 'h' },
   ];
+
+  readonly RATE_UNITS_DIVIDERS: Record<string, number> = {
+    s: 3600,
+    m: 60,
+    h: 1,
+  };
 
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
 
+  @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
   _internalSettings?: TSChartSettings;
   _attributesByIds: Record<string, MetricAttribute> = {};
@@ -72,16 +99,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
 
-  readonly ChartAggregation = ChartAggregation;
-  readonly PCL_VALUES = [80, 90, 99];
-  selectedPclValue?: number;
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
+  selectedAggregatePcl?: number;
+  requestOql: string = '';
 
   private _timeSeriesService = inject(TimeSeriesService);
-  private _timeSeriesUtilityService = inject(TimeSeriesUtilityService);
+  private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   syncGroupSubscription?: Subscription;
+  cachedResponse?: TimeSeriesAPIResponse;
+  showHigherResolutionWarning = false;
+  collectionResolutionUsed: number = 0;
 
   ngOnInit(): void {
     if (!this.item || !this.context || !this.height) {
@@ -130,11 +159,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   private prepareState(item: DashboardItem) {
     item.attributes?.forEach((attr) => (this._attributesByIds[attr.name] = attr));
     this.groupingSelection = this.prepareGroupingAttributes(item);
-    this.selectedAggregate = item.chartSettings!.primaryAxes!.aggregation as ChartAggregation;
-    this.selectedPclValue = item.chartSettings!.primaryAxes!.pclValue;
-    if (this.selectedAggregate === ChartAggregation.PERCENTILE && !this.selectedPclValue) {
-      this.selectedPclValue = this.PCL_VALUES[0];
-    }
+    const initialAggregate = item.chartSettings!.primaryAxes!.aggregation;
+    this.selectedAggregate = initialAggregate.type as ChartAggregation;
+    this.selectedAggregatePcl = initialAggregate.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90;
     this.subscribeToMasterDashletChanges();
   }
 
@@ -162,54 +189,32 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.context.resetZoom();
   }
 
-  switchAggregate(aggregate: ChartAggregation, pclValue?: number) {
-    this.selectedPclValue = pclValue;
+  switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;
+    this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
     this.refresh(true).subscribe();
+  }
+
+  switchRateUnit(unit: RateUnit) {
+    const primaryAggregation: MetricAggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    const secondaryAggregation: MetricAggregation | undefined = this.item.chartSettings!.secondaryAxes?.aggregation;
+    if (primaryAggregation.type === ChartAggregation.RATE) {
+      primaryAggregation.params!['rateUnit'] = unit.unitKey;
+    }
+    if (secondaryAggregation?.type === ChartAggregation.RATE) {
+      secondaryAggregation!.params!['rateUnit'] = unit.unitKey;
+    }
+
+    if (this.cachedResponse) {
+      this.createChart(this.cachedResponse);
+    } else {
+      this.fetchDataAndCreateChart();
+    }
   }
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
     this.refresh(true).subscribe();
-  }
-
-  private getMasterChart(): DashboardItem | undefined {
-    return this.item.masterChartId ? this.context.getDashlet(this.item.masterChartId) : undefined;
-  }
-
-  private composeRequestFilter(): string {
-    const masterChart = this.getMasterChart();
-    const metric = masterChart?.metricKey || this.item.metricKey;
-    const metricFilterItem = {
-      attributeName: 'metricType',
-      type: FilterBarItemType.FREE_TEXT,
-      exactMatch: true,
-      freeTextValues: [`"${metric}"`],
-      searchEntities: [],
-    };
-    let filterItems: FilterBarItem[] = [];
-
-    const itemToInheritSettingsFrom = masterChart || this.item;
-    if (itemToInheritSettingsFrom.inheritGlobalFilters) {
-      filterItems = FilterUtils.combineGlobalWithChartFilters(
-        this.context.getFilteringSettings().filterItems,
-        itemToInheritSettingsFrom.filters,
-      );
-    } else {
-      filterItems = itemToInheritSettingsFrom.filters.map(FilterUtils.convertApiFilterItem);
-    }
-    if (metric !== 'threadgroup') {
-      filterItems.push(metricFilterItem);
-      return FilterUtils.filtersToOQL(filterItems, 'attributes');
-    } else {
-      // TODO clean this once the migration of sampler measurements is done
-      return new OQLBuilder()
-        .append(
-          '((attributes.metricType = threadgroup) or (attributes.metricType = sampler and attributes.type = threadgroup))',
-        )
-        .append(FilterUtils.filtersToOQL(filterItems, 'attributes'))
-        .build();
-    }
   }
 
   handleLockStateChange(locked: boolean) {
@@ -233,6 +238,18 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
+  private getSeriesStroke(id: string, axes: AxesSettings): SeriesStroke {
+    const hasGrouping = this.getGroupDimensions()?.length > 0;
+    if (!hasGrouping) {
+      return { color: TimeSeriesConfig.SERIES_DEFAULT_COLOR, type: MarkerType.SQUARE };
+    }
+    const customSeriesColor = axes.renderingSettings?.seriesColors?.[id];
+    if (customSeriesColor) {
+      return { color: customSeriesColor, type: MarkerType.SQUARE };
+    }
+    return this.context.colorsPool.getSeriesColor(id);
+  }
+
   /**
    * When there is no grouping, the key and label will be 'Value'.
    * If there are grouping, all empty elements will be replaced with an empty label
@@ -246,27 +263,26 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     const removeChartGaps = this.item.metricKey === 'threadgroup';
     const hasSecondaryAxes = !!this.item.chartSettings!.secondaryAxes;
     const hasExecutionLinks = !!this._attributesByIds[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE] && !hasSteppedDisplay;
-    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation as ChartAggregation;
+    const secondaryAxesAggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
     const groupDimensions = this.getGroupDimensions();
     const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
     const primaryAxes = this.item.chartSettings!.primaryAxes!;
-    const primaryAggregation = this.selectedAggregate!;
+    const primaryAggregation = primaryAxes.aggregation;
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
       let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
       if (groupDimensions.length === 0) {
-        labelItems = [this.item.metricKey];
+        labelItems = [this.context.getMetric(this.item.metricKey).displayName];
       }
       const seriesKey = this.mergeLabelItems(labelItems);
-      const color =
-        primaryAxes.renderingSettings?.seriesColors?.[seriesKey] || this.context.colorsPool.getColor(seriesKey);
+      const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
 
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
           metadata.push(b?.attributes);
           if (hasSecondaryAxes) {
-            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation);
+            const bucketValue = this.getBucketValue(b, secondaryAxesAggregation!);
             if (secondaryAxesData[j] == undefined) {
               secondaryAxesData[j] = bucketValue;
             } else if (bucketValue) {
@@ -291,12 +307,25 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         data: seriesData,
         metadata: metadata,
         value: (self, x) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(x),
-        stroke: color,
+        strokeConfig: stroke,
         points: { show: false },
         show: syncGroup ? syncGroup?.seriesShouldBeVisible(seriesKey) : true,
       };
+      switch (stroke.type) {
+        case MarkerType.SQUARE:
+          s.width = 1;
+          break;
+        case MarkerType.DASHED:
+          s.dash = [10, 5];
+          s.width = 1;
+          break;
+        case MarkerType.DOTS:
+          s.width = 2;
+          s.dash = [2, 2];
+          break;
+      }
       if (primaryAxes.colorizationType === 'FILL') {
-        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, color);
+        s.fill = (self, seriesIdx: number) => this._uPlotUtils.gradientFill(self, stroke.color);
       }
       if (hasSteppedDisplay) {
         s.paths = this.stepped({ align: 1 });
@@ -316,8 +345,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       },
     ];
 
-    this.fetchLegendEntities(series).subscribe();
-
     if (hasSecondaryAxes) {
       axes.push({
         // @ts-ignore
@@ -326,17 +353,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         values: (u: unknown, vals: number[]) =>
           vals.map((v) =>
-            this.getAxesFormatFunction(
-              this.item.chartSettings!.secondaryAxes!.aggregation as ChartAggregation,
-              undefined,
-            )(v),
+            this.getAxesFormatFunction(this.item.chartSettings!.secondaryAxes!.aggregation, undefined)(v),
           ),
         grid: { show: false },
       });
       series.unshift({
-        scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+        scale: 'z',
         labelItems: ['Total'],
         id: 'total',
+        strokeConfig: { color: '', type: MarkerType.SQUARE },
         data: secondaryAxesData,
         value: (x, v: number) => Math.trunc(v) + ' total',
         fill: TimeSeriesConfig.TOTAL_BARS_COLOR,
@@ -345,20 +370,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       });
     }
 
-    this._internalSettings = {
-      title: this.getChartTitle(),
-      xValues: xLabels,
-      series: series,
-      tooltipOptions: {
-        enabled: true,
-        zAxisLabel: this.getSecondAxesLabel(),
-        yAxisUnit: yAxesUnit,
-        useExecutionLinks: this.showExecutionLinks,
-      },
-      showLegend: groupDimensions.length > 0, // in case it has grouping, display the legend
-      axes: axes,
-      truncated: response.truncated,
-    };
+    this.fetchLegendEntities(series).subscribe((v) => {
+      this._internalSettings = {
+        title: this.getChartTitle(),
+        xValues: xLabels,
+        series: series,
+        tooltipOptions: {
+          enabled: true,
+          zAxisLabel: this.getSecondAxesLabel(),
+          yAxisUnit: yAxesUnit,
+          useExecutionLinks: this.showExecutionLinks,
+        },
+        showLegend: true,
+        axes: axes,
+        truncated: response.truncated,
+      };
+    });
   }
 
   private removeDataGaps(data: (number | undefined)[]): number[] {
@@ -374,31 +401,49 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private getSecondAxesLabel(): string | undefined {
-    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation;
-    switch (aggregation) {
+    const aggregation = this.item.chartSettings!.secondaryAxes?.aggregation!;
+    switch (aggregation?.type) {
       case ChartAggregation.RATE:
-        return 'Total Hits/h';
+        return 'Total Hits/' + aggregation.params?.['rateUnit'];
+      case ChartAggregation.PERCENTILE:
+        return 'Overall PCL ' + aggregation.params?.['pclValue'];
       default:
         return 'Overall ' + aggregation;
     }
   }
 
+  private getPrimaryPclValue(): number | undefined {
+    return this.item.chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM];
+  }
+
   private getChartTitle(): string {
     let title = this.item.name;
-    let aggregationValue: string = this.selectedAggregate as string;
-    if (aggregationValue === (ChartAggregation.PERCENTILE as string)) {
-      aggregationValue += ` ${this.selectedPclValue}`;
+    let aggregation: MetricAggregation = this.item.chartSettings!.primaryAxes.aggregation;
+    let aggregationLabel;
+    switch (aggregation.type) {
+      case ChartAggregation.PERCENTILE:
+        aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
+        break;
+      case ChartAggregation.RATE:
+        aggregationLabel =
+          'RATE/' + this.item.chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+        break;
+      default:
+        aggregationLabel = aggregation.type;
+        break;
     }
-    return `${title} (${aggregationValue})`;
+    return `${title} (${aggregationLabel})`;
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
     const groupDimensions = this.getGroupDimensions();
+    const oqlFilter = this.composeRequestFilter();
+    this.requestOql = oqlFilter;
     const request: FetchBucketsRequest = {
       start: this.context.getSelectedTimeRange().from,
       end: this.context.getSelectedTimeRange().to,
       groupDimensions: groupDimensions,
-      oqlFilter: this.composeRequestFilter(),
+      oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
     };
     const customResolution = this.context.getChartsResolution();
@@ -414,9 +459,17 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
+        this.showHigherResolutionWarning = response.higherResolutionUsed;
+        this.collectionResolutionUsed = response.collectionResolution;
+        this.cachedResponse = response;
         this.createChart(response);
       }),
     );
+  }
+
+  handleAggregateChange(change: { aggregate?: ChartAggregation; params?: AggregateParams }) {
+    this.switchAggregate(change.aggregate!, change.params);
+    this.settingsMenuTrigger?.closeMenu();
   }
 
   private fetchLegendEntities(series: TSChartSeries[]): Observable<any> {
@@ -428,11 +481,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         if (!entityName) {
           return undefined;
         }
-        const entityIds: Set<string> = new Set<string>(series.map((s) => s.labelItems[i]!).filter((v) => !!v));
+        const entityIds: Set<string> = new Set<string>(
+          series
+            .map((s) => {
+              if (s.scale !== 'y') {
+                // ignore other scales
+                return '';
+              } else {
+                return s.labelItems[i]!;
+              }
+            })
+            .filter((v) => !!v),
+        );
         if (entityIds.size === 0) {
           of(undefined);
         }
-        return this._timeSeriesUtilityService.getEntitiesNamesByIds(Array.from(entityIds.values()), entityName).pipe(
+        return this._timeSeriesEntityService.getEntityNames(Array.from(entityIds.values()), entityName).pipe(
           tap((response) => {
             series.forEach((s, j) => {
               const labelId = s.labelItems[i];
@@ -443,23 +507,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
                 } else {
                   newLabel = labelId + ' (unresolved)';
                 }
-                this.chart.setLabelItem(s.id, i, newLabel);
+                s.labelItems[i] = newLabel;
               }
             });
           }),
         );
       })
       .filter((x) => !!x);
-    return forkJoin(requests$);
-  }
-
-  /**
-   * Function that updates the label of a series, which was not able to be fetched for more information
-   * @param label
-   * @private
-   */
-  private updateFailedToLoadLabel(label: string): string {
-    return label + ' (unresolved)';
+    return forkJoin(requests$).pipe(defaultIfEmpty(null));
   }
 
   private getGroupDimensions(): string[] {
@@ -479,9 +534,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
-  private getAxesFormatFunction(aggregation: ChartAggregation, unit?: string): (v: number) => string {
-    if (aggregation === ChartAggregation.RATE) {
-      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/h';
+  private getAxesFormatFunction(aggregation: MetricAggregation, unit?: string): (v: number) => string {
+    if (aggregation.type === ChartAggregation.RATE) {
+      const rateUnit = aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+      return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + rateUnit;
     }
     if (!unit) {
       return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber;
@@ -498,9 +554,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     }
   }
 
-  private getUnitLabel(aggregation: ChartAggregation, unit: string): string {
-    if (aggregation === 'RATE') {
-      return '/ h';
+  private getUnitLabel(aggregation: MetricAggregation, unit: string): string {
+    if (aggregation.type === 'RATE') {
+      return '/ ' + aggregation.params?.['rateUnit'];
     }
     switch (unit) {
       case '%':
@@ -513,27 +569,28 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   }
 
   private getRequiredPercentiles(): number[] {
-    const aggregate = this.selectedAggregate;
-    const secondaryAggregate = this.item.chartSettings!.secondaryAxes?.aggregation;
+    const aggregate: ChartAggregation = this.selectedAggregate;
+    const secondaryAggregate = this.item.chartSettings!.secondaryAxes?.aggregation.type;
     const percentilesToRequest: number[] = [];
     if (aggregate === ChartAggregation.MEDIAN || secondaryAggregate === ChartAggregation.MEDIAN) {
       percentilesToRequest.push(50);
     }
-    if (aggregate === ChartAggregation.PERCENTILE || secondaryAggregate === ChartAggregation.PERCENTILE) {
-      percentilesToRequest.push(80, 90, 99);
+    if (aggregate === ChartAggregation.PERCENTILE) {
+      percentilesToRequest.push(this.getPrimaryPclValue() || 90);
+    }
+    if (secondaryAggregate === ChartAggregation.PERCENTILE) {
+      percentilesToRequest.push(
+        this.item.chartSettings!.secondaryAxes?.aggregation.params?.[TimeSeriesConfig.PCL_VALUE_PARAM] || 90,
+      );
     }
     return percentilesToRequest;
   }
 
-  private getBucketValue(
-    b: BucketResponse,
-    aggregation: ChartAggregation,
-    returnZeroIfEmpty = true,
-  ): number | undefined | null {
+  private getBucketValue(b: BucketResponse, aggregation: MetricAggregation): number | undefined | null {
     if (!b) {
       return undefined;
     }
-    switch (aggregation) {
+    switch (aggregation.type) {
       case 'SUM':
         return b.sum;
       case 'AVG':
@@ -545,13 +602,21 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'COUNT':
         return b.count;
       case 'RATE':
-        return b.throughputPerHour;
+        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[aggregation.params?.['rateUnit']];
       case 'MEDIAN':
-        return b.pclValues?.[50];
+        return b.pclValues?.['50.0'];
       case 'PERCENTILE':
-        return b.pclValues?.[this.selectedPclValue || this.PCL_VALUES[0]];
+        return b.pclValues?.[this.getPclWithDecimals(aggregation.params?.['pclValue']) || '90.0'];
       default:
         throw new Error('Unhandled aggregation value: ' + aggregation);
+    }
+  }
+
+  private getPclWithDecimals(value: number) {
+    if (Math.floor(value) === value) {
+      return value.toFixed(1);
+    } else {
+      return value;
     }
   }
 
@@ -559,10 +624,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return 'CHART';
   }
 
-  showSeries(key: string): void {
-    throw new Error('Method not implemented.');
+  getContext(): TimeSeriesContext {
+    return this.context;
   }
-  hideSeries(key: string): void {
-    throw new Error('Method not implemented.');
+
+  getItem(): DashboardItem {
+    return this.item;
   }
+
+  protected readonly ChartAggregation = ChartAggregation;
+  protected readonly resolutionLabels = resolutionLabels;
 }

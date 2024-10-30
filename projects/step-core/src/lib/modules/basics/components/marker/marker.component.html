@@ -1,13 +1,12 @@
 @switch (markerType) {
   @case (MarkerType.SQUARE) {
-    <div class="color-square" [style.--item-color]="color"></div>
+    <div class="step-marker-filled-square" [style.--item-color]="color"></div>
   }
   @case (MarkerType.DOTS) {
-    <div class="color-dots" [style.--item-color]="color">
-      <div class="dot-left"></div>
-      <div class="dot-line"></div>
-      <div class="dot-right"></div>
-    </div>
+    <div class="step-marker-dots" [style.--item-color]="color"></div>
+  }
+  @case (MarkerType.DASHED) {
+    <div class="step-marker-dashed-square" [style.--item-color]="color"></div>
   }
   @default {}
 }

@@ -1,7 +1,9 @@
-import { defaultIfEmpty, forkJoin, merge, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
+import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
+import { TimeRangeType } from './time-range-type';
 
 export class DashboardStateEngine {
   private terminator$ = new Subject<void>();
@@ -14,14 +16,13 @@ export class DashboardStateEngine {
   destroy() {
     this.terminator$.next();
     this.terminator$.complete();
-    this.state.context.destroy();
   }
 
   subscribeForContextChange(): void {
     const context = this.state.context;
     merge(
-      context.onFilteringChange(),
       context.onGroupingChange(),
+      context.onFilteringChange(),
       context.onChartsResolutionChange(),
       context.onTimeSelectionChange(),
     )
@@ -40,15 +41,36 @@ export class DashboardStateEngine {
     if ((state.refreshInProgress || state.context.getChartsLockedState()) && !force) {
       return;
     }
-    let newRange: TimeRange;
-    if (state.timeRangeSelection.type === 'FULL' && state.context.defaultFullTimeRange?.from) {
-      const defaultFullTimeRange = state.context.defaultFullTimeRange;
-      newRange = { from: defaultFullTimeRange.from!, to: defaultFullTimeRange.to || new Date().getTime() };
-    } else {
-      newRange = TimeSeriesUtils.convertSelectionToTimeRange(state.timeRangeSelection);
+    const timeRangeSettings = state.context.getTimeRangeSettings();
+    const now = new Date().getTime() - 5000;
+    switch (timeRangeSettings.type) {
+      case 'FULL':
+        if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
+          timeRangeSettings.fullRange.to = now;
+        }
+        break;
+      case 'ABSOLUTE':
+        break;
+      case 'RELATIVE':
+        const isFullTimeSelection = TimeSeriesUtils.intervalsEqual(
+          timeRangeSettings.selectedRange,
+          timeRangeSettings.fullRange,
+        );
+        const fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
+        timeRangeSettings.fullRange = fullRange;
+        if (isFullTimeSelection) {
+          timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange };
+        } else {
+          // we have a custom selection. has to be cropped if needed
+          const croppedSelection = TimeSeriesUtils.cropInterval(timeRangeSettings.selectedRange, fullRange);
+          if (croppedSelection) {
+            timeRangeSettings.selectedRange = croppedSelection;
+          } else {
+            timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange }; // zoom reset when the interval is very small
+          }
+        }
+        break;
     }
-
-    this.updateFullAndSelectedRange(newRange);
     this.refreshAllCharts(true, force);
   }
 
@@ -82,11 +104,43 @@ export class DashboardStateEngine {
    * Handle full range interval changes, not selection changes.
    */
   handleTimeRangeChange(params: { selection: TimeRangePickerSelection; triggerRefresh: boolean }) {
-    const state = this.state;
-    const range = this.getTimeRangeFromTimeSelection(params.selection);
-    state.timeRangeSelection = params.selection;
-    state.context.updateFullRange(range, false);
-    state.context.updateSelectedRange(range, false);
+    const oldSettings = this.state.context.getTimeRangeSettings();
+    let newSettings: DashboardTimeRangeSettings;
+    switch (params.selection.type) {
+      case 'FULL':
+        const fullRange = {
+          from: oldSettings.defaultFullRange!.from!,
+          to: oldSettings.defaultFullRange?.to || new Date().getTime(),
+        };
+        newSettings = {
+          type: TimeRangeType.FULL,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: fullRange,
+          selectedRange: fullRange,
+        };
+        break;
+      case 'ABSOLUTE':
+        newSettings = {
+          type: TimeRangeType.ABSOLUTE,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: params.selection.absoluteSelection!,
+          selectedRange: params.selection.absoluteSelection!,
+        };
+        break;
+      case 'RELATIVE':
+        const relativeSelection = params.selection.relativeSelection!;
+        const now = new Date().getTime();
+        const from = now - relativeSelection!.timeInMs!;
+        newSettings = {
+          type: TimeRangeType.RELATIVE,
+          defaultFullRange: oldSettings.defaultFullRange,
+          fullRange: { from: from, to: now },
+          selectedRange: { from: from, to: now },
+          relativeSelection: relativeSelection,
+        };
+        break;
+    }
+    this.state.context.updateTimeRangeSettings(newSettings);
     this.refreshRanger().subscribe();
     this.refreshAllCharts(true, true);
   }
@@ -120,20 +174,21 @@ export class DashboardStateEngine {
     return this.state.getFilterBar().timeSelection!.refreshRanger();
   }
 
-  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
+  private getFullRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
+    const timeRangeSettings = this.state.context.getTimeRangeSettings();
     switch (selection.type) {
       case 'FULL':
-        if (!this.state.context.defaultFullTimeRange?.from) {
+        if (!timeRangeSettings.defaultFullRange?.from) {
           throw new Error('Default full time range is not set before using "FULL" selection');
         }
         return {
-          from: this.state.context.defaultFullTimeRange!.from!,
-          to: this.state.context.defaultFullTimeRange?.to || new Date().getTime(),
+          from: timeRangeSettings.defaultFullRange!.from!,
+          to: timeRangeSettings.defaultFullRange?.to || new Date().getTime(),
         };
       case 'ABSOLUTE':
         return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
       case 'RELATIVE':
-        let now = new Date().getTime();
+        const now = new Date().getTime();
         return { from: now - selection.relativeSelection!.timeInMs!, to: now };
       default:
         throw new Error('Unsupported time selection type: ' + selection.type);

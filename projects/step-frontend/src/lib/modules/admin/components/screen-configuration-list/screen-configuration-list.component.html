@@ -1,6 +1,6 @@
 <section class="header">
-  <step-form-field>
-    <mat-select [value]="currentlySelectedScreenChoice">
+  <step-form-field class="screen-select">
+    <mat-select stepTestId="screen-select" [value]="currentlySelectedScreenChoice">
       <mat-option
         *ngFor="let screenChoice of screenChoicesRequest$ | async"
         [value]="screenChoice"
@@ -12,6 +12,7 @@
   </step-form-field>
   <step-btn-group>
     <button
+      stepTestId="add-screen-btn"
       type="button"
       mat-mini-fab
       color="primary"
@@ -52,16 +53,21 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
       <step-btn-group>
-        <button mat-icon-button matTooltip="Move Down" (click)="moveScreen(element.id, 1)">
+        <button stepTestId="move-down-btn" mat-icon-button matTooltip="Move Down" (click)="moveScreen(element.id, 1)">
           <step-icon name="chevron-down"></step-icon>
         </button>
-        <button mat-icon-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
+        <button stepTestId="move-up-btn" mat-icon-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
           <step-icon name="chevron-up"></step-icon>
         </button>
-        <button mat-icon-button matTooltip="Edit" (click)="editScreen(element)">
+        <button stepTestId="edit-btn" mat-icon-button matTooltip="Edit" (click)="editScreen(element)">
           <step-icon name="edit-2"></step-icon>
         </button>
-        <button mat-icon-button matTooltip="Delete Screen" (click)="removeScreen(element.id, element.input.label)">
+        <button
+          stepTestId="delete-screen-btn"
+          mat-icon-button
+          matTooltip="Delete Screen"
+          (click)="removeScreen(element.id, element.input.label)"
+        >
           <step-icon name="trash-2">delete</step-icon>
         </button>
       </step-btn-group>

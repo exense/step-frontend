@@ -1,0 +1,86 @@
+<div widthExpanders key="dynamicFields" [class.with-padding]="!isChildNode">
+  <ng-container [formGroup]="form">
+    @if (!!primaryFields?.length) {
+      @if (primaryFieldsLabel) {
+        <h5>{{ primaryFieldsLabel }}</h5>
+      }
+      @if (primaryFieldsDescription) {
+        <p class="description">{{ primaryFieldsDescription }}</p>
+      }
+    }
+    @for (field of primaryFields; track field.trackId) {
+      @if (field.fieldType === DynamicFieldType.OBJECT || field.fieldType === DynamicFieldType.ARRAY) {
+        <step-dynamic-field-complex
+          [formControl]="field.control"
+          [label]="field.label"
+          [canEditLabel]="field.isAdditional"
+          [fieldType]="field.fieldType"
+          [canRemove]="false"
+          [tooltip]="field.tooltip"
+          [fieldSchema]="field.fieldSchema"
+          [fieldObjectTemplate]="complexObjectTemplate"
+          [fieldArrayTemplate]="complexArrayTemplate"
+          elementRefMapKey="dynamicFields"
+        />
+      } @else {
+        <step-dynamic-field
+          [formControl]="field.control"
+          [label]="field.label"
+          [canEditLabel]="field.isAdditional"
+          [fieldType]="field.fieldType"
+          [canRemove]="false"
+          [enumItems]="field.enumItems"
+          [tooltip]="field.tooltip"
+          elementRefMapKey="dynamicFields"
+        />
+      }
+    }
+
+    @if (!!optionalFields.length) {
+      @if (optionalFieldsLabel) {
+        <h5>{{ optionalFieldsLabel }}</h5>
+      }
+      @if (optionalFieldsDescription) {
+        <p class="description">{{ optionalFieldsDescription }}</p>
+      }
+    }
+    @for (field of optionalFields; track field.trackId) {
+      @if (field.fieldType === DynamicFieldType.OBJECT || field.fieldType === DynamicFieldType.ARRAY) {
+        <step-dynamic-field-complex
+          [formControl]="field.control"
+          [label]="field.label"
+          [canEditLabel]="field.isAdditional"
+          [fieldType]="field.fieldType"
+          [canRemove]="true"
+          [tooltip]="field.tooltip"
+          (remove)="removeField(field)"
+          [fieldSchema]="field.fieldSchema"
+          [fieldObjectTemplate]="complexObjectTemplate"
+          [fieldArrayTemplate]="complexArrayTemplate"
+          elementRefMapKey="dynamicFields"
+        />
+      } @else {
+        <step-dynamic-field
+          [formControl]="field.control"
+          [label]="field.label"
+          (labelChange)="updateLabel(field, $event)"
+          [canEditLabel]="field.isAdditional"
+          [fieldType]="field.fieldType"
+          [canRemove]="true"
+          [enumItems]="field.enumItems"
+          [tooltip]="field.tooltip"
+          (remove)="removeField(field)"
+          elementRefMapKey="dynamicFields"
+        />
+      }
+    }
+  </ng-container>
+  @if (!isDisabled && (possibleFieldsToAdd.length > 0 || !schema?.properties || allowNotSchemaFields)) {
+    <step-add-field-button
+      [isChildMode]="isChildNode"
+      [addLabel]="addFieldBtnLabel || ''"
+      [possibleFields]="possibleFieldsToAdd"
+      (addField)="addOptionalField($event)"
+    />
+  }
+</div>

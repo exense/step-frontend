@@ -4,6 +4,8 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AggregatedReportView } from '../models/AggregatedReportView';
+import type { AggregatedReportViewRequest } from '../models/AggregatedReportViewRequest';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Execution } from '../models/Execution';
 import type { ExecutionParameters } from '../models/ExecutionParameters';
@@ -109,6 +111,44 @@ export class ExecutionsService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * Returns the full aggregated report view for the provided execution.
+   * @param id
+   * @returns AggregatedReportView default response
+   * @throws ApiError
+   */
+  public getFullAggregatedReportView(id: string): Observable<AggregatedReportView> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/report/aggregated',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * Returns an aggregated report view for the provided execution and aggregation parameters.
+   * @param id
+   * @param requestBody
+   * @returns AggregatedReportView default response
+   * @throws ApiError
+   */
+  public getAggregatedReportView(
+    id: string,
+    requestBody?: AggregatedReportViewRequest,
+  ): Observable<AggregatedReportView> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/{id}/report/aggregated',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 
@@ -221,6 +261,35 @@ export class ExecutionsService {
       url: '/executions/{id}/reportnodes-with-errors',
       path: {
         id: id,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
+    });
+  }
+
+  /**
+   * Returns the list of report nodes by execution id and artefact hash
+   * @param id
+   * @param hash
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodesByArtefactHash(
+    id: string,
+    hash: string,
+    skip?: number,
+    limit?: number,
+  ): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/reportnodes-by-hash/{hash}',
+      path: {
+        id: id,
+        hash: hash,
       },
       query: {
         skip: skip,

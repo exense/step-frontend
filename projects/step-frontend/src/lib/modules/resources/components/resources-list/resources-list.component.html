@@ -13,10 +13,12 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
+          stepTestId="new-resource-btn"
           mat-mini-fab
           color="primary"
           matTooltip="New resource"
           matTooltipPosition="below"
+          [disabled]="!('resource-write' | hasRight | async)"
           [routerLink]="'new' | resourceUrl"
         >
           <step-icon name="plus"></step-icon>
@@ -47,7 +49,12 @@
       <td mat-cell *matCellDef="let element">{{ element.resourceType }}</td>
     </ng-container>
     <ng-container matColumnDef="id" stepActivityCol="Id" stepSearchCol>
-      <step-input-filter *stepSearchCellDef stepFilterConnect [useRegex]="false"></step-input-filter>
+      <step-input-filter
+        stepTestId="id-input"
+        *stepSearchCellDef
+        stepFilterConnect
+        [useRegex]="false"
+      ></step-input-filter>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Id</step-drag-column-caption>
       </th>
@@ -69,10 +76,16 @@
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
-          <button mat-icon-button matTooltip="Download resource" (click)="downloadResource(element.id)">
+          <button
+            stepTestId="download-resource-btn"
+            mat-icon-button
+            matTooltip="Download resource"
+            (click)="downloadResource(element.id)"
+          >
             <step-icon name="download-cloud"></step-icon>
           </button>
           <button
+            stepTestId="search-resource-btn"
             mat-icon-button
             matTooltip="Search for resource"
             [disabled]="element.resourceType !== 'datasource' && element.resourceType !== 'functions'"
@@ -80,17 +93,30 @@
           >
             <step-icon name="search"></step-icon>
           </button>
-          <a mat-icon-button matTooltip="Edit resource" [routerLink]="element | resourceUrl">
+          <a
+            stepTestId="edit-resource-btn"
+            mat-icon-button
+            matTooltip="Edit resource"
+            [disabled]="!('resource-write' | hasRight | async)"
+            [routerLink]="element | resourceUrl"
+          >
             <step-icon name="edit-2"></step-icon>
           </a>
           <button
+            stepTestId="delete-resource-btn"
             mat-icon-button
             matTooltip="Delete resource"
+            [disabled]="!('resource-delete' | hasRight | async)"
             (click)="deleteResource(element.id, element.resourceName)"
           >
             <step-icon name="trash-2">delete</step-icon>
           </button>
-          <step-entity-menu-button [entityItem]="element" [entityMenu]="entityMenu" stepHighlightTableRow>
+          <step-entity-menu-button
+            stepTestId="resources-entity-menu-btn"
+            [entityItem]="element"
+            [entityMenu]="entityMenu"
+            stepHighlightTableRow
+          >
             <step-icon name="more-horizontal"></step-icon>
           </step-entity-menu-button>
         </step-btn-group>

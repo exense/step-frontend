@@ -56,9 +56,16 @@ import { MessageDialogComponent } from './components/message-dialog/message-dial
 import { ProjectNamePipe } from './pipes/project-name.pipe';
 import { GetObjectFieldPipe } from './pipes/get-object-field.pipe';
 import { StatusCommonComponent } from './components/status-common/status-common.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { SimpleObjectInputComponent } from './components/simple-object-input/simple-object-input.component';
+import { WarningDirective } from './directives/warning.directive';
+import { ControlHasWarningsPipe } from './pipes/control-has-warnings.pipe';
+import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
+import { BigNumberPipe } from './pipes/big-number.pipe';
+import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -77,6 +84,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    WarningDirective,
     AlertDirective,
     ValidateJsonDirective,
     ErrorsListComponent,
@@ -113,6 +121,11 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
+    ControlHasWarningsPipe,
+    ControlWarningsPipe,
+    BigNumberPipe,
+    BooleanFilterComponent,
   ],
   exports: [
     CommonModule,
@@ -136,6 +149,7 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     SuffixDirective,
     HintDirective,
     ErrorDirective,
+    WarningDirective,
     AlertDirective,
     ValidateJsonDirective,
     ErrorsListComponent,
@@ -173,12 +187,18 @@ import { StatusCommonComponent } from './components/status-common/status-common.
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
+    SimpleObjectInputComponent,
+    ControlHasWarningsPipe,
+    ControlWarningsPipe,
+    BigNumberPipe,
+    BooleanFilterComponent,
   ],
 })
 export class StepBasicsModule {}
 
 export * from './components/base-filter/base-filter.component';
 export * from './components/array-filter/array-filter.component';
+export * from './components/boolean-filter/boolean-filter.component';
 export * from './components/array-filter-advanced/array-filter-advanced.component';
 export * from './components/single-item-array-filter/single-item-array-filter.component';
 export * from './components/input-filter/hexadecimal-input-filter.component';
@@ -203,6 +223,7 @@ export * from './components/marker/marker.component';
 export * from './components/string-array-input/string-array-input.component';
 export * from './directives/z-index.directive';
 export * from './pipes/artefact-icon.pipe';
+export * from './pipes/big-number.pipe';
 export * from './pipes/array-item-label.pipe';
 export * from './injectables/item-by-id-cache.service';
 export * from './injectables/cron-presets.token';
@@ -222,12 +243,11 @@ export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
 export * from './directives/error.directive';
+export * from './directives/warning.directive';
 export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
 export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
-export * from './types/repository-parameters.token';
-export * from './repository-parameters-initializer';
 export * from './injectables/array-item-label-value-extractor';
 export * from './types/storage-proxy';
 export * from './types/storage.token';
@@ -236,6 +256,7 @@ export * from './types/validators/json-validator';
 export * from './types/validators/number-validator';
 export * from './types/validators/boolean-validator';
 export * from './types/validators/coma-split-array-validator';
+export * from './types/validators/is-regex-validator';
 export * from './types/is-used-by-dialog-data';
 export * from './types/is-used-by-search-type';
 export * from './injectables/multiple-projects.service';
@@ -256,13 +277,14 @@ export * from './injectables/object-utils.service';
 export * from './injectables/dialogs.service';
 export * from './types/bulk-operation-type.enum';
 export * from './types/string-array-regex';
+export * from './types/string-hash';
 export * from './injectables/dialog-parent.service';
 export * from './injectables/alerts.service';
 export * from './injectables/quick-access-route.service';
 export * from './types/marker-type.enum';
 export * from './types/dialog-route';
 export * from './types/dialog-route-result';
-export * from './types/quick-access-route';
+export * from './types/step-route-additional-config';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './directives/input-model-formatter.directive';
@@ -281,3 +303,10 @@ export * from './types/mutable';
 export * from './types/date-format.enum';
 export * from './guards/preload-screen-data.resolver';
 export * from './injectables/screen-data-meta.service';
+export * from './types/time-converter';
+export * from './types/form-control-warnings-extension';
+export * from './pipes/control-has-warnings.pipe';
+export * from './pipes/control-warnings.pipe';
+export * from './injectables/time-converters-factory.service';
+export * from './components/simple-object-input/simple-object-input.component';
+export * from './injectables/statuses-colors.token';

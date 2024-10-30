@@ -123,8 +123,11 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (this.context.getGroupDimensions()) {
       this.activeGrouping = this.context.getGroupDimensions();
     }
-    this._internalFilters = this.context.getFilteringSettings().filterItems;
-
+    let contextFiltering = this.context.getFilteringSettings();
+    this.oqlValue = contextFiltering.oql || '';
+    this.activeMode = contextFiltering.mode;
+    this._internalFilters = contextFiltering.filterItems;
+    this.activeTimeRange;
     this.context
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
@@ -164,9 +167,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private collectUnusedAttributes(): MetricAttribute[] {
+    const hiddenFilters = this.context.getFilteringSettings().hiddenFilters || [];
     return this.context
       .getAllAttributes()
-      .filter((attr) => !this._internalFilters.find((i) => attr.name === i.attributeName));
+      .filter(
+        (attr) =>
+          !this._internalFilters.find((item) => attr.name === item.attributeName) &&
+          !hiddenFilters.find((item) => attr.name === item.attributeName),
+      );
   }
 
   getValidFilters(): FilterBarItem[] {
@@ -235,7 +243,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   emitFiltersChange() {
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
-      filterItems: this.getValidFilters(),
+      filterItems: JSON.parse(JSON.stringify(this._internalFilters)),
+      hiddenFilters: this.context.getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };
     this.context.setFilteringSettings(settings);
@@ -269,7 +278,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.removeFilterItem(index);
       return;
     }
-    const existingItems = this._internalFilters.filter((i) => i.attributeName === item.attributeName);
+    const existingItems = this._internalFilters.filter((filterItem) => filterItem.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
       this._snackbar.open('Filter not applied', 'dismiss');
@@ -315,10 +324,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     return { from: min, to: max };
   }
 
-  addFilterItem(item: MetricAttribute) {
-    const filterIndex = this._internalFilters.findIndex((i) => i.attributeName === item.name);
+  addFilterItem(metricAttribute: MetricAttribute) {
+    const filterIndex = this._internalFilters.findIndex(
+      (filterItem) => filterItem.attributeName === metricAttribute.name,
+    );
     if (filterIndex < 0) {
-      this.addFilter(FilterUtils.createFilterItemFromAttribute(item));
+      this.addFilter(FilterUtils.createFilterItemFromAttribute(metricAttribute));
     }
   }
 
@@ -348,11 +359,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.filterOptions = this.collectUnusedAttributes();
     this._changeDetectorRef.detectChanges();
     this.filterComponents!.last.openMenu();
-    this.filterComponents!.last.menuTrigger!.menuClosed.pipe(take(1)).subscribe(() => {
-      if (!item.attributeName || (!this.editMode && !FilterUtils.filterItemIsValid(item))) {
-        this.removeFilterItem(this._internalFilters.length - 1);
-      }
-    });
   }
 
   private haveNewGrouping() {
@@ -380,11 +386,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       filteringSettings.mode === TsFilteringMode.OQL
         ? filteringSettings.oql!.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    // const contextualOql = FilterUtils.objectToOQL(
-    //   this.performanceViewSettings.contextualFilters,
-    //   undefined,
-    //   ATTRIBUTES_REMOVAL_FUNCTION
-    // );
     const selectedTimeRange = this.context.getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')

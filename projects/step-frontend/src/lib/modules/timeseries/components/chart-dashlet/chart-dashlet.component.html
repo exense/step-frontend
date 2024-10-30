@@ -13,6 +13,17 @@
   }
 </div>
 
+@if (showHigherResolutionWarning) {
+  <div class="resolution-warning">
+    <step-icon
+      name="alert-triangle"
+      matTooltip="Data for requested resolution doesn't exist. Used higher resolution of <{{
+        resolutionLabels[collectionResolutionUsed.toString()] || collectionResolutionUsed
+      }}> instead."
+    />
+  </div>
+}
+
 <div class="settings-container">
   <div class="edit-buttons" *ngIf="editMode">
     <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
@@ -28,10 +39,36 @@
       <step-icon name="x"></step-icon>
     </button>
   </div>
-  @if (!editMode && !((item.readonlyGrouping || item.inheritGlobalGrouping) && item.readonlyAggregate)) {
-    <button mat-icon-button matTooltip="Settings" [matMenuTriggerFor]="settingsMenu">
-      <step-icon name="settings"></step-icon>
+  @if (!editMode) {
+    <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
+      <step-icon name="filter"></step-icon>
     </button>
+    <mat-menu #oqlMenu="matMenu">
+      <div class="oql" (click)="$event.stopPropagation()">
+        <div>
+          <step-icon
+            name="help-circle"
+            matTooltip="The OQL represents all the active filters used in the current chart."
+          ></step-icon>
+        </div>
+        <div>{{ requestOql }}</div>
+      </div>
+    </mat-menu>
+    @if (
+      (!item.readonlyGrouping && !item.inheritGlobalGrouping) ||
+      !item.readonlyAggregate ||
+      item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+      item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE
+    ) {
+      <button
+        mat-icon-button
+        matTooltip="Settings"
+        [matMenuTriggerFor]="settingsMenu"
+        #settingsMenuTrigger="matMenuTrigger"
+      >
+        <step-icon name="settings"></step-icon>
+      </button>
+    }
   }
 
   <mat-menu #settingsMenu="matMenu">
@@ -40,6 +77,21 @@
     }
     @if (!item.readonlyAggregate) {
       <button mat-menu-item [matMenuTriggerFor]="aggregateMenu">Aggregate</button>
+    }
+    @if (
+      item.readonlyAggregate &&
+      (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE ||
+        item.chartSettings!.secondaryAxes?.aggregation?.type === ChartAggregation.RATE)
+    ) {
+      <button mat-menu-item [matMenuTriggerFor]="rateUnitMenu">Rate Unit</button>
+    }
+  </mat-menu>
+
+  <mat-menu #rateUnitMenu="matMenu">
+    @for (rate of RATE_UNITS; track rate.unitKey) {
+      <button mat-menu-item (click)="switchRateUnit(rate)">
+        {{ rate.menuLabel }}
+      </button>
     }
   </mat-menu>
 
@@ -59,34 +111,10 @@
   </mat-menu>
 
   <mat-menu #aggregateMenu="matMenu">
-    @for (aggregate of AGGREGATES; track aggregate) {
-      <button
-        (click)="switchAggregate(aggregate)"
-        mat-menu-item
-        class="selected-menu-item"
-        [class.selected-menu-item]="aggregate === selectedAggregate"
-      >
-        {{ aggregate }}
-      </button>
-    }
-    <button
-      mat-menu-item
-      [matMenuTriggerFor]="pclMenu"
-      [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE"
-    >
-      PERCENTILE
-    </button>
-  </mat-menu>
-
-  <mat-menu #pclMenu="matMenu">
-    @for (pcl of PCL_VALUES; track pcl) {
-      <button
-        (click)="switchAggregate(ChartAggregation.PERCENTILE, pcl)"
-        [class.selected-menu-item]="selectedAggregate === ChartAggregation.PERCENTILE && selectedPclValue === pcl"
-        mat-menu-item
-      >
-        {{ pcl }}th
-      </button>
-    }
+    <step-timeseries-aggregate-picker
+      [selectedAggregate]="$any(item.chartSettings!.primaryAxes.aggregation)"
+      [pclValue]="item.chartSettings!.primaryAxes.aggregation.params?.['pclValue']"
+      (aggregateChange)="handleAggregateChange($event)"
+    />
   </mat-menu>
 </div>

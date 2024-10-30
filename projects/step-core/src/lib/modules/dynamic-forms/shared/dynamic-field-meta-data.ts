@@ -1,15 +1,17 @@
 import { FormControl } from '@angular/forms';
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
-import { DynamicFieldType } from './dynamic-field-type';
+import { DynamicValue } from '../../../client/step-client-module';
+import { SchemaField } from './dynamic-fields-schema';
+import { JsonFieldType } from '../../json-forms';
 
 export interface DynamicFieldMetaData {
   trackId: string;
   key: string;
   label?: string;
   tooltip?: string;
-  fieldType: DynamicFieldType;
+  fieldType: JsonFieldType;
+  fieldSchema?: SchemaField;
   isAdditional?: boolean;
   isRequired?: boolean;
-  control: FormControl<DynamicValueString | DynamicValueBoolean | DynamicValueInteger>;
+  control: FormControl<DynamicValue>;
   enumItems?: string[];
 }

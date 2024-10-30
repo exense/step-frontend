@@ -17,6 +17,7 @@ export enum Status {
   ESTIMATING = 'ESTIMATING',
   PROVISIONING = 'PROVISIONING',
   DEPROVISIONING = 'DEPROVISIONING',
+  IMPORT_ERROR = 'IMPORT_ERROR',
 }
 
 export const EXECUTION_RESULT: ReadonlyArray<Status> = [
@@ -42,14 +43,30 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
 ];
 
 export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
-  ...[Status.INITIALIZING, Status.IMPORTING, Status.RUNNING, Status.ABORTING, Status.EXPORTING].map((key) => ({
+  ...[
+    Status.INITIALIZING,
+    Status.IMPORTING,
+    Status.ESTIMATING,
+    Status.PROVISIONING,
+    Status.DEPROVISIONING,
+    Status.RUNNING,
+    Status.ABORTING,
+    Status.EXPORTING,
+  ].map((key) => ({
     key,
     value: key,
   })),
   {
     key: Status.ENDED,
     value: Status.ENDED,
-    children: [Status.TECHNICAL_ERROR, Status.FAILED, Status.PASSED, Status.INTERRUPTED, Status.SKIPPED].map((key) => ({
+    children: [
+      Status.TECHNICAL_ERROR,
+      Status.FAILED,
+      Status.PASSED,
+      Status.INTERRUPTED,
+      Status.SKIPPED,
+      Status.IMPORT_ERROR,
+    ].map((key) => ({
       key,
       value: key,
     })),

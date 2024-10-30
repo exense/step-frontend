@@ -32,7 +32,7 @@ section.content {
 .detail-container {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin: 1em;
 }
 
 .wordbreak {
@@ -46,5 +46,5 @@ section.content {
 }
 
 .detail {
-  color: var.$dark-gray;
+  color: var.$gray-525;
 }
