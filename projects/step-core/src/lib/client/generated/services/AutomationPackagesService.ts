@@ -126,4 +126,15 @@ export class AutomationPackagesService {
       mediaType: 'multipart/form-data',
     });
   }
+
+  /**
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getAutomationPackageDescriptorSchema(): Observable<string> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/schema',
+    });
+  }
 }

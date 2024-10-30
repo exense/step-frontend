@@ -2,8 +2,12 @@ import { TableLocalDataSource } from './table-local-data-source';
 import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { Mutable } from '../../basics/step-basics.module';
+import { StepDataSourceReloadOptions } from '../../../client/table/shared/step-data-source';
 
-type ReloadOptions<R> = { hideProgress?: boolean; request?: R } | undefined;
+interface ReloadOptions<R> extends StepDataSourceReloadOptions {
+  request?: R;
+}
+
 type FieldAccessor = Mutable<Pick<TableFetchLocalDataSource<any>, 'inProgress$'>>;
 
 interface TableFetchConfig<T, R> extends TableLocalDataSourceConfig<T> {
@@ -13,7 +17,7 @@ interface TableFetchConfig<T, R> extends TableLocalDataSourceConfig<T> {
 export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<T> {
   private inProgressInternal$!: BehaviorSubject<boolean>;
 
-  private reload$?: BehaviorSubject<ReloadOptions<R>>;
+  private reload$?: BehaviorSubject<ReloadOptions<R> | undefined>;
   private pendingReload?: ReloadOptions<R>;
 
   override readonly inProgress$ = of(false);
@@ -36,7 +40,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
 
   override destroy(): void {
     super.destroy();
-    this.inProgressInternal$.complete();
+    this.inProgressInternal$?.complete();
     this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;
   }
@@ -46,7 +50,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     // because it is invoked in the constructor.
     // It means that all inline initializations will be done after,
     // but these subject are already required to setup streams
-    const reload$ = new BehaviorSubject<ReloadOptions<R>>(config.initialReloadOptions);
+    const reload$ = new BehaviorSubject<ReloadOptions<R> | undefined>(config.initialReloadOptions);
     const inProgressInternal$ = new BehaviorSubject<boolean>(false);
 
     const source$ = this.createDataStream(reload$, inProgressInternal$);
@@ -67,15 +71,19 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   }
 
   private createDataStream(
-    reload$: BehaviorSubject<ReloadOptions<R>>,
+    reload$: BehaviorSubject<ReloadOptions<R> | undefined>,
     inProgressInternal$: BehaviorSubject<boolean>,
   ): Observable<T[]> {
     return reload$.pipe(
       map((reloadOptions) => reloadOptions || {}),
-      tap(({ hideProgress }) => {
-        if (!hideProgress) {
-          inProgressInternal$.next(true);
+      tap(({ immediateHideProgress, hideProgress }) => {
+        // Don't show progress bar, when immediateHideProgress flag is passed
+        // or hideProgress is passed and there is no in progress current operation
+        let inProgress = true;
+        if (!!immediateHideProgress || (!!hideProgress && !inProgressInternal$.value)) {
+          inProgress = false;
         }
+        inProgressInternal$.next(inProgress);
       }),
       switchMap(({ request }) => this.retrieveData(request)),
       tap(() => inProgressInternal$.next(false)),
