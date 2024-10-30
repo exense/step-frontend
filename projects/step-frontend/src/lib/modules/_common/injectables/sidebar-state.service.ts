@@ -71,6 +71,13 @@ export class SidebarStateService implements OnDestroy, LogoutCleanup {
     this._menuStorage.setItem(OPENED_MENU_ITEMS, JSON.stringify(this.openedMenuItems!));
   }
 
+  initializeProjectsReadOnly() {
+    if (!this.isOpened) {
+      const projectsReadOnly = this._document.querySelector('#projects-read-only');
+      projectsReadOnly?.classList?.add(PROJECTS_READ_ONLY_WHEN_SIDEBAR_CLOSED);
+    }
+  }
+
   private setupSmallScreenChange(): void {
     this._isSmallScreen$
       .pipe(
