@@ -2,10 +2,9 @@ import { TablePersistenceStateService } from './table-persistence-state.service'
 import { inject, Injectable } from '@angular/core';
 import { SearchValue } from '../shared/search-value';
 import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
-import { FilterConditionJson } from '../shared/filter-condition-json.interface';
-import { FilterCondition } from '../shared/filter-condition';
 import { filter, first, map, pairwise, switchMap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TABLE_PERSISTENCE_URL_PARAMS_SERIALIZERS } from './table-persistence-url-params-serializer.token';
 
 export const TABLE_QUERY_PREFIX = 'tq_';
 
@@ -13,6 +12,7 @@ export const TABLE_QUERY_PREFIX = 'tq_';
 export class TablePersistenceUrlStateService extends TablePersistenceStateService {
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
+  private _urlParamsSerializers = inject(TABLE_PERSISTENCE_URL_PARAMS_SERIALIZERS);
 
   private isInternalUrlChange = false;
   private isSearchRestoreRequired = false;
@@ -140,41 +140,15 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
   }
 
   private convertToUrlValue(searchValue: SearchValue): string {
-    if (typeof searchValue === 'string') {
-      return searchValue;
-    }
-    if (searchValue instanceof FilterCondition) {
-      if (searchValue.isEmpty()) {
-        return '';
-      }
-      return JSON.stringify(searchValue);
-    }
-    if (searchValue.regex && searchValue.value) {
-      return `r[${searchValue.value}]`;
-    }
-    return searchValue.value;
+    const serializer = this._urlParamsSerializers.find((item) => item.isValueMatchForSerialize(searchValue))!;
+
+    return serializer.serialize(searchValue);
   }
 
   private parseUrlValue(value: string): SearchValue | undefined {
-    if (value.startsWith('r[') && value.endsWith(']')) {
-      const regexValue = value.slice(2, value.length - 1);
-      if (!regexValue) {
-        return undefined;
-      }
-      return { regex: true, value: regexValue };
-    }
-    if (value.startsWith('{') && value.endsWith('}')) {
-      const jsonValue = JSON.parse(value) as FilterConditionJson;
-      if (jsonValue.filterConditionType !== undefined) {
-        const filterCondition = this._filterConditionFactory.create(jsonValue as FilterConditionJson);
-        if (filterCondition && !filterCondition?.isEmpty()) {
-          return filterCondition;
-        } else {
-          return undefined;
-        }
-      }
-    }
-    return value;
+    const serializer = this._urlParamsSerializers.find((item) => item.isValueMatchForDeserialize(value))!;
+
+    return serializer.deserialize(value);
   }
 
   private hasUrlSearch(queryParams: Params): boolean {

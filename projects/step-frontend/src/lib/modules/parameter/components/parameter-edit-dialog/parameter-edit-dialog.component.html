@@ -1,144 +1,165 @@
-<step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
-  <div step-modal-window-body>
-    @if (parameter) {
-      <div class="step-form-fields">
-        <section class="param-scope">
-          <step-form-field class="scope-field">
-            <mat-select
-              [ngClass]="selectedScope?.cssClass"
-              [ngModel]="selectedScope"
-              (ngModelChange)="selectScope($event)"
-            >
-              @for (item of scopeItems; track item.scope) {
-                <mat-option [value]="item">
-                  <div class="scope-item">
-                    <step-icon [name]="item.icon" [ngClass]="item.spanCssClass" />
-                    {{ item.label }}
-                  </div>
-                </mat-option>
-              }
-            </mat-select>
-          </step-form-field>
-          @if (parameter.scope === 'APPLICATION') {
-            <step-standard-custom-form-inputs
-              class="scope-entity"
-              stScreen="keyword"
-              stInputId="attributes.application"
-              [(ngModel)]="parameter.scopeEntity"
-              hint="The name of the application this parameter is restricted to"
-              [hideLabel]="true"
+<form #parameterForm="ngForm">
+  <step-modal-window [title]="modalTitle" [@fadeInOut]="animationState">
+    <div step-modal-window-body>
+      @if (error) {
+        <step-alert type="danger">{{ error }}</step-alert>
+      }
+      @if (parameter) {
+        <div class="step-form-fields">
+          <section class="param-scope">
+            <step-form-field class="scope-field">
+              <mat-select
+                [ngClass]="selectedScope?.cssClass"
+                [ngModel]="selectedScope"
+                (ngModelChange)="selectScope($event)"
+                name="scope"
+              >
+                @for (item of scopeItems; track item.scope) {
+                  <mat-option [value]="item">
+                    <div class="scope-item">
+                      <step-icon [name]="item.icon" [ngClass]="item.spanCssClass" />
+                      {{ item.label }}
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+            </step-form-field>
+            @if (parameter.scope === 'APPLICATION') {
+              <step-standard-custom-form-inputs
+                class="scope-entity"
+                stScreen="keyword"
+                stInputId="attributes.application"
+                [(ngModel)]="parameter.scopeEntity"
+                name="scopeEntityApplication"
+                hint="The name of the application this parameter is restricted to"
+                [hideLabel]="true"
+              />
+            } @else if (parameter.scope === 'FUNCTION') {
+              <step-form-field class="scope-entity">
+                <input type="text" [(ngModel)]="parameter.scopeEntity" name="scopeEntityFunction" />
+                <step-suffix class="icon-suffix">
+                  <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to" />
+                </step-suffix>
+              </step-form-field>
+            }
+          </section>
+
+          <step-form-field>
+            <step-label>Key</step-label>
+            <input
+              title="Key"
+              autofocus
+              placeholder="Key"
+              name="key"
+              required
+              [ngModel]="parameter.key"
+              (ngModelChange)="onKeyChange($event)"
             />
-          } @else if (parameter.scope === 'FUNCTION') {
-            <step-form-field class="scope-entity">
-              <input type="text" [(ngModel)]="parameter.scopeEntity" />
-              <step-suffix class="icon-suffix">
-                <step-icon name="help-circle" matTooltip="The name of the Keyword this parameter is restricted to" />
-              </step-suffix>
+          </step-form-field>
+
+          @if (parameter.protectedValue) {
+            <step-form-field>
+              <step-label>Value</step-label>
+              <input
+                title="Value"
+                type="password"
+                placeholder="Value"
+                [(ngModel)]="parameter.value!.value"
+                name="protectedValue"
+              />
+            </step-form-field>
+          } @else {
+            <step-form-field>
+              <step-dynamic-textfield label="Value" [(ngModel)]="parameter.value" name="value" />
             </step-form-field>
           }
-        </section>
 
-        <step-form-field>
-          <step-label>Key</step-label>
-          <input
-            title="Key"
-            autofocus
-            placeholder="Key"
-            [ngModel]="parameter.key"
-            (ngModelChange)="onKeyChange($event)"
-          />
-        </step-form-field>
+          <step-form-field class="protect-field">
+            <mat-checkbox
+              color="primary"
+              [ngModel]="parameter.protectedValue"
+              (ngModelChange)="setProtectedValue($event)"
+              [disabled]="protectedParameter"
+              name="protected"
+            >
+              <span>Protect parameter value</span>
+              &nbsp;
+              <step-icon
+                name="help-circle"
+                matTooltip="When a parameter is protected, its value will not show in the UI. This is useful to safely store passwords."
+              />
+            </mat-checkbox>
+          </step-form-field>
+          <step-form-field>
+            <step-label>Description</step-label>
+            <input type="text" [(ngModel)]="parameter.description" name="description" />
+          </step-form-field>
 
-        @if (parameter.protectedValue) {
           <step-form-field>
-            <step-label>Value</step-label>
-            <input title="Value" type="password" placeholder="Value" [(ngModel)]="parameter.value!.value" />
+            <step-label>Activation script</step-label>
+            <step-label-addon>
+              <div [matMenuTriggerFor]="activationMenu">
+                <button mat-flat-button color="primary">Wizard</button>
+                <mat-menu #activationMenu="matMenu">
+                  <button [disabled]="!!parameter?.activationExpression?.script" mat-menu-item (click)="addCondition()">
+                    {{ 'Add condition' }}
+                  </button>
+                  <button
+                    [disabled]="!parameter?.activationExpression?.script"
+                    mat-menu-item
+                    (click)="addCondition('OR')"
+                  >
+                    {{ 'Add OR condition' }}
+                  </button>
+                  <button
+                    [disabled]="!parameter?.activationExpression?.script"
+                    mat-menu-item
+                    (click)="addCondition('AND')"
+                  >
+                    {{ 'Add AND condition' }}
+                  </button>
+                </mat-menu>
+              </div>
+            </step-label-addon>
+            <input type="text" [(ngModel)]="parameter.activationExpression!.script!" name="activationScript" />
           </step-form-field>
-        } @else {
+
           <step-form-field>
-            <step-dynamic-textfield label="Value" [(ngModel)]="parameter.value" name="value" />
+            <step-label>Priority</step-label>
+            <input type="number" [(ngModel)]="parameter.priority" name="priority" />
           </step-form-field>
+        </div>
+        @if (parameter.lastModificationDate) {
+          <section class="last-modification">
+            <label>Last modification</label>
+            <span
+              >{{ parameter.lastModificationDate | date: DateFormat.DATE }} by
+              {{ parameter.lastModificationUser }}</span
+            >
+          </section>
         }
-
-        <step-form-field class="protect-field">
-          <mat-checkbox
-            color="primary"
-            [ngModel]="parameter.protectedValue"
-            (ngModelChange)="setProtectedValue($event)"
-            [disabled]="protectedParameter"
-          >
-            <span>Protect parameter value</span>
-            &nbsp;
-            <step-icon
-              name="help-circle"
-              matTooltip="When a parameter is protected, its value will not show in the UI. This is useful to safely store passwords."
-            />
-          </mat-checkbox>
-        </step-form-field>
-        <step-form-field>
-          <step-label>Description</step-label>
-          <input type="text" [(ngModel)]="parameter.description" />
-        </step-form-field>
-        <step-form-field>
-          <step-label>Activation script</step-label>
-          <step-label-addon>
-            <div [matMenuTriggerFor]="activationMenu">
-              <button mat-flat-button color="primary">Wizard</button>
-              <mat-menu #activationMenu="matMenu">
-                <button [disabled]="!!parameter?.activationExpression?.script" mat-menu-item (click)="addCondition()">
-                  {{ 'Add condition' }}
-                </button>
-                <button
-                  [disabled]="!parameter?.activationExpression?.script"
-                  mat-menu-item
-                  (click)="addCondition('OR')"
-                >
-                  {{ 'Add OR condition' }}
-                </button>
-                <button
-                  [disabled]="!parameter?.activationExpression?.script"
-                  mat-menu-item
-                  (click)="addCondition('AND')"
-                >
-                  {{ 'Add AND condition' }}
-                </button>
-              </mat-menu>
-            </div>
-          </step-label-addon>
-          <input type="text" [(ngModel)]="parameter.activationExpression!.script!" />
-        </step-form-field>
-        <step-form-field>
-          <step-label>Priority</step-label>
-          <input type="number" [(ngModel)]="parameter.priority" />
-        </step-form-field>
-      </div>
-      <section class="last-modification" *ngIf="parameter.lastModificationDate">
-        <label>Last modification</label>
-        <span
-          >{{ parameter.lastModificationDate | date: DateFormat.DATE }} by {{ parameter.lastModificationUser }}</span
-        >
-      </section>
-    }
-  </div>
-  <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button
-      [hidden]="isEditMode"
-      [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
-      type="button"
-      mat-stroked-button
-      (click)="saveAndNext()"
-    >
-      Save & next
-    </button>
-    <button
-      [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
-      type="button"
-      mat-flat-button
-      color="primary"
-      (click)="save()"
-    >
-      Save
-    </button>
-  </div>
-</step-modal-window>
+      }
+    </div>
+    <div step-modal-window-buttons>
+      <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+      <button
+        [hidden]="isEditMode"
+        [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
+        type="button"
+        mat-stroked-button
+        (click)="saveAndNext()"
+      >
+        Save & next
+      </button>
+      <button
+        [disabled]="parameter.scope === 'GLOBAL' && !('param-global-write' | hasRight | async)"
+        type="button"
+        mat-flat-button
+        color="primary"
+        (click)="save()"
+      >
+        Save
+      </button>
+    </div>
+  </step-modal-window>
+</form>

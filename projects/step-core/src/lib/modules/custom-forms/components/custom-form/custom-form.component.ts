@@ -10,7 +10,7 @@ import {
   Output,
   signal,
 } from '@angular/core';
-import { AugmentedScreenService, Input as StInput } from '../../../../client/step-client-module';
+import { AugmentedScreenService, Input as StInput, ScreenInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
 import { DynamicLabelCustomFormInputComponent } from '../custom-form-input/dynamic-label-custom-form-input.component';
@@ -135,22 +135,22 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     this.customInputTouch.emit();
   }
 
-  private determineCustomFormInputSchema(stInputs: StInput[]): CustomFormInputsSchema {
-    return stInputs.reduce(
-      (res, input) => {
-        res.ids.push(input.id!);
-        if (input.activationExpression) {
-          res.activeExpressionInputsKeys.add(input.id!);
+  private determineCustomFormInputSchema(screenInputs: ScreenInput[]): CustomFormInputsSchema {
+    return screenInputs.reduce(
+      (res, item) => {
+        res.ids.push(item.id!);
+        if (item?.input?.activationExpression) {
+          res.activeExpressionInputsKeys.add(item.id!);
         }
 
-        if (input.options) {
-          input.options.forEach((opt) => {
+        if (item?.input?.options) {
+          item.input.options.forEach((opt) => {
             if (opt.activationExpression) {
-              res.activeExpressionInputsKeys.add(`${input.id!}.${opt.value}`);
+              res.activeExpressionInputsKeys.add(`${item.id!}.${opt.value}`);
             }
           });
         }
-        res.inputs[input.id!] = input;
+        res.inputs[item.id!] = item.input!;
         return res;
       },
       {
@@ -163,16 +163,16 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   private determineCustomFormInputVisibilityFlags(
     activeExpressionInputsKeys: Set<string>,
-    stInputs: StInput[],
+    screenInputs: ScreenInput[],
   ): Record<string, boolean> {
     const result: Record<string, boolean> = {};
     activeExpressionInputsKeys.forEach((key) => (result[key] = false));
-    return stInputs.reduce((res, input) => {
-      if (res[input.id!] !== undefined) {
-        res[input.id!] = true;
+    return screenInputs.reduce((res, item) => {
+      if (res[item.id!] !== undefined) {
+        res[item.id!] = true;
       }
-      input.options?.forEach((option) => {
-        const optionKey = `${input.id!}.${option.value}`;
+      item?.input?.options?.forEach((option) => {
+        const optionKey = `${item.id!}.${option.value}`;
         if (res[optionKey] === undefined) {
           return;
         }
@@ -186,8 +186,9 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     this._screensService
       .getScreenInputsByScreenIdWithCache(this.stScreen)
       .pipe(
-        map((screenInputs) => screenInputs.map((sInput) => sInput.input!)),
-        map((screenInputs) => screenInputs.filter((input) => !!input && !this.stExcludeFields.includes(input.id!))),
+        map((screenInputs) =>
+          screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!)),
+        ),
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
@@ -228,8 +229,10 @@ export class CustomFormComponent implements OnInit, OnDestroy {
             ...this.stModel,
           });
         }),
-        switchMap(() => this._screensService.getInputsForScreenPost(this.stScreen, this.stModel)),
-        map((screenInputs) => screenInputs.filter((input) => !!input && !this.stExcludeFields.includes(input.id!))),
+        switchMap(() => this._screensService.getScreenInputsForScreenPost(this.stScreen, this.stModel)),
+        map((screenInputs) =>
+          screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!)),
+        ),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
         ),
@@ -238,11 +241,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
       .subscribe((visibilityFlags) => this.visibilityFlags.set(visibilityFlags));
   }
 
-  private setDefaultValues(inputs: StInput[]): void {
+  private setDefaultValues(screenInputs: ScreenInput[]): void {
     let valueHasBeenChanged = false;
-    inputs
-      .filter((input) => this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined)
-      .forEach((input) => {
+    screenInputs
+      .map((item) => item.input as StInput)
+      .filter((input) => !!input && this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined)
+      .forEach((input: StInput) => {
         const defaultValue = input.type === 'CHECKBOX' ? input.defaultValue ?? false : input.defaultValue;
         if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
           this._objectUtils.setObjectFieldValue(this.stModel, input.id!, defaultValue);
