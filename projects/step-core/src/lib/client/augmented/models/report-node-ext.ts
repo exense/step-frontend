@@ -1,4 +1,4 @@
-import { ReportNode } from '@exense/step-core';
+import { ReportNode } from '../../generated';
 
 interface ReportNodeAddon {
   functionAttributes?: Record<string, string>;
