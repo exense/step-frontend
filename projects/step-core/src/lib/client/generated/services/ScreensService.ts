@@ -109,6 +109,39 @@ export class ScreensService {
   }
 
   /**
+   * @param id
+   * @returns ScreenInput default response
+   * @throws ApiError
+   */
+  public getScreenInputsForScreenGet(id: string): Observable<Array<ScreenInput>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/screens/{id}/screen-inputs',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @param requestBody
+   * @returns ScreenInput default response
+   * @throws ApiError
+   */
+  public getScreenInputsForScreenPost(id: string, requestBody?: any): Observable<Array<ScreenInput>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/screens/{id}/screen-inputs',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * @returns string default response
    * @throws ApiError
    */
