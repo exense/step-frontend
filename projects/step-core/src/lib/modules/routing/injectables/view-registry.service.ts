@@ -362,9 +362,15 @@ export class ViewRegistryService implements OnDestroy {
     return dashlets;
   }
 
-  private configureRoute(route: Route, { label, weight, accessPermissions }: SubRouterConfig = {}): void {
+  private configureRoute(
+    route: Route,
+    { label, weight, accessPermissions, accessPermissionsCondition }: SubRouterConfig = {},
+  ): void {
     if (weight || label || accessPermissions) {
-      route.data = { ...route.data, [SUB_ROUTE_DATA]: { weight, label, accessPermissions } };
+      route.data = {
+        ...route.data,
+        [SUB_ROUTE_DATA]: { weight, label, accessPermissions, accessPermissionsCondition },
+      };
     }
 
     if (accessPermissions) {
