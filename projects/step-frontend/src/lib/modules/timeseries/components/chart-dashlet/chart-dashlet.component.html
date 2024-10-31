@@ -14,14 +14,6 @@
 </div>
 
 <div class="warnings-container">
-  @if (showMissingTTLWarning) {
-    <div>
-      <step-icon
-        name="alert-triangle"
-        matTooltip="Requested range is out of the configured TTL (Time To Live) in the Housekeeping settings"
-      />
-    </div>
-  }
   @if (showHigherResolutionWarning) {
     <div>
       <step-icon

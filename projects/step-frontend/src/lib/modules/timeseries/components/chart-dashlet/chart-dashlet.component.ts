@@ -110,7 +110,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
   syncGroupSubscription?: Subscription;
   cachedResponse?: TimeSeriesAPIResponse;
   showHigherResolutionWarning = false;
-  showMissingTTLWarning = false;
   collectionResolutionUsed: number = 0;
 
   ngOnInit(): void {
@@ -461,7 +460,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     return this._timeSeriesService.getTimeSeries(request).pipe(
       tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
-        this.showMissingTTLWarning = !response.ttlCovered;
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
         this.createChart(response);
