@@ -15,9 +15,7 @@ export class ProjectSettingsMenuComponent {
 
   readonly _configurationItems = inject(ViewRegistryService)
     .getChildrenRouteInfo(this._activatedRoute)
-    .filter(
-      (routeData) => !routeData.accessPermissions?.length || this._auth.hasAnyRights(routeData.accessPermissions),
-    );
+    .filter((routeData) => this._auth.checkPermissionGroup(routeData));
 
   private _specialLinks = inject(SpecialLinksService);
   readonly userSettings = this._specialLinks.userSettings();
