@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { AdditionalRightRuleService } from './additional-right-rule.service';
 import { AppConfigContainerService, Mutable, SESSION_STORAGE } from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
-import { NavigatorService } from '../../routing';
+import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
 
 type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
@@ -148,11 +148,46 @@ export class AuthService implements OnDestroy {
     return !!context?.rights ? context.rights.indexOf(right) !== -1 : false;
   }
 
-  hasAnyRights(rights: string[]): boolean {
+  checkPermissionGroup(group: AccessPermissionGroup): boolean {
+    if (!group.accessPermissions?.length) {
+      return true;
+    }
+    const condition = group.accessPermissionsCondition ?? AccessPermissionCondition.OR;
+
+    const permissions = group.accessPermissions.filter((item) => typeof item === 'string') as string[];
+
+    const groups = group.accessPermissions.filter((item) => typeof item !== 'string') as AccessPermissionGroup[];
+
+    let permissionCheckResult: boolean | undefined = undefined;
+    let groupsCheckResult: boolean | undefined = undefined;
+
+    if (permissions.length) {
+      permissionCheckResult =
+        condition === AccessPermissionCondition.OR ? this.hasAnyRights(permissions) : this.hasAllRights(permissions);
+    }
+
+    if (groups.length) {
+      groupsCheckResult = groups.reduce((res, group) => {
+        return condition === AccessPermissionCondition.OR
+          ? res || this.checkPermissionGroup(group)
+          : res && this.checkPermissionGroup(group);
+      }, condition !== AccessPermissionCondition.OR);
+    }
+
+    if (permissionCheckResult !== undefined && groupsCheckResult !== undefined) {
+      return condition === AccessPermissionCondition.OR
+        ? permissionCheckResult || groupsCheckResult
+        : permissionCheckResult && groupsCheckResult;
+    }
+
+    return !!(permissionCheckResult ?? groupsCheckResult);
+  }
+
+  private hasAnyRights(rights: string[]): boolean {
     return rights.reduce((res, right) => res || this.hasRight(right), false);
   }
 
-  hasAllRights(rights: string[]): boolean {
+  private hasAllRights(rights: string[]): boolean {
     return rights.reduce((res, right) => res && this.hasRight(right), true);
   }
 
