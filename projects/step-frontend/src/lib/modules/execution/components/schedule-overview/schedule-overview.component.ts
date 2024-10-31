@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
   AugmentedSchedulerService,
@@ -26,7 +27,6 @@ import {
   tap,
 } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DateTime } from 'luxon';
