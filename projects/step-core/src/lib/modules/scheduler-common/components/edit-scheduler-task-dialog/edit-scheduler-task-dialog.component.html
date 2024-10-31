@@ -129,11 +129,6 @@
           <input type="text" placeholder="User" formControlName="userID" />
         </step-form-field>
       }
-      @if (!isNew()) {
-        <section>
-          <a [routerLink]="'/executions/schedules/' + task.id">Open cross-execution dashboard</a>
-        </section>
-      }
       <step-dashlet itemKey="taskAddon" [context]="taskForm" />
       @if (paramsSchema(); as schema) {
         <mat-expansion-panel [(expanded)]="showParameters">
