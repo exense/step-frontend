@@ -103,7 +103,11 @@ export class AdminModule {
           {
             path: '',
             redirectTo: CURRENT_SCREEN_CHOICE_DEFAULT,
+            data: {
+              weight: 100,
+            },
           },
+
           {
             path: ':screenId',
             component: ScreenConfigurationListComponent,
@@ -146,6 +150,7 @@ export class AdminModule {
         parentPath: 'settings',
         label: 'Screens',
         accessPermissions: ['settings-ui-menu', 'admin-ui-menu'],
+        weight: 10,
       },
     );
 
