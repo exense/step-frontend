@@ -1,7 +1,7 @@
 import { Component, computed, EventEmitter, input, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
-import { DynamicFieldsSchema, SchemaObjectField } from '../../shared/dynamic-fields-schema';
+import { JsonFieldsSchema, SchemaObjectField } from '../../../json-forms';
 
 @Component({
   selector: 'step-dynamic-field-editor',
@@ -12,7 +12,7 @@ export class DynamicFieldEditorComponent implements OnChanges {
   @Input() isDisabled?: boolean;
 
   /** @Input() **/
-  readonly dynamicSchema = input<DynamicFieldsSchema | undefined>(undefined, { alias: 'schema' });
+  readonly dynamicSchema = input<JsonFieldsSchema | undefined>(undefined, { alias: 'schema' });
   protected schema = computed(() => {
     const dynamicSchema = this.dynamicSchema();
     if (!dynamicSchema) {
