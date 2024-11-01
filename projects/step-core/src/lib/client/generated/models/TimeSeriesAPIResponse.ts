@@ -14,4 +14,5 @@ export type TimeSeriesAPIResponse = {
   truncated: boolean;
   collectionResolution: number;
   higherResolutionUsed: boolean;
+  ttlCovered: boolean;
 };
