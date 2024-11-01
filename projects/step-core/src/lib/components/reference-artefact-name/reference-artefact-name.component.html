@@ -1,41 +1,62 @@
 <div class="main-name" [class.with-meta]="referenceMeta">
-  <step-editable-label
-    [ngModel]="artefactName"
-    (ngModelChange)="onArtefactNameChange($event)"
-    [disabled]="isDisabled"
-  />
-  @if (referenceMeta) {
-    <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
-      <step-popover>
-        <step-icon [name]="referenceMeta.icon" />
-        {{ referenceMeta.description }}
-        <step-popover-content>
-          @if (referenceMeta.hintFor === hintFor.KEYWORD) {
-            Click on
-            <step-icon name="edit-2" />
-            to specify selection criteria for any keyword
-          } @else if (referenceMeta.hintFor === hintFor.PLAN) {
-            Click on
-            <step-icon name="edit-2" />
-            to specify selection criteria for any plan
-          }
-        </step-popover-content>
-      </step-popover>
+  @if (!artefact!.dynamicName!.dynamic) {
+    <div class="dynamic-name">
+      <step-editable-label
+        [ngModel]="artefactName"
+        (ngModelChange)="onArtefactNameChange($event)"
+        [disabled]="isDisabled"
+      />
+      <button
+        type="button"
+        matTooltip="Use an expression to replace dynamically the step name at execution time"
+        matTooltipPosition="below"
+        mat-icon-button
+        [disabled]="isDisabled"
+        (click)="switchToDynamicName()"
+      >
+        <step-icon name="zap" />
+      </button>
     </div>
+  } @else {
+    <step-dynamic-textfield
+      label="Name"
+      name="dynamicName"
+      [(ngModel)]="artefact!.dynamicName"
+      (ngModelChange)="syncName($event)"
+      [disabled]="isDisabled"
+    />
   }
-  @if (!isDisabled) {
-    <button
-      type="button"
-      [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
-      matTooltipPosition="below"
-      mat-icon-button
-      [color]="isEditorMode ? 'primary' : undefined"
-      (click)="isEditorMode = !isEditorMode"
-    >
-      <step-icon name="edit-2" />
-    </button>
-  }
+  <button
+    type="button"
+    [matTooltip]="_artefactNameConfig.captions.editSelectionCriteria"
+    matTooltipPosition="below"
+    mat-icon-button
+    [color]="isEditorMode ? 'primary' : undefined"
+    (click)="isEditorMode = !isEditorMode"
+    [ngClass]="{ 'dynamic-on': artefact?.dynamicName?.dynamic === true }"
+  >
+    <step-icon name="edit-2" />
+  </button>
 </div>
+@if (referenceMeta) {
+  <div class="reference-meta" [class.reference-meta-error]="referenceMeta.isError">
+    <step-popover>
+      <step-icon [name]="referenceMeta.icon" />
+      {{ referenceMeta.description }}
+      <step-popover-content>
+        @if (referenceMeta.hintFor === hintFor.KEYWORD) {
+          Click on
+          <step-icon name="edit-2" />
+          to specify selection criteria for any keyword
+        } @else if (referenceMeta.hintFor === hintFor.PLAN) {
+          Click on
+          <step-icon name="edit-2" />
+          to specify selection criteria for any plan
+        }
+      </step-popover-content>
+    </step-popover>
+  </div>
+}
 @if (referenceString && referenceString !== artefactName) {
   <div class="references">
     <label>{{ _artefactNameConfig.captions.referenceLabel }}:</label>

@@ -133,6 +133,28 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this.onSave.emit();
   }
 
+  protected syncName(dynamicValue: DynamicValueString): void {
+    if (dynamicValue.dynamic) {
+      return;
+    }
+    this.artefact!.attributes!['name'] = this.artefactName = dynamicValue.value ?? '';
+    this.save();
+  }
+
+  protected switchToDynamicName(): void {
+    this.artefact!.dynamicName!.expression = this.artefact!.attributes!['name'];
+    this.artefact!.dynamicName!.dynamic = true;
+    this.save();
+  }
+
+  save(): void {
+    if (this.isDisabled) {
+      return;
+    }
+    this.artefact!.useDynamicName = this.artefact!.dynamicName!.dynamic;
+    this.onSave.emit(this.artefact);
+  }
+
   private initArtefactName(artefact?: CallFunction): void {
     this.artefactName = '';
     this._changeDetectorRef.detectChanges();
