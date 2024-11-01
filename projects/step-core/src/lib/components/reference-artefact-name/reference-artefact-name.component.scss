@@ -19,6 +19,7 @@ step-reference-artefact-name {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-block: 2.5rem;
 
     &.reference-meta-error {
       step-icon {
@@ -29,11 +30,26 @@ step-reference-artefact-name {
 
   .main-name {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    flex: 1;
     gap: 1rem;
 
-    step-editable-label {
+    .dynamic-name {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+      align-items: center;
+
+      step-editable-label {
+        flex: 1;
+      }
+    }
+
+    .dynamic-on {
+      align-self: flex-end;
+    }
+
+    step-dynamic-textfield {
       flex: 1;
     }
 
