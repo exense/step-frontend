@@ -103,11 +103,7 @@ export class AdminModule {
           {
             path: '',
             redirectTo: CURRENT_SCREEN_CHOICE_DEFAULT,
-            data: {
-              weight: 100,
-            },
           },
-
           {
             path: ':screenId',
             component: ScreenConfigurationListComponent,
