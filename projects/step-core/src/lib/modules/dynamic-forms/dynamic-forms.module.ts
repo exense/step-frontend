@@ -79,6 +79,5 @@ export * from './components/dynamic-resource/dynamic-resource.component';
 export * from './components/add-field-button/add-field-button.component';
 export * from './components/add-field-schema-button/add-field-schema-button.component';
 export * from './components/dynamic-time-input/dynamic-time-input.component';
-export * from './shared/dynamic-fields-schema';
 export * from './shared/dynamic-field-group-value';
 export * from './services/schemas-factory.service';
