@@ -168,10 +168,10 @@
             >
               {{ item.chartSettings!.primaryAxes.aggregation.type }}
               @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.PERCENTILE) {
-                {{ item.chartSettings!.primaryAxes?.aggregation?.params?.['pclValue'] }}
+                {{ item.chartSettings!.primaryAxes.aggregation.params?.['pclValue'] }}
               }
               @if (item.chartSettings!.primaryAxes.aggregation.type === ChartAggregation.RATE) {
-                (/{{ item.chartSettings!.primaryAxes?.aggregation?.params?.['rateUnit'] }})
+                (/{{ item.chartSettings!.primaryAxes.aggregation.params?.['rateUnit'] }})
               }
             </button>
           </step-form-field>

@@ -14,7 +14,7 @@
               (click)="fixLabelFocus($event)"
               [(ngModel)]="labelModel"
               (blur)="labelChange.emit(labelModel())"
-              [tabindex]="tabIndex"
+              [tabindex]="tabIndex()"
               (focusin)="forceFocus.set(true)"
               (focusout)="forceFocus.set(false)"
             />
@@ -97,7 +97,7 @@
                 (click)="fixLabelFocus($event)"
                 [(ngModel)]="labelModel"
                 (blur)="labelChange.emit(labelModel())"
-                [tabindex]="tabIndex"
+                [tabindex]="tabIndex()"
                 (focusin)="forceFocus.set(true)"
                 (focusout)="forceFocus.set(false)"
               />

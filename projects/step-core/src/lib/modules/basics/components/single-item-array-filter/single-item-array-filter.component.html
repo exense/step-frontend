@@ -12,7 +12,7 @@
       </ngx-mat-select-search>
     </mat-option>
     <mat-option value=""></mat-option>
-    @for (item of dropdownItemsFiltered; track trackByKeyValue) {
+    @for (item of dropdownItemsFiltered; track item.key) {
       <mat-option [value]="item.key">{{ item.value }}</mat-option>
     }
   </mat-select>

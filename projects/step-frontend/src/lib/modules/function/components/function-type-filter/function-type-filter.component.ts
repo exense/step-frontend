@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, forwardRef, inject, TrackByFunction } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, inject } from '@angular/core';
 import { ArrayFilterComponent, BaseFilterComponent, FunctionTypeRegistryService, ItemInfo } from '@exense/step-core';
 import { FormControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,7 +20,6 @@ export class FunctionTypeFilterComponent
   implements AfterViewInit, BaseFilterComponent<string, unknown>
 {
   readonly _functionTypes = inject(FunctionTypeRegistryService).getItemInfos();
-  readonly trackByItemInfo: TrackByFunction<ItemInfo> = (index, item) => item.type;
   filterMultiControl: FormControl<string | null> = new FormControl<string>('');
   functionTypesFiltered: ItemInfo[] = [...this._functionTypes];
 
