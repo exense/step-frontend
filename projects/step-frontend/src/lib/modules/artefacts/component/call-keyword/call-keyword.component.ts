@@ -1,22 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
 import {
-  AbstractArtefact,
   Keyword,
   BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueString,
   DynamicFieldsSchema,
   ArtefactFormChangeHelperService,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-export interface KeywordArtefact extends AbstractArtefact {
-  description: string;
-  argument: DynamicValueString;
-  resultMap: DynamicValueString;
-  remote: DynamicValueBoolean;
-  token: DynamicValueString;
-}
+import { KeywordArtefact } from '../../types/keyword.artefact';
 
 @Component({
   selector: 'step-call-keyword',

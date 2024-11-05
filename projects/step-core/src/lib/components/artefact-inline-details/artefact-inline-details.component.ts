@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedArtefactInfo } from '../../shared';
 import { ArtefactService } from '../../services/artefact.service';
-import { ReportNodeExt } from '../../client/step-client-module';
+import { AbstractArtefact, ReportNode } from '../../client/step-client-module';
 
 @Component({
   selector: 'step-artefact-inline-details',
@@ -11,11 +11,11 @@ import { ReportNodeExt } from '../../client/step-client-module';
     '[class.overflow]': 'overflowContent()',
   },
 })
-export class ArtefactInlineDetailsComponent<T extends AggregatedArtefactInfo> {
+export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
   private _artefactService = inject(ArtefactService);
 
-  readonly aggregatedInfo = input<T | undefined>(undefined);
-  readonly reportInfo = input<ReportNodeExt | undefined>(undefined);
+  readonly aggregatedInfo = input<AggregatedArtefactInfo<A> | undefined>(undefined);
+  readonly reportInfo = input<R | undefined>(undefined);
   readonly isVertical = input(false);
   readonly overflowContent = input(false);
 

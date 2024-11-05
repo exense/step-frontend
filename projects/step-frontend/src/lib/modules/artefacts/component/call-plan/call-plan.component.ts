@@ -1,11 +1,9 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
-  AbstractArtefact,
   ArtefactFormChangeHelperService,
   AugmentedPlansService,
   BaseArtefactComponent,
   DialogsService,
-  DynamicValueString,
   LinkProcessorService,
   Plan,
   PlanDialogsService,
@@ -13,11 +11,7 @@ import {
 import { NgForm } from '@angular/forms';
 import { from, map } from 'rxjs';
 import { Router } from '@angular/router';
-
-interface CallPlanArtefact extends AbstractArtefact {
-  planId?: string;
-  input: DynamicValueString;
-}
+import { CallPlanArtefact } from '../../types/call-plan.artefact';
 
 @Component({
   selector: 'step-call-plan',

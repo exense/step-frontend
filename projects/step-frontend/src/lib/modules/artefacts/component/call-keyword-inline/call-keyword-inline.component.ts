@@ -4,22 +4,18 @@ import {
   ArtefactInlineItem,
   BaseInlineArtefactComponent,
   DynamicValueString,
-  ReportNodeExt,
 } from '@exense/step-core';
-import { KeywordArtefact } from '../call-keyword/call-keyword.component';
 import { Observable, of } from 'rxjs';
-
-interface CallKeywordReportView extends AggregatedArtefactInfo {
-  originalArtefact: KeywordArtefact;
-}
+import { KeywordArtefact } from '../../types/keyword.artefact';
+import { KeywordReportNode } from '../../types/keyword.report-node';
 
 @Component({
   selector: 'step-call-keyword-inline',
   templateUrl: './call-keyword-inline.component.html',
   styleUrl: './call-keyword-inline.component.scss',
 })
-export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<CallKeywordReportView> {
-  protected getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<KeywordArtefact, KeywordReportNode> {
+  protected getReportNodeItems(info?: KeywordReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
     let inputParams: Record<string, string> | undefined;
     let outputParams: Record<string, string> | undefined;
     try {
@@ -33,42 +29,27 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Call
       outputParams = undefined;
     }
 
-    const result: ArtefactInlineItem[] = [];
+    const items: [string, string | undefined][] = [];
+
     if (inputParams) {
       if (isVertical) {
-        result.push({ label: 'Inputs' });
+        items.push(['Inputs', undefined]);
       }
-      Object.entries(inputParams).forEach(([key, value]) => {
-        result.push({
-          label: key,
-          value: {
-            value,
-            dynamic: false,
-          },
-          isResolved: true,
-        });
-      });
+      const inputs: [string, string | undefined][] = Object.entries(inputParams).map(([key, value]) => [key, value]);
+      items.push(...inputs);
     }
     if (outputParams) {
       if (isVertical) {
-        result.push({ label: 'Outputs' });
+        items.push(['Outputs', undefined]);
       }
-      Object.entries(outputParams).forEach(([key, value]) => {
-        result.push({
-          label: key,
-          value: {
-            value,
-            dynamic: false,
-          },
-          isResolved: true,
-        });
-      });
+      const outputs: [string, string | undefined][] = Object.entries(outputParams).map(([key, value]) => [key, value]);
+      items.push(...outputs);
     }
-    return result;
+    return this.convert(items);
   }
 
   protected getArtefactItems(
-    info?: CallKeywordReportView,
+    info?: AggregatedArtefactInfo<KeywordArtefact>,
     isVertical: boolean = false,
     isResolved: boolean = false,
   ): Observable<ArtefactInlineItem[] | undefined> {
@@ -81,23 +62,15 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Call
     if (!keywordInputs) {
       return of(undefined);
     }
-    const inputs = Object.entries(keywordInputs).map(
-      ([label, value]) =>
-        ({
-          label,
-          value,
-          isResolved,
-        }) as ArtefactInlineItem,
-    );
+    const inputs: [string, DynamicValueString | undefined][] = Object.entries(keywordInputs).map(([label, value]) => [
+      label,
+      value,
+    ]);
 
-    if (!isVertical) {
-      return of(!inputs.length ? undefined : inputs);
+    if (isVertical && inputs.length) {
+      inputs.unshift(['Inputs', undefined]);
     }
 
-    if (inputs.length) {
-      inputs.unshift({ label: 'Inputs' });
-    }
-
-    return of(inputs);
+    return of(this.convert(inputs, isResolved));
   }
 }

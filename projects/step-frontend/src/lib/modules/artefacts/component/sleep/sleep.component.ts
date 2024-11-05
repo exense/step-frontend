@@ -3,19 +3,12 @@ import {
   AlertType,
   ArtefactFormChangeHelperService,
   BaseArtefactComponent,
-  DynamicValueInteger,
-  DynamicValueString,
   TimeConvertersFactoryService,
   TimeUnit,
-  WaitingArtefactsAdvancedArtefact,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-
-export interface SleepArtefact extends WaitingArtefactsAdvancedArtefact {
-  duration: DynamicValueInteger;
-  unit: DynamicValueString;
-}
+import { SleepArtefact } from '../../types/sleep.artefact';
 
 export const TIME_UNIT_DICTIONARY = {
   ms: TimeUnit.MILLISECOND,

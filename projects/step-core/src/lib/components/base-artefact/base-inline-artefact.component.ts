@@ -5,19 +5,27 @@ import { AggregatedArtefactInfo } from '../../shared';
 import { Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
-import { ReportNodeExt } from '../../client/step-client-module';
+import {
+  AbstractArtefact,
+  DynamicValueBoolean,
+  DynamicValueInteger,
+  DynamicValueString,
+  ReportNode,
+} from '../../client/step-client-module';
 
-export interface InlineArtefactContext<A extends AggregatedArtefactInfo> {
-  aggregatedInfo?: A;
-  reportInfo?: ReportNodeExt;
+export interface InlineArtefactContext<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
+  aggregatedInfo?: AggregatedArtefactInfo<A>;
+  reportInfo?: R;
   isVertical?: boolean;
 }
 
 @Component({
   template: '',
 })
-export abstract class BaseInlineArtefactComponent<A extends AggregatedArtefactInfo> implements CustomComponent {
-  private contextInternal = signal<InlineArtefactContext<A> | undefined>(undefined);
+export abstract class BaseInlineArtefactComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode>
+  implements CustomComponent
+{
+  private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
   protected info = computed(() => this.contextInternal()?.aggregatedInfo);
   protected isVertical = computed(() => !!this.contextInternal()?.isVertical);
 
@@ -38,7 +46,7 @@ export abstract class BaseInlineArtefactComponent<A extends AggregatedArtefactIn
     const ctx = this.contextInternal();
     const reportInfo = ctx?.reportInfo;
     const isVertical = ctx?.isVertical;
-    if (!reportInfo) {
+    if (!reportInfo || !this.getReportNodeItems) {
       return undefined;
     }
     return this.getReportNodeItems(reportInfo, isVertical);
@@ -50,21 +58,21 @@ export abstract class BaseInlineArtefactComponent<A extends AggregatedArtefactIn
     return aggregated ?? report;
   });
 
-  context?: InlineArtefactContext<A>;
+  context?: InlineArtefactContext<A, R>;
 
-  contextChange(previousContext?: InlineArtefactContext<A>, currentContext?: InlineArtefactContext<A>) {
+  contextChange(previousContext?: InlineArtefactContext<A, R>, currentContext?: InlineArtefactContext<A, R>) {
     this.contextInternal.set(currentContext);
   }
 
-  protected abstract getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined;
+  protected abstract getReportNodeItems?(info?: R, isVertical?: boolean): ArtefactInlineItem[] | undefined;
 
   protected abstract getArtefactItems(
-    info?: A,
+    info?: AggregatedArtefactInfo<A>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[] | undefined>;
 
-  private isResolved(info?: A): boolean {
+  private isResolved(info?: AggregatedArtefactInfo<A>): boolean {
     if (!info) {
       return false;
     }
@@ -75,5 +83,32 @@ export abstract class BaseInlineArtefactComponent<A extends AggregatedArtefactIn
     }
 
     return true;
+  }
+
+  protected convert(
+    items: [
+      string,
+      string | number | boolean | DynamicValueString | DynamicValueInteger | DynamicValueBoolean | undefined,
+    ][],
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] {
+    return items.map(([label, value]) => {
+      const valueType = typeof value;
+      if (valueType === 'string' || valueType === 'number' || valueType === 'boolean' || valueType === 'undefined') {
+        return {
+          label,
+          value: {
+            value: value as string | number | boolean,
+            dynamic: false,
+          },
+          isResolved: true,
+        };
+      }
+      return {
+        label,
+        value: value as DynamicValueString | DynamicValueInteger | DynamicValueBoolean,
+        isResolved,
+      };
+    });
   }
 }

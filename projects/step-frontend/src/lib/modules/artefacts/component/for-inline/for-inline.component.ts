@@ -1,49 +1,37 @@
 import { Component } from '@angular/core';
-import {
-  AggregatedArtefactInfo,
-  ArtefactInlineItem,
-  BaseInlineArtefactComponent,
-  ReportNodeExt,
-} from '@exense/step-core';
-import { ForArtefact } from '../for/for.component';
+import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
 import { Observable, of } from 'rxjs';
-
-export interface ForReportView extends AggregatedArtefactInfo {
-  originalArtefact: ForArtefact;
-}
+import { ForArtefact } from '../../types/for.artefact';
+import { ForReportNode } from '../../types/for.report-node';
 
 @Component({
   selector: 'step-for-inline',
   templateUrl: './for-inline.component.html',
   styleUrl: './for-inline.component.scss',
 })
-export class ForInlineComponent extends BaseInlineArtefactComponent<ForReportView> {
-  protected getReportNodeItems(info?: ReportNodeExt, isVertical?: boolean): ArtefactInlineItem[] | undefined {
-    return undefined;
+export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact, ForReportNode> {
+  protected getReportNodeItems(info?: ForReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+    return this.convert([
+      ['Count', info?.count],
+      ['Error Count', info?.errorCount],
+    ]);
   }
 
   protected getArtefactItems(
-    info?: ForReportView,
+    info?: AggregatedArtefactInfo<ForArtefact>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[]> {
     const dataSource = info?.originalArtefact?.dataSource;
-    return of([
-      {
-        label: 'Start',
-        value: dataSource?.start,
+    return of(
+      this.convert(
+        [
+          ['Start', dataSource?.start],
+          ['End', dataSource?.end],
+          ['Increment', dataSource?.inc],
+        ],
         isResolved,
-      },
-      {
-        label: 'End',
-        value: dataSource?.end,
-        isResolved,
-      },
-      {
-        label: 'Increment',
-        value: dataSource?.inc,
-        isResolved,
-      },
-    ]);
+      ),
+    );
   }
 }
