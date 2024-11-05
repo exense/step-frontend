@@ -2,7 +2,7 @@ import { Component, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { map } from 'rxjs';
-import { DataSourceType } from '../../shared/data-source-type.enum';
+import { DataSourceType } from '../../types/data-source-type.enum';
 import {
   AceMode,
   ArtefactContext,
@@ -10,8 +10,8 @@ import {
   BaseArtefactComponent,
   PrivateDataPoolPluginService,
 } from '@exense/step-core';
-import { DataSourceConfigurationArtefact } from '../../shared/data-source-configuration-artefact';
-import { DataSourceConf } from '../../shared/data-source-conf';
+import { DataSourceConfigurationArtefact } from '../../types/data-source-configuration-artefact';
+import { DataSourceConf } from '../../types/data-source-conf';
 
 type DataSourceTypeItem = KeyValue<DataSourceType, string>;
 

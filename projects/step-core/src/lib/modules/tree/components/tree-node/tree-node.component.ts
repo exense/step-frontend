@@ -2,6 +2,7 @@ import { Component, computed, EventEmitter, inject, input, Input, Output, ViewEn
 import { TreeNode } from '../../shared/tree-node';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
+import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 
 const ICON_EXPANDED = 'chevron-down';
 const ICON_COLLAPSED = 'chevron-right';
@@ -14,8 +15,9 @@ const ICON_COLLAPSED = 'chevron-right';
 })
 export class TreeNodeComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
+  protected readonly _treeNodeTemplateContainer = inject(TreeNodeTemplateContainerService);
 
-  node = input.required<TreeFlatNode>();
+  readonly node = input.required<TreeFlatNode>();
   readonly isRootNode = computed(() => this.node().id === this._treeState.rootNodeId());
   readonly isSelected = computed(() => this._treeState.selectedNodeIds().includes(this.node().id));
   readonly isExpanded = computed(() => this._treeState.expandedNodeIds().includes(this.node().id));

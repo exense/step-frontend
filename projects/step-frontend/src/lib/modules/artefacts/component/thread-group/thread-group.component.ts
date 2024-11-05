@@ -1,28 +1,13 @@
 import { Component, inject, ViewChild } from '@angular/core';
 import {
-  AbstractArtefact,
   ArtefactFormChangeHelperService,
-  DynamicValueInteger,
-  DynamicValueString,
   BaseArtefactComponent,
   TimeUnit,
   ThreadDistributionWizardDialogComponent,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-
-interface ThreadGroupArtefact extends AbstractArtefact {
-  users: DynamicValueInteger;
-  pacing: DynamicValueInteger;
-  rampup: DynamicValueInteger;
-  pack: DynamicValueInteger;
-  startOffset: DynamicValueInteger;
-  iterations: DynamicValueInteger;
-  maxDuration: DynamicValueInteger;
-  localItem: DynamicValueString;
-  userItem: DynamicValueString;
-  item: DynamicValueString;
-}
+import { ThreadGroupArtefact } from '../../types/thread-group.artefact';
 
 @Component({
   selector: 'step-thread-group',
