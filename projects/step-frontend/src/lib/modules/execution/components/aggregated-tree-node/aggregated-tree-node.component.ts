@@ -12,10 +12,32 @@ export class AggregatedTreeNodeComponent {
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
-  nodeId = input.required<string>();
+  readonly nodeId = input.required<string>();
 
-  node = computed(() => {
+  protected node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
   });
+
+  protected isHideInlineInfo = computed(() => {
+    const nodeId = this.nodeId();
+    const visibleInfos = this._treeState.visibleInfos();
+    return !!visibleInfos[nodeId];
+  });
+
+  protected toggleInfo(): void {
+    const node = this.node();
+    if (!node) {
+      return;
+    }
+    this._treeState.toggleInfo(node);
+  }
+
+  protected showAggregatedDetails(): void {
+    const node = this.node();
+    if (!node) {
+      return;
+    }
+    this._treeState.showAggregatedDetails(node);
+  }
 }

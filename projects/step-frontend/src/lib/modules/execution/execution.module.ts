@@ -77,6 +77,11 @@ import { ExecutionActionsExecuteContentDirective } from './directives/execution-
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
+import { AltKeywordInlineDrilldownComponent } from './components/alt-keyword-inline-drilldown/alt-keyword-inline-drilldown.component';
+import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree-node-details/aggregated-tree-node-details.component';
+import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
+import { ArtefactsModule } from '../artefacts/artefacts.module';
+import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 
 @NgModule({
   declarations: [
@@ -123,6 +128,7 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     AltReportCurrentOperationsComponent,
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
+    AltReportWidgetSortDirective,
     AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -130,14 +136,17 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     AltKeywordDrilldownComponent,
     AltExecutionRangePickerComponent,
     AltExecutionRangePrintComponent,
+    AltKeywordInlineDrilldownComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
+    AggregatedTreeNodeDetailsComponent,
+    AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule],
+  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
@@ -158,6 +167,8 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
+    AltKeywordInlineDrilldownComponent,
+    AggregatedTreeNodeInfoComponent,
   ],
 })
 export class ExecutionModule {

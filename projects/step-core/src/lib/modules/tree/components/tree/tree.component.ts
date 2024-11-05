@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  contentChild,
   ContentChild,
   DestroyRef,
   effect,
@@ -29,6 +30,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
 import { TreeFocusStateService } from '../../services/tree-focus-state.service';
 import { DOCUMENT } from '@angular/common';
+import { TreeNodeDetailsTemplateDirective } from '../../directives/tree-node-details-template.directive';
 
 @Component({
   selector: 'step-tree',
@@ -60,7 +62,8 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   @ViewChild('nodeContextMenuTrigger', { static: true, read: MatMenuTrigger }) contextMenuTrigger!: MatMenuTrigger;
 
-  @ContentChild(TreeNodeTemplateDirective) readonly treeNodeTemplate?: TreeNodeTemplateDirective;
+  readonly treeNodeTemplate = contentChild(TreeNodeTemplateDirective);
+  readonly treeNodeDetailsTemplate = contentChild(TreeNodeDetailsTemplateDirective);
 
   @Input() dragDisabled: boolean = false;
 
