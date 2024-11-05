@@ -1,10 +1,10 @@
 <section>
-  <h4>Every</h4>
+  <h4 data-step-testid>Every</h4>
   <step-day-of-week-selector [ngModel]="selectedDays" (ngModelChange)="handleSelectedDayChange($event)">
   </step-day-of-week-selector>
 </section>
 <section>
-  <h4>On</h4>
+  <h4 data-step-testid>On</h4>
   <div class="editor-content">
     <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)">
       <mat-option [value]="0">00</mat-option>
