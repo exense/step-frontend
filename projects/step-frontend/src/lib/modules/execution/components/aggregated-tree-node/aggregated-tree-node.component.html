@@ -1,31 +1,16 @@
 @if (node(); as node) {
-  <div class="keyword">
-    <span>{{ node?.name }}</span>
-    <step-aggregated-tree-status [node]="node" />
-    <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
-    <step-artefact-inline-details [info]="node" />
-  </div>
-  <!--
   @switch (node.nodeType) {
-    @case (AggregateTreeNodeType.KEYWORD) {
-      <div class="keyword">
-        <span>{{ node?.name }}</span>
-        <step-aggregated-tree-status [node]="node" />
+    @case (AggregateTreeNodeType.AGGREGATED_INFO) {
+      <div class="aggregated-info">
+        <step-icon [name]="isHideInlineInfo() ? 'chevron-down' : 'chevron-right'" (click)="toggleInfo()" />
+        <span (click)="toggleInfo()">{{ node?.name }}</span>
+        <step-aggregated-tree-status [node]="node" (click)="showAggregatedDetails()" />
         <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
+        @if (!isHideInlineInfo()) {
+          <step-artefact-inline-details [aggregatedInfo]="node" />
+        }
       </div>
     }
-    @case (AggregateTreeNodeType.DETAILS_NODE) {
-      <span>{{ node?.name }}</span>
-    }
-    @case (AggregateTreeNodeType.DETAILS_DATA) {
-      <section class="artefact-container">
-        <mat-card>
-          <mat-card-content>
-            <step-artefact-details [artefact]="node.originalArtefact" [readonly]="true" />
-          </mat-card-content>
-        </mat-card>
-      </section>
-    }
+    @default {}
   }
--->
 }

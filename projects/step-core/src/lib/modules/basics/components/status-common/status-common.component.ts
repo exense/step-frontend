@@ -9,10 +9,19 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
 })
 export class StatusCommonComponent {
   /** @Input() **/
-  status = input<string | undefined>(undefined);
+  readonly status = input<string | undefined>(undefined);
 
   /** @Input() **/
-  classPrefix = input<string>('step');
+  readonly classPrefix = input<string>('step');
 
-  readonly className = computed(() => `${this.classPrefix()}-${this.status()}`);
+  /** @Input() **/
+  readonly iconMode = input(false);
+
+  protected readonly className = computed(() => {
+    const prefix = this.classPrefix();
+    const iconMode = this.iconMode();
+    const status = this.status();
+
+    return [prefix, iconMode ? 'icon' : '', status].filter((part) => !!part).join('-');
+  });
 }

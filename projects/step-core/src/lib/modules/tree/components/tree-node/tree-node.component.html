@@ -29,3 +29,10 @@
     </div>
   }
 </div>
+@if (_treeNodeTemplateContainer.treeNodeDetailsTemplate(); as detailsTemplate) {
+  @if (node(); as n) {
+    <div class="tree-node-details">
+      <ng-container *ngTemplateOutlet="detailsTemplate.templateRef; context: { $implicit: n }" />
+    </div>
+  }
+}

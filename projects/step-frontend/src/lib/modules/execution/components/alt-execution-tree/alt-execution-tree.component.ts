@@ -15,7 +15,8 @@ export class AltExecutionTreeComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
 
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  readonly artefact = computed(() => this._treeState.selectedNode()?.originalArtefact);
+  protected readonly aggregatedNode = this._treeState.displayedAggregatedDetailsNode;
+  protected readonly artefact = computed(() => this.aggregatedNode()?.originalArtefact);
 
   ngOnInit(): void {
     this._activatedRoute.queryParams
@@ -23,9 +24,11 @@ export class AltExecutionTreeComponent implements OnInit {
         map((params) => params['artefactId']),
         filter((artefactId) => !!artefactId),
         takeUntilDestroyed(this._destroyRef),
-        map((artefactId) => `details_data_${artefactId}`),
-        switchMap((nodeId) => this._treeState.expandNode(nodeId)),
+        switchMap((nodeId) => {
+          return this._treeState.expandNode(nodeId).pipe(map((isExpanded) => (isExpanded ? nodeId : undefined)));
+        }),
+        filter((nodeId) => !!nodeId),
       )
-      .subscribe();
+      .subscribe((nodeId) => this._treeState.showAggregatedDetails(nodeId));
   }
 }

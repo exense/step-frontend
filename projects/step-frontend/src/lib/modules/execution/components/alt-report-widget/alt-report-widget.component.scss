@@ -12,8 +12,15 @@ step-alt-report-widget {
     gap: 1rem;
   }
 
-  mat-card-title {
+  mat-card-title.mat-mdc-card-title {
     white-space: nowrap;
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+  }
+
+  step-alt-report-widget-sort {
+    font-size: 1.4rem;
   }
 
   step-alt-report-widget-filter {

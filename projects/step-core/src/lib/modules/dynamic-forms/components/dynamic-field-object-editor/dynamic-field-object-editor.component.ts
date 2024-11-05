@@ -14,13 +14,17 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
 import { DynamicValueString } from '../../../../client/generated';
 import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
-import { DynamicFieldMetaData } from '../../shared/dynamic-field-meta-data';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
-import { DynamicFieldsSchema, SchemaField, SchemaObjectField } from '../../shared/dynamic-fields-schema';
 import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
-import { DynamicFieldUtilsService } from '../../services/dynamic-field-utils.service';
-import { JsonFieldType } from '../../../json-forms';
+import {
+  JsonFieldMetaData,
+  SchemaField,
+  JsonFieldsSchema,
+  JsonFieldType,
+  JsonFieldUtilsService,
+  SchemaObjectField,
+} from '../../../json-forms';
 
 const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
 
@@ -31,7 +35,7 @@ const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: fal
 })
 export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
   private _fb = inject(FormBuilder);
-  private _utils = inject(DynamicFieldUtilsService);
+  private _utils = inject(JsonFieldUtilsService);
   private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
@@ -55,8 +59,8 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
 
   @Input() isChildNode = false;
 
-  protected primaryFields: DynamicFieldMetaData[] = [];
-  protected optionalFields: DynamicFieldMetaData[] = [];
+  protected primaryFields: JsonFieldMetaData<DynamicValue>[] = [];
+  protected optionalFields: JsonFieldMetaData<DynamicValue>[] = [];
   protected form = this.formBuilder.group({});
   protected possibleFieldsToAdd: string[] = [];
 
@@ -66,7 +70,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     let schemeChanged = false;
-    let schema: DynamicFieldsSchema | undefined = undefined;
+    let schema: SchemaObjectField | undefined = undefined;
     let value: DynamicFieldObjectValue | undefined = undefined;
 
     const cSchema = changes['schema'];
@@ -87,7 +91,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
 
     if (schemeChanged) {
       this.buildForm(schema, value);
-    } else if (value && !this._utils.areDynamicFieldObjectsEqual(value, this.lastFormValue)) {
+    } else if (value && !this.areDynamicFieldObjectsEqual(value, this.lastFormValue)) {
       this.assignValueToForm(value);
     }
 
@@ -97,7 +101,18 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  protected updateLabel(field: DynamicFieldMetaData, label?: string): void {
+  private areDynamicFieldObjectsEqual(objectA?: DynamicFieldObjectValue, objectB?: DynamicFieldObjectValue): boolean {
+    return this._utils.areObjectsEqual(objectA, objectB, (valueA, valueB) => {
+      return !(
+        valueA?.dynamic !== valueB?.dynamic ||
+        valueA?.value !== valueB?.value ||
+        valueA?.expression !== valueB?.expression ||
+        valueA?.expressionType !== valueB?.expressionType
+      );
+    });
+  }
+
+  protected updateLabel(field: JsonFieldMetaData<DynamicValue>, label?: string): void {
     if (field.label === label) {
       return;
     }
@@ -118,7 +133,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     this.addFieldInternal(this.schema, fieldName || '', this.value, { isAdditional });
   }
 
-  protected removeField(field: DynamicFieldMetaData): void {
+  protected removeField(field: JsonFieldMetaData<DynamicValue>): void {
     const fields = field.isRequired ? this.primaryFields : this.optionalFields;
     const index = fields.indexOf(field);
     if (index < 0) {
@@ -139,7 +154,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     controlNames.forEach((controlName) => this.form.removeControl(controlName));
   }
 
-  private buildForm(schema?: DynamicFieldsSchema, value?: DynamicFieldObjectValue): void {
+  private buildForm(schema?: JsonFieldsSchema, value?: DynamicFieldObjectValue): void {
     schema = schema || this.schema;
     value = value || this.value;
     this.schemaJson = schema ? JSON.stringify(schema) : '';
@@ -206,7 +221,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     });
 
     // add/remove optional inputs
-    const fieldsToRemove: DynamicFieldMetaData[] = [];
+    const fieldsToRemove: JsonFieldMetaData<DynamicValue>[] = [];
     this.optionalFields.forEach((field) => {
       const fieldValue = value[field.key];
       fieldValue ? field.control.setValue(fieldValue) : fieldsToRemove.push(field);
@@ -233,7 +248,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
   }
 
   private addFieldInternal(
-    schema: DynamicFieldsSchema | undefined,
+    schema: JsonFieldsSchema | undefined,
     field: string,
     value: DynamicFieldObjectValue = {},
     config?: { isRequired?: boolean; isAdditional?: boolean },
@@ -274,7 +289,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
     const control = this.formBuilder.control<DynamicValue>(fieldValue, validator);
 
-    const meta: DynamicFieldMetaData = {
+    const meta: JsonFieldMetaData<DynamicValue> = {
       trackId: `track_${v4()}`,
       key: isAdditional && !field ? this.createTemporaryKey() : field,
       label: field,
@@ -310,5 +325,5 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
     }
   }
 
-  protected readonly DynamicFieldType = JsonFieldType;
+  protected readonly JsonFieldType = JsonFieldType;
 }
