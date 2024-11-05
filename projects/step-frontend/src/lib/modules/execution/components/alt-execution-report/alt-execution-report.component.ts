@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -30,7 +31,9 @@ export class AltExecutionReportComponent {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
   readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
-  readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
+  readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$.pipe(
+    map((summary) => (summary.total === 0 ? undefined : summary)),
+  );
 
   readonly _mode = inject(VIEW_MODE);
 

@@ -12,8 +12,13 @@ step-alt-execution-tree {
     background: transparent !important;
   }
 
-  .tree-container {
+  .tree-panel {
     overflow: auto !important;
+    padding-right: 1rem;
+  }
+
+  .node-details-panel {
+    padding-left: 1rem;
   }
 
   step-report-node-short {

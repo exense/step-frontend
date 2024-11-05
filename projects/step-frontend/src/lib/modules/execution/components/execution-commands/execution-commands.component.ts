@@ -26,6 +26,7 @@ import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { from, map, Observable, of, switchMap } from 'rxjs';
+import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 
 @Component({
   selector: 'step-execution-commands',
@@ -50,6 +51,7 @@ export class ExecutionCommandsComponent implements OnInit, OnChanges {
   @Input() includedTestcases?: IncludeTestcases | null;
   @Input() execution?: Execution;
   @Input() displayParametersForm = true;
+  @Input() tooltips?: ExecutionActionsTooltips;
 
   @Output() refresh = new EventEmitter<void>();
   @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
