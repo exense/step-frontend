@@ -8,7 +8,7 @@
     }
   }
   @if (keywordsSummary$ | async; as keywordsSummary) {
-    <step-alt-report-node-summary title="Summary: Steps" [summary]="keywordsSummary" />
+    <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
   }
   @if (_mode === ViewMode.VIEW) {
     <step-alt-report-node-keywords
