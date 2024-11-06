@@ -32,6 +32,7 @@ import {
   TimeRange,
   TreeNodeUtilsService,
   TreeStateService,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -129,6 +130,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     execute: 'Relaunch execution with same parameters',
     schedule: 'Schedule for cyclical execution',
   };
+
+  protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
 

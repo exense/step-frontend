@@ -124,9 +124,15 @@ step-alt-execution-progress {
     }
 
     .plan-link,
+    .execution-message,
     .simulate-icon {
       display: none;
     }
+  }
+
+  .execution-message {
+    display: block;
+    margin-bottom: 2em;
   }
 }
 

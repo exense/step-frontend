@@ -68,6 +68,11 @@
   </div>
 </section>
 <section class="main">
+  @if (execution$ | async; as execution) {
+    @for (messages of _executionMessages; track messages.id) {
+      <step-dashlet [itemKey]="messages.template" [context]="execution" class="execution-message" />
+    }
+  }
   <step-alt-execution-tabs />
   @if (execution$ | async; as execution) {
     <step-alt-report-widget class="print-execution-details">
