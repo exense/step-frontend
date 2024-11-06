@@ -26,18 +26,17 @@ export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
 
-  readonly _state = inject(AltExecutionStateService);
+  protected readonly _state = inject(AltExecutionStateService);
 
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
-  readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$.pipe(
-    map((summary) => (summary.total === 0 ? undefined : summary)),
-  );
+  protected readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
+  protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
-  readonly _mode = inject(VIEW_MODE);
+  protected readonly _mode = inject(VIEW_MODE);
 
-  handleOpenKeywordInTreeView(keyword: ReportNode): void {
+  protected handleOpenKeywordInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
@@ -45,7 +44,7 @@ export class AltExecutionReportComponent {
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
   }
 
-  handleOpenKeywordDrilldown(keyword: ReportNode): void {
+  protected handleOpenKeywordDrilldown(keyword: ReportNode): void {
     const id = keyword.id;
     if (!id) {
       return;
