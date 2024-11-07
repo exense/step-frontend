@@ -1,7 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
-// step-tree.in-focus,
 step-tree-node .tree-node.tree-node-selected step-tree-node-name {
   background: var.$gray-100;
 }
