@@ -53,10 +53,11 @@ export abstract class AltReportNodesStateService implements OnDestroy {
 
   readonly listInProgress$: Observable<boolean>;
 
-  readonly summary$ = this._executionState.executionId$.pipe(
+  readonly summary$ = this._executionState.execution$.pipe(
+    map((execution) => execution?.id),
     filter((executionId) => !!executionId),
     tap(() => this.summaryInProgressInternal$.next(true)),
-    switchMap((executionId) => this._viewService.getView(this.summaryView, executionId)),
+    switchMap((executionId) => this._viewService.getView(this.summaryView, executionId!)),
     map((view) => (view as ExecutionSummaryDto).distribution),
     map((distribution) =>
       Object.values(distribution).reduce(

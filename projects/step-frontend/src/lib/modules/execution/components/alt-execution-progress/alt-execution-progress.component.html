@@ -2,7 +2,7 @@
   <div class="title">
     @if (execution$ | async; as execution) {
       <h3>
-        {{ execution?.description }}
+        <div>{{ execution?.description }}</div>
         @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
           <a
             class="plan-link"
@@ -40,24 +40,28 @@
     }
   </div>
   <div class="controls">
-    @if (execution$ | async; as execution) {
-      <step-execution-commands
-        [displayParametersForm]="false"
-        [description]="execution.description"
-        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-        [execution]="execution"
-        (refresh)="manualRefresh()"
-        (scheduleTask)="handleTaskSchedule($event)"
-      />
-    }
-    <step-btn-group class="without-borders">
+    <step-btn-group class="with-round-borders">
+      <div class="controls-marker">
+        <step-icon name="play" />
+      </div>
+      @if (execution$ | async; as execution) {
+        <step-execution-commands
+          [displayParametersForm]="false"
+          [description]="execution.description"
+          [tooltips]="executionTooltips"
+          [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+          [execution]="execution"
+          (refresh)="manualRefresh()"
+          (scheduleTask)="handleTaskSchedule($event)"
+        />
+      }
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
           <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
         }
       }
-      <router-outlet name="controls" />
     </step-btn-group>
+    <router-outlet name="controls" />
   </div>
   <div class="range-picker">
     <router-outlet name="rangePicker" />

@@ -5,6 +5,7 @@
   <step-execution-actions
     [execution]="execution"
     [isExecutionIsolated]="isExecutionIsolated"
+    [tooltips]="tooltips"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
@@ -16,6 +17,7 @@
     [execution]="execution"
     [isExecutionIsolated]="isExecutionIsolated"
     [allowExecuteWithContent]="!!executionParameters"
+    [tooltips]="tooltips"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
