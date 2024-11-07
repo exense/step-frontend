@@ -5,6 +5,7 @@
   width: 100%;
   margin: 1em;
   padding: 1em;
+  align-items: flex-start;
 
   .title {
     display: flex;
@@ -27,6 +28,7 @@
         text-align: center;
       }
     }
+
   }
 
   .range-picker {

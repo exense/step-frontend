@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
   AugmentedSchedulerService,
@@ -223,7 +224,7 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     });
   }
 
-  private getDefaultRangeForTask(execution: Execution): DateRange {
+  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
     let start: DateTime;
     let end: DateTime;
 
@@ -238,7 +239,7 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     return { start, end };
   }
 
-  private applyDefaultRange(execution: Execution): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForTask(execution));
+  private applyDefaultRange(execution: Execution, useStorage = false): void {
+    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
   }
 }
