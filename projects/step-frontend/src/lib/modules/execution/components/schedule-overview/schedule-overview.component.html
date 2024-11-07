@@ -1,0 +1,37 @@
+<section class="header">
+  @if (task$ | async; as task) {
+    <div class="title">
+      <entity-icon entityName="tasks" [entity]="task"></entity-icon>
+      <h1>{{ task.attributes?.['name'] }}</h1>
+    </div>
+  }
+  <div class="range-picker">
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="calendar" (click)="picker.open()" />
+      </step-prefix>
+      <input
+        type="text"
+        placeholder="From - To"
+        [formControl]="dateRangeCtrl"
+        [stepDateRangePicker]="picker"
+        [showRelativeTime]="true"
+        (relativeOptionChange)="updateRelativeTime($event)"
+        [matTooltip]="rangePicker.formattedValue()"
+        matTooltipPosition="before"
+        #rangePicker="DateRangePicker"
+      />
+      <ng-container *ngIf="!(isFullRangeSelected$ | async)">
+        <step-suffix class="icon-suffix">
+          <step-icon name="alert-circle" class="full-range-warn" matTooltip="Not full range is selected" />
+        </step-suffix>
+      </ng-container>
+    </step-form-field>
+    <step-date-picker #picker></step-date-picker>
+  </div>
+</section>
+<section class="body">
+  @if (summary$ | async; as summary) {
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
+  }
+</section>

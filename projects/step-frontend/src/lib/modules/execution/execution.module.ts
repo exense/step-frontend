@@ -46,6 +46,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -110,6 +111,7 @@ import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -296,6 +298,10 @@ export class ExecutionModule {
         {
           path: 'list',
           component: ExecutionListComponent,
+        },
+        {
+          path: 'schedules/:id',
+          component: ScheduleOverviewComponent,
         },
         {
           path: ':id',

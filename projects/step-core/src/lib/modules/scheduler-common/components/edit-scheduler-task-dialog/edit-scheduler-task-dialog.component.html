@@ -46,9 +46,7 @@
             <step-popover-content>
               <span>
                 The CRON expression when to cyclical execute a plan (see
-                <a href="https://step.exense.ch/knowledgebase/userdocs/executions/#schedule" target="_blank"
-                  >knowledgebase</a
-                >
+                <a href="https://step.dev/knowledgebase/userdocs/executions/#schedule" target="_blank">documentation</a>
                 )
               </span>
             </step-popover-content>
@@ -146,6 +144,11 @@
             />
           </section>
         </mat-expansion-panel>
+      }
+      @if (!isNew()) {
+        <section>
+          <a [routerLink]="'/alt-executions/schedules/' + task.id">Open cross-execution dashboard</a>
+        </section>
       }
     </form>
   </div>
