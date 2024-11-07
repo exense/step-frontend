@@ -5,7 +5,8 @@
       mat-icon-button
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
-      matTooltip="Simulate execution"
+      [matTooltip]="tooltips().simulate"
+      matTooltipPosition="below"
       (click)="execute.emit(true)"
     >
       <step-icon name="check-circle" aria-hidden="true" />
@@ -15,7 +16,8 @@
       mat-icon-button
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
-      matTooltip="New execution"
+      [matTooltip]="tooltips().execute"
+      matTooltipPosition="below"
       (click)="execute.emit(false)"
     >
       <step-icon name="play-circle" aria-hidden="true" />
@@ -26,7 +28,8 @@
         mat-icon-button
         [disabled]="!('plan-execute' | hasRight | async)"
         aria-label="Left Align"
-        matTooltip="New execution with parameters"
+        [matTooltip]="tooltips().executeWithParams"
+        matTooltipPosition="below"
         [matMenuTriggerFor]="executionContent"
       >
         <step-icon name="plus-circle" aria-hidden="true" />
@@ -47,7 +50,8 @@
       mat-icon-button
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
-      matTooltip="Schedule"
+      [matTooltip]="tooltips().schedule"
+      matTooltipPosition="below"
       (click)="schedule.emit()"
     >
       <step-icon name="clock" aria-hidden="true" />
@@ -58,7 +62,8 @@
           type="button"
           mat-icon-button
           aria-label="Left Align"
-          matTooltip="Stop"
+          [matTooltip]="tooltips().stop"
+          matTooltipPosition="below"
           [disabled]="!('plan-execute' | hasRight | async)"
           (click)="stop.emit()"
         >
@@ -71,7 +76,8 @@
           mat-icon-button
           class="warning"
           aria-label="Left Align"
-          matTooltip="Force stop"
+          [matTooltip]="tooltips().forceStop"
+          matTooltipPosition="below"
           [disabled]="!('plan-execute' | hasRight | async)"
           (click)="forceStop.emit()"
         >
@@ -85,7 +91,8 @@
     mat-icon-button
     aria-label="Left Align"
     [disabled]="!('plan-execute' | hasRight | async)"
-    matTooltip="Copy start request as curl command to clipboard"
+    [matTooltip]="tooltips().link"
+    matTooltipPosition="below"
     (click)="copyLink.emit()"
   >
     <step-icon name="link" aria-hidden="true" />

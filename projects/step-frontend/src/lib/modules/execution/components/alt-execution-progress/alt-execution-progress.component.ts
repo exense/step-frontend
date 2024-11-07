@@ -49,6 +49,7 @@ import { AltExecutionReportPrintService } from '../../services/alt-execution-rep
 import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
+import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -129,6 +130,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+
+  protected readonly executionTooltips: ExecutionActionsTooltips = {
+    simulate: 'Relaunch execution in simulation mode',
+    execute: 'Relaunch execution with same parameters',
+    schedule: 'Schedule for cyclical execution',
+  };
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
