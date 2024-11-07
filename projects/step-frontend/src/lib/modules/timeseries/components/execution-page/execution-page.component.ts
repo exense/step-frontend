@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
@@ -11,7 +11,16 @@ import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
-import { AuthService, Execution, TimeRange } from '@exense/step-core';
+import {
+  AsyncTasksService,
+  AuthService,
+  Execution,
+  pollAsyncTask,
+  TimeRange,
+  TimeSeriesService,
+} from '@exense/step-core';
+import { takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-execution-page',
@@ -38,7 +47,14 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   hiddenFilters: FilterBarItem[] = [];
   executionRange?: Partial<TimeRange>;
 
-  initialized = false;
+  executionHasToBeBuilt = false;
+  executionCreationInProgress = false;
+  isInitialized = false;
+
+  private timeSeriesService = inject(TimeSeriesService);
+  private _asyncTaskService = inject(AsyncTasksService);
+
+  private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     if (!this.execution) {
@@ -61,7 +77,13 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
       },
     ];
     this.executionRange = this.getExecutionRange(this.execution);
-    this.initialized = true;
+    this.timeSeriesService.checkTimeSeries(this.execution!.id!).subscribe((exists) => {
+      if (exists) {
+        this.isInitialized = true;
+      } else {
+        this.executionHasToBeBuilt = true;
+      }
+    });
   }
 
   getExecutionRange(execution: Execution): Partial<TimeRange> {
@@ -74,5 +96,26 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
       this.executionRange = this.getExecutionRange(this.execution);
       this.dashboard.refresh();
     }
+  }
+
+  rebuildTimeSeries() {
+    this.executionCreationInProgress = true;
+    this.timeSeriesService
+      .rebuildTimeSeries({ executionId: this.execution.id })
+      .pipe(pollAsyncTask(this._asyncTaskService), takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (task) => {
+          if (task.ready) {
+            this.executionCreationInProgress = false;
+            this.executionHasToBeBuilt = false;
+            this.isInitialized = true;
+          } else {
+            console.error('The task is not finished yet');
+          }
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
   }
 }
