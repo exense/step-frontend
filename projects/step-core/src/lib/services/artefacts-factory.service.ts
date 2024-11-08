@@ -7,8 +7,8 @@ import {
   DynamicValueString,
   KeywordsService,
 } from '../client/step-client-module';
-import { DynamicFieldsSchema } from '../modules/dynamic-forms/shared/dynamic-fields-schema';
 import { AuthService } from '../modules/auth';
+import { JsonFieldsSchema } from '../modules/json-forms';
 
 @Injectable({
   providedIn: 'root',
@@ -68,7 +68,7 @@ export class ArtefactsFactoryService {
           return artefact;
         }
 
-        const schema = keyword?.schema as unknown as DynamicFieldsSchema | undefined;
+        const schema = keyword?.schema as unknown as JsonFieldsSchema | undefined;
         if (!schema?.properties) {
           return artefact;
         }

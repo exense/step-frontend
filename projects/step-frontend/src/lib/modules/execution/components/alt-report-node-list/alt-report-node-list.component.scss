@@ -1,6 +1,12 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 step-alt-report-node-list {
+  step-alt-report-widget-sort {
+    step-icon {
+      cursor: pointer;
+    }
+  }
+
   step-alt-report-widget-filter {
     step-form-field {
       flex: 1;

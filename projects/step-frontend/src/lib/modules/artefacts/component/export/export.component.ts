@@ -1,18 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueString,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface ExportArtefact extends AbstractArtefact {
-  value: DynamicValueString;
-  file: DynamicValueString;
-  prefix: DynamicValueString;
-  filter: DynamicValueString;
-}
+import { ExportArtefact } from '../../types/export.artefact';
 
 @Component({
   selector: 'step-export',

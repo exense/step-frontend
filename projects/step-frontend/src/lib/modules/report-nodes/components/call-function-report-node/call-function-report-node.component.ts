@@ -2,6 +2,9 @@ import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/cor
 import { DateFormat, Execution, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
+import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
+import { of } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-call-function-report-node',
@@ -9,6 +12,15 @@ import { ExecutionStateService } from '../../../execution/services/execution-sta
   styleUrls: ['./call-function-report-node.component.scss'],
 })
 export class CallFunctionReportNodeComponent implements OnChanges {
+  private _executionState = inject(ExecutionStateService, { optional: true });
+  private _altExecutionState = inject(AltExecutionStateService, { optional: true });
+
+  private execution$ = this._altExecutionState
+    ? this._altExecutionState.execution$
+    : of(this._executionState?.execution);
+
+  protected readonly execution = toSignal(this.execution$.pipe(takeUntilDestroyed()), { initialValue: undefined });
+
   readonly DateFormat = DateFormat;
 
   @Input() node!: ReportNode | any | { measures: Measure[] };
@@ -20,8 +32,6 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   hideMeasures: boolean = false;
   hideRouting: boolean = true;
-
-  execution: Execution = inject(ExecutionStateService).execution!;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cChildren = changes['children'];
@@ -36,17 +46,21 @@ export class CallFunctionReportNodeComponent implements OnChanges {
   }
 
   navigateToAnalyticsView(measure: Measure) {
-    const start = this.execution.startTime;
-    const executionInProgress = !this.execution.endTime;
+    const execution = this.execution();
+    if (!execution) {
+      return;
+    }
+    const start = execution.startTime;
+    const executionInProgress = !execution.endTime;
     const params: any = {
-      executionId: this.execution.id,
+      executionId: execution.id,
       name: measure.name,
       start: start,
       refresh: executionInProgress ? '1' : '0',
       tsParams: 'eId,name,start,end,refresh',
     };
     if (!executionInProgress) {
-      params.end = this.execution.endTime;
+      params.end = execution.endTime;
     }
     let paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;

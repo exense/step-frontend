@@ -63,6 +63,7 @@ import { ControlHasWarningsPipe } from './pipes/control-has-warnings.pipe';
 import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
+import { StatusIconPipe } from './pipes/status-icon.pipe';
 import { FormFieldFocusAddonDirective } from './directives/form-field-focus-addon.directive';
 import { InputFilterRegexSwitcherComponent } from './components/input-filter-regex-switcher/input-filter-regex-switcher.component';
 
@@ -129,6 +130,7 @@ import { InputFilterRegexSwitcherComponent } from './components/input-filter-reg
     ControlWarningsPipe,
     BigNumberPipe,
     BooleanFilterComponent,
+    StatusIconPipe,
     InputFilterRegexSwitcherComponent,
   ],
   exports: [
@@ -197,6 +199,7 @@ import { InputFilterRegexSwitcherComponent } from './components/input-filter-reg
     ControlWarningsPipe,
     BigNumberPipe,
     BooleanFilterComponent,
+    StatusIconPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -316,4 +319,5 @@ export * from './pipes/control-warnings.pipe';
 export * from './injectables/time-converters-factory.service';
 export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';
+export * from './pipes/status-icon.pipe';
 export * from './injectables/filter-regex-switcher.service';

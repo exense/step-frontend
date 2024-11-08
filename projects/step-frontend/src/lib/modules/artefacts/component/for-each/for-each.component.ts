@@ -1,20 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueInteger,
-  DynamicValueString,
-} from '@exense/step-core';
-import { DataSourceConfigurationArtefact } from '../../shared/data-source-configuration-artefact';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface ForEachArtefact extends DataSourceConfigurationArtefact {
-  threads: DynamicValueInteger;
-  maxFailedLoops: DynamicValueInteger;
-  item: DynamicValueString;
-  userItem: DynamicValueString;
-  globalCounter: DynamicValueString;
-}
+import { ForEachArtefact } from '../../types/for-each.artefact';
 
 @Component({
   selector: 'step-for-each',

@@ -1,0 +1,20 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  font-size: 1.4rem;
+}
+
+label {
+  color: var.$muted;
+  white-space: nowrap;
+}
+
+section {
+  display: flex;
+  align-items: flex-start;
+  margin: 1rem 0;
+  gap: 1rem;
+  &.col-view {
+    flex-direction: column;
+  }
+}

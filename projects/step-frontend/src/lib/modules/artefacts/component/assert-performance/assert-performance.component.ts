@@ -1,14 +1,9 @@
-import { Component, TrackByFunction, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import {
-  BaseArtefactComponent,
-  dynamicValueFactory,
-  AbstractArtefact,
-  DynamicValueString,
-  ArtefactFormChangeHelperService,
-} from '@exense/step-core';
+import { BaseArtefactComponent, dynamicValueFactory, ArtefactFormChangeHelperService } from '@exense/step-core';
 import { AggregatorType, AssertOperatorType } from '@exense/step-core';
+import { AssertPerformanceArtefact } from '../../types/assert-performance.artefact';
 
 const { createDynamicValueString } = dynamicValueFactory();
 
@@ -17,17 +12,6 @@ type AggregatorTypeItem = KeyValue<AggregatorType, string>;
 
 const createOperatorTypeItem = (key: AssertOperatorType, value: string): OperatorTypeItem => ({ key, value });
 const createAggregatorTypeItem = (key: AggregatorType, value: string): AggregatorTypeItem => ({ key, value });
-
-interface AssertPerformanceArtefact extends AbstractArtefact {
-  aggregator: AggregatorType;
-  comparator: AssertOperatorType;
-  expectedValue: DynamicValueString;
-  filters?: {
-    field: DynamicValueString;
-    filter: DynamicValueString;
-    filterType: AssertOperatorType;
-  }[];
-}
 
 @Component({
   selector: 'step-assert-performance',

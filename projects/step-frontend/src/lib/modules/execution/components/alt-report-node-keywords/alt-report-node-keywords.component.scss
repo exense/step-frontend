@@ -7,9 +7,21 @@
   flex: 1;
 }
 
+.details-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 step-table {
   --mat-table-row-item-container-height: 3rem;
   flex: 1;
+
+  td {
+    vertical-align: top;
+    padding-top: 0.5rem !important;
+  }
 }
 
 .name {
@@ -26,6 +38,7 @@ step-table {
 }
 
 @media print {
+  step-alt-keyword-inline-drilldown,
   .actions {
     display: none;
   }
