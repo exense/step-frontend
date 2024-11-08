@@ -8,4 +8,12 @@ import { FilterRegexSwitcherService } from '../../injectables/filter-regex-switc
 })
 export class InputFilterRegexSwitcherComponent {
   protected readonly _regexSwitcher = inject(FilterRegexSwitcherService, { optional: true });
+
+  toggleSwitch(active: any) {
+    if (active) {
+      this._regexSwitcher?.switchToRegex?.();
+    } else {
+      this._regexSwitcher?.switchToText?.();
+    }
+  }
 }

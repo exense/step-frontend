@@ -1,2 +1,2 @@
-<button [class.selected]="!_regexSwitcher?.isRegex?.()" (click)="_regexSwitcher?.switchToText?.()">Text</button>
-<button [class.selected]="_regexSwitcher?.isRegex?.()" (click)="_regexSwitcher?.switchToRegex?.()">RegEx</button>
+<mat-slide-toggle color="primary" [ngModel]="_regexSwitcher?.isRegex" (ngModelChange)="toggleSwitch($event)" />
+<span>Regex</span>
