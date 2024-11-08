@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title> Repository plan</mat-card-title>
+    <mat-card-title data-step-testid="title-repository-plan"> Repository plan</mat-card-title>
   </mat-card-header>
   <mat-card-content>
     @if (error) {
@@ -16,7 +16,7 @@
     @if (artefact && repoRef) {
       <div class="artefact-info">
         <section>
-          <h4 data-step-testid>{{ artefact.name }}</h4>
+          <h4>{{ artefact.name }}</h4>
           <div>
             <div>
               <span>Type</span>&nbsp;
