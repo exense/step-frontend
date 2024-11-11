@@ -1,4 +1,9 @@
 <step-alt-report-widget [title]="title()" [applyOverflow]="true">
+  @if (showSort()) {
+    <step-alt-report-widget-sort>
+      <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" (click)="toggleSort()" />
+    </step-alt-report-widget-sort>
+  }
   <step-alt-report-widget-filter>
     @if (mode() === ViewMode.VIEW) {
       <step-form-field>

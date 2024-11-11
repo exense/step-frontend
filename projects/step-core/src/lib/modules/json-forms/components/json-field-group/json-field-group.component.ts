@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { JsonFieldGroupValue } from '../../types/json-field-group-value';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
-import { JsonFieldSchema } from '../../types/json-field-schema';
+import { JsonFieldsSchema } from '../../types/json-field-schema';
 import { v4 } from 'uuid';
 import { JsonFieldType } from '../../types/json-field-type.enum';
 import { JsonFieldMetaData } from '../../types/json-field-meta-data';
@@ -49,7 +49,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
   private schemaJson?: string;
 
   private groupValue = signal<JsonFieldGroupValue | undefined>(undefined);
-  readonly schema = input<JsonFieldSchema | undefined>(undefined);
+  readonly schema = input<JsonFieldsSchema | undefined>(undefined);
   readonly addFieldLabel = input('Add field');
   readonly allowedNonSchemaFields = input(false);
 
@@ -133,7 +133,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
   }
 
   private addFieldInternal(
-    schema: JsonFieldSchema | undefined,
+    schema: JsonFieldsSchema | undefined,
     field: string,
     value: JsonFieldGroupValue = {},
     config?: { isRequired?: boolean; isAdditional?: boolean },
@@ -264,7 +264,7 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
     this.setupFormBehavior();
   }
 
-  private buildForm(schema?: JsonFieldSchema, value: JsonFieldGroupValue = {}): void {
+  private buildForm(schema?: JsonFieldsSchema, value: JsonFieldGroupValue = {}): void {
     this.schemaJson = schema ? JSON.stringify(schema) : '';
     this.destroyForm();
 

@@ -1,5 +1,5 @@
 import { Component, inject, output, viewChild } from '@angular/core';
-import { ItemsPerPageService, ReportNode, TableReload, TableSearch } from '@exense/step-core';
+import { ItemsPerPageService, ReportNode, TableSearch } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
@@ -23,6 +23,8 @@ import { AltExecutionStateService } from '../../services/alt-execution-state.ser
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _executionState = inject(AltExecutionStateService);
 
+  protected readonly _keywordsState = inject(AltKeywordNodesStateService);
+
   protected tableSearch = viewChild('table', { read: TableSearch });
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
@@ -32,4 +34,8 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   /** @Output() **/
   openKeywordDrilldown = output<ReportNode>();
+
+  toggleDetail(node: ReportNode): void {
+    this._keywordsState.toggleDetail(node);
+  }
 }

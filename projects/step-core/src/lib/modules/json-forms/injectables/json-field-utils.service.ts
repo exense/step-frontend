@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { JsonFieldType } from '../types/json-field-type.enum';
-import { JsonFieldProperty } from '../types/json-field-schema';
+import { SchemaField, SchemaSimpleField } from '../types/json-field-schema';
 
 interface FieldMetaParameters {
+  fieldSchema?: SchemaField;
   fieldType?: JsonFieldType;
   tooltip?: string;
   enumItems: string[];
@@ -12,14 +13,15 @@ interface FieldMetaParameters {
   providedIn: 'root',
 })
 export class JsonFieldUtilsService {
-  determineFieldMetaParameters(fieldDescription: JsonFieldProperty = {}): FieldMetaParameters {
+  determineFieldMetaParameters(fieldDescription: SchemaField = {}): FieldMetaParameters {
+    let fieldSchema: SchemaField | undefined;
     let fieldType: JsonFieldType | undefined;
     let enumItems: string[] = [];
     const tooltip = fieldDescription.description;
 
-    if (!fieldDescription.type && fieldDescription.enum) {
+    if ((fieldDescription as SchemaSimpleField).enum) {
       fieldType = JsonFieldType.ENUM;
-      enumItems = fieldDescription.enum;
+      enumItems = (fieldDescription as SchemaSimpleField).enum!;
     } else {
       switch (fieldDescription.type) {
         case 'string':
@@ -34,16 +36,18 @@ export class JsonFieldUtilsService {
           break;
         case 'array':
           fieldType = JsonFieldType.ARRAY;
+          fieldSchema = fieldDescription.items;
           break;
         case 'object':
           fieldType = JsonFieldType.OBJECT;
+          fieldSchema = fieldDescription.properties;
           break;
         default:
           break;
       }
     }
 
-    return { fieldType, enumItems, tooltip };
+    return { fieldSchema, fieldType, enumItems, tooltip };
   }
 
   areObjectsEqual<T>(

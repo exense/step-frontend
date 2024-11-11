@@ -1,1 +1,10 @@
-<div class="status" [ngClass]="className()">{{ status() }}</div>
+@if (iconMode()) {
+  <step-icon
+    [ngClass]="className()"
+    [name]="status() | statusIcon"
+    [matTooltip]="status() ?? ''"
+    matTooltipPosition="below"
+  />
+} @else {
+  <div class="status" [ngClass]="className()">{{ status() }}</div>
+}

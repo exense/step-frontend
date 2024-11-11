@@ -13,18 +13,14 @@ import {
 } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
-import {
-  DynamicFieldObjectValue,
-  DynamicFieldsSchema,
-  SchemaObjectField,
-  SchemasFactoryService,
-} from '../../modules/dynamic-forms/dynamic-forms.module';
+import { DynamicFieldObjectValue, SchemasFactoryService } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type-resolver';
 import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
 import { HintFor } from '../../shared/hint-for.enum';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SchemaObjectField } from '../../modules/json-forms';
 
 interface ReferenceMeta {
   icon: string;
@@ -131,6 +127,28 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     this.createReferenceString(this.artefactReferenceAttributes);
 
     this.onSave.emit();
+  }
+
+  protected syncName(dynamicValue: DynamicValueString): void {
+    if (dynamicValue.dynamic) {
+      return;
+    }
+    this.artefact!.attributes!['name'] = this.artefactName = dynamicValue.value ?? '';
+    this.save();
+  }
+
+  protected switchToDynamicName(): void {
+    this.artefact!.dynamicName!.expression = this.artefact!.attributes!['name'];
+    this.artefact!.dynamicName!.dynamic = true;
+    this.save();
+  }
+
+  save(): void {
+    if (this.isDisabled) {
+      return;
+    }
+    this.artefact!.useDynamicName = this.artefact!.dynamicName!.dynamic;
+    this.onSave.emit(this.artefact);
   }
 
   private initArtefactName(artefact?: CallFunction): void {

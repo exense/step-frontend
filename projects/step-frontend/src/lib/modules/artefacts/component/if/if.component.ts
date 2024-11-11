@@ -1,15 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueString,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface IfArtefact extends AbstractArtefact {
-  condition: DynamicValueString;
-}
+import { IfArtefact } from '../../types/if.artefact';
 
 @Component({
   selector: 'step-if',

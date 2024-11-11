@@ -1,24 +1,11 @@
-import { AfterViewInit, Component, DestroyRef, inject, OnDestroy, TrackByFunction, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueString,
-} from '@exense/step-core';
-import { OperatorType } from '../../shared/operator-type.enum';
+import { AfterViewInit, Component, DestroyRef, inject, TrackByFunction, ViewChild } from '@angular/core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
+import { OperatorType } from '../../types/operator-type.enum';
 import { NgForm, NgModel } from '@angular/forms';
 import { KeyValue } from '@angular/common';
-import { map, Observable, of, startWith, Subject, takeUntil } from 'rxjs';
+import { map, Observable, of, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-interface AssertArtefact extends AbstractArtefact {
-  actual: DynamicValueString;
-  operator: OperatorType;
-  expected: DynamicValueString;
-  doNegate: DynamicValueBoolean;
-  customErrorMessage: DynamicValueString;
-}
+import { AssertArtefact } from '../../types/assert.artefact';
 
 type OperatorTypeEntry = KeyValue<OperatorType, string>;
 
