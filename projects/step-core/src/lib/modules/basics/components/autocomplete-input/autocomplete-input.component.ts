@@ -1,21 +1,23 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
+  ElementRef,
   forwardRef,
+  HostListener,
   inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  SimpleChanges,
-  TrackByFunction,
-  ViewChild,
+  input,
+  signal,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BehaviorSubject, combineLatest, startWith, debounceTime, map } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { KeyValue } from '@angular/common';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange = (value: string) => void;
 type OnTouch = () => void;
@@ -31,48 +33,78 @@ type OnTouch = () => void;
       multi: true,
     },
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class AutocompleteInputComponent<T = unknown> implements ControlValueAccessor, OnChanges, OnDestroy {
+export class AutocompleteInputComponent<T = unknown> implements ControlValueAccessor {
   private _fb = inject(FormBuilder).nonNullable;
-
-  private availableItems$ = new BehaviorSubject<KeyValue<string, string>[]>([]);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  private selectedValue: string = '';
+  private selectedValue = signal('');
 
   protected filterCtrl = this._fb.control('');
 
-  protected readonly trackByKeyValue: TrackByFunction<KeyValue<string, string>> = (index, item) => item.key;
-
-  protected readonly displayItems$ = combineLatest([
-    this.availableItems$,
-    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), debounceTime(300), takeUntilDestroyed()),
-  ]).pipe(
-    map(([availableItems, filter]) => {
-      let result = availableItems.filter(
-        ({ value }) => !filter || value.toLowerCase().includes(filter.trim().toLowerCase()),
-      );
-      if (result.length === 0 && !!filter.trim()) {
-        result = [{ key: filter, value: filter }];
-      }
-      return result;
-    }),
+  private filterValue = toSignal(
+    this.filterCtrl.valueChanges.pipe(startWith(this.filterCtrl.value), distinctUntilChanged(), debounceTime(300)),
   );
 
-  @Input() possibleItems?: T[];
-  @Input() placeHolder?: string;
-  @Input() valueLabelExtractor?: ArrayItemLabelValueExtractor<T, string>;
+  /** @Input **/
+  readonly possibleItems = input<T[] | undefined>(undefined);
 
-  @ViewChild('inputElement', { static: true, read: MatAutocompleteTrigger })
-  private autoCompleteTrigger!: MatAutocompleteTrigger;
+  /** @Input **/
+  readonly placeholder = input<string>('');
+
+  /** @Input **/
+  readonly valueLabelExtractor = input<ArrayItemLabelValueExtractor<T, string> | undefined>(undefined);
+
+  /** @ViewChild **/
+  private autoCompleteTrigger = viewChild('inputElement', { read: MatAutocompleteTrigger });
+
+  /** @ViewChild **/
+  private inputElement = viewChild('inputElement', { read: ElementRef<HTMLInputElement> });
+
+  private availableItems = computed(() => {
+    const possibleItems = this.possibleItems() ?? [];
+    const extractor = this.valueLabelExtractor();
+    if (!extractor) {
+      return [];
+    }
+    return possibleItems.map((item) => {
+      const key = extractor!.getValue(item);
+      const value = extractor!.getLabel(item);
+      return { key, value } as KeyValue<string, string>;
+    });
+  });
+
+  private effectDetermineFilterValue = effect(() => {
+    const selectedValue = this.selectedValue();
+    const extractor = this.valueLabelExtractor();
+    const availAbleItems = this.availableItems();
+    if (!extractor) {
+      this.filterCtrl.setValue('', { emitEvent: false });
+      return;
+    }
+    const selectedItem = availAbleItems.find((item) => item.key === selectedValue)?.value ?? selectedValue;
+    this.filterCtrl.setValue(selectedItem);
+  });
+
+  protected readonly displayItems = computed(() => {
+    const availableItems = this.availableItems();
+    const filter = (this.filterValue() ?? '').toLowerCase().trim();
+
+    let result = availableItems.filter(({ value }) => !filter || value.toLowerCase().includes(filter));
+
+    if (result.length === 0 && !!filter) {
+      result = [{ key: filter, value: this.filterValue()! }];
+    }
+    return result;
+  });
 
   writeValue(selectedValue?: string): void {
     selectedValue = selectedValue ?? '';
-    this.selectedValue = selectedValue;
-    this.determineItems({ selectedValue });
+    this.selectedValue.set(selectedValue);
   }
 
   registerOnChange(fn: OnChange): void {
@@ -91,68 +123,36 @@ export class AutocompleteInputComponent<T = unknown> implements ControlValueAcce
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cPossibleItems = changes['possibleItems'];
-    if (cPossibleItems?.previousValue !== cPossibleItems?.currentValue || cPossibleItems?.firstChange) {
-      const possibleItems = cPossibleItems.currentValue;
-      this.determineItems({ possibleItems });
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.availableItems$.complete();
-  }
-
   protected select(event: MatAutocompleteSelectedEvent): void {
     const selectedValue = event.option.value;
     this.updateValue(selectedValue);
   }
 
-  protected handleBlur(): void {
-    // Invoke blur logic with little timeout, because otherwise it might intersect with select option logic
-    // because input filter looses the focus
-    setTimeout(() => {
-      const value = this.filterCtrl.value.trim();
-      this.autoCompleteTrigger.closePanel();
-      if (value !== this.selectedValue) {
-        this.updateValue(value);
-      }
-    }, 100);
-  }
-
-  private determineItems({
-    selectedValue,
-    possibleItems,
-    extractor,
-  }: {
-    selectedValue?: string;
-    possibleItems?: T[];
-    extractor?: ArrayItemLabelValueExtractor<T>;
-  } = {}): void {
-    selectedValue = selectedValue ?? this.selectedValue ?? '';
-    possibleItems = possibleItems ?? this.possibleItems ?? [];
-    extractor = extractor ?? this.valueLabelExtractor;
-    if (!extractor) {
-      this.availableItems$.next([]);
-      this.filterCtrl.setValue('', { emitEvent: false });
+  protected handleBlur($event: FocusEvent): void {
+    // Menu items are not focusable.
+    // If panel is open, and there is no related target - it means that menu item has been clicked.
+    // In that case ignore blur's logic
+    if (this.autoCompleteTrigger()?.panelOpen && !$event.relatedTarget) {
       return;
     }
-    const items = possibleItems.map((item) => {
-      const key = extractor!.getValue(item);
-      const value = extractor!.getLabel(item);
-      return { key, value } as KeyValue<string, string>;
-    });
-    const selectedItem = items.find((item) => item.key === selectedValue)?.value ?? selectedValue;
-    this.filterCtrl.setValue(selectedItem);
-    this.availableItems$.next(items);
+    const value = this.filterCtrl.value.trim();
+    this.autoCompleteTrigger()?.closePanel();
+    if (value !== this.selectedValue()) {
+      this.updateValue(value);
+    }
   }
 
   private updateValue(value: string): void {
     if (this.filterCtrl.disabled) {
       return;
     }
-    this.selectedValue = value;
-    this.onChange?.(this.selectedValue);
+    this.selectedValue.set(value);
+    this.onChange?.(value);
     this.onTouch?.();
+  }
+
+  @HostListener('click')
+  private handleClick(): void {
+    this.inputElement()?.nativeElement?.focus();
   }
 }
