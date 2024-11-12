@@ -12,6 +12,21 @@ step-table {
   flex: 1;
 }
 
-.name {
+.actions {
+  gap: 1rem;
+  margin-right: 1rem;
+  & > button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.operations {
   width: 100%;
+}
+
+@media print {
+  .actions {
+    display: none;
+  }
 }

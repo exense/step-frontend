@@ -1,5 +1,5 @@
-import { Component, viewChild } from '@angular/core';
-import { ItemsPerPageService, TableSearch } from '@exense/step-core';
+import { Component, output, viewChild } from '@angular/core';
+import { ItemsPerPageService, ReportNode, TableSearch } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
@@ -22,4 +22,7 @@ import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table
 export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
   protected tableSearch = viewChild('table', { read: TableSearch });
   showAllOperations = false;
+
+  /** @Output() **/
+  readonly openTestCaseInTreeView = output<ReportNode>();
 }

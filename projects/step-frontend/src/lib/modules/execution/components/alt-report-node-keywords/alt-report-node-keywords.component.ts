@@ -32,9 +32,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   /** @Output() **/
   openKeywordInTreeView = output<ReportNode>();
 
-  /** @Output() **/
-  openKeywordDrilldown = output<ReportNode>();
-
   toggleDetail(node: ReportNode): void {
     this._keywordsState.toggleDetail(node);
   }
