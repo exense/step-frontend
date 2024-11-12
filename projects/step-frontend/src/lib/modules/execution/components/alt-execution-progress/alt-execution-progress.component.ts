@@ -289,7 +289,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private setupTreeRefresh(): void {
-    const range$ = this.dateRange$.pipe(map((range) => (range?.isDefault ? undefined : range)));
+    const range$ = this.dateRange$.pipe(map((range) => (!this.relativeTime && range?.isDefault ? undefined : range)));
 
     combineLatest([this.executionId$, range$])
       .pipe(
