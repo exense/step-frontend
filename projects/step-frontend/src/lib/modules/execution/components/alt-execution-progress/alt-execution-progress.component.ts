@@ -53,6 +53,12 @@ import { ExecutionActionsTooltips } from '../execution-actions/execution-actions
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
+const COMPARE_MEASUREMENT_ERROR_MS = 30_000;
+
+interface DateRangeExt extends DateRange {
+  isDefault?: boolean;
+}
+
 @Component({
   selector: 'step-alt-execution-progress',
   templateUrl: './alt-execution-progress.component.html',
@@ -146,17 +152,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.relativeTime = time;
   }
 
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
-
-  private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe((range) => {
-      // Ignore synchronization in case of view all mode
-      if (this._viewAllService.isViewAll) {
-        return;
-      }
-      this.saveRangeToStorage(range);
-    });
+  readonly dateRangeCtrl = this._fb.control<DateRangeExt | null | undefined>(null);
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -184,6 +180,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly executionId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),
     filter((id) => !!id),
+    takeUntilDestroyed(),
   );
 
   readonly activeExecution$ = this.executionId$.pipe(map((id) => this._activeExecutions.getActiveExecution(id)));
@@ -203,7 +200,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
     map(([selectedRange, fullRange]) => {
       const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
+      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end, COMPARE_MEASUREMENT_ERROR_MS);
       return startEq && endEq;
     }),
   );
@@ -259,13 +256,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   ngOnInit(): void {
-    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    combineLatest([this.execution$, isIgnoreFilter$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, isIgnoreFilter]) => {
-        this.refreshExecutionTree(execution);
-        this.applyDefaultRange(execution, !isIgnoreFilter);
-      });
+    this.setupRangeSyncWithStorage();
+    this.setupDateRangeSyncOnExecutionRefresh();
+    this.setupTreeRefresh();
   }
 
   ngOnDestroy(): void {
@@ -273,7 +266,40 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.testCasesDataSource?.destroy();
   }
 
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
+  private setupRangeSyncWithStorage(): void {
+    this.dateRangeCtrl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((range) => {
+      // Ignore synchronization in case of view all mode
+      if (this._viewAllService.isViewAll) {
+        return;
+      }
+      const executionId = this.executionIdSnapshot;
+      if (!range || !executionId) {
+        return;
+      }
+      const start = range.start?.toMillis();
+      const end = range.end?.toMillis();
+      this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
+    });
+  }
+
+  private setupDateRangeSyncOnExecutionRefresh(): void {
+    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      this.applyDefaultRange(execution);
+    });
+  }
+
+  private setupTreeRefresh(): void {
+    const range$ = this.dateRange$.pipe(map((range) => (!this.relativeTime && range?.isDefault ? undefined : range)));
+
+    combineLatest([this.executionId$, range$])
+      .pipe(
+        switchMap(([executionId, range]) => this._aggregatedTreeState.loadTree(executionId, range)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((isTreeInitialized) => (this.isTreeInitialized = isTreeInitialized));
+  }
+
+  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {
     let start: DateTime;
     let end: DateTime;
 
@@ -295,17 +321,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       end = DateTime.now();
     }
 
-    return { start, end };
-  }
-
-  private saveRangeToStorage(range?: DateRange | null): void {
-    const executionId = this.executionIdSnapshot;
-    if (!range || !executionId) {
-      return;
-    }
-    const start = range.start?.toMillis();
-    const end = range.end?.toMillis();
-    this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
+    return { start, end, isDefault: true };
   }
 
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
@@ -319,13 +335,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
-  }
-
-  private refreshExecutionTree(execution: Execution): void {
-    this._aggregatedTreeState
-      .loadTree(execution.id!)
-      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    const defaultRange = this.getDefaultRangeForExecution(execution, useStorage);
+    this.dateRangeCtrl.setValue(defaultRange);
   }
 
   private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
