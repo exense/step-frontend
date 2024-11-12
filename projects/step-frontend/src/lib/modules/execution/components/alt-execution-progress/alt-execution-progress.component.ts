@@ -32,6 +32,7 @@ import {
   TimeRange,
   TreeNodeUtilsService,
   TreeStateService,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -122,6 +123,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+
+  protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
 

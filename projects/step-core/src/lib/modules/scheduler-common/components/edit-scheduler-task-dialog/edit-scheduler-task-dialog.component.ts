@@ -35,7 +35,7 @@ import {
   tap,
 } from 'rxjs';
 import { KeyValue } from '@angular/common';
-import { JSON_FORM_EXPORTS, JsonFieldSchema, JsonFieldUtilsService } from '../../../json-forms';
+import { JSON_FORM_EXPORTS, JsonFieldsSchema, JsonFieldUtilsService } from '../../../json-forms';
 import { RepositoryParametersSchemasService } from '../../../repository-parameters';
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 import { catchError } from 'rxjs/operators';
@@ -108,7 +108,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   );
 
   protected showParameters = model(false);
-  protected paramsSchema = signal<JsonFieldSchema | undefined>(undefined);
+  protected paramsSchema = signal<JsonFieldsSchema | undefined>(undefined);
   protected isLocal = signal(false);
   protected hasExclusions = toSignal(this.hasExclusions$);
 

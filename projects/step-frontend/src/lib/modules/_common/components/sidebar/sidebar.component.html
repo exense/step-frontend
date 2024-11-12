@@ -39,7 +39,13 @@
               />
               <label for="collapsable-tab-{{ mainMenuEntry.title }}">
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                <span
+                  class="sidebar-aligned-text main-menu-name"
+                  [attr.data-icon]="mainMenuEntry.icon"
+                  [attr.data-id]="mainMenuEntry.id"
+                  [attr.data-title]="mainMenuEntry.title"
+                  >{{ mainMenuEntry.title }}</span
+                >
                 <span><step-icon class="chevron" name="chevron-right" /></span>
               </label>
             } @else {
@@ -49,7 +55,13 @@
                 (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
               >
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                <span
+                  class="sidebar-aligned-text main-menu-name"
+                  [attr.data-icon]="mainMenuEntry.icon"
+                  [attr.data-id]="mainMenuEntry.id"
+                  [attr.data-title]="mainMenuEntry.title"
+                  >{{ mainMenuEntry.title }}</span
+                >
               </label>
             }
             <div class="content">

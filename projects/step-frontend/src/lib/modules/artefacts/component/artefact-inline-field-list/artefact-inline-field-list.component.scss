@@ -1,4 +1,10 @@
-:host {
+section.list {
   display: flex;
   gap: 1rem;
+  &.vertical {
+    flex-direction: column;
+  }
+  &.wrap {
+    flex-wrap: wrap;
+  }
 }
