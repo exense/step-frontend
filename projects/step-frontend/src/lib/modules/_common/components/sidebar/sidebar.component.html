@@ -16,12 +16,20 @@
   </div>
   <div id="sidebar-home-and-settings">
     @if (isOpened$ | async) {
-      <span class="visible-when-collapsed sidebar-home-button" (stepSideBarClick)="navigateTo('home', $event)">
+      <span
+        data-step-testid="sidebar-home-button"
+        class="visible-when-collapsed sidebar-home-button"
+        (stepSideBarClick)="navigateTo('home', $event)"
+      >
         <step-icon name="home" />
       </span>
     }
     @if (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) {
-      <step-settings-button class="sidebar-home-and-settings-icon" matTooltip="Project Settings" />
+      <step-settings-button
+        data-step-testid="sidebar-settings-button"
+        class="sidebar-home-and-settings-icon"
+        matTooltip="Project Settings"
+      />
     }
   </div>
   <div id="sidebar-categories">
@@ -39,7 +47,9 @@
               />
               <label for="collapsable-tab-{{ mainMenuEntry.title }}">
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                <span data-step-testid="sidebar-main-menu-title" class="sidebar-aligned-text">{{
+                  mainMenuEntry.title
+                }}</span>
                 <span><step-icon class="chevron" name="chevron-right" /></span>
               </label>
             } @else {
@@ -61,7 +71,9 @@
                     (stepSideBarClick)="navigateTo(entry.id, $event)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
-                    <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
+                    <span data-step-testid="sidebar-sub-menu-title" class="sidebar-aligned-subtext">{{
+                      entry.title
+                    }}</span>
                   </div>
                   <div class="sidebar-subtab-content">
                     @for (subEntry of entry.children; track subEntry.id) {
