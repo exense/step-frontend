@@ -25,6 +25,10 @@ step-table {
   width: 100%;
 }
 
+.name {
+  white-space: nowrap;
+}
+
 @media print {
   .actions {
     display: none;
