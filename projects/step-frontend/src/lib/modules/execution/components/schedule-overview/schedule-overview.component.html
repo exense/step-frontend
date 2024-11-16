@@ -1,5 +1,5 @@
 <section class="header">
-  @if (task$ | async; as task) {
+  @if (selectedTask; as task) {
     <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       <h1>{{ task.attributes?.['name'] }}</h1>
@@ -21,7 +21,7 @@
         matTooltipPosition="before"
         #rangePicker="DateRangePicker"
       />
-      <ng-container *ngIf="!(isFullRangeSelected$ | async)">
+      <ng-container *ngIf="!false">
         <step-suffix class="icon-suffix">
           <step-icon name="alert-circle" class="full-range-warn" matTooltip="Not full range is selected" />
         </step-suffix>
@@ -30,8 +30,19 @@
     <step-date-picker #picker></step-date-picker>
   </div>
 </section>
-<section class="body">
-  @if (summary$ | async; as summary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
-  }
+<section>
+  <div class="row">
+    <div style="width: 440px">
+      @if (summary) {
+        <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
+      }
+    </div>
+    <step-alt-report-widget style="flex-grow: 1">
+      <step-alt-report-widget-content>
+        @if (chartSettings) {
+          <step-timeseries-chart [settings]="chartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
 </section>

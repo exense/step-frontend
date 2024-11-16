@@ -1,4 +1,4 @@
-import { Axis, Cursor, Hooks } from 'uplot';
+import { Axis, Band, Cursor, Hooks } from 'uplot';
 import { TsTooltipOptions } from './ts-tooltip-options';
 import { TSChartSeries } from './ts-chart-series';
 
@@ -9,6 +9,7 @@ export interface TSChartSettings {
   series: TSChartSeries[];
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
+  bands?: Band[];
   tooltipOptions: TsTooltipOptions;
   showLegend?: boolean; // default true
   hooks?: Hooks.Arrays; // if some hooks have to be override

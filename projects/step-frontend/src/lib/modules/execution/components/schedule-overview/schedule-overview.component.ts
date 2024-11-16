@@ -3,34 +3,31 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
   AugmentedSchedulerService,
+  BucketResponse,
   DateRange,
   DateUtilsService,
-  Execution,
-  ExecutionSummaryDto,
+  ExecutiontTaskParameters,
+  FetchBucketsRequest,
+  MarkerType,
   Plan,
-  PrivateViewPluginService,
+  STATUS_COLORS,
   TimeRange,
+  TimeSeriesService,
 } from '@exense/step-core';
-import { ScheduleCrossExecutionStateService } from '../../services/schedule-cross-execution-state.service';
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  forkJoin,
-  map,
-  Observable,
-  shareReplay,
-  startWith,
-  switchMap,
-  take,
-  tap,
-} from 'rxjs';
+import { filter, forkJoin, map, Observable, shareReplay, startWith, switchMap } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DateTime } from 'luxon';
-import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
+import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
+import { SeriesStroke } from '../../../timeseries/modules/_common/types/time-series/series-stroke';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { Axis, Band } from 'uplot';
+import { Status } from '../../../_common/shared/status.enum';
+import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { UPlotStackedUtils } from '../../../timeseries/modules/_common/UPlotStackedUtils';
+
+declare const uPlot: any;
 
 @Component({
   selector: 'step-schedule-overview',
@@ -44,15 +41,18 @@ import { AltExecutionViewAllService } from '../../services/alt-execution-view-al
         return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
-    AltExecutionViewAllService,
   ],
 })
-export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecutionStateService {
+export class ScheduleOverviewComponent implements OnInit {
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _timeSeriesService = inject(TimeSeriesService);
   private _dateUtils = inject(DateUtilsService);
-  private _viewService = inject(PrivateViewPluginService);
   private _fb = inject(FormBuilder);
+  private _statusColors = inject(STATUS_COLORS);
+
+  // generate bar builder with 60% bar (40% gap) & 100px max bar width
+  private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
 
   private relativeTime?: number;
 
@@ -62,6 +62,10 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   protected error = '';
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
+
+  selectedTask?: ExecutiontTaskParameters;
+  summary?: ReportNodeSummary;
+  chartSettings?: TSChartSettings;
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -81,106 +85,177 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     filter((id) => !!id),
   );
 
-  readonly activeTask$ = this.taskId$.pipe(
-    switchMap((id) => {
-      return this._scheduleApi.getExecutionTaskById(id);
-    }),
-  );
+  private updateTask(task: ExecutiontTaskParameters): ExecutiontTaskParameters {
+    task.attributes = task.attributes || {};
+    task.executionsParameters = task.executionsParameters || {};
+    task.executionsParameters.customParameters = task.executionsParameters.customParameters || {};
 
-  readonly task$ = this.activeTask$.pipe(
-    map((task) => {
-      if (!task) {
-        return null;
+    const repository = task.executionsParameters.repositoryObject;
+
+    if (repository?.repositoryID === 'local') {
+      const planId = repository.repositoryParameters?.['planid'];
+      if (planId) {
+        const name = task.executionsParameters.description ?? '';
+        this.plan = {
+          id: planId,
+          attributes: { name },
+        };
       }
+    } else {
+      this.repositoryId = repository?.repositoryID;
+      this.repositoryPlanId =
+        repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
+    }
+    return task;
+  }
 
-      task.attributes = task.attributes || {};
-      task.executionsParameters = task.executionsParameters || {};
-      task.executionsParameters.customParameters = task.executionsParameters.customParameters || {};
-
-      const repository = task.executionsParameters.repositoryObject;
-
-      if (repository?.repositoryID === 'local') {
-        const planId = repository.repositoryParameters?.['planid'];
-        if (planId) {
-          const name = task.executionsParameters.description ?? '';
-          this.plan = {
-            id: planId,
-            attributes: { name },
-          };
+  private getFullTimeRange(taskId: string): Observable<TimeRange> {
+    return this._scheduleApi.getExecutionsByTaskId(taskId, 0, new Date().getTime()).pipe(
+      map((executions) => {
+        let now = new Date().getTime();
+        let start = 0;
+        if (executions.data.length) {
+          start = executions.data[0].startTime;
+        } else {
+          start = now - 1000 * 60;
         }
-      } else {
-        this.repositoryId = repository?.repositoryID;
-        this.repositoryPlanId =
-          repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
-      }
-
-      return task;
-    }),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly executions$ = combineLatest([
-    this.taskId$,
-    this.dateRangeCtrl.valueChanges.pipe(startWith(this.dateRangeCtrl.value)),
-  ]).pipe(
-    switchMap(([id, dateRange]) =>
-      this._scheduleApi.getExecutionsByTaskId(id, dateRange?.start?.toMillis(), dateRange?.end?.toMillis()).pipe(
-        map((executions) => {
-          return executions;
-        }),
-      ),
-    ),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly executionFulLRange$ = this.executions$.pipe(
-    map((execution) => this.getDefaultRangeForExecution(execution.data[0])),
-  );
-
-  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
-    map(([selectedRange, fullRange]) => {
-      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
-      return startEq && endEq;
-    }),
-  );
-
-  private summaryInProgressInternal$ = new BehaviorSubject(false);
-
-  readonly summaryInProgress$ = this.summaryInProgressInternal$.pipe(distinctUntilChanged());
-
-  protected summary$: Observable<ReportNodeSummary> = this.executions$.pipe(
-    tap(() => this.summaryInProgressInternal$.next(true)),
-    switchMap((exec) => {
-      const views$ = exec.data.map((execution) =>
-        this._viewService.getView('statusDistributionForTestcases', execution.id),
-      );
-      return forkJoin(views$);
-    }),
-    map((views) => {
-      const combinedSummary: ReportNodeSummary = { total: 0 };
-      views.forEach((view) => {
-        const distribution = (view as ExecutionSummaryDto).distribution;
-        Object.values(distribution).forEach((value) => {
-          if (value.count > 0) {
-            combinedSummary[value.status] = (combinedSummary[value.status] || 0) + value.count;
-            combinedSummary.total += value.count;
-          }
-        });
-      });
-
-      return combinedSummary;
-    }),
-    tap(() => this.summaryInProgressInternal$.next(false)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
+        return { from: start - 1000 * 60 * 60 * 24 * 7, to: now };
+      }),
+    );
+  }
 
   ngOnInit(): void {
-    this.executions$.pipe(take(1)).subscribe((execution) => {
-      this.applyDefaultRange(execution.data[0]);
+    this.taskId$
+      .pipe(
+        switchMap((taskId) => {
+          return forkJoin([this._scheduleApi.getExecutionTaskById(taskId), this.getFullTimeRange(taskId)]);
+        }),
+      )
+      .subscribe(([task, fullRange]) => {
+        this.selectedTask = this.updateTask(task);
+        this.dateRangeCtrl.setValue({
+          start: DateTime.fromMillis(fullRange.from),
+          end: DateTime.fromMillis(fullRange.to),
+        });
+        this.createPieChart(task.id!, fullRange);
+        this.createChart(task.id!, fullRange);
+      });
+  }
+
+  private cumulateSeriesData(series: TSChartSeries[]): void {
+    series.forEach((s, i) => {
+      if (i == 0) {
+        return;
+      }
+      s.data.forEach((point, j) => {
+        const previousSeriesValue: number = series[i - 1].data[j]!;
+        s.data[j] = previousSeriesValue + (s.data[j]! as number);
+      });
+    });
+  }
+
+  private createChart(taskId: string, timeRange: TimeRange) {
+    const statusAttribute = 'result';
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      intervalSize: 1000 * 60 * 60 * 24, // one day
+      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
+      groupDimensions: [statusAttribute],
+    };
+    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+      console.log(response);
+      const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+      let series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
+        const seriesKey: string = response.matrixKeys[i][statusAttribute];
+        const seriesData: (number | undefined | null)[] = [];
+        seriesBuckets.forEach((b, i) => {
+          let value = b?.count || 0;
+          seriesData[i] = value;
+        });
+        let color = this._statusColors[seriesKey as Status];
+        const fill = color + 'cc';
+        const s: TSChartSeries = {
+          id: seriesKey,
+          scale: 'y',
+          labelItems: [seriesKey],
+          legendName: seriesKey,
+          data: seriesData,
+          width: 1,
+          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          stroke: color,
+          fill: fill,
+          paths: this.bars,
+          points: { show: false },
+          show: true,
+        };
+        return s;
+      });
+      this.cumulateSeriesData(series); // used for stacked bar
+
+      const axes: Axis[] = [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals.map((v: any) => v);
+          },
+        },
+      ];
+      this.chartSettings = {
+        title: 'Executions in time',
+        showLegend: false,
+        xValues: xLabels,
+        series: series,
+        tooltipOptions: {
+          enabled: false,
+        },
+        axes: axes,
+        bands: this.getDefaultBands(series.length),
+      };
+    });
+  }
+
+  private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
+    if (seriesIdx > 1) {
+      const valueBelow = self.data[seriesIdx - 1][idx] || 0;
+      return currentValue - valueBelow;
+    }
+    return currentValue;
+  }
+
+  private getDefaultBands(count: number): Band[] {
+    const bands: Band[] = [];
+    for (let i = count; i > 1; i--) {
+      bands.push({ series: [i, i - 1] });
+    }
+    console.log(bands);
+    return bands;
+  }
+
+  private createPieChart(taskId: string, timeRange: TimeRange) {
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
+      groupDimensions: ['result'],
+    };
+    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+      console.log(response);
+      let total = 0;
+      const pairs: { [key: string]: number } = {};
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        let bucket: BucketResponse = response.matrix[i][0];
+        pairs[keyAttributes['result'] as string] = bucket.count;
+        total += bucket.count;
+      });
+
+      this.summary = {
+        ...pairs,
+        total: total,
+      };
     });
   }
 
@@ -190,30 +265,5 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
 
   updateRelativeTime(time?: number): void {
     this.relativeTime = time;
-  }
-
-  selectFullRange(): void {
-    this.executions$.pipe(take(1)).subscribe((execution) => {
-      this.applyDefaultRange(execution.data[0]);
-    });
-  }
-
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
-    let start: DateTime;
-    let end: DateTime;
-
-    if (this.relativeTime) {
-      end = DateTime.now();
-      start = end.set({ millisecond: end.millisecond - this.relativeTime });
-    } else {
-      start = DateTime.fromMillis(execution.startTime!);
-      end = DateTime.now();
-    }
-
-    return { start, end };
-  }
-
-  private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
   }
 }

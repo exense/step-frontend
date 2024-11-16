@@ -22,6 +22,7 @@ import { TooltipParentContainer } from '../../types/tooltip-parent-container';
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
+import { UPlotStackedUtils } from '../../../_common/UPlotStackedUtils';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -177,11 +178,11 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     this.chartIsEmpty = noData;
 
-    const opts: uPlot.Options = {
+    let opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
-      legend: { show: false },
+      legend: { show: true },
       cursor: cursorOpts,
       // @ts-ignore
       select: { show: settings.zoomEnabled ?? true },
@@ -204,6 +205,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         },
         ...settings.series, // show flag will show/hide series, but they will still exist in the chart
       ],
+      bands: settings.bands,
       hooks: {
         ...settings.hooks,
         setSelect: [
@@ -226,6 +228,8 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     if (this.uplot) {
       this.uplot.destroy();
     }
+    //@ts-ignore
+    // opts = UPlotStackedUtils.getStackedOpts('test', settings.series, data, undefined);
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
   }
 
