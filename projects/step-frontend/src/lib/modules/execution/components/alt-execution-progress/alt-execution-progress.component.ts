@@ -16,6 +16,7 @@ import {
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
+  AugmentedPlansService,
   DateRange,
   DateUtilsService,
   DEFAULT_RELATIVE_TIME_OPTIONS,
@@ -50,6 +51,7 @@ import { AltExecutionStorageService } from '../../services/alt-execution-storage
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
+import { KeyValue } from '@angular/common';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -120,6 +122,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
+  private _plansApi = inject(AugmentedPlansService);
   private _router = inject(Router);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
@@ -189,6 +192,19 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  readonly executionPlan$ = this.execution$.pipe(
+    map((execution) => execution.planId),
+    switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly resolvedParameters$ = this.execution$.pipe(
+    map((execution) => {
+      return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
+    }),
   );
 
   readonly displayStatus$ = this.execution$.pipe(
