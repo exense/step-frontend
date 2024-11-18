@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { SelectionCollector } from '@exense/step-core';
+import { SelectionCollector } from '../services/selection-collector/selection-collector';
 import { map, Observable, of } from 'rxjs';
 
 @Pipe({
