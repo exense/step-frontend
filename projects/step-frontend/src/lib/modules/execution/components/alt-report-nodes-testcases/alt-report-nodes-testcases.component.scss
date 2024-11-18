@@ -29,6 +29,14 @@ step-table {
   white-space: nowrap;
 }
 
+.test-case-name {
+  cursor: pointer;
+  user-select: none;
+  &.not-selected {
+    color: var.$muted;
+  }
+}
+
 @media print {
   .actions {
     display: none;

@@ -38,6 +38,11 @@ step-table {
   }
 }
 
+.clear-test-cases {
+  white-space: nowrap;
+  border-radius: 0.8rem;
+}
+
 @media print {
   step-alt-keyword-inline-drilldown,
   .actions {

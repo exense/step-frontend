@@ -9,7 +9,13 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
-        {{ element.name }}
+        <span
+          class="test-case-name"
+          [class.not-selected]="hasTestCasesFilter() && !(element.artefactID | isSelected | async)"
+          (click)="toggleSelection(element, $event)"
+        >
+          {{ element.name }}
+        </span>
       </td>
     </ng-container>
     <ng-container matColumnDef="operations">
