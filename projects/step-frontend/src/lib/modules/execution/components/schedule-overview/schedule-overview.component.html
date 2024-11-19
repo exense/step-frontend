@@ -32,15 +32,24 @@
 </section>
 <section>
   <div class="row">
-    <div style="width: 440px">
+    <div class="piechart-container">
       @if (summary) {
         <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
       }
     </div>
-    <step-alt-report-widget style="flex-grow: 1">
+    <step-alt-report-widget class="flex-grow-1">
       <step-alt-report-widget-content>
-        @if (chartSettings) {
-          <step-timeseries-chart [settings]="chartSettings" />
+        @if (executionsChartSettings) {
+          <step-timeseries-chart [settings]="executionsChartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <step-alt-report-widget class="flex-grow-1">
+      <step-alt-report-widget-content>
+        @if (keywordsChartSettings) {
+          <step-timeseries-chart [settings]="keywordsChartSettings" />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>

@@ -14,20 +14,36 @@ import {
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
-import { filter, forkJoin, map, Observable, shareReplay, startWith, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  combineLatestWith,
+  filter,
+  forkJoin,
+  map,
+  Observable,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { DateTime } from 'luxon';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { SeriesStroke } from '../../../timeseries/modules/_common/types/time-series/series-stroke';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { UPlotStackedUtils } from '../../../timeseries/modules/_common/UPlotStackedUtils';
+import { MonitoringService } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/services/monitoring.service';
+import { DashboardEntry } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/shared/dashboard-entry';
+import { DateTime, Duration } from 'luxon';
 
 declare const uPlot: any;
+
+interface ExecutionWithKeywordsStats {
+  executionId: string;
+  timestamp: number;
+  statuses: Record<string, number>;
+}
 
 @Component({
   selector: 'step-schedule-overview',
@@ -47,6 +63,7 @@ export class ScheduleOverviewComponent implements OnInit {
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
+  private _monitoringService = inject(MonitoringService);
   private _dateUtils = inject(DateUtilsService);
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
@@ -55,8 +72,11 @@ export class ScheduleOverviewComponent implements OnInit {
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
 
   private relativeTime?: number;
-
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
+  now = DateTime.now();
+  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>({
+    start: this.now.minus({ months: 1 }),
+    end: this.now,
+  });
 
   protected plan?: Partial<Plan>;
   protected error = '';
@@ -65,7 +85,10 @@ export class ScheduleOverviewComponent implements OnInit {
 
   selectedTask?: ExecutiontTaskParameters;
   summary?: ReportNodeSummary;
-  chartSettings?: TSChartSettings;
+  executionsChartSettings?: TSChartSettings;
+  keywordsChartSettings?: TSChartSettings;
+
+  taskDashboardEntry?: DashboardEntry;
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -74,8 +97,9 @@ export class ScheduleOverviewComponent implements OnInit {
     takeUntilDestroyed(),
   );
 
-  readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
+  readonly timeRangeChange$: Observable<TimeRange> = this.dateRange$.pipe(
+    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange) as TimeRange),
+    filter((v) => v !== undefined),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -84,6 +108,23 @@ export class ScheduleOverviewComponent implements OnInit {
     map((params) => params?.['id'] as string),
     filter((id) => !!id),
   );
+
+  ngOnInit(): void {
+    const fetchTask$: Observable<ExecutiontTaskParameters> = this.taskId$.pipe(
+      switchMap((taskId) => this._scheduleApi.getExecutionTaskById(taskId)),
+    );
+    let x = combineLatest([fetchTask$, this.timeRangeChange$]).subscribe(([task, fullRange]) => {
+      this.selectedTask = task;
+      // this.dateRangeCtrl.setValue({
+      //   start: DateTime.fromMillis(fullRange.from),
+      //   end: DateTime.fromMillis(fullRange.to),
+      // });
+      this.createPieChart(task.id!, fullRange);
+      this.createExecutionsChart(task.id!, fullRange);
+      this.createKeywordsChart(task.id!, fullRange);
+      this.fetchLastExecution(task.id!);
+    });
+  }
 
   private updateTask(task: ExecutiontTaskParameters): ExecutiontTaskParameters {
     task.attributes = task.attributes || {};
@@ -124,24 +165,6 @@ export class ScheduleOverviewComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    this.taskId$
-      .pipe(
-        switchMap((taskId) => {
-          return forkJoin([this._scheduleApi.getExecutionTaskById(taskId), this.getFullTimeRange(taskId)]);
-        }),
-      )
-      .subscribe(([task, fullRange]) => {
-        this.selectedTask = this.updateTask(task);
-        this.dateRangeCtrl.setValue({
-          start: DateTime.fromMillis(fullRange.from),
-          end: DateTime.fromMillis(fullRange.to),
-        });
-        this.createPieChart(task.id!, fullRange);
-        this.createChart(task.id!, fullRange);
-      });
-  }
-
   private cumulateSeriesData(series: TSChartSeries[]): void {
     series.forEach((s, i) => {
       if (i == 0) {
@@ -154,7 +177,112 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  private createChart(taskId: string, timeRange: TimeRange) {
+  private createKeywordsChart(taskId: string, timeRange: TimeRange) {
+    const statusAttribute = 'rnStatus';
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      intervalSize: 1000 * 60 * 60 * 24, // one day
+      oqlFilter: `attributes.metricType = response-time and attributes.taskId = ${taskId}`,
+      groupDimensions: ['eId', 'rnStatus'],
+    };
+    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+      const executionsIndexes: Record<string, number> = {};
+      const executionsWithStats: ExecutionWithKeywordsStats[] = [];
+      const allStatuses = new Set<string>();
+      response.matrixKeys.forEach((attributes, i) => {
+        const executionId = attributes['eId'];
+        const status = attributes[statusAttribute];
+        allStatuses.add(status);
+        let executionEntry: ExecutionWithKeywordsStats = {
+          executionId: executionId,
+          statuses: {},
+          timestamp: Number.MAX_VALUE,
+        };
+        if (executionsIndexes[executionId] >= 0) {
+          executionEntry = executionsWithStats[executionsIndexes[executionId]];
+        } else {
+          executionsWithStats.push(executionEntry);
+          executionsIndexes[executionId] = executionsWithStats.length - 1;
+        }
+        response.matrix[i].forEach((bucket) => {
+          if (bucket) {
+            if (bucket.begin < executionEntry.timestamp) {
+              executionEntry.timestamp = bucket.begin; // select the first apparition of the execution
+            }
+            const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+            executionEntry.statuses[status] = newCount;
+          }
+        });
+      });
+      executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
+
+      let series = Array.from(allStatuses).map((status) => {
+        let color = this._statusColors[status as Status];
+        const fill = color + 'cc';
+        const s: TSChartSeries = {
+          id: status,
+          scale: 'y',
+          labelItems: [status],
+          legendName: status,
+          data: executionsWithStats.map((item) => item.statuses[status] || 0),
+          width: 0,
+          // value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+          //   this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          stroke: color,
+          fill: fill,
+          paths: this.bars,
+          points: { show: false },
+          show: true,
+        };
+        return s;
+      });
+      const axes: Axis[] = [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals.map((v: any) => v);
+          },
+        },
+      ];
+      this.cumulateSeriesData(series);
+      this.keywordsChartSettings = {
+        title: 'Keywords calls',
+        showLegend: false,
+        xAxesSettings: {
+          time: false,
+          label: 'Execution',
+          show: false,
+          values: executionsWithStats.map((item, i) => i),
+          valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
+            return executionsWithStats[idx].executionId;
+          },
+        },
+        scales: {
+          y: {
+            range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+              return [0, initMax];
+            },
+          },
+        },
+        series: series,
+        tooltipOptions: {
+          enabled: false,
+        },
+        axes: axes,
+        bands: this.getDefaultBands(series.length),
+      };
+    });
+  }
+
+  private fetchLastExecution(taskId: string) {
+    this._monitoringService.getDashboardEntry(taskId).subscribe((entry) => {
+      this.taskDashboardEntry = entry;
+    });
+  }
+
+  private createExecutionsChart(taskId: string, timeRange: TimeRange) {
     const statusAttribute = 'result';
     const request: FetchBucketsRequest = {
       start: timeRange.from,
@@ -164,7 +292,6 @@ export class ScheduleOverviewComponent implements OnInit {
       groupDimensions: [statusAttribute],
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-      console.log(response);
       const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
       let series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
         const seriesKey: string = response.matrixKeys[i][statusAttribute];
@@ -203,10 +330,19 @@ export class ScheduleOverviewComponent implements OnInit {
           },
         },
       ];
-      this.chartSettings = {
+      this.executionsChartSettings = {
         title: 'Executions in time',
         showLegend: false,
-        xValues: xLabels,
+        xAxesSettings: {
+          values: xLabels,
+        },
+        scales: {
+          y: {
+            range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+              return [0, initMax];
+            },
+          },
+        },
         series: series,
         tooltipOptions: {
           enabled: false,
@@ -230,7 +366,6 @@ export class ScheduleOverviewComponent implements OnInit {
     for (let i = count; i > 1; i--) {
       bands.push({ series: [i, i - 1] });
     }
-    console.log(bands);
     return bands;
   }
 
@@ -243,7 +378,6 @@ export class ScheduleOverviewComponent implements OnInit {
       groupDimensions: ['result'],
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-      console.log(response);
       let total = 0;
       const pairs: { [key: string]: number } = {};
       response.matrixKeys.forEach((keyAttributes, i) => {
@@ -259,11 +393,13 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  updateRange(timeRange?: TimeRange | null): void {
-    this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
+  updateRange(timeRange?: DateRange): void {
+    this.dateRangeCtrl.setValue(timeRange);
   }
 
   updateRelativeTime(time?: number): void {
     this.relativeTime = time;
+    let now = DateTime.now();
+    this.updateRange({ start: now.minus({ millisecond: time }), end: now });
   }
 }
