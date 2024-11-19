@@ -11,7 +11,7 @@
       <td class="name" mat-cell *matCellDef="let element">
         <span
           class="test-case-name"
-          [class.not-selected]="hasTestCasesFilter() && !(element.artefactID | isSelected | async)"
+          [class.is-selected]="hasTestCasesFilter() && (element.artefactID | isSelected | async)"
           (click)="toggleSelection(element, $event)"
         >
           {{ element.name }}

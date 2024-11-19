@@ -32,8 +32,8 @@ step-table {
 .test-case-name {
   cursor: pointer;
   user-select: none;
-  &.not-selected {
-    color: var.$muted;
+  &.is-selected {
+    font-weight: bold;
   }
 }
 
