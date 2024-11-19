@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
@@ -16,7 +16,7 @@ import {
 } from 'rxjs';
 import { ExecutionSummaryDto, PrivateViewPluginService, ReportNode, TableDataSource } from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
 import { REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
 import { AltExecutionViewAllService } from './alt-execution-view-all.service';
@@ -82,6 +82,8 @@ export abstract class AltReportNodesStateService implements OnDestroy {
 
   readonly statusesCtrl = this._fb.control<Status[]>([]);
 
+  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, { initialValue: this.statusesCtrl.value });
+
   readonly selectedStatuses$ = this.statusesCtrl.valueChanges.pipe(
     startWith(this.statusesCtrl.value),
     map((statuses) => new Set(statuses)),
@@ -103,8 +105,14 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.summaryInProgressInternal$.complete();
   }
 
-  filterNonPassed(): void {
-    const statuses = this.statuses.filter((status) => status !== Status.PASSED);
+  readonly isFilteredByNonPassed = computed(() => {
+    const statuses = new Set(this.statusCtrlValue());
+    return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
+  });
+
+  toggleFilterNonPassed(): void {
+    const isFilteredByNonPassed = this.isFilteredByNonPassed();
+    const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
     this.statusesCtrl.setValue(statuses);
   }
 

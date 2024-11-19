@@ -71,6 +71,9 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     .subscribe((search) => this.tableSearch()?.onSearch('name', search));
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
+  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
+    initialValue: this.statusesCtrl.value,
+  });
   private statusesSubscription = this.statusesCtrl.valueChanges
     .pipe(
       startWith(this.statusesCtrl.value),
@@ -95,8 +98,14 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
   }
 
-  protected filterNonPassed(): void {
-    const statuses = this.statuses.filter((status) => status !== Status.PASSED);
+  readonly isFilteredByNonPassed = computed(() => {
+    const statuses = new Set(this.statusCtrlValue());
+    return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
+  });
+
+  protected toggleFilterNonPassed(): void {
+    const isFilteredByNonPassed = this.isFilteredByNonPassed();
+    const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
     this.statusesCtrl.setValue(statuses);
   }
 }

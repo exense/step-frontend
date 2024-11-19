@@ -53,7 +53,7 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
   readonly useClear = input(true);
 
   /** @Input() **/
-  readonly clearLabel = input('Clear');
+  readonly clearLabel = input('clear');
 
   /** @Input() **/
   readonly clearValue = input<null | undefined>(undefined);

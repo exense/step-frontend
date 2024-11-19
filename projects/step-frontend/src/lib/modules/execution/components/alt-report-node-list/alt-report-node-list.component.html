@@ -12,14 +12,15 @@
           [items]="_state.statuses"
           [multiple]="true"
           emptyPlaceholder="ALL STATUS"
-          clearLabel="Select all statuses"
         />
         <step-suffix class="button-suffix">
           <button
             type="button"
-            mat-stroked-button
-            matTooltip="Filter for all status except passed"
-            (click)="_state.filterNonPassed()"
+            mat-flat-button
+            [color]="_state.isFilteredByNonPassed() ? 'primary' : undefined"
+            [matTooltip]="_state.isFilteredByNonPassed() ? 'Clear' : 'Filter for all status except passed'"
+            matTooltipPosition="below"
+            (click)="_state.toggleFilterNonPassed()"
           >
             <step-icon name="alert-circle" />
           </button>

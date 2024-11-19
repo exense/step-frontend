@@ -6,19 +6,15 @@
       </button>
     </div>
     <step-form-field>
-      <step-select
-        [formControl]="statusesCtrl"
-        [items]="statuses"
-        [multiple]="true"
-        emptyPlaceholder="ALL STATUS"
-        clearLabel="Select all statuses"
-      />
+      <step-select [formControl]="statusesCtrl" [items]="statuses" [multiple]="true" emptyPlaceholder="ALL STATUS" />
       <step-suffix class="button-suffix">
         <button
           type="button"
-          mat-stroked-button
-          matTooltip="Filter for all status except passed"
-          (click)="filterNonPassed()"
+          mat-flat-button
+          [color]="isFilteredByNonPassed() ? 'primary' : undefined"
+          [matTooltip]="isFilteredByNonPassed() ? 'Clear' : 'Filter for all status except passed'"
+          matTooltipPosition="below"
+          (click)="toggleFilterNonPassed()"
         >
           <step-icon name="alert-circle" />
         </button>
