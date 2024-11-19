@@ -24,6 +24,16 @@ step-table {
   margin-left: 2.5rem;
 }
 
+section > div {
+  display: flex;
+  gap: 1rem;
+  padding-right: 2rem;
+  margin-bottom: 0.5rem;
+  .sort-container {
+    flex: 1;
+  }
+}
+
 button.details-trigger {
   width: 2rem !important;
   step-icon {

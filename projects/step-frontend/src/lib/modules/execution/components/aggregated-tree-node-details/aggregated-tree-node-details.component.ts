@@ -12,10 +12,13 @@ import {
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
-import { AugmentedExecutionsService, ReportNode } from '@exense/step-core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { arrayToRegex, AugmentedExecutionsService, ReportNode, TableSearch } from '@exense/step-core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { MatSort, SortDirection } from '@angular/material/sort';
+import { FormBuilder } from '@angular/forms';
+import { debounceTime, map, startWith } from 'rxjs';
+import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-aggregated-tree-node-details',
@@ -23,11 +26,16 @@ import { MatSort, SortDirection } from '@angular/material/sort';
   styleUrl: './aggregated-tree-node-details.component.scss',
 })
 export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
+  private _fb = inject(FormBuilder).nonNullable;
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
   private _augmentedExecutionService = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
+
+  readonly statuses = REPORT_NODE_STATUS;
+
+  protected tableSearch = viewChild('table', { read: TableSearch });
 
   private matSort = viewChild(MatSort);
 
@@ -52,6 +60,26 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
 
   protected readonly visibleDetails = this._treeState.visibleDetails;
 
+  protected readonly searchCtrl = this._fb.control('');
+  private searchSubscription = this.searchCtrl.valueChanges
+    .pipe(
+      startWith(this.searchCtrl.value),
+      debounceTime(200),
+      map((value) => (value ?? '').trim().toLowerCase()),
+      takeUntilDestroyed(),
+    )
+    .subscribe((search) => this.tableSearch()?.onSearch('name', search));
+
+  protected readonly statusesCtrl = this._fb.control<Status[]>([]);
+  private statusesSubscription = this.statusesCtrl.valueChanges
+    .pipe(
+      startWith(this.statusesCtrl.value),
+      map((statuses) => new Set(statuses)),
+      map((statuses) => arrayToRegex(Array.from(statuses) as string[])),
+      takeUntilDestroyed(),
+    )
+    .subscribe((statuses) => this.tableSearch()?.onSearch('status', { value: statuses, regex: true }));
+
   ngAfterViewInit(): void {
     const treeNodeName = this._el.nativeElement.closest<HTMLElement>('step-tree-node-name');
     if (treeNodeName) {
@@ -65,5 +93,10 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
 
   protected toggleSort(): void {
     this.sort.update((sort) => (sort === 'asc' ? 'desc' : 'asc'));
+  }
+
+  protected filterNonPassed(): void {
+    const statuses = this.statuses.filter((status) => status !== Status.PASSED);
+    this.statusesCtrl.setValue(statuses);
   }
 }

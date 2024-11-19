@@ -1,8 +1,37 @@
 <section matSort [matSortDisableClear]="true">
-  <button class="sort-handler" type="button" mat-icon-button (click)="toggleSort()">
-    <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
-  </button>
+  <div>
+    <div class="sort-container">
+      <button class="sort-handler" type="button" mat-icon-button (click)="toggleSort()">
+        <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+      </button>
+    </div>
+    <step-form-field>
+      <step-prefix>Status</step-prefix>
+      <mat-select [formControl]="statusesCtrl" [multiple]="true">
+        @for (status of statuses; track status) {
+          <mat-option [value]="status">{{ status }}</mat-option>
+        }
+      </mat-select>
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-stroked-button
+          matTooltip="Filter for all status except passed"
+          (click)="filterNonPassed()"
+        >
+          <step-icon name="alert-circle" />
+        </button>
+      </step-suffix>
+    </step-form-field>
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="search" />
+      </step-prefix>
+      <input type="text" class="search-input" [formControl]="searchCtrl" placeholder="Search" />
+    </step-form-field>
+  </div>
   <step-table
+    #table
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
     class="paddingless-full no-border hide-header"
