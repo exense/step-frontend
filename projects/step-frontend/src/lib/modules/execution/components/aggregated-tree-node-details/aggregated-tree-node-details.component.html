@@ -6,12 +6,13 @@
       </button>
     </div>
     <step-form-field>
-      <step-prefix>Status</step-prefix>
-      <mat-select [formControl]="statusesCtrl" [multiple]="true">
-        @for (status of statuses; track status) {
-          <mat-option [value]="status">{{ status }}</mat-option>
-        }
-      </mat-select>
+      <step-select
+        [formControl]="statusesCtrl"
+        [items]="statuses"
+        [multiple]="true"
+        emptyPlaceholder="ALL STATUS"
+        clearLabel="Select all statuses"
+      />
       <step-suffix class="button-suffix">
         <button
           type="button"
