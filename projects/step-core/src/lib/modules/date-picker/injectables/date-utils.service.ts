@@ -7,8 +7,12 @@ import { TimeRange } from '../../../client/step-client-module';
   providedIn: 'root',
 })
 export class DateUtilsService {
-  areDatesEqual(a: DateTime | null | undefined, b: DateTime | null | undefined): boolean {
-    return a === b || this.compare(a, b) === 0;
+  areDatesEqual(
+    a: DateTime | null | undefined,
+    b: DateTime | null | undefined,
+    measurementErrorMs: number = 0,
+  ): boolean {
+    return a === b || Math.abs(this.compare(a, b)) <= measurementErrorMs;
   }
 
   compare(a: DateTime | null | undefined, b: DateTime | null | undefined): number {
