@@ -36,7 +36,7 @@ export class AltExecutionReportComponent {
 
   protected readonly _mode = inject(VIEW_MODE);
 
-  protected handleOpenKeywordInTreeView(keyword: ReportNode): void {
+  protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
@@ -44,6 +44,7 @@ export class AltExecutionReportComponent {
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
   }
 
+  /*
   protected handleOpenKeywordDrilldown(keyword: ReportNode): void {
     const id = keyword.id;
     if (!id) {
@@ -51,6 +52,7 @@ export class AltExecutionReportComponent {
     }
     this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
   }
+*/
 
   protected readonly ViewMode = ViewMode;
 }

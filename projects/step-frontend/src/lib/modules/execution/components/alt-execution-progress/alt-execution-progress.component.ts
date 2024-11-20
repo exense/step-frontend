@@ -2,29 +2,36 @@ import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } f
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import {
+  combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   of,
+  pairwise,
   shareReplay,
-  switchMap,
-  combineLatest,
   startWith,
+  switchMap,
   take,
   tap,
-  distinctUntilChanged,
 } from 'rxjs';
 import {
+  ArtefactFilter,
   AugmentedControllerService,
   AugmentedExecutionsService,
+  AutoDeselectStrategy,
+  AugmentedPlansService,
   DateRange,
   DateUtilsService,
   DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
   ExecutiontTaskParameters,
   IS_SMALL_SCREEN,
+  RegistrationStrategy,
   RELATIVE_TIME_OPTIONS,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
+  selectionCollectionProvider,
+  SelectionCollector,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
@@ -50,8 +57,26 @@ import { AltExecutionStorageService } from '../../services/alt-execution-storage
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
+import { KeyValue } from '@angular/common';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
+
+enum UpdateSelection {
+  ALL = 'all',
+  ONLY_NEW = 'onlyNew',
+  NONE = 'none',
+}
+
+interface RefreshParams {
+  execution?: Execution;
+  updateSelection?: UpdateSelection;
+}
+
+const COMPARE_MEASUREMENT_ERROR_MS = 30_000;
+
+interface DateRangeExt extends DateRange {
+  isDefault?: boolean;
+}
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -107,6 +132,13 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
       },
     },
     AltExecutionReportPrintService,
+    ...selectionCollectionProvider(
+      {
+        selectionKeyProperty: 'artefactID',
+        registrationStrategy: RegistrationStrategy.MANUAL,
+      },
+      AutoDeselectStrategy.KEEP_SELECTION,
+    ),
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
@@ -114,6 +146,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
+  private _plansApi = inject(AugmentedPlansService);
   private _router = inject(Router);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
@@ -124,6 +157,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
 
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
@@ -146,17 +180,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.relativeTime = time;
   }
 
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
-
-  private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe((range) => {
-      // Ignore synchronization in case of view all mode
-      if (this._viewAllService.isViewAll) {
-        return;
-      }
-      this.saveRangeToStorage(range);
-    });
+  readonly dateRangeCtrl = this._fb.control<DateRangeExt | null | undefined>(null);
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -184,6 +208,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly executionId$ = this._activatedRoute.params.pipe(
     map((params) => params?.['id'] as string),
     filter((id) => !!id),
+    takeUntilDestroyed(),
   );
 
   readonly activeExecution$ = this.executionId$.pipe(map((id) => this._activeExecutions.getActiveExecution(id)));
@@ -192,6 +217,19 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  readonly executionPlan$ = this.execution$.pipe(
+    map((execution) => execution.planId),
+    switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly resolvedParameters$ = this.execution$.pipe(
+    map((execution) => {
+      return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
+    }),
   );
 
   readonly displayStatus$ = this.execution$.pipe(
@@ -203,17 +241,46 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
     map(([selectedRange, fullRange]) => {
       const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
+      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end, COMPARE_MEASUREMENT_ERROR_MS);
       return startEq && endEq;
     }),
   );
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
+  readonly hasTestCasesFilter$ = this._testCasesSelection.selected$.pipe(
+    map((selected) => selected.length > 0 && selected.length < this._testCasesSelection.possibleLength),
+  );
+
+  private previousTestCasesIds: string[] = [];
   readonly testCases$ = this.execution$.pipe(
-    switchMap((execution) =>
-      this._executionsApi.getReportNodesByExecutionId(execution.id!, 'step.artefacts.reports.TestCaseReportNode', 500),
-    ),
+    pairwise(),
+    map(([prevExecution, currentExecution]) => {
+      const updateSelection =
+        prevExecution?.id !== currentExecution?.id ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW;
+      return { execution: currentExecution, updateSelection } as RefreshParams;
+    }),
+    switchMap(({ execution, updateSelection }) => {
+      if (!execution?.id) {
+        return of([]);
+      }
+      return this._executionsApi
+        .getReportNodesByExecutionId(execution.id, 'step.artefacts.reports.TestCaseReportNode', 500)
+        .pipe(
+          tap((reportNodes) => {
+            const oldTestCasesIds = new Set(this.previousTestCasesIds);
+            const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.has(testCase.id!));
+            this.previousTestCasesIds = reportNodes.map((testCase) => testCase.id!);
+            this._testCasesSelection.registerPossibleSelectionManually(reportNodes);
+            if (updateSelection !== UpdateSelection.NONE) {
+              this.determineDefaultSelection(
+                updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
+                execution.executionParameters?.artefactFilter,
+              );
+            }
+          }),
+        );
+    }),
     map((testCases) => (!testCases?.length ? undefined : testCases)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -228,12 +295,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly keywordParameters$ = combineLatest([this.execution$, this.testCases$]).pipe(
-    map(([execution, testCases]) => {
+  readonly keywordParameters$ = combineLatest([this.execution$, this._testCasesSelection.selected$]).pipe(
+    map(([execution, testCasesSelection]) => {
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
-        testcases: !testCases?.length ? undefined : testCases.map((testCase) => testCase.artefactID!),
+        testcases: !testCasesSelection.length ? undefined : testCasesSelection,
       } as KeywordParameters;
     }),
     shareReplay(1),
@@ -259,13 +326,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   ngOnInit(): void {
-    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    combineLatest([this.execution$, isIgnoreFilter$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, isIgnoreFilter]) => {
-        this.refreshExecutionTree(execution);
-        this.applyDefaultRange(execution, !isIgnoreFilter);
-      });
+    this.setupRangeSyncWithStorage();
+    this.setupDateRangeSyncOnExecutionRefresh();
+    this.setupTreeRefresh();
   }
 
   ngOnDestroy(): void {
@@ -273,7 +336,40 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.testCasesDataSource?.destroy();
   }
 
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
+  private setupRangeSyncWithStorage(): void {
+    this.dateRangeCtrl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((range) => {
+      // Ignore synchronization in case of view all mode
+      if (this._viewAllService.isViewAll) {
+        return;
+      }
+      const executionId = this.executionIdSnapshot;
+      if (!range || !executionId) {
+        return;
+      }
+      const start = range.start?.toMillis();
+      const end = range.end?.toMillis();
+      this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
+    });
+  }
+
+  private setupDateRangeSyncOnExecutionRefresh(): void {
+    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      this.applyDefaultRange(execution);
+    });
+  }
+
+  private setupTreeRefresh(): void {
+    const range$ = this.dateRange$.pipe(map((range) => (!this.relativeTime && range?.isDefault ? undefined : range)));
+
+    combineLatest([this.executionId$, range$])
+      .pipe(
+        switchMap(([executionId, range]) => this._aggregatedTreeState.loadTree(executionId, range)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((isTreeInitialized) => (this.isTreeInitialized = isTreeInitialized));
+  }
+
+  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {
     let start: DateTime;
     let end: DateTime;
 
@@ -295,17 +391,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       end = DateTime.now();
     }
 
-    return { start, end };
-  }
-
-  private saveRangeToStorage(range?: DateRange | null): void {
-    const executionId = this.executionIdSnapshot;
-    if (!range || !executionId) {
-      return;
-    }
-    const start = range.start?.toMillis();
-    const end = range.end?.toMillis();
-    this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
+    return { start, end, isDefault: true };
   }
 
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
@@ -319,13 +405,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
-  }
-
-  private refreshExecutionTree(execution: Execution): void {
-    this._aggregatedTreeState
-      .loadTree(execution.id!)
-      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    const defaultRange = this.getDefaultRangeForExecution(execution, useStorage);
+    this.dateRangeCtrl.setValue(defaultRange);
   }
 
   private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
@@ -343,5 +424,22 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         })
         .build(),
     );
+  }
+
+  private determineDefaultSelection(testCases: ReportNode[], artefactFilter?: ArtefactFilter): void {
+    const selectedTestCases = testCases.filter((value) => {
+      if (!artefactFilter) {
+        return true;
+      }
+      switch (artefactFilter.class) {
+        case 'step.artefacts.filters.TestCaseFilter':
+          return (artefactFilter as any).includedNames.includes(value.name);
+        case `step.artefacts.filters.TestCaseIdFilter`:
+          return (artefactFilter as any).includedIds.includes(value.artefactID);
+        default:
+          return true;
+      }
+    });
+    this._testCasesSelection.select(...selectedTestCases);
   }
 }

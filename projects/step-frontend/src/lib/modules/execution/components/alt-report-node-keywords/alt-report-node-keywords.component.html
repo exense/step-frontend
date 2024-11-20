@@ -5,6 +5,14 @@
   matSort
   [matSortDisableClear]="true"
 >
+  <step-alt-report-widget-filter>
+    @if (hasTestCasesFilter()) {
+      <button type="button" class="clear-test-cases" mat-stroked-button (click)="clearTestCasesFilter()">
+        <step-icon name="x" />
+        <span>Clear test cases filter</span>
+      </button>
+    }
+  </step-alt-report-widget-filter>
   <step-table
     #table
     [dataSource]="(dataSource$ | async)!"
@@ -53,17 +61,6 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
         <step-btn-group class="actions">
-          <!--
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Open keyword details"
-            matTooltipPosition="below"
-            (click)="openKeywordDrilldown.emit(element)"
-          >
-            <step-icon name="keyword" />
-          </button>
--->
           <button
             type="button"
             mat-icon-button

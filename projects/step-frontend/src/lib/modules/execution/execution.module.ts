@@ -83,6 +83,8 @@ import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-no
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/doughnut-chart.component';
+import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
+import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 
 @NgModule({
   declarations: [
@@ -99,6 +101,7 @@ import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/
     ExecutionTreeComponent,
     RepositoryComponent,
     ExecutionActionsComponent,
+    ExecutionCommandsDirective,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     DashletExecutionStepComponent,
@@ -133,6 +136,7 @@ import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/
     AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
+    AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
     AltExecutionRangePickerComponent,
@@ -162,6 +166,7 @@ import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/
     ExecutionErrorsComponent,
     KeywordCallsComponent,
     ExecutionTreeComponent,
+    ExecutionCommandsDirective,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     RepositoryComponent,

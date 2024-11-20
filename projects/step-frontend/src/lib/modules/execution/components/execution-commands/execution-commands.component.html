@@ -1,11 +1,11 @@
-@if (displayParametersForm) {
-  @if (executionParameters) {
-    <step-custom-forms [stModel]="executionParameters" stScreen="executionParameters" />
+@if (displayParametersForm()) {
+  @if (executionParameters(); as params) {
+    <step-custom-forms [stModel]="params" stScreen="executionParameters" />
   }
   <step-execution-actions
-    [execution]="execution"
-    [isExecutionIsolated]="isExecutionIsolated"
-    [tooltips]="tooltips"
+    [execution]="execution()"
+    [isExecutionIsolated]="isExecutionIsolated()"
+    [tooltips]="tooltips()"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
@@ -14,10 +14,10 @@
   />
 } @else {
   <step-execution-actions
-    [execution]="execution"
-    [isExecutionIsolated]="isExecutionIsolated"
-    [allowExecuteWithContent]="!!executionParameters"
-    [tooltips]="tooltips"
+    [execution]="execution()"
+    [isExecutionIsolated]="isExecutionIsolated()"
+    [allowExecuteWithContent]="!!executionParameters()"
+    [tooltips]="tooltips()"
     (execute)="execute($event)"
     (schedule)="schedule()"
     (stop)="stop()"
@@ -25,9 +25,9 @@
     (copyLink)="copyExecutionServiceAsCurlToClipboard()"
   >
     <step-execution-actions-execute-content>
-      @if (executionParameters) {
+      @if (executionParameters(); as params) {
         <section class="execution-params-popover">
-          <step-custom-forms [stModel]="executionParameters" stScreen="executionParameters" />
+          <step-custom-forms [stModel]="params" stScreen="executionParameters" />
           <button type="button" mat-flat-button color="primary" (click)="execute(false)">Execute</button>
         </section>
       }
