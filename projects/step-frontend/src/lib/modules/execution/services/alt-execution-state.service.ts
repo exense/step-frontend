@@ -12,6 +12,7 @@ export abstract class AltExecutionStateService {
   abstract readonly isFullRangeSelected$: Observable<boolean>;
   abstract readonly keywordParameters$: Observable<KeywordParameters>;
   abstract readonly keywordsDataSource$: Observable<TableDataSource<ReportNode>>;
+  abstract readonly hasTestCasesFilter$: Observable<boolean>;
   abstract readonly testCases$: Observable<ReportNode[] | undefined>;
   abstract readonly testCasesDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;

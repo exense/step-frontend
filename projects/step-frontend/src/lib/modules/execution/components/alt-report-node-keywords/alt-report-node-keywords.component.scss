@@ -26,6 +26,7 @@ step-table {
 
 .name {
   width: 100%;
+  white-space: nowrap;
 }
 
 .actions {
@@ -35,6 +36,11 @@ step-table {
     width: 2rem;
     height: 2rem;
   }
+}
+
+.clear-test-cases {
+  white-space: nowrap;
+  border-radius: 0.8rem;
 }
 
 @media print {
