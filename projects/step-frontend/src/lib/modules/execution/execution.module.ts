@@ -82,6 +82,7 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/doughnut-chart.component';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 
@@ -150,7 +151,14 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    DoughnutChartComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
