@@ -41,7 +41,9 @@ step-alt-execution-progress {
         line-height: 3.8rem;
         display: flex;
         flex-wrap: nowrap;
+        align-items: center;
         gap: 0.5rem;
+
         div {
           text-overflow: ellipsis;
           overflow: hidden;
@@ -134,6 +136,21 @@ step-alt-execution-progress {
     display: block;
     margin-bottom: 2em;
   }
+
+  entity-icon {
+    display: flex;
+    line-height: 1;
+  }
+
+  button.warning {
+    color: var.$red-50;
+  }
 }
 
 @include common.executions-menu;
+
+.execution-resolved-params {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
