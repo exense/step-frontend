@@ -248,6 +248,22 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns a map of execution ID to names by the provided ids.
+   * @param taskId
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getLastExecutionByTaskId(taskId: string): Observable<Execution> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/search/last/by/task-id/{taskId}',
+      path: {
+        taskId: taskId,
+      },
+    });
+  }
+
+  /**
    * Returns the list of report nodes with contributing errors for the given execution
    * @param id
    * @param skip

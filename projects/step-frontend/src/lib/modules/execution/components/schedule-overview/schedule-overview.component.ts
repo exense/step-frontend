@@ -6,6 +6,8 @@ import {
   BucketResponse,
   DateRange,
   DateUtilsService,
+  Execution,
+  ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   MarkerType,
@@ -33,7 +35,6 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { MonitoringService } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/services/monitoring.service';
 import { DashboardEntry } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/shared/dashboard-entry';
 import { DateTime, Duration } from 'luxon';
 
@@ -63,7 +64,7 @@ export class ScheduleOverviewComponent implements OnInit {
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
-  private _monitoringService = inject(MonitoringService);
+  private _executionService = inject(ExecutionsService);
   private _dateUtils = inject(DateUtilsService);
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
@@ -83,12 +84,11 @@ export class ScheduleOverviewComponent implements OnInit {
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
 
+  lastExecution?: Execution;
   selectedTask?: ExecutiontTaskParameters;
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
-
-  taskDashboardEntry?: DashboardEntry;
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -115,54 +115,11 @@ export class ScheduleOverviewComponent implements OnInit {
     );
     let x = combineLatest([fetchTask$, this.timeRangeChange$]).subscribe(([task, fullRange]) => {
       this.selectedTask = task;
-      // this.dateRangeCtrl.setValue({
-      //   start: DateTime.fromMillis(fullRange.from),
-      //   end: DateTime.fromMillis(fullRange.to),
-      // });
       this.createPieChart(task.id!, fullRange);
       this.createExecutionsChart(task.id!, fullRange);
       this.createKeywordsChart(task.id!, fullRange);
       this.fetchLastExecution(task.id!);
     });
-  }
-
-  private updateTask(task: ExecutiontTaskParameters): ExecutiontTaskParameters {
-    task.attributes = task.attributes || {};
-    task.executionsParameters = task.executionsParameters || {};
-    task.executionsParameters.customParameters = task.executionsParameters.customParameters || {};
-
-    const repository = task.executionsParameters.repositoryObject;
-
-    if (repository?.repositoryID === 'local') {
-      const planId = repository.repositoryParameters?.['planid'];
-      if (planId) {
-        const name = task.executionsParameters.description ?? '';
-        this.plan = {
-          id: planId,
-          attributes: { name },
-        };
-      }
-    } else {
-      this.repositoryId = repository?.repositoryID;
-      this.repositoryPlanId =
-        repository?.repositoryParameters?.['planid'] ?? repository?.repositoryParameters?.['planId'];
-    }
-    return task;
-  }
-
-  private getFullTimeRange(taskId: string): Observable<TimeRange> {
-    return this._scheduleApi.getExecutionsByTaskId(taskId, 0, new Date().getTime()).pipe(
-      map((executions) => {
-        let now = new Date().getTime();
-        let start = 0;
-        if (executions.data.length) {
-          start = executions.data[0].startTime;
-        } else {
-          start = now - 1000 * 60;
-        }
-        return { from: start - 1000 * 60 * 60 * 24 * 7, to: now };
-      }),
-    );
   }
 
   private cumulateSeriesData(series: TSChartSeries[]): void {
@@ -227,8 +184,8 @@ export class ScheduleOverviewComponent implements OnInit {
           legendName: status,
           data: executionsWithStats.map((item) => item.statuses[status] || 0),
           width: 0,
-          // value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-          //   this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
           stroke: color,
           fill: fill,
           paths: this.bars,
@@ -248,8 +205,9 @@ export class ScheduleOverviewComponent implements OnInit {
       ];
       this.cumulateSeriesData(series);
       this.keywordsChartSettings = {
-        title: 'Keywords calls',
+        title: 'Keywords calls by execution',
         showLegend: false,
+        showDefaultLegend: true,
         xAxesSettings: {
           time: false,
           label: 'Execution',
@@ -276,10 +234,13 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  private fetchLastExecution(taskId: string) {
-    this._monitoringService.getDashboardEntry(taskId).subscribe((entry) => {
-      this.taskDashboardEntry = entry;
+  private fetchLastExecution(taskId: string): void {
+    this._executionService.getLastExecutionByTaskId(taskId).subscribe((execution) => {
+      this.lastExecution = execution;
     });
+    // this._monitoringService.getDashboardEntry(taskId).subscribe((entry) => {
+    //   this.taskDashboardEntry = entry;
+    // });
   }
 
   private createExecutionsChart(taskId: string, timeRange: TimeRange) {
@@ -331,8 +292,9 @@ export class ScheduleOverviewComponent implements OnInit {
         },
       ];
       this.executionsChartSettings = {
-        title: 'Executions in time',
+        title: 'Executions per day',
         showLegend: false,
+        showDefaultLegend: true,
         xAxesSettings: {
           values: xLabels,
         },

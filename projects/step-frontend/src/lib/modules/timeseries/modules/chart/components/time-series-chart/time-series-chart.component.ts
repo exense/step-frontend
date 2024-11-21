@@ -192,7 +192,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
-      legend: { show: true },
+      legend: { show: !!settings.showDefaultLegend },
       cursor: cursorOpts,
       // @ts-ignore
       select: { show: settings.zoomEnabled ?? true },

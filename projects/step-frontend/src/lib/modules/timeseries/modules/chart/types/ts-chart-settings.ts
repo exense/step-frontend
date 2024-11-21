@@ -6,6 +6,7 @@ import uPlot from '../../_common/types/uPlot';
 export interface TSChartSettings {
   title: string;
   xAxesSettings: XAxesSettings;
+  showDefaultLegend?: boolean;
   cursor?: Cursor; // cursor related settings and events
   series: TSChartSeries[];
   scales?: Scales;
