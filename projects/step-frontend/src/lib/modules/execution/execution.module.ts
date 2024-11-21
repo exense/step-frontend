@@ -83,7 +83,6 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
-import { MatCard } from '@angular/material/card';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 
 @NgModule({
@@ -156,7 +155,6 @@ import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
     ReportNodesModule,
     TimeSeriesModule,
     ArtefactsModule,
-    MatCard,
     TimeSeriesChartComponent,
   ],
   exports: [

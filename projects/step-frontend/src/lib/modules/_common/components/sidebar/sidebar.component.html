@@ -73,7 +73,13 @@
                     (stepSideBarClick)="navigateTo(entry.id, $event)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
-                    <span class="sidebar-aligned-subtext">{{ entry.title }}</span>
+                    <span
+                      class="sidebar-aligned-subtext sub-menu-name"
+                      [attr.data-icon]="entry.icon"
+                      [attr.data-id]="entry.id"
+                      [attr.data-title]="entry.title"
+                      >{{ entry.title }}</span
+                    >
                   </div>
                   <div class="sidebar-subtab-content">
                     @for (subEntry of entry.children; track subEntry.id) {
@@ -81,7 +87,7 @@
                         <div
                           class="sidebar-sub-subtab"
                           [class.sidebar-highlighted-subtab]="subEntry.id | isMenuItemActive | async"
-                          (mouseup)="navigateTo(entry.id, $event, entry.isBookmark)"
+                          (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark)"
                         >
                           <step-icon class="visible-when-collapsed" [name]="subEntry.icon || 'minus'" />
                           <span class="sidebar-aligned-sub-subtext" [matTooltip]="subEntry.title">
