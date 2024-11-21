@@ -31,6 +31,9 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
   /** @Input() **/
   summary = input.required<ReportNodeSummary>();
 
+  /** @Input() **/
+  action = input<() => void>();
+
   protected readonly legend = computed(() => {
     const summary = this.summary();
     const keysSet = new Set(Object.keys(summary));
@@ -136,6 +139,7 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
             enabled: false,
           },
         },
+        onClick: this.action(),
       },
     });
   }

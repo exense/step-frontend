@@ -27,6 +27,7 @@ import {
   tap,
 } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DateTime } from 'luxon';
@@ -62,6 +63,10 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
   protected error = '';
   protected repositoryId?: string;
   protected repositoryPlanId?: string;
+
+  chartAction() {
+    console.log('action');
+  }
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -135,8 +140,29 @@ export class ScheduleOverviewComponent implements OnInit, ScheduleCrossExecution
     takeUntilDestroyed(),
   );
 
+  readonly latestExecution$ = this.executions$.pipe(
+    map((executions) => {
+      const data = executions.data;
+      const lastExecution = data[data.length - 1];
+
+      const date = new Date(lastExecution.startTime);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear() % 100;
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+
+      const formattedDate = `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year.toString().padStart(2, '0')}`;
+      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+      return data.length > 0 ? { result: lastExecution.result, date: { formattedDate, formattedTime } } : null;
+    }),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   readonly executionFulLRange$ = this.executions$.pipe(
-    map((execution) => this.getDefaultRangeForExecution(execution.data[0])),
+    map((execution) => this.getDefaultRangeForTask(execution.data[0])),
   );
 
   readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(

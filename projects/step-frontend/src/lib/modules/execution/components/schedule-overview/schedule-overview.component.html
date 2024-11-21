@@ -3,6 +3,12 @@
     <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       <h1>{{ task.attributes?.['name'] }}</h1>
+      @if (latestExecution$ | async; as latestExecution) {
+        <div class="latest-execution">
+          <p>{{ latestExecution.date.formattedDate }} - {{ latestExecution.date.formattedTime }}</p>
+          <p>{{ latestExecution.result }}</p>
+        </div>
+      }
     </div>
   }
   <div class="range-picker">
@@ -32,6 +38,6 @@
 </section>
 <section class="body">
   @if (summary$ | async; as summary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
+    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" [action]="chartAction" />
   }
 </section>
