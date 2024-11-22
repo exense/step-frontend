@@ -255,7 +255,7 @@ export class ExecutionsService {
    */
   public getLastExecutionByTaskId(taskId: string): Observable<Execution> {
     return this.httpRequest.request({
-      method: 'POST',
+      method: 'GET',
       url: '/executions/search/last/by/task-id/{taskId}',
       path: {
         taskId: taskId,
