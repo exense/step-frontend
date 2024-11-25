@@ -1,0 +1,30 @@
+<section class="invisible-items">
+  @for (item of items(); track item.key) {
+    <div [stepAutoShrankItem]="item" class="item">
+      <strong>{{ item.key }}</strong>
+      <span>{{ item.value }}</span>
+    </div>
+  }
+</section>
+<section class="visible-items">
+  @for (item of visibleItems(); track item.key) {
+    <div class="item" [matTooltip]="item | itemTooltip" matTooltipPosition="below">
+      <strong>{{ item.key }}</strong>
+      <span>{{ item.value }}</span>
+    </div>
+  }
+  @if (hasHiddenItems()) {
+    <button type="button" mat-flat-button [matMenuTriggerFor]="hiddenItemsMenu">
+      <div>more</div>
+      <step-icon name="chevron-down" />
+    </button>
+  }
+</section>
+<mat-menu #hiddenItemsMenu>
+  @for (item of hiddenItems(); track item.key) {
+    <div class="item" mat-menu-item [matTooltip]="item | itemTooltip" matTooltipPosition="before">
+      <strong>{{ item.key }}</strong>
+      <span>{{ item.value }}</span>
+    </div>
+  }
+</mat-menu>

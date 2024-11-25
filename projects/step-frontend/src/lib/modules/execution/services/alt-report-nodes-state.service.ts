@@ -105,14 +105,16 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.summaryInProgressInternal$.complete();
   }
 
-  readonly isFilteredByNonPassed = computed(() => {
+  readonly isFilteredByNonPassedAndNoRunning = computed(() => {
     const statuses = new Set(this.statusCtrlValue());
-    return statuses.size === this.statuses.length - 1 && !statuses.has(Status.PASSED);
+    return statuses.size === this.statuses.length - 2 && !statuses.has(Status.PASSED) && !statuses.has(Status.RUNNING);
   });
 
-  toggleFilterNonPassed(): void {
-    const isFilteredByNonPassed = this.isFilteredByNonPassed();
-    const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
+  toggleFilterNonPassedAndNoRunning(): void {
+    const isFilteredByNonPassed = this.isFilteredByNonPassedAndNoRunning();
+    const statuses = !isFilteredByNonPassed
+      ? this.statuses.filter((status) => status !== Status.PASSED && status !== Status.RUNNING)
+      : [];
     this.statusesCtrl.setValue(statuses);
   }
 

@@ -76,6 +76,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
+import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
 
 @NgModule({
   declarations: [
@@ -152,6 +153,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
+    AUTO_SHRANK_LIST_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -220,6 +222,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
+    AUTO_SHRANK_LIST_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
@@ -357,5 +360,6 @@ export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
+export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';

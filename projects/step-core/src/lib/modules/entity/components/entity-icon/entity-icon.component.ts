@@ -1,57 +1,44 @@
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { EntityTypeResolver } from '../../injectables/entity-type-resolver';
 import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../injectables/entity-registry';
 
-import { AugmentedPlansService } from '../../../../client/augmented/services/augmented-plans.service';
-import { Plan } from '../../../../client/generated';
+import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
 import { ArtefactService } from '../../../../services/artefact.service';
 
 @Component({
   selector: 'entity-icon', // eslint-disable-line @angular-eslint/component-selector
   templateUrl: './entity-icon.component.html',
   styleUrls: ['./entity-icon.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
-export class EntityIconComponent implements OnChanges {
-  @Input() entityName?: string;
-  @Input() entity!: Entity;
-
-  icon: string = '';
-  tooltip: string = '';
-
+export class EntityIconComponent {
   private _entityTypeResolver = inject(EntityTypeResolver);
-  private entityRegistry = inject(EntityRegistry);
+  private _entityRegistry = inject(EntityRegistry);
   private _artefactService = inject(ArtefactService);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['entity'].firstChange ||
-      changes['entityName']?.firstChange ||
-      changes['entity'].previousValue !== changes['entity'].currentValue ||
-      changes['entityName']?.previousValue !== changes['entityName']?.currentValue
-    ) {
-      this.update();
-    }
-  }
+  /** @Input() **/
+  readonly entityName = input<string>();
 
-  update(): void {
-    const iconType = this.getIconType();
-    this.icon = iconType.icon;
-    this.tooltip = iconType.tooltip;
-  }
+  /** @Input() **/
+  readonly entity = input.required<Entity>();
 
-  private getIconType(): { icon: string; tooltip: string } {
-    const entityType = this.entityName ? this.entityRegistry.getEntityByName(this.entityName) : undefined;
-    let iconOverride = this._entityTypeResolver.getTypeExtension(this.entity, entityType);
+  protected readonly iconInfo = computed(() => {
+    const entityName = this.entityName();
+    const entity = this.entity();
+
+    const entityType = entityName ? this._entityRegistry.getEntityByName(entityName) : undefined;
+    let iconOverride = this._entityTypeResolver.getTypeExtension(entity, entityType);
 
     if (entityType?.type === AugmentedPlansService.PLANS_TABLE_ID) {
       if (!iconOverride?.icon) {
-        const planEntity = this.entity as Plan;
+        const planEntity = entity as Plan;
         const planTypeIcon = this._artefactService.getArtefactType(planEntity.root?._class)?.icon;
         iconOverride = { icon: planTypeIcon };
       }
     }
 
     return { icon: iconOverride?.icon ?? entityType?.icon ?? '', tooltip: iconOverride?.tooltip ?? '' };
-  }
+  });
 }
