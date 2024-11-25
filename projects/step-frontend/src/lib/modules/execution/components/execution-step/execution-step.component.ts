@@ -13,12 +13,11 @@ import {
   BulkSelectionType,
   Execution,
   ExecutionSummaryDto,
-  FilterConditionFactoryService,
   ReportNode,
   SelectionCollector,
   TableLocalDataSource,
 } from '@exense/step-core';
-import { ExecutionViewServices } from '../../../operations/shared/execution-view-services';
+import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';

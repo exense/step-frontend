@@ -2,20 +2,23 @@ import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } f
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import {
+  combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   of,
+  pairwise,
   shareReplay,
-  switchMap,
-  combineLatest,
   startWith,
+  switchMap,
   take,
   tap,
-  distinctUntilChanged,
 } from 'rxjs';
 import {
+  ArtefactFilter,
   AugmentedControllerService,
   AugmentedExecutionsService,
+  AutoDeselectStrategy,
   AugmentedPlansService,
   DateRange,
   DateUtilsService,
@@ -23,9 +26,12 @@ import {
   Execution,
   ExecutiontTaskParameters,
   IS_SMALL_SCREEN,
+  RegistrationStrategy,
   RELATIVE_TIME_OPTIONS,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
+  selectionCollectionProvider,
+  SelectionCollector,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
@@ -54,6 +60,17 @@ import { ExecutionActionsTooltips } from '../execution-actions/execution-actions
 import { KeyValue } from '@angular/common';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
+
+enum UpdateSelection {
+  ALL = 'all',
+  ONLY_NEW = 'onlyNew',
+  NONE = 'none',
+}
+
+interface RefreshParams {
+  execution?: Execution;
+  updateSelection?: UpdateSelection;
+}
 
 const COMPARE_MEASUREMENT_ERROR_MS = 30_000;
 
@@ -115,6 +132,13 @@ interface DateRangeExt extends DateRange {
       },
     },
     AltExecutionReportPrintService,
+    ...selectionCollectionProvider(
+      {
+        selectionKeyProperty: 'artefactID',
+        registrationStrategy: RegistrationStrategy.MANUAL,
+      },
+      AutoDeselectStrategy.KEEP_SELECTION,
+    ),
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
@@ -133,6 +157,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
 
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
@@ -234,10 +259,39 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
+  readonly hasTestCasesFilter$ = this._testCasesSelection.selected$.pipe(
+    map((selected) => selected.length > 0 && selected.length < this._testCasesSelection.possibleLength),
+  );
+
+  private previousTestCasesIds: string[] = [];
   readonly testCases$ = this.execution$.pipe(
-    switchMap((execution) =>
-      this._executionsApi.getReportNodesByExecutionId(execution.id!, 'step.artefacts.reports.TestCaseReportNode', 500),
-    ),
+    pairwise(),
+    map(([prevExecution, currentExecution]) => {
+      const updateSelection =
+        prevExecution?.id !== currentExecution?.id ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW;
+      return { execution: currentExecution, updateSelection } as RefreshParams;
+    }),
+    switchMap(({ execution, updateSelection }) => {
+      if (!execution?.id) {
+        return of([]);
+      }
+      return this._executionsApi
+        .getReportNodesByExecutionId(execution.id, 'step.artefacts.reports.TestCaseReportNode', 500)
+        .pipe(
+          tap((reportNodes) => {
+            const oldTestCasesIds = new Set(this.previousTestCasesIds);
+            const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.has(testCase.id!));
+            this.previousTestCasesIds = reportNodes.map((testCase) => testCase.id!);
+            this._testCasesSelection.registerPossibleSelectionManually(reportNodes);
+            if (updateSelection !== UpdateSelection.NONE) {
+              this.determineDefaultSelection(
+                updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
+                execution.executionParameters?.artefactFilter,
+              );
+            }
+          }),
+        );
+    }),
     map((testCases) => (!testCases?.length ? undefined : testCases)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -252,12 +306,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly keywordParameters$ = combineLatest([this.execution$, this.testCases$]).pipe(
-    map(([execution, testCases]) => {
+  readonly keywordParameters$ = combineLatest([this.execution$, this._testCasesSelection.selected$]).pipe(
+    map(([execution, testCasesSelection]) => {
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
-        testcases: !testCases?.length ? undefined : testCases.map((testCase) => testCase.artefactID!),
+        testcases: !testCasesSelection.length ? undefined : testCasesSelection,
       } as KeywordParameters;
     }),
     shareReplay(1),
@@ -381,5 +435,22 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         })
         .build(),
     );
+  }
+
+  private determineDefaultSelection(testCases: ReportNode[], artefactFilter?: ArtefactFilter): void {
+    const selectedTestCases = testCases.filter((value) => {
+      if (!artefactFilter) {
+        return true;
+      }
+      switch (artefactFilter.class) {
+        case 'step.artefacts.filters.TestCaseFilter':
+          return (artefactFilter as any).includedNames.includes(value.name);
+        case `step.artefacts.filters.TestCaseIdFilter`:
+          return (artefactFilter as any).includedIds.includes(value.artefactID);
+        default:
+          return true;
+      }
+    });
+    this._testCasesSelection.select(...selectedTestCases);
   }
 }

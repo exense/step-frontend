@@ -5,6 +5,7 @@
     </step-alt-report-widget-sort>
   }
   <step-alt-report-widget-filter>
+    <ng-content select="step-alt-report-widget-filter" />
     @if (mode() === ViewMode.VIEW) {
       <step-form-field>
         <step-select [formControl]="_state.statusesCtrl" [items]="_state.statuses" [multiple]="true" />
