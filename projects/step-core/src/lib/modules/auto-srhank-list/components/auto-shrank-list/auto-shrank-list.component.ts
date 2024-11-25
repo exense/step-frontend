@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -36,10 +35,12 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private observer?: ResizeObserver;
-  private itemWidths = new Map<KeyValue<string, string>, number>();
+  private itemWidths = new Map<string, number>();
 
   /** @Input() **/
   readonly items = input<KeyValue<string, string>[]>([]);
+
+  private itemWidthKeys = computed(() => this.items().map((item) => this.widthKey(item)));
 
   protected itemsToDisplay = signal<number>(0);
 
@@ -56,15 +57,6 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
   });
 
   protected hasHiddenItems = computed(() => this.hiddenItems().length > 0);
-
-  private effectCleanupWidths = effect(() => {
-    const items = new Set(this.items());
-    this.itemWidths.forEach((_, key) => {
-      if (!items.has(key)) {
-        this.itemWidths.delete(key);
-      }
-    });
-  });
 
   constructor() {
     // recalculate visible items, after rendering and items' change
@@ -83,16 +75,16 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
   }
 
   registerWidth(item: KeyValue<string, string>, width: number): void {
-    this.itemWidths.set(item, width);
+    this.itemWidths.set(this.widthKey(item), width);
   }
 
   private determineVisibleItems(): void {
     const possibleWidth = this._elRef.nativeElement.clientWidth - 100;
     let totalWidth = 0;
-    const items = this.items();
-    let itemsToDisplay = items.length;
-    for (let i = 0; i < items.length; i++) {
-      const width = this.itemWidths.get(items[i])!;
+    const widthKeys = this.itemWidthKeys();
+    let itemsToDisplay = widthKeys.length;
+    for (let [i, widthKey] of widthKeys.entries()) {
+      const width = this.itemWidths.get(widthKey) ?? 0;
       totalWidth += width;
       if (totalWidth > possibleWidth) {
         itemsToDisplay = i;
@@ -100,5 +92,9 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
       }
     }
     this.itemsToDisplay.set(itemsToDisplay);
+  }
+
+  private widthKey(item: KeyValue<string, string>): string {
+    return `${item.key}_${item.value}`;
   }
 }
