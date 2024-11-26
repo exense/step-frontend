@@ -14,15 +14,14 @@ import {
 import { KeyValue } from '@angular/common';
 import { ItemWidthRegisterService } from '../../injectables/item-width-register.service';
 import { AutoShrankItemDirective } from '../../directives/auto-shrank-item.directive';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
-import { ItemTooltipPipe } from '../../pipes/item-tooltip.pipe';
+import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-auto-shrank-list',
   templateUrl: './auto-shrank-list.component.html',
   styleUrl: './auto-shrank-list.component.scss',
   standalone: true,
-  imports: [AutoShrankItemDirective, StepBasicsModule, ItemTooltipPipe],
+  imports: [AutoShrankItemDirective, StepBasicsModule],
   providers: [
     {
       provide: ItemWidthRegisterService,
@@ -57,6 +56,7 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
   });
 
   protected hasHiddenItems = computed(() => this.hiddenItems().length > 0);
+  protected isHiddenVisible = signal(false);
 
   constructor() {
     // recalculate visible items, after rendering and items' change
@@ -97,4 +97,6 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
   private widthKey(item: KeyValue<string, string>): string {
     return `${item.key}_${item.value}`;
   }
+
+  protected readonly PopoverMode = PopoverMode;
 }

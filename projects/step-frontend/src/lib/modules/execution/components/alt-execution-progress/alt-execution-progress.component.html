@@ -35,8 +35,14 @@
       }
       <div class="user">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
-        <step-popover yPosition="below">
-          <step-icon name="sliders" />
+        <step-popover
+          yPosition="below"
+          [mode]="PopoverMode.CLICK"
+          (toggledEvent)="isResolvedParametersVisible.set($event)"
+        >
+          <button type="button" mat-icon-button [color]="isResolvedParametersVisible() ? 'primary' : 'default'">
+            <step-icon name="sliders" />
+          </button>
           <step-popover-content>
             <div class="execution-resolved-params">
               <strong class="resolved-params-header">Resolved parameters</strong>

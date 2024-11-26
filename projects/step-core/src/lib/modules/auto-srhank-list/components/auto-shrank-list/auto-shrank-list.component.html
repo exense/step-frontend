@@ -8,23 +8,36 @@
 </section>
 <section class="visible-items">
   @for (item of visibleItems(); track item.key) {
-    <div class="item" [matTooltip]="item | itemTooltip" matTooltipPosition="below">
-      <strong>{{ item.key }}</strong>
-      <span>{{ item.value }}</span>
-    </div>
+    <step-popover yPosition="below" [mode]="PopoverMode.HOVER">
+      <div class="item">
+        <strong>{{ item.key }}</strong>
+        <span>{{ item.value }}</span>
+      </div>
+      <step-popover-content>
+        <div><strong>Parameter key:</strong></div>
+        <div>{{ item.key }}</div>
+        <div><strong>Parameter value:</strong></div>
+        <div>{{ item.value }}</div>
+      </step-popover-content>
+    </step-popover>
   }
   @if (hasHiddenItems()) {
-    <button type="button" mat-flat-button [matMenuTriggerFor]="hiddenItemsMenu">
-      <div>more</div>
-      <step-icon name="chevron-down" />
-    </button>
+    <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
+      <button type="button" mat-button [color]="isHiddenVisible() ? 'primary' : 'default'">
+        <div>more</div>
+        <step-icon name="chevron-down" />
+      </button>
+      <step-popover-content>
+        @for (item of hiddenItems(); track item.key; let isLast = $last) {
+          <div><strong>Parameter key:</strong></div>
+          <div>{{ item.key }}</div>
+          <div><strong>Parameter value:</strong></div>
+          <div>{{ item.value }}</div>
+          @if (!isLast) {
+            <br />
+          }
+        }
+      </step-popover-content>
+    </step-popover>
   }
 </section>
-<mat-menu #hiddenItemsMenu>
-  @for (item of hiddenItems(); track item.key) {
-    <div class="item" mat-menu-item [matTooltip]="item | itemTooltip" matTooltipPosition="before">
-      <strong>{{ item.key }}</strong>
-      <span>{{ item.value }}</span>
-    </div>
-  }
-</mat-menu>
