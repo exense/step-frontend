@@ -16,6 +16,7 @@ import { ExecutionTabsComponent } from './components/execution-tabs/execution-ta
 import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
+  dialogRoute,
   EntityRegistry,
   NavigatorService,
   preloadScreenDataResolver,
@@ -84,6 +85,8 @@ import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
+import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
+import { RepoRefHolderService } from './services/repo-ref-holder.service';
 
 @NgModule({
   declarations: [
@@ -141,6 +144,7 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
     AltExecutionRangePickerComponent,
     AltExecutionRangePrintComponent,
     AltKeywordInlineDrilldownComponent,
+    AltExecutionLaunchDialogComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -174,6 +178,7 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
     AltKeywordDrilldownComponent,
     AltKeywordInlineDrilldownComponent,
     AggregatedTreeNodeInfoComponent,
+    AltExecutionLaunchDialogComponent,
   ],
 })
 export class ExecutionModule {
@@ -316,6 +321,7 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
+          providers: [RepoRefHolderService],
           children: [
             {
               path: '',
@@ -383,6 +389,21 @@ export class ExecutionModule {
               component: AltKeywordDrilldownComponent,
             },
             schedulePlanRoute('modal'),
+            dialogRoute({
+              path: 'launch',
+              outlet: 'modal',
+              dialogComponent: AltExecutionLaunchDialogComponent,
+              resolve: {
+                repoRef: () => {
+                  const repoRefHolder = inject(RepoRefHolderService);
+                  return repoRefHolder.repoRef();
+                },
+              },
+              data: {
+                title: 'Relaunch Execution',
+                schedulePath: '',
+              },
+            }),
             {
               path: 'viz',
               redirectTo: 'analytics',
@@ -404,3 +425,5 @@ export class ExecutionModule {
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';
 export { KeywordParameters } from './shared/keyword-parameters';
+export * from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
+export * from './services/scheduler-invoker.service';

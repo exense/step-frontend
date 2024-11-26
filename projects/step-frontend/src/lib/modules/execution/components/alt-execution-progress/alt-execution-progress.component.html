@@ -121,11 +121,12 @@
             }
           }
         </ng-container>
-        <button type="button" mat-icon-button [matMenuTriggerFor]="executionsMenu" #executionTrigger="matMenuTrigger">
+        <button type="button" mat-icon-button (click)="relaunchExecution()">
           <step-icon name="play-circle" />
         </button>
       </step-btn-group>
-      <mat-menu #executionsMenu="matMenu">
+      <!--
+      <mat-menu #executionsMenu="matMenu" class="execution-menu">
         <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
           <step-execution-commands
             [description]="execution.description"
@@ -138,6 +139,7 @@
           />
         </span>
       </mat-menu>
+-->
     }
     @if (!(isExecutionCompleted$ | async)) {
       @if (activeExecution$ | async; as activeExecution) {

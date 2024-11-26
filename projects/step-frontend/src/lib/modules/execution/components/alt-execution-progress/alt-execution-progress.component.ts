@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import {
@@ -58,6 +58,8 @@ import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-r
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 import { KeyValue } from '@angular/common';
+import { RepoRefHolderService } from '../../services/repo-ref-holder.service';
+import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -139,9 +141,15 @@ interface DateRangeExt extends DateRange {
       },
       AutoDeselectStrategy.KEEP_SELECTION,
     ),
+    {
+      provide: SchedulerInvokerService,
+      useExisting: forwardRef(() => AltExecutionProgressComponent),
+    },
   ],
 })
-export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
+export class AltExecutionProgressComponent
+  implements OnInit, OnDestroy, AltExecutionStateService, SchedulerInvokerService
+{
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -158,6 +166,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _repoRefHolder = inject(RepoRefHolderService);
 
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
@@ -218,6 +227,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  /**
+   * todo: Rather a temporary solution. Make sense to refactor execution state services to be defined as route providers
+   * **/
+  private syncRepoRef = this.execution$
+    .pipe(map((execution) => execution.executionParameters?.repositoryObject))
+    .subscribe((repoRef) => this._repoRefHolder.repoRef.set(repoRef));
 
   readonly executionPlan$ = this.execution$.pipe(
     map((execution) => execution.planId),
@@ -394,7 +410,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     return { start, end, isDefault: true };
   }
 
-  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+  relaunchExecution(): void {
+    this._router.navigate([{ outlets: { modal: ['launch'] } }], { relativeTo: this._activatedRoute });
+  }
+
+  openScheduler(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
   }
