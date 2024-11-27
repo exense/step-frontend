@@ -84,6 +84,7 @@ import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
+import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 
 @NgModule({
   declarations: [
@@ -138,6 +139,7 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
+    AltExecutionParametersComponent,
     AltExecutionRangePickerComponent,
     AltExecutionRangePrintComponent,
     AltKeywordInlineDrilldownComponent,

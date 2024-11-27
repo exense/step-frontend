@@ -227,17 +227,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly executionParameters$ = this.execution$.pipe(
-    map((execution) => {
-      const customParameters = execution.executionParameters?.customParameters ?? {};
-      const repositoryParameters = execution.executionParameters?.repositoryObject?.repositoryParameters ?? {};
-      let result: KeyValue<string, string>[] = [];
-      result = Object.entries(customParameters).reduce((res, [key, value]) => [...res, { key, value }], result);
-      result = Object.entries(repositoryParameters).reduce((res, [key, value]) => [...res, { key, value }], result);
-      return !result.length ? undefined : result;
-    }),
-  );
-
   readonly resolvedParameters$ = this.execution$.pipe(
     map((execution) => {
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;

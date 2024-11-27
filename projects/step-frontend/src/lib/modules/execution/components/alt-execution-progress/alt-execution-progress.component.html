@@ -63,8 +63,8 @@
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
-      @if (executionParameters$ | async; as executionParameters) {
-        <step-auto-shrank-list [items]="executionParameters" />
+      @if (execution?.executionParameters?.customParameters; as executionParameters) {
+        <step-alt-execution-parameters [executionParameters]="executionParameters" />
       }
     </div>
     <div class="controls">
