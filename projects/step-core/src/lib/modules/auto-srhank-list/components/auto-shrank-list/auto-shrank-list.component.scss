@@ -16,12 +16,15 @@
   height: 0;
 }
 
-.item {
+.item,
+.popover-item {
   display: flex;
   gap: 0.8rem;
   flex-wrap: nowrap;
   align-items: center;
+}
 
+.item {
   & > strong,
   & > span {
     display: block;

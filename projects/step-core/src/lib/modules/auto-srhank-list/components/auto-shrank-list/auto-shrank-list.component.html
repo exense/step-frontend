@@ -14,10 +14,10 @@
         <span>{{ item.value }}</span>
       </div>
       <step-popover-content>
-        <div><strong>Parameter key:</strong></div>
-        <div>{{ item.key }}</div>
-        <div><strong>Parameter value:</strong></div>
-        <div>{{ item.value }}</div>
+        <div class="popover-item">
+          <strong>{{ item.key }}</strong>
+          <span>{{ item.value }}</span>
+        </div>
       </step-popover-content>
     </step-popover>
   }
@@ -29,10 +29,10 @@
       </button>
       <step-popover-content>
         @for (item of hiddenItems(); track item.key; let isLast = $last) {
-          <div><strong>Parameter key:</strong></div>
-          <div>{{ item.key }}</div>
-          <div><strong>Parameter value:</strong></div>
-          <div>{{ item.value }}</div>
+          <div class="popover-item">
+            <strong>{{ item.key }}</strong>
+            <span>{{ item.value }}</span>
+          </div>
           @if (!isLast) {
             <br />
           }
