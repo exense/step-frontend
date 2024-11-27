@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { Status } from '../../../_common/shared/status.enum';
@@ -14,12 +14,22 @@ export interface StatusItem {
   selector: 'step-aggregated-tree-status',
   templateUrl: './aggregated-tree-status.component.html',
   styleUrl: './aggregated-tree-status.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AggregatedTreeStatusComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
 
+  /**
+   * @Input()
+   * **/
   readonly nodeId = input<string>();
+
+  /**
+   * @Input()
+   * **/
   readonly node = input<AggregatedTreeNode>();
+
+  readonly statusClick = output<Status>();
 
   protected status = computed(() => {
     let node = this.node();

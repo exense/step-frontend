@@ -41,7 +41,7 @@ import {
   TreeStateService,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -189,6 +189,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
+  private isNotDefaultRangeSelected = toSignal(this.dateRange$.pipe(map((range) => !!range && !range.isDefault)));
+
   readonly timeRange$ = this.dateRange$.pipe(
     map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
     shareReplay(1),
@@ -254,6 +256,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private previousTestCasesIds: string[] = [];
   readonly testCases$ = this.execution$.pipe(
+    startWith(undefined),
     pairwise(),
     map(([prevExecution, currentExecution]) => {
       const updateSelection =
@@ -354,6 +357,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private setupDateRangeSyncOnExecutionRefresh(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      if (this.isNotDefaultRangeSelected()) {
+        return;
+      }
       this.applyDefaultRange(execution);
     });
   }
