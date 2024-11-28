@@ -155,6 +155,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
 
+    this.resourceFilename = file.name;
     this.filesChange.emit();
   }
 
@@ -231,7 +232,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this._augmentedResourcesService.getResource(id).subscribe((resource) => {
       if (resource) {
         this.resourceNotExisting = false;
-        this.resourceFilename = resource.resourceName;
+        // this.resourceFilename = resource.resourceName;
       } else {
         this.resourceNotExisting = true;
       }
@@ -284,7 +285,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       if (!resourceUploadResponse.similarResources?.length) {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
-        this.resourceFilename = resourceUploadResponse.resource!.resourceName;
+        // this.resourceFilename = resourceUploadResponse.resource!.resourceName;
         this.deleteUploadedResource();
         this.uploadedResourceIds.push(resourceId);
       } else {
