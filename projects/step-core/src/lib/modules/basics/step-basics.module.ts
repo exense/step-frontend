@@ -64,6 +64,8 @@ import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 import { StatusIconPipe } from './pipes/status-icon.pipe';
+import { FormFieldFocusAddonDirective } from './directives/form-field-focus-addon.directive';
+import { InputFilterRegexSwitcherComponent } from './components/input-filter-regex-switcher/input-filter-regex-switcher.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -119,6 +121,7 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
     MarkerComponent,
     AlertsContainerComponent,
     InputModelFormatterDirective,
+    FormFieldFocusAddonDirective,
     ProjectNamePipe,
     GetObjectFieldPipe,
     StatusCommonComponent,
@@ -128,6 +131,7 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
+    InputFilterRegexSwitcherComponent,
   ],
   exports: [
     CommonModule,
@@ -146,6 +150,7 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
     WidthExpandersDirective,
     ModalWindowComponent,
     FormFieldComponent,
+    FormFieldFocusAddonDirective,
     LabelDirective,
     PrefixDirective,
     SuffixDirective,
@@ -249,6 +254,7 @@ export * from './directives/error.directive';
 export * from './directives/warning.directive';
 export * from './directives/alert.directive';
 export * from './directives/prevent-chars.directive';
+export * from './directives/form-field-focus-addon.directive';
 export * from './directives/allow-chars.directive';
 export * from './directives/label-addon.directive';
 export * from './injectables/array-item-label-value-extractor';
@@ -314,3 +320,4 @@ export * from './injectables/time-converters-factory.service';
 export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
+export * from './injectables/filter-regex-switcher.service';
