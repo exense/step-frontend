@@ -145,7 +145,7 @@ export class ScheduleOverviewComponent implements OnInit {
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
       const executionsIndexes: Record<string, number> = {};
-      const executionsWithStats: ExecutionWithKeywordsStats[] = [];
+      let executionsWithStats: ExecutionWithKeywordsStats[] = [];
       const allStatuses = new Set<string>();
       response.matrixKeys.forEach((attributes, i) => {
         const executionId = attributes['eId'];
@@ -172,7 +172,9 @@ export class ScheduleOverviewComponent implements OnInit {
           }
         });
       });
+      const executionsToDisplay = 30;
       executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
+      executionsWithStats = executionsWithStats.slice(-executionsToDisplay);
 
       let series = Array.from(allStatuses).map((status) => {
         let color = this._statusColors[status as Status];
@@ -238,9 +240,6 @@ export class ScheduleOverviewComponent implements OnInit {
     this._executionService.getLastExecutionByTaskId(taskId).subscribe((execution) => {
       this.lastExecution = execution;
     });
-    // this._monitoringService.getDashboardEntry(taskId).subscribe((entry) => {
-    //   this.taskDashboardEntry = entry;
-    // });
   }
 
   private createExecutionsChart(taskId: string, timeRange: TimeRange) {
