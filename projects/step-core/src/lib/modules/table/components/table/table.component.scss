@@ -1,3 +1,7 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+$screen-height: 850px;
+
 step-table {
   height: 100%;
   display: flex;
@@ -75,6 +79,87 @@ step-table {
   step-table {
     .table-container {
       overflow: hidden;
+    }
+  }
+}
+
+.quick-actions {
+  padding-inline: 2rem;
+  display: grid;
+  row-gap: 2.4rem;
+  column-gap: 2.4rem;
+  grid-template-rows: auto;
+  grid-template-columns: auto auto auto;
+
+  .wizard-panel {
+    color: var.$white;
+    background: var.$blue-625;
+    padding: 2.4rem;
+    border-radius: 1.6rem;
+    min-height: 35.8rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .icon-container {
+    width: 4.8rem;
+    height: 4.8rem;
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var.$blue-600;
+    border: solid 0.1rem rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+  }
+
+  .wizard-content {
+    font-size: 1.6rem;
+    line-height: 2.4rem;
+
+    h3 {
+      font-size: 2rem;
+    }
+  }
+
+  .wizard-buttons {
+    font-size: 1.6rem;
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.8rem;
+
+    button {
+      border-radius: 0.8rem;
+      border-style: solid;
+      border-width: 0.1rem;
+
+      &[color='primary'] {
+        color: var.$white;
+        background: var.$blue-600;
+        border-color: var.$blue-600;
+      }
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+  }
+
+  @media screen and (max-height: $screen-height) {
+    min-height: 27rem;
+    .wizard-content {
+      gap: 0;
+    }
+  }
+
+  .even {
+    background: var.$gray-750;
+    .icon-container {
+      background: var.$gray-550;
     }
   }
 }
