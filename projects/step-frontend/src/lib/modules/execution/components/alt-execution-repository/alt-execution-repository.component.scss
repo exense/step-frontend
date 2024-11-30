@@ -1,0 +1,13 @@
+:host {
+  font-size: 1.2rem;
+  min-width: 2.4rem;
+  cursor: pointer;
+  line-height: 1;
+  text-align: center;
+}
+
+section {
+  display: grid;
+  grid-template-columns: min-content 0.5rem auto;
+  gap: 0.5rem;
+}

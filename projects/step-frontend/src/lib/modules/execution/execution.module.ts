@@ -82,6 +82,8 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
+import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 
 @NgModule({
   declarations: [
@@ -98,6 +100,7 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     ExecutionTreeComponent,
     RepositoryComponent,
     ExecutionActionsComponent,
+    ExecutionCommandsDirective,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     DashletExecutionStepComponent,
@@ -132,6 +135,7 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
+    AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
     AltExecutionRangePickerComponent,
@@ -154,6 +158,7 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     ExecutionErrorsComponent,
     KeywordCallsComponent,
     ExecutionTreeComponent,
+    ExecutionCommandsDirective,
     ExecutionCommandsComponent,
     ExecutionProgressComponent,
     RepositoryComponent,
