@@ -60,7 +60,12 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     return this._augmentedExecutionService.getReportNodeDataSource(artefactHash);
   });
 
-  protected readonly keywordParameters = toSignal(this._executionState.keywordParameters$);
+  protected readonly keywordParameters = toSignal(
+    this._executionState.keywordParameters$.pipe(
+      // omit test case selection in case of tree
+      map((keywordParameters) => ({ ...keywordParameters, testcases: undefined })),
+    ),
+  );
 
   protected readonly visibleDetails = this._treeState.visibleDetails;
 
