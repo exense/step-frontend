@@ -71,6 +71,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   absoluteFilepath?: string;
   resourceNotExisting?: boolean;
   resourceFilename?: string;
+  fileName?: string;
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
@@ -155,7 +156,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       });
     }
 
-    this.resourceFilename = file.name;
+    this.fileName = file.name;
     this.filesChange.emit();
   }
 
@@ -233,6 +234,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       if (resource) {
         this.resourceNotExisting = false;
         // this.resourceFilename = resource.resourceName;
+        this.resourceFilename = this.fileName;
       } else {
         this.resourceNotExisting = true;
       }
@@ -286,6 +288,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
         // No similar resource found
         this.setResourceIdToFieldValue(resourceId);
         // this.resourceFilename = resourceUploadResponse.resource!.resourceName;
+        this.resourceFilename = this.fileName;
         this.deleteUploadedResource();
         this.uploadedResourceIds.push(resourceId);
       } else {
