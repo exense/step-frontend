@@ -250,15 +250,21 @@ export class ExecutionsService {
   /**
    * Returns a map of execution ID to names by the provided ids.
    * @param taskId
+   * @param limit
    * @returns Execution default response
    * @throws ApiError
    */
-  public getLastExecutionByTaskId(taskId: string): Observable<Execution> {
+  public getLastExecutionsByTaskId(taskId: string, limit: number, from?: number, to?: number): Observable<Execution[]> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/executions/search/last/by/task-id/{taskId}',
       path: {
         taskId: taskId,
+      },
+      query: {
+        limit: limit,
+        from: from,
+        to: to,
       },
     });
   }

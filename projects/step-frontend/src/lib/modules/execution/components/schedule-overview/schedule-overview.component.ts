@@ -31,7 +31,7 @@ import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
@@ -135,110 +135,122 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
-    const statusAttribute = 'rnStatus';
-    const request: FetchBucketsRequest = {
-      start: timeRange.from,
-      end: timeRange.to,
-      intervalSize: 1000 * 60 * 60 * 24, // one day
-      oqlFilter: `attributes.metricType = response-time and attributes.taskId = ${taskId}`,
-      groupDimensions: ['eId', 'rnStatus'],
-    };
-    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-      const executionsIndexes: Record<string, number> = {};
-      let executionsWithStats: ExecutionWithKeywordsStats[] = [];
-      const allStatuses = new Set<string>();
-      response.matrixKeys.forEach((attributes, i) => {
-        const executionId = attributes['eId'];
-        const status = attributes[statusAttribute];
-        allStatuses.add(status);
-        let executionEntry: ExecutionWithKeywordsStats = {
-          executionId: executionId,
-          statuses: {},
-          timestamp: Number.MAX_VALUE,
-        };
-        if (executionsIndexes[executionId] >= 0) {
-          executionEntry = executionsWithStats[executionsIndexes[executionId]];
-        } else {
-          executionsWithStats.push(executionEntry);
-          executionsIndexes[executionId] = executionsWithStats.length - 1;
-        }
-        response.matrix[i].forEach((bucket) => {
-          if (bucket) {
-            if (bucket.begin < executionEntry.timestamp) {
-              executionEntry.timestamp = bucket.begin; // select the first apparition of the execution
-            }
-            const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
-            executionEntry.statuses[status] = newCount;
+    let executionsCountToDisplay = 30;
+    this._executionService
+      .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
+      .pipe(
+        switchMap((executions) => {
+          const executionsIdsJoined = executions.map((e) => `"${e.id!}"`).join(',');
+          let oqlFilter = 'attributes.metricType = response-time';
+          if (executionsIdsJoined) {
+            oqlFilter += ` and attributes.eId in (${executionsIdsJoined})`;
           }
-        });
-      });
-      const executionsToDisplay = 30;
-      executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
-      executionsWithStats = executionsWithStats.slice(-executionsToDisplay);
+          const request: FetchBucketsRequest = {
+            start: timeRange.from,
+            end: timeRange.to,
+            intervalSize: 1000 * 60 * 60 * 24, // one day
+            oqlFilter: oqlFilter,
+            groupDimensions: ['eId', 'rnStatus'],
+          };
 
-      let series = Array.from(allStatuses).map((status) => {
-        let color = this._statusColors[status as Status];
-        const fill = color + 'cc';
-        const s: TSChartSeries = {
-          id: status,
-          scale: 'y',
-          labelItems: [status],
-          legendName: status,
-          data: executionsWithStats.map((item) => item.statuses[status] || 0),
-          width: 0,
-          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
-          stroke: color,
-          fill: fill,
-          paths: this.bars,
-          points: { show: false },
-          show: true,
-        };
-        return s;
-      });
-      const axes: Axis[] = [
-        {
-          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-          scale: 'y',
-          values: (u, vals) => {
-            return vals.map((v: any) => v);
-          },
-        },
-      ];
-      this.cumulateSeriesData(series);
-      this.keywordsChartSettings = {
-        title: 'Keywords calls by execution',
-        showLegend: false,
-        showDefaultLegend: true,
-        xAxesSettings: {
-          time: false,
-          label: 'Execution',
-          show: false,
-          values: executionsWithStats.map((item, i) => i),
-          valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-            return executionsWithStats[idx].executionId;
-          },
-        },
-        scales: {
-          y: {
-            range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-              return [0, initMax];
+          return this._timeSeriesService.getTimeSeries(request);
+        }),
+      )
+      .subscribe((response) => {
+        const statusAttribute = 'rnStatus';
+        const executionsIndexes: Record<string, number> = {};
+        let executionsWithStats: ExecutionWithKeywordsStats[] = [];
+        const allStatuses = new Set<string>();
+        response.matrixKeys.forEach((attributes, i) => {
+          const executionId = attributes['eId'];
+          const status = attributes[statusAttribute];
+          allStatuses.add(status);
+          let executionEntry: ExecutionWithKeywordsStats = {
+            executionId: executionId,
+            statuses: {},
+            timestamp: Number.MAX_VALUE,
+          };
+          if (executionsIndexes[executionId] >= 0) {
+            executionEntry = executionsWithStats[executionsIndexes[executionId]];
+          } else {
+            executionsWithStats.push(executionEntry);
+            executionsIndexes[executionId] = executionsWithStats.length - 1;
+          }
+          response.matrix[i].forEach((bucket) => {
+            if (bucket) {
+              if (bucket.begin < executionEntry.timestamp) {
+                executionEntry.timestamp = bucket.begin; // select the first apparition of the execution
+              }
+              const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+              executionEntry.statuses[status] = newCount;
+            }
+          });
+        });
+        executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
+
+        let series = Array.from(allStatuses).map((status) => {
+          let color = this._statusColors[status as Status];
+          const fill = color + 'cc';
+          const s: TSChartSeries = {
+            id: status,
+            scale: 'y',
+            labelItems: [status],
+            legendName: status,
+            data: executionsWithStats.map((item) => item.statuses[status] || 0),
+            width: 0,
+            value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+              this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+            stroke: color,
+            fill: fill,
+            paths: this.bars,
+            points: { show: false },
+            show: true,
+          };
+          return s;
+        });
+        const axes: Axis[] = [
+          {
+            size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+            scale: 'y',
+            values: (u, vals) => {
+              return vals.map((v: any) => v);
             },
           },
-        },
-        series: series,
-        tooltipOptions: {
-          enabled: false,
-        },
-        axes: axes,
-        bands: this.getDefaultBands(series.length),
-      };
-    });
+        ];
+        this.cumulateSeriesData(series);
+        this.keywordsChartSettings = {
+          title: 'Keywords calls by execution',
+          showLegend: false,
+          showDefaultLegend: true,
+          xAxesSettings: {
+            time: false,
+            label: 'Execution',
+            show: false,
+            values: executionsWithStats.map((item, i) => i),
+            valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
+              return executionsWithStats[idx].executionId;
+            },
+          },
+          scales: {
+            y: {
+              range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+                return [0, initMax];
+              },
+            },
+          },
+          series: series,
+          tooltipOptions: {
+            enabled: false,
+          },
+          axes: axes,
+          bands: this.getDefaultBands(series.length),
+        };
+      });
   }
 
   private fetchLastExecution(taskId: string): void {
-    this._executionService.getLastExecutionByTaskId(taskId).subscribe((execution) => {
-      this.lastExecution = execution;
+    this._executionService.getLastExecutionsByTaskId(taskId, 1, undefined, undefined).subscribe((executions) => {
+      this.lastExecution = executions[0];
     });
   }
 
