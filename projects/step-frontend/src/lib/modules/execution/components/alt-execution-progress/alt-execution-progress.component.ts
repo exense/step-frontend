@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import {
@@ -40,6 +40,7 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   ViewRegistryService,
+  PopoverMode,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -231,6 +232,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
   );
+  protected isResolvedParametersVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
@@ -442,4 +444,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     });
     this._testCasesSelection.select(...selectedTestCases);
   }
+
+  protected readonly PopoverMode = PopoverMode;
 }
