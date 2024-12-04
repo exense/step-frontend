@@ -11,15 +11,35 @@ step-alt-execution-progress {
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    grid-template-areas: 'title controls ranger';
+    grid-template-areas:
+      'title controls ranger'
+      'sub-title sub-title sub-title';
     gap: 0.5rem;
     align-items: flex-start;
 
     &.small-screen {
-      grid-template-columns: auto auto;
+      grid-template-columns: 1fr 1fr;
       grid-template-areas:
         'title title'
+        'sub-title sub-title'
         'controls ranger';
+
+      .controls {
+        justify-self: flex-start;
+      }
+    }
+
+    .sub-title {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      grid-area: sub-title;
+
+      step-alt-execution-parameters {
+        margin-left: 1rem;
+      }
     }
 
     .title {
@@ -28,14 +48,6 @@ step-alt-execution-progress {
       flex-direction: column;
       justify-content: flex-end;
 
-      .sub-title {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 0.4rem;
-        white-space: nowrap;
-      }
-
       h3 {
         margin: 0;
         line-height: 3.8rem;
@@ -43,6 +55,7 @@ step-alt-execution-progress {
         flex-wrap: nowrap;
         align-items: center;
         gap: 0.5rem;
+        font-size: 2rem;
 
         div {
           text-overflow: ellipsis;
@@ -55,6 +68,10 @@ step-alt-execution-progress {
       .user {
         font-weight: 400;
         color: var.$gray-550;
+      }
+
+      entity-icon {
+        @include core.step-icon(2.4rem);
       }
     }
 
