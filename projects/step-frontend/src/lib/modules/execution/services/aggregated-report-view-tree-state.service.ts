@@ -8,6 +8,7 @@ import {
 } from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
+import { Status } from '../../_common/shared/status.enum';
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
@@ -25,16 +26,19 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     );
   }
 
-  private displayedAggregatedDetailsNodeInternal = signal<AggregatedTreeNode | undefined>(undefined);
+  private displayedAggregatedDetailsNodeIdInternal = signal<string | undefined>(undefined);
 
   readonly displayedAggregatedDetailsNode = computed(() => {
     const selectedNode = this.selectedNode();
-    const displayAggregatedNode = this.displayedAggregatedDetailsNodeInternal();
-    if (selectedNode === displayAggregatedNode) {
+    const displayAggregatedNodeId = this.displayedAggregatedDetailsNodeIdInternal();
+    if (selectedNode && selectedNode.id === displayAggregatedNodeId) {
       return selectedNode;
     }
     return undefined;
   });
+
+  private predefinedAggregatedDetailsNodeStatusInternal = signal<Status | undefined>(undefined);
+  readonly predefinedAggregatedDetailsNodeStatus = this.predefinedAggregatedDetailsNodeStatusInternal.asReadonly();
 
   private visibleDetailsInternal = signal<Record<string, boolean>>({});
   readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
@@ -58,10 +62,11 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }));
   }
 
-  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode): void {
+  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode, status?: Status): void {
     this.selectNode(nodeOrId);
-    const node = typeof nodeOrId === 'string' ? this.findNodeById(nodeOrId) : nodeOrId;
-    this.displayedAggregatedDetailsNodeInternal.set(node);
+    const nodeId = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+    this.displayedAggregatedDetailsNodeIdInternal.set(nodeId);
+    this.predefinedAggregatedDetailsNodeStatusInternal.set(status);
   }
 
   private requestTree(executionId: string, dateRange?: DateRange): Observable<AggregatedReportView> {

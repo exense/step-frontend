@@ -42,7 +42,7 @@ import {
   ViewRegistryService,
   PopoverMode,
 } from '@exense/step-core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -77,6 +77,7 @@ const COMPARE_MEASUREMENT_ERROR_MS = 30_000;
 
 interface DateRangeExt extends DateRange {
   isDefault?: boolean;
+  relativeTime?: number;
 }
 
 @Component({
@@ -170,7 +171,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private isTreeInitialized = false;
 
-  private relativeTime?: number;
+  private relativeTime = signal<number | undefined>(undefined);
 
   get executionIdSnapshot(): string {
     const routeSnapshot = this._activatedRoute.snapshot;
@@ -178,17 +179,30 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   updateRelativeTime(time?: number) {
-    this.relativeTime = time;
+    this.relativeTime.set(time);
   }
 
   readonly dateRangeCtrl = this._fb.control<DateRangeExt | null | undefined>(null);
 
-  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
-    startWith(this.dateRangeCtrl.value),
-    map((range) => range ?? undefined),
+  readonly dateRange$ = combineLatest([
+    this.dateRangeCtrl.valueChanges.pipe(startWith(this.dateRangeCtrl.value)),
+    toObservable(this.relativeTime),
+  ]).pipe(
+    map(([range, relativeTime]) => {
+      if (!range) {
+        return undefined;
+      }
+      return {
+        ...range,
+        isDefault: range.isDefault || !!relativeTime,
+        relativeTime,
+      } as DateRangeExt;
+    }),
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  private isNotDefaultRangeSelected = toSignal(this.dateRange$.pipe(map((range) => !!range && !range.isDefault)));
 
   readonly timeRange$ = this.dateRange$.pipe(
     map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
@@ -256,6 +270,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private previousTestCasesIds: string[] = [];
   readonly testCases$ = this.execution$.pipe(
+    startWith(undefined),
     pairwise(),
     map(([prevExecution, currentExecution]) => {
       const updateSelection =
@@ -356,12 +371,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private setupDateRangeSyncOnExecutionRefresh(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      if (this.isNotDefaultRangeSelected()) {
+        return;
+      }
       this.applyDefaultRange(execution);
     });
   }
 
   private setupTreeRefresh(): void {
-    const range$ = this.dateRange$.pipe(map((range) => (!this.relativeTime && range?.isDefault ? undefined : range)));
+    const range$ = this.dateRange$.pipe(map((range) => (!range?.relativeTime && range?.isDefault ? undefined : range)));
 
     combineLatest([this.executionId$, range$])
       .pipe(
@@ -374,6 +392,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {
     let start: DateTime;
     let end: DateTime;
+    const relativeTime = this.relativeTime();
 
     if (execution.endTime) {
       const storedRange = useStorage ? this._executionStorage.getItem(rangeKey(execution.id!)) : undefined;
@@ -385,9 +404,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         start = DateTime.fromMillis(execution.startTime!);
         end = DateTime.fromMillis(execution.endTime);
       }
-    } else if (this.relativeTime) {
+    } else if (relativeTime) {
       end = DateTime.now();
-      start = end.set({ millisecond: end.millisecond - this.relativeTime });
+      start = end.set({ millisecond: end.millisecond - relativeTime });
     } else {
       start = DateTime.fromMillis(execution.startTime!);
       end = DateTime.now();
