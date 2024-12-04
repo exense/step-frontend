@@ -47,7 +47,11 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
 
+  /** @Input() **/
   readonly node = input.required<AggregatedTreeNode>();
+
+  /** @Input() **/
+  readonly initialStatus = input<Status | undefined>(undefined);
 
   private artefactHash = computed(() => this.node().artefactHash);
 
@@ -56,7 +60,12 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     return this._augmentedExecutionService.getReportNodeDataSource(artefactHash);
   });
 
-  protected readonly keywordParameters = toSignal(this._executionState.keywordParameters$);
+  protected readonly keywordParameters = toSignal(
+    this._executionState.keywordParameters$.pipe(
+      // omit test case selection in case of tree
+      map((keywordParameters) => ({ ...keywordParameters, testcases: undefined })),
+    ),
+  );
 
   protected readonly visibleDetails = this._treeState.visibleDetails;
 
@@ -71,6 +80,15 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     .subscribe((search) => this.tableSearch()?.onSearch('name', search));
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
+
+  private effectSyncStatus = effect(
+    () => {
+      const initialStatus = this.initialStatus();
+      this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
+    },
+    { allowSignalWrites: true },
+  );
+
   private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,
   });

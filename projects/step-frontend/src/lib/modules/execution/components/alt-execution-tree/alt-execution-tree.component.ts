@@ -16,6 +16,7 @@ export class AltExecutionTreeComponent implements OnInit {
 
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected readonly aggregatedNode = this._treeState.displayedAggregatedDetailsNode;
+  protected readonly predefinedStatus = this._treeState.predefinedAggregatedDetailsNodeStatus;
   protected readonly artefact = computed(() => this.aggregatedNode()?.originalArtefact);
 
   ngOnInit(): void {
