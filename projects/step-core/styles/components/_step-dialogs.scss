@@ -17,9 +17,13 @@
       font-weight: normal;
     }
 
-    .mat-mdc-dialog-actions {
-      padding: 2.4rem;
+    step-modal-window:not(.slim-actions) {
+      .mat-mdc-dialog-actions {
+        padding: 2.4rem;
+      }
+    }
 
+    .mat-mdc-dialog-actions {
       step-btn-group {
         flex: 1;
         display: flex;

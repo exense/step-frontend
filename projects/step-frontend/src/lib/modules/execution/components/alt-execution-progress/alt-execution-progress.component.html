@@ -120,30 +120,17 @@
         <button
           type="button"
           mat-icon-button
+          (click)="relaunchExecution()"
           matTooltip="Launch execution with parameters"
           matTooltipPosition="below"
-          [matMenuTriggerFor]="executionsMenu"
-          #executionTrigger="matMenuTrigger"
         >
           <step-icon name="play-circle" />
         </button>
       </step-btn-group>
-      <mat-menu #executionsMenu="matMenu">
-        <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-          <step-execution-commands
-            [description]="execution.description"
-            [tooltips]="executionTooltips"
-            [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-            [execution]="execution"
-            (refresh)="manualRefresh()"
-            (scheduleTask)="handleTaskSchedule($event)"
-            (commandInvoke)="executionTrigger.closeMenu()"
-          />
-        </span>
-      </mat-menu>
+
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="with-round-borders">
+          <step-btn-group class="without-borders">
             <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
           </step-btn-group>
         }
