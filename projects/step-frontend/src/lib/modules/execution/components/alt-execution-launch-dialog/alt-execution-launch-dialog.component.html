@@ -27,24 +27,26 @@
         </section>
         <mat-card>
           <mat-card-content>
-            <step-execution-commands
-              [description]="artefact.name"
-              [repositoryObjectRef]="repoRef"
-              [includedTestcases]="includedTestcases()"
-              (scheduleTask)="_schedulerInvoker?.openScheduler($event)"
-            />
+            @if (executionParameters(); as params) {
+              <step-custom-forms [stModel]="params" stScreen="executionParameters" />
+            }
           </mat-card-content>
         </mat-card>
       </div>
       @if (artefact.type === 'TestSet') {
-        <step-repository-plan-testcase-list
-          [repoRef]="repoRef"
-          (includedTestCasesChange)="includedTestcases.set($event)"
-        />
+        <step-repository-plan-testcase-list [repoRef]="repoRef" (includedTestCasesChange)="testcases.set($event)" />
       }
     }
   </div>
   <div step-modal-window-buttons>
-    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <step-btn-group class="btn-group-close">
+      <button type="button" mat-button mat-dialog-close>Close</button>
+    </step-btn-group>
+    <step-execution-actions
+      [tooltips]="tooltips()"
+      (execute)="execute($event)"
+      (schedule)="schedule()"
+      (copyLink)="copyExecutionServiceAsCurlToClipboard()"
+    />
   </div>
 </step-modal-window>

@@ -11,3 +11,11 @@ div[step-modal-window-body] {
 div[step-modal-window-body] {
   gap: 2rem;
 }
+
+div[step-modal-window-buttons] {
+  justify-content: space-between;
+}
+
+.btn-group-close {
+  flex: 0 !important;
+}

@@ -9,6 +9,9 @@ import {
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
+import { ExecutionCommandsDirective } from '../../directives/execution-commands.directive';
+import { ExecutionCommandsContext } from '../../shared/execution-commands-context.interface';
+import { ExecutionCommandsService } from '../../services/execution-commands.service';
 
 export interface AltExecutionLaunchDialogData {
   title?: string;
@@ -28,10 +31,14 @@ export interface AltExecutionLaunchDialogData {
       provide: TablePersistenceConfig,
       useValue: null,
     },
+    ExecutionCommandsService,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AltExecutionLaunchDialogComponent implements OnInit {
+export class AltExecutionLaunchDialogComponent
+  extends ExecutionCommandsDirective
+  implements OnInit, ExecutionCommandsContext
+{
   private _controllersApi = inject(ControllerService);
   private _data = inject<AltExecutionLaunchDialogData>(MAT_DIALOG_DATA);
   protected _schedulerInvoker = inject(SchedulerInvokerService, { optional: true });
@@ -42,10 +49,28 @@ export class AltExecutionLaunchDialogComponent implements OnInit {
   protected loading = signal(false);
   protected error = signal<string | undefined>(undefined);
   protected artefact = signal<ArtefactInfo | undefined>(undefined);
-  protected includedTestcases = signal<IncludeTestcases | undefined>(undefined);
+  protected testcases = signal<IncludeTestcases | undefined>(undefined);
 
   ngOnInit(): void {
     this.loadArtefact();
+  }
+
+  override getIncludedTestcases(): IncludeTestcases | null | undefined {
+    return this.testcases();
+  }
+
+  override getDescription(): string | undefined {
+    return this.artefact()?.name;
+  }
+
+  override getRepositoryObjectRef(): RepositoryObjectReference | undefined {
+    return this.repoRef;
+  }
+
+  override schedule() {
+    this._commands.prefillScheduledTask().subscribe((task) => {
+      this._schedulerInvoker?.openScheduler(task);
+    });
   }
 
   private loadArtefact(): void {
