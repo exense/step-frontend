@@ -1,6 +1,6 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
-  <div class="title">
-    @if (execution$ | async; as execution) {
+  @if (execution$ | async; as execution) {
+    <div class="title">
       <h3>
         @if (executionPlan$ | async; as plan) {
           <entity-icon
@@ -12,7 +12,9 @@
         }
         <div>{{ execution?.description }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
-          <step-alt-execution-repository [repositoryParams]="repositoryParams" />
+          @if (repositoryParams.repositoryID !== 'local') {
+            <step-alt-execution-repository [repositoryParams]="repositoryParams" />
+          }
         }
         @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
           <a
@@ -25,53 +27,47 @@
           </a>
         }
       </h3>
-      <div class="sub-title">
-        <step-alt-execution-time [execution]="execution" />
-        @if (displayStatus$ | async; as status) {
-          <step-status [status]="status" />
-        }
-        <div class="user">{{ execution.executionParameters?.userID }}</div>
-        <step-popover class="details-hint" yPosition="below">
-          <step-icon name="help-circle" />
+    </div>
+    <div class="sub-title">
+      <step-alt-execution-time [execution]="execution" />
+      @if (displayStatus$ | async; as status) {
+        <step-status [status]="status" />
+      }
+      <div class="user">{{ execution.executionParameters?.userID }}</div>
+      @if (resolvedParameters$ | async; as resolvedParams) {
+        <step-popover
+          yPosition="below"
+          [mode]="PopoverMode.CLICK"
+          (toggledEvent)="isResolvedParametersVisible.set($event)"
+        >
+          <button type="button" mat-icon-button [color]="isResolvedParametersVisible() ? 'primary' : 'default'">
+            <step-icon name="sliders" />
+          </button>
           <step-popover-content>
-            <step-execution-details
-              [execution]="execution"
-              [showPlan]="false"
-              [showMode]="false"
-              [showUser]="false"
-              [showExecutionId]="false"
-              [showDates]="false"
-            />
+            <div class="execution-resolved-params">
+              <strong class="resolved-params-header">Resolved parameters</strong>
+              <step-table [dataSource]="resolvedParams">
+                <ng-container matColumnDef="key">
+                  <th mat-header-cell *matHeaderCellDef>Key</th>
+                  <td mat-cell *matCellDef="let element">{{ element.key }}</td>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                  <th mat-header-cell *matHeaderCellDef>Value</th>
+                  <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+                </ng-container>
+              </step-table>
+            </div>
           </step-popover-content>
         </step-popover>
-        @if (resolvedParameters$ | async; as resolvedParams) {
-          <step-popover yPosition="below">
-            <step-icon name="sliders" />
-            <step-popover-content>
-              <div class="execution-resolved-params">
-                <strong class="resolved-params-header">Resolved parameters</strong>
-                <step-table [dataSource]="resolvedParams">
-                  <ng-container matColumnDef="key">
-                    <th mat-header-cell *matHeaderCellDef>Key</th>
-                    <td mat-cell *matCellDef="let element">{{ element.key }}</td>
-                  </ng-container>
-                  <ng-container matColumnDef="value">
-                    <th mat-header-cell *matHeaderCellDef>Value</th>
-                    <td mat-cell *matCellDef="let element">{{ element.value }}</td>
-                  </ng-container>
-                </step-table>
-              </div>
-            </step-popover-content>
-          </step-popover>
-        }
-        @if (execution?.executionParameters?.mode === 'SIMULATION') {
-          <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
-        }
-      </div>
-    }
-  </div>
-  <div class="controls">
-    @if (execution$ | async; as execution) {
+      }
+      @if (execution?.executionParameters?.mode === 'SIMULATION') {
+        <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
+      }
+      @if (execution?.executionParameters?.customParameters; as executionParameters) {
+        <step-alt-execution-parameters [executionParameters]="executionParameters" />
+      }
+    </div>
+    <div class="controls">
       <step-btn-group class="with-round-borders">
         <ng-container
           stepExecutionCommands
@@ -121,38 +117,30 @@
             }
           }
         </ng-container>
-        <button type="button" mat-icon-button (click)="relaunchExecution()">
+        <button
+          type="button"
+          mat-icon-button
+          (click)="relaunchExecution()"
+          matTooltip="Launch execution with parameters"
+          matTooltipPosition="below"
+        >
           <step-icon name="play-circle" />
         </button>
       </step-btn-group>
-      <!--
-      <mat-menu #executionsMenu="matMenu" class="execution-menu">
-        <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
-          <step-execution-commands
-            [description]="execution.description"
-            [tooltips]="executionTooltips"
-            [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-            [execution]="execution"
-            (refresh)="manualRefresh()"
-            (scheduleTask)="handleTaskSchedule($event)"
-            (commandInvoke)="executionTrigger.closeMenu()"
-          />
-        </span>
-      </mat-menu>
--->
-    }
-    @if (!(isExecutionCompleted$ | async)) {
-      @if (activeExecution$ | async; as activeExecution) {
-        <step-btn-group class="without-borders">
-          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-        </step-btn-group>
+
+      @if (!(isExecutionCompleted$ | async)) {
+        @if (activeExecution$ | async; as activeExecution) {
+          <step-btn-group class="without-borders">
+            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+          </step-btn-group>
+        }
       }
-    }
-    <router-outlet name="controls" />
-  </div>
-  <div class="range-picker">
-    <router-outlet name="rangePicker" />
-  </div>
+      <router-outlet name="controls" />
+    </div>
+    <div class="range-picker">
+      <router-outlet name="rangePicker" />
+    </div>
+  }
 </section>
 <section class="main">
   @if (execution$ | async; as execution) {

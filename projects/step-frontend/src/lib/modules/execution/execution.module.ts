@@ -85,6 +85,7 @@ import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
+import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { RepoRefHolderService } from './services/repo-ref-holder.service';
 
@@ -141,6 +142,7 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
     AltKeywordDrilldownComponent,
+    AltExecutionParametersComponent,
     AltExecutionRangePickerComponent,
     AltExecutionRangePrintComponent,
     AltKeywordInlineDrilldownComponent,

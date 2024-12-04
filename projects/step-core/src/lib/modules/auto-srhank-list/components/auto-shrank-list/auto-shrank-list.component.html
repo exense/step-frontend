@@ -1,0 +1,43 @@
+<section class="invisible-items">
+  @for (item of items(); track item.key) {
+    <div [stepAutoShrankItem]="item" class="item">
+      <strong>{{ item.key }}</strong>
+      <span>{{ item.value }}</span>
+    </div>
+  }
+</section>
+<section class="visible-items">
+  @for (item of visibleItems(); track item.key) {
+    <step-popover yPosition="below" [mode]="PopoverMode.HOVER">
+      <div class="item">
+        <strong>{{ item.key }}</strong>
+        <span>{{ item.value }}</span>
+      </div>
+      <step-popover-content>
+        <div class="popover-item">
+          <strong>{{ item.key }}</strong>
+          <span>{{ item.value }}</span>
+        </div>
+      </step-popover-content>
+    </step-popover>
+  }
+  @if (hasHiddenItems()) {
+    <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
+      <button type="button" mat-button [color]="isHiddenVisible() ? 'primary' : 'default'">
+        <div>more</div>
+        <step-icon name="chevron-down" />
+      </button>
+      <step-popover-content>
+        @for (item of hiddenItems(); track item.key; let isLast = $last) {
+          <div class="popover-item">
+            <strong>{{ item.key }}</strong>
+            <span>{{ item.value }}</span>
+          </div>
+          @if (!isLast) {
+            <br />
+          }
+        }
+      </step-popover-content>
+    </step-popover>
+  }
+</section>
