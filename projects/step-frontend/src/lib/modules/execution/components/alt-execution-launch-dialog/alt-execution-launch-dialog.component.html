@@ -1,4 +1,4 @@
-<step-modal-window [title]="title">
+<step-modal-window [title]="title" class="slim-actions">
   <div step-modal-window-body>
     @if (error(); as error) {
       <step-alert type="danger" role="alert">
@@ -40,7 +40,7 @@
   </div>
   <div step-modal-window-buttons>
     <step-btn-group class="btn-group-close">
-      <button type="button" mat-button mat-dialog-close>Close</button>
+      <button type="button" mat-button mat-dialog-close>Cancel</button>
     </step-btn-group>
     <step-execution-actions
       [tooltips]="tooltips()"
