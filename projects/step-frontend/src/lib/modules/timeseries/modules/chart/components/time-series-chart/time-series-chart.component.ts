@@ -22,8 +22,19 @@ import { TooltipParentContainer } from '../../types/tooltip-parent-container';
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
+import { UPlotStackedUtils } from '../../../_common/UPlotStackedUtils';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
+
+const DEFAULT_TIMESTAMP_FORMAT_FN: (
+  self: uPlot,
+  rawValue: number,
+  seriesIdx: number,
+  idx: number,
+) => string | number = (self: uPlot, rawValue: number, seriesIdx: number, idx: number): string | number => {
+  let date = new Date(rawValue);
+  return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+};
 
 @Component({
   selector: 'step-timeseries-chart',
@@ -177,33 +188,37 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     this.chartIsEmpty = noData;
 
-    const opts: uPlot.Options = {
+    let opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
-      legend: { show: false },
+      legend: { show: !!settings.showDefaultLegend },
       cursor: cursorOpts,
       // @ts-ignore
       select: { show: settings.zoomEnabled ?? true },
       scales: {
         x: {
-          time: true,
+          time: settings.xAxesSettings.time ?? true,
+          // @ts-ignore
+          range: (uPlot, min, max) => {
+            return [min - 1, max + 1];
+          }, // Add padding to x-axis range
           // min: this.selection?.from,
           // max: this.selection?.to,
         },
+        ...settings.scales,
       },
       plugins: this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [],
-      axes: [{ show: settings.showTimeAxes ?? true }, ...(settings.axes || [])],
+      axes: [{ show: settings.xAxesSettings.show ?? true }, ...(settings.axes || [])],
       series: [
         {
-          label: 'Timestamp',
-          value: (x: uPlot, timestamp: number) => {
-            let date = new Date(timestamp);
-            return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-          },
+          label:
+            this.settings.xAxesSettings.label || (this.settings.xAxesSettings.time ?? true ? 'Timestamp' : 'Value'),
+          value: this.settings.xAxesSettings.valueFormatFn || DEFAULT_TIMESTAMP_FORMAT_FN,
         },
         ...settings.series, // show flag will show/hide series, but they will still exist in the chart
       ],
+      bands: settings.bands,
       hooks: {
         ...settings.hooks,
         setSelect: [
@@ -222,10 +237,12 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         ],
       },
     };
-    let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
+    let data: AlignedData = [settings.xAxesSettings.values, ...settings.series.map((s) => s.data)];
     if (this.uplot) {
       this.uplot.destroy();
     }
+    //@ts-ignore
+    // opts = UPlotStackedUtils.getStackedOpts('test', settings.series, data, undefined);
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
   }
 
@@ -394,7 +411,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
    */
   updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
-    let data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
+    let data: AlignedData = [this.settings.xAxesSettings.values, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
       this.removeAllSeries();
       this.uplot.addSeries({

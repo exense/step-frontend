@@ -83,6 +83,7 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 
 @NgModule({
   declarations: [
@@ -148,7 +149,14 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    TimeSeriesChartComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

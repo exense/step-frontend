@@ -1,8 +1,12 @@
 <section class="header">
-  @if (task$ | async; as task) {
+  @if (selectedTask; as task) {
     <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
-      <h1>{{ task.attributes?.['name'] }}</h1>
+      <h3>{{ task.attributes?.['name'] }}</h3>
+      @if (lastExecution) {
+        <step-alt-execution-time [execution]="lastExecution" />
+        <step-status [status]="lastExecution!.result" />
+      }
     </div>
   }
   <div class="range-picker">
@@ -21,17 +25,32 @@
         matTooltipPosition="before"
         #rangePicker="DateRangePicker"
       />
-      <ng-container *ngIf="!(isFullRangeSelected$ | async)">
-        <step-suffix class="icon-suffix">
-          <step-icon name="alert-circle" class="full-range-warn" matTooltip="Not full range is selected" />
-        </step-suffix>
-      </ng-container>
     </step-form-field>
     <step-date-picker #picker></step-date-picker>
   </div>
 </section>
-<section class="body">
-  @if (summary$ | async; as summary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="summary" />
-  }
+<section>
+  <div class="row">
+    <div class="piechart-container">
+      @if (summary) {
+        <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" />
+      }
+    </div>
+    <step-alt-report-widget class="flex-grow-1">
+      <step-alt-report-widget-content>
+        @if (executionsChartSettings) {
+          <step-timeseries-chart [settings]="executionsChartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <step-alt-report-widget class="flex-grow-1">
+      <step-alt-report-widget-content>
+        @if (keywordsChartSettings) {
+          <step-timeseries-chart [settings]="keywordsChartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
 </section>
