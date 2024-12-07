@@ -22,6 +22,7 @@ import { MatMenu } from '@angular/material/menu';
 export class PopoverComponent {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
+  @Input() noPadding = false;
   @Input() displayByClick = false;
 
   @Output() toggledEvent = new EventEmitter<boolean>();
