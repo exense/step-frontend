@@ -1,7 +1,7 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
   <div class="title">
     @if (execution$ | async; as execution) {
-      <h3>
+      <h3 data-step-testid>
         {{ execution?.description }}
         @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
           <a
