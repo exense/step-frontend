@@ -3,7 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
   AugmentedSchedulerService,
+  BucketAttributes,
   BucketResponse,
+  DateFormat,
   DateRange,
   DateUtilsService,
   Execution,
@@ -14,6 +16,7 @@ import {
   Plan,
   STATUS_COLORS,
   TimeRange,
+  TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
@@ -23,6 +26,7 @@ import {
   forkJoin,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
@@ -31,7 +35,7 @@ import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
@@ -41,6 +45,7 @@ declare const uPlot: any;
 
 interface ExecutionWithKeywordsStats {
   executionId: string;
+  name: string;
   timestamp: number;
   statuses: Record<string, number>;
 }
@@ -68,6 +73,8 @@ export class ScheduleOverviewComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
 
+  readonly DateFormat = DateFormat;
+
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
 
@@ -88,6 +95,9 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
+
+  keywordsChartExecutionsByIds: Record<string, Execution> = {};
+  keywordsChartStats: ExecutionWithKeywordsStats[] = [];
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -139,10 +149,27 @@ export class ScheduleOverviewComponent implements OnInit {
       .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
       .pipe(
         switchMap((executions) => {
-          const executionsIdsJoined = executions.map((e) => `"${e.id!}"`).join(',');
+          if (executions.length === 0) {
+            return of({
+              start: 0,
+              interval: 0,
+              end: 0,
+              matrix: [],
+              matrixKeys: [],
+              truncated: false,
+              collectionResolution: 0,
+              higherResolutionUsed: false,
+              ttlCovered: false,
+            });
+          }
+          const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
+          this.keywordsChartExecutionsByIds = {};
+          executions.forEach((execution) => {
+            this.keywordsChartExecutionsByIds[execution.id!] = execution;
+          });
           let oqlFilter = 'attributes.metricType = response-time';
           if (executionsIdsJoined) {
-            oqlFilter += ` and attributes.eId in (${executionsIdsJoined})`;
+            oqlFilter += ` and (${executionsIdsJoined})`;
           }
           const request: FetchBucketsRequest = {
             start: timeRange.from,
@@ -158,22 +185,24 @@ export class ScheduleOverviewComponent implements OnInit {
       .subscribe((response) => {
         const statusAttribute = 'rnStatus';
         const executionsIndexes: Record<string, number> = {};
-        let executionsWithStats: ExecutionWithKeywordsStats[] = [];
+        this.keywordsChartStats = [];
         const allStatuses = new Set<string>();
         response.matrixKeys.forEach((attributes, i) => {
           const executionId = attributes['eId'];
           const status = attributes[statusAttribute];
           allStatuses.add(status);
+          let execution: Execution = this.keywordsChartExecutionsByIds[executionId]!;
           let executionEntry: ExecutionWithKeywordsStats = {
             executionId: executionId,
+            name: execution.description! || 'Unnamed',
             statuses: {},
-            timestamp: Number.MAX_VALUE,
+            timestamp: execution.startTime!,
           };
           if (executionsIndexes[executionId] >= 0) {
-            executionEntry = executionsWithStats[executionsIndexes[executionId]];
+            executionEntry = this.keywordsChartStats[executionsIndexes[executionId]];
           } else {
-            executionsWithStats.push(executionEntry);
-            executionsIndexes[executionId] = executionsWithStats.length - 1;
+            this.keywordsChartStats.push(executionEntry);
+            executionsIndexes[executionId] = this.keywordsChartStats.length - 1;
           }
           response.matrix[i].forEach((bucket) => {
             if (bucket) {
@@ -185,7 +214,7 @@ export class ScheduleOverviewComponent implements OnInit {
             }
           });
         });
-        executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
+        this.keywordsChartStats.sort((a, b) => a.timestamp - b.timestamp);
 
         let series = Array.from(allStatuses).map((status) => {
           let color = this._statusColors[status as Status];
@@ -195,7 +224,7 @@ export class ScheduleOverviewComponent implements OnInit {
             scale: 'y',
             labelItems: [status],
             legendName: status,
-            data: executionsWithStats.map((item) => item.statuses[status] || 0),
+            data: this.keywordsChartStats.map((item) => item.statuses[status] || 0),
             width: 0,
             value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
               this.calculateStackedValue(self, rawValue, seriesIdx, idx),
@@ -212,7 +241,7 @@ export class ScheduleOverviewComponent implements OnInit {
             size: TimeSeriesConfig.CHART_LEGEND_SIZE,
             scale: 'y',
             values: (u, vals) => {
-              return vals.map((v: any) => v);
+              return vals;
             },
           },
         ];
@@ -225,10 +254,17 @@ export class ScheduleOverviewComponent implements OnInit {
             time: false,
             label: 'Execution',
             show: false,
-            values: executionsWithStats.map((item, i) => i),
+            values: this.keywordsChartStats.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executionsWithStats[idx].executionId;
+              if (!this.keywordsChartStats[idx]) {
+                console.log(idx);
+              }
+              return this.keywordsChartStats[idx].executionId;
             },
+            incrs: [1000 * 60 * 60 * 24, 1000 * 60 * 60 * 24 * 2, 1000 * 60 * 60 * 24 * 7],
+          },
+          cursor: {
+            lock: true,
           },
           scales: {
             y: {
@@ -239,7 +275,7 @@ export class ScheduleOverviewComponent implements OnInit {
           },
           series: series,
           tooltipOptions: {
-            enabled: false,
+            enabled: true,
           },
           axes: axes,
           bands: this.getDefaultBands(series.length),
@@ -307,6 +343,7 @@ export class ScheduleOverviewComponent implements OnInit {
         showDefaultLegend: true,
         xAxesSettings: {
           values: xLabels,
+          valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleDateString(),
         },
         cursor: {
           lock: true,
@@ -342,6 +379,10 @@ export class ScheduleOverviewComponent implements OnInit {
       bands.push({ series: [i, i - 1] });
     }
     return bands;
+  }
+
+  jumpToExecution(eId: string) {
+    window.open(`#/executions/${eId!}/viz`);
   }
 
   private createPieChart(taskId: string, timeRange: TimeRange) {

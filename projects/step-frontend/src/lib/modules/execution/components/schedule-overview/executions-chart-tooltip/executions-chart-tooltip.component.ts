@@ -27,7 +27,7 @@ interface ExecutionItem {
 }
 
 @Component({
-  selector: 'step-execution-tooltip',
+  selector: 'step-executions-chart-tooltip',
   templateUrl: './executions-chart-tooltip.component.html',
   styleUrls: ['./executions-chart-tooltip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,16 +44,11 @@ export class ExecutionsChartTooltipComponent {
   selectedSeriesExecutions: ExecutionItem[] = [];
   executionsListTruncated: boolean = false;
 
-  myEffect = effect(() => {
-    console.log('Signal input changed:', this.data());
-  });
-
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
     const contextData = this.data();
     const transformedSeries: TransformedSeries[] = [];
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;
-      //@ts-ignore
       let value =
         i === 0
           ? series.data[contextData?.idx!] || 0

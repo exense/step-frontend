@@ -40,8 +40,8 @@
       <step-alt-report-widget-content>
         @if (executionsChartSettings) {
           <step-timeseries-chart [settings]="executionsChartSettings">
-            <ng-template let-data>
-              <step-execution-tooltip [data]="data" />
+            <ng-template tooltipContent let-data>
+              <step-executions-chart-tooltip [data]="data" />
             </ng-template>
           </step-timeseries-chart>
         }
@@ -52,7 +52,18 @@
     <step-alt-report-widget class="flex-grow-1">
       <step-alt-report-widget-content>
         @if (keywordsChartSettings) {
-          <step-timeseries-chart [settings]="keywordsChartSettings" />
+          <step-timeseries-chart [settings]="keywordsChartSettings">
+            <ng-template tooltipContent let-data>
+              <div
+                class="link-item"
+                (click)="jumpToExecution(keywordsChartStats[data.idx!].executionId)"
+                title="See Execution"
+              >
+                <span>{{ keywordsChartStats[data.idx!].name }}</span>
+                <span class="link-icon"></span>
+              </div>
+            </ng-template>
+          </step-timeseries-chart>
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ContentChild,
   ElementRef,
@@ -25,9 +26,9 @@ import { TooltipParentContainer } from '../../types/tooltip-parent-container';
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
-import { UPlotStackedUtils } from '../../../_common/UPlotStackedUtils';
 import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
+import { TooltipContentDirective } from './tooltip-content.directive';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -71,7 +72,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
-  @ContentChild(TemplateRef) tooltipTemplate!: TemplateRef<any>;
+  @ContentChild(TooltipContentDirective, { static: true, read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
 
   uplot!: uPlot;
 
@@ -88,7 +89,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   // this will be called from the tooltip instance.
   // returns true if the tooltip should be rendered. false otherwise
-  renderTooltip = (container: any, data: TooltipContextData): boolean => {
+  renderCustomTooltipFn = (container: any, data: TooltipContextData): boolean => {
     let allSeriesAreEmpty = true;
     for (let i = 0; i < data.series.length; i++) {
       let value = data.series[i].data[data.idx!];
@@ -167,6 +168,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
     this.chartMetadata = [[]];
+    this.tooltipEmbeddedView = undefined;
 
     const cursorOpts: uPlot.Cursor = {
       show: this.settings.showCursor ?? true,
@@ -228,13 +230,16 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     this.chartIsEmpty = noData;
 
-    let plugins = [];
-    if (Math.random() > 0) {
-      plugins = this.settings.tooltipOptions.enabled
-        ? [this._customTooltipPlugin.createPlugin(this, this.renderTooltip)]
-        : [];
-    } else {
-      plugins = this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [];
+    let plugins: uPlot.Plugin[] = [];
+
+    // there is a custom tooltip template specified
+    if (this.settings.tooltipOptions.enabled) {
+      console.log(this.tooltipTemplate);
+      if (this.tooltipTemplate) {
+        plugins = [this._customTooltipPlugin.createPlugin(this, this.renderCustomTooltipFn)];
+      } else {
+        plugins = [this._tooltipPlugin.createPlugin(this)];
+      }
     }
 
     let opts: uPlot.Options = {
@@ -258,7 +263,10 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         ...settings.scales,
       },
       plugins: plugins,
-      axes: [{ show: settings.xAxesSettings.show ?? true }, ...(settings.axes || [])],
+      axes: [
+        { show: settings.xAxesSettings.show ?? true, incrs: settings.xAxesSettings.incrs, grid: { show: true } },
+        ...(settings.axes || []),
+      ],
       series: [
         {
           label:

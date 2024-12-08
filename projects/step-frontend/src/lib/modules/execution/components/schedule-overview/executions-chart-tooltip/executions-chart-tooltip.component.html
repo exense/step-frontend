@@ -12,7 +12,6 @@
     @for (exec of selectedSeriesExecutions; track exec.id) {
       <div class="link-item" (click)="jumpToExecution(exec)" title="See Execution">
         <span>{{ exec.name }}</span>
-        <span class="timestamp">({{ exec.timestamp }})</span>
         <span class="link-icon"></span>
       </div>
     }
