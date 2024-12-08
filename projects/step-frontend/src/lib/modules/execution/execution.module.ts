@@ -20,7 +20,9 @@ import {
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
+  StepIconsModule,
   stepRouteAdditionalConfig,
+  TableModule,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -83,6 +85,10 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { GridsterModule } from 'angular-gridster2';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -148,7 +154,19 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    TimeSeriesChartComponent,
+    StepIconsModule,
+    TableModule,
+    MatMenuTrigger,
+    MatMenu,
+    MatTooltip,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

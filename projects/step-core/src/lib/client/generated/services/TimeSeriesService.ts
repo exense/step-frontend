@@ -109,6 +109,20 @@ export class TimeSeriesService {
   }
 
   /**
+   * @param requestBody
+   * @returns TimeSeriesAPIResponse default response
+   * @throws ApiError
+   */
+  public getReportNodesTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/time-series/report-nodes',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * Rebuild a time series based on the provided request
    * @param requestBody
    * @returns AsyncTaskStatusObject default response
