@@ -1,6 +1,8 @@
 import {
   Component,
+  ContentChild,
   ElementRef,
+  EmbeddedViewRef,
   EventEmitter,
   inject,
   Input,
@@ -9,6 +11,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  TemplateRef,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -23,6 +26,8 @@ import { TooltipParentContainer } from '../../types/tooltip-parent-container';
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
 import { UPlotStackedUtils } from '../../../_common/UPlotStackedUtils';
+import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
+import { TooltipContextData } from '../../injectables/tooltip-context-data';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -40,7 +45,7 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
-  providers: [TooltipPlugin],
+  providers: [TooltipPlugin, CustomTooltipPlugin],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [COMMON_IMPORTS],
@@ -48,6 +53,7 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
 export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, TooltipParentContainer {
   private _element = inject(ElementRef);
   private _tooltipPlugin = inject(TooltipPlugin);
+  private _customTooltipPlugin = inject(CustomTooltipPlugin);
 
   private readonly HEADER_HEIGHT = 27;
   private readonly LEGEND_HEIGHT = 24;
@@ -65,6 +71,8 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
+  @ContentChild(TemplateRef) tooltipTemplate!: TemplateRef<any>;
+
   uplot!: uPlot;
 
   seriesIndexesByIds: { [key: string]: number } = {}; // for fast accessing
@@ -75,6 +83,38 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   chartIsUnavailable = false;
 
   legendSettings: LegendSettings = { show: true, items: [], expanded: false };
+
+  tooltipEmbeddedView?: EmbeddedViewRef<any>;
+
+  // this will be called from the tooltip instance.
+  // returns true if the tooltip should be rendered. false otherwise
+  renderTooltip = (container: any, data: TooltipContextData): boolean => {
+    let allSeriesAreEmpty = true;
+    for (let i = 0; i < data.series.length; i++) {
+      let value = data.series[i].data[data.idx!];
+      if (value && value > 0) {
+        allSeriesAreEmpty = false;
+        break;
+      }
+    }
+    if (allSeriesAreEmpty) {
+      container.innerHTML = '';
+      this.tooltipEmbeddedView?.destroy();
+      this.tooltipEmbeddedView = undefined;
+      return false;
+    }
+
+    if (this.tooltipEmbeddedView) {
+      this.tooltipEmbeddedView.context.$implicit = data;
+    } else {
+      this.tooltipEmbeddedView = this.tooltipTemplate.createEmbeddedView({ $implicit: data });
+      this.tooltipEmbeddedView.rootNodes.forEach((node) => {
+        container.appendChild(node); // Append each node to the target element
+      });
+    }
+    this.tooltipEmbeddedView.detectChanges();
+    return true;
+  };
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
@@ -188,6 +228,15 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     this.chartIsEmpty = noData;
 
+    let plugins = [];
+    if (Math.random() > 0) {
+      plugins = this.settings.tooltipOptions.enabled
+        ? [this._customTooltipPlugin.createPlugin(this, this.renderTooltip)]
+        : [];
+    } else {
+      plugins = this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [];
+    }
+
     let opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
@@ -208,7 +257,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         },
         ...settings.scales,
       },
-      plugins: this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [],
+      plugins: plugins,
       axes: [{ show: settings.xAxesSettings.show ?? true }, ...(settings.axes || [])],
       series: [
         {

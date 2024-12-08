@@ -1,7 +1,7 @@
 @mixin ts-tooltip {
   .ts-tooltip {
     position: absolute;
-    z-index: 1000;
+    z-index: 100;
     display: block;
     margin: 0 2.4rem;
     padding: 8px 12px;

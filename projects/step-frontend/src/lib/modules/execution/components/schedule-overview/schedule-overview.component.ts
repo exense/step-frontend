@@ -308,6 +308,9 @@ export class ScheduleOverviewComponent implements OnInit {
         xAxesSettings: {
           values: xLabels,
         },
+        cursor: {
+          lock: true,
+        },
         scales: {
           y: {
             range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
@@ -317,7 +320,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
         series: series,
         tooltipOptions: {
-          enabled: false,
+          enabled: true,
         },
         axes: axes,
         bands: this.getDefaultBands(series.length),

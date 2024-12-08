@@ -254,8 +254,8 @@ export class TooltipPlugin {
 
   private createTooltipElement() {
     const tooltip = this.createElementWithClass('div', 'ts-tooltip');
-    tooltip.id = 'tooltip';
-    tooltip.classList.add('ts-tooltip');
+    // tooltip.id = 'tooltip';
+    // tooltip.classList.add('ts-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
     return tooltip;

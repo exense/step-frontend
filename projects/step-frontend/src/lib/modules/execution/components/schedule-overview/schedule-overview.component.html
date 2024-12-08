@@ -39,7 +39,11 @@
     <step-alt-report-widget class="flex-grow-1">
       <step-alt-report-widget-content>
         @if (executionsChartSettings) {
-          <step-timeseries-chart [settings]="executionsChartSettings" />
+          <step-timeseries-chart [settings]="executionsChartSettings">
+            <ng-template let-data>
+              <step-execution-tooltip [data]="data" />
+            </ng-template>
+          </step-timeseries-chart>
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
