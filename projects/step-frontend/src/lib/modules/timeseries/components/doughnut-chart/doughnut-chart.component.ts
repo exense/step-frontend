@@ -1,11 +1,16 @@
 import {
   AfterViewInit,
   Component,
+  effect,
   ElementRef,
+  input,
   Input,
   OnChanges,
   OnDestroy,
+  signal,
   SimpleChanges,
+  TemplateRef,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import { DoughnutChartSettings } from './doughnut-chart-settings';
@@ -21,43 +26,51 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   imports: [StepCommonModule],
   standalone: true,
 })
-export class DoughnutChartComponent implements AfterViewInit, OnDestroy, OnChanges {
-  @Input() settings!: DoughnutChartSettings;
-
-  @ViewChild('canvas') private canvas!: ElementRef<HTMLCanvasElement>;
+export class DoughnutChartComponent implements OnDestroy {
+  settings = input<DoughnutChartSettings>({ items: [] });
+  canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  // @ViewChild('canvas') private canvas!: ElementRef<HTMLCanvasElement>;
   private chart: Chart | undefined;
 
-  ngAfterViewInit(): void {
-    if (this.settings) {
-      this.chart = this.createChart();
-    }
-  }
+  // ngAfterViewInit(): void {
+  //   if (this.settings) {
+  //     this.chart = this.createChart();
+  //   }
+  // }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const settings = changes['settings'];
-    if (settings && this.canvas) {
-      this.chart?.destroy();
-      this.createChart();
+  effect = effect(() => {
+    let settings = this.settings();
+    let canvas = this.canvas();
+    if (settings && canvas) {
+      this.createChart(settings, canvas);
     }
-  }
+  });
 
-  private createChart(): Chart {
-    return new Chart(this.canvas.nativeElement, {
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   const settings = changes['settings'];
+  //   if (settings && this.canvas) {
+  //     this.chart?.destroy();
+  //     this.createChart();
+  //   }
+  // }
+
+  private createChart(settings: DoughnutChartSettings, canvas: ElementRef<HTMLCanvasElement>): Chart {
+    return new Chart(canvas.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: [this.settings.items.map((i) => i.label)],
+        labels: [settings.items.map((i) => i.label)],
         datasets: [
           {
             label: 'Test',
-            data: this.settings.items.map((i) => i.value),
-            backgroundColor: this.settings.items.map((i) => i.background),
+            data: settings.items.map((i) => i.value),
+            backgroundColor: this.settings().items.map((i) => i.background),
           },
         ],
       },
       plugins: [ChartDataLabels],
       options: {
         animation: {
-          duration: this.settings.viewMode === ViewMode.PRINT ? 0 : 500,
+          duration: settings.viewMode === ViewMode.PRINT ? 0 : 500,
         },
         plugins: {
           legend: {
