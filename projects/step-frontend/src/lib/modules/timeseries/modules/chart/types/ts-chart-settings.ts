@@ -26,5 +26,6 @@ export interface XAxesSettings {
   show?: boolean; // default true
   time?: boolean; // default true
   label?: string;
+  incrs?: number[]; // specify multipliers of how the grid add more values when zooming.
   valueFormatFn?: (self: any, rawValue: number, seriesIdx: number, idx: number) => string | number;
 }

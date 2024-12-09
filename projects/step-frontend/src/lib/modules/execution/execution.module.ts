@@ -84,6 +84,10 @@ import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-no
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -148,6 +152,7 @@ import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
+    ExecutionsChartTooltipComponent,
   ],
   imports: [
     StepCommonModule,
@@ -156,6 +161,11 @@ import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
     TimeSeriesModule,
     ArtefactsModule,
     TimeSeriesChartComponent,
+    MatMenu,
+    MatMenuTrigger,
+    MatMenuItem,
+    TooltipContentDirective,
+    DatePipe,
   ],
   exports: [
     ExecutionListComponent,
