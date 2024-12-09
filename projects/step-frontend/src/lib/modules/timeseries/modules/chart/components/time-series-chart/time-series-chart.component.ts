@@ -234,7 +234,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
     // there is a custom tooltip template specified
     if (this.settings.tooltipOptions.enabled) {
-      console.log(this.tooltipTemplate);
       if (this.tooltipTemplate) {
         plugins = [this._customTooltipPlugin.createPlugin(this, this.renderCustomTooltipFn)];
       } else {

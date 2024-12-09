@@ -256,9 +256,6 @@ export class ScheduleOverviewComponent implements OnInit {
             show: false,
             values: this.keywordsChartStats.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              if (!this.keywordsChartStats[idx]) {
-                console.log(idx);
-              }
               return this.keywordsChartStats[idx].executionId;
             },
             incrs: [1000 * 60 * 60 * 24, 1000 * 60 * 60 * 24 * 2, 1000 * 60 * 60 * 24 * 7],
