@@ -108,6 +108,7 @@ export class TooltipPlugin {
         init: (u: uPlot) => {
           chart = u;
           over = u.over;
+          over.appendChild(tooltip);
 
           bound = over;
 
@@ -243,13 +244,39 @@ export class TooltipPlugin {
           // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
           const boundingClientRect = over.getBoundingClientRect();
 
-          const anchor: TooltipAnchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
-          // tooltip.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
-          const container = this.getAdjustedBoundaries(bound);
-          TooltipPlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
+          let finalPosition = TooltipPlugin.getTooltipPosition(boundingClientRect, left, top, tooltip);
+          tooltip.style.left = finalPosition.left + 'px';
+          tooltip.style.top = finalPosition.top + 'px';
         },
       },
     };
+  }
+
+  public static getTooltipPosition(
+    containerRect: DOMRect,
+    cursorLeft: number,
+    cursorTop: number,
+    tooltip: HTMLElement,
+  ): { left: number; top: number } {
+    let totalWidth = document.body.scrollWidth;
+    let totalHeight = document.body.scrollHeight;
+    let tooltipMargin = 24;
+    let safeMargin = 24;
+    let finalLeft = cursorLeft;
+    let finalTop = cursorTop;
+    let positionToRight = true;
+    let positionToBottom = true;
+    if (containerRect.left + cursorLeft + tooltip.offsetWidth + tooltipMargin * 2 + safeMargin > totalWidth) {
+      positionToRight = false;
+      finalLeft = cursorLeft - tooltip.offsetWidth - 2 * tooltipMargin;
+    }
+    if (containerRect.top + cursorTop + tooltip.offsetHeight + safeMargin > totalHeight) {
+      positionToBottom = false;
+      const exceededHeight = containerRect.top + cursorTop + tooltip.offsetHeight - totalHeight;
+      finalTop = cursorTop - exceededHeight - safeMargin / 2;
+    }
+    console.log(positionToRight, positionToBottom);
+    return { left: finalLeft, top: finalTop };
   }
 
   private createTooltipElement() {
