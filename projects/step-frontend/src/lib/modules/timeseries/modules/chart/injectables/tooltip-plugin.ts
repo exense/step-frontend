@@ -3,11 +3,9 @@ import uPlot = require('uplot');
 import { Options } from 'uplot';
 import { TooltipRowEntry } from '../types/tooltip-row-entry';
 import { TimeSeriesConfig } from '../../_common';
-import { TooltipAnchor } from '../types/tooltip-anchor';
 import { inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ExecutionsService, MarkerType } from '@exense/step-core';
-import { TooltipPlacementFunction } from './tooltip-placement-function';
 import { TooltipParentContainer } from '../types/tooltip-parent-container';
 import { SeriesStroke } from '../../_common/types/time-series/series-stroke';
 
@@ -161,6 +159,7 @@ export class TooltipPlugin {
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
             // some weird uPlot behaviour. it happens to be -10 many times
+            hideTooltip();
             return;
           }
           const hoveredValue = u.posToVal(top, 'y');
@@ -212,10 +211,9 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
+            hideTooltip();
             // tooltip.style.zIndex = '-1';
             return; // there is no data to show
-          } else {
-            tooltip.style.zIndex = '1000';
           }
           tooltip.innerHTML = '';
           yPoints.forEach((point) => {
@@ -264,14 +262,10 @@ export class TooltipPlugin {
     let safeMargin = 24;
     let finalLeft = cursorLeft;
     let finalTop = cursorTop;
-    let positionToRight = true;
-    let positionToBottom = true;
     if (containerRect.left + cursorLeft + tooltip.offsetWidth + tooltipMargin * 2 + safeMargin > totalWidth) {
-      positionToRight = false;
       finalLeft = cursorLeft - tooltip.offsetWidth - 2 * tooltipMargin;
     }
     if (containerRect.top + cursorTop + tooltip.offsetHeight + safeMargin > totalHeight) {
-      positionToBottom = false;
       const exceededHeight = containerRect.top + cursorTop + tooltip.offsetHeight - totalHeight;
       finalTop = cursorTop - exceededHeight - safeMargin / 2;
     }
@@ -284,6 +278,20 @@ export class TooltipPlugin {
     tooltip.classList.add('ts-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
+
+    tooltip.addEventListener('mouseup', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('mousedown', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('dblclick', (event) => {
+      event.stopPropagation();
+    });
+
     return tooltip;
   }
 
