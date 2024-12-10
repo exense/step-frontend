@@ -145,6 +145,7 @@ export class ScheduleOverviewComponent implements OnInit {
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
     let executionsCountToDisplay = 30;
+    let oneDay = 1000 * 60 * 60 * 24;
     this._executionService
       .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
       .pipe(
@@ -174,7 +175,7 @@ export class ScheduleOverviewComponent implements OnInit {
           const request: FetchBucketsRequest = {
             start: timeRange.from,
             end: timeRange.to,
-            intervalSize: 1000 * 60 * 60 * 24, // one day
+            intervalSize: oneDay, // one day
             oqlFilter: oqlFilter,
             groupDimensions: ['eId', 'rnStatus'],
           };
@@ -258,7 +259,7 @@ export class ScheduleOverviewComponent implements OnInit {
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
               return this.keywordsChartStats[idx].executionId;
             },
-            incrs: [1000 * 60 * 60 * 24, 1000 * 60 * 60 * 24 * 2, 1000 * 60 * 60 * 24 * 7],
+            gridDisplayMultipliers: [oneDay, oneDay * 2, oneDay * 7],
           },
           cursor: {
             lock: true,

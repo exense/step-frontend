@@ -26,6 +26,6 @@ export interface XAxesSettings {
   show?: boolean; // default true
   time?: boolean; // default true
   label?: string;
-  incrs?: number[]; // specify multipliers of how the grid add more values when zooming.
+  gridDisplayMultipliers?: number[]; // see uPlot "incrs" property for more details
   valueFormatFn?: (self: any, rawValue: number, seriesIdx: number, idx: number) => string | number;
 }

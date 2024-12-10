@@ -35,7 +35,6 @@ export class CustomTooltipPlugin {
     }
 
     const hideTooltip = () => {
-      // tooltip.innerHTML = '';
       tooltip.style.display = 'none';
     };
 
@@ -148,7 +147,6 @@ export class CustomTooltipPlugin {
 
   private createTooltipElement() {
     const tooltip = this.createElementWithClass('div', 'ts-tooltip');
-    // tooltip.id = 'tooltip';
     tooltip.onclick = (e) => e.stopPropagation();
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';

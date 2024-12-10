@@ -263,7 +263,11 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       },
       plugins: plugins,
       axes: [
-        { show: settings.xAxesSettings.show ?? true, incrs: settings.xAxesSettings.incrs, grid: { show: true } },
+        {
+          show: settings.xAxesSettings.show ?? true,
+          incrs: settings.xAxesSettings.gridDisplayMultipliers,
+          grid: { show: true },
+        },
         ...(settings.axes || []),
       ],
       series: [
