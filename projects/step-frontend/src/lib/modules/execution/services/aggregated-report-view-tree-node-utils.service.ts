@@ -47,7 +47,7 @@ export class AggregatedReportViewTreeNodeUtilsService
   updateChildren(
     root: AggregatedReportView,
     nodeId: string,
-    children: ArtefactTreeNode[],
+    children: AggregatedTreeNode[],
     updateType: 'append' | 'replace',
   ): void {}
 

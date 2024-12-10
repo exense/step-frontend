@@ -19,16 +19,22 @@ import {
 } from '../drag-drop';
 import { DynamicInputWidthDirective } from '../editable-labels/directives/dynamic-input-width.directive';
 import { TreeNodeDetailsTemplateDirective } from './directives/tree-node-details-template.directive';
+import { TreeNodeNameTemplateDirective } from './directives/tree-node-name-template.directive';
+import { TreeNodeClassesPipe } from './pipes/tree-node-classes.pipe';
+import { TreeNodeHasActionsPipe } from './pipes/tree-node-has-actions.pipe';
 
 @NgModule({
   declarations: [
     TreeComponent,
     TreeDragPreviewComponent,
     TreeNodeActionsPipe,
+    TreeNodeHasActionsPipe,
     TreeNodeNameComponent,
     TreeNodeComponent,
     TreeNodeTemplateDirective,
+    TreeNodeNameTemplateDirective,
     TreeNodeDetailsTemplateDirective,
+    TreeNodeClassesPipe,
   ],
   imports: [
     CommonModule,
@@ -43,7 +49,7 @@ import { TreeNodeDetailsTemplateDirective } from './directives/tree-node-details
     IsDragDataPipe,
     DynamicInputWidthDirective,
   ],
-  exports: [TreeComponent, TreeNodeTemplateDirective, TreeNodeDetailsTemplateDirective],
+  exports: [TreeComponent, TreeNodeTemplateDirective, TreeNodeDetailsTemplateDirective, TreeNodeHasActionsPipe],
 })
 export class TreeModule {}
 

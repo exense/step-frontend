@@ -227,7 +227,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     const indexes = nodes.map((node) => parent.children!.indexOf(node));
     const insertIndex = Math.max(...indexes) + 1;
 
-    const artefacts = nodes.map((node) => node.originalArtefact);
+    const artefacts = nodes.map((node) => node.originalArtefact).filter((artefact) => !!artefact) as AbstractArtefact[];
     this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
       this._treeState.insertChildren(parent.id, children, insertIndex);
       this.expandChildren(children);

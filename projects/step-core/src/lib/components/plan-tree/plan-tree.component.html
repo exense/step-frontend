@@ -16,16 +16,17 @@
         >
           <step-icon name="play-circle" />
         </button>
-        <button
-          *ngIf="!isReadonly"
-          class="actions-button"
-          type="button"
-          mat-flat-button
-          matTooltip="Show actions menu (right click)"
-          (click)="openTreeMenu($event, node.id)"
-        >
-          <step-icon name="more-horizontal" />
-        </button>
+        @if (!isReadonly && (node | treeNodeHasActions)) {
+          <button
+            class="actions-button"
+            type="button"
+            mat-flat-button
+            matTooltip="Show actions menu (right click)"
+            (click)="openTreeMenu($event, node.id)"
+          >
+            <step-icon name="more-horizontal" />
+          </button>
+        }
       </div>
     </step-tree>
   </step-split-area>

@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   Component,
   contentChild,
-  ContentChild,
   DestroyRef,
   effect,
   ElementRef,
@@ -89,6 +88,9 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((dragItemId) => this._treeState.selectNode(dragItemId as string, undefined, true));
+    this.dragData.dragEnd$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(() => this._treeState.notifyInsertionComplete?.());
   }
 
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
@@ -124,6 +126,17 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   handleContextClose(): void {
     this.openedMenuNodeId = undefined;
+  }
+
+  handleDragOver(event: DropInfo): void {
+    if (!this._treeState.rootNodeId()) {
+      return;
+    }
+    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
+    if (!this._treeState.canInsertTo(newParentId)) {
+      return;
+    }
+    this._treeState.notifyPotentialInsert?.(newParentId);
   }
 
   handleDropNode(event: DropInfo): void {
