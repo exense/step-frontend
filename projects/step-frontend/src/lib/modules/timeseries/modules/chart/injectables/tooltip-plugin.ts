@@ -275,7 +275,6 @@ export class TooltipPlugin {
       const exceededHeight = containerRect.top + cursorTop + tooltip.offsetHeight - totalHeight;
       finalTop = cursorTop - exceededHeight - safeMargin / 2;
     }
-    console.log(positionToRight, positionToBottom);
     return { left: finalLeft, top: finalTop };
   }
 
