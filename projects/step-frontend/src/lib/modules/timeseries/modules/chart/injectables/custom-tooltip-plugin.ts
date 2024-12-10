@@ -137,7 +137,6 @@ export class CustomTooltipPlugin {
           const boundingClientRect = over.getBoundingClientRect();
 
           const anchor: TooltipAnchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
-          // tooltip.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
           const container = this.getAdjustedBoundaries(bound);
           TooltipPlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
         },
