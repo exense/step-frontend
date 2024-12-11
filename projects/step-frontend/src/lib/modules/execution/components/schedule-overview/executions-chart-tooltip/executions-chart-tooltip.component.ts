@@ -77,8 +77,8 @@ export class ExecutionsChartTooltipComponent {
       sort: { field: 'startTime', direction: SortDirection.ASCENDING },
       filters: [
         { field: 'result', value: item.label },
-        { collectionFilter: { type: 'Gte', field: 'endTime', value: item.timestamp } },
-        { collectionFilter: { type: 'Lte', field: 'endTime', value: item.timestamp + 1000 * 60 * 60 * 24 } },
+        { collectionFilter: { type: 'Gte', field: 'startTime', value: item.timestamp } },
+        { collectionFilter: { type: 'Lte', field: 'startTime', value: item.timestamp + 1000 * 60 * 60 * 24 } },
       ],
     };
     this._tableApiWrapper.requestTable('executions', request).subscribe((response) => {
