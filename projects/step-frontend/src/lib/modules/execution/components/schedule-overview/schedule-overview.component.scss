@@ -41,3 +41,15 @@
 .flex-grow-1 {
   flex-grow: 1;
 }
+
+.link-item {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  gap: 0.6rem;
+  padding: 2px 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

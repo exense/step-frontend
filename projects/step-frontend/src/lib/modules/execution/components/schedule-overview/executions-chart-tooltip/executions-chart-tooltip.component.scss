@@ -1,0 +1,28 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  padding: 2px 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.selected {
+    font-weight: bold;
+  }
+}
+
+.link-item {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  gap: 0.6rem;
+  padding: 2px 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

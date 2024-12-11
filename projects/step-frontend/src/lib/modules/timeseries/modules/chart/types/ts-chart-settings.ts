@@ -26,5 +26,6 @@ export interface XAxesSettings {
   show?: boolean; // default true
   time?: boolean; // default true
   label?: string;
+  gridDisplayMultipliers?: number[]; // see uPlot "incrs" property for more details
   valueFormatFn?: (self: any, rawValue: number, seriesIdx: number, idx: number) => string | number;
 }
