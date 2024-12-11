@@ -197,7 +197,7 @@
       stepTestId="export-schedule-btn"
       mat-menu-item
       [disabled]="!('task-write' | hasRight | async)"
-      [routerLink]="['/', 'alt-executions', 'schedules', element.id]"
+      [routerLink]="['/', 'schedule-view', element.id]"
     >
       <step-icon name="rocket" />
       Cross-execution dashboard

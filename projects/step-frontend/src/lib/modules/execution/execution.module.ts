@@ -299,7 +299,10 @@ export class ExecutionModule {
         },
       ],
     });
-
+    this._viewRegistry.registerRoute({
+      path: 'schedule-view/:id',
+      component: ScheduleOverviewComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,
@@ -317,10 +320,6 @@ export class ExecutionModule {
         {
           path: 'list',
           component: ExecutionListComponent,
-        },
-        {
-          path: 'schedules/:id',
-          component: ScheduleOverviewComponent,
         },
         {
           path: ':id',

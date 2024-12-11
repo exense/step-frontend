@@ -104,6 +104,7 @@ export class ActiveExecutionsService implements OnDestroy {
   }
 
   private createActiveExecution(executionId: string): ActiveExecution {
+    console.log('CREATE ACTIVE EXEC', executionId);
     const autoRefreshModel = this._autoRefreshFactory.create();
     return new ActiveExecutionImpl(executionId, autoRefreshModel, (executionId: string) =>
       this._executionService.getExecutionById(executionId).pipe(
