@@ -1,18 +1,53 @@
 import {
-  AfterViewInit,
   Component,
+  DestroyRef,
   ElementRef,
-  HostBinding,
+  EnvironmentInjector,
+  forwardRef,
   inject,
-  NgZone,
+  InjectionToken,
+  Injector,
   OnDestroy,
-  ViewChild,
+  OnInit,
+  signal,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { BehaviorSubject, Subject, switchMap, timer } from 'rxjs';
-import { v4 } from 'uuid';
 import { DragDataService } from '../../injectables/drag-data.service';
-import { DRAG_DROP_CLASS_NAMES } from '../../injectables/drag-drop-class-names.token';
+import { DragDropGroupService } from '../../injectables/drag-drop-group.service';
+import { DragDropContainerService } from '../../injectables/drag-drop-container.service';
+import { DragDropGroupContainerService } from '../../injectables/drag-drop-group-container.service';
+import { DRAG_DROP_GROUP_CONTAINERS } from '../../injectables/drag-drop-group-containers.token';
+import { DROP_AREA_ID } from '../../injectables/drop-area-id.token';
+
+const DRAG_DROP_CONTAINER_INTERNAL = new InjectionToken<DragDataService & DragDropGroupService>(
+  'Internal token for drag drop group container',
+);
+
+const dragDropGroupContainerFactory = () => {
+  const _injector = inject(Injector);
+  const _destroyRef = inject(DestroyRef);
+  const _elRef = inject(ElementRef);
+
+  const _dropAreaId = inject(DROP_AREA_ID, { optional: true });
+  const _parents = inject(DRAG_DROP_GROUP_CONTAINERS, { skipSelf: true, optional: true });
+
+  const parent = _dropAreaId ? _parents?.find((item) => item.dropAreaId === _dropAreaId) : undefined;
+
+  // If parent group has been found, return parent group
+  if (parent) {
+    return parent;
+  }
+
+  // Otherwise create instance of DragDropGroupContainerService
+  const internalInjector = Injector.create({
+    providers: [{ provide: ElementRef, useValue: _elRef }, DragDropGroupContainerService],
+    parent: _injector,
+  }) as EnvironmentInjector;
+  _destroyRef.onDestroy(() => internalInjector.destroy());
+
+  return internalInjector.get(DragDropGroupContainerService);
+};
 
 @Component({
   selector: 'step-drag-drop-container',
@@ -22,93 +57,55 @@ import { DRAG_DROP_CLASS_NAMES } from '../../injectables/drag-drop-class-names.t
   styleUrl: './drag-drop-container.component.scss',
   providers: [
     {
+      provide: DRAG_DROP_CONTAINER_INTERNAL,
+      useFactory: dragDropGroupContainerFactory,
+    },
+    {
       provide: DragDataService,
-      useExisting: DragDropContainerComponent,
+      useExisting: DRAG_DROP_CONTAINER_INTERNAL,
+    },
+    {
+      provide: DragDropGroupService,
+      useExisting: DRAG_DROP_CONTAINER_INTERNAL,
+    },
+    {
+      provide: DragDropContainerService,
+      useExisting: forwardRef(() => DragDropContainerComponent),
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.drag-in-progress]': 'isDragStarted()',
+  },
 })
-export class DragDropContainerComponent implements AfterViewInit, OnDestroy, DragDataService {
-  private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private _classNames = inject(DRAG_DROP_CLASS_NAMES);
-  private _zone = inject(NgZone);
+export class DragDropContainerComponent implements OnInit, OnDestroy, DragDropContainerService {
+  private _dragDropGroup = inject(DragDropGroupService);
 
-  private dragStartInternal$ = new Subject<void>();
-  private dragEndInternal$ = new Subject<void>();
+  protected isDragStarted = signal(false);
 
-  readonly dragAreaId = v4();
-  readonly dragStart$ = this.dragStartInternal$.asObservable();
-  readonly dragEnd$ = this.dragEndInternal$.asObservable();
+  /** @ViewChild('dragImageContainer', { static: true }) **/
+  private dragImageContainer = viewChild<ElementRef<HTMLDivElement>>('dragImageContainer');
 
-  @HostBinding('class.drag-in-progress')
-  private isDragStartedInternal = false;
+  /** @ViewChild('dragPreview', { static: true }) **/
+  private dragPreview = viewChild<ElementRef<HTMLDivElement>>('dragPreview');
 
-  get isDragStarted(): boolean {
-    return this.isDragStartedInternal;
-  }
-
-  private dragDataInternal$ = new BehaviorSubject<unknown | undefined>(undefined);
-
-  readonly dragData$ = this.dragDataInternal$.asObservable();
-
-  get dragData(): unknown | undefined {
-    return this.dragDataInternal$.value;
-  }
-
-  @ViewChild('dragImageContainer', { static: true }) private dragImageContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('dragPreview', { static: true }) private dragPreview!: ElementRef<HTMLDivElement>;
-
-  ngAfterViewInit(): void {
-    this.dragEnd$.pipe(switchMap(() => timer(50))).subscribe(() => this.cleanup());
+  ngOnInit(): void {
+    this._dragDropGroup.registerGroupItem(this);
   }
 
   ngOnDestroy(): void {
-    this.dragStartInternal$.complete();
-    this.dragEndInternal$.complete();
-    this.cleanup();
+    this._dragDropGroup.unregisterGroupItem(this);
   }
 
-  createDragImageForElement(element: HTMLElement): HTMLElement {
-    let previewNode = this.getPreviewNode();
-    if (previewNode) {
-      return previewNode;
-    }
-    previewNode = element.cloneNode(true) as HTMLElement;
-    previewNode.draggable = false;
-    previewNode.classList.remove(this._classNames.DRAG_IN_PROGRESS);
-    this.dragImageContainer.nativeElement.appendChild(previewNode);
-    return previewNode;
+  getImageContainer(): HTMLElement | undefined {
+    return this.dragImageContainer()?.nativeElement;
   }
 
-  dragStart(dragData?: unknown): void {
-    this.dragDataInternal$.next(dragData);
-    this.isDragStartedInternal = true;
-    this.dragStartInternal$.next();
+  getPreviewNode(): HTMLElement | undefined {
+    return this.dragPreview()?.nativeElement;
   }
 
-  dragEnd(): void {
-    this.dragDataInternal$.next(undefined);
-    this.isDragStartedInternal = false;
-    this.dragEndInternal$.next();
-  }
-
-  private cleanup(): void {
-    this._zone.runOutsideAngular(() => {
-      this._elRef.nativeElement.querySelectorAll(`.${this._classNames.DRAG_OVER}`).forEach((element) => {
-        element.classList.remove(this._classNames.DRAG_OVER);
-      });
-      this._elRef.nativeElement.querySelectorAll(`.${this._classNames.DRAG_IN_PROGRESS}`).forEach((element) => {
-        element.classList.remove(this._classNames.DRAG_IN_PROGRESS);
-      });
-      this.dragImageContainer.nativeElement.childNodes.forEach((child) => child.remove());
-    });
-  }
-
-  private getPreviewNode(): HTMLElement | undefined {
-    const dragPreview = this.dragPreview.nativeElement.querySelector<HTMLElement>('step-drag-preview');
-    if (!dragPreview || !dragPreview.children.length) {
-      return undefined;
-    }
-    return dragPreview;
+  setIsDragStarted(value: boolean): void {
+    this.isDragStarted.set(value);
   }
 }

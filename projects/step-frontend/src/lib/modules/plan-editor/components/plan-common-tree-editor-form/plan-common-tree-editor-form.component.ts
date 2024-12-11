@@ -13,11 +13,14 @@ import {
   TreeStateService,
   PlanContextApiService,
   PlanContext,
+  DropInfo,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { CopyBufferService } from '../../injectables/copy-buffer.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { ControlDropInfo } from '../../types/control-drop-info.interface';
+import { ControlType } from '../../types/control-type.enum';
 
 const MESSAGE_ADD_AT_MULTIPLE_NODES =
   'Adding elements is not supported when more then one node is selected in the tree';
@@ -52,6 +55,35 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
 
   readonly hasRedo$ = this._planHistory.hasRedo$;
   readonly hasUndo$ = this._planHistory.hasUndo$;
+
+  protected handleExternalNodeDrop(event: DropInfo): void {
+    if (!event.draggedElement || typeof event.draggedElement === 'string') {
+      return;
+    }
+    const parentNodeId = event.droppedArea as string;
+    const controlDropInfo = event.draggedElement as ControlDropInfo;
+    let artefact$: Observable<AbstractArtefact> | undefined = undefined;
+    switch (controlDropInfo.type) {
+      case ControlType.ARTEFACT:
+        artefact$ = this._artefactsFactory.createControlArtefact(controlDropInfo.id);
+        break;
+      case ControlType.KEYWORD:
+        artefact$ = this._artefactsFactory.createCallKeywordArtefact(controlDropInfo.id);
+        break;
+      case ControlType.PLAN:
+        artefact$ = this._artefactsFactory.createCallPlanArtefact(controlDropInfo.id);
+        break;
+      default:
+        break;
+    }
+    if (!artefact$) {
+      return;
+    }
+    artefact$.subscribe((artefact) => {
+      this._treeState.insertChildren(parentNodeId, [artefact]);
+      this._treeState.notifyInsertionComplete?.();
+    });
+  }
 
   ngOnInit(): void {
     this.initPlanUpdate();
@@ -227,7 +259,7 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     const indexes = nodes.map((node) => parent.children!.indexOf(node));
     const insertIndex = Math.max(...indexes) + 1;
 
-    const artefacts = nodes.map((node) => node.originalArtefact);
+    const artefacts = nodes.map((node) => node.originalArtefact).filter((artefact) => !!artefact) as AbstractArtefact[];
     this._planApi.cloneArtefacts(artefacts).subscribe((children) => {
       this._treeState.insertChildren(parent.id, children, insertIndex);
       this.expandChildren(children);

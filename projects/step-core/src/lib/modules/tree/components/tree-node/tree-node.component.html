@@ -6,7 +6,7 @@
   [class.skipped]="node().isVisuallySkipped"
   [class.root-node]="isRootNode()"
 >
-  @if (canToggle) {
+  @if (canToggle()) {
     <button mat-icon-button (click)="toggle()">
       <step-icon class="toggle-state" [name]="toggleStateIcon()" />
     </button>
@@ -18,7 +18,7 @@
       class="node-content"
       (contextmenu)="openContextMenu($event)"
       [stepDragItem]="n.id"
-      [dragDisabled]="dragDisabled"
+      [dragDisabled]="dragDisabled()"
     >
       @if (n.icon) {
         <div class="node-icon">

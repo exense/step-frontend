@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, inject, input, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, ViewEncapsulation } from '@angular/core';
 import { TreeNode } from '../../shared/tree-node';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeFlatNode } from '../../shared/tree-flat-node';
@@ -12,6 +12,7 @@ const ICON_COLLAPSED = 'chevron-right';
   templateUrl: './tree-node.component.html',
   styleUrl: './tree-node.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreeNodeComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
@@ -32,9 +33,14 @@ export class TreeNodeComponent {
   });
   readonly toggleStateIcon = computed(() => (this.isExpanded() ? ICON_EXPANDED : ICON_COLLAPSED));
 
-  @Input() canToggle: boolean = false;
-  @Input() dragDisabled: boolean = false;
-  @Output() contextMenu = new EventEmitter<{ event: MouseEvent; nodeId: string }>();
+  /** @Input() **/
+  readonly canToggle = input(false);
+
+  /** @Input() **/
+  readonly dragDisabled = input(false);
+
+  /** @Output() **/
+  readonly contextMenu = output<{ event: MouseEvent; nodeId: string }>();
 
   toggle(): void {
     this._treeState.toggleNode(this.node().id);

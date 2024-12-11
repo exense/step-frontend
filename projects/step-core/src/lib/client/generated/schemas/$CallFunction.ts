@@ -52,6 +52,12 @@ export const $CallFunction = {
     continueParentNodeExecutionOnError: {
       type: 'DynamicValueBoolean',
     },
+    before: {
+      type: 'ChildrenBlock',
+    },
+    after: {
+      type: 'ChildrenBlock',
+    },
     remote: {
       type: 'DynamicValueBoolean',
     },

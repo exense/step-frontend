@@ -52,6 +52,9 @@ export const $ReportNode = {
         type: 'string',
       },
     },
+    parentSource: {
+      type: 'Enum',
+    },
     resolvedArtefact: {
       type: 'AbstractArtefact',
     },

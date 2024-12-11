@@ -4,6 +4,4 @@
 
 import type { Filter } from './Filter';
 
-export type Exists = Filter & {
-  field?: string;
-};
+export type Exists = Filter;

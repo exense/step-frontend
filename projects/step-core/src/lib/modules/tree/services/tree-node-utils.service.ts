@@ -8,4 +8,5 @@ export abstract class TreeNodeUtilsService<T, N extends TreeNode> {
   abstract hasChildren?(nodeId: string): boolean;
   abstract loadChildren?(node: N): Observable<unknown>;
   abstract restoreTree?(root: T, nodeIdsToRestore: string[]): Observable<unknown>;
+  abstract getNodeAdditionalClasses?(node: N): string[];
 }

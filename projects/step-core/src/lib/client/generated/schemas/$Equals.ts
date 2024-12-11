@@ -9,9 +9,6 @@ export const $Equals = {
     },
     {
       properties: {
-        field: {
-          type: 'string',
-        },
         expectedValue: {
           properties: {},
         },

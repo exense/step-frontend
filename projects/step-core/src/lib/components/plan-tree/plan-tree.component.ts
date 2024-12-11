@@ -5,6 +5,7 @@ import {
   forwardRef,
   inject,
   Input,
+  output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -12,18 +13,21 @@ import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
 import {
   ArtefactTreeNode,
+  ArtefactTreeNodeType,
   TreeAction,
   TreeActionsService,
   TreeComponent,
+  TreeNode,
   TreeStateService,
 } from '../../modules/tree/tree.module';
 import {
   PlanArtefactResolverService,
+  PlanEditorPersistenceStateService,
   PlanEditorService,
   PlanInteractiveSessionService,
   PlanTreeAction,
-  PlanEditorPersistenceStateService,
 } from '../../modules/plan-common';
+import { DropInfo } from '../../modules/drag-drop';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -49,6 +53,9 @@ export class PlanTreeComponent implements TreeActionsService {
 
   readonly activeNode = this._treeState.selectedNode;
   readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
+
+  /** @Output() **/
+  readonly externalObjectDrop = output<DropInfo>();
 
   @Input() isReadonly: boolean = false;
 
@@ -137,8 +144,9 @@ export class PlanTreeComponent implements TreeActionsService {
     });
   }
 
-  hasActionsForNode(node: ArtefactTreeNode): boolean {
-    return true;
+  hasActionsForNode(treeNode: TreeNode): boolean {
+    const node = this._treeState.findNodeById(treeNode?.id);
+    return node?.nodeType === ArtefactTreeNodeType.artefact;
   }
 
   handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
@@ -206,7 +214,10 @@ export class PlanTreeComponent implements TreeActionsService {
     this._planPersistenceState.setPanelSize(ARTEFACT_DETAILS_SIZE, size);
   }
 
-  private canOpenArtefact(artefact: AbstractArtefact): boolean {
+  private canOpenArtefact(artefact?: AbstractArtefact): boolean {
+    if (!artefact) {
+      return false;
+    }
     return ['CallPlan', 'CallKeyword'].includes(artefact._class);
   }
 }

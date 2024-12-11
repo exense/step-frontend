@@ -200,6 +200,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  notifyPotentialInsert?(potentialParentId: string): void;
+  notifyInsertionComplete?(): void;
+
   insertSelectedNodesTo(
     newParentId: string,
     insertParams?: { insertAtFirstPosition?: boolean; insertAfterSiblingId?: string },
@@ -667,10 +670,14 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return !isPossibleNodeCycleExits;
   }
 
-  private refresh(): void {
+  protected isRefreshInProgress = false;
+
+  protected refresh(): void {
+    this.isRefreshInProgress = true;
     const root = this._treeNodeUtils.convertItem(this.originalRoot!);
     this.rootNode.set(root);
     this.treeUpdateInternal$.next(this.originalRoot!);
+    setTimeout(() => (this.isRefreshInProgress = false), 500);
   }
 
   private expandPath(path: string[]): Observable<boolean> {

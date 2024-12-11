@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { AbstractArtefact } from './AbstractArtefact';
+import type { ChildrenBlock } from './ChildrenBlock';
 import type { DynamicValueBoolean } from './DynamicValueBoolean';
 import type { DynamicValueString } from './DynamicValueString';
 
@@ -18,6 +19,8 @@ export type CallFunction = {
   skipNode?: DynamicValueBoolean;
   instrumentNode?: DynamicValueBoolean;
   continueParentNodeExecutionOnError?: DynamicValueBoolean;
+  before?: ChildrenBlock;
+  after?: ChildrenBlock;
   remote?: DynamicValueBoolean;
   token?: DynamicValueString;
   function?: DynamicValueString;

@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ChildrenBlock } from './ChildrenBlock';
 import type { DynamicValueBoolean } from './DynamicValueBoolean';
 import type { DynamicValueString } from './DynamicValueString';
 
@@ -17,6 +18,8 @@ export type AbstractArtefact = {
   skipNode?: DynamicValueBoolean;
   instrumentNode?: DynamicValueBoolean;
   continueParentNodeExecutionOnError?: DynamicValueBoolean;
+  before?: ChildrenBlock;
+  after?: ChildrenBlock;
   id?: string;
   _class: string;
 };

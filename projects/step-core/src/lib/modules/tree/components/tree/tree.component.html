@@ -1,7 +1,7 @@
 <step-drag-drop-container>
   @for (item of _treeState.flatTree(); track item.id) {
     <div
-      class="node-container"
+      [ngClass]="item | treeNodeClasses"
       draggable="false"
       [style.--level]="item.parentPath.length"
       (click)="_treeState.selectNode(item, $event)"
@@ -12,9 +12,10 @@
         [class.is-drag-in-progress]="!!(item.id | isDragData | async)"
         [node]="item"
         [canToggle]="item.hasChild || item.expandable"
-        [dragDisabled]="dragDisabled"
+        [dragDisabled]="!!(dragDisabled || item.isDragDisabled)"
         (contextMenu)="openContextMenu($event)"
         [stepDropArea]="item.id"
+        (dragOver)="handleDragOver($event)"
         (dropItem)="handleDropNode($event)"
       />
       @if (dragDisabled) {

@@ -30,4 +30,11 @@ step-plan-otherplan-list {
     justify-content: space-between;
     min-height: 4rem;
   }
+
+  .move {
+    width: 1%;
+    step-icon {
+      cursor: grab;
+    }
+  }
 }

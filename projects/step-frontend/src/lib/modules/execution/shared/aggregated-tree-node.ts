@@ -6,7 +6,9 @@ export enum AggregatedTreeNodeType {
   DETAILS_DATA,
 }
 
-export interface AggregatedTreeNode extends ArtefactTreeNode, AggregatedArtefactInfo<AbstractArtefact> {
+export interface AggregatedTreeNode
+  extends Omit<ArtefactTreeNode, 'nodeType'>,
+    AggregatedArtefactInfo<AbstractArtefact> {
   countByStatus?: Record<string, number>;
   nodeType: AggregatedTreeNodeType;
   artefactHash?: string;

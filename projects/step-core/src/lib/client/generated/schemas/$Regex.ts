@@ -9,9 +9,6 @@ export const $Regex = {
     },
     {
       properties: {
-        field: {
-          type: 'string',
-        },
         expression: {
           type: 'string',
         },

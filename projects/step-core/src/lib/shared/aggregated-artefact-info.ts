@@ -1,6 +1,6 @@
 import { AbstractArtefact } from '../client/step-client-module';
 
 export interface AggregatedArtefactInfo<T extends AbstractArtefact> {
-  originalArtefact: T;
+  originalArtefact?: T;
   countByStatus?: Record<string, number>;
 }
