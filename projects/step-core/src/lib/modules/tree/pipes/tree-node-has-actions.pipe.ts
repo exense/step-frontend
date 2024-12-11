@@ -1,5 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { TreeActionsService, TreeNode } from '@exense/step-core';
+import { TreeActionsService } from '../services/tree-actions.service';
+import { TreeNode } from '../shared/tree-node';
 
 @Pipe({
   name: 'treeNodeHasActions',
