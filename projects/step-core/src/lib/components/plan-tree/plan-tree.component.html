@@ -1,9 +1,11 @@
 <step-split>
   <step-split-area [size]="treeSize" (sizeChange)="handleTreeSizeChange($event)">
     <step-tree
+      stepDropAreaId="planTree"
       [dragDisabled]="isReadonly"
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
       (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
+      (externalObjectDrop)="externalObjectDrop.emit($event)"
     >
       <div *stepTreeNodeTemplate="let node" class="node-name" [class.node-displayed]="node.id === activeNode()?.id">
         <span>{{ node?.name }}</span>

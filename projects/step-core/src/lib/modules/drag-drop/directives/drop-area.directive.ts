@@ -3,6 +3,7 @@ import { DragDataService } from '../injectables/drag-data.service';
 import { DropInfo } from '../types/drop-info';
 import { DRAG_DROP_CLASS_NAMES } from '../injectables/drag-drop-class-names.token';
 import { DragDropListener } from '../types/drag-drop-listener';
+import { DragEndType } from '../types/drag-end-type.enum';
 
 @Directive({
   selector: '[stepDropArea]',
@@ -64,7 +65,7 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
     event.preventDefault();
     this._zone.run(() => {
       this.dropItem.emit(this.getDropInfo());
-      this._dragDataService.dragEnd();
+      this._dragDataService.dragEnd(DragEndType.DROP);
     });
   }
 

@@ -22,6 +22,7 @@ import { TreeNodeDetailsTemplateDirective } from './directives/tree-node-details
 import { TreeNodeNameTemplateDirective } from './directives/tree-node-name-template.directive';
 import { TreeNodeClassesPipe } from './pipes/tree-node-classes.pipe';
 import { TreeNodeHasActionsPipe } from './pipes/tree-node-has-actions.pipe';
+import { DropAreaIdDirective } from '../drag-drop/directives/drop-area-id.directive';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { TreeNodeHasActionsPipe } from './pipes/tree-node-has-actions.pipe';
     DragPreviewDirective,
     IsDragDataPipe,
     DynamicInputWidthDirective,
+    DropAreaIdDirective,
   ],
   exports: [TreeComponent, TreeNodeTemplateDirective, TreeNodeDetailsTemplateDirective, TreeNodeHasActionsPipe],
 })

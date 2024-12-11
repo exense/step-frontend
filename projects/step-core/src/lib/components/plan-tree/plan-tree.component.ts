@@ -5,6 +5,7 @@ import {
   forwardRef,
   inject,
   Input,
+  output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -26,6 +27,7 @@ import {
   PlanInteractiveSessionService,
   PlanTreeAction,
 } from '../../modules/plan-common';
+import { DropInfo } from '../../modules/drag-drop';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -51,6 +53,9 @@ export class PlanTreeComponent implements TreeActionsService {
 
   readonly activeNode = this._treeState.selectedNode;
   readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
+
+  /** @Output() **/
+  readonly externalObjectDrop = output<DropInfo>();
 
   @Input() isReadonly: boolean = false;
 
