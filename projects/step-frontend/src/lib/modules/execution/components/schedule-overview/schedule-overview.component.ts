@@ -37,7 +37,6 @@ import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../.
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DashboardEntry } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/shared/dashboard-entry';
 import { DateTime, Duration } from 'luxon';
 
 declare const uPlot: any;
