@@ -139,10 +139,10 @@ export class ScheduleOverviewComponent implements OnInit {
       .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
       .pipe(
         switchMap((executions) => {
-          const executionsIdsJoined = executions.map((e) => `"${e.id!}"`).join(',');
+          const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
           let oqlFilter = 'attributes.metricType = response-time';
           if (executionsIdsJoined) {
-            oqlFilter += ` and attributes.eId in (${executionsIdsJoined})`;
+            oqlFilter += ` and (${executionsIdsJoined})`;
           }
           const request: FetchBucketsRequest = {
             start: timeRange.from,
