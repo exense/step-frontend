@@ -23,6 +23,7 @@ import {
   forkJoin,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
@@ -139,6 +140,19 @@ export class ScheduleOverviewComponent implements OnInit {
       .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
       .pipe(
         switchMap((executions) => {
+          if (executions.length === 0) {
+            return of({
+              start: 0,
+              interval: 0,
+              end: 0,
+              matrix: [],
+              matrixKeys: [],
+              truncated: false,
+              collectionResolution: 0,
+              higherResolutionUsed: false,
+              ttlCovered: false,
+            });
+          }
           const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
           let oqlFilter = 'attributes.metricType = response-time';
           if (executionsIdsJoined) {
