@@ -300,7 +300,7 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'schedule-view/:id',
+      path: 'cross-executions/:id',
       component: ScheduleOverviewComponent,
     });
     this._viewRegistry.registerRoute({
