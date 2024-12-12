@@ -13,8 +13,10 @@ import {
   MarkerType,
   Plan,
   STATUS_COLORS,
+  TimeOption,
   TimeRange,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
 import {
   combineLatest,
@@ -35,7 +37,6 @@ import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../.
 import { Axis, Band } from 'uplot';
 import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DashboardEntry } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/monitoring/shared/dashboard-entry';
 import { DateTime, Duration } from 'luxon';
 
 declare const uPlot: any;
@@ -68,6 +69,13 @@ export class ScheduleOverviewComponent implements OnInit {
   private _dateUtils = inject(DateUtilsService);
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
+
+  readonly RELATIVE_TIME_RANGES: TimeOption[] = [
+    { label: 'Last Week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
+    { label: 'Last 2 Weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
+    { label: 'Last Month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
+    { label: 'Last 6 Months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+  ];
 
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
