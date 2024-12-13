@@ -272,7 +272,7 @@ export class ScheduleOverviewComponent implements OnInit {
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
-      intervalSize: 1000 * 60 * 60 * 24, // one day
+      numberOfBuckets: 30,
       oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
       groupDimensions: [statusAttribute],
     };
@@ -316,7 +316,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
       ];
       this.executionsChartSettings = {
-        title: 'Executions per day',
+        title: 'Executions statuses over time',
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
