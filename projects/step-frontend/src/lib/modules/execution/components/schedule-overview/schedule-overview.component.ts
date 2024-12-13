@@ -154,14 +154,14 @@ export class ScheduleOverviewComponent implements OnInit {
             });
           }
           const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
-          let oqlFilter = 'attributes.metricType = response-time';
+          let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
           if (executionsIdsJoined) {
             oqlFilter += ` and (${executionsIdsJoined})`;
           }
           const request: FetchBucketsRequest = {
             start: timeRange.from,
             end: timeRange.to,
-            intervalSize: 1000 * 60 * 60 * 24, // one day
+            numberOfBuckets: 1,
             oqlFilter: oqlFilter,
             groupDimensions: ['eId', 'rnStatus'],
           };
