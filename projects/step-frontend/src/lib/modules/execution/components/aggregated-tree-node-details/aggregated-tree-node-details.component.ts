@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   input,
+  output,
   Renderer2,
   signal,
   viewChild,
@@ -14,7 +15,6 @@ import { AltExecutionStateService } from '../../services/alt-execution-state.ser
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { arrayToRegex, AugmentedExecutionsService, ReportNode, TableSearch } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
@@ -31,7 +31,6 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
   private _augmentedExecutionService = inject(AugmentedExecutionsService);
-  private _treeState = inject(AggregatedReportViewTreeStateService);
 
   readonly statuses = REPORT_NODE_STATUS;
 
@@ -53,6 +52,8 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
   /** @Input() **/
   readonly initialStatus = input<Status | undefined>(undefined);
 
+  readonly showDetails = output<ReportNode>();
+
   private artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
@@ -66,8 +67,6 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
       map((keywordParameters) => ({ ...keywordParameters, testcases: undefined })),
     ),
   );
-
-  protected readonly visibleDetails = this._treeState.visibleDetails;
 
   protected readonly searchCtrl = this._fb.control('');
   private searchSubscription = this.searchCtrl.valueChanges
@@ -108,8 +107,8 @@ export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
     }
   }
 
-  protected toggleDetail(node: ReportNode): void {
-    this._treeState.toggleDetail(node);
+  protected openNodeDetails(node: ReportNode): void {
+    this.showDetails.emit(node);
   }
 
   protected toggleSort(): void {

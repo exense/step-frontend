@@ -66,6 +66,7 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
 import { StatusIconPipe } from './pipes/status-icon.pipe';
 import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
+import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -132,6 +133,7 @@ import { SelectExtraOptionsDirective } from './directives/select-extra-options.d
     StatusIconPipe,
     SelectComponent,
     SelectExtraOptionsDirective,
+    ShortenNumberPipe,
   ],
   exports: [
     CommonModule,
@@ -201,6 +203,7 @@ import { SelectExtraOptionsDirective } from './directives/select-extra-options.d
     StatusIconPipe,
     SelectComponent,
     SelectExtraOptionsDirective,
+    ShortenNumberPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -320,5 +323,6 @@ export * from './injectables/time-converters-factory.service';
 export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
+export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/select-extra-options.directive';

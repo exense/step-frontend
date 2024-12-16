@@ -16,12 +16,17 @@ import { ExecutionTabsComponent } from './components/execution-tabs/execution-ta
 import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
+  DialogParentService,
   dialogRoute,
+  DialogRouteResult,
   EntityRegistry,
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
+  SimpleOutletComponent,
   stepRouteAdditionalConfig,
+  TreeNodeUtilsService,
+  TreeStateService,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -65,7 +70,7 @@ import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
@@ -88,6 +93,19 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { RepoRefHolderService } from './services/repo-ref-holder.service';
+import { AggregatedTreeNodeDetailsDialogComponent } from './components/aggregated-tree-node-details-dialog/aggregated-tree-node-details-dialog.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { AltNodeDetailsParentComponent } from './components/alt-node-details-parent/alt-node-details-parent.component';
+import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AGGREGATED_TREE_WIDGET_STATE,
+  AggregatedReportViewTreeStateService,
+} from './services/aggregated-report-view-tree-state.service';
+import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
+import { AltExecutionKeywordDrilldownDialogComponent } from './components/alt-execution-keyword-drilldown-dialog/alt-execution-keyword-drilldown-dialog.component';
+import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 
 @NgModule({
   declarations: [
@@ -141,6 +159,8 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreeTabComponent,
+    AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
     AltExecutionRangePickerComponent,
@@ -154,7 +174,10 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeDetailsComponent,
+    AltNodeDetailsParentComponent,
+    AggregatedTreeNodeDetailsDialogComponent,
     AggregatedTreeNodeInfoComponent,
+    AltExecutionKeywordDrilldownDialogComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
   exports: [
@@ -177,10 +200,13 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreeTabComponent,
+    AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltKeywordInlineDrilldownComponent,
     AggregatedTreeNodeInfoComponent,
     AltExecutionLaunchDialogComponent,
+    AltReportWidgetComponent,
   ],
 })
 export class ExecutionModule {
@@ -323,7 +349,23 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
-          providers: [RepoRefHolderService],
+          providers: [
+            RepoRefHolderService,
+            AggregatedReportViewTreeNodeUtilsService,
+            {
+              provide: TreeNodeUtilsService,
+              useExisting: AggregatedReportViewTreeNodeUtilsService,
+            },
+            {
+              provide: AGGREGATED_TREE_TAB_STATE,
+              useClass: AggregatedReportViewTreeStateService,
+            },
+            {
+              provide: AGGREGATED_TREE_WIDGET_STATE,
+              useClass: AggregatedReportViewTreeStateService,
+            },
+            AltReportNodeDetailsStateService,
+          ],
           children: [
             {
               path: '',
@@ -373,7 +415,7 @@ export class ExecutionModule {
               children: [
                 {
                   path: '',
-                  component: AltExecutionTreeComponent,
+                  component: AltExecutionTreeTabComponent,
                 },
                 {
                   path: '',
@@ -406,6 +448,62 @@ export class ExecutionModule {
                 schedulePath: '',
               },
             }),
+            {
+              path: 'aggregated-info',
+              outlet: 'aggregatedNode',
+              component: AltNodeDetailsParentComponent,
+              children: [
+                dialogRoute(
+                  {
+                    path: ':nodeId',
+                    resolve: {
+                      node: (route: ActivatedRouteSnapshot) =>
+                        inject(AGGREGATED_TREE_TAB_STATE).findNodeById(route.params['nodeId']),
+                    },
+                    dialogComponent: AggregatedTreeNodeDetailsDialogComponent,
+                  },
+                  {
+                    hasBackdrop: false,
+                    height: '100%',
+                    width: '40%',
+                    panelClass: 'side-dialog',
+                    position: {
+                      right: '0',
+                      top: '0',
+                      bottom: '0',
+                    },
+                  },
+                ),
+              ],
+            },
+            {
+              path: 'report-node',
+              outlet: 'reportNode',
+              component: AltNodeDetailsParentComponent,
+              children: [
+                dialogRoute(
+                  {
+                    path: ':nodeId',
+                    resolve: {
+                      node: (route: ActivatedRouteSnapshot) =>
+                        inject(AltReportNodeDetailsStateService).getReportNode(route.params['nodeId']),
+                    },
+                    dialogComponent: AltExecutionKeywordDrilldownDialogComponent,
+                  },
+                  {
+                    hasBackdrop: false,
+                    height: '100%',
+                    width: '25%',
+                    panelClass: 'side-dialog',
+                    position: {
+                      right: '0',
+                      top: '0',
+                      bottom: '0',
+                    },
+                  },
+                ),
+              ],
+            },
             {
               path: 'viz',
               redirectTo: 'analytics',

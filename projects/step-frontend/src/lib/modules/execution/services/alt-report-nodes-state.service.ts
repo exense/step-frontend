@@ -20,6 +20,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
 import { REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
 import { AltExecutionViewAllService } from './alt-execution-view-all.service';
+import { EXECUTION_ID } from './execution-id.token';
 
 @Injectable()
 export abstract class AltReportNodesStateService implements OnDestroy {
@@ -36,6 +37,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.setupSyncWithStorage();
   }
 
+  private _executionId = inject(EXECUTION_ID);
   private _destroyRef = inject(DestroyRef);
   private _viewService = inject(PrivateViewPluginService);
   private _executionStorage = inject(AltExecutionStorageService);
@@ -150,7 +152,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     if (this.isIgnoreFilter) {
       return;
     }
-    const executionId = this._executionState.executionIdSnapshot;
+    const executionId = this._executionId();
     if (executionId && search) {
       this._executionStorage.setItem(this.searchKey(executionId), search);
     }
@@ -176,7 +178,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     if (this.isIgnoreFilter) {
       return;
     }
-    const executionId = this._executionState.executionIdSnapshot;
+    const executionId = this._executionId();
     if (executionId && statuses?.length) {
       const statusesString = statuses.join('|');
       this._executionStorage.setItem(this.statusesKey(executionId), statusesString);
