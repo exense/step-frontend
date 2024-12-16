@@ -1,11 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  AggregatedReportView,
-  ArtefactService,
-  ArtefactTreeNode,
-  TreeNode,
-  TreeNodeUtilsService,
-} from '@exense/step-core';
+import { AggregatedReportView, ArtefactService, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 
 @Injectable()
@@ -24,9 +18,23 @@ export class AggregatedReportViewTreeNodeUtilsService
     const name = originalArtefact.attributes?.['name'] ?? '';
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
-    const children = (item.children ?? []).map((child) =>
-      this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
-    );
+
+    const beforeChildren = (item?.children || []).filter((child) => child.parentSource === 'BEFORE');
+    const beforeContainer = this.createPseudoContainer('BEFORE', beforeChildren, id);
+    const afterChildren = (item?.children || []).filter((child) => child.parentSource === 'AFTER');
+    const afterContainer = this.createPseudoContainer('AFTER', afterChildren, id);
+
+    const children = (item?.children || [])
+      .filter((child) => child.parentSource !== 'BEFORE' && child.parentSource !== 'AFTER')
+      .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeContainer) {
+      children.unshift(beforeContainer);
+    }
+
+    if (afterContainer) {
+      children.push(afterContainer);
+    }
 
     return {
       id,
@@ -75,6 +83,38 @@ export class AggregatedReportViewTreeNodeUtilsService
       nodeType: AggregatedTreeNodeType.DETAILS_NODE,
       originalArtefact,
       artefactHash: item.artefactHash,
+    };
+  }
+
+  private createPseudoContainer(
+    containerType: AggregatedReportView['parentSource'],
+    childArtefacts: AggregatedReportView[] | undefined,
+    parentId: string,
+  ): AggregatedTreeNode | undefined {
+    if (!childArtefacts?.length) {
+      return undefined;
+    }
+    const id = `${containerType}_${parentId}`;
+    let name = '';
+    if (containerType === 'BEFORE') {
+      name = 'Before';
+    } else if (containerType === 'AFTER') {
+      name = 'After';
+    }
+    const isSkipped = false;
+    const isVisuallySkipped = false;
+    const icon = 'chevron-left';
+    const children = (childArtefacts ?? []).map((child) => this.convertItem(child, { parentId: id }));
+    const expandable = true;
+    return {
+      id,
+      name,
+      isSkipped,
+      isVisuallySkipped,
+      icon,
+      children,
+      expandable,
+      nodeType: AggregatedTreeNodeType.PSEUDO_CONTAINER,
     };
   }
 }

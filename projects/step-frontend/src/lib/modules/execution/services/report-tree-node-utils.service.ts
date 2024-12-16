@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { ArtefactService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import {
+  AbstractArtefact,
+  ArtefactService,
+  ControllerService,
+  ReportNode,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { EXECUTION_TREE_PAGING_SETTINGS, ExecutionTreePagingService } from './execution-tree-paging.service';
 import { ReportTreeNode } from '../shared/report-tree-node';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -26,7 +33,24 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const isVisuallySkipped = false;
     const icon = this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = this.hasChildren(id);
-    const children = (item?.children || []).map((child) => this.convertItem(child, { parentId: id }));
+
+    const beforeChildren = (item?.children || []).filter((child) => child.parentSource === 'BEFORE');
+    const beforeContainer = this.createPseudoContainer('BEFORE', beforeChildren, id);
+    const afterChildren = (item?.children || []).filter((child) => child.parentSource === 'AFTER');
+    const afterContainer = this.createPseudoContainer('AFTER', afterChildren, id);
+
+    const children = (item?.children || [])
+      .filter((child) => child.parentSource !== 'BEFORE' && child.parentSource !== 'AFTER')
+      .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeContainer) {
+      children.unshift(beforeContainer);
+    }
+
+    if (afterContainer) {
+      children.push(afterContainer);
+    }
+
     const iconClassName = `step-node-status-${item.status}`;
     return {
       id,
@@ -68,7 +92,9 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const nodeId = node.id;
     return this.loadNodes(nodeId).pipe(
       tap((children) => {
-        node.originalNode.children = children;
+        if (node.originalNode) {
+          node.originalNode.children = children;
+        }
       }),
       map((children) => children.length),
     );
@@ -113,5 +139,36 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
         map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
         tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
       );
+  }
+
+  private createPseudoContainer(
+    nodeType: ReportNodeWithChildren['parentSource'],
+    childArtefacts: ReportNodeWithChildren[] | undefined,
+    parentId: string,
+  ): ReportTreeNode | undefined {
+    if (!childArtefacts?.length) {
+      return undefined;
+    }
+    const id = `${nodeType}_${parentId}`;
+    let name = '';
+    if (nodeType === 'BEFORE') {
+      name = 'Before';
+    } else if (nodeType === 'AFTER') {
+      name = 'After';
+    }
+    const isSkipped = false;
+    const isVisuallySkipped = false;
+    const icon = 'chevron-left';
+    const children = (childArtefacts ?? []).map((child) => this.convertItem(child, { parentId: id }));
+    const expandable = true;
+    return {
+      id,
+      name,
+      isSkipped,
+      isVisuallySkipped,
+      icon,
+      children,
+      expandable,
+    };
   }
 }

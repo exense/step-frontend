@@ -4,6 +4,7 @@ export enum AggregatedTreeNodeType {
   AGGREGATED_INFO,
   DETAILS_NODE,
   DETAILS_DATA,
+  PSEUDO_CONTAINER,
 }
 
 export interface AggregatedTreeNode
