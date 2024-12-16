@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
@@ -10,6 +11,7 @@ import { Status } from '../../../_common/shared/status.enum';
 })
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
@@ -35,10 +37,11 @@ export class AggregatedTreeNodeComponent {
   }
 
   protected showAggregatedDetails(status?: Status): void {
-    const node = this.node();
-    if (!node) {
+    const nodeId = this.nodeId();
+    if (!nodeId) {
       return;
     }
-    this._treeState.showAggregatedDetails(node, status);
+    this._treeState.selectNode(nodeId);
+    this._executionDialogs.openTreeNodeDetails(nodeId, status);
   }
 }

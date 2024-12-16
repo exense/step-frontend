@@ -16,12 +16,17 @@ import { ExecutionTabsComponent } from './components/execution-tabs/execution-ta
 import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
+  DialogParentService,
   dialogRoute,
+  DialogRouteResult,
   EntityRegistry,
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
+  SimpleOutletComponent,
   stepRouteAdditionalConfig,
+  TreeNodeUtilsService,
+  TreeStateService,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -88,6 +93,13 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { RepoRefHolderService } from './services/repo-ref-holder.service';
+import { AggregatedTreeNodeDetailsDialogComponent } from './components/aggregated-tree-node-details-dialog/aggregated-tree-node-details-dialog.component';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { AltNodeDetailsParentComponent } from './components/alt-node-details-parent/alt-node-details-parent.component';
+import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
+import { AggregatedReportViewTreeStateService } from './services/aggregated-report-view-tree-state.service';
+import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
+import { AltExecutionKeywordDrilldownDialogComponent } from './components/alt-execution-keyword-drilldown-dialog/alt-execution-keyword-drilldown-dialog.component';
 
 @NgModule({
   declarations: [
@@ -154,7 +166,10 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     TreeNodeDescriptionPipe,
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeDetailsComponent,
+    AltNodeDetailsParentComponent,
+    AggregatedTreeNodeDetailsDialogComponent,
     AggregatedTreeNodeInfoComponent,
+    AltExecutionKeywordDrilldownDialogComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
   exports: [
@@ -323,7 +338,20 @@ export class ExecutionModule {
         {
           path: ':id',
           component: AltExecutionProgressComponent,
-          providers: [RepoRefHolderService],
+          providers: [
+            RepoRefHolderService,
+            AggregatedReportViewTreeNodeUtilsService,
+            {
+              provide: TreeNodeUtilsService,
+              useExisting: AggregatedReportViewTreeNodeUtilsService,
+            },
+            AggregatedReportViewTreeStateService,
+            {
+              provide: TreeStateService,
+              useExisting: AggregatedReportViewTreeStateService,
+            },
+            AltReportNodeDetailsStateService,
+          ],
           children: [
             {
               path: '',
@@ -406,6 +434,62 @@ export class ExecutionModule {
                 schedulePath: '',
               },
             }),
+            {
+              path: 'aggregated-info',
+              outlet: 'aggregatedNode',
+              component: AltNodeDetailsParentComponent,
+              children: [
+                dialogRoute(
+                  {
+                    path: ':nodeId',
+                    resolve: {
+                      node: (route: ActivatedRouteSnapshot) =>
+                        inject(TreeStateService).findNodeById(route.params['nodeId']),
+                    },
+                    dialogComponent: AggregatedTreeNodeDetailsDialogComponent,
+                  },
+                  {
+                    hasBackdrop: false,
+                    height: '100%',
+                    width: '40%',
+                    panelClass: 'side-dialog',
+                    position: {
+                      right: '0',
+                      top: '0',
+                      bottom: '0',
+                    },
+                  },
+                ),
+              ],
+            },
+            {
+              path: 'report-node',
+              outlet: 'reportNode',
+              component: AltNodeDetailsParentComponent,
+              children: [
+                dialogRoute(
+                  {
+                    path: ':nodeId',
+                    resolve: {
+                      node: (route: ActivatedRouteSnapshot) =>
+                        inject(AltReportNodeDetailsStateService).getReportNode(route.params['nodeId']),
+                    },
+                    dialogComponent: AltExecutionKeywordDrilldownDialogComponent,
+                  },
+                  {
+                    hasBackdrop: false,
+                    height: '100%',
+                    width: '25%',
+                    panelClass: 'side-dialog',
+                    position: {
+                      right: '0',
+                      top: '0',
+                      bottom: '0',
+                    },
+                  },
+                ),
+              ],
+            },
             {
               path: 'viz',
               redirectTo: 'analytics',

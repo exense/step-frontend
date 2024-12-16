@@ -1,14 +1,7 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import {
-  AggregatedReportView,
-  AugmentedExecutionsService,
-  DateRange,
-  ReportNode,
-  TreeStateService,
-} from '@exense/step-core';
+import { inject, Injectable, signal } from '@angular/core';
+import { AggregatedReportView, AugmentedExecutionsService, DateRange, TreeStateService } from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
-import { Status } from '../../_common/shared/status.enum';
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
@@ -26,33 +19,8 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     );
   }
 
-  private displayedAggregatedDetailsNodeIdInternal = signal<string | undefined>(undefined);
-
-  readonly displayedAggregatedDetailsNode = computed(() => {
-    const selectedNode = this.selectedNode();
-    const displayAggregatedNodeId = this.displayedAggregatedDetailsNodeIdInternal();
-    if (selectedNode && selectedNode.id === displayAggregatedNodeId) {
-      return selectedNode;
-    }
-    return undefined;
-  });
-
-  private predefinedAggregatedDetailsNodeStatusInternal = signal<Status | undefined>(undefined);
-  readonly predefinedAggregatedDetailsNodeStatus = this.predefinedAggregatedDetailsNodeStatusInternal.asReadonly();
-
-  private visibleDetailsInternal = signal<Record<string, boolean>>({});
-  readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
-
   private visibleInfosInternal = signal<Record<string, boolean>>({});
   readonly visibleInfos = this.visibleInfosInternal.asReadonly();
-
-  toggleDetail(node: ReportNode): void {
-    const isVisible = !!this.visibleDetailsInternal()[node.id!];
-    this.visibleDetailsInternal.update((value) => ({
-      ...value,
-      [node.id!]: !isVisible,
-    }));
-  }
 
   toggleInfo(node: AggregatedTreeNode): void {
     const isVisible = !!this.visibleInfosInternal()[node.id!];
@@ -60,13 +28,6 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       ...value,
       [node.id!]: !isVisible,
     }));
-  }
-
-  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode, status?: Status): void {
-    this.selectNode(nodeOrId);
-    const nodeId = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
-    this.displayedAggregatedDetailsNodeIdInternal.set(nodeId);
-    this.predefinedAggregatedDetailsNodeStatusInternal.set(status);
   }
 
   private requestTree(executionId: string, dateRange?: DateRange): Observable<AggregatedReportView> {

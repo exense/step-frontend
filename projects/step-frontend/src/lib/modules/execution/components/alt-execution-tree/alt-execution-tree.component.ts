@@ -1,8 +1,9 @@
-import { Component, computed, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 
 @Component({
   selector: 'step-alt-execution-tree',
@@ -13,11 +14,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class AltExecutionTreeComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  protected readonly aggregatedNode = this._treeState.displayedAggregatedDetailsNode;
-  protected readonly predefinedStatus = this._treeState.predefinedAggregatedDetailsNodeStatus;
-  protected readonly artefact = computed(() => this.aggregatedNode()?.originalArtefact);
 
   ngOnInit(): void {
     this._activatedRoute.queryParams
@@ -30,6 +29,9 @@ export class AltExecutionTreeComponent implements OnInit {
         }),
         filter((nodeId) => !!nodeId),
       )
-      .subscribe((nodeId) => this._treeState.showAggregatedDetails(nodeId));
+      .subscribe((nodeId) => {
+        this._treeState.selectNode(nodeId);
+        this._executionDialogs.openTreeNodeDetails(nodeId);
+      });
   }
 }

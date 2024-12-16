@@ -12,6 +12,7 @@ export class AltKeywordInlineDrilldownComponent<R extends ReportNode = ReportNod
   private _controllerService = inject(AugmentedControllerService);
 
   readonly node = input.required<R>();
+  readonly showArtefact = input(false);
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
