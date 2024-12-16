@@ -7,12 +7,6 @@
   matSortDirection="asc"
   [matSortDisableClear]="true"
 >
-  <ng-container matColumnDef="icon">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td class="icon-cell" mat-cell *matCellDef="let element">
-      <step-icon [name]="element.icon"></step-icon>
-    </td>
-  </ng-container>
   <ng-container matColumnDef="move">
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="move" mat-cell *matCellDef="let element">
@@ -22,6 +16,12 @@
           <step-plan-nodes-drag-preview />
         </step-drag-preview>
       </step-drag-drop-container>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="icon">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td class="icon-cell" mat-cell *matCellDef="let element">
+      <step-icon [name]="element.icon"></step-icon>
     </td>
   </ng-container>
   <ng-container matColumnDef="label" stepSearchCol>

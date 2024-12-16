@@ -1,22 +1,35 @@
-.artefact-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+step-plan-artefact-list {
+  .artefact-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-.actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+  }
 
-.icon-cell {
-  width: 1%;
-}
-.move {
-  width: 1%;
-  step-icon {
-    cursor: grab;
+  .icon-cell {
+    width: 1%;
+  }
+
+  .entity-column-header,
+  .entity-column-cell {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .move {
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+    text-align: center;
+    step-icon {
+      cursor: grab;
+    }
   }
 }

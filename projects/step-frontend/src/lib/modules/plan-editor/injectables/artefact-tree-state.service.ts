@@ -42,7 +42,7 @@ export class ArtefactTreeStateService
       }
       this.timerId = undefined;
       this.nodeId = undefined;
-    }, 2000) as unknown as number;
+    }, 1000) as unknown as number;
   }
 
   private hidePseudoContainers(): void {

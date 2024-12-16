@@ -31,8 +31,18 @@ step-plan-otherplan-list {
     min-height: 4rem;
   }
 
+  .entity-column-header,
+  .entity-column-cell {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
   .move {
-    width: 1%;
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+    text-align: center;
     step-icon {
       cursor: grab;
     }
