@@ -44,7 +44,11 @@ import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
-import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AGGREGATED_TREE_WIDGET_STATE,
+  AggregatedReportViewTreeStateService,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -153,7 +157,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
-  private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
+  private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
+  private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   private _dateUtils = inject(DateUtilsService);
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
@@ -388,10 +393,24 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     combineLatest([this.executionId$, range$])
       .pipe(
-        switchMap(([executionId, range]) => this._aggregatedTreeState.loadTree(executionId, range)),
+        switchMap(([executionId, range]) => {
+          if (!range) {
+            return this._executionsApi.getFullAggregatedReportView(executionId);
+          }
+          const from = range.start?.toMillis();
+          const to = range.end?.toMillis();
+          return this._executionsApi.getAggregatedReportView(executionId, { range: { from, to } });
+        }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((isTreeInitialized) => (this.isTreeInitialized = isTreeInitialized));
+      .subscribe((root) => {
+        if (!root) {
+          this.isTreeInitialized = false;
+        }
+        this._aggregatedTreeTabState.init(root, { expandAllByDefault: false });
+        this._aggregatedTreeWidgetState.init(root, { expandAllByDefault: false });
+        this.isTreeInitialized = true;
+      });
   }
 
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {

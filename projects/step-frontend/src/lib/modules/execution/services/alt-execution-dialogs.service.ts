@@ -7,7 +7,10 @@ import {
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
-import { AggregatedReportViewTreeStateService } from './aggregated-report-view-tree-state.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AggregatedReportViewTreeStateService,
+} from './aggregated-report-view-tree-state.service';
 import { map, Observable } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
@@ -20,7 +23,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService);
-  private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   private _executionId = inject(EXECUTION_ID);
 
   openTreeNodeDetails(nodeId: string, nodeStatus?: Status): void {
@@ -54,7 +57,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private navigateToReportNodeDetails(reportNodeId: string): void {
-    this._router.navigate([{ outlets: { reportNode: ['report-node', reportNodeId] } }], {
+    this._router.navigate([{ outlets: { reportNode: ['report-node', reportNodeId], aggregatedNode: [] } }], {
       relativeTo: this._activatedRoute,
       queryParamsHandling: 'merge',
     });

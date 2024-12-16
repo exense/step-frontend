@@ -7,7 +7,7 @@
       matTooltipPosition="below"
       (click)="statusClick.emit(item.status)"
     >
-      {{ item.count }}x
+      {{ item.count | shortenNumber: 'x' }}
     </div>
   </div>
 }

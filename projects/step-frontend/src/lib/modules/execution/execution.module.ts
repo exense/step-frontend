@@ -70,7 +70,7 @@ import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
-import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
@@ -97,9 +97,15 @@ import { AggregatedTreeNodeDetailsDialogComponent } from './components/aggregate
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { AltNodeDetailsParentComponent } from './components/alt-node-details-parent/alt-node-details-parent.component';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
-import { AggregatedReportViewTreeStateService } from './services/aggregated-report-view-tree-state.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AGGREGATED_TREE_WIDGET_STATE,
+  AggregatedReportViewTreeStateService,
+} from './services/aggregated-report-view-tree-state.service';
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionKeywordDrilldownDialogComponent } from './components/alt-execution-keyword-drilldown-dialog/alt-execution-keyword-drilldown-dialog.component';
+import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
+import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 
 @NgModule({
   declarations: [
@@ -153,6 +159,8 @@ import { AltExecutionKeywordDrilldownDialogComponent } from './components/alt-ex
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreeTabComponent,
+    AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
     AltExecutionRangePickerComponent,
@@ -192,10 +200,13 @@ import { AltExecutionKeywordDrilldownDialogComponent } from './components/alt-ex
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreeTabComponent,
+    AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltKeywordInlineDrilldownComponent,
     AggregatedTreeNodeInfoComponent,
     AltExecutionLaunchDialogComponent,
+    AltReportWidgetComponent,
   ],
 })
 export class ExecutionModule {
@@ -345,10 +356,13 @@ export class ExecutionModule {
               provide: TreeNodeUtilsService,
               useExisting: AggregatedReportViewTreeNodeUtilsService,
             },
-            AggregatedReportViewTreeStateService,
             {
-              provide: TreeStateService,
-              useExisting: AggregatedReportViewTreeStateService,
+              provide: AGGREGATED_TREE_TAB_STATE,
+              useClass: AggregatedReportViewTreeStateService,
+            },
+            {
+              provide: AGGREGATED_TREE_WIDGET_STATE,
+              useClass: AggregatedReportViewTreeStateService,
             },
             AltReportNodeDetailsStateService,
           ],
@@ -401,7 +415,7 @@ export class ExecutionModule {
               children: [
                 {
                   path: '',
-                  component: AltExecutionTreeComponent,
+                  component: AltExecutionTreeTabComponent,
                 },
                 {
                   path: '',
@@ -444,7 +458,7 @@ export class ExecutionModule {
                     path: ':nodeId',
                     resolve: {
                       node: (route: ActivatedRouteSnapshot) =>
-                        inject(TreeStateService).findNodeById(route.params['nodeId']),
+                        inject(AGGREGATED_TREE_TAB_STATE).findNodeById(route.params['nodeId']),
                     },
                     dialogComponent: AggregatedTreeNodeDetailsDialogComponent,
                   },

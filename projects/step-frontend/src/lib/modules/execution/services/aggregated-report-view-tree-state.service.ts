@@ -1,24 +1,9 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { AggregatedReportView, AugmentedExecutionsService, DateRange, TreeStateService } from '@exense/step-core';
-import { map, Observable } from 'rxjs';
+import { Injectable, InjectionToken, signal } from '@angular/core';
+import { AggregatedReportView, TreeStateService } from '@exense/step-core';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
-  private _executionsApi = inject(AugmentedExecutionsService);
-
-  loadTree(executionId: string, dateRange?: DateRange): Observable<boolean> {
-    return this.requestTree(executionId, dateRange).pipe(
-      map((root) => {
-        if (!root) {
-          return false;
-        }
-        this.init(root, { expandAllByDefault: false });
-        return true;
-      }),
-    );
-  }
-
   private visibleInfosInternal = signal<Record<string, boolean>>({});
   readonly visibleInfos = this.visibleInfosInternal.asReadonly();
 
@@ -29,16 +14,11 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       [node.id!]: !isVisible,
     }));
   }
-
-  private requestTree(executionId: string, dateRange?: DateRange): Observable<AggregatedReportView> {
-    if (!dateRange) {
-      return this._executionsApi.getFullAggregatedReportView(executionId);
-    }
-    return this._executionsApi.getAggregatedReportView(executionId, {
-      range: {
-        from: dateRange.start?.toMillis(),
-        to: dateRange.end?.toMillis(),
-      },
-    });
-  }
 }
+
+export const AGGREGATED_TREE_TAB_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
+  'Tree state related to tab',
+);
+export const AGGREGATED_TREE_WIDGET_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
+  'Tree state related to widget',
+);
