@@ -4,6 +4,7 @@ import {
   ArtefactRefreshNotificationService,
   ArtefactService,
   ArtefactTreeNode,
+  ChildrenBlock,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
@@ -253,17 +254,17 @@ export class ArtefactTreeNodeUtilsService
     const id = originalArtefact.id!;
     const forceDisplay = this.displayInsertContainersFor === id;
     const isThreadGroup = originalArtefact._class === THREAD_GROUP;
-    const threadGroupArtefact = isThreadGroup ? (originalArtefact as ThreadGroupArtefact) : undefined;
 
     let children: ArtefactTreeNode[] = [];
 
     if (forceDisplay && !originalArtefact?.children?.length) {
-      const items = this.createPseudoContainer(ArtefactNodeSource.MAIN, originalArtefact.children, {
-        parentId: id,
+      const items = this.createPseudoContainer(
+        ArtefactNodeSource.MAIN,
+        originalArtefact,
         forceDisplay,
-        isParentVisuallySkipped: isVisuallySkipped,
-      })!;
-      children.push(items);
+        isVisuallySkipped,
+      );
+      children.push(items!);
     } else {
       children = (originalArtefact?.children || []).map((child) =>
         this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
@@ -273,23 +274,21 @@ export class ArtefactTreeNodeUtilsService
     if (isThreadGroup) {
       const beforeThread = this.createPseudoContainer(
         ArtefactNodeSource.BEFORE_THREAD,
-        threadGroupArtefact!.beforeThread?.steps,
-        {
-          parentId: id,
-          forceDisplay,
-          isParentVisuallySkipped: isVisuallySkipped,
-        },
+        originalArtefact,
+        forceDisplay,
+        isVisuallySkipped,
       );
       if (beforeThread) {
         children.unshift(beforeThread);
       }
     }
 
-    const before = this.createPseudoContainer(ArtefactNodeSource.BEFORE, originalArtefact.before?.steps, {
-      parentId: id,
+    const before = this.createPseudoContainer(
+      ArtefactNodeSource.BEFORE,
+      originalArtefact,
       forceDisplay,
-      isParentVisuallySkipped: isVisuallySkipped,
-    });
+      isVisuallySkipped,
+    );
     if (before) {
       children.unshift(before);
     }
@@ -297,23 +296,21 @@ export class ArtefactTreeNodeUtilsService
     if (isThreadGroup) {
       const afterThread = this.createPseudoContainer(
         ArtefactNodeSource.AFTER_THREAD,
-        threadGroupArtefact!.afterThread?.steps,
-        {
-          parentId: id,
-          forceDisplay,
-          isParentVisuallySkipped: isVisuallySkipped,
-        },
+        originalArtefact,
+        forceDisplay,
+        isVisuallySkipped,
       );
       if (afterThread) {
         children.push(afterThread);
       }
     }
 
-    const after = this.createPseudoContainer(ArtefactNodeSource.AFTER, originalArtefact.after?.steps, {
-      parentId: id,
+    const after = this.createPseudoContainer(
+      ArtefactNodeSource.AFTER,
+      originalArtefact,
       forceDisplay,
-      isParentVisuallySkipped: isVisuallySkipped,
-    });
+      isVisuallySkipped,
+    );
     if (after) {
       children.push(after);
     }
@@ -323,32 +320,52 @@ export class ArtefactTreeNodeUtilsService
 
   private createPseudoContainer(
     nodeType: ArtefactNodeSource,
-    childArtefacts: AbstractArtefact[] | undefined,
-    params: { parentId: string; forceDisplay?: boolean; isParentVisuallySkipped?: boolean },
+    originalArtefact: AbstractArtefact,
+    forceDisplay?: boolean,
+    isParentVisuallySkipped?: boolean,
   ): ArtefactTreeNode | undefined {
-    const { parentId, isParentVisuallySkipped, forceDisplay } = params;
-    if (!childArtefacts?.length && !forceDisplay) {
-      return undefined;
-    }
+    const parentId = originalArtefact.id;
+    const isThreadGroup = originalArtefact._class === THREAD_GROUP;
+    const threadGroupArtefact = isThreadGroup ? (originalArtefact as ThreadGroupArtefact) : undefined;
+
     const id = `${nodeType}|${parentId}`;
     let name = '';
+    let childContainer: ChildrenBlock | undefined = undefined;
+    let childArtefacts: AbstractArtefact[] | undefined = undefined;
     switch (nodeType) {
       case ArtefactNodeSource.AFTER:
         name = 'After';
+        childContainer = originalArtefact.after;
         break;
       case ArtefactNodeSource.AFTER_THREAD:
-        name = 'After Thread';
+        if (isThreadGroup) {
+          name = 'After Thread';
+          childContainer = threadGroupArtefact!.afterThread;
+        }
         break;
       case ArtefactNodeSource.BEFORE:
         name = 'Before';
+        childContainer = originalArtefact.before;
         break;
       case ArtefactNodeSource.BEFORE_THREAD:
-        name = 'Before Thread';
+        if (isThreadGroup) {
+          name = 'Before Thread';
+          childContainer = threadGroupArtefact!.beforeThread;
+        }
         break;
       default:
-        name = 'Items';
+        name = 'Steps';
+        childArtefacts = originalArtefact.children;
         break;
     }
+    if (childContainer) {
+      childArtefacts = childContainer.steps;
+    }
+
+    if (!childArtefacts?.length && !forceDisplay) {
+      return undefined;
+    }
+
     const isSkipped = false;
     const isVisuallySkipped = isParentVisuallySkipped ?? false;
     const isDragDisabled = true;
@@ -367,6 +384,7 @@ export class ArtefactTreeNodeUtilsService
       children,
       parentId,
       nodeType,
+      childContainer,
       isDragDisabled,
     };
   }

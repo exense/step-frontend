@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
@@ -53,6 +54,7 @@ export class PlanTreeComponent implements TreeActionsService {
 
   readonly activeNode = this._treeState.selectedNode;
   readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
+  readonly activeNodeChildContainer = computed(() => this.activeNode()?.childContainer);
 
   /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();
