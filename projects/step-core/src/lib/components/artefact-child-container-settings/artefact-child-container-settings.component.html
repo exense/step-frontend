@@ -10,8 +10,7 @@
       </mat-expansion-panel-header>
       <section class="child-artefact-flags">
         <step-dynamic-checkbox
-          label="Continue sequence execution on errors in child elements"
-          tooltip="Defines if the execution of this sequence should continue when on of the children node fails"
+          label="Continue execution on errors in child elements"
           name="continueOnError"
           [disabled]="isReadonly()"
           [ngModel]="childContainer.continueOnError"
