@@ -142,6 +142,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       icon,
       children,
       expandable,
+      parentId,
       nodeType: AggregatedTreeNodeType.PSEUDO_CONTAINER,
     };
   }

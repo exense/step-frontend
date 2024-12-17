@@ -151,6 +151,30 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
       );
   }
 
+  getPathToNode(nodeId: string): Observable<string[]> {
+    return this._controllerService.getReportNodePath(nodeId).pipe(
+      map((nodes) => {
+        nodes.shift();
+
+        const nodesIds = nodes.reduce((res, node, i) => {
+          if (
+            i > 0 &&
+            node.parentSource !== ArtefactNodeSource.MAIN &&
+            node.parentSource !== ArtefactNodeSource.SUB_PLAN
+          ) {
+            const parent = nodes[i - 1];
+            const pseudoContainerId = `${node.parentSource}|${parent.id!}`;
+            res.push(pseudoContainerId);
+          }
+          res.push(node.id!);
+          return res;
+        }, [] as string[]);
+
+        return nodesIds;
+      }),
+    );
+  }
+
   private createPseudoContainer(
     nodeType: ArtefactNodeSource,
     parentNode: ReportNodeWithChildren,
@@ -192,6 +216,7 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
       icon,
       children,
       expandable,
+      parentId,
     };
   }
 }
