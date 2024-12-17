@@ -1,5 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { AggregatedReportView, ArtefactService, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import {
+  AggregatedReportView,
+  ArtefactNodeSource,
+  ArtefactService,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 
 @Injectable()
@@ -19,17 +25,27 @@ export class AggregatedReportViewTreeNodeUtilsService
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
 
-    const beforeChildren = (item?.children || []).filter((child) => child.parentSource === 'BEFORE');
-    const beforeContainer = this.createPseudoContainer('BEFORE', beforeChildren, id);
-    const afterChildren = (item?.children || []).filter((child) => child.parentSource === 'AFTER');
-    const afterContainer = this.createPseudoContainer('AFTER', afterChildren, id);
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item);
 
     const children = (item?.children || [])
-      .filter((child) => child.parentSource !== 'BEFORE' && child.parentSource !== 'AFTER')
+      .filter(
+        (child) => child.parentSource === ArtefactNodeSource.MAIN || child.parentSource === ArtefactNodeSource.SUB_PLAN,
+      )
       .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeThreadContainer) {
+      children.unshift(beforeThreadContainer);
+    }
 
     if (beforeContainer) {
       children.unshift(beforeContainer);
+    }
+
+    if (afterThreadContainer) {
+      children.push(afterThreadContainer);
     }
 
     if (afterContainer) {
@@ -87,19 +103,31 @@ export class AggregatedReportViewTreeNodeUtilsService
   }
 
   private createPseudoContainer(
-    containerType: AggregatedReportView['parentSource'],
-    childArtefacts: AggregatedReportView[] | undefined,
-    parentId: string,
+    containerType: ArtefactNodeSource,
+    parent: AggregatedReportView,
   ): AggregatedTreeNode | undefined {
-    if (!childArtefacts?.length) {
+    const parentId = parent?.artefact?.id;
+    const childArtefacts = (parent?.children ?? []).filter((child) => child.parentSource === containerType);
+    if (!childArtefacts?.length || !parentId) {
       return undefined;
     }
-    const id = `${containerType}_${parentId}`;
+    const id = `${containerType}|${parentId}`;
     let name = '';
-    if (containerType === 'BEFORE') {
-      name = 'Before';
-    } else if (containerType === 'AFTER') {
-      name = 'After';
+    switch (containerType) {
+      case ArtefactNodeSource.BEFORE:
+        name = 'Before';
+        break;
+      case ArtefactNodeSource.BEFORE_THREAD:
+        name = 'Before Thread';
+        break;
+      case ArtefactNodeSource.AFTER_THREAD:
+        name = 'After Thread';
+        break;
+      case ArtefactNodeSource.AFTER:
+        name = 'After';
+        break;
+      default:
+        break;
     }
     const isSkipped = false;
     const isVisuallySkipped = false;

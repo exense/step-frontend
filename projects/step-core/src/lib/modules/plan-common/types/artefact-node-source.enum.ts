@@ -1,0 +1,8 @@
+export enum ArtefactNodeSource {
+  BEFORE = 'BEFORE',
+  BEFORE_THREAD = 'BEFORE_THREAD',
+  MAIN = 'MAIN',
+  SUB_PLAN = 'SUB_PLAN',
+  AFTER_THREAD = 'AFTER_THREAD',
+  AFTER = 'AFTER',
+}

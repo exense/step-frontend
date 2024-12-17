@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  AbstractArtefact,
+  ArtefactNodeSource,
   ArtefactService,
   ControllerService,
   ReportNode,
@@ -34,17 +34,27 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const icon = this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = this.hasChildren(id);
 
-    const beforeChildren = (item?.children || []).filter((child) => child.parentSource === 'BEFORE');
-    const beforeContainer = this.createPseudoContainer('BEFORE', beforeChildren, id);
-    const afterChildren = (item?.children || []).filter((child) => child.parentSource === 'AFTER');
-    const afterContainer = this.createPseudoContainer('AFTER', afterChildren, id);
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item);
 
     const children = (item?.children || [])
-      .filter((child) => child.parentSource !== 'BEFORE' && child.parentSource !== 'AFTER')
+      .filter(
+        (child) => child.parentSource === ArtefactNodeSource.MAIN || child.parentSource === ArtefactNodeSource.SUB_PLAN,
+      )
       .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeThreadContainer) {
+      children.unshift(beforeThreadContainer);
+    }
 
     if (beforeContainer) {
       children.unshift(beforeContainer);
+    }
+
+    if (afterThreadContainer) {
+      children.push(afterThreadContainer);
     }
 
     if (afterContainer) {
@@ -142,19 +152,32 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
   }
 
   private createPseudoContainer(
-    nodeType: ReportNodeWithChildren['parentSource'],
-    childArtefacts: ReportNodeWithChildren[] | undefined,
-    parentId: string,
+    nodeType: ArtefactNodeSource,
+    parentNode: ReportNodeWithChildren,
   ): ReportTreeNode | undefined {
+    const parentId = parentNode?.id;
+    const childArtefacts = (parentNode.children ?? []).filter((child) => child.parentSource === nodeType);
+
     if (!childArtefacts?.length) {
       return undefined;
     }
-    const id = `${nodeType}_${parentId}`;
+    const id = `${nodeType}|${parentId}`;
     let name = '';
-    if (nodeType === 'BEFORE') {
-      name = 'Before';
-    } else if (nodeType === 'AFTER') {
-      name = 'After';
+    switch (nodeType) {
+      case ArtefactNodeSource.BEFORE:
+        name = 'Before';
+        break;
+      case ArtefactNodeSource.BEFORE_THREAD:
+        name = 'Before Thread';
+        break;
+      case ArtefactNodeSource.AFTER_THREAD:
+        name = 'After Thread';
+        break;
+      case ArtefactNodeSource.AFTER:
+        name = 'After';
+        break;
+      default:
+        break;
     }
     const isSkipped = false;
     const isVisuallySkipped = false;

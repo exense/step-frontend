@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { AbstractArtefact, ArtefactTreeNode, ArtefactTreeNodeType, TreeStateService } from '@exense/step-core';
+import { AbstractArtefact, ArtefactTreeNode, ArtefactNodeSource, TreeStateService } from '@exense/step-core';
 import { ArtefactTreeNodeUtilsService } from './artefact-tree-node-utils.service';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class ArtefactTreeStateService
       const needsToRefresh = this._artefactTreeNodeUtils.setPseudoContainersVisibility(id);
       if (needsToRefresh) {
         this.refresh();
-        this.expandNodes([id, ...this.getPseudoNodesId(id)]);
+        this.expandNodes([id, ...this._artefactTreeNodeUtils.getPseudoNodesIds(id)]);
       }
       this.timerId = undefined;
       this.nodeId = undefined;
@@ -53,13 +53,5 @@ export class ArtefactTreeStateService
     if (needsToRefresh) {
       this.refresh();
     }
-  }
-
-  private getPseudoNodesId(id: string): string[] {
-    return [
-      `${ArtefactTreeNodeType.before}_${id}`,
-      `${ArtefactTreeNodeType.items}_${id}`,
-      `${ArtefactTreeNodeType.after}_${id}`,
-    ];
   }
 }

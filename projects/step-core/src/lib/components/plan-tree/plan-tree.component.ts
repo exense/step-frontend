@@ -12,8 +12,6 @@ import {
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
 import {
-  ArtefactTreeNode,
-  ArtefactTreeNodeType,
   TreeAction,
   TreeActionsService,
   TreeComponent,
@@ -21,6 +19,8 @@ import {
   TreeStateService,
 } from '../../modules/tree/tree.module';
 import {
+  ArtefactNodeSource,
+  ArtefactTreeNode,
   PlanArtefactResolverService,
   PlanEditorPersistenceStateService,
   PlanEditorService,
@@ -146,7 +146,7 @@ export class PlanTreeComponent implements TreeActionsService {
 
   hasActionsForNode(treeNode: TreeNode): boolean {
     const node = this._treeState.findNodeById(treeNode?.id);
-    return node?.nodeType === ArtefactTreeNodeType.artefact;
+    return node?.nodeType === undefined;
   }
 
   handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
