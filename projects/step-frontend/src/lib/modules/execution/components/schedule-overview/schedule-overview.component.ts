@@ -10,44 +10,34 @@ import {
   ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
+  MarkerType,
   Plan,
+  STATUS_COLORS,
+  TimeOption,
   STATUS_COLORS,
   TableDataSource,
   TableLocalDataSource,
   TimeRange,
   TimeSeriesService,
+  TimeUnit,
 } from '@exense/step-core';
-import { combineLatest, filter, map, Observable, shareReplay, startWith, switchMap, take } from 'rxjs';
+import {
+  combineLatest,
+  combineLatestWith,
+  filter,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { Axis, Band } from 'uplot';
-import { Status } from '../../../_common/shared/status.enum';
-import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DateTime, Duration } from 'luxon';
-
-declare const uPlot: any;
-
-interface ExecutionWithKeywordsStats {
-  executionId: string;
-  timestamp: number;
-  statuses: Record<string, number>;
-}
-
-interface TableErrorEntry {
-  label: string;
-  count: number;
-  percentage: number;
-  overallPercentage: number;
-  type: string;
-}
-
-interface ErrorGroupingOption {
-  label: string;
-  attribute: string;
-}
+import { DateTime } from 'luxon';
+import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 
 @Component({
   selector: 'step-schedule-overview',
@@ -64,6 +54,7 @@ interface ErrorGroupingOption {
   ],
 })
 export class ScheduleOverviewComponent implements OnInit {
+  readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
@@ -72,13 +63,20 @@ export class ScheduleOverviewComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
 
+  readonly RELATIVE_TIME_RANGES: TimeOption[] = [
+    { label: 'Last Week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
+    { label: 'Last 2 Weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
+    { label: 'Last Month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
+    { label: 'Last 6 Months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+  ];
+
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
 
   private relativeTime?: number;
   now = DateTime.now();
   readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>({
-    start: this.now.minus({ days: 14 }),
+    start: this.now.minus({ months: 1 }),
     end: this.now,
   });
 
@@ -92,12 +90,6 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
-  errorsDataSource?: TableDataSource<TableErrorEntry>;
-  errorChartGroupingOptions: ErrorGroupingOption[] = [
-    { label: 'Error Code', attribute: 'errorCode' },
-    { label: 'Error Message', attribute: 'errorMessage' },
-  ];
-  errorChartSelectedGrouping: ErrorGroupingOption = this.errorChartGroupingOptions[0];
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -145,59 +137,62 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
-    let executionsCountToDisplay = 30;
     this._executionService
-      .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
+      .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
       .pipe(
         switchMap((executions) => {
-          const executionsIdsJoined = executions.map((e) => `"${e.id!}"`).join(',');
-          let oqlFilter = 'attributes.metricType = response-time';
+          if (executions.length === 0) {
+            return of({
+              executions: [],
+              timeSeriesResponse: EMPTY_TS_RESPONSE,
+            });
+          }
+          const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
+          let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
           if (executionsIdsJoined) {
-            oqlFilter += ` and attributes.eId in (${executionsIdsJoined})`;
+            oqlFilter += ` and (${executionsIdsJoined})`;
           }
           const request: FetchBucketsRequest = {
             start: timeRange.from,
             end: timeRange.to,
-            intervalSize: 1000 * 60 * 60 * 24, // one day
+            numberOfBuckets: 1,
             oqlFilter: oqlFilter,
             groupDimensions: ['eId', 'rnStatus'],
           };
 
-          return this._timeSeriesService.getTimeSeries(request);
+          return this._timeSeriesService.getTimeSeries(request).pipe(
+            map((tsResponse) => {
+              return { executions: executions, timeSeriesResponse: tsResponse };
+            }),
+          );
         }),
       )
-      .subscribe((response) => {
+      .subscribe(({ executions, timeSeriesResponse }) => {
         const statusAttribute = 'rnStatus';
-        const executionsIndexes: Record<string, number> = {};
-        let executionsWithStats: ExecutionWithKeywordsStats[] = [];
+        let executionStats: Record<string, ExecutionWithKeywordsStats> = {};
         const allStatuses = new Set<string>();
-        response.matrixKeys.forEach((attributes, i) => {
+        timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
           const executionId = attributes['eId'];
           const status = attributes[statusAttribute];
           allStatuses.add(status);
           let executionEntry: ExecutionWithKeywordsStats = {
             executionId: executionId,
             statuses: {},
-            timestamp: Number.MAX_VALUE,
+            timestamp: 0,
           };
-          if (executionsIndexes[executionId] >= 0) {
-            executionEntry = executionsWithStats[executionsIndexes[executionId]];
+          if (executionStats[executionId]) {
+            executionEntry = executionStats[executionId];
           } else {
-            executionsWithStats.push(executionEntry);
-            executionsIndexes[executionId] = executionsWithStats.length - 1;
+            executionStats[executionId] = executionEntry;
           }
-          response.matrix[i].forEach((bucket) => {
+          timeSeriesResponse.matrix[i].forEach((bucket) => {
             if (bucket) {
-              if (bucket.begin < executionEntry.timestamp) {
-                executionEntry.timestamp = bucket.begin; // select the first apparition of the execution
-              }
               const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
               executionEntry.statuses[status] = newCount;
             }
           });
         });
-        executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
-
+        executions.sort((a, b) => a.startTime! - b.startTime!);
         let series = Array.from(allStatuses).map((status) => {
           let color = this._statusColors[status as Status];
           const fill = color + 'cc';
@@ -206,8 +201,8 @@ export class ScheduleOverviewComponent implements OnInit {
             scale: 'y',
             labelItems: [status],
             legendName: status,
-            data: executionsWithStats.map((item) => item.statuses[status] || 0),
-            width: 0,
+            data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+            width: 1,
             value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
               this.calculateStackedValue(self, rawValue, seriesIdx, idx),
             stroke: color,
@@ -229,16 +224,16 @@ export class ScheduleOverviewComponent implements OnInit {
         ];
         this.cumulateSeriesData(series);
         this.keywordsChartSettings = {
-          title: 'Keywords calls by execution',
+          title: `Keywords calls by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
           showLegend: false,
           showDefaultLegend: true,
           xAxesSettings: {
             time: false,
             label: 'Execution',
             show: false,
-            values: executionsWithStats.map((item, i) => i),
+            values: executions.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executionsWithStats[idx].executionId;
+              return executions[idx].id!;
             },
           },
           scales: {
@@ -269,7 +264,7 @@ export class ScheduleOverviewComponent implements OnInit {
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
-      intervalSize: 1000 * 60 * 60 * 24, // one day
+      numberOfBuckets: 30,
       oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
       groupDimensions: [statusAttribute],
     };
@@ -313,7 +308,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
       ];
       this.executionsChartSettings = {
-        title: '',
+        title: 'Executions statuses over time',
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
@@ -336,15 +331,6 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  switchErrorGrouping(option: ErrorGroupingOption) {
-    if (this.errorChartSelectedGrouping.attribute !== option.attribute) {
-      this.errorChartSelectedGrouping = option;
-      this.timeRangeChange$.pipe(take(1)).subscribe((dateRange) => {
-        this.createErrorsChart(this.selectedTask!.id!, dateRange!);
-      });
-    }
-  }
-
   private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
     if (seriesIdx > 1) {
       const valueBelow = self.data[seriesIdx - 1][idx] || 0;
@@ -359,6 +345,40 @@ export class ScheduleOverviewComponent implements OnInit {
       bands.push({ series: [i, i - 1] });
     }
     return bands;
+  }
+
+  private createPieChart(taskId: string, timeRange: TimeRange) {
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
+      groupDimensions: ['result'],
+    };
+    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
+      let total = 0;
+      const pairs: { [key: string]: number } = {};
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        let bucket: BucketResponse = response.matrix[i][0];
+        pairs[keyAttributes['result'] as string] = bucket.count;
+        total += bucket.count;
+      });
+
+      this.summary = {
+        ...pairs,
+        total: total,
+      };
+    });
+  }
+
+  updateRange(timeRange?: DateRange): void {
+    this.dateRangeCtrl.setValue(timeRange);
+  }
+
+  updateRelativeTime(time?: number): void {
+    this.relativeTime = time;
+    let now = DateTime.now();
+    this.updateRange({ start: now.minus({ millisecond: time }), end: now });
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
@@ -404,39 +424,5 @@ export class ScheduleOverviewComponent implements OnInit {
       this.errorsDataSource = new TableLocalDataSource(data);
       console.log(data);
     });
-  }
-
-  private createPieChart(taskId: string, timeRange: TimeRange) {
-    const request: FetchBucketsRequest = {
-      start: timeRange.from,
-      end: timeRange.to,
-      numberOfBuckets: 1,
-      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
-      groupDimensions: ['result'],
-    };
-    this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
-      let total = 0;
-      const pairs: { [key: string]: number } = {};
-      response.matrixKeys.forEach((keyAttributes, i) => {
-        let bucket: BucketResponse = response.matrix[i][0];
-        pairs[keyAttributes['result'] as string] = bucket.count;
-        total += bucket.count;
-      });
-
-      this.summary = {
-        ...pairs,
-        total: total,
-      };
-    });
-  }
-
-  updateRange(timeRange?: DateRange): void {
-    this.dateRangeCtrl.setValue(timeRange);
-  }
-
-  updateRelativeTime(time?: number): void {
-    this.relativeTime = time;
-    let now = DateTime.now();
-    this.updateRange({ start: now.minus({ millisecond: time }), end: now });
   }
 }

@@ -1,6 +1,7 @@
 import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AlertType,
+  ArtefactNodeSource,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,
@@ -160,14 +161,10 @@ export class ExecutionProgressComponent
   protected activeTabId?: string;
 
   showNodeInTree(nodeId: string): void {
-    this._controllerService
-      .getReportNodePath(nodeId)
+    this._treeUtils
+      .getPathToNode(nodeId)
       .pipe(
         tap(() => this.selectTab('tree')),
-        map((nodes) => {
-          nodes.shift();
-          return nodes.map((node) => node.id!);
-        }),
         switchMap((path) => {
           const finalNodeId = path[path.length - 1];
           return this._executionTreeState.expandNode(path).pipe(map(() => finalNodeId));

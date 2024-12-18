@@ -1,0 +1,14 @@
+.container-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.container-name {
+  font-size: 1.8rem;
+  font-weight: 500;
+  min-width: 20rem;
+  display: flex;
+  align-items: center;
+}

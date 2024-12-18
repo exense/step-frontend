@@ -9,8 +9,17 @@
 
   .title {
     display: flex;
+    flex-direction: row;
     gap: 1rem;
     align-items: center;
+
+    .last-execution-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.6rem;
+      margin-left: 3rem;
+    }
 
     h1 {
       margin: 0;
@@ -40,34 +49,4 @@
 
 .flex-grow-1 {
   flex-grow: 1;
-}
-
-.widget {
-  display: flex;
-  height: 20px;
-  position: relative;
-  margin: 2px;
-
-  .icons {
-    position: absolute;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.8rem;
-    right: 1rem;
-    top: 1rem;
-    z-index: 99999;
-
-    .icon {
-      cursor: pointer;
-    }
-  }
-}
-
-.drag-icon {
-  padding: 0.2rem;
-
-  &:hover {
-    cursor: grabbing;
-  }
 }

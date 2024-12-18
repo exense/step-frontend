@@ -76,6 +76,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
+import { ArtefactChildContainerSettingsComponent } from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +104,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     PlanNameComponent,
     PredefinedOptionsInputComponent,
     ArtefactDetailsComponent,
+    ArtefactChildContainerSettingsComponent,
     WaitingArtefactsAdvancedComponent,
     UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
@@ -194,6 +196,7 @@ import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     ArtefactDetailsComponent,
+    ArtefactChildContainerSettingsComponent,
     WaitingArtefactsAdvancedComponent,
     ResourceInputModule,
     KeywordsCommonModule,
@@ -276,6 +279,7 @@ export { SplitAreaComponent } from './components/split-area/split-area.component
 export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
 export { SplitComponent } from './components/split/split.component';
 export * from './components/artefact-details/artefact-details.component';
+export * from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';

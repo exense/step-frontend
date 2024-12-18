@@ -86,7 +86,6 @@ import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-no
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
-import { GridsterModule } from 'angular-gridster2';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 
@@ -309,7 +308,10 @@ export class ExecutionModule {
         },
       ],
     });
-
+    this._viewRegistry.registerRoute({
+      path: 'cross-executions/:id',
+      component: ScheduleOverviewComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,
@@ -327,10 +329,6 @@ export class ExecutionModule {
         {
           path: 'list',
           component: ExecutionListComponent,
-        },
-        {
-          path: 'schedules/:id',
-          component: ScheduleOverviewComponent,
         },
         {
           path: ':id',
