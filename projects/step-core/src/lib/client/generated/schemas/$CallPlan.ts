@@ -52,6 +52,12 @@ export const $CallPlan = {
     continueParentNodeExecutionOnError: {
       type: 'DynamicValueBoolean',
     },
+    before: {
+      type: 'ChildrenBlock',
+    },
+    after: {
+      type: 'ChildrenBlock',
+    },
     planId: {
       type: 'string',
     },

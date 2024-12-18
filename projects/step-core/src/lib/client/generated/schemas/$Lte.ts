@@ -9,9 +9,6 @@ export const $Lte = {
     },
     {
       properties: {
-        field: {
-          type: 'string',
-        },
         value: {
           type: 'number',
           format: 'int64',

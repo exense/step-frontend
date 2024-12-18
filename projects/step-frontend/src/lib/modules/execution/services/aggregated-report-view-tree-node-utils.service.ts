@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import {
   AggregatedReportView,
+  ArtefactNodeSource,
   ArtefactService,
-  ArtefactTreeNode,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
@@ -24,9 +24,33 @@ export class AggregatedReportViewTreeNodeUtilsService
     const name = originalArtefact.attributes?.['name'] ?? '';
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
-    const children = (item.children ?? []).map((child) =>
-      this.convertItem(child, { parentId: id, isParentVisuallySkipped }),
-    );
+
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item);
+
+    const children = (item?.children || [])
+      .filter(
+        (child) => child.parentSource === ArtefactNodeSource.MAIN || child.parentSource === ArtefactNodeSource.SUB_PLAN,
+      )
+      .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeThreadContainer) {
+      children.unshift(beforeThreadContainer);
+    }
+
+    if (beforeContainer) {
+      children.unshift(beforeContainer);
+    }
+
+    if (afterThreadContainer) {
+      children.push(afterThreadContainer);
+    }
+
+    if (afterContainer) {
+      children.push(afterContainer);
+    }
 
     return {
       id,
@@ -47,7 +71,7 @@ export class AggregatedReportViewTreeNodeUtilsService
   updateChildren(
     root: AggregatedReportView,
     nodeId: string,
-    children: ArtefactTreeNode[],
+    children: AggregatedTreeNode[],
     updateType: 'append' | 'replace',
   ): void {}
 
@@ -75,6 +99,51 @@ export class AggregatedReportViewTreeNodeUtilsService
       nodeType: AggregatedTreeNodeType.DETAILS_NODE,
       originalArtefact,
       artefactHash: item.artefactHash,
+    };
+  }
+
+  private createPseudoContainer(
+    containerType: ArtefactNodeSource,
+    parent: AggregatedReportView,
+  ): AggregatedTreeNode | undefined {
+    const parentId = parent?.artefact?.id;
+    const childArtefacts = (parent?.children ?? []).filter((child) => child.parentSource === containerType);
+    if (!childArtefacts?.length || !parentId) {
+      return undefined;
+    }
+    const id = `${containerType}|${parentId}`;
+    let name = '';
+    switch (containerType) {
+      case ArtefactNodeSource.BEFORE:
+        name = 'Before';
+        break;
+      case ArtefactNodeSource.BEFORE_THREAD:
+        name = 'Before Thread';
+        break;
+      case ArtefactNodeSource.AFTER_THREAD:
+        name = 'After Thread';
+        break;
+      case ArtefactNodeSource.AFTER:
+        name = 'After';
+        break;
+      default:
+        break;
+    }
+    const isSkipped = false;
+    const isVisuallySkipped = false;
+    const icon = 'chevron-left';
+    const children = (childArtefacts ?? []).map((child) => this.convertItem(child, { parentId: id }));
+    const expandable = true;
+    return {
+      id,
+      name,
+      isSkipped,
+      isVisuallySkipped,
+      icon,
+      children,
+      expandable,
+      parentId,
+      nodeType: AggregatedTreeNodeType.PSEUDO_CONTAINER,
     };
   }
 }
