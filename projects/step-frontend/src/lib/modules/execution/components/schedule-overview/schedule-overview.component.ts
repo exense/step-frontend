@@ -25,6 +25,7 @@ import {
   forkJoin,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
@@ -47,6 +48,18 @@ interface ExecutionWithKeywordsStats {
   statuses: Record<string, number>;
 }
 
+const EMPTY_TS_RESPONSE = {
+  start: 0,
+  interval: 0,
+  end: 0,
+  matrix: [],
+  matrixKeys: [],
+  truncated: false,
+  collectionResolution: 0,
+  higherResolutionUsed: false,
+  ttlCovered: false,
+};
+
 @Component({
   selector: 'step-schedule-overview',
   templateUrl: './schedule-overview.component.html',
@@ -62,6 +75,7 @@ interface ExecutionWithKeywordsStats {
   ],
 })
 export class ScheduleOverviewComponent implements OnInit {
+  readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
@@ -143,59 +157,62 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
-    let executionsCountToDisplay = 30;
     this._executionService
-      .getLastExecutionsByTaskId(taskId, executionsCountToDisplay, timeRange.from, timeRange.to)
+      .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
       .pipe(
         switchMap((executions) => {
-          const executionsIdsJoined = executions.map((e) => `"${e.id!}"`).join(',');
-          let oqlFilter = 'attributes.metricType = response-time';
+          if (executions.length === 0) {
+            return of({
+              executions: [],
+              timeSeriesResponse: EMPTY_TS_RESPONSE,
+            });
+          }
+          const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
+          let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
           if (executionsIdsJoined) {
-            oqlFilter += ` and attributes.eId in (${executionsIdsJoined})`;
+            oqlFilter += ` and (${executionsIdsJoined})`;
           }
           const request: FetchBucketsRequest = {
             start: timeRange.from,
             end: timeRange.to,
-            intervalSize: 1000 * 60 * 60 * 24, // one day
+            numberOfBuckets: 1,
             oqlFilter: oqlFilter,
             groupDimensions: ['eId', 'rnStatus'],
           };
 
-          return this._timeSeriesService.getTimeSeries(request);
+          return this._timeSeriesService.getTimeSeries(request).pipe(
+            map((tsResponse) => {
+              return { executions: executions, timeSeriesResponse: tsResponse };
+            }),
+          );
         }),
       )
-      .subscribe((response) => {
+      .subscribe(({ executions, timeSeriesResponse }) => {
         const statusAttribute = 'rnStatus';
-        const executionsIndexes: Record<string, number> = {};
-        let executionsWithStats: ExecutionWithKeywordsStats[] = [];
+        let executionStats: Record<string, ExecutionWithKeywordsStats> = {};
         const allStatuses = new Set<string>();
-        response.matrixKeys.forEach((attributes, i) => {
+        timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
           const executionId = attributes['eId'];
           const status = attributes[statusAttribute];
           allStatuses.add(status);
           let executionEntry: ExecutionWithKeywordsStats = {
             executionId: executionId,
             statuses: {},
-            timestamp: Number.MAX_VALUE,
+            timestamp: 0,
           };
-          if (executionsIndexes[executionId] >= 0) {
-            executionEntry = executionsWithStats[executionsIndexes[executionId]];
+          if (executionStats[executionId]) {
+            executionEntry = executionStats[executionId];
           } else {
-            executionsWithStats.push(executionEntry);
-            executionsIndexes[executionId] = executionsWithStats.length - 1;
+            executionStats[executionId] = executionEntry;
           }
-          response.matrix[i].forEach((bucket) => {
+          timeSeriesResponse.matrix[i].forEach((bucket) => {
             if (bucket) {
-              if (bucket.begin < executionEntry.timestamp) {
-                executionEntry.timestamp = bucket.begin; // select the first apparition of the execution
-              }
               const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
               executionEntry.statuses[status] = newCount;
             }
           });
         });
-        executionsWithStats.sort((a, b) => a.timestamp - b.timestamp);
-
+        executions.sort((a, b) => a.startTime! - b.startTime!);
         let series = Array.from(allStatuses).map((status) => {
           let color = this._statusColors[status as Status];
           const fill = color + 'cc';
@@ -204,8 +221,8 @@ export class ScheduleOverviewComponent implements OnInit {
             scale: 'y',
             labelItems: [status],
             legendName: status,
-            data: executionsWithStats.map((item) => item.statuses[status] || 0),
-            width: 0,
+            data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+            width: 1,
             value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
               this.calculateStackedValue(self, rawValue, seriesIdx, idx),
             stroke: color,
@@ -227,16 +244,16 @@ export class ScheduleOverviewComponent implements OnInit {
         ];
         this.cumulateSeriesData(series);
         this.keywordsChartSettings = {
-          title: 'Keywords calls by execution',
+          title: `Keywords calls by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
           showLegend: false,
           showDefaultLegend: true,
           xAxesSettings: {
             time: false,
             label: 'Execution',
             show: false,
-            values: executionsWithStats.map((item, i) => i),
+            values: executions.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executionsWithStats[idx].executionId;
+              return executions[idx].id!;
             },
           },
           scales: {
@@ -267,7 +284,7 @@ export class ScheduleOverviewComponent implements OnInit {
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
-      intervalSize: 1000 * 60 * 60 * 24, // one day
+      numberOfBuckets: 30,
       oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
       groupDimensions: [statusAttribute],
     };
@@ -311,7 +328,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
       ];
       this.executionsChartSettings = {
-        title: 'Executions per day',
+        title: 'Executions statuses over time',
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
