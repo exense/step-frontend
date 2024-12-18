@@ -106,6 +106,34 @@ export class ControllerService {
 
   /**
    * @param id
+   * @param source
+   * @param skip
+   * @param limit
+   * @returns ReportNode default response
+   * @throws ApiError
+   */
+  public getReportNodeChildrenBySource(
+    id: string,
+    source: 'BEFORE' | 'BEFORE_THREAD' | 'MAIN' | 'SUB_PLAN' | 'AFTER_THREAD' | 'AFTER',
+    skip?: number,
+    limit?: number,
+  ): Observable<Array<ReportNode>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/controller/reportnode/{id}/children/{source}',
+      path: {
+        id: id,
+        source: source,
+      },
+      query: {
+        skip: skip,
+        limit: limit,
+      },
+    });
+  }
+
+  /**
+   * @param id
    * @returns ReportNode default response
    * @throws ApiError
    */

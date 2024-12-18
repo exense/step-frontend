@@ -8,4 +8,5 @@ export interface TreeNode {
   isSkipped: boolean;
   isVisuallySkipped?: boolean;
   children?: TreeNode[];
+  isDragDisabled?: boolean;
 }

@@ -9,9 +9,6 @@ export const $Gte = {
     },
     {
       properties: {
-        field: {
-          type: 'string',
-        },
         value: {
           type: 'number',
           format: 'int64',

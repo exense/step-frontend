@@ -1,10 +1,11 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
 import { ArtefactService } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-artefact-list',
   templateUrl: './plan-artefact-list.component.html',
   styleUrls: ['./plan-artefact-list.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PlanArtefactListComponent {
   readonly availableArtefacts$ = inject(ArtefactService).availableArtefacts$;
