@@ -4,6 +4,8 @@ import { DateField } from '../../types/date-field';
 import { DatePickerContentComponent } from '../date-picker-content/date-picker-content.component';
 import { DateFieldContainerService } from '../../injectables/date-field-container.service';
 import { STEP_DATE_TIME_FORMAT_PROVIDERS } from '../../injectables/step-date-format-config.providers';
+import { TimeRange } from '../../types/time-range';
+import { TimeOption } from '../../types/time-option';
 
 @Component({
   selector: 'step-date-picker',
@@ -18,6 +20,7 @@ export class DatePickerComponent {
 
   @Input() xPosition: 'start' | 'end' = 'start';
   @Input() yPosition: 'above' | 'below' = 'below';
+  @Input() relativeRangeOptions?: TimeOption[];
 
   registerInput(dateField: DateField<unknown>): void {
     this._fieldContainer.register(dateField);
@@ -26,9 +29,11 @@ export class DatePickerComponent {
   open(): void {
     const xPosition = this.xPosition;
     const yPosition = this.yPosition;
-    this._popoverOverlay
+    const createdComponent: DatePickerContentComponent = this._popoverOverlay
       .setPositions({ xPosition, yPosition })
-      .open(DatePickerContentComponent, this._fieldContainer.getConnectedOverlayOrigin()?.nativeElement);
+      .open(DatePickerContentComponent, this._fieldContainer.getConnectedOverlayOrigin()?.nativeElement)
+      .getComponent()!;
+    createdComponent.customRelativeRangeOptions = this.relativeRangeOptions;
   }
 
   close(): void {

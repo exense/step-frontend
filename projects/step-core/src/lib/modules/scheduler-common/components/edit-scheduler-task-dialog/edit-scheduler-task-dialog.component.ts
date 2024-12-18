@@ -85,10 +85,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   private _repositoryParamsSchemas = inject(RepositoryParametersSchemasService);
   private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA).taskAndConfig;
 
-  private task = this._dialogData.task;
   private config = this._dialogData.config;
 
   private customForms = viewChild(CustomFormWrapperComponent);
+
+  protected task = this._dialogData.task;
 
   protected hideUser = this.config?.hideUser;
 

@@ -46,6 +46,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -82,6 +83,7 @@ import { AggregatedTreeNodeDetailsComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeInfoComponent } from './components/aggregated-tree-node-info/aggregated-tree-node-info.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 
 @NgModule({
   declarations: [
@@ -115,6 +117,7 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -146,7 +149,14 @@ import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sor
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    TimeSeriesChartComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
@@ -289,7 +299,10 @@ export class ExecutionModule {
         },
       ],
     });
-
+    this._viewRegistry.registerRoute({
+      path: 'cross-executions/:id',
+      component: ScheduleOverviewComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,

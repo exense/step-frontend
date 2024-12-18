@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   AxesSettings,
   BucketResponse,
@@ -65,7 +75,7 @@ const resolutionLabels: Record<string, string> = {
     MatTooltip,
   ],
 })
-export class ChartDashletComponent extends ChartDashlet implements OnInit {
+export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
@@ -373,7 +383,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
     this.fetchLegendEntities(series).subscribe((v) => {
       this._internalSettings = {
         title: this.getChartTitle(),
-        xValues: xLabels,
+        xAxesSettings: {
+          values: xLabels,
+        },
         series: series,
         tooltipOptions: {
           enabled: true,

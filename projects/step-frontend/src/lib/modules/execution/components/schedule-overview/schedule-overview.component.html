@@ -1,0 +1,59 @@
+<section class="header">
+  @if (selectedTask; as task) {
+    <div class="title">
+      <entity-icon entityName="tasks" [entity]="task"></entity-icon>
+      <h3>{{ task.attributes?.['name'] }}</h3>
+      @if (lastExecution) {
+        <div class="last-execution-container">
+          <span>Last execution:</span>
+          <step-alt-execution-time [execution]="lastExecution" />
+          <step-status [status]="lastExecution!.result" />
+        </div>
+      }
+    </div>
+  }
+  <div class="range-picker">
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="calendar" (click)="picker.open()" />
+      </step-prefix>
+      <input
+        type="text"
+        placeholder="From - To"
+        [formControl]="dateRangeCtrl"
+        [stepDateRangePicker]="picker"
+        [showRelativeTime]="true"
+        (relativeOptionChange)="updateRelativeTime($event)"
+        [matTooltip]="rangePicker.formattedValue()"
+        matTooltipPosition="before"
+        #rangePicker="DateRangePicker"
+      />
+    </step-form-field>
+    <step-date-picker [relativeRangeOptions]="RELATIVE_TIME_RANGES" #picker></step-date-picker>
+  </div>
+</section>
+<section>
+  <div class="row">
+    <div class="piechart-container">
+      @if (summary) {
+        <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" />
+      }
+    </div>
+    <step-alt-report-widget class="flex-grow-1">
+      <step-alt-report-widget-content>
+        @if (executionsChartSettings) {
+          <step-timeseries-chart [settings]="executionsChartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <step-alt-report-widget class="flex-grow-1">
+      <step-alt-report-widget-content>
+        @if (keywordsChartSettings) {
+          <step-timeseries-chart [settings]="keywordsChartSettings" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+</section>

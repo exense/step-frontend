@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, ViewEncapsulation } from '@angular/core';
 import { DateTime } from 'luxon';
 import { DateFieldContainerService } from '../../injectables/date-field-container.service';
 import { CalendarSingleStrategyService } from '../../injectables/calendar-single-strategy.service';
@@ -10,6 +10,7 @@ import { TimeRange } from '../../types/time-range';
 import { Time } from '../../types/time';
 import { RELATIVE_TIME_OPTIONS } from '../../injectables/relative-time-options.token';
 import { TimeOption } from '../../types/time-option';
+import { Tab } from '../../../tabs';
 
 @Component({
   selector: 'step-date-picker-content',
@@ -31,6 +32,9 @@ import { TimeOption } from '../../types/time-option';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatePickerContentComponent {
+  /** @Input() **/
+  customRelativeRangeOptions?: TimeOption[];
+
   private _fieldContainer = inject<DateFieldContainerService<DateTime | DateRange>>(DateFieldContainerService);
   private _calendarStrategy = inject(CalendarStrategyService);
   protected _relativeTimeOptions$ = inject(RELATIVE_TIME_OPTIONS);
