@@ -34,7 +34,6 @@ declare const uPlot: any;
 
 interface ExecutionWithKeywordsStats {
   executionId: string;
-  name: string;
   timestamp: number;
   statuses: Record<string, number>;
 }
@@ -211,7 +210,6 @@ export class ScheduleOverviewComponent implements OnInit {
           allStatuses.add(status);
           let executionEntry: ExecutionWithKeywordsStats = {
             executionId: executionId,
-            name: '',
             statuses: {},
             timestamp: 0,
           };
@@ -226,12 +224,6 @@ export class ScheduleOverviewComponent implements OnInit {
               executionEntry.statuses[status] = newCount;
             }
           });
-        });
-        executions.forEach((execution) => {
-          let executionId: string = execution.id!;
-          if (executionStats[executionId]) {
-            executionStats[executionId]!.name = execution.description! || 'Unnamed';
-          }
         });
         executions.sort((a, b) => a.startTime! - b.startTime!);
         let series = Array.from(allStatuses).map((status) => {

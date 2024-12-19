@@ -59,10 +59,10 @@
             <ng-template tooltipContent let-data>
               <div
                 class="link-item"
-                (click)="jumpToExecution(keywordsChartStats[data.idx!].executionId)"
+                (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
                 title="See Execution"
               >
-                <span>{{ keywordsChartStats[data.idx!].name }}</span>
+                <span>{{ lastKeywordsExecutions[data.idx!].description || 'Unnamed' }}</span>
                 <span class="link-icon"></span>
               </div>
             </ng-template>

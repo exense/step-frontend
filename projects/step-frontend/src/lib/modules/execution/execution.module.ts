@@ -90,6 +90,7 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { DatePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
