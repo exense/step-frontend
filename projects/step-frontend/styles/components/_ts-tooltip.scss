@@ -8,6 +8,7 @@
     background: #fffaf2d9;
     box-shadow: 2px 2px 5px 2px #a3a3a3;
     top: 0; // this is a tricky fix. if top is not set it will make the container overflow
+    cursor: default;
 
     &.pointer {
       cursor: pointer;

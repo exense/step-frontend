@@ -21,6 +21,17 @@
         <step-entity-selection-di [entity]="element" />
       </td>
     </ng-container>
+    <ng-container matColumnDef="move">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td class="move" mat-cell *matCellDef="let element">
+        <step-drag-drop-container stepDropAreaId="planTree">
+          <step-icon name="move" [stepDragItem]="element | planDropInfo" />
+          <step-drag-preview>
+            <step-plan-nodes-drag-preview />
+          </step-drag-preview>
+        </step-drag-drop-container>
+      </td>
+    </ng-container>
     <step-entity-column-container entityName="plans" />
     <ng-container matColumnDef="actions" stepActionCol>
       <th mat-header-cell *matHeaderCellDef>

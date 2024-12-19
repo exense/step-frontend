@@ -20,7 +20,9 @@ import {
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
+  StepIconsModule,
   stepRouteAdditionalConfig,
+  TableModule,
   ViewRegistryService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
@@ -161,9 +163,11 @@ import { DatePipe } from '@angular/common';
     TimeSeriesModule,
     ArtefactsModule,
     TimeSeriesChartComponent,
-    MatMenu,
+    StepIconsModule,
+    TableModule,
     MatMenuTrigger,
-    MatMenuItem,
+    MatMenu,
+    MatTooltip,
     TooltipContentDirective,
     DatePipe,
   ],
