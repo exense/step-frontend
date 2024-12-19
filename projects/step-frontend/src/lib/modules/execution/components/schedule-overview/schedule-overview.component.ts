@@ -40,11 +40,11 @@ interface ExecutionWithKeywordsStats {
 }
 
 interface TableErrorEntry {
-  label: string;
+  errorMessage: string;
+  errorCode: string;
   count: number;
   percentage: number;
-  overallPercentage: number;
-  type: string;
+  types: string[]; // can be more when using same error code/message
 }
 
 interface ErrorGroupingOption {
@@ -89,10 +89,14 @@ export class ScheduleOverviewComponent implements OnInit {
   private _statusColors = inject(STATUS_COLORS);
 
   readonly RELATIVE_TIME_RANGES: TimeOption[] = [
-    { label: 'Last Week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
-    { label: 'Last 2 Weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
-    { label: 'Last Month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
-    { label: 'Last 6 Months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+    { label: 'Last day', value: { isRelative: true, msFromNow: TimeUnit.DAY } },
+    { label: 'Last week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
+    { label: 'Last 2 weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
+    { label: 'Last month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
+    { label: 'Last 3 month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 3 } },
+    { label: 'Last 6 months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+    { label: 'Last year', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 } },
+    { label: 'Last 3 years', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 * 3 } },
   ];
 
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
@@ -116,11 +120,6 @@ export class ScheduleOverviewComponent implements OnInit {
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
-  errorChartGroupingOptions: ErrorGroupingOption[] = [
-    { label: 'Error Code', attribute: 'errorCode' },
-    { label: 'Error Message', attribute: 'errorMessage' },
-  ];
-  errorChartSelectedGrouping: ErrorGroupingOption = this.errorChartGroupingOptions[0];
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -362,15 +361,6 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  switchErrorGrouping(option: ErrorGroupingOption) {
-    if (this.errorChartSelectedGrouping.attribute !== option.attribute) {
-      this.errorChartSelectedGrouping = option;
-      this.timeRangeChange$.pipe(take(1)).subscribe((dateRange) => {
-        this.createErrorsChart(this.selectedTask!.id!, dateRange!);
-      });
-    }
-  }
-
   private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
     if (seriesIdx > 1) {
       const valueBelow = self.data[seriesIdx - 1][idx] || 0;
@@ -422,44 +412,42 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
-    let groupingAttribute = this.errorChartSelectedGrouping.attribute;
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
       numberOfBuckets: 1,
       oqlFilter: `attributes.taskId = ${taskId}`,
-      groupDimensions: [groupingAttribute],
+      groupDimensions: ['errorMessage', 'errorCode'],
       collectAttributeKeys: ['status'],
       collectAttributesValuesLimit: 10,
     };
     this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
-      let totalCount = 0;
-      let countWithoutError = 0;
+      let totalCountWithErrors = 0;
       const data: TableErrorEntry[] = response.matrixKeys
-        .map((key, index) => {
-          const error = key[groupingAttribute];
+        .map((keyAttributes, index) => {
+          const errorCode = keyAttributes['errorCode'];
+          const errorMessage = keyAttributes['errorMessage'];
           const bucket = response.matrix[index][0];
           const bucketCount = bucket.count;
-          totalCount += bucketCount;
-          if (error === undefined) {
-            countWithoutError += bucketCount;
+
+          if (errorCode === undefined && errorMessage === undefined) {
             return undefined;
           } else {
+            totalCountWithErrors += bucketCount;
             return {
-              label: error,
+              errorCode: errorCode,
+              errorMessage: errorMessage,
               count: bucketCount,
               percentage: 0,
               overallPercentage: 0,
-              type: ((bucket.attributes['status'] as string[]) || []).join(', '),
+              types: (bucket.attributes['status'] as string[]) || [],
             } as TableErrorEntry;
           }
         })
         .filter((item) => !!item) as TableErrorEntry[];
-      const totalWithErrors = totalCount - countWithoutError;
       // update the percentages
       data.forEach((entry) => {
-        entry.percentage = Number(((entry.count / totalWithErrors) * 100).toFixed(2));
-        entry.overallPercentage = Number(((entry.count / totalCount) * 100).toFixed(2));
+        entry.percentage = Number(((entry.count / totalCountWithErrors) * 100).toFixed(2));
       });
       this.errorsDataSource = new TableLocalDataSource(data);
     });

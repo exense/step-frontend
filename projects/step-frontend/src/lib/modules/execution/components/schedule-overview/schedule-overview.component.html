@@ -61,50 +61,39 @@
   <step-alt-report-widget class="flex-grow-1" title="Errors">
     <step-alt-report-widget-content style="height: 100%">
       <div class="widget">
-        <div class="icons">
-          <step-icon name="settings" [matMenuTriggerFor]="settingsMenu" matTooltip="Settings" class="icon" />
-          <mat-menu #settingsMenu="matMenu">
-            <button mat-menu-item [matMenuTriggerFor]="groupByMenu">
-              <span>Group by</span>
-            </button>
-          </mat-menu>
-          <mat-menu #groupByMenu="matMenu">
-            @for (option of errorChartGroupingOptions; track option.attribute) {
-              <button mat-menu-item (click)="switchErrorGrouping(option)">
-                <span>{{ option.label }}</span>
-              </button>
-            }
-          </mat-menu>
-        </div>
-
         @if (errorsDataSource) {
-          <step-table #table [dataSource]="errorsDataSource!" class="">
-            <ng-container matColumnDef="label">
-              <th mat-header-cell *matHeaderCellDef>{{ errorChartSelectedGrouping.label }}</th>
+          <step-table #table [dataSource]="errorsDataSource!" matSort>
+            <ng-container matColumnDef="errorMessage">
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.label }}
+                {{ element.errorMessage }}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="errorCode">
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Code</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.errorCode }}
               </td>
             </ng-container>
             <ng-container matColumnDef="count">
-              <th mat-header-cell *matHeaderCellDef>Count</th>
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Count</th>
               <td mat-cell *matCellDef="let element">
                 {{ element.count }}
               </td>
             </ng-container>
             <ng-container matColumnDef="types">
-              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Type</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.type }}
+                <div class="types-column">
+                  @for (type of element.types; track type) {
+                    <step-status [status]="type" />
+                  }
+                </div>
               </td>
             </ng-container>
             <ng-container matColumnDef="percentage">
-              <th mat-header-cell *matHeaderCellDef>Percentage</th>
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Percentage</th>
               <td mat-cell *matCellDef="let element">{{ element.percentage }}%</td>
-            </ng-container>
-
-            <ng-container matColumnDef="overallPercentage">
-              <th mat-header-cell *matHeaderCellDef>Overall Percentage</th>
-              <td mat-cell *matCellDef="let element">{{ element.overallPercentage }}%</td>
             </ng-container>
           </step-table>
         }
