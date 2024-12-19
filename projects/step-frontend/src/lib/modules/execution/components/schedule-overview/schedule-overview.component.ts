@@ -462,7 +462,6 @@ export class ScheduleOverviewComponent implements OnInit {
         entry.overallPercentage = Number(((entry.count / totalCount) * 100).toFixed(2));
       });
       this.errorsDataSource = new TableLocalDataSource(data);
-      console.log(data);
     });
   }
 }
