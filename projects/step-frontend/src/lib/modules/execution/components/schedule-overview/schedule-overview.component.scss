@@ -50,3 +50,23 @@
 .flex-grow-1 {
   flex-grow: 1;
 }
+
+.widget {
+  position: relative;
+  margin: 2px;
+
+  .icons {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.8rem;
+    right: 1rem;
+    top: 1rem;
+    z-index: 99999;
+
+    .icon {
+      cursor: pointer;
+    }
+  }
+}
