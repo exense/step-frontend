@@ -12,7 +12,6 @@ import {
   FetchBucketsRequest,
   MarkerType,
   Plan,
-  STATUS_COLORS,
   TimeOption,
   STATUS_COLORS,
   TableDataSource,
@@ -21,23 +20,49 @@ import {
   TimeSeriesService,
   TimeUnit,
 } from '@exense/step-core';
-import {
-  combineLatest,
-  combineLatestWith,
-  filter,
-  forkJoin,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { combineLatest, filter, map, Observable, of, shareReplay, startWith, switchMap, take } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime } from 'luxon';
-import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
+import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
+import { Status } from '../../../_common/shared/status.enum';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { Axis, Band } from 'uplot';
+
+declare const uPlot: any;
+
+interface ExecutionWithKeywordsStats {
+  executionId: string;
+  timestamp: number;
+  statuses: Record<string, number>;
+}
+
+interface TableErrorEntry {
+  label: string;
+  count: number;
+  percentage: number;
+  overallPercentage: number;
+  type: string;
+}
+
+interface ErrorGroupingOption {
+  label: string;
+  attribute: string;
+}
+
+const EMPTY_TS_RESPONSE = {
+  start: 0,
+  interval: 0,
+  end: 0,
+  matrix: [],
+  matrixKeys: [],
+  truncated: false,
+  collectionResolution: 0,
+  higherResolutionUsed: false,
+  ttlCovered: false,
+};
 
 @Component({
   selector: 'step-schedule-overview',
@@ -90,6 +115,12 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
+  errorsDataSource?: TableDataSource<TableErrorEntry>;
+  errorChartGroupingOptions: ErrorGroupingOption[] = [
+    { label: 'Error Code', attribute: 'errorCode' },
+    { label: 'Error Message', attribute: 'errorMessage' },
+  ];
+  errorChartSelectedGrouping: ErrorGroupingOption = this.errorChartGroupingOptions[0];
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -329,6 +360,15 @@ export class ScheduleOverviewComponent implements OnInit {
         bands: this.getDefaultBands(series.length),
       };
     });
+  }
+
+  switchErrorGrouping(option: ErrorGroupingOption) {
+    if (this.errorChartSelectedGrouping.attribute !== option.attribute) {
+      this.errorChartSelectedGrouping = option;
+      this.timeRangeChange$.pipe(take(1)).subscribe((dateRange) => {
+        this.createErrorsChart(this.selectedTask!.id!, dateRange!);
+      });
+    }
   }
 
   private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
