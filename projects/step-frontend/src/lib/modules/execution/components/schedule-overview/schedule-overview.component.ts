@@ -12,33 +12,24 @@ import {
   FetchBucketsRequest,
   MarkerType,
   Plan,
-  STATUS_COLORS,
   TimeOption,
+  STATUS_COLORS,
+  TableDataSource,
+  TableLocalDataSource,
   TimeRange,
   TimeSeriesService,
   TimeUnit,
 } from '@exense/step-core';
-import {
-  combineLatest,
-  combineLatestWith,
-  filter,
-  forkJoin,
-  map,
-  Observable,
-  of,
-  shareReplay,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { combineLatest, filter, map, Observable, of, shareReplay, startWith, switchMap, take } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { Axis, Band } from 'uplot';
-import { Status } from '../../../_common/shared/status.enum';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
+import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
+import { Status } from '../../../_common/shared/status.enum';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { Axis, Band } from 'uplot';
 
 declare const uPlot: any;
 
@@ -46,6 +37,19 @@ interface ExecutionWithKeywordsStats {
   executionId: string;
   timestamp: number;
   statuses: Record<string, number>;
+}
+
+interface TableErrorEntry {
+  errorMessage: string;
+  errorCode: string;
+  count: number;
+  percentage: number;
+  types: string[]; // can be more when using same error code/message
+}
+
+interface ErrorGroupingOption {
+  label: string;
+  attribute: string;
 }
 
 const EMPTY_TS_RESPONSE = {
@@ -85,10 +89,14 @@ export class ScheduleOverviewComponent implements OnInit {
   private _statusColors = inject(STATUS_COLORS);
 
   readonly RELATIVE_TIME_RANGES: TimeOption[] = [
-    { label: 'Last Week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
-    { label: 'Last 2 Weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
-    { label: 'Last Month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
-    { label: 'Last 6 Months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+    { label: 'Last day', value: { isRelative: true, msFromNow: TimeUnit.DAY } },
+    { label: 'Last week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
+    { label: 'Last 2 weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
+    { label: 'Last month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
+    { label: 'Last 3 month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 3 } },
+    { label: 'Last 6 months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
+    { label: 'Last year', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 } },
+    { label: 'Last 3 years', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 * 3 } },
   ];
 
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
@@ -111,6 +119,7 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
+  errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
@@ -140,6 +149,7 @@ export class ScheduleOverviewComponent implements OnInit {
       this.createPieChart(task.id!, fullRange);
       this.createExecutionsChart(task.id!, fullRange);
       this.createKeywordsChart(task.id!, fullRange);
+      this.createErrorsChart(task.id!, fullRange);
       this.fetchLastExecution(task.id!);
     });
   }
@@ -399,5 +409,47 @@ export class ScheduleOverviewComponent implements OnInit {
     this.relativeTime = time;
     let now = DateTime.now();
     this.updateRange({ start: now.minus({ millisecond: time }), end: now });
+  }
+
+  private createErrorsChart(taskId: string, timeRange: TimeRange) {
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: `attributes.taskId = ${taskId}`,
+      groupDimensions: ['errorMessage', 'errorCode'],
+      collectAttributeKeys: ['status'],
+      collectAttributesValuesLimit: 10,
+    };
+    this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
+      let totalCountWithErrors = 0;
+      const data: TableErrorEntry[] = response.matrixKeys
+        .map((keyAttributes, index) => {
+          const errorCode = keyAttributes['errorCode'];
+          const errorMessage = keyAttributes['errorMessage'];
+          const bucket = response.matrix[index][0];
+          const bucketCount = bucket.count;
+
+          if (errorCode === undefined && errorMessage === undefined) {
+            return undefined;
+          } else {
+            totalCountWithErrors += bucketCount;
+            return {
+              errorCode: errorCode,
+              errorMessage: errorMessage,
+              count: bucketCount,
+              percentage: 0,
+              overallPercentage: 0,
+              types: (bucket.attributes['status'] as string[]) || [],
+            } as TableErrorEntry;
+          }
+        })
+        .filter((item) => !!item) as TableErrorEntry[];
+      // update the percentages
+      data.forEach((entry) => {
+        entry.percentage = Number(((entry.count / totalCountWithErrors) * 100).toFixed(2));
+      });
+      this.errorsDataSource = new TableLocalDataSource(data);
+    });
   }
 }
