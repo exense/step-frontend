@@ -10,7 +10,6 @@ import {
   ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
-  MarkerType,
   Plan,
   TimeOption,
   STATUS_COLORS,
@@ -24,12 +23,12 @@ import { combineLatest, filter, map, Observable, of, shareReplay, startWith, swi
 import { FormBuilder } from '@angular/forms';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DateTime } from 'luxon';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
+import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { DateTime, Duration } from 'luxon';
 
 declare const uPlot: any;
 
@@ -121,6 +120,8 @@ export class ScheduleOverviewComponent implements OnInit {
   keywordsChartSettings?: TSChartSettings;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
+  lastKeywordsExecutions: Execution[] = [];
+
   readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
     startWith(this.dateRangeCtrl.value),
     map((range) => range ?? undefined),
@@ -167,6 +168,7 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
+    let oneDay = 1000 * 60 * 60 * 24;
     this._executionService
       .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
       .pipe(
@@ -198,6 +200,7 @@ export class ScheduleOverviewComponent implements OnInit {
         }),
       )
       .subscribe(({ executions, timeSeriesResponse }) => {
+        this.lastKeywordsExecutions = executions;
         const statusAttribute = 'rnStatus';
         let executionStats: Record<string, ExecutionWithKeywordsStats> = {};
         const allStatuses = new Set<string>();
@@ -248,7 +251,7 @@ export class ScheduleOverviewComponent implements OnInit {
             size: TimeSeriesConfig.CHART_LEGEND_SIZE,
             scale: 'y',
             values: (u, vals) => {
-              return vals.map((v: any) => v);
+              return vals;
             },
           },
         ];
@@ -263,8 +266,11 @@ export class ScheduleOverviewComponent implements OnInit {
             show: false,
             values: executions.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executions[idx].id!;
+              return executions[idx].description!;
             },
+          },
+          cursor: {
+            lock: true,
           },
           scales: {
             y: {
@@ -275,7 +281,7 @@ export class ScheduleOverviewComponent implements OnInit {
           },
           series: series,
           tooltipOptions: {
-            enabled: false,
+            enabled: true,
           },
           axes: axes,
           bands: this.getDefaultBands(series.length),
@@ -343,6 +349,10 @@ export class ScheduleOverviewComponent implements OnInit {
         showDefaultLegend: true,
         xAxesSettings: {
           values: xLabels,
+          valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleDateString(),
+        },
+        cursor: {
+          lock: true,
         },
         scales: {
           y: {
@@ -353,7 +363,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
         series: series,
         tooltipOptions: {
-          enabled: false,
+          enabled: true,
         },
         axes: axes,
         bands: this.getDefaultBands(series.length),
@@ -375,6 +385,10 @@ export class ScheduleOverviewComponent implements OnInit {
       bands.push({ series: [i, i - 1] });
     }
     return bands;
+  }
+
+  jumpToExecution(eId: string) {
+    window.open(`#/executions/${eId!}/viz`);
   }
 
   private createPieChart(taskId: string, timeRange: TimeRange) {
