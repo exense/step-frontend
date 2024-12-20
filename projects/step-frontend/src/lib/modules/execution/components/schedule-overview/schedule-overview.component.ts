@@ -277,16 +277,6 @@ export class ScheduleOverviewComponent implements OnInit {
           series: series,
           tooltipOptions: {
             enabled: true,
-            displayCondition: (contextData: TooltipContextData) => {
-              for (let i = 0; i < contextData.series.length; i++) {
-                let value = contextData.series[i].data[contextData.idx!];
-                if (value && value > 0) {
-                  console.log('we have a value');
-                  return true;
-                }
-              }
-              return false;
-            },
           },
           axes: axes,
           bands: this.getDefaultBands(series.length),

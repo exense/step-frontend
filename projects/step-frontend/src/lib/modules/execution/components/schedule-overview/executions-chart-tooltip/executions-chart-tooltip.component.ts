@@ -46,6 +46,9 @@ export class ExecutionsChartTooltipComponent {
 
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
     const contextData = this.data();
+    this.selectedSeriesExecutions = [];
+    this.executionsListTruncated = false;
+    this.selectedSeries = undefined;
     const transformedSeries: TransformedSeries[] = [];
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;

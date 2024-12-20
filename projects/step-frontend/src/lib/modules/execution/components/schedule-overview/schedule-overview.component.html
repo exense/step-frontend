@@ -57,13 +57,15 @@
         @if (keywordsChartSettings) {
           <step-timeseries-chart [settings]="keywordsChartSettings">
             <ng-template tooltipContent let-data>
-              <div
-                class="link-item"
-                (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
-                title="See Execution"
-              >
-                <span>{{ lastKeywordsExecutions[data.idx!].description || 'Unnamed' }}</span>
-                <span class="link-icon"></span>
+              <div class="container">
+                <div
+                  class="link-item"
+                  (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
+                  title="See Execution"
+                >
+                  <span>{{ lastKeywordsExecutions[data.idx!].description || 'Unnamed' }}</span>
+                  <span class="link-icon"></span>
+                </div>
               </div>
             </ng-template>
           </step-timeseries-chart>

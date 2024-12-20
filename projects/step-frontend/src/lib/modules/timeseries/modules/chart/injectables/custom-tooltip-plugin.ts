@@ -18,7 +18,6 @@ export class CustomTooltipPlugin {
     for (let i = 0; i < contextData.series.length; i++) {
       let value = contextData.series[i].data[contextData.idx!];
       if (value && value > 0) {
-        console.log('we have a value');
         return true;
       }
     }
