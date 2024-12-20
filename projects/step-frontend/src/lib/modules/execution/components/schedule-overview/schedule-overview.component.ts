@@ -266,9 +266,8 @@ export class ScheduleOverviewComponent implements OnInit {
             show: false,
             values: executions.map((item, i) => i),
             valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executions[idx].id!;
+              return executions[idx].description!;
             },
-            gridDisplayMultipliers: [oneDay, oneDay * 2, oneDay * 7],
           },
           cursor: {
             lock: true,
