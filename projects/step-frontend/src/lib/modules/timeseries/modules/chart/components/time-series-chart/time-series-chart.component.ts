@@ -90,20 +90,27 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   // this will be called from the tooltip instance.
   // returns true if the tooltip should be rendered. false otherwise
   renderCustomTooltipFn = (container: any, data: TooltipContextData): boolean => {
-    let allSeriesAreEmpty = true;
-    for (let i = 0; i < data.series.length; i++) {
-      let value = data.series[i].data[data.idx!];
-      if (value && value > 0) {
-        allSeriesAreEmpty = false;
-        break;
-      }
-    }
-    if (allSeriesAreEmpty) {
+    console.log('render tooltip');
+    if (this.settings.tooltipOptions.displayCondition && !this.settings.tooltipOptions.displayCondition(data)) {
       container.innerHTML = '';
       this.tooltipEmbeddedView?.destroy();
       this.tooltipEmbeddedView = undefined;
       return false;
     }
+    // let allSeriesAreEmpty = true;
+    // for (let i = 0; i < data.series.length; i++) {
+    //   let value = data.series[i].data[data.idx!];
+    //   if (value && value > 0) {
+    //     allSeriesAreEmpty = false;
+    //     break;
+    //   }
+    // }
+    // if (allSeriesAreEmpty) {
+    //   container.innerHTML = '';
+    //   this.tooltipEmbeddedView?.destroy();
+    //   this.tooltipEmbeddedView = undefined;
+    //   return false;
+    // }
 
     if (this.tooltipEmbeddedView) {
       this.tooltipEmbeddedView.context.$implicit = data;
@@ -114,6 +121,13 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       });
     }
     this.tooltipEmbeddedView.detectChanges();
+    console.log(this.tooltipEmbeddedView.rootNodes);
+    if (!this.tooltipEmbeddedView || this.tooltipEmbeddedView.rootNodes.length === 0) {
+      container.innerHTML = '';
+      this.tooltipEmbeddedView?.destroy();
+      this.tooltipEmbeddedView = undefined;
+      return false;
+    }
     return true;
   };
 

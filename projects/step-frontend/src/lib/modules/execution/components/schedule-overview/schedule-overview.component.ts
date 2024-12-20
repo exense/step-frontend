@@ -29,6 +29,7 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime, Duration } from 'luxon';
+import { TooltipContextData } from '../../../timeseries/modules/chart/injectables/tooltip-context-data';
 
 declare const uPlot: any;
 
@@ -276,6 +277,16 @@ export class ScheduleOverviewComponent implements OnInit {
           series: series,
           tooltipOptions: {
             enabled: true,
+            displayCondition: (contextData: TooltipContextData) => {
+              for (let i = 0; i < contextData.series.length; i++) {
+                let value = contextData.series[i].data[contextData.idx!];
+                if (value && value > 0) {
+                  console.log('we have a value');
+                  return true;
+                }
+              }
+              return false;
+            },
           },
           axes: axes,
           bands: this.getDefaultBands(series.length),

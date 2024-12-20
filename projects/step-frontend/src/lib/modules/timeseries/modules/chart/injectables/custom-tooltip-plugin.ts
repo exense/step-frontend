@@ -14,6 +14,17 @@ export class CustomTooltipPlugin {
   private _doc = inject(DOCUMENT);
   private win = this._doc.defaultView!;
 
+  public static SERIES_NOT_EMPTY_CONDITION_FN = (contextData: TooltipContextData) => {
+    for (let i = 0; i < contextData.series.length; i++) {
+      let value = contextData.series[i].data[contextData.idx!];
+      if (value && value > 0) {
+        console.log('we have a value');
+        return true;
+      }
+    }
+    return false;
+  };
+
   /**
    * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
    */
