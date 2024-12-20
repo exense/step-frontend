@@ -46,11 +46,6 @@ interface TableErrorEntry {
   types: string[]; // can be more when using same error code/message
 }
 
-interface ErrorGroupingOption {
-  label: string;
-  attribute: string;
-}
-
 const EMPTY_TS_RESPONSE = {
   start: 0,
   interval: 0,
@@ -168,7 +163,6 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createKeywordsChart(taskId: string, timeRange: TimeRange) {
-    let oneDay = 1000 * 60 * 60 * 24;
     this._executionService
       .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
       .pipe(
