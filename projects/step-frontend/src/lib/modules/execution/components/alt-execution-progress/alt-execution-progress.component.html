@@ -1,7 +1,7 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
   @if (execution$ | async; as execution) {
     <div class="title">
-      <h3>
+      <h3 data-step-testid>
         @if (executionPlan$ | async; as plan) {
           <entity-icon
             entityName="plans"

@@ -12,20 +12,6 @@
 }
 
 step-plan-tree {
-  step-tree-node {
-    .tree-node.tree-node-selected-for-insert {
-      @include highlight-node(var.$blue-600);
-    }
-
-    &.dragover .tree-node {
-      @include highlight-node(var.$blue-600);
-      .node-content .node-name {
-        color: var.$blue-600;
-        font-weight: 500;
-      }
-    }
-  }
-
   display: flex;
   height: 100%;
 
@@ -35,6 +21,13 @@ step-plan-tree {
     padding-right: 6.5rem;
     &:hover {
       overflow: auto;
+    }
+  }
+
+  .node-container.empty-pseudo-node step-tree-node {
+    .tree-node .node-content step-tree-node-name {
+      border: dashed 0.1rem var.$muted;
+      min-width: 8rem;
     }
   }
 
@@ -65,6 +58,18 @@ step-plan-tree {
         .node-content .node-name.node-displayed {
           color: var.$blue-50 !important;
         }
+      }
+
+      &.tree-node-selected-for-insert {
+        @include highlight-node(var.$blue-600);
+      }
+    }
+
+    &.dragover .tree-node {
+      @include highlight-node(var.$blue-600);
+      .node-content .node-name {
+        color: var.$blue-600;
+        font-weight: 500;
       }
     }
 

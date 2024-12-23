@@ -116,8 +116,8 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   countExecutionsByStatus(status: string): Observable<number> {
     const runningFilter: FieldFilter = {
       field: 'status',
-      regex: true,
-      value: `^${status}$`,
+      regex: false,
+      value: `${status}`,
     };
     return this._tableApiWrapper
       .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })

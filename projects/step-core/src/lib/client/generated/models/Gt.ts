@@ -5,6 +5,5 @@
 import type { Filter } from './Filter';
 
 export type Gt = Filter & {
-  field?: string;
   value?: number;
 };

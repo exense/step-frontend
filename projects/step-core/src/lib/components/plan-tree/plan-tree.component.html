@@ -1,9 +1,11 @@
 <step-split>
   <step-split-area [size]="treeSize" (sizeChange)="handleTreeSizeChange($event)">
     <step-tree
+      stepDropAreaId="planTree"
       [dragDisabled]="isReadonly"
       (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
       (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
+      (externalObjectDrop)="externalObjectDrop.emit($event)"
     >
       <div *stepTreeNodeTemplate="let node" class="node-name" [class.node-displayed]="node.id === activeNode()?.id">
         <span>{{ node?.name }}</span>
@@ -16,16 +18,17 @@
         >
           <step-icon name="play-circle" />
         </button>
-        <button
-          *ngIf="!isReadonly"
-          class="actions-button"
-          type="button"
-          mat-flat-button
-          matTooltip="Show actions menu (right click)"
-          (click)="openTreeMenu($event, node.id)"
-        >
-          <step-icon name="more-horizontal" />
-        </button>
+        @if (!isReadonly && (node | treeNodeHasActions)) {
+          <button
+            class="actions-button"
+            type="button"
+            mat-flat-button
+            matTooltip="Show actions menu (right click)"
+            (click)="openTreeMenu($event, node.id)"
+          >
+            <step-icon name="more-horizontal" />
+          </button>
+        }
       </div>
     </step-tree>
   </step-split-area>
@@ -40,6 +43,14 @@
   >
     @if (activeNodeArtefact(); as selectedArtefact) {
       <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
+    }
+    @if (activeNodeChildContainer(); as childContainer) {
+      <step-artefact-child-container-settings
+        [name]="activeNode()?.name"
+        [childContainer]="childContainer"
+        [isReadonly]="isReadonly"
+        (save)="handlePlanChange()"
+      />
     }
   </step-split-area>
 </step-split>

@@ -30,4 +30,21 @@ step-plan-function-list {
     justify-content: space-between;
     min-height: 4rem;
   }
+
+  .entity-column-header,
+  .entity-column-cell {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .move {
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+    text-align: center;
+    step-icon {
+      cursor: grab;
+    }
+  }
 }

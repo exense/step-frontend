@@ -28,6 +28,7 @@ export enum PopoverMode {
 export class PopoverComponent {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
+  @Input() noPadding = false;
   @Input() mode = PopoverMode.BOTH;
 
   @Output() toggledEvent = new EventEmitter<boolean>();

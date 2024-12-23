@@ -1,4 +1,4 @@
-import { AbstractArtefact, DynamicValueInteger, DynamicValueString } from '@exense/step-core';
+import { AbstractArtefact, type ChildrenBlock, DynamicValueInteger, DynamicValueString } from '@exense/step-core';
 
 export interface ThreadGroupArtefact extends AbstractArtefact {
   users: DynamicValueInteger;
@@ -11,4 +11,6 @@ export interface ThreadGroupArtefact extends AbstractArtefact {
   localItem: DynamicValueString;
   userItem: DynamicValueString;
   item: DynamicValueString;
+  beforeThread?: ChildrenBlock;
+  afterThread?: ChildrenBlock;
 }

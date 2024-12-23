@@ -1,5 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { ArtefactService, ControllerService, ReportNode, TreeNode, TreeNodeUtilsService } from '@exense/step-core';
+import {
+  ArtefactNodeSource,
+  ArtefactService,
+  ControllerService,
+  ReportNode,
+  TreeNode,
+  TreeNodeUtilsService,
+} from '@exense/step-core';
 import { EXECUTION_TREE_PAGING_SETTINGS, ExecutionTreePagingService } from './execution-tree-paging.service';
 import { ReportTreeNode } from '../shared/report-tree-node';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -26,7 +33,34 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const isVisuallySkipped = false;
     const icon = this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = this.hasChildren(id);
-    const children = (item?.children || []).map((child) => this.convertItem(child, { parentId: id }));
+
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item);
+
+    const children = (item?.children || [])
+      .filter(
+        (child) => child.parentSource === ArtefactNodeSource.MAIN || child.parentSource === ArtefactNodeSource.SUB_PLAN,
+      )
+      .map((child) => this.convertItem(child, { parentId: id }));
+
+    if (beforeThreadContainer) {
+      children.unshift(beforeThreadContainer);
+    }
+
+    if (beforeContainer) {
+      children.unshift(beforeContainer);
+    }
+
+    if (afterThreadContainer) {
+      children.push(afterThreadContainer);
+    }
+
+    if (afterContainer) {
+      children.push(afterContainer);
+    }
+
     const iconClassName = `step-node-status-${item.status}`;
     return {
       id,
@@ -68,7 +102,9 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
     const nodeId = node.id;
     return this.loadNodes(nodeId).pipe(
       tap((children) => {
-        node.originalNode.children = children;
+        if (node.originalNode) {
+          node.originalNode.children = children;
+        }
       }),
       map((children) => children.length),
     );
@@ -113,5 +149,74 @@ export class ReportTreeNodeUtilsService implements TreeNodeUtilsService<ReportNo
         map((nodes) => nodes.filter((node) => node.resolvedArtefact !== null)),
         tap((nodes) => (this.hasChildrenFlags[nodeId] = nodes.length > 0)),
       );
+  }
+
+  getPathToNode(nodeId: string): Observable<string[]> {
+    return this._controllerService.getReportNodePath(nodeId).pipe(
+      map((nodes) => {
+        nodes.shift();
+
+        const nodesIds = nodes.reduce((res, node, i) => {
+          if (
+            i > 0 &&
+            node.parentSource !== ArtefactNodeSource.MAIN &&
+            node.parentSource !== ArtefactNodeSource.SUB_PLAN
+          ) {
+            const parent = nodes[i - 1];
+            const pseudoContainerId = `${node.parentSource}|${parent.id!}`;
+            res.push(pseudoContainerId);
+          }
+          res.push(node.id!);
+          return res;
+        }, [] as string[]);
+
+        return nodesIds;
+      }),
+    );
+  }
+
+  private createPseudoContainer(
+    nodeType: ArtefactNodeSource,
+    parentNode: ReportNodeWithChildren,
+  ): ReportTreeNode | undefined {
+    const parentId = parentNode?.id;
+    const childArtefacts = (parentNode.children ?? []).filter((child) => child.parentSource === nodeType);
+
+    if (!childArtefacts?.length) {
+      return undefined;
+    }
+    const id = `${nodeType}|${parentId}`;
+    let name = '';
+    switch (nodeType) {
+      case ArtefactNodeSource.BEFORE:
+        name = 'Before';
+        break;
+      case ArtefactNodeSource.BEFORE_THREAD:
+        name = 'Before Thread';
+        break;
+      case ArtefactNodeSource.AFTER_THREAD:
+        name = 'After Thread';
+        break;
+      case ArtefactNodeSource.AFTER:
+        name = 'After';
+        break;
+      default:
+        break;
+    }
+    const isSkipped = false;
+    const isVisuallySkipped = false;
+    const icon = 'chevron-left';
+    const children = (childArtefacts ?? []).map((child) => this.convertItem(child, { parentId: id }));
+    const expandable = true;
+    return {
+      id,
+      name,
+      isSkipped,
+      isVisuallySkipped,
+      icon,
+      children,
+      expandable,
+      parentId,
+    };
   }
 }
