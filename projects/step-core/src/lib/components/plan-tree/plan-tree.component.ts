@@ -1,29 +1,34 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   forwardRef,
   inject,
   Input,
+  output,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import { AbstractArtefact } from '../../client/generated';
 import {
-  ArtefactTreeNode,
   TreeAction,
   TreeActionsService,
   TreeComponent,
+  TreeNode,
   TreeStateService,
 } from '../../modules/tree/tree.module';
 import {
+  ArtefactNodeSource,
+  ArtefactTreeNode,
   PlanArtefactResolverService,
+  PlanEditorPersistenceStateService,
   PlanEditorService,
   PlanInteractiveSessionService,
   PlanTreeAction,
-  PlanEditorPersistenceStateService,
 } from '../../modules/plan-common';
+import { DropInfo } from '../../modules/drag-drop';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -49,6 +54,10 @@ export class PlanTreeComponent implements TreeActionsService {
 
   readonly activeNode = this._treeState.selectedNode;
   readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
+  readonly activeNodeChildContainer = computed(() => this.activeNode()?.childContainer);
+
+  /** @Output() **/
+  readonly externalObjectDrop = output<DropInfo>();
 
   @Input() isReadonly: boolean = false;
 
@@ -137,8 +146,9 @@ export class PlanTreeComponent implements TreeActionsService {
     });
   }
 
-  hasActionsForNode(node: ArtefactTreeNode): boolean {
-    return true;
+  hasActionsForNode(treeNode: TreeNode): boolean {
+    const node = this._treeState.findNodeById(treeNode?.id);
+    return node?.nodeType === undefined;
   }
 
   handleDoubleClick(node: ArtefactTreeNode, event: MouseEvent): void {
@@ -206,7 +216,10 @@ export class PlanTreeComponent implements TreeActionsService {
     this._planPersistenceState.setPanelSize(ARTEFACT_DETAILS_SIZE, size);
   }
 
-  private canOpenArtefact(artefact: AbstractArtefact): boolean {
+  private canOpenArtefact(artefact?: AbstractArtefact): boolean {
+    if (!artefact) {
+      return false;
+    }
     return ['CallPlan', 'CallKeyword'].includes(artefact._class);
   }
 }
