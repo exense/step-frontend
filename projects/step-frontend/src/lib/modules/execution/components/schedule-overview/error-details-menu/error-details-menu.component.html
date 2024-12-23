@@ -1,0 +1,10 @@
+<div class="container">
+  @for (execution of executions; track execution.id!) {
+    <span class="row" matTooltip="See Execution" (click)="jumpToExecution(execution.id!)">
+      <span
+        >{{ execution.description! }}
+        <span class="timestamp">({{ execution.startTime | date: DateFormat.DATE }})</span>
+      </span>
+    </span>
+  }
+</div>
