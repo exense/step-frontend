@@ -91,6 +91,7 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
 
 @NgModule({
   declarations: [
@@ -155,7 +156,6 @@ import { MatTooltip } from '@angular/material/tooltip';
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
-    ExecutionsChartTooltipComponent,
   ],
   imports: [
     StepCommonModule,

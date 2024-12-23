@@ -427,7 +427,7 @@ export class ScheduleOverviewComponent implements OnInit {
       numberOfBuckets: 1,
       oqlFilter: `attributes.taskId = ${taskId}`,
       groupDimensions: ['errorMessage', 'errorCode'],
-      collectAttributeKeys: ['status'],
+      collectAttributeKeys: ['status', 'executionId'],
       collectAttributesValuesLimit: 10,
     };
     this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
