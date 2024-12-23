@@ -44,6 +44,7 @@ interface TableErrorEntry {
   errorCode: string;
   count: number;
   percentage: number;
+  executionIds: string[];
   types: string[]; // can be more when using same error code/message
 }
 
@@ -449,6 +450,7 @@ export class ScheduleOverviewComponent implements OnInit {
               count: bucketCount,
               percentage: 0,
               overallPercentage: 0,
+              executionIds: bucket.attributes['executionId'] as string[],
               types: (bucket.attributes['status'] as string[]) || [],
             } as TableErrorEntry;
           }

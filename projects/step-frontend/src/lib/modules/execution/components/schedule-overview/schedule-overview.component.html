@@ -83,7 +83,12 @@
             <ng-container matColumnDef="errorMessage" stepSearchCol>
               <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
               <td mat-cell *matCellDef="let element">
-                {{ element.errorMessage }}
+                <span class="error-name" [matMenuTriggerFor]="menu">
+                  {{ element.errorMessage }}
+                </span>
+                <mat-menu #menu="matMenu">
+                  <step-error-details-menu [executionIds]="element.executionIds"></step-error-details-menu>
+                </mat-menu>
               </td>
             </ng-container>
             <ng-container matColumnDef="errorCode" stepSearchCol>

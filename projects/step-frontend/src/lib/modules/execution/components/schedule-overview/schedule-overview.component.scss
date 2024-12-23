@@ -88,3 +88,11 @@
     text-decoration: underline;
   }
 }
+
+.error-name {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

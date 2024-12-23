@@ -156,6 +156,8 @@ import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
+    ExecutionsChartTooltipComponent,
+    ErrorDetailsMenuComponent,
   ],
   imports: [
     StepCommonModule,
