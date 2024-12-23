@@ -21,11 +21,11 @@ import { debounceTime, map, startWith } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 
 @Component({
-  selector: 'step-aggregated-tree-node-details',
-  templateUrl: './aggregated-tree-node-details.component.html',
-  styleUrl: './aggregated-tree-node-details.component.scss',
+  selector: 'step-aggregated-tree-node-iteration-list',
+  templateUrl: './aggregated-tree-node-iteration-list.component.html',
+  styleUrl: './aggregated-tree-node-iteration-list.component.scss',
 })
-export class AggregatedTreeNodeDetailsComponent implements AfterViewInit {
+export class AggregatedTreeNodeIterationListComponent implements AfterViewInit {
   private _fb = inject(FormBuilder).nonNullable;
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);

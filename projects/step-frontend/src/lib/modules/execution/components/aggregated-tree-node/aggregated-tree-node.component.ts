@@ -22,26 +22,21 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
-  protected isHideInlineInfo = computed(() => {
-    const nodeId = this.nodeId();
-    const visibleInfos = this._treeState.visibleInfos();
-    return !!visibleInfos[nodeId];
-  });
-
-  protected toggleInfo(): void {
-    const node = this.node();
-    if (!node) {
-      return;
-    }
-    this._treeState.toggleInfo(node);
-  }
-
-  protected showAggregatedDetails(status?: Status): void {
+  protected showIterations(status?: Status): void {
     const nodeId = this.nodeId();
     if (!nodeId) {
       return;
     }
     this._treeState.selectNode(nodeId);
-    this._executionDialogs.openTreeNodeDetails(nodeId, status);
+    this._executionDialogs.openIterations(nodeId, status);
+  }
+
+  protected showAggregatedDetails(): void {
+    const nodeId = this.nodeId();
+    if (!nodeId) {
+      return;
+    }
+    this._treeState.selectNode(nodeId);
+    this._executionDialogs.openAggregatedDetails(nodeId);
   }
 }

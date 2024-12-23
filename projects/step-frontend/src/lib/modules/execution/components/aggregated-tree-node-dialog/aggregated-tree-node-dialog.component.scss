@@ -1,0 +1,14 @@
+.tree-node-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  step-btn-group {
+    font-size: 1.4rem;
+  }
+}
+
+div[step-modal-window-body] {
+  font-size: 1.4rem;
+}

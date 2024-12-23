@@ -49,7 +49,7 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
   openKeywordInTreeView = output<ReportNode>();
 
   protected openDetails(node: ReportNode): void {
-    this._dialogs.openReportNodeDetails(node);
+    this._dialogs.openIterationDetails(node);
   }
 
   protected clearTestCasesFilter(): void {

@@ -4,11 +4,11 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { catchError, map, of, switchMap } from 'rxjs';
 
 @Component({
-  selector: 'step-alt-keyword-inline-drilldown',
-  templateUrl: './alt-keyword-inline-drilldown.component.html',
-  styleUrl: './alt-keyword-inline-drilldown.component.scss',
+  selector: 'step-alt-report-node-details',
+  templateUrl: './alt-report-node-details.component.html',
+  styleUrl: './alt-report-node-details.component.scss',
 })
-export class AltKeywordInlineDrilldownComponent<R extends ReportNode = ReportNode> {
+export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
 
   readonly node = input.required<R>();

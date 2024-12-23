@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedExecutionsService,
   ExecutiontTaskParameters,
@@ -11,10 +11,11 @@ import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
 } from './aggregated-report-view-tree-state.service';
-import { map, Observable } from 'rxjs';
+import { from, map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
+import { AggregatedTreeNodeDialogMode } from '../components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -26,19 +27,22 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   private _executionId = inject(EXECUTION_ID);
 
-  openTreeNodeDetails(nodeId: string, nodeStatus?: Status): void {
+  openIterations(nodeId: string, nodeStatus?: Status): void {
     const node = this._treeState.findNodeById(nodeId)!;
     const itemsCounts = Object.values(node.countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1 && node.artefactHash) {
-      this.getSingleRunReportNode(node.artefactHash).subscribe((reportNode) => this.openReportNodeDetails(reportNode));
+      this.getSingleRunReportNode(node.artefactHash).subscribe((reportNode) => {
+        this._reportNodeDetails.setReportNode(reportNode);
+        this.navigateToIterationDetails(reportNode.id!, nodeId);
+      });
       return;
     }
-    this.navigateToTreeNodeDetails(nodeId, nodeStatus);
+    this.navigateToIterationList(nodeId, nodeStatus);
   }
 
-  openReportNodeDetails<T extends ReportNode>(reportNode: T): void {
+  openIterationDetails<T extends ReportNode>(reportNode: T): void {
     this._reportNodeDetails.setReportNode(reportNode);
-    this.navigateToReportNodeDetails(reportNode.id!);
+    this.navigateToIterationDetails(reportNode.id!);
   }
 
   openScheduler(task: ExecutiontTaskParameters): void {
@@ -48,19 +52,44 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     });
   }
 
-  private navigateToTreeNodeDetails(nodeId: string, nodeStatus?: Status): void {
-    this._router.navigate([{ outlets: { aggregatedNode: ['aggregated-info', nodeId], reportNode: [] } }], {
-      relativeTo: this._activatedRoute,
-      queryParams: { nodeStatus },
-      queryParamsHandling: 'merge',
+  openAggregatedDetails(aggregatedNodeId: string): void {
+    this.openNodeDetails({ aggregatedNodeId });
+  }
+
+  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status): void {
+    this.openNodeDetails({
+      aggregatedNodeId,
+      searchStatus,
+      mode: AggregatedTreeNodeDialogMode.ITERATION,
     });
   }
 
-  private navigateToReportNodeDetails(reportNodeId: string): void {
-    this._router.navigate([{ outlets: { reportNode: ['report-node', reportNodeId], aggregatedNode: [] } }], {
+  private navigateToIterationDetails(reportNodeId: string, aggregatedNodeId?: string): void {
+    this.openNodeDetails({
+      reportNodeId,
+      aggregatedNodeId,
+      mode: AggregatedTreeNodeDialogMode.ITERATION,
+    });
+  }
+
+  private openNodeDetails(queryParams: Params): void {
+    const isDetailsOpened = this._router.url.includes('node-details');
+    const closePrevious$ = isDetailsOpened ? this.closeNodeDetails() : of(undefined);
+    closePrevious$.subscribe(() => {
+      this._router.navigate([{ outlets: { nodeDetails: ['node-details'] } }], {
+        relativeTo: this._activatedRoute,
+        queryParams,
+        queryParamsHandling: 'merge',
+      });
+    });
+  }
+
+  private closeNodeDetails(): Observable<unknown> {
+    const closePromise = this._router.navigate([{ outlets: { nodeDetails: null } }], {
       relativeTo: this._activatedRoute,
       queryParamsHandling: 'merge',
     });
+    return from(closePromise);
   }
 
   private getSingleRunReportNode(artefactHash: string): Observable<ReportNode> {
