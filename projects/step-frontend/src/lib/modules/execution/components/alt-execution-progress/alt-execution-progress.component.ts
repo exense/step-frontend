@@ -1,10 +1,8 @@
 import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
 import {
   combineLatest,
   distinctUntilChanged,
-  filter,
   map,
   of,
   pairwise,
@@ -41,6 +39,7 @@ import {
   TreeStateService,
   ViewRegistryService,
   PopoverMode,
+  IncludeTestcases,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -59,8 +58,8 @@ import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-r
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 import { KeyValue } from '@angular/common';
-import { RepoRefHolderService } from '../../services/repo-ref-holder.service';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
+import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -152,7 +151,7 @@ interface DateRangeExt extends DateRange {
 export class AltExecutionProgressComponent
   implements OnInit, OnDestroy, AltExecutionStateService, SchedulerInvokerService
 {
-  private _activeExecutions = inject(ActiveExecutionsService);
+  private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
@@ -168,7 +167,6 @@ export class AltExecutionProgressComponent
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
-  private _repoRefHolder = inject(RepoRefHolderService);
 
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
@@ -229,26 +227,9 @@ export class AltExecutionProgressComponent
     });
   }
 
-  readonly executionId$ = this._activatedRoute.params.pipe(
-    map((params) => params?.['id'] as string),
-    filter((id) => !!id),
-    takeUntilDestroyed(),
-  );
-
-  readonly activeExecution$ = this.executionId$.pipe(map((id) => this._activeExecutions.getActiveExecution(id)));
-
-  readonly execution$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  /**
-   * todo: Rather a temporary solution. Make sense to refactor execution state services to be defined as route providers
-   * **/
-  private syncRepoRef = this.execution$
-    .pipe(map((execution) => execution.executionParameters?.repositoryObject))
-    .subscribe((repoRef) => this._repoRefHolder.repoRef.set(repoRef));
+  readonly executionId$ = this._activeExecutionContext.executionId$;
+  readonly activeExecution$ = this._activeExecutionContext.activeExecution$;
+  readonly execution$ = this._activeExecutionContext.execution$;
 
   readonly executionPlan$ = this.execution$.pipe(
     map((execution) => execution.planId),
@@ -317,6 +298,25 @@ export class AltExecutionProgressComponent
     map((testCases) => (!testCases?.length ? undefined : testCases)),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  protected testCasesForRelaunch$ = this.testCases$.pipe(
+    map((testCases) => {
+      const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
+      if (list?.length === testCases?.length) {
+        return undefined;
+      }
+      return list;
+    }),
+    map((list) => {
+      if (!list?.length) {
+        return undefined;
+      }
+      return {
+        list,
+        by: 'id',
+      } as IncludeTestcases;
+    }),
   );
 
   private testCasesDataSource?: TableDataSource<ReportNode>;
@@ -441,8 +441,7 @@ export class AltExecutionProgressComponent
   }
 
   manualRefresh(): void {
-    const executionId = this._activatedRoute.snapshot.params['id'];
-    this._activeExecutions.getActiveExecution(executionId)?.manualRefresh();
+    this._activeExecutionContext.manualRefresh();
   }
 
   private applyDefaultRange(execution: Execution, useStorage = false): void {
