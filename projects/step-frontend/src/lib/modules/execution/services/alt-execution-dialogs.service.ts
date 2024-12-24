@@ -87,7 +87,6 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private closeNodeDetails(): Observable<unknown> {
     const closePromise = this._router.navigate([{ outlets: { nodeDetails: null } }], {
       relativeTo: this._activatedRoute,
-      queryParamsHandling: 'merge',
     });
     return from(closePromise);
   }
