@@ -92,6 +92,7 @@ import { TooltipContentDirective } from '../timeseries/modules/chart/components/
 import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
+import { TimeRangePickerComponent } from '../timeseries/modules/_common';
 
 @NgModule({
   declarations: [
@@ -173,6 +174,7 @@ import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-
     MatTooltip,
     TooltipContentDirective,
     DatePipe,
+    TimeRangePickerComponent,
   ],
   exports: [
     ExecutionListComponent,
