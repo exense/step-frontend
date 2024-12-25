@@ -108,7 +108,6 @@ export class ScheduleOverviewComponent implements OnInit {
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
     let selection = this.activeTimeRangeSelection();
-    console.log('COMPUTED CALLED', selection);
     if (selection) {
       return this.calculateTimeRange(selection);
     } else {
