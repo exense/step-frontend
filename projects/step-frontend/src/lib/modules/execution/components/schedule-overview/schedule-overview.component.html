@@ -71,6 +71,11 @@
           </step-timeseries-chart>
         }
       </step-alt-report-widget-content>
+      <step-alt-report-widget-content>
+        @if (testCasesChartSettings) {
+          <step-timeseries-chart [settings]="testCasesChartSettings"> </step-timeseries-chart>
+        }
+      </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
 </section>

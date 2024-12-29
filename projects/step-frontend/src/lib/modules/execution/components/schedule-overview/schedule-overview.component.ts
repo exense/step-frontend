@@ -25,7 +25,7 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeseriesColorsPool, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime, Duration } from 'luxon';
@@ -83,6 +83,7 @@ export class ScheduleOverviewComponent implements OnInit {
   private _dateUtils = inject(DateUtilsService);
   private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
+  private colorsPool = new TimeseriesColorsPool();
 
   readonly RELATIVE_TIME_RANGES: TimeOption[] = [
     { label: 'Last day', value: { isRelative: true, msFromNow: TimeUnit.DAY } },
@@ -115,6 +116,7 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
+  testCasesChartSettings?: TSChartSettings;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   lastKeywordsExecutions: Execution[] = [];
@@ -147,6 +149,7 @@ export class ScheduleOverviewComponent implements OnInit {
       this.createPieChart(task.id!, fullRange);
       this.createExecutionsChart(task.id!, fullRange);
       this.createKeywordsChart(task.id!, fullRange);
+      this.createTestCasesChart(task.id!, fullRange);
       this.createErrorsChart(task.id!, fullRange);
       this.fetchLastExecution(task.id!);
     });
@@ -419,6 +422,69 @@ export class ScheduleOverviewComponent implements OnInit {
     this.relativeTime = time;
     let now = DateTime.now();
     this.updateRange({ start: now.minus({ millisecond: time }), end: now });
+  }
+
+  private createTestCasesChart(taskId: string, timeRange: TimeRange) {
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      oqlFilter: `attributes.taskId = ${taskId} and attributes.type = TestCase`,
+      groupDimensions: ['artefactHash', 'name'],
+      // collectAttributeKeys: ['status', 'executionId'],
+      // collectAttributesValuesLimit: 10,
+    };
+
+    this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
+      const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+      let series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
+        const keyAttributes: Record<string, any> = response.matrixKeys[i];
+        const artefactHash = keyAttributes['artefactHash'];
+        const seriesName = keyAttributes['name'];
+        const seriesData: (number | undefined | null)[] = [];
+        seriesBuckets.forEach((b, i) => {
+          let value = b?.count || 0;
+          seriesData[i] = value;
+        });
+        const color = this.colorsPool.getSeriesColor(seriesName).color;
+        const fill = color + 'cc';
+        const s: TSChartSeries = {
+          id: `${seriesName}-${artefactHash}`,
+          scale: 'y',
+          labelItems: [seriesName],
+          legendName: seriesName,
+          data: seriesData,
+          width: 1,
+          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          stroke: color,
+          fill: fill,
+          paths: this.bars,
+          points: { show: false },
+          show: true,
+        };
+        return s;
+      });
+      const axes: Axis[] = [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals.map((v: any) => v);
+          },
+        },
+      ];
+      this.testCasesChartSettings = {
+        title: 'Test Cases',
+        showLegend: false,
+        showDefaultLegend: true,
+        xAxesSettings: {
+          values: xLabels,
+        },
+        tooltipOptions: { enabled: false },
+        series: series,
+        axes: axes,
+      };
+    });
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
