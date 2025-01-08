@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { GridsterConfig } from 'angular-gridster2';
 
 @Component({
@@ -33,23 +33,28 @@ export class AltExecutionReportComponent {
 
   protected readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
   protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
-  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!!testCases?.length));
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   protected readonly _mode = inject(VIEW_MODE);
 
-  gridOptions: GridsterConfig = {
-    gridType: 'verticalFixed',
-    displayGrid: 'onDrag&Resize',
-    draggable: { enabled: true, dragHandleClass: 'drag-icon', ignoreContent: true },
-    resizable: { enabled: false },
-    margin: 12,
-    minCols: 4,
-    maxCols: 4,
-    minRows: 4,
-    maxRows: 4,
-    fixedRowHeight: 450,
-    pushItems: true,
-  };
+  protected readonly gridSettings$: Observable<GridsterConfig> = this.hasTestCases$.pipe(
+    map((hasTestCases) => {
+      return {
+        gridType: 'verticalFixed',
+        displayGrid: 'onDrag&Resize',
+        compactType: 'compactUp',
+        draggable: { enabled: true, dragHandleClass: 'drag-icon', ignoreContent: true },
+        resizable: { enabled: false },
+        margin: 12,
+        minCols: 4,
+        maxCols: 4,
+        minRows: 4,
+        maxRows: 4,
+        fixedRowHeight: 450,
+        pushItems: true,
+      };
+    }),
+  );
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;

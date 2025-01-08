@@ -72,9 +72,10 @@ step-alt-execution-report {
     flex-direction: row;
     align-items: center;
     gap: 0.8rem;
-    right: 1rem;
-    top: 1rem;
+    right: 0;
+    top: 0;
     z-index: 99999;
+    transform: scale(0.4);
 
     .icon {
       cursor: pointer;
