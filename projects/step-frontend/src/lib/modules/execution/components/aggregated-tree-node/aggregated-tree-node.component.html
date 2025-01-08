@@ -11,6 +11,9 @@
         }
       </div>
     }
+    @case (AggregateTreeNodeType.PSEUDO_CONTAINER) {
+      {{ node?.name }}
+    }
     @default {}
   }
 }

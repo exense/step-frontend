@@ -52,6 +52,12 @@ export const $AbstractArtefact = {
     continueParentNodeExecutionOnError: {
       type: 'DynamicValueBoolean',
     },
+    before: {
+      type: 'ChildrenBlock',
+    },
+    after: {
+      type: 'ChildrenBlock',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

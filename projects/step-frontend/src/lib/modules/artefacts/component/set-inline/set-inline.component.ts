@@ -28,8 +28,8 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
     return of(
       this.convert(
         [
-          ['Key', info?.originalArtefact.key],
-          ['Value', info?.originalArtefact.value],
+          ['Key', info?.originalArtefact!.key],
+          ['Value', info?.originalArtefact!.value],
         ],
         isResolved,
       ),
