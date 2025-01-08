@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { DashboardViewSettingsBtnLocation } from '../../../timeseries/components/dashboard/dashboard-view-settings-btn-location';
 
 @Component({
   selector: 'step-alt-execution-analytics',

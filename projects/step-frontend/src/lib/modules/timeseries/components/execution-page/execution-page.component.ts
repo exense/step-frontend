@@ -21,6 +21,8 @@ import {
 } from '@exense/step-core';
 import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
+import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 
 @Component({
   selector: 'step-execution-page',
@@ -42,6 +44,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);
+  readonly isNewMode = inject(ExecutionViewModeService).mode;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -55,6 +58,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   private _asyncTaskService = inject(AsyncTasksService);
 
   private _destroyRef = inject(DestroyRef);
+
+  readonly SETTINGS_BTN_LOCATION = DashboardViewSettingsBtnLocation;
 
   ngOnInit(): void {
     if (!this.execution) {

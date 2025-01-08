@@ -1,1 +1,3 @@
-<step-execution-page [execution]="(_state.execution$ | async)!" />
+@if (_state.execution$ | async) {
+  <step-execution-page [execution]="(_state.execution$ | async)!" />
+}
