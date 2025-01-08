@@ -4,7 +4,7 @@
     style="background-color: white; width: 100%; overflow-y: visible; overflow-x: unset"
   >
     @if (hasTestCases$ | async) {
-      <gridster-item [item]="{ x: 0, y: 0, cols: 2, rows: 2 }">
+      <gridster-item [item]="{ x: 0, y: 0, cols: 1, rows: 1 }">
         <div class="widget">
           <div class="icons">
             <step-icon name="move" class="drag-icon" />
@@ -14,7 +14,7 @@
           }
         </div>
       </gridster-item>
-      <gridster-item [item]="{ x: 2, y: 0, cols: 4, rows: 2 }">
+      <gridster-item [item]="{ x: 1, y: 0, cols: 3, rows: 1 }">
         <div class="widget">
           <div class="icons">
             <step-icon name="move" class="drag-icon" />
@@ -25,7 +25,7 @@
         </div>
       </gridster-item>
     }
-    <gridster-item [item]="{ x: 0, y: 2, cols: 2, rows: 2 }">
+    <gridster-item [item]="{ x: 0, y: 1, cols: 1, rows: 1 }">
       <div class="widget">
         <div class="icons">
           <step-icon name="move" class="drag-icon" />
@@ -36,7 +36,7 @@
       </div>
     </gridster-item>
     @if (_mode === ViewMode.VIEW) {
-      <gridster-item [item]="{ x: 2, y: 2, cols: 4, rows: 2 }">
+      <gridster-item [item]="{ x: 1, y: 1, cols: 3, rows: 1 }">
         <div class="widget">
           <div class="icons">
             <step-icon name="move" class="drag-icon" />
@@ -45,7 +45,7 @@
         </div>
       </gridster-item>
     }
-    <gridster-item [item]="{ x: 0, y: 4, cols: 4, rows: 2 }">
+    <gridster-item [item]="{ x: 0, y: 2, cols: 3, rows: 1 }">
       <div class="widget">
         <div class="icons">
           <step-icon name="move" class="drag-icon" />
@@ -63,7 +63,7 @@
     </gridster-item>
 
     @if (_state.currentOperations$ | async; as currentOperations) {
-      <gridster-item [item]="{ x: 4, y: 4, cols: 2, rows: 2 }">
+      <gridster-item [item]="{ x: 3, y: 3, cols: 1, rows: 1 }">
         <div class="widget">
           <div class="icons">
             <step-icon name="move" class="drag-icon" />

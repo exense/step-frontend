@@ -33,22 +33,21 @@ export class AltExecutionReportComponent {
 
   protected readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
   protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
-  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!!testCases?.length));
 
   protected readonly _mode = inject(VIEW_MODE);
 
   gridOptions: GridsterConfig = {
     gridType: 'verticalFixed',
     displayGrid: 'onDrag&Resize',
-    compactType: 'compactUp',
     draggable: { enabled: true, dragHandleClass: 'drag-icon', ignoreContent: true },
     resizable: { enabled: false },
     margin: 12,
-    minCols: 6,
-    maxCols: 6,
-    minRows: 6,
-    maxRows: 6,
-    fixedRowHeight: 220,
+    minCols: 4,
+    maxCols: 4,
+    minRows: 4,
+    maxRows: 4,
+    fixedRowHeight: 450,
     pushItems: true,
   };
 
