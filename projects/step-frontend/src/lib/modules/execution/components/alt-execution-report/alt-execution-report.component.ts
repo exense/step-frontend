@@ -6,6 +6,7 @@ import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-st
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { map } from 'rxjs';
+import { GridsterConfig } from 'angular-gridster2';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -35,6 +36,21 @@ export class AltExecutionReportComponent {
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   protected readonly _mode = inject(VIEW_MODE);
+
+  gridOptions: GridsterConfig = {
+    gridType: 'verticalFixed',
+    displayGrid: 'onDrag&Resize',
+    compactType: 'compactUp',
+    draggable: { enabled: true, dragHandleClass: 'drag-icon', ignoreContent: true },
+    resizable: { enabled: false },
+    margin: 12,
+    minCols: 6,
+    maxCols: 6,
+    minRows: 6,
+    maxRows: 6,
+    fixedRowHeight: 220,
+    pushItems: true,
+  };
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;

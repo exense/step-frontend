@@ -88,6 +88,7 @@ import { ExecutionCommandsDirective } from './directives/execution-commands.dire
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { RepoRefHolderService } from './services/repo-ref-holder.service';
+import { GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
 
 @NgModule({
   declarations: [
@@ -156,7 +157,15 @@ import { RepoRefHolderService } from './services/repo-ref-holder.service';
     AggregatedTreeNodeDetailsComponent,
     AggregatedTreeNodeInfoComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    GridsterItemComponent,
+    GridsterComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,

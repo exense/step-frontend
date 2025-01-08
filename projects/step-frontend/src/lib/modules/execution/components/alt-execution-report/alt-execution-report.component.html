@@ -1,30 +1,78 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
-  @if (hasTestCases$ | async) {
-    @if (testCasesSummary$ | async; as testCasesSummary) {
-      <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+  <gridster
+    [options]="gridOptions"
+    style="background-color: white; width: 100%; overflow-y: visible; overflow-x: unset"
+  >
+    @if (hasTestCases$ | async) {
+      <gridster-item [item]="{ x: 0, y: 0, cols: 2, rows: 2 }">
+        <div class="widget">
+          <div class="icons">
+            <step-icon name="move" class="drag-icon" />
+          </div>
+          @if (testCasesSummary$ | async; as testCasesSummary) {
+            <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+          }
+        </div>
+      </gridster-item>
+      <gridster-item [item]="{ x: 2, y: 0, cols: 4, rows: 2 }">
+        <div class="widget">
+          <div class="icons">
+            <step-icon name="move" class="drag-icon" />
+          </div>
+          @if (_state.testCases$ | async) {
+            <step-alt-report-nodes-testcases />
+          }
+        </div>
+      </gridster-item>
     }
-    @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
+    <gridster-item [item]="{ x: 0, y: 2, cols: 2, rows: 2 }">
+      <div class="widget">
+        <div class="icons">
+          <step-icon name="move" class="drag-icon" />
+        </div>
+        @if (keywordsSummary$ | async; as keywordsSummary) {
+          <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
+        }
+      </div>
+    </gridster-item>
+    @if (_mode === ViewMode.VIEW) {
+      <gridster-item [item]="{ x: 2, y: 2, cols: 4, rows: 2 }">
+        <div class="widget">
+          <div class="icons">
+            <step-icon name="move" class="drag-icon" />
+          </div>
+          <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />
+        </div>
+      </gridster-item>
     }
-  }
-  @if (keywordsSummary$ | async; as keywordsSummary) {
-    <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
-  }
-  @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />
-  }
-  @if (_state.executionId$ | async; as executionId) {
-    <step-alt-report-performance-overview-chart
-      [executionId]="executionId"
-      [timeRange]="(_state.timeRange$ | async)!"
-      (timeRangeChange)="_state.updateRange($event)"
-      [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
-      (fullRange)="_state.selectFullRange()"
-    />
-  }
-  @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations [operations]="currentOperations" />
-  }
+    <gridster-item [item]="{ x: 0, y: 4, cols: 4, rows: 2 }">
+      <div class="widget">
+        <div class="icons">
+          <step-icon name="move" class="drag-icon" />
+        </div>
+        @if (_state.executionId$ | async; as executionId) {
+          <step-alt-report-performance-overview-chart
+            [executionId]="executionId"
+            [timeRange]="(_state.timeRange$ | async)!"
+            (timeRangeChange)="_state.updateRange($event)"
+            [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
+            (fullRange)="_state.selectFullRange()"
+          />
+        }
+      </div>
+    </gridster-item>
+
+    @if (_state.currentOperations$ | async; as currentOperations) {
+      <gridster-item [item]="{ x: 4, y: 4, cols: 2, rows: 2 }">
+        <div class="widget">
+          <div class="icons">
+            <step-icon name="move" class="drag-icon" />
+          </div>
+          <step-alt-report-current-operations [operations]="currentOperations" />
+        </div>
+      </gridster-item>
+    }
+  </gridster>
   @if (_mode === ViewMode.PRINT) {
     <div class="print-footer"></div>
   }
