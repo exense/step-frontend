@@ -4,7 +4,7 @@ import { FindReferencesResponse, ReferencesService } from '../../../../client/st
 import { TableFetchLocalDataSource } from '../../../table/table.module';
 import { StepBasicsModule, IsUsedBySearchType, ProjectNamePipe } from '../../../basics/step-basics.module';
 import { TableModule } from '../../../table/table.module';
-import { PlanLinkComponent } from '../../../plan-common';
+import { PLAN_COMMON_EXPORTS } from '../../../plan-common';
 import { EntityModule } from '../../../entity/entity.module';
 import { KeywordsCommonModule } from '../../../keywords-common/keywords-common.module';
 import { NavigationStart, Router } from '@angular/router';
@@ -23,7 +23,7 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
   selector: 'step-is-used-by-list',
   templateUrl: './is-used-by-list.component.html',
   styleUrls: ['./is-used-by-list.component.scss'],
-  imports: [StepBasicsModule, TableModule, PlanLinkComponent, KeywordsCommonModule, EntityModule],
+  imports: [StepBasicsModule, TableModule, PLAN_COMMON_EXPORTS, KeywordsCommonModule, EntityModule],
   providers: [ProjectNamePipe],
   standalone: true,
 })

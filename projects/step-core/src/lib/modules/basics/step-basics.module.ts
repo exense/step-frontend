@@ -64,6 +64,7 @@ import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 import { StatusIconPipe } from './pipes/status-icon.pipe';
+import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -128,6 +129,7 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
+    DynamicInputWidthDirective,
   ],
   exports: [
     CommonModule,
@@ -195,6 +197,7 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
+    DynamicInputWidthDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -314,3 +317,4 @@ export * from './injectables/time-converters-factory.service';
 export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
+export * from './directives/dynamic-input-width.directive';

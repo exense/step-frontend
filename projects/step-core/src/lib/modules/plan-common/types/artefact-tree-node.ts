@@ -1,4 +1,4 @@
-import { TreeNode } from '../../tree/tree.module';
+import { TreeNode } from '../../tree';
 import { AbstractArtefact, ChildrenBlock } from '../../../client/generated';
 import { ArtefactNodeSource } from './artefact-node-source.enum';
 

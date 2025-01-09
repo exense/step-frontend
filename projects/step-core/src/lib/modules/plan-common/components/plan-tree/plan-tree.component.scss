@@ -24,14 +24,14 @@ step-plan-tree {
     }
   }
 
-  .node-container.empty-pseudo-node step-tree-node {
+  step-tree-node-draggable.step-tree-node-container.empty-pseudo-node {
     .tree-node .node-content step-tree-node-name {
       border: dashed 0.1rem var.$muted;
       min-width: 8rem;
     }
   }
 
-  step-tree-node {
+  step-tree-node-draggable {
     .tree-node {
       .node-content .node-name {
         display: flex;

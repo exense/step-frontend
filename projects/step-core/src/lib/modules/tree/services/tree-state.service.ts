@@ -1,9 +1,9 @@
 import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { TreeNode } from '../shared/tree-node';
+import { TreeNode } from '../types/tree-node';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
-import { TreeStateInitOptions } from '../shared/tree-state-init-options.interface';
+import { TreeStateInitOptions } from '../types/tree-state-init-options.interface';
 import { TreeFlattenerService } from './tree-flattener.service';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
@@ -203,12 +203,14 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   notifyPotentialInsert?(potentialParentId: string): void;
   notifyInsertionComplete?(): void;
 
-  insertSelectedNodesTo(
+  insertNodesTo(
+    insertCandidatesIds: string[],
     newParentId: string,
     insertParams?: { insertAtFirstPosition?: boolean; insertAfterSiblingId?: string },
   ): void {
-    const selectedNodeIds = this.selectedNodeIdsInternal().filter((nodeId) => nodeId !== this.rootNode()?.id);
-    if (selectedNodeIds.length === 0) {
+    const { accessCache } = this.treeData();
+    const nodesIds = insertCandidatesIds.filter((nodeId) => nodeId !== this.rootNode()?.id && accessCache.has(nodeId));
+    if (nodesIds.length === 0) {
       return;
     }
 
@@ -217,8 +219,8 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return;
     }
 
-    const nodesToAdd = selectedNodeIds.map((nodeId) => this.findNodeById(nodeId)).filter((x) => !!x) as N[];
-    const children = ([...parent.children!] as N[]).filter((child) => !selectedNodeIds.includes(child.id));
+    const nodesToAdd = nodesIds.map((nodeId) => this.findNodeById(nodeId)).filter((x) => !!x) as N[];
+    const children = ([...parent.children!] as N[]).filter((child) => !nodesIds.includes(child.id));
 
     if (!insertParams) {
       children.push(...nodesToAdd);
@@ -242,14 +244,15 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
-  canInsertTo(nodeId: string): boolean {
-    const nodesIds = this.selectedNodeIdsInternal().filter((nodeId) => nodeId !== this.rootNode()?.id);
+  canInsertTo(insertCandidatesIds: string[], newParentId: string): boolean {
+    const { accessCache } = this.treeData();
+    const nodesIds = insertCandidatesIds.filter((nodeId) => nodeId !== this.rootNode()?.id && accessCache.has(nodeId));
 
     if (nodesIds.length === 0) {
       return false;
     }
 
-    return this.isPossibleToInsert(nodeId, nodesIds);
+    return this.isPossibleToInsert(newParentId, nodesIds);
   }
 
   moveSelectedNodesIn(direction: 'prevSibling' | 'nextSibling'): void {
