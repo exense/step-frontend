@@ -3,8 +3,6 @@
 
 step-alt-execution-tree {
   display: block;
-  height: 60vh;
-  max-height: 60vh;
 
   @include core.reportNodeStatuses;
 

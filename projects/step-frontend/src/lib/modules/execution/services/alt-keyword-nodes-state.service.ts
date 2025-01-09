@@ -1,7 +1,7 @@
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import { AltReportNodesStateService } from './alt-report-nodes-state.service';
-import { FetchBucketsRequest, ReportNode, TimeSeriesService } from '@exense/step-core';
+import { FetchBucketsRequest, TimeSeriesService } from '@exense/step-core';
 import {
   BehaviorSubject,
   distinctUntilChanged,
@@ -23,10 +23,6 @@ export class AltKeywordNodesStateService extends AltReportNodesStateService impl
   }
 
   private _timeSeriesService = inject(TimeSeriesService);
-
-  private visibleDetailsInternal = signal<Record<string, boolean>>({});
-
-  readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
 
   private summaryInProgressInternal$ = new BehaviorSubject(false);
   override readonly summaryInProgress$ = this.summaryInProgressInternal$.pipe(distinctUntilChanged());
@@ -72,13 +68,5 @@ export class AltKeywordNodesStateService extends AltReportNodesStateService impl
 
   ngOnDestroy(): void {
     this.summaryInProgressInternal$.complete();
-  }
-
-  toggleDetail(node: ReportNode): void {
-    const isVisible = !!this.visibleDetailsInternal()[node.id!];
-    this.visibleDetailsInternal.update((value) => ({
-      ...value,
-      [node.id!]: !isVisible,
-    }));
   }
 }
