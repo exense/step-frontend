@@ -430,6 +430,7 @@ export class ScheduleOverviewComponent implements OnInit {
       end: timeRange.to,
       oqlFilter: `attributes.taskId = ${taskId} and attributes.type = TestCase`,
       groupDimensions: ['artefactHash', 'name'],
+      numberOfBuckets: 1,
       // collectAttributeKeys: ['status', 'executionId'],
       // collectAttributesValuesLimit: 10,
     };

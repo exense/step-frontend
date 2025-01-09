@@ -71,15 +71,19 @@
           </step-timeseries-chart>
         }
       </step-alt-report-widget-content>
-      <step-alt-report-widget-content>
-        @if (testCasesChartSettings) {
-          <step-timeseries-chart [settings]="testCasesChartSettings"> </step-timeseries-chart>
-        }
-      </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
+  @if (testCasesChartSettings) {
+    <div class="row">
+      <step-alt-report-widget class="flex-grow-1">
+        <step-alt-report-widget-content>
+          <step-timeseries-chart [settings]="testCasesChartSettings"></step-timeseries-chart>
+        </step-alt-report-widget-content>
+      </step-alt-report-widget>
+    </div>
+  }
 </section>
-<section>
+<div class="row">
   <step-alt-report-widget class="flex-grow-1" title="Errors">
     <step-alt-report-widget-content style="height: 100%">
       <div class="widget">
@@ -127,4 +131,4 @@
       </div>
     </step-alt-report-widget-content>
   </step-alt-report-widget>
-</section>
+</div>
