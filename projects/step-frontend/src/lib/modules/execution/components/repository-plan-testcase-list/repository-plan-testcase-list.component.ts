@@ -1,16 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  DestroyRef,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, computed, effect, forwardRef, inject, input, model, OnInit, output } from '@angular/core';
 import {
   BulkSelectionType,
   ControllerService,
@@ -22,9 +10,9 @@ import {
   TableFetchLocalDataSource,
   TestRunStatus,
 } from '@exense/step-core';
-import { BehaviorSubject, combineLatest, filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
+import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -39,18 +27,22 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
     }),
   ],
 })
-export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, OnDestroy {
-  private _cd = inject(ChangeDetectorRef);
-  private _destroyRef = inject(DestroyRef);
-  readonly _controllerService = inject(ControllerService);
-  readonly _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);
+export class RepositoryPlanTestcaseListComponent implements OnInit {
+  private _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);
+  readonly selectionCollector = this._selectionCollector;
 
-  @Input() repoRef?: RepositoryObjectReference;
-  @Output() includedTestCasesChange = new EventEmitter<IncludeTestcases>();
+  private _controllerService = inject(ControllerService);
 
-  readonly selectionType$ = new BehaviorSubject<BulkSelectionType>(BulkSelectionType.NONE);
+  /** @Input() **/
+  readonly repoRef = input<RepositoryObjectReference | undefined>(undefined);
 
-  readonly searchableRepositoryReport = new TableFetchLocalDataSource<TestRunStatus, RepositoryObjectReference>(
+  private selected = toSignal(this._selectionCollector.selected$);
+  readonly selectionType = model(BulkSelectionType.NONE);
+
+  /** @Output **/
+  readonly includedTestCasesChange = output<IncludeTestcases>();
+
+  readonly dataSource = new TableFetchLocalDataSource<TestRunStatus, RepositoryObjectReference>(
     (request) => this.getTestRuns(request),
     TableFetchLocalDataSource.configBuilder<TestRunStatus>()
       .addSearchStringRegexPredicate('status', (item) => item.status)
@@ -58,47 +50,42 @@ export class RepositoryPlanTestcaseListComponent implements OnInit, OnChanges, O
       .build(),
   );
 
-  readonly statusItems$ = this.searchableRepositoryReport.allData$.pipe(
-    map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique)),
+  protected statusItems = toSignal(
+    this.dataSource.allData$.pipe(
+      map((testRunStatusList) =>
+        testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique),
+      ),
+    ),
+    { initialValue: [] },
   );
 
-  ngOnInit(): void {
-    combineLatest([this.selectionType$, this._selectionCollector.selected$])
-      .pipe(
-        map(([selectionType, ids]) => {
-          const list = ids as string[];
-          let by: IncludeTestcases['by'] = this.repoRef?.repositoryID === 'local' ? 'id' : 'name';
-          by = selectionType === BulkSelectionType.ALL ? 'all' : by;
-          return { by, list } as IncludeTestcases;
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((includedTestCases) => this.includedTestCasesChange.emit(includedTestCases));
+  private effectEmitTestCases = effect(() => {
+    const includedTestCases = this.includedTestCases();
+    this.includedTestCasesChange.emit(includedTestCases);
+  });
 
-    this.searchableRepositoryReport.allData$
+  readonly includedTestCases = computed(() => {
+    const repoRef = this.repoRef();
+    const list = this.selected() as string[];
+    const selectionType = this.selectionType();
+
+    let by: IncludeTestcases['by'] = repoRef?.repositoryID === 'local' ? 'id' : 'name';
+    by = selectionType === BulkSelectionType.ALL ? 'all' : by;
+    return { by, list } as IncludeTestcases;
+  });
+
+  private effectReloadTable = effect(() => {
+    const repoRef = this.repoRef();
+    this.dataSource.reload({ request: repoRef });
+  });
+
+  ngOnInit(): void {
+    this.dataSource.allData$
       .pipe(
         filter((items) => !!items.length),
         take(1),
       )
-      .subscribe((items) => {
-        this.selectionType$.next(BulkSelectionType.ALL);
-      });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const cRepoRef = changes['repoRef'];
-    if (cRepoRef?.previousValue !== cRepoRef?.currentValue || cRepoRef?.firstChange) {
-      this.searchableRepositoryReport.reload({ request: cRepoRef?.currentValue });
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.selectionType$.complete();
-  }
-
-  handleSelectionTypeChange(selectionType: BulkSelectionType): void {
-    this.selectionType$.next(selectionType);
-    this._cd.detectChanges();
+      .subscribe((_) => this.selectionType.set(BulkSelectionType.ALL));
   }
 
   private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[]> {

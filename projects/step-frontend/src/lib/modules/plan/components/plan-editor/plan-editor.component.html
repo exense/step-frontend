@@ -1,7 +1,7 @@
 <step-plan-editor-base
   stepPlanEditorKeyHandler
   [initialPlanContext]="initialPlanContext$ | async"
-  (scheduleTask)="handleTaskSchedule($event)"
+  (runPlan)="launchPlan()"
 >
   <step-plan-editor-attributes>
     <step-custom-forms

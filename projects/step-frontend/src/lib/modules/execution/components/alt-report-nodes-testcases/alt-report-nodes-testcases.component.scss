@@ -12,6 +12,33 @@ step-table {
   flex: 1;
 }
 
-.name {
+.actions {
+  gap: 1rem;
+  margin-right: 1rem;
+  & > button {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.operations {
   width: 100%;
+}
+
+.name {
+  white-space: nowrap;
+}
+
+.test-case-name {
+  cursor: pointer;
+  user-select: none;
+  &.is-selected {
+    font-weight: bold;
+  }
+}
+
+@media print {
+  .actions {
+    display: none;
+  }
 }

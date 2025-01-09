@@ -1,0 +1,21 @@
+.artefact-info,
+div[step-modal-window-body] {
+  display: flex;
+  flex-direction: column;
+}
+
+.artefact-info {
+  gap: 1rem;
+}
+
+div[step-modal-window-body] {
+  gap: 2rem;
+}
+
+div[step-modal-window-buttons] {
+  justify-content: space-between;
+}
+
+.btn-group-close {
+  flex: 0 !important;
+}

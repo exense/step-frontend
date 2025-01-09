@@ -1,14 +1,21 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { AggregatedReportView, AugmentedExecutionsService, ReportNode, TreeStateService } from '@exense/step-core';
+import {
+  AggregatedReportView,
+  AugmentedExecutionsService,
+  DateRange,
+  ReportNode,
+  TreeStateService,
+} from '@exense/step-core';
 import { map, Observable } from 'rxjs';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
+import { Status } from '../../_common/shared/status.enum';
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
   private _executionsApi = inject(AugmentedExecutionsService);
 
-  loadTree(executionId: string): Observable<boolean> {
-    return this._executionsApi.getFullAggregatedReportView(executionId).pipe(
+  loadTree(executionId: string, dateRange?: DateRange): Observable<boolean> {
+    return this.requestTree(executionId, dateRange).pipe(
       map((root) => {
         if (!root) {
           return false;
@@ -19,16 +26,19 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     );
   }
 
-  private displayedAggregatedDetailsNodeInternal = signal<AggregatedTreeNode | undefined>(undefined);
+  private displayedAggregatedDetailsNodeIdInternal = signal<string | undefined>(undefined);
 
   readonly displayedAggregatedDetailsNode = computed(() => {
     const selectedNode = this.selectedNode();
-    const displayAggregatedNode = this.displayedAggregatedDetailsNodeInternal();
-    if (selectedNode === displayAggregatedNode) {
+    const displayAggregatedNodeId = this.displayedAggregatedDetailsNodeIdInternal();
+    if (selectedNode && selectedNode.id === displayAggregatedNodeId) {
       return selectedNode;
     }
     return undefined;
   });
+
+  private predefinedAggregatedDetailsNodeStatusInternal = signal<Status | undefined>(undefined);
+  readonly predefinedAggregatedDetailsNodeStatus = this.predefinedAggregatedDetailsNodeStatusInternal.asReadonly();
 
   private visibleDetailsInternal = signal<Record<string, boolean>>({});
   readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
@@ -52,9 +62,22 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     }));
   }
 
-  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode): void {
+  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode, status?: Status): void {
     this.selectNode(nodeOrId);
-    const node = typeof nodeOrId === 'string' ? this.findNodeById(nodeOrId) : nodeOrId;
-    this.displayedAggregatedDetailsNodeInternal.set(node);
+    const nodeId = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+    this.displayedAggregatedDetailsNodeIdInternal.set(nodeId);
+    this.predefinedAggregatedDetailsNodeStatusInternal.set(status);
+  }
+
+  private requestTree(executionId: string, dateRange?: DateRange): Observable<AggregatedReportView> {
+    if (!dateRange) {
+      return this._executionsApi.getFullAggregatedReportView(executionId);
+    }
+    return this._executionsApi.getAggregatedReportView(executionId, {
+      range: {
+        from: dateRange.start?.toMillis(),
+        to: dateRange.end?.toMillis(),
+      },
+    });
   }
 }

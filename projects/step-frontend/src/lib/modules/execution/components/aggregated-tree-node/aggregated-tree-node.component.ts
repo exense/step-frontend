@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -33,11 +34,11 @@ export class AggregatedTreeNodeComponent {
     this._treeState.toggleInfo(node);
   }
 
-  protected showAggregatedDetails(): void {
+  protected showAggregatedDetails(status?: Status): void {
     const node = this.node();
     if (!node) {
       return;
     }
-    this._treeState.showAggregatedDetails(node);
+    this._treeState.showAggregatedDetails(node, status);
   }
 }

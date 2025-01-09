@@ -1,14 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Operation } from '@exense/step-core';
-import { ExecutionViewServices } from '../../shared/execution-view-services';
-
-export enum SpecificOperations {
-  KEYWORD_CALL = 'Keyword Call',
-  QUOTA_ACQUISITION = 'Quota acquisition',
-  TOKEN_SELECTION = 'Token selection',
-  WAITING_FOR_LOCK = 'Waiting for lock',
-  WAITING_FOR_GLOBAL_LOCK = 'Waiting for global lock',
-}
+import { ExecutionViewServices } from '../../types/execution-view-services';
+import { SpecificOperations } from '../../types/specific-operations.enum';
 
 @Component({
   selector: 'step-operation',
