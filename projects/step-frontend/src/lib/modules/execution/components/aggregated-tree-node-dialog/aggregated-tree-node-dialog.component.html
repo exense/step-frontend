@@ -1,44 +1,28 @@
 <step-modal-window>
   <div class="tree-node-modal-header" step-modal-window-title>
-    <span>{{ title() }}</span>
-    @if (aggregatedNode) {
-      <step-btn-group class="with-borders">
-        <button
-          type="button"
-          mat-flat-button
-          (click)="switchToAggregated()"
-          [color]="mode() === AggregatedTreeNodeDialogMode.AGGREGATED ? 'primary' : undefined"
-        >
-          Aggregated
-        </button>
-        <button
-          type="button"
-          mat-flat-button
-          (click)="switchToIteration()"
-          [color]="mode() === AggregatedTreeNodeDialogMode.ITERATION ? 'primary' : undefined"
-        >
-          Iteration
-        </button>
-      </step-btn-group>
+    @if (selectedReportNode() && hasBackButton) {
+      <button
+        type="button"
+        mat-icon-button
+        (click)="selectedReportNode.set(undefined)"
+        matTooltip="Back to iteration's list"
+        matTooltipPosition="below"
+      >
+        <step-icon name="arrow-left" />
+      </button>
     }
+    <span>{{ title() }}</span>
   </div>
   <div step-modal-window-body>
     @if (hasData) {
-      @switch (mode()) {
-        @case (AggregatedTreeNodeDialogMode.AGGREGATED) {
-          <step-artefact-inline-details [aggregatedInfo]="aggregatedNode!" />
-        }
-        @case (AggregatedTreeNodeDialogMode.ITERATION) {
-          @if (selectedReportNode(); as reportNode) {
-            <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
-          } @else {
-            <step-aggregated-tree-node-iteration-list
-              [node]="aggregatedNode!"
-              [initialStatus]="initialSearchStatus"
-              (showDetails)="selectedReportNode.set($event)"
-            />
-          }
-        }
+      @if (selectedReportNode(); as reportNode) {
+        <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
+      } @else {
+        <step-aggregated-tree-node-iteration-list
+          [node]="aggregatedNode!"
+          [initialStatus]="initialSearchStatus"
+          (showDetails)="selectedReportNode.set($event)"
+        />
       }
     }
   </div>

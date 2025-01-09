@@ -30,13 +30,4 @@ export class AggregatedTreeNodeComponent {
     this._treeState.selectNode(nodeId);
     this._executionDialogs.openIterations(nodeId, status);
   }
-
-  protected showAggregatedDetails(): void {
-    const nodeId = this.nodeId();
-    if (!nodeId) {
-      return;
-    }
-    this._treeState.selectNode(nodeId);
-    this._executionDialogs.openAggregatedDetails(nodeId);
-  }
 }

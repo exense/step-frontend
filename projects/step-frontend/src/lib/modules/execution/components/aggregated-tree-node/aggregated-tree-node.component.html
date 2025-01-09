@@ -2,7 +2,7 @@
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info">
-        <span class="name" (click)="showAggregatedDetails()">{{ node?.name }}</span>
+        <span class="name" (click)="showIterations()">{{ node?.name }}</span>
         <step-aggregated-tree-status [node]="node" (statusClick)="showIterations($event)" />
         <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
         <step-artefact-inline-details [aggregatedInfo]="node" />

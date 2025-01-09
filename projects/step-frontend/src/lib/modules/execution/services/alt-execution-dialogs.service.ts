@@ -7,15 +7,11 @@ import {
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
-import {
-  AGGREGATED_TREE_TAB_STATE,
-  AggregatedReportViewTreeStateService,
-} from './aggregated-report-view-tree-state.service';
+import { AGGREGATED_TREE_TAB_STATE } from './aggregated-report-view-tree-state.service';
 import { from, map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
-import { AggregatedTreeNodeDialogMode } from '../components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -52,15 +48,10 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     });
   }
 
-  openAggregatedDetails(aggregatedNodeId: string): void {
-    this.openNodeDetails({ aggregatedNodeId });
-  }
-
   private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status): void {
     this.openNodeDetails({
       aggregatedNodeId,
       searchStatus,
-      mode: AggregatedTreeNodeDialogMode.ITERATION,
     });
   }
 
@@ -68,7 +59,6 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this.openNodeDetails({
       reportNodeId,
       aggregatedNodeId,
-      mode: AggregatedTreeNodeDialogMode.ITERATION,
     });
   }
 

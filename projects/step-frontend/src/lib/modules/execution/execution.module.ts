@@ -98,10 +98,7 @@ import {
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
-import {
-  AggregatedTreeNodeDialogComponent,
-  AggregatedTreeNodeDialogMode,
-} from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 
 @NgModule({
   declarations: [
@@ -460,15 +457,6 @@ export class ExecutionModule {
                   },
                   searchStatus: (route: ActivatedRouteSnapshot) =>
                     route.queryParams['searchStatus'] as Status | undefined,
-                  mode: (route: ActivatedRouteSnapshot) => {
-                    const aggregatedNodeId = route.queryParams['aggregatedNodeId'] as string | undefined;
-                    const reportNodeId = route.queryParams['reportNodeId'] as string | undefined;
-                    const isIteration = route.queryParams['mode'] === AggregatedTreeNodeDialogMode.ITERATION.toString();
-                    if (!aggregatedNodeId || !!reportNodeId || isIteration) {
-                      return AggregatedTreeNodeDialogMode.ITERATION;
-                    }
-                    return AggregatedTreeNodeDialogMode.AGGREGATED;
-                  },
                 },
                 dialogComponent: AggregatedTreeNodeDialogComponent,
               },
