@@ -79,15 +79,32 @@
     <step-alt-report-widget-content style="height: 100%">
       <div class="widget">
         @if (errorsDataSource) {
-          <step-table #table [dataSource]="errorsDataSource!" matSort>
+          <step-table
+            #table
+            [dataSource]="errorsDataSource!"
+            matSort
+            noResultsPlaceholder="No errors"
+            matSortActive="count"
+            matSortDirection="desc"
+          >
             <ng-container matColumnDef="errorMessage" stepSearchCol>
               <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
               <td mat-cell *matCellDef="let element">
-                <span class="error-name" [matMenuTriggerFor]="menu">
-                  {{ element.errorMessage }}
+                <span class="error-name">
+                  <span>{{ element.errorMessage }}</span>
+                  <step-icon
+                    class="icon"
+                    matTooltip="See execution"
+                    name="external-link"
+                    [matMenuTriggerFor]="menu"
+                  ></step-icon>
                 </span>
-                <mat-menu #menu="matMenu">
-                  <step-error-details-menu [executionIds]="element.executionIds"></step-error-details-menu>
+
+                <mat-menu #menu="matMenu" class="wide-menu">
+                  <step-error-details-menu
+                    [executionIds]="element.executionIds"
+                    [truncated]="element.executionIdsTruncated"
+                  ></step-error-details-menu>
                 </mat-menu>
               </td>
             </ng-container>
