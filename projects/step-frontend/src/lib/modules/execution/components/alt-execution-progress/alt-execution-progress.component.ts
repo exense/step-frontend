@@ -407,8 +407,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         if (!root) {
           this.isTreeInitialized = false;
         }
-        this._aggregatedTreeTabState.init(root, { expandAllByDefault: false });
-        this._aggregatedTreeWidgetState.init(root, { expandAllByDefault: false });
+        this._aggregatedTreeTabState.init(root);
+        this._aggregatedTreeWidgetState.init(root);
         this.isTreeInitialized = true;
       });
   }
