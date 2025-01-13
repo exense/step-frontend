@@ -1,10 +1,11 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, inject, Injectable, NgZone, OnDestroy, signal } from '@angular/core';
 import { map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TreeNode } from '../types/tree-node';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeStateInitOptions } from '../types/tree-state-init-options.interface';
 import { TreeFlattenerService } from './tree-flattener.service';
+import { DOCUMENT } from '@angular/common';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
@@ -665,6 +666,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   }
 
   private isPossibleToInsert(newParentId: string, idsToInsert: string[]): boolean {
+    if (idsToInsert.includes(newParentId)) {
+      return false;
+    }
     const parentNode = this.treeData().tree.find((node) => node.id === newParentId);
     if (!parentNode) {
       return false;

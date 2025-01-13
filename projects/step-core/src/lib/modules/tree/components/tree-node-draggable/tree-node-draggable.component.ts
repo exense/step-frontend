@@ -36,6 +36,12 @@ export class TreeNodeDraggableComponent {
   /** @Input() **/
   readonly dragDisabled = input(false);
 
+  /** @Input() **/
+  readonly dropDisabled = input(false);
+
+  /** @Output() **/
+  readonly dragOver = output<DropInfo>();
+
   /** @Output() **/
   readonly dropNode = output<DropInfo>();
 

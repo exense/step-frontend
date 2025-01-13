@@ -1,7 +1,9 @@
 @for (item of _treeState.flatTree(); track item.id) {
   <div draggable="false" (click)="_treeState.selectNode(item, $event)" (dblclick)="handleDblClick(item, $event)">
     @if (treeNodeTemplate(); as treeNode) {
-      <ng-container *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item }" />
+      <ng-container
+        *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
+      />
     } @else {
       <step-tree-node
         [class.context-menu-open]="item.id === openedMenuNodeId"

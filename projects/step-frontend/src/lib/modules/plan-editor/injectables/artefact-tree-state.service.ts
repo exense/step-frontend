@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { AbstractArtefact, ArtefactTreeNode, ArtefactNodeSource, TreeStateService } from '@exense/step-core';
+import { AbstractArtefact, ArtefactTreeNode, TreeStateService } from '@exense/step-core';
 import { ArtefactTreeNodeUtilsService } from './artefact-tree-node-utils.service';
 
 @Injectable()

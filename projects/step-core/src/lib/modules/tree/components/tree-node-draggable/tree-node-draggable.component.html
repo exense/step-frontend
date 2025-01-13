@@ -19,6 +19,10 @@
       (contextmenu)="_treeNode.openContextMenu($event)"
       [stepDragItem]="n.id"
       [dragDisabled]="dragDisabled()"
+      [stepDropArea]="n.id"
+      (dragOver)="dragOver.emit($event)"
+      (dropItem)="dropNode.emit($event)"
+      [dropDisabled]="dropDisabled()"
     >
       @if (n.icon) {
         <div class="node-icon">
@@ -30,7 +34,7 @@
   }
 </div>
 @if (_treeNode.node(); as n) {
-  @if (dragDisabled()) {
+  @if (dropDisabled()) {
     @for (pId of n.parentPath; track pId; let idx = $index) {
       <div draggable="false" [style.--idx]="idx" class="node-line"></div>
     }

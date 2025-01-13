@@ -14,6 +14,7 @@
     user-select: none;
     & > div {
       flex: 1;
+      // border: dotted .1rem #000;
     }
     &.dragover > div {
       background: var.$gray-800;

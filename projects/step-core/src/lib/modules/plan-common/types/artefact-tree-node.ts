@@ -6,4 +6,6 @@ export interface ArtefactTreeNode extends TreeNode {
   originalArtefact?: AbstractArtefact;
   childContainer?: ChildrenBlock;
   nodeType?: ArtefactNodeSource;
+  isDragDisabled?: boolean;
+  isDropDisabled?: boolean;
 }

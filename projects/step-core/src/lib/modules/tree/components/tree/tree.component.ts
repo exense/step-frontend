@@ -30,6 +30,7 @@ import { TreeNodeNameTemplateDirective } from '../../directives/tree-node-name-t
 import { TreeNodeComponent } from '../tree-node/tree-node.component';
 import { TreeNodeActionsPipe } from '../../pipes/tree-node-actions.pipe';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
+import { OriginalNodePipe } from '../../pipes/original-node.pipe';
 
 @Component({
   selector: 'step-tree',
@@ -43,7 +44,7 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
   ],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet],
+  imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })
 export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService {
   private _treeActions = inject(TreeActionsService, { optional: true });

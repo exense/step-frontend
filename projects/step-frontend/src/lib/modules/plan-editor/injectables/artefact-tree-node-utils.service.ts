@@ -373,9 +373,10 @@ export class ArtefactTreeNodeUtilsService
       return undefined;
     }
 
+    const isDragDisabled = true;
+    const isDropDisabled = false;
     const isSkipped = false;
     const isVisuallySkipped = isParentVisuallySkipped ?? false;
-    const isDragDisabled = true;
     const icon = 'chevron-left';
     const children = (childArtefacts ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
@@ -393,6 +394,7 @@ export class ArtefactTreeNodeUtilsService
       nodeType,
       childContainer,
       isDragDisabled,
+      isDropDisabled,
     };
   }
 }

@@ -1,16 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-@mixin highlight-node($color) {
-  .node-content .node-icon {
-    border: 1px solid $color;
-  }
-
-  &:not(.skipped) .node-content .node-icon {
-    background: var.$white;
-    color: $color;
-  }
-}
-
 step-plan-tree {
   display: flex;
   height: 100%;
@@ -61,15 +50,29 @@ step-plan-tree {
       }
 
       &.tree-node-selected-for-insert {
-        @include highlight-node(var.$blue-600);
+        .node-content .node-icon {
+          border: 0.1rem solid var.$blue-600;
+        }
+        &:not(.skipped) .node-content .node-icon {
+          background: var.$white;
+          color: var.$blue-600;
+        }
       }
     }
 
-    &.dragover .tree-node {
-      @include highlight-node(var.$blue-600);
-      .node-content .node-name {
+    .tree-node {
+      .node-content.dragover {
+        .node-icon {
+          border: 0.1rem solid var.$blue-600;
+        }
+        .node-name {
+          color: var.$blue-600;
+          font-weight: 500;
+        }
+      }
+      &:not(.skipped) .node-content.dragover .node-icon {
+        background: var.$white;
         color: var.$blue-600;
-        font-weight: 500;
       }
     }
 

@@ -48,7 +48,7 @@ export class TreeFlattenerService {
   }
 
   private convertNode(node: TreeNode, parentPath: string[]): TreeFlatNode {
-    const { id, name, icon, iconClassName, expandable, isSkipped, isVisuallySkipped, isDragDisabled } = node;
+    const { id, name, icon, iconClassName, expandable, isSkipped, isVisuallySkipped } = node;
 
     return {
       id,
@@ -59,7 +59,6 @@ export class TreeFlattenerService {
       isSkipped,
       isVisuallySkipped,
       parentPath,
-      isDragDisabled,
       parentId: parentPath?.length ? parentPath[parentPath.length - 1] : undefined,
       hasChild: !!node.children?.length,
     };
