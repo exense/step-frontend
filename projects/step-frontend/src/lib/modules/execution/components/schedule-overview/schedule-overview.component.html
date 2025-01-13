@@ -136,12 +136,6 @@
                 {{ element.errorCode }}
               </td>
             </ng-container>
-            <ng-container matColumnDef="count">
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Count</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.count }}
-              </td>
-            </ng-container>
             <ng-container matColumnDef="types" stepSearchCol>
               <th mat-header-cell mat-sort-header *matHeaderCellDef>Type</th>
               <td mat-cell *matCellDef="let element">
@@ -150,6 +144,12 @@
                     <step-status [status]="type" />
                   }
                 </div>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="count">
+              <th mat-header-cell mat-sort-header *matHeaderCellDef>Count</th>
+              <td mat-cell *matCellDef="let element">
+                {{ element.count }}
               </td>
             </ng-container>
             <ng-container matColumnDef="percentage">
