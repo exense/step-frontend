@@ -1,5 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { TreeNode, TreeStateService } from '@exense/step-core';
+import { TreeNode } from '../types/tree-node';
+import { TreeStateService } from '../services/tree-state.service';
 
 @Pipe({
   name: 'originalNode',
