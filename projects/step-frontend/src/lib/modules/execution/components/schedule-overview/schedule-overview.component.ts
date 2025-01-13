@@ -29,7 +29,6 @@ import { TimeseriesColorsPool, TimeSeriesConfig, TimeSeriesUtils } from '../../.
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime, Duration } from 'luxon';
-import { TooltipContextData } from '../../../timeseries/modules/chart/injectables/tooltip-context-data';
 
 declare const uPlot: any;
 
@@ -45,6 +44,7 @@ interface TableErrorEntry {
   count: number;
   percentage: number;
   executionIds: string[];
+  executionIdsTruncated: boolean;
   types: string[]; // can be more when using same error code/message
 }
 
@@ -526,6 +526,7 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
+    const executionsAttributesLimit = 10;
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
@@ -533,7 +534,7 @@ export class ScheduleOverviewComponent implements OnInit {
       oqlFilter: `attributes.taskId = ${taskId}`,
       groupDimensions: ['errorMessage', 'errorCode'],
       collectAttributeKeys: ['status', 'executionId'],
-      collectAttributesValuesLimit: 10,
+      collectAttributesValuesLimit: executionsAttributesLimit,
     };
     this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
       let totalCountWithErrors = 0;
@@ -555,6 +556,7 @@ export class ScheduleOverviewComponent implements OnInit {
               percentage: 0,
               overallPercentage: 0,
               executionIds: bucket.attributes['executionId'] as string[],
+              executionIdsTruncated: (bucket.attributes['executionId'] || []).length >= executionsAttributesLimit,
               types: (bucket.attributes['status'] as string[]) || [],
             } as TableErrorEntry;
           }
@@ -564,7 +566,7 @@ export class ScheduleOverviewComponent implements OnInit {
       data.forEach((entry) => {
         entry.percentage = Number(((entry.count / totalCountWithErrors) * 100).toFixed(2));
       });
-      this.errorsDataSource = new TableLocalDataSource(data);
+      this.errorsDataSource = new TableLocalDataSource(data, {});
     });
   }
 }
