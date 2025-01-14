@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { AbstractArtefact, ArtefactTreeNode, ArtefactNodeSource, TreeStateService } from '@exense/step-core';
+import { AbstractArtefact, ArtefactTreeNode, TreeStateService } from '@exense/step-core';
 import { ArtefactTreeNodeUtilsService } from './artefact-tree-node-utils.service';
 
 @Injectable()
@@ -16,7 +16,11 @@ export class ArtefactTreeStateService
     if (this.isRefreshInProgress) {
       return;
     }
-    this.showPseudoContainers(id);
+    if (id === this.selectedForInsertCandidate()) {
+      this.showPseudoContainers(id, true);
+      return;
+    }
+    this.showPseudoContainersWithDelay(id);
   }
 
   override notifyInsertionComplete() {
@@ -28,21 +32,26 @@ export class ArtefactTreeStateService
     clearTimeout(this.timerId);
   }
 
-  private showPseudoContainers(id: string): void {
+  private showPseudoContainersWithDelay(id: string): void {
     if (this.nodeId === id) {
       return;
     }
     clearTimeout(this.timerId);
     this.nodeId = id;
     this.timerId = setTimeout(() => {
-      const needsToRefresh = this._artefactTreeNodeUtils.setPseudoContainersVisibility(id);
-      if (needsToRefresh) {
-        this.refresh();
-        this.expandNodes([id, ...this._artefactTreeNodeUtils.getPseudoNodesIds(id)]);
-      }
+      this.showPseudoContainers(id);
       this.timerId = undefined;
       this.nodeId = undefined;
-    }, 800) as unknown as number;
+    }, 500) as unknown as number;
+  }
+
+  private showPseudoContainers(id: string, isPersistent?: boolean): void {
+    const needsToRefresh = this._artefactTreeNodeUtils.setPseudoContainersVisibility(id, isPersistent);
+    if (!needsToRefresh) {
+      return;
+    }
+    this.refresh();
+    this.expandNodes([id, ...this._artefactTreeNodeUtils.getPseudoNodesIds(id)]);
   }
 
   private hidePseudoContainers(): void {

@@ -1,10 +1,11 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { TreeNodeUtilsService } from '../services/tree-node-utils.service';
 import { TreeStateService } from '../services/tree-state.service';
-import { TreeNode } from '../shared/tree-node';
+import { TreeNode } from '../types/tree-node';
 
 @Pipe({
   name: 'treeNodeClasses',
+  standalone: true,
 })
 export class TreeNodeClassesPipe implements PipeTransform {
   private _utils = inject(TreeNodeUtilsService, { optional: true });
