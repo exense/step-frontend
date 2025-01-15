@@ -66,6 +66,15 @@
         <td mat-cell *matCellDef="let element" class="cell-actions">
           <step-btn-group>
             <button
+              stepTestId="execute-package-btn"
+              mat-icon-button
+              matTooltip="Execute package"
+              (click)="executePackage(element)"
+              [disabled]="!(AutomationPackagePermission.EXECUTE | hasRight | async)"
+            >
+              <step-icon name="play-circle" />
+            </button>
+            <button
               stepTestId="edit-package-btn"
               type="button"
               mat-icon-button
