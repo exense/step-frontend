@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.json-node {
+  display: flex;
+  gap: 0.5rem;
+  padding-left: calc(var(--level, 0) * 3rem);
+}

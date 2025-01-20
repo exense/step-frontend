@@ -1,0 +1,30 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: 2rem;
+}
+
+.section-label {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+step-json-view-expanded .section-label {
+  height: 3rem;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.json-container {
+  position: relative;
+  min-height: 2rem;
+  padding-right: 4rem;
+  button {
+    position: absolute;
+    right: 0;
+    top: -2rem;
+  }
+}

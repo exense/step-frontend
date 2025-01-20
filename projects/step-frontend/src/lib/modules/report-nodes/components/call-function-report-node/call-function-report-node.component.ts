@@ -30,8 +30,8 @@ export class CallFunctionReportNodeComponent implements OnChanges {
 
   displayChildren: ReportNode[] = [];
 
-  hideMeasures: boolean = false;
-  hideRouting: boolean = true;
+  @Input() hideMeasures: boolean = false;
+  @Input() hideRouting: boolean = true;
 
   ngOnChanges(changes: SimpleChanges): void {
     const cChildren = changes['children'];

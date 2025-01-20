@@ -1,0 +1,11 @@
+<ng-content />
+@for (node of jsonParsed(); track node.id) {
+  <div class="json-node" [style.--level]="node.level">
+    @if (node.name) {
+      <strong class="name">{{ node.name }}:</strong>
+    }
+    @if (node.value?.toString(); as value) {
+      <step-detailed-value [value]="value" />
+    }
+  </div>
+}

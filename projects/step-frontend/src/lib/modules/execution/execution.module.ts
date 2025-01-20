@@ -15,6 +15,7 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import {
+  ControllerService,
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -99,6 +100,8 @@ import { AltReportNodeDetailsStateService } from './services/alt-report-node-det
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
+import { of } from 'rxjs';
 
 @NgModule({
   declarations: [
@@ -168,6 +171,7 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
+    PlanNodeDetailsDialogComponent,
   ],
   imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
   exports: [
@@ -459,6 +463,12 @@ export class ExecutionModule {
                     route.queryParams['searchStatus'] as Status | undefined,
                 },
                 dialogComponent: AggregatedTreeNodeDialogComponent,
+                children: [
+                  dialogRoute({
+                    path: 'plan-node',
+                    dialogComponent: PlanNodeDetailsDialogComponent,
+                  }),
+                ],
               },
               {
                 hasBackdrop: false,

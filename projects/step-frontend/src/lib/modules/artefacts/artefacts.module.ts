@@ -40,6 +40,7 @@ import { AssertPerformanceInlineComponent } from './component/assert-performance
 import { CallPlanInlineComponent } from './component/call-plan-inline/call-plan-inline.component';
 import { CaseInlineComponent } from './component/case-inline/case-inline.component';
 import { CheckInlineComponent } from './component/check-inline/check-inline.component';
+import { CallKeywordReportDetailsComponent } from './component/call-keyword-report-details/call-keyword-report-details.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +77,7 @@ import { CheckInlineComponent } from './component/check-inline/check-inline.comp
     CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
+    CallKeywordReportDetailsComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
@@ -117,6 +119,7 @@ import { CheckInlineComponent } from './component/check-inline/check-inline.comp
     CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
+    CallKeywordReportDetailsComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
@@ -155,6 +158,7 @@ export class ArtefactsModule {
       icon: 'keyword',
       component: CallKeywordComponent,
       inlineComponent: CallKeywordInlineComponent,
+      reportDetailsComponent: CallKeywordReportDetailsComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });

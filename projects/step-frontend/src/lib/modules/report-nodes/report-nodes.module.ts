@@ -39,6 +39,7 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
     AssertReportNodeShortComponent,
     AttachmentPreviewComponent,
     AttachmentsPreviewComponent,
+    CallFunctionReportNodeComponent,
   ],
 })
 export class ReportNodesModule {}

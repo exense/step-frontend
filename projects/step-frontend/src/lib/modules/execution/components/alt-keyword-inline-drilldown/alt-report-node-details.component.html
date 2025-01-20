@@ -1,42 +1,76 @@
 @if (node(); as node) {
-  <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
-  <!--Assertion errors-->
-  @if (children()?.length) {
-    <section>
-      <label>Errors</label>
-      <div>
-        @for (child of children(); track child.id) {
-          <step-assert-report-node-short [node]="child" />
-        }
-      </div>
-    </section>
-  }
-  <!--Error-->
-  @if (node.error; as err) {
-    <section>
-      <label>Error</label>
-      <div>
-        {{ err.msg }}
-        {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
-      </div>
-    </section>
-  }
-  <!--Attachments-->
-  @if (!!node.attachments?.length) {
-    <section>
-      <step-attachments-preview [attachments]="node.attachments" />
-    </section>
-  }
-  <!--Details-->
-  <section>
-    <step-report-node [reportNodeId]="node.id" [showArtefact]="showArtefact()" />
-  </section>
-  <hr />
-  <section class="footer">
-    <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
-    <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
-    @if (artefactClass() === 'CallKeyword') {
-      <span class="muted mat-small"> | Agent: {{ $any(node)?.agentUrl }}</span>
+  @if (artefactClass() === 'CallKeyword') {
+    <div class="keyword-container">
+      <step-report-node-artefact-details [reportInfo]="node" />
+      <!--Assertion errors-->
+      @if (children()?.length) {
+        <section>
+          <label>Errors</label>
+          <div>
+            @for (child of children(); track child.id) {
+              <step-assert-report-node-short [node]="child" />
+            }
+          </div>
+        </section>
+      }
+      <!--Error-->
+      @if (node.error; as err) {
+        <section>
+          <label>Error</label>
+          <div>
+            {{ err.msg }}
+            {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
+          </div>
+        </section>
+      }
+      <!--Attachments-->
+      @if (!!node.attachments?.length) {
+        <section>
+          <step-attachments-preview [attachments]="node.attachments" />
+        </section>
+      }
+      <step-call-function-report-node [node]="node" [children]="children()" [hideRouting]="false" />
+    </div>
+  } @else {
+    <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
+    <!--Assertion errors-->
+    @if (children()?.length) {
+      <section>
+        <label>Errors</label>
+        <div>
+          @for (child of children(); track child.id) {
+            <step-assert-report-node-short [node]="child" />
+          }
+        </div>
+      </section>
     }
-  </section>
+    <!--Error-->
+    @if (node.error; as err) {
+      <section>
+        <label>Error</label>
+        <div>
+          {{ err.msg }}
+          {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
+        </div>
+      </section>
+    }
+    <!--Attachments-->
+    @if (!!node.attachments?.length) {
+      <section>
+        <step-attachments-preview [attachments]="node.attachments" />
+      </section>
+    }
+    <!--Details-->
+    <section>
+      <step-report-node [reportNodeId]="node.id" [showArtefact]="showArtefact()" />
+    </section>
+    <hr />
+    <section class="footer">
+      <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
+      <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
+      @if (artefactClass() === 'CallKeyword') {
+        <span class="muted mat-small"> | Agent: {{ $any(node)?.agentUrl }}</span>
+      }
+    </section>
+  }
 }

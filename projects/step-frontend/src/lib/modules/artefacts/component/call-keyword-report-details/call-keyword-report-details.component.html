@@ -1,0 +1,32 @@
+@if (keywordInputs(); as inputs) {
+  <section class="json-container">
+    @if (isInputsExpanded()) {
+      <step-json-view-expanded class="pointer" [data]="inputs" (click)="toggleInputsExpanded()">
+        <span class="section-label">Inputs</span>
+      </step-json-view-expanded>
+    } @else {
+      <step-json-view-inline class="pointer" [data]="inputs" (click)="toggleInputsExpanded()">
+        <span class="section-label">Inputs</span>
+      </step-json-view-inline>
+    }
+    <button type="button" mat-icon-button matTooltip="Copy to clipboard" (click)="copyInput()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (keywordOutputs(); as outputs) {
+  <section class="json-container">
+    @if (isOutputsExpanded()) {
+      <step-json-view-expanded class="pointer" [data]="outputs" (click)="toggleOutputsExpanded()">
+        <span class="section-label">Outputs</span>
+      </step-json-view-expanded>
+    } @else {
+      <step-json-view-inline class="pointer" [data]="outputs" (click)="toggleOutputsExpanded()">
+        <span class="section-label">Outputs</span>
+      </step-json-view-inline>
+    }
+    <button type="button" mat-icon-button matTooltip="Copy to clipboard" (click)="copyOutput()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
