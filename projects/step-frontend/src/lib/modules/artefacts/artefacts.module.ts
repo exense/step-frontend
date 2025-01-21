@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ArtefactService, RICH_EDITOR_EXPORTS, RichEditorComponent } from '@exense/step-core';
+import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
@@ -86,7 +86,7 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
-  imports: [StepCommonModule, RICH_EDITOR_EXPORTS, ReportNodesModule],
+  imports: [StepCommonModule, ReportNodesModule],
   exports: [
     EchoComponent,
     EchoInlineComponent,
