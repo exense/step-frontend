@@ -1,0 +1,91 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-artefact-details {
+  .artefact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .artefact-name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+
+      step-editable-label {
+        font-size: 1.8rem;
+        font-weight: 500;
+        flex: 1;
+        min-width: 20rem;
+        margin-left: -1.6rem;
+      }
+    }
+
+    step-editable-textarea-label {
+      margin-left: -1.6rem;
+    }
+  }
+
+  .artefact-flags {
+    @include core.common-form-content;
+    margin-bottom: 1rem;
+  }
+
+  mat-expansion-panel,
+  .editor {
+    margin-bottom: 2rem !important;
+    position: relative;
+  }
+
+  .artefact-hint {
+    position: absolute;
+    z-index: 1000;
+    top: 1rem;
+    left: 0;
+  }
+
+  .artefact-hint {
+    position: absolute !important;
+    z-index: 1000 !important;
+  }
+
+  .call-plan:not(.call-direct-plan) {
+    .artefact-hint {
+      top: 3rem;
+      left: 1rem;
+    }
+  }
+  .call-direct-plan {
+    .artefact-hint {
+      display: none;
+    }
+  }
+
+  .no-plan-or-keyword {
+    .artefact-hint {
+      top: 1rem;
+    }
+  }
+
+  .editor:has(step-plan-name) .artefact-hint {
+    top: 1rem !important;
+    left: 0 !important;
+  }
+
+  .artefact-name,
+  #call-name-input {
+    step-editable-label {
+      .editable-label {
+        padding-left: 4rem !important;
+      }
+      .form-field-content {
+        input {
+          padding-left: 4rem !important;
+        }
+      }
+    }
+  }
+}

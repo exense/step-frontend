@@ -1,17 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueInteger,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface SequenceArtefact extends AbstractArtefact {
-  continueOnError: DynamicValueBoolean;
-  pacing: DynamicValueInteger;
-}
+import { SequenceArtefact } from '../../types/sequence.artefact';
 
 @Component({
   selector: 'step-sequence',

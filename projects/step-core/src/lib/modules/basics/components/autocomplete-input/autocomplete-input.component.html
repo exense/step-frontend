@@ -1,12 +1,12 @@
 <input
   #inputElement
-  [placeholder]="placeHolder"
+  [placeholder]="placeholder()"
   [formControl]="filterCtrl"
   [matAutocomplete]="auto"
-  (blur)="handleBlur()"
+  (blur)="handleBlur($event)"
 />
 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)" panelWidth="auto">
-  <mat-option *ngFor="let item of displayItems$ | async; trackBy: trackByKeyValue" [value]="item.key">
-    {{ item.value }}
-  </mat-option>
+  @for (item of displayItems(); track item.key) {
+    <mat-option [value]="item.key">{{ item.value }}</mat-option>
+  }
 </mat-autocomplete>

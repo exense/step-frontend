@@ -1,14 +1,16 @@
 @if (item(); as item) {
   <label>{{ item.label }}:</label>
-  <div>
-    @if (item.isResolved) {
-      @if (!item.value.dynamic) {
-        <span class="resolved">{{ item.value.value }}</span>
+  @if (item.value; as value) {
+    <div>
+      @if (item.isResolved) {
+        @if (!value.dynamic) {
+          <span class="resolved">{{ value.value }}</span>
+        } @else {
+          <span class="dynamic-resolved">{{ value.expression }}</span>
+        }
       } @else {
-        <span class="dynamic-resolved">{{ item.value.expression }}</span>
+        <span class="unresolved">[unresolved]</span>
       }
-    } @else {
-      <span class="unresolved">[unresolved]</span>
-    }
-  </div>
+    </div>
+  }
 }

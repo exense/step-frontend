@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, effect, inject, Signal } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, inject, Signal } from '@angular/core';
 import {
   arrayToRegex,
   DateUtilsService,
@@ -10,7 +10,7 @@ import {
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, combineLatest, take } from 'rxjs';
+import { map, combineLatest } from 'rxjs';
 
 const VIEW_PAGE_SIZE = 10;
 const PRINT_PAGE_SIZE = 50_000;

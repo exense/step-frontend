@@ -1,8 +1,6 @@
 @if (!isEditMode()) {
-  @if (templateContainer.treeNodeTemplate?.templateRef) {
-    <ng-container
-      *ngTemplateOutlet="templateContainer.treeNodeTemplate!.templateRef!; context: { $implicit: node() }"
-    />
+  @if (templateContainer.treeNodeNameTemplate()?.templateRef; as templateRef) {
+    <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: node() }" />
   } @else {
     {{ node()?.name }}
   }

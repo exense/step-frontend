@@ -3,11 +3,9 @@ import uPlot = require('uplot');
 import { Options } from 'uplot';
 import { TooltipRowEntry } from '../types/tooltip-row-entry';
 import { TimeSeriesConfig } from '../../_common';
-import { TooltipAnchor } from '../types/tooltip-anchor';
 import { inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ExecutionsService, MarkerType } from '@exense/step-core';
-import { TooltipPlacementFunction } from './tooltip-placement-function';
 import { TooltipParentContainer } from '../types/tooltip-parent-container';
 import { SeriesStroke } from '../../_common/types/time-series/series-stroke';
 
@@ -108,6 +106,7 @@ export class TooltipPlugin {
         init: (u: uPlot) => {
           chart = u;
           over = u.over;
+          over.appendChild(tooltip);
 
           bound = over;
 
@@ -160,6 +159,7 @@ export class TooltipPlugin {
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || !idx || !left) {
             // some weird uPlot behaviour. it happens to be -10 many times
+            hideTooltip();
             return;
           }
           const hoveredValue = u.posToVal(top, 'y');
@@ -211,10 +211,9 @@ export class TooltipPlugin {
             }
           }
           if (yPoints.length === 0) {
+            hideTooltip();
             // tooltip.style.zIndex = '-1';
             return; // there is no data to show
-          } else {
-            tooltip.style.zIndex = '1000';
           }
           tooltip.innerHTML = '';
           yPoints.forEach((point) => {
@@ -243,13 +242,34 @@ export class TooltipPlugin {
           // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
           const boundingClientRect = over.getBoundingClientRect();
 
-          const anchor: TooltipAnchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
-          // tooltip.textContent = `${x} at ${Math.round(left)},${Math.round(top)}`;
-          const container = this.getAdjustedBoundaries(bound);
-          TooltipPlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
+          let finalPosition = TooltipPlugin.getTooltipPosition(boundingClientRect, left, top, tooltip);
+          tooltip.style.left = finalPosition.left + 'px';
+          tooltip.style.top = finalPosition.top + 'px';
         },
       },
     };
+  }
+
+  public static getTooltipPosition(
+    containerRect: DOMRect,
+    cursorLeft: number,
+    cursorTop: number,
+    tooltip: HTMLElement,
+  ): { left: number; top: number } {
+    let totalWidth = document.body.scrollWidth;
+    let totalHeight = document.body.scrollHeight;
+    let tooltipMargin = 24;
+    let safeMargin = 24;
+    let finalLeft = cursorLeft;
+    let finalTop = cursorTop;
+    if (containerRect.left + cursorLeft + tooltip.offsetWidth + tooltipMargin * 2 + safeMargin > totalWidth) {
+      finalLeft = cursorLeft - tooltip.offsetWidth - 2 * tooltipMargin;
+    }
+    if (containerRect.top + cursorTop + tooltip.offsetHeight + safeMargin > totalHeight) {
+      const exceededHeight = containerRect.top + cursorTop + tooltip.offsetHeight - totalHeight;
+      finalTop = cursorTop - exceededHeight - safeMargin / 2;
+    }
+    return { left: finalLeft, top: finalTop };
   }
 
   private createTooltipElement() {
@@ -258,6 +278,20 @@ export class TooltipPlugin {
     tooltip.classList.add('ts-tooltip');
     tooltip.style.display = 'none';
     tooltip.style.position = 'absolute';
+
+    tooltip.addEventListener('mouseup', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('mousedown', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+    tooltip.addEventListener('dblclick', (event) => {
+      event.stopPropagation();
+    });
+
     return tooltip;
   }
 

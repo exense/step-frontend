@@ -1,17 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueString,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface Synchronized extends AbstractArtefact {
-  lockName: DynamicValueString;
-  globalLock: DynamicValueBoolean;
-}
+import { Synchronized } from '../../types/synchronized.artefact';
 
 @Component({
   selector: 'step-synchronized',

@@ -2,14 +2,14 @@
   <ng-container [formGroup]="form">
     @if (!!primaryFields.length) {
       @if (primaryFieldsLabel) {
-        <h5>{{ primaryFieldsLabel }}</h5>
+        <h5 data-step-testid>{{ primaryFieldsLabel }}</h5>
       }
       @if (primaryFieldsDescription) {
         <p class="description">{{ primaryFieldsDescription }}</p>
       }
     }
     @for (field of primaryFields; track field.trackId) {
-      @if (field.fieldType === DynamicFieldType.OBJECT || field.fieldType === DynamicFieldType.ARRAY) {
+      @if (field.fieldType === JsonFieldType.OBJECT || field.fieldType === JsonFieldType.ARRAY) {
         <step-dynamic-field-complex
           [formControl]="field.control"
           [label]="field.label"
@@ -45,7 +45,7 @@
       }
     }
     @for (field of optionalFields; track field.trackId) {
-      @if (field.fieldType === DynamicFieldType.OBJECT || field.fieldType === DynamicFieldType.ARRAY) {
+      @if (field.fieldType === JsonFieldType.OBJECT || field.fieldType === JsonFieldType.ARRAY) {
         <step-dynamic-field-complex
           [formControl]="field.control"
           [label]="field.label"

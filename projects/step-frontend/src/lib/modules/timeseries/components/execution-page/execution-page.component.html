@@ -1,11 +1,27 @@
-<step-timeseries-dashboard
-  [id]="dashboardId"
-  [storageId]="execution.id"
-  [editable]="false"
-  [hiddenFilters]="hiddenFilters"
-  [defaultFullTimeRange]="executionRange"
-  [showExecutionLinks]="false"
-  [showRefreshOption]="false"
-  [showDashboardName]="false"
-  [showHeaderBar]="false"
-/>
+@if (isInitialized) {
+  <step-timeseries-dashboard
+    [id]="dashboardId"
+    [storageId]="execution.id"
+    [editable]="false"
+    [hiddenFilters]="hiddenFilters"
+    [defaultFullTimeRange]="executionRange"
+    [showExecutionLinks]="false"
+    [showRefreshOption]="false"
+    [showDashboardName]="false"
+    [showHeaderBar]="false"
+  />
+} @else if (executionHasToBeBuilt) {
+  <div class="info-container">
+    <div class="content">
+      <div class="msg">
+        This execution has no time-series created yet. Start the building process clicking the button below.
+      </div>
+      @if (executionCreationInProgress) {
+        <mat-spinner [diameter]="20"></mat-spinner>
+        <div>Building in progress...</div>
+      } @else {
+        <button mat-raised-button (click)="rebuildTimeSeries()">Build time-series</button>
+      }
+    </div>
+  </div>
+}

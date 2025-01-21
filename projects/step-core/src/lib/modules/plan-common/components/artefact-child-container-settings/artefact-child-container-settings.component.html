@@ -1,0 +1,22 @@
+@if (childContainer(); as childContainer) {
+  <section class="container-info">
+    <div class="container-name">
+      <step-icon name="chevron-left" />
+      {{ name() }}
+    </div>
+    <mat-expansion-panel [(expanded)]="showAttributes">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Properties</mat-panel-title>
+      </mat-expansion-panel-header>
+      <section class="child-artefact-flags">
+        <step-dynamic-checkbox
+          label="Continue execution on errors in child elements"
+          name="continueOnError"
+          [disabled]="isReadonly()"
+          [ngModel]="childContainer.continueOnError"
+          (ngModelChange)="handleContinueOnErrorChange($event)"
+        />
+      </section>
+    </mat-expansion-panel>
+  </section>
+}

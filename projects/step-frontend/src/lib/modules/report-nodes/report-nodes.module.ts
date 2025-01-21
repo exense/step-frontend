@@ -33,6 +33,12 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
     CallFunctionReportNodeExternalLinkPipe,
   ],
   imports: [StepCommonModule],
-  exports: [ReportNodeShortComponent, ReportNodeComponent],
+  exports: [
+    ReportNodeShortComponent,
+    ReportNodeComponent,
+    AssertReportNodeShortComponent,
+    AttachmentPreviewComponent,
+    AttachmentsPreviewComponent,
+  ],
 })
 export class ReportNodesModule {}

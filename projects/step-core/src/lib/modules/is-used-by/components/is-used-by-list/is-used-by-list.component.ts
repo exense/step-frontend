@@ -4,7 +4,7 @@ import { FindReferencesResponse, ReferencesService } from '../../../../client/st
 import { TableFetchLocalDataSource } from '../../../table/table.module';
 import { StepBasicsModule, IsUsedBySearchType, ProjectNamePipe } from '../../../basics/step-basics.module';
 import { TableModule } from '../../../table/table.module';
-import { PlanLinkComponent } from '../../../plan-common';
+import { PlanLinkComponent } from '../../../plan-common/components/plan-link/plan-link.component';
 import { EntityModule } from '../../../entity/entity.module';
 import { KeywordsCommonModule } from '../../../keywords-common/keywords-common.module';
 import { NavigationStart, Router } from '@angular/router';

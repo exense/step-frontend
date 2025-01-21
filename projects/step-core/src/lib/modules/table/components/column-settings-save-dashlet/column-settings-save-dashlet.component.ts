@@ -10,5 +10,5 @@ import { CustomComponent } from '../../../custom-registeries/shared/custom-compo
 })
 export class ColumnSettingsSaveDashletComponent implements CustomComponent {
   context?: any;
-  readonly _tableColumns = inject(TableColumnsService);
+  protected readonly _tableColumns = inject(TableColumnsService);
 }

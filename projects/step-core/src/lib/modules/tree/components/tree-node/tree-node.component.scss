@@ -1,12 +1,23 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
-step-tree.in-focus,
-step-tree-node .tree-node.tree-node-selected step-tree-node-name {
+.step-tree-node-container .tree-node.tree-node-selected step-tree-node-name {
   background: var.$gray-100;
 }
 
-step-tree-node {
+.step-tree-node-container {
+  display: flex;
+  position: relative;
+  padding-left: calc(var(--level, 0) * 3rem);
+
+  .node-line {
+    position: absolute;
+    top: 0;
+    left: calc(var(--idx) * 3rem + 1.5rem);
+    border-right: 1px solid var.$gray-100;
+    height: 100%;
+  }
+
   .tree-node {
     display: flex;
     align-items: center;
@@ -68,5 +79,9 @@ step-tree-node {
 
   step-icon.toggle-state {
     @include core.step-icon-size(12px);
+  }
+
+  .tree-node-details {
+    margin-left: 2.4rem;
   }
 }

@@ -3,6 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
   BehaviorSubject,
+  combineLatest,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -12,7 +13,6 @@ import {
   startWith,
   switchMap,
   tap,
-  combineLatest,
 } from 'rxjs';
 import { ExecutionSummaryDto, PrivateViewPluginService, ReportNode, TableDataSource } from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';

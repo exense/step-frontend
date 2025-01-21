@@ -1,38 +1,78 @@
 import { Component, computed, signal } from '@angular/core';
-import { CustomComponent } from '../../modules/custom-registeries/shared/custom-component';
+import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactInlineItem } from './artefact-inline-item';
 import { AggregatedArtefactInfo } from '../../shared';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
+import {
+  AbstractArtefact,
+  DynamicValueBoolean,
+  DynamicValueInteger,
+  DynamicValueString,
+  ReportNode,
+} from '../../client/step-client-module';
+
+export interface InlineArtefactContext<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
+  aggregatedInfo?: AggregatedArtefactInfo<A>;
+  reportInfo?: R;
+  isVertical?: boolean;
+}
 
 @Component({
   template: '',
 })
-export abstract class BaseInlineArtefactComponent<T extends AggregatedArtefactInfo> implements CustomComponent {
-  private infoInternal = signal<T | undefined>(undefined);
-  protected info = this.infoInternal.asReadonly();
+export abstract class BaseInlineArtefactComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode>
+  implements CustomComponent
+{
+  private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
+  protected info = computed(() => this.contextInternal()?.aggregatedInfo);
+  protected isVertical = computed(() => !!this.contextInternal()?.isVertical);
 
-  private info$ = toObservable(this.info);
-  private items$ = this.info$.pipe(
-    switchMap((info) => {
-      const isResolved = this.isResolved(info);
-      return this.getArtefactItems(info, isResolved);
+  private context$ = toObservable(this.contextInternal);
+  private aggregatedInfoItems$ = this.context$.pipe(
+    switchMap((context) => {
+      if (!context?.aggregatedInfo) {
+        return of(undefined);
+      }
+      const isResolved = this.isResolved(context?.aggregatedInfo);
+      return this.getArtefactItems(context?.aggregatedInfo, context?.isVertical, isResolved);
     }),
     takeUntilDestroyed(),
   );
+  private aggregatedInfoItems = toSignal(this.aggregatedInfoItems$);
 
-  protected items = toSignal(this.items$);
+  private reportInfoItems = computed(() => {
+    const ctx = this.contextInternal();
+    const reportInfo = ctx?.reportInfo;
+    const isVertical = ctx?.isVertical;
+    if (!reportInfo || !this.getReportNodeItems) {
+      return undefined;
+    }
+    return this.getReportNodeItems(reportInfo, isVertical);
+  });
 
-  context?: T;
+  protected items = computed(() => {
+    const aggregated = this.aggregatedInfoItems();
+    const report = this.reportInfoItems();
+    return aggregated ?? report;
+  });
 
-  contextChange(previousContext?: T, currentContext?: T) {
-    this.infoInternal.set(currentContext);
+  context?: InlineArtefactContext<A, R>;
+
+  contextChange(previousContext?: InlineArtefactContext<A, R>, currentContext?: InlineArtefactContext<A, R>) {
+    this.contextInternal.set(currentContext);
   }
 
-  protected abstract getArtefactItems(info?: T, isResolved?: boolean): Observable<ArtefactInlineItem[] | undefined>;
+  protected abstract getReportNodeItems?(info?: R, isVertical?: boolean): ArtefactInlineItem[] | undefined;
 
-  private isResolved(info?: T): boolean {
+  protected abstract getArtefactItems(
+    info?: AggregatedArtefactInfo<A>,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): Observable<ArtefactInlineItem[] | undefined>;
+
+  private isResolved(info?: AggregatedArtefactInfo<A>): boolean {
     if (!info) {
       return false;
     }
@@ -42,7 +82,33 @@ export abstract class BaseInlineArtefactComponent<T extends AggregatedArtefactIn
       return false;
     }
 
-    const count = Object.values(info.countByStatus ?? {}).reduce((res, item) => res + item, 0);
-    return count === 1;
+    return true;
+  }
+
+  protected convert(
+    items: [
+      string,
+      string | number | boolean | DynamicValueString | DynamicValueInteger | DynamicValueBoolean | undefined,
+    ][],
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] {
+    return items.map(([label, value]) => {
+      const valueType = typeof value;
+      if (valueType === 'string' || valueType === 'number' || valueType === 'boolean' || valueType === 'undefined') {
+        return {
+          label,
+          value: {
+            value: value as string | number | boolean,
+            dynamic: false,
+          },
+          isResolved: true,
+        };
+      }
+      return {
+        label,
+        value: value as DynamicValueString | DynamicValueInteger | DynamicValueBoolean,
+        isResolved,
+      };
+    });
   }
 }
