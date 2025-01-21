@@ -22,7 +22,7 @@ export class ArtefactTreeNodeUtilsService
   private refreshArtefactInternal$ = new Subject<void>();
   readonly refreshArtefact$ = this.refreshArtefactInternal$.asObservable();
 
-  private displayInsertContainersFor?: string;
+  private displayInsertContainersFor = new Map<string, boolean>();
 
   ngOnDestroy(): void {
     this.refreshArtefactInternal$.complete();
@@ -198,15 +198,22 @@ export class ArtefactTreeNodeUtilsService
     return result;
   }
 
-  setPseudoContainersVisibility(artefactId: string): boolean {
-    const isNeedToUpdate = this.displayInsertContainersFor !== artefactId;
-    this.displayInsertContainersFor = artefactId;
+  setPseudoContainersVisibility(artefactId: string, isPersistent: boolean = false): boolean {
+    const isNeedToUpdate =
+      !this.displayInsertContainersFor.has(artefactId) ||
+      this.displayInsertContainersFor.get(artefactId) !== isPersistent;
+
+    Array.from(this.displayInsertContainersFor.keys())
+      .filter((key) => this.displayInsertContainersFor.get(key) === false)
+      .forEach((key) => this.displayInsertContainersFor.delete(key));
+
+    this.displayInsertContainersFor.set(artefactId, isPersistent);
     return isNeedToUpdate;
   }
 
   hidePseudoContainers(): boolean {
-    const isNeedToUpdate = !!this.displayInsertContainersFor;
-    this.displayInsertContainersFor = undefined;
+    const isNeedToUpdate = !!this.displayInsertContainersFor.size;
+    this.displayInsertContainersFor.clear();
     return isNeedToUpdate;
   }
 
@@ -252,7 +259,7 @@ export class ArtefactTreeNodeUtilsService
 
   private createChildNodes(originalArtefact: AbstractArtefact, isVisuallySkipped: boolean): ArtefactTreeNode[] {
     const id = originalArtefact.id!;
-    const forceDisplay = this.displayInsertContainersFor === id;
+    const forceDisplay = this.displayInsertContainersFor.has(id);
     const isThreadGroup = originalArtefact._class === THREAD_GROUP;
 
     let children: ArtefactTreeNode[] = [];
@@ -366,9 +373,10 @@ export class ArtefactTreeNodeUtilsService
       return undefined;
     }
 
+    const isDragDisabled = true;
+    const isDropDisabled = false;
     const isSkipped = false;
     const isVisuallySkipped = isParentVisuallySkipped ?? false;
-    const isDragDisabled = true;
     const icon = 'chevron-left';
     const children = (childArtefacts ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
@@ -386,6 +394,7 @@ export class ArtefactTreeNodeUtilsService
       nodeType,
       childContainer,
       isDragDisabled,
+      isDropDisabled,
     };
   }
 }

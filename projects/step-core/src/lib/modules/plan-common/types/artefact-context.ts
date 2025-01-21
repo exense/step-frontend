@@ -1,4 +1,4 @@
-import { AbstractArtefact } from '../client/generated';
+import { AbstractArtefact } from '../../../client/generated';
 import { Observable } from 'rxjs';
 
 export abstract class ArtefactContext<T extends AbstractArtefact = AbstractArtefact> {

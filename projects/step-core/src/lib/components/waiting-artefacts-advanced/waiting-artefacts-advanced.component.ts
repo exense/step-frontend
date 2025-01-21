@@ -2,8 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/
 import { AbstractArtefact, DynamicValueBoolean } from '../../client/step-client-module';
 import { BaseArtefactComponent } from '../base-artefact/base-artefact.component';
 import { NgForm } from '@angular/forms';
-import { ArtefactContext } from '../../shared';
-import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
+import { ArtefactFormChangeHelperService, ArtefactContext } from '../../modules/plan-common';
 
 export interface WaitingArtefactsAdvancedArtefact extends AbstractArtefact {
   releaseTokens: DynamicValueBoolean;
