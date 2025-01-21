@@ -2,7 +2,9 @@
   <div class="rich-header" step-modal-window-title>
     <section>
       <div>{{ _data.title }}</div>
-      <step-rich-editor-change-status [changeStatus]="changeStatus" />
+      @if (!_data.isReadOnly) {
+        <step-rich-editor-change-status [changeStatus]="changeStatus" />
+      }
     </section>
     <step-rich-editor-settings-bar
       [allowedModes]="_data.allowedModes"
@@ -15,6 +17,8 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+    @if (!_data.isReadOnly) {
+      <button type="button" mat-flat-button color="primary" (click)="save()">Save</button>
+    }
   </div>
 </step-modal-window>

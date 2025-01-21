@@ -473,7 +473,7 @@ export class ExecutionModule {
               {
                 hasBackdrop: false,
                 height: '100%',
-                width: '35%',
+                width: '40%',
                 panelClass: 'side-dialog',
                 position: {
                   right: '0',

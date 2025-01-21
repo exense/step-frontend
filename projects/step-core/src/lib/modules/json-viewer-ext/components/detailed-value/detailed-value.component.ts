@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, input, viewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { DetailedValueDialogComponent } from '../detailed-value-dialog/detailed-value-dialog.component';
+import { AceMode, RichEditorDialogService } from '@exense/step-core';
 
 @Component({
   selector: 'step-detailed-value',
@@ -11,10 +10,11 @@ import { DetailedValueDialogComponent } from '../detailed-value-dialog/detailed-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DetailedValueComponent {
-  private _matDialog = inject(MatDialog);
+  private _richEditorDialog = inject(RichEditorDialogService);
 
   private valueContainer = viewChild<ElementRef<HTMLDivElement>>('valueContainer');
 
+  /** @Input() **/
   readonly value = input.required<string>();
 
   protected openDetailedInfo($event: MouseEvent): void {
@@ -26,6 +26,10 @@ export class DetailedValueComponent {
     $event.stopPropagation();
     $event.stopImmediatePropagation();
     const value = this.value();
-    this._matDialog.open(DetailedValueDialogComponent, { data: value });
+    this._richEditorDialog.editText(value, {
+      isReadOnly: true,
+      title: '',
+      predefinedMode: AceMode.TEXT,
+    });
   }
 }

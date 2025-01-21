@@ -11,10 +11,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RichEditorChangeStatusComponent } from '../rich-editor-change-status/rich-editor-change-status.component';
 
 export interface RichEditorDialogData {
-  title: string;
+  title?: string;
   text: string;
   predefinedMode?: AceMode;
   allowedModes?: AceMode[];
+  isReadOnly?: boolean;
 }
 
 type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;
@@ -42,6 +43,10 @@ export class RichEditorDialogComponent implements OnInit {
   protected changeStatus = RichEditorChangeStatus.NO_CHANGES;
 
   ngOnInit(): void {
+    if (this._data.isReadOnly) {
+      this.textControl.disable();
+      return;
+    }
     this.textControl.valueChanges
       .pipe(
         debounceTime(300),

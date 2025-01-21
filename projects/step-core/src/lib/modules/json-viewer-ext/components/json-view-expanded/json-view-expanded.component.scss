@@ -9,3 +9,7 @@
   gap: 0.5rem;
   padding-left: calc(var(--level, 0) * 3rem);
 }
+
+.name {
+  white-space: nowrap;
+}

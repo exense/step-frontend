@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ArtefactService, RichEditorComponent } from '@exense/step-core';
+import { ArtefactService, RICH_EDITOR_EXPORTS, RichEditorComponent } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
@@ -41,6 +41,7 @@ import { CallPlanInlineComponent } from './component/call-plan-inline/call-plan-
 import { CaseInlineComponent } from './component/case-inline/case-inline.component';
 import { CheckInlineComponent } from './component/check-inline/check-inline.component';
 import { CallKeywordReportDetailsComponent } from './component/call-keyword-report-details/call-keyword-report-details.component';
+import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,7 @@ import { CallKeywordReportDetailsComponent } from './component/call-keyword-repo
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
-  imports: [StepCommonModule, RichEditorComponent],
+  imports: [StepCommonModule, RICH_EDITOR_EXPORTS, ReportNodesModule],
   exports: [
     EchoComponent,
     EchoInlineComponent,
