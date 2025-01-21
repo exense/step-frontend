@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
@@ -111,7 +111,6 @@ import { SPLIT_EXPORTS } from './modules/split';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
@@ -149,7 +148,6 @@ import { SPLIT_EXPORTS } from './modules/split';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -233,6 +231,7 @@ import { SPLIT_EXPORTS } from './modules/split';
       provide: FunctionActionsService,
       useExisting: FunctionActionsImplService,
     },
+    provideHttpClient(withInterceptorsFromDi()),
   ],
 })
 export class StepCoreModule {

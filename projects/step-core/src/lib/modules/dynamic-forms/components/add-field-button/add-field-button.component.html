@@ -1,7 +1,7 @@
 @if (!isChildMode) {
   <hr />
 }
-@if (!possibleFields?.length || !showPossibleFields) {
+@if (!possibleFields.length || !showPossibleFields) {
   <button class="add-additional" type="button" mat-stroked-button (click)="addOptionalField($event)">
     <div class="add-additional-content">
       {{ addLabel }}

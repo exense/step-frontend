@@ -1,6 +1,6 @@
 <div widthExpanders key="dynamicFields" [class.with-padding]="!isChildNode">
   <ng-container [formGroup]="form">
-    @if (!!primaryFields?.length) {
+    @if (!!primaryFields.length) {
       @if (primaryFieldsLabel) {
         <h5 data-step-testid>{{ primaryFieldsLabel }}</h5>
       }

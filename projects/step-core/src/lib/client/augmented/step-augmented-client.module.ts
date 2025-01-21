@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { StepGeneratedClientModule } from '../generated';
 import { StepTableClientModule } from '../table/step-table-client.module';
 
 @NgModule({
-  imports: [HttpClientModule, StepGeneratedClientModule, StepTableClientModule],
-  providers: [],
+  imports: [StepGeneratedClientModule, StepTableClientModule],
+  providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class StepAugmentedClientModule {}
 
