@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, input, viewChild } from '@angular/core';
-import { AceMode, RichEditorDialogService } from '@exense/step-core';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 
 @Component({
   selector: 'step-detailed-value',
