@@ -16,6 +16,7 @@ export interface RichEditorDialogData {
   predefinedMode?: AceMode;
   allowedModes?: AceMode[];
   isReadOnly?: boolean;
+  wrapText?: boolean;
 }
 
 type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;

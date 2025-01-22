@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AugmentedControllerService, ReportNode } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'step-alt-report-node-details',
@@ -16,7 +16,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
-      if (node.status === 'FAILED') {
+      if (node.status !== 'FAILED') {
         return of(undefined);
       }
       return this._controllerService.getReportNodeChildren(node.id!).pipe(catchError(() => of(undefined)));
@@ -29,7 +29,6 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
           child.status !== 'PASSED',
       );
     }),
-    takeUntilDestroyed(),
   );
 
   protected readonly children = toSignal(this.children$, { initialValue: [] });

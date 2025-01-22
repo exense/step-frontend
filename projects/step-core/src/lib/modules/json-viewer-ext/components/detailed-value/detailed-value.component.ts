@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, input, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 
 @Component({
@@ -12,24 +12,16 @@ import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 export class DetailedValueComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
 
-  private valueContainer = viewChild<ElementRef<HTMLDivElement>>('valueContainer');
-
   /** @Input() **/
   readonly value = input.required<string>();
 
-  protected openDetailedInfo($event: MouseEvent): void {
-    const valueContainer = this.valueContainer()?.nativeElement;
-    if (!valueContainer || valueContainer.getBoundingClientRect().height < 80) {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopPropagation();
-    $event.stopImmediatePropagation();
+  protected openDetailedInfo(): void {
     const value = this.value();
     this._richEditorDialog.editText(value, {
       isReadOnly: true,
       title: '',
       predefinedMode: AceMode.TEXT,
+      wrapText: true,
     });
   }
 }

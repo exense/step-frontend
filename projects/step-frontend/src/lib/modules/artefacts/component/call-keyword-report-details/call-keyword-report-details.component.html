@@ -1,44 +1,34 @@
 @if (keywordInputs(); as inputs) {
   <section class="json-container">
-    @if (isInputsExpanded()) {
-      <step-json-view-expanded class="pointer" [data]="inputs" (click)="toggleInputsExpanded()">
-        <label>Inputs</label>
-      </step-json-view-expanded>
-    } @else {
-      <step-json-view-inline class="pointer" [data]="inputs" (click)="toggleInputsExpanded()">
-        <label>Inputs</label>
-      </step-json-view-inline>
-    }
-    <button type="button" mat-icon-button matTooltip="Copy to clipboard" (click)="copyInput()">
+    <step-json-view-expanded class="pointer" [data]="inputs" [limit]="5">
+      <label>Inputs</label>
+    </step-json-view-expanded>
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
       <step-icon name="copy" />
     </button>
   </section>
 }
 @if (keywordOutputs(); as outputs) {
   <section class="json-container">
-    @if (isOutputsExpanded()) {
-      <step-json-view-expanded class="pointer" [data]="outputs" (click)="toggleOutputsExpanded()">
-        <label>Outputs</label>
-      </step-json-view-expanded>
-    } @else {
-      <step-json-view-inline class="pointer" [data]="outputs" (click)="toggleOutputsExpanded()">
-        <label>Outputs</label>
-      </step-json-view-inline>
-    }
-    <button type="button" mat-icon-button matTooltip="Copy to clipboard" (click)="copyOutput()">
+    <step-json-view-expanded class="pointer" [data]="outputs" [limit]="5">
+      <label>Outputs</label>
+    </step-json-view-expanded>
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
       <step-icon name="copy" />
     </button>
   </section>
 }
-@if (children().length) {
-  <section class="data-container">
-    <label>Errors</label>
-    <div>
-      @for (child of children(); track child.id) {
-        <step-assert-report-node-short [node]="child" />
-      }
-    </div>
-  </section>
+@if (children(); as children) {
+  @if (children.length) {
+    <section class="data-container">
+      <label>Errors</label>
+      <div>
+        @for (child of children; track child.id) {
+          <step-assert-report-node-short [node]="child" />
+        }
+      </div>
+    </section>
+  }
 }
 @if (node()?.error; as err) {
   <section class="data-container error">
@@ -56,15 +46,6 @@
       <div>
         <step-attachments-preview [attachments]="attachments" />
       </div>
-    </section>
-  }
-}
-@if (children(); as children) {
-  @if (children.length) {
-    <section class="data-container">
-      @for (child of children; track child.id) {
-        <step-assert-report-node-short [node]="child" />
-      }
     </section>
   }
 }

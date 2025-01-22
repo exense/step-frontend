@@ -15,10 +15,11 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import {
-  ControllerService,
+  AugmentedControllerService,
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
+  NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
@@ -101,7 +102,8 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
-import { of } from 'rxjs';
+import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
+import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 
 @NgModule({
   declarations: [
@@ -200,6 +202,13 @@ import { of } from 'rxjs';
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
+  ],
+  providers: [
+    {
+      provide: NAVIGATOR_QUERY_PARAMS_CLEANUP,
+      useClass: ExecutionNavigatorQueryParamsCleanupService,
+      multi: true,
+    },
   ],
 })
 export class ExecutionModule {
@@ -447,20 +456,32 @@ export class ExecutionModule {
                 outlet: 'nodeDetails',
                 resolve: {
                   aggregatedNode: (route: ActivatedRouteSnapshot) => {
-                    const aggregatedNodeId = route.queryParams['aggregatedNodeId'];
                     const _state = inject(AGGREGATED_TREE_TAB_STATE);
+                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                    const aggregatedNodeId = route.queryParams[_queryParamNames.aggregatedNodeId];
                     if (!aggregatedNodeId) {
                       return undefined;
                     }
                     return _state.findNodeById(aggregatedNodeId);
                   },
                   reportNode: (route: ActivatedRouteSnapshot) => {
-                    const reportNodeId = route.queryParams['reportNodeId'];
                     const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                    return !!reportNodeId ? _reportNodeDetailsState.getReportNode(reportNodeId) : undefined;
+                    const _controllerService = inject(AugmentedControllerService);
+                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                    const reportNodeId = route.queryParams[_queryParamNames.reportNodeId];
+                    if (!reportNodeId) {
+                      return undefined;
+                    }
+                    const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
+                    if (reportNode) {
+                      return reportNode;
+                    }
+                    return _controllerService.getReportNode(reportNodeId);
                   },
-                  searchStatus: (route: ActivatedRouteSnapshot) =>
-                    route.queryParams['searchStatus'] as Status | undefined,
+                  searchStatus: (route: ActivatedRouteSnapshot) => {
+                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                    return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
+                  },
                 },
                 dialogComponent: AggregatedTreeNodeDialogComponent,
                 children: [

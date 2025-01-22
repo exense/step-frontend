@@ -13,7 +13,7 @@
     />
   </div>
   <div step-modal-window-body>
-    <step-rich-editor #richEditor [formControl]="textControl" [syntaxMode]="selectedMode" />
+    <step-rich-editor #richEditor [formControl]="textControl" [syntaxMode]="selectedMode" [wrapText]="_data.wrapText" />
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>

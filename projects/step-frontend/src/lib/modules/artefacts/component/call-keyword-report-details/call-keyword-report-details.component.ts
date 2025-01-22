@@ -11,7 +11,7 @@ import {
 import { KeywordReportNode } from '../../types/keyword.report-node';
 import { DOCUMENT } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, map, of, shareReplay, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 
@@ -58,20 +58,9 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     return result;
   });
 
-  protected isInputsExpanded = signal(false);
-  protected isOutputsExpanded = signal(false);
-
-  protected toggleInputsExpanded(): void {
-    this.isInputsExpanded.update((value) => !value);
-  }
-
-  protected toggleOutputsExpanded(): void {
-    this.isOutputsExpanded.update((value) => !value);
-  }
-
   private children$ = toObservable(this.contextInternal).pipe(
     switchMap((node) => {
-      if (!node || node.status === 'FAILED') {
+      if (!node || node.status !== 'FAILED') {
         return of(undefined);
       }
       return this._controllerService.getReportNodeChildren(node.id!).pipe(catchError(() => of(undefined)));
@@ -84,7 +73,6 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
           child.status !== 'PASSED',
       );
     }),
-    takeUntilDestroyed(),
   );
 
   protected readonly children = toSignal(this.children$, { initialValue: [] });

@@ -4,15 +4,17 @@
   } @else {
     <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
     <!--Assertion errors-->
-    @if (children()?.length) {
-      <section>
-        <label>Errors</label>
-        <div>
-          @for (child of children(); track child.id) {
-            <step-assert-report-node-short [node]="child" />
-          }
-        </div>
-      </section>
+    @if (children(); as children) {
+      @if (children.length) {
+        <section>
+          <label>Errors</label>
+          <div>
+            @for (child of children; track child.id) {
+              <step-assert-report-node-short [node]="child" />
+            }
+          </div>
+        </section>
+      }
     }
     <!--Error-->
     @if (node.error; as err) {
