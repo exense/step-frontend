@@ -243,7 +243,7 @@ export class ScheduleOverviewComponent implements OnInit {
       ];
       this.cumulateSeriesData(series);
       this.keywordsChartSettings = {
-        title: `Keywords calls by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
+        title: ``,
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
@@ -357,7 +357,7 @@ export class ScheduleOverviewComponent implements OnInit {
       ];
       this.cumulateSeriesData(series);
       this.testCasesChartSettings = {
-        title: `Test cases by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
+        title: `t`,
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
@@ -444,7 +444,7 @@ export class ScheduleOverviewComponent implements OnInit {
         },
       ];
       this.executionsChartSettings = {
-        title: 'Executions statuses over time',
+        title: '',
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {

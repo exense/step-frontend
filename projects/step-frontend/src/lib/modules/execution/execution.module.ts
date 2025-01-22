@@ -93,6 +93,7 @@ import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
 import { MatSort } from '@angular/material/sort';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -175,6 +176,7 @@ import { MatSort } from '@angular/material/sort';
     TooltipContentDirective,
     DatePipe,
     MatSort,
+    MatProgressSpinner,
   ],
   exports: [
     ExecutionListComponent,

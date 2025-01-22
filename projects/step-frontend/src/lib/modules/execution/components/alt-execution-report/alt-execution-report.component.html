@@ -1,6 +1,8 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
   @if (keywordsSummary$ | async; as keywordsSummary) {
-    <step-alt-report-node-summary title="Summary: Steps" [summary]="keywordsSummary" />
+    <step-alt-report-widget title="Summary: Steps">
+      <step-alt-report-node-summary [summary]="keywordsSummary" />
+    </step-alt-report-widget>
   }
   @if (_mode === ViewMode.VIEW) {
     <step-alt-report-node-keywords
@@ -13,7 +15,9 @@
     <step-alt-report-nodes-testcases />
   }
   @if (testCasesSummary$ | async; as testCasesSummary) {
-    <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+    <step-alt-report-widget title="Summary: Testcases">
+      <step-alt-report-node-summary [summary]="testCasesSummary" />
+    </step-alt-report-widget>
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
