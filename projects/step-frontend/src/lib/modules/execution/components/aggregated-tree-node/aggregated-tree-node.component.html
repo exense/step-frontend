@@ -2,14 +2,14 @@
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info">
-        <step-icon [name]="isHideInlineInfo() ? 'chevron-down' : 'chevron-right'" (click)="toggleInfo()" />
-        <span (click)="toggleInfo()">{{ node?.name }}</span>
-        <step-aggregated-tree-status [node]="node" (click)="showAggregatedDetails()" />
+        <span class="name" (click)="showIterations()">{{ node?.name }}</span>
+        <step-aggregated-tree-status [node]="node" (statusClick)="showIterations($event)" />
         <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
-        @if (!isHideInlineInfo()) {
-          <step-artefact-inline-details [aggregatedInfo]="node" />
-        }
+        <step-artefact-inline-details [aggregatedInfo]="node" />
       </div>
+    }
+    @case (AggregateTreeNodeType.PSEUDO_CONTAINER) {
+      {{ node?.name }}
     }
     @default {}
   }

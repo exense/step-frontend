@@ -4,7 +4,7 @@
   </div>
 }
 
-<h1 mat-dialog-title>
+<h1 data-step-testid mat-dialog-title>
   <section class="header-title">
     {{ title }}
     <div #titleContent [class.without-chidlren]="!titleContent.children.length">
@@ -16,7 +16,7 @@
   </section>
 </h1>
 
-<div mat-dialog-content #dialogContent>
+<div mat-dialog-content #dialogContent class="dialog-content">
   <input type="text" class="track-focus" #trackFocus />
   <ng-content select="[step-modal-window-body]" />
 </div>

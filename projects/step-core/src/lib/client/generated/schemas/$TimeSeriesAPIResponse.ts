@@ -48,5 +48,9 @@ export const $TimeSeriesAPIResponse = {
       type: 'boolean',
       isRequired: true,
     },
+    ttlCovered: {
+      type: 'boolean',
+      isRequired: true,
+    },
   },
 } as const;

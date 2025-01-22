@@ -9,12 +9,6 @@ import { RepositoryObjectReference } from '@exense/step-core';
 export class AltExecutionRepositoryComponent {
   readonly repositoryParams = input.required<RepositoryObjectReference>();
 
-  constructor() {
-    effect(() => {
-      console.log(this.repositoryParams());
-    });
-  }
-
   protected readonly repositoryId = computed(() => this.repositoryParams().repositoryID);
 
   protected readonly repositoryKey = computed(() => {

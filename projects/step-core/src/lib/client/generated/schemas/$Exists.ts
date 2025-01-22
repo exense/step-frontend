@@ -7,12 +7,5 @@ export const $Exists = {
     {
       type: 'Filter',
     },
-    {
-      properties: {
-        field: {
-          type: 'string',
-        },
-      },
-    },
   ],
 } as const;

@@ -1,17 +1,5 @@
-<as-split direction="horizontal">
-  <as-split-area [size]="50" class="tree-panel">
-    <step-tree [dragDisabled]="true" [forceFocus]="true">
-      <div *stepTreeNodeTemplate="let node" class="node-name">
-        <step-aggregated-tree-node [nodeId]="node.id" />
-      </div>
-      <div *stepTreeNodeDetailsTemplate="let node" class="node-info">
-        <step-aggregated-tree-node-info [nodeId]="node.id" />
-      </div>
-    </step-tree>
-  </as-split-area>
-  @if (aggregatedNode(); as node) {
-    <as-split-area [size]="50" class="node-details-panel">
-      <step-aggregated-tree-node-details [node]="node" />
-    </as-split-area>
-  }
-</as-split>
+<step-tree [dragDisabled]="true" [forceFocus]="true">
+  <div *stepTreeNodeTemplate="let node" class="node-name">
+    <step-aggregated-tree-node [nodeId]="node.id" />
+  </div>
+</step-tree>

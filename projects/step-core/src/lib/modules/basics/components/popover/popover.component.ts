@@ -11,6 +11,12 @@ import {
 import { TriggerPopoverDirective } from '../../directives/trigger-popover.directive';
 import { MatMenu } from '@angular/material/menu';
 
+export enum PopoverMode {
+  BOTH,
+  HOVER,
+  CLICK,
+}
+
 @Component({
   selector: 'step-popover',
   templateUrl: './popover.component.html',
@@ -22,7 +28,8 @@ import { MatMenu } from '@angular/material/menu';
 export class PopoverComponent {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
-  @Input() displayByClick = false;
+  @Input() noPadding = false;
+  @Input() mode = PopoverMode.BOTH;
 
   @Output() toggledEvent = new EventEmitter<boolean>();
 
@@ -33,20 +40,25 @@ export class PopoverComponent {
 
   protected isMouseOverPopover = false;
 
-  @HostListener('click', ['$event'])
-  private togglePopover($event?: MouseEvent): void {
-    if ($event) {
-      $event.preventDefault();
-      $event.stopImmediatePropagation();
-    }
+  private togglePopover(): void {
     this.toggled = !this.toggled;
     this.toggled ? this.triggerPopoverDirective.openMenu() : this.triggerPopoverDirective.closeMenu();
     this.toggledEvent.emit(this.toggled);
   }
 
+  @HostListener('click', ['$event'])
+  private handleClick($event: MouseEvent): void {
+    if (this.mode === PopoverMode.HOVER) {
+      return;
+    }
+    $event.preventDefault();
+    $event.stopImmediatePropagation();
+    this.togglePopover();
+  }
+
   @HostListener('document:click')
   private handleDocumentClick(): void {
-    if (!this.displayByClick || !this.toggled) {
+    if (this.mode !== PopoverMode.CLICK || !this.toggled) {
       return;
     }
     this.togglePopover();
@@ -54,7 +66,7 @@ export class PopoverComponent {
 
   @HostListener('mouseenter')
   protected onPopoverMouseEnter(): void {
-    if (this.displayByClick) {
+    if (this.mode === PopoverMode.CLICK) {
       return;
     }
     this.tooltipTimeout = setTimeout(() => {
@@ -65,7 +77,7 @@ export class PopoverComponent {
 
   @HostListener('mouseleave')
   protected onPopoverMouseLeave(): void {
-    if (this.displayByClick) {
+    if (this.mode === PopoverMode.CLICK) {
       return;
     }
     clearTimeout(this.tooltipTimeout);

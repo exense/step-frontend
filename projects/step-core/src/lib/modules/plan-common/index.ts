@@ -23,6 +23,8 @@ export * from './injectables/plan-context-initializer.service';
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
 export * from './types/plan-context.interface';
+export * from './types/artefact-node-source.enum';
+export * from './types/artefact-tree-node';
 
 export * from './pipes/plan-name.pipe';
 export * from './pipes/plan-url.pipe';

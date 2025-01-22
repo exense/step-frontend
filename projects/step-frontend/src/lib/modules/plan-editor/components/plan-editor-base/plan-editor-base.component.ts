@@ -48,6 +48,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ArtefactTreeStateService } from '../../injectables/artefact-tree-state.service';
 
 const PLAN_SIZE = 'PLAN_SIZE';
 const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
@@ -72,7 +73,11 @@ export interface ActionsConfig {
       provide: ArtefactRefreshNotificationService,
       useExisting: ArtefactTreeNodeUtilsService,
     },
-    TreeStateService,
+    ArtefactTreeStateService,
+    {
+      provide: TreeStateService,
+      useExisting: ArtefactTreeStateService,
+    },
     PlanHistoryService,
     InteractiveSessionService,
     {
@@ -128,7 +133,7 @@ export class PlanEditorBaseComponent
     showExecuteButton: true,
     showExportSourceButton: true,
   };
-  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
+  @Output() runPlan = new EventEmitter<void>();
 
   selectedTab = 'controls';
 
@@ -251,8 +256,8 @@ export class PlanEditorBaseComponent
     }
 
     const artefact = this._treeState.getSelectedNodes()[0]?.originalArtefact;
-    const isPlan = artefact._class === 'CallPlan';
-    const isKeyword = artefact._class === 'CallKeyword';
+    const isPlan = artefact?._class === 'CallPlan';
+    const isKeyword = artefact?._class === 'CallKeyword';
 
     const NO_DATA = 'NO_DATA';
 

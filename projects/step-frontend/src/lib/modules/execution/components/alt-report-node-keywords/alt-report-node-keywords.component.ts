@@ -1,11 +1,19 @@
 import { Component, inject, output, viewChild } from '@angular/core';
-import { ItemsPerPageService, ReportNode, SelectionCollector, TableSearch } from '@exense/step-core';
+import {
+  AugmentedScreenService,
+  ItemsPerPageService,
+  ReportNode,
+  SelectionCollector,
+  TableSearch,
+} from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { map, Observable, of } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -23,11 +31,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
   ],
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
+  private _screenApiService = inject(AugmentedScreenService);
   private _selectionCollector = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
 
   private _executionState = inject(AltExecutionStateService);
-
-  protected readonly _keywordsState = inject(AltKeywordNodesStateService);
+  private _dialogs = inject(AltExecutionDialogsService);
 
   protected tableSearch = viewChild('table', { read: TableSearch });
 
@@ -35,14 +43,37 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected hasTestCasesFilter = toSignal(this._executionState.hasTestCasesFilter$, { initialValue: false });
 
+  private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
+
   /** @Output() **/
   openKeywordInTreeView = output<ReportNode>();
 
-  protected toggleDetail(node: ReportNode): void {
-    this._keywordsState.toggleDetail(node);
+  protected openDetails(node: ReportNode): void {
+    this._dialogs.openIterationDetails(node);
   }
 
   protected clearTestCasesFilter(): void {
     this._selectionCollector.clear();
+  }
+
+  override setupSearchFilter(): void {
+    this._state.search$
+      .pipe(
+        map((value) => this._filterConditionFactory.reportNodeFilterCondition(value, this.keywordColumnIds())),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((filterCondition) => {
+        this.tableSearch()?.onSearch('name', filterCondition);
+      });
+  }
+
+  private getKeywordColumnIds(): Observable<string[]> {
+    return this._screenApiService.getInputsForScreenPost('keyword').pipe(
+      map((inputs) => inputs.map((input) => input?.id || '').filter((id) => !!id)),
+      catchError((err) => {
+        console.error(err);
+        return of([]);
+      }),
+    );
   }
 }

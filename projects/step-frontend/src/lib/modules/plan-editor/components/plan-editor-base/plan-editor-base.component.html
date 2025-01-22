@@ -27,7 +27,6 @@
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
-        [description]="planContext?.plan?.attributes?.['name']"
         [repositoryObjectRef]="repositoryObjectRef"
         (discardAll)="_planEditService.discardAll()"
         (undo)="_planEditService.undo()"
@@ -38,41 +37,43 @@
         (reset)="resetInteractive()"
         (stop)="stopInteractive()"
         (showSource)="showPlanSource()"
-        (scheduleTask)="scheduleTask.emit($event)"
+        (runPlan)="runPlan.emit()"
       />
     }
   </div>
 
-  <step-split stepMaxHeightViewportHeightMinusOffsetTop>
-    <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
-      @if (planClass) {
-        <step-plan-type [itemKey]="planClass" />
-      }
-    </step-split-area>
-
-    <step-split-gutter />
-
-    <step-split-area
-      [size]="planControlsSize"
-      (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
-    >
-      <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true" />
-      <div class="tab-content" [ngSwitch]="selectedTab">
-        @switch (selectedTab) {
-          @case ('controls') {
-            <step-plan-artefact-list (onSelection)="addControl($event)" />
-          }
-          @case ('keywords') {
-            <step-plan-function-list (addKeywords)="addKeywords($event)" />
-          }
-          @case ('other') {
-            <step-plan-otherplan-list (addPlans)="addPlans($event)" />
-          }
-          @case ('console') {
-            <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
-          }
+  <section stepDragDropGroupContainer stepDropAreaId="planTree">
+    <step-split stepMaxHeightViewportHeightMinusOffsetTop>
+      <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
+        @if (planClass) {
+          <step-plan-type [itemKey]="planClass" />
         }
-      </div>
-    </step-split-area>
-  </step-split>
+      </step-split-area>
+
+      <step-split-gutter />
+
+      <step-split-area
+        [size]="planControlsSize"
+        (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
+      >
+        <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true" />
+        <div class="tab-content" [ngSwitch]="selectedTab">
+          @switch (selectedTab) {
+            @case ('controls') {
+              <step-plan-artefact-list (onSelection)="addControl($event)" />
+            }
+            @case ('keywords') {
+              <step-plan-function-list (addKeywords)="addKeywords($event)" />
+            }
+            @case ('other') {
+              <step-plan-otherplan-list (addPlans)="addPlans($event)" />
+            }
+            @case ('console') {
+              <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
+            }
+          }
+        </div>
+      </step-split-area>
+    </step-split>
+  </section>
 </div>

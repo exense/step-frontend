@@ -4,6 +4,7 @@
   border-radius: $radius;
   border: 0.1rem solid var.$gray-300;
 
+  .mat-mdc-button-base,
   .mat-mdc-outlined-button {
     border-radius: 0;
 
@@ -31,6 +32,7 @@ step-btn-group {
   &.without-borders,
   &.with-round-borders,
   &.with-borders {
+    .mat-mdc-button-base,
     .mat-mdc-outlined-button {
       border: 0;
       border-radius: 0;
@@ -46,6 +48,7 @@ step-btn-group {
   }
 
   &.without-borders {
+    .mat-mdc-button-base,
     .mat-mdc-outlined-button {
       border-radius: 2.8rem;
       width: 3.6rem;
