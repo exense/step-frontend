@@ -87,6 +87,7 @@ export class ScheduleOverviewComponent implements OnInit {
   private _router = inject(Router);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'RELATIVE', relativeSelection: { label: 'Last day', timeInMs: TimeUnit.DAY } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last week', timeInMs: TimeUnit.DAY * 7 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.DAY * 14 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last month', timeInMs: TimeUnit.DAY * 30 } },
@@ -128,7 +129,7 @@ export class ScheduleOverviewComponent implements OnInit {
     if (urlParams.timeRangeSelection) {
       this.activeTimeRangeSelection.set(urlParams.timeRangeSelection!);
     } else {
-      this.activeTimeRangeSelection.set(this.timeRangeOptions[0]);
+      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
     effect(() => {
       let range = this.timeRange();
