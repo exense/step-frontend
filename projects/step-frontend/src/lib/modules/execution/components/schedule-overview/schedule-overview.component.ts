@@ -105,6 +105,7 @@ export class ScheduleOverviewComponent implements OnInit {
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
   testCasesChartSettings?: TSChartSettings;
+  emptyTestCasesResponse = false;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   lastKeywordsExecutions: Execution[] = [];
@@ -298,8 +299,10 @@ export class ScheduleOverviewComponent implements OnInit {
       const allStatuses = new Set<string>();
       if (timeSeriesResponse.matrixKeys.length === 0) {
         // don't display the chart when there are no test cases data
+        this.emptyTestCasesResponse = true;
         return;
       }
+      this.emptyTestCasesResponse = false;
       timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
         // const nodeName = attributes['name'];
         // let artefactHash = attributes['artefactHash'];
