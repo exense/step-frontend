@@ -357,7 +357,7 @@ export class ScheduleOverviewComponent implements OnInit {
       ];
       this.cumulateSeriesData(series);
       this.testCasesChartSettings = {
-        title: `t`,
+        title: ``,
         showLegend: false,
         showDefaultLegend: true,
         xAxesSettings: {
