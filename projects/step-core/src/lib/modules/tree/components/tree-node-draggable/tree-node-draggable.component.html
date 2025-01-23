@@ -1,0 +1,73 @@
+<div
+  class="tree-node"
+  [class.tree-node-selected]="_treeNode.isSelected()"
+  [class.tree-node-selected-for-insert]="_treeNode.isSelectedForInsert()"
+  [class.tree-node-hidden]="_treeNode.isHidden()"
+  [class.skipped]="_treeNode.node().isVisuallySkipped"
+  [class.root-node]="_treeNode.isRootNode()"
+>
+  @if (_treeNode.canToggle()) {
+    <button mat-icon-button (click)="_treeNode.toggle()">
+      <step-icon class="toggle-state" [name]="_treeNode.toggleStateIcon()" />
+    </button>
+  } @else {
+    <div class="no-toggle"></div>
+  }
+  @if (_treeNode.node(); as n) {
+    <div
+      class="node-content"
+      (contextmenu)="_treeNode.openContextMenu($event)"
+      [stepDragItem]="n.id"
+      [dragDisabled]="dragDisabled()"
+      [stepDropArea]="n.id"
+      (dragOver)="dragOver.emit($event)"
+      (dropItem)="dropNode.emit($event)"
+      [dropDisabled]="dropDisabled()"
+    >
+      @if (n.icon) {
+        <div class="node-icon">
+          <step-icon [name]="n.icon" [class]="n.iconClassName" />
+        </div>
+      }
+      <step-tree-node-name [node]="n" />
+    </div>
+  }
+</div>
+@if (_treeNode.node(); as n) {
+  @if (dropDisabled()) {
+    @for (pId of n.parentPath; track pId; let idx = $index) {
+      <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+    }
+  } @else {
+    @for (pId of n.parentPath; track pId; let idx = $index) {
+      <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+      <section
+        draggable="false"
+        class="middle-drop-container"
+        [style.--idx]="idx"
+        [stepDropArea]="pId"
+        [dropAdditionalInfo]="n.parentPath[idx + 1] || n.id"
+        (dropItem)="dropNode.emit($event)"
+      >
+        <div></div>
+      </section>
+    }
+    <section
+      draggable="false"
+      class="middle-drop-container"
+      [style.--idx]="n.parentPath.length"
+      [stepDropArea]="n.id"
+      dropAdditionalInfo="first"
+      (dropItem)="dropNode.emit($event)"
+    >
+      <div></div>
+    </section>
+  }
+}
+@if (_treeNodeTemplateContainer.treeNodeDetailsTemplate(); as detailsTemplate) {
+  @if (_treeNode.node(); as n) {
+    <div class="tree-node-details">
+      <ng-container *ngTemplateOutlet="detailsTemplate.templateRef; context: { $implicit: n }" />
+    </div>
+  }
+}

@@ -3,12 +3,14 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
+  DateRange,
   DateUtilsService,
   Execution,
   ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
+  TimeOption,
   STATUS_COLORS,
   TableDataSource,
   TableLocalDataSource,
@@ -22,9 +24,11 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { DateTime, Duration } from 'luxon';
+import { TooltipContextData } from '../../../timeseries/modules/chart/injectables/tooltip-context-data';
 
 declare const uPlot: any;
 
@@ -32,8 +36,8 @@ interface UrlParams {
   timeRangeSelection?: TimeRangePickerSelection;
 }
 
-interface ExecutionWithKeywordsStats {
-  executionId: string;
+interface EntityWithKeywordsStats {
+  entity: string;
   timestamp: number;
   statuses: Record<string, number>;
 }
@@ -44,20 +48,9 @@ interface TableErrorEntry {
   count: number;
   percentage: number;
   executionIds: string[];
+  executionIdsTruncated: boolean;
   types: string[]; // can be more when using same error code/message
 }
-
-const EMPTY_TS_RESPONSE = {
-  start: 0,
-  interval: 0,
-  end: 0,
-  matrix: [],
-  matrixKeys: [],
-  truncated: false,
-  collectionResolution: 0,
-  higherResolutionUsed: false,
-  ttlCovered: false,
-};
 
 @Component({
   selector: 'step-schedule-overview',
@@ -120,6 +113,7 @@ export class ScheduleOverviewComponent implements OnInit {
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
+  testCasesChartSettings?: TSChartSettings;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   lastKeywordsExecutions: Execution[] = [];
@@ -156,9 +150,11 @@ export class ScheduleOverviewComponent implements OnInit {
     }
     this.createPieChart(taskId, fullRange);
     this.createExecutionsChart(taskId, fullRange);
-    this.createKeywordsChart(taskId, fullRange);
-    this.createErrorsChart(taskId, fullRange);
     this.fetchLastExecution(taskId);
+    this.getLastExecutionsSorted(taskId, fullRange).subscribe((executions) => {
+      this.createKeywordsChart(fullRange, executions);
+      this.createTestCasesChart(fullRange, executions);
+    });
   }
 
   private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
@@ -187,125 +183,235 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  private createKeywordsChart(taskId: string, timeRange: TimeRange) {
-    this._executionService
+  private getLastExecutionsSorted(taskId: string, timeRange: TimeRange): Observable<Execution[]> {
+    return this._executionService
       .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
       .pipe(
-        switchMap((executions) => {
-          if (executions.length === 0) {
-            return of({
-              executions: [],
-              timeSeriesResponse: EMPTY_TS_RESPONSE,
-            });
-          }
-          const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
-          let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
-          if (executionsIdsJoined) {
-            oqlFilter += ` and (${executionsIdsJoined})`;
-          }
-          const request: FetchBucketsRequest = {
-            start: timeRange.from,
-            end: timeRange.to,
-            numberOfBuckets: 1,
-            oqlFilter: oqlFilter,
-            groupDimensions: ['eId', 'rnStatus'],
-          };
-
-          return this._timeSeriesService.getTimeSeries(request).pipe(
-            map((tsResponse) => {
-              return { executions: executions, timeSeriesResponse: tsResponse };
-            }),
-          );
+        map((executions) => {
+          executions.sort((a, b) => a.startTime! - b.startTime!);
+          return executions;
         }),
-      )
-      .subscribe(({ executions, timeSeriesResponse }) => {
-        this.lastKeywordsExecutions = executions;
-        const statusAttribute = 'rnStatus';
-        let executionStats: Record<string, ExecutionWithKeywordsStats> = {};
-        const allStatuses = new Set<string>();
-        timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-          const executionId = attributes['eId'];
-          const status = attributes[statusAttribute];
-          allStatuses.add(status);
-          let executionEntry: ExecutionWithKeywordsStats = {
-            executionId: executionId,
-            statuses: {},
-            timestamp: 0,
-          };
-          if (executionStats[executionId]) {
-            executionEntry = executionStats[executionId];
-          } else {
-            executionStats[executionId] = executionEntry;
-          }
-          timeSeriesResponse.matrix[i].forEach((bucket) => {
-            if (bucket) {
-              const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
-              executionEntry.statuses[status] = newCount;
-            }
-          });
-        });
-        executions.sort((a, b) => a.startTime! - b.startTime!);
-        let series = Array.from(allStatuses).map((status) => {
-          let color = this._statusColors[status as Status];
-          const fill = color + 'cc';
-          const s: TSChartSeries = {
-            id: status,
-            scale: 'y',
-            labelItems: [status],
-            legendName: status,
-            data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
-            width: 1,
-            value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-              this.calculateStackedValue(self, rawValue, seriesIdx, idx),
-            stroke: color,
-            fill: fill,
-            paths: this.bars,
-            points: { show: false },
-            show: true,
-          };
-          return s;
-        });
-        const axes: Axis[] = [
-          {
-            size: TimeSeriesConfig.CHART_LEGEND_SIZE,
-            scale: 'y',
-            values: (u, vals) => {
-              return vals;
-            },
-          },
-        ];
-        this.cumulateSeriesData(series);
-        this.keywordsChartSettings = {
-          title: `Keywords calls by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
-          showLegend: false,
-          showDefaultLegend: true,
-          xAxesSettings: {
-            time: false,
-            label: 'Execution',
-            show: false,
-            values: executions.map((item, i) => i),
-            valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
-              return executions[idx].description!;
-            },
-          },
-          cursor: {
-            lock: true,
-          },
-          scales: {
-            y: {
-              range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-                return [0, initMax];
-              },
-            },
-          },
-          series: series,
-          tooltipOptions: {
-            enabled: true,
-          },
-          axes: axes,
-          bands: this.getDefaultBands(series.length),
+      );
+  }
+
+  private createKeywordsChart(timeRange: TimeRange, executions: Execution[]) {
+    if (executions.length === 0) {
+      return;
+    }
+    const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
+    let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
+    if (executionsIdsJoined) {
+      oqlFilter += ` and (${executionsIdsJoined})`;
+    }
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: oqlFilter,
+      groupDimensions: ['eId', 'rnStatus'],
+    };
+
+    return this._timeSeriesService.getTimeSeries(request).subscribe((timeSeriesResponse) => {
+      this.lastKeywordsExecutions = executions;
+      const statusAttribute = 'rnStatus';
+      let executionStats: Record<string, EntityWithKeywordsStats> = {};
+      const allStatuses = new Set<string>();
+      timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
+        const executionId = attributes['eId'];
+        const status = attributes[statusAttribute];
+        allStatuses.add(status);
+        let executionEntry: EntityWithKeywordsStats = {
+          entity: executionId,
+          statuses: {},
+          timestamp: 0,
         };
+        if (executionStats[executionId]) {
+          executionEntry = executionStats[executionId];
+        } else {
+          executionStats[executionId] = executionEntry;
+        }
+        timeSeriesResponse.matrix[i].forEach((bucket) => {
+          if (bucket) {
+            const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+            executionEntry.statuses[status] = newCount;
+          }
+        });
       });
+      let series = Array.from(allStatuses).map((status) => {
+        let color = this._statusColors[status as Status];
+        const fill = color + 'cc';
+        const s: TSChartSeries = {
+          id: status,
+          scale: 'y',
+          labelItems: [status],
+          legendName: status,
+          data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+          width: 1,
+          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          stroke: color,
+          fill: fill,
+          paths: this.bars,
+          points: { show: false },
+          show: true,
+        };
+        return s;
+      });
+      const axes: Axis[] = [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals;
+          },
+        },
+      ];
+      this.cumulateSeriesData(series);
+      this.keywordsChartSettings = {
+        title: `Keywords calls by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
+        showLegend: false,
+        showDefaultLegend: true,
+        xAxesSettings: {
+          time: false,
+          label: 'Execution',
+          show: false,
+          values: executions.map((item, i) => i),
+          valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
+            return executions[idx].description!;
+          },
+        },
+        cursor: {
+          lock: true,
+        },
+        scales: {
+          y: {
+            range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+              return [0, initMax];
+            },
+          },
+        },
+        series: series,
+        tooltipOptions: {
+          enabled: true,
+        },
+        axes: axes,
+        bands: this.getDefaultBands(series.length),
+      };
+    });
+  }
+
+  private createTestCasesChart(timeRange: TimeRange, executions: Execution[]) {
+    if (executions.length === 0) {
+      return;
+    }
+    const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
+    let oqlFilter = 'attributes.type = TestCase';
+    if (executionsIdsJoined) {
+      oqlFilter += ` and (${executionsIdsJoined})`;
+    }
+    const request: FetchBucketsRequest = {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: oqlFilter,
+      groupDimensions: ['executionId', 'status'],
+    };
+
+    return this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((timeSeriesResponse) => {
+      this.lastKeywordsExecutions = executions;
+      let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
+      const allStatuses = new Set<string>();
+      if (timeSeriesResponse.matrixKeys.length === 0) {
+        // don't display the chart when there are no test cases data
+        return;
+      }
+      timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
+        // const nodeName = attributes['name'];
+        // let artefactHash = attributes['artefactHash'];
+        const executionId = attributes['executionId'];
+        const status = attributes['status'];
+        // const nodeUniqueId = nodeName + artefactHash;
+
+        allStatuses.add(status);
+        let executionEntry: EntityWithKeywordsStats = {
+          entity: executionId,
+          statuses: {},
+          timestamp: 0,
+        };
+        if (statsByNodes[executionId]) {
+          executionEntry = statsByNodes[executionId];
+        } else {
+          statsByNodes[executionId] = executionEntry;
+        }
+        timeSeriesResponse.matrix[i].forEach((bucket) => {
+          if (bucket) {
+            const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+            executionEntry.statuses[status] = newCount;
+          }
+        });
+      });
+      let series = Array.from(allStatuses).map((status) => {
+        let color = this._statusColors[status as Status];
+        const fill = color + 'cc';
+        const s: TSChartSeries = {
+          id: status,
+          scale: 'y',
+          labelItems: [status],
+          legendName: status,
+          data: executions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
+          width: 1,
+          value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+            this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+          stroke: color,
+          fill: fill,
+          paths: this.bars,
+          points: { show: false },
+          show: true,
+        };
+        return s;
+      });
+      console.log(series);
+      const axes: Axis[] = [
+        {
+          size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+          scale: 'y',
+          values: (u, vals) => {
+            return vals;
+          },
+        },
+      ];
+      this.cumulateSeriesData(series);
+      this.testCasesChartSettings = {
+        title: `Test cases by execution (last ${this.LAST_EXECUTIONS_TO_DISPLAY})`,
+        showLegend: false,
+        showDefaultLegend: true,
+        xAxesSettings: {
+          time: false,
+          label: 'Execution',
+          show: false,
+          values: executions.map((item, i) => i),
+          valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
+            return executions[idx].description!;
+          },
+        },
+        cursor: {
+          lock: true,
+        },
+        scales: {
+          y: {
+            range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+              return [0, initMax];
+            },
+          },
+        },
+        series: series,
+        tooltipOptions: {
+          enabled: true,
+        },
+        axes: axes,
+        bands: this.getDefaultBands(series.length),
+      };
+    });
   }
 
   private fetchLastExecution(taskId: string): void {
@@ -440,6 +546,7 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
+    const executionsAttributesLimit = 10;
     const request: FetchBucketsRequest = {
       start: timeRange.from,
       end: timeRange.to,
@@ -447,7 +554,7 @@ export class ScheduleOverviewComponent implements OnInit {
       oqlFilter: `attributes.taskId = ${taskId}`,
       groupDimensions: ['errorMessage', 'errorCode'],
       collectAttributeKeys: ['status', 'executionId'],
-      collectAttributesValuesLimit: 10,
+      collectAttributesValuesLimit: executionsAttributesLimit,
     };
     this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
       let totalCountWithErrors = 0;
@@ -469,6 +576,7 @@ export class ScheduleOverviewComponent implements OnInit {
               percentage: 0,
               overallPercentage: 0,
               executionIds: bucket.attributes['executionId'] as string[],
+              executionIdsTruncated: (bucket.attributes['executionId'] || []).length >= executionsAttributesLimit,
               types: (bucket.attributes['status'] as string[]) || [],
             } as TableErrorEntry;
           }
@@ -478,7 +586,7 @@ export class ScheduleOverviewComponent implements OnInit {
       data.forEach((entry) => {
         entry.percentage = Number(((entry.count / totalCountWithErrors) * 100).toFixed(2));
       });
-      this.errorsDataSource = new TableLocalDataSource(data);
+      this.errorsDataSource = new TableLocalDataSource(data, {});
     });
   }
 

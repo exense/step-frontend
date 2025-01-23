@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
-import { TreeAction } from '../shared/tree-action';
-import { TreeNode } from '../shared/tree-node';
+import { TreeAction } from '../types/tree-action';
+import { TreeNode } from '../types/tree-node';
 
 export abstract class TreeActionsService {
   abstract getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]>;

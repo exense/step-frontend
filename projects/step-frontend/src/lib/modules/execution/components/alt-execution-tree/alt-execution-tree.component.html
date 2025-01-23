@@ -1,7 +1,7 @@
 <as-split direction="horizontal">
   <as-split-area [size]="50" class="tree-container">
     <step-tree [dragDisabled]="true" [forceFocus]="true">
-      <div *stepTreeNodeTemplate="let node" class="node-name">
+      <div *stepTreeNodeNameTemplate="let node" class="node-name">
         <step-aggregated-tree-node [nodeId]="node.id" />
       </div>
       <div *stepTreeNodeDetailsTemplate="let node" class="node-details">

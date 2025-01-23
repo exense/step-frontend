@@ -12,6 +12,7 @@ export class ErrorDetailsMenuComponent {
   readonly DateFormat = DateFormat;
 
   executionIds = input<string[]>([]);
+  truncated = input<boolean>(false);
   loading = signal(false);
 
   executions: Execution[] = [];
@@ -23,7 +24,7 @@ export class ErrorDetailsMenuComponent {
       this._timeSeriesEntityService.getExecutions(ids).subscribe(
         (executions) => {
           this.executions = executions;
-          this.executions.sort((e1, e2) => (e1.startTime! = e2.startTime!));
+          this.executions.sort((e1, e2) => e1.startTime! - e2.startTime!);
           this.loading.set(false);
         },
         (error) => {

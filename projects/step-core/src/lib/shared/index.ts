@@ -4,7 +4,6 @@ export * from './utils';
 export * from './script-language.enum';
 export * from './persistence-tokens';
 export * from './function-script-language.interface';
-export * from './artefact-context';
 export * from './function-type-script-options.token';
 export * from './auto-refresh-model.interface';
 export * from './aggregator-type.enum';

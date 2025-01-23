@@ -21,6 +21,7 @@ export * from './injectables/drag-drop-class-names.token';
 
 export * from './types/drop-info';
 export * from './types/drop-info';
+export * from './types/drag-end-type.enum';
 
 export const DRAG_DROP_EXPORTS = [
   DragDropContainerComponent,
