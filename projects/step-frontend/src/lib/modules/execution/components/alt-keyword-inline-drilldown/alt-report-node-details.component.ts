@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AugmentedControllerService, ReportNode } from '@exense/step-core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, shareReplay, switchMap, tap } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'step-alt-report-node-details',

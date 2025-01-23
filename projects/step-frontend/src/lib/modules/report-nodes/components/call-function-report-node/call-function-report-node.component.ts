@@ -1,10 +1,11 @@
 import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { DateFormat, Execution, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
+import { DateFormat, Measure, ReportNode, TableLocalDataSource } from '@exense/step-core';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { ExecutionStateService } from '../../../execution/services/execution-state.service';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 import { of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-call-function-report-node',
@@ -14,6 +15,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 export class CallFunctionReportNodeComponent implements OnChanges {
   private _executionState = inject(ExecutionStateService, { optional: true });
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
+  private _window = inject(DOCUMENT).defaultView!;
 
   private execution$ = this._altExecutionState
     ? this._altExecutionState.execution$
@@ -45,26 +47,26 @@ export class CallFunctionReportNodeComponent implements OnChanges {
     }
   }
 
-  navigateToAnalyticsView(measure: Measure) {
+  navigateToAnalyticsView(measure: Measure): void {
     const execution = this.execution();
     if (!execution) {
       return;
     }
-    const start = execution.startTime;
+    const start = execution.startTime!;
     const executionInProgress = !execution.endTime;
-    const params: any = {
-      executionId: execution.id,
-      name: measure.name,
-      start: start,
-      refresh: executionInProgress ? '1' : '0',
-      tsParams: 'eId,name,start,end,refresh',
+    const params: Record<string, string> = {
+      dc_rangeType: 'ABSOLUTE',
+      dc_q_eId: execution.id!,
+      dc_q_name: measure.name!,
+      dc_from: start!.toString(),
+      dc_refreshInterval: executionInProgress ? '1' : '0',
     };
     if (!executionInProgress) {
-      params.end = execution.endTime;
+      params['dc_to'] = execution.endTime!.toString();
     }
-    let paramsString = new URLSearchParams(params).toString();
+    const paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;
-    window.open(url, '_blank');
+    this._window.open(url, '_blank');
   }
 
   private filterChildren(children?: ReportNode[]): void {

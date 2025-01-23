@@ -1,7 +1,10 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
 }
 
 .json-node {
@@ -17,4 +20,14 @@
 
 button {
   margin-left: -1rem;
+}
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4rem;
+  height: 8rem;
+  pointer-events: none;
+  background: linear-gradient(transparent, var.$white);
 }

@@ -10,6 +10,9 @@
   </div>
 }
 @if (hasCollapseButton()) {
+  @if (isCollapsed()) {
+    <div class="fade"></div>
+  }
   <button mat-icon-button (click)="toggleCollapse()" [matTooltip]="isCollapsed() ? 'Show all' : 'Collapse'">
     @if (isCollapsed()) {
       <step-icon name="more-horizontal" />

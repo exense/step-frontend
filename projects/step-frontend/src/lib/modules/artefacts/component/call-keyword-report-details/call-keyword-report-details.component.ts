@@ -10,8 +10,8 @@ import {
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 import { DOCUMENT } from '@angular/common';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, shareReplay, switchMap } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 
@@ -24,7 +24,8 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
   private _controllerService = inject(AugmentedControllerService);
   private _formatter = inject(JsonViewerFormatterService);
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
-  private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
+  private _window = inject(DOCUMENT).defaultView!;
+  private clipboard = this._window.navigator.clipboard;
 
   protected readonly execution = toSignal(this._altExecutionState?.execution$ ?? of(undefined), {
     initialValue: undefined,
@@ -103,21 +104,21 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     if (!execution) {
       return;
     }
-    const start = execution.startTime;
+    const start = execution.startTime!;
     const executionInProgress = !execution.endTime;
-    const params: any = {
-      executionId: execution.id,
-      name: measure.name,
-      start: start,
-      refresh: executionInProgress ? '1' : '0',
-      tsParams: 'eId,name,start,end,refresh',
+    const params: Record<string, string> = {
+      dc_rangeType: 'ABSOLUTE',
+      dc_q_eId: execution.id!,
+      dc_q_name: measure.name!,
+      dc_from: start.toString(),
+      dc_refreshInterval: executionInProgress ? '1' : '0',
     };
     if (!executionInProgress) {
-      params.end = execution.endTime;
+      params['dc_to'] = execution.endTime!.toString();
     }
-    let paramsString = new URLSearchParams(params).toString();
+    const paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;
-    window.open(url, '_blank');
+    this._window.open(url, '_blank');
   }
 
   contextChange(previousContext?: KeywordReportNode, currentContext?: KeywordReportNode) {
@@ -129,7 +130,7 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
       return;
     }
     const formatted = this._formatter.formatToJsonString(json);
-    this._clipboard.writeText(formatted);
+    this.clipboard.writeText(formatted);
   }
 
   protected readonly DateFormat = DateFormat;
