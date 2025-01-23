@@ -1,0 +1,76 @@
+<step-split>
+  <step-split-area [size]="treeSize" (sizeChange)="handleTreeSizeChange($event)">
+    <step-drag-drop-container stepDropAreaId="planTree">
+      <step-tree
+        #tree
+        [dragDisabled]="isReadonly"
+        (nodeDblClick)="handleDoubleClick($event.node, $event.event)"
+        (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
+      >
+        <ng-container *stepTreeNodeTemplate="let node; let originalNode = originalNode">
+          <step-tree-node-draggable
+            [class.context-menu-open]="node.id === tree.openedMenuNodeId"
+            [dragDisabled]="!!(isReadonly || originalNode.isDragDisabled)"
+            [dropDisabled]="!!(isReadonly || originalNode.isDropDisabled)"
+            (contextMenu)="tree.openContextMenu($event)"
+            [node]="node"
+            (dragOver)="handleDragOver($event)"
+            (dropNode)="handleDropNode($event)"
+          />
+        </ng-container>
+        <div
+          *stepTreeNodeNameTemplate="let node"
+          class="node-name"
+          [class.node-displayed]="node.id === activeNode()?.id"
+        >
+          <span>{{ node?.name }}</span>
+          @if (_planInteractiveSession?.isInteractiveSessionActive$ | async) {
+            <button
+              type="button"
+              mat-flat-button
+              matTooltip="Execute in interactive session"
+              (click)="_planInteractiveSession?.execute(node.id)"
+            >
+              <step-icon name="play-circle" />
+            </button>
+          }
+          @if (!isReadonly && (node | treeNodeHasActions)) {
+            <button
+              class="actions-button"
+              type="button"
+              mat-flat-button
+              matTooltip="Show actions menu (right click)"
+              (click)="openTreeMenu($event, node.id)"
+            >
+              <step-icon name="more-horizontal" />
+            </button>
+          }
+        </div>
+      </step-tree>
+      <step-drag-preview>
+        <step-tree-drag-preview />
+      </step-drag-preview>
+    </step-drag-drop-container>
+  </step-split-area>
+
+  <step-split-gutter />
+
+  <step-split-area
+    sizeType="flex"
+    padding="24px"
+    [size]="artefactDetailsSize"
+    (sizeChange)="handleArtefactDetailsSizeChange($event)"
+  >
+    @if (activeNodeArtefact(); as selectedArtefact) {
+      <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
+    }
+    @if (activeNodeChildContainer(); as childContainer) {
+      <step-artefact-child-container-settings
+        [name]="activeNode()?.name"
+        [childContainer]="childContainer"
+        [isReadonly]="isReadonly"
+        (save)="handlePlanChange()"
+      />
+    }
+  </step-split-area>
+</step-split>

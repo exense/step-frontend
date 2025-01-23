@@ -20,7 +20,7 @@ step-dynamic-checkbox {
       width: 2rem !important;
       height: 2rem !important;
       step-icon {
-        line-height: 1 !important;
+        display: flex;
       }
     }
   }

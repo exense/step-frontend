@@ -1,20 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueInteger,
-  DynamicValueString,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface WhileArtefact extends AbstractArtefact {
-  condition: DynamicValueString;
-  postCondition: DynamicValueString;
-  pacing: DynamicValueInteger;
-  timeout: DynamicValueInteger;
-  maxIterations: DynamicValueInteger;
-}
+import { WhileArtefact } from '../../types/while.artefact';
 
 @Component({
   selector: 'step-while',

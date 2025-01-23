@@ -1,6 +1,6 @@
 <ng-container matColumnDef="entityIcon">
-  <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-  <td mat-cell *matCellDef="let element">
+  <th class="entity-column-header" mat-header-cell *matHeaderCellDef>&nbsp;</th>
+  <td class="entity-column-cell" mat-cell *matCellDef="let element">
     <entity-icon [entity]="entityPath ? $any(element)[entityPath] : element" [entityName]="entityName" />
   </td>
 </ng-container>

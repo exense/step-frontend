@@ -1,57 +1,18 @@
-<step-drag-drop-container>
-  @for (item of _treeState.flatTree(); track item.id) {
-    <div
-      class="node-container"
-      draggable="false"
-      [style.--level]="item.parentPath.length"
-      (click)="_treeState.selectNode(item, $event)"
-      (dblclick)="handleDblClick(item, $event)"
-    >
+@for (item of _treeState.flatTree(); track item.id) {
+  <div draggable="false" (click)="_treeState.selectNode(item, $event)" (dblclick)="handleDblClick(item, $event)">
+    @if (treeNodeTemplate(); as treeNode) {
+      <ng-container
+        *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
+      />
+    } @else {
       <step-tree-node
         [class.context-menu-open]="item.id === openedMenuNodeId"
-        [class.is-drag-in-progress]="!!(item.id | isDragData | async)"
         [node]="item"
-        [canToggle]="item.hasChild || item.expandable"
-        [dragDisabled]="dragDisabled"
         (contextMenu)="openContextMenu($event)"
-        [stepDropArea]="item.id"
-        (dropItem)="handleDropNode($event)"
       />
-      @if (dragDisabled) {
-        @for (pId of item.parentPath; track pId; let idx = $index) {
-          <div draggable="false" [style.--idx]="idx" class="node-line"></div>
-        }
-      } @else {
-        @for (pId of item.parentPath; track pId; let idx = $index) {
-          <div draggable="false" [style.--idx]="idx" class="node-line"></div>
-          <section
-            draggable="false"
-            class="middle-drop-container"
-            [style.--idx]="idx"
-            [stepDropArea]="pId"
-            [dropAdditionalInfo]="item.parentPath[idx + 1] || item.id"
-            (dropItem)="handleDropNode($event)"
-          >
-            <div></div>
-          </section>
-        }
-        <section
-          draggable="false"
-          class="middle-drop-container"
-          [style.--idx]="item.parentPath.length"
-          [stepDropArea]="item.id"
-          dropAdditionalInfo="first"
-          (dropItem)="handleDropNode($event)"
-        >
-          <div></div>
-        </section>
-      }
-    </div>
-  }
-  <step-drag-preview>
-    <step-tree-drag-preview />
-  </step-drag-preview>
-</step-drag-drop-container>
+    }
+  </div>
+}
 <div
   #nodeContextMenuTrigger
   class="node-context-menu-trigger"
@@ -72,7 +33,7 @@
         {{ action.label }}
       </button>
       @if (action.hasSeparator) {
-        <mat-divider *ngIf="action.hasSeparator" />
+        <mat-divider />
       }
     }
   </ng-template>

@@ -32,6 +32,14 @@ import { ArtefactInlineFieldComponent } from './component/artefact-inline-field/
 import { EchoInlineComponent } from './component/echo-inline/echo-inline.component';
 import { ArtefactInlineFieldListComponent } from './component/artefact-inline-field-list/artefact-inline-field-list.component';
 import { CallKeywordInlineComponent } from './component/call-keyword-inline/call-keyword-inline.component';
+import { SetInlineComponent } from './component/set-inline/set-inline.component';
+import { ForInlineComponent } from './component/for-inline/for-inline.component';
+import { SleepInlineComponent } from './component/sleep-inline/sleep-inline.component';
+import { AssertInlineComponent } from './component/assert-inline/assert-inline.component';
+import { AssertPerformanceInlineComponent } from './component/assert-performance-inline/assert-performance-inline.component';
+import { CallPlanInlineComponent } from './component/call-plan-inline/call-plan-inline.component';
+import { CaseInlineComponent } from './component/case-inline/case-inline.component';
+import { CheckInlineComponent } from './component/check-inline/check-inline.component';
 
 @NgModule({
   declarations: [
@@ -39,19 +47,25 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     EchoInlineComponent,
     ThreadGroupComponent,
     AssertComponent,
+    AssertInlineComponent,
     PlaceholderComponent,
     ExportComponent,
     CheckComponent,
+    CheckInlineComponent,
     RetryIfFailsComponent,
     CaseComponent,
+    CaseInlineComponent,
     SwitchComponent,
     SleepComponent,
+    SleepInlineComponent,
     SetComponent,
+    SetInlineComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
@@ -59,11 +73,13 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
+    CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
+    AssertPerformanceInlineComponent,
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
@@ -73,19 +89,24 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     EchoInlineComponent,
     ThreadGroupComponent,
     AssertComponent,
+    AssertInlineComponent,
     PlaceholderComponent,
     ExportComponent,
     CheckComponent,
+    CheckInlineComponent,
     RetryIfFailsComponent,
     CaseComponent,
+    CaseInlineComponent,
     SwitchComponent,
     SleepComponent,
     SetComponent,
+    SetInlineComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
     TestSetComponent,
     ForComponent,
+    ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
@@ -93,11 +114,13 @@ import { CallKeywordInlineComponent } from './component/call-keyword-inline/call
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
+    CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
+    AssertPerformanceInlineComponent,
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
@@ -125,6 +148,7 @@ export class ArtefactsModule {
     this._artefactService.register('CallPlan', {
       icon: 'external-link',
       component: CallPlanComponent,
+      inlineComponent: CallPlanInlineComponent,
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
@@ -137,6 +161,7 @@ export class ArtefactsModule {
     this._artefactService.register('For', {
       icon: 'cpu',
       component: ForComponent,
+      inlineComponent: ForInlineComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this._artefactService.register('ForEach', {
@@ -196,12 +221,14 @@ export class ArtefactsModule {
     });
     this._artefactService.register('Set', {
       component: SetComponent,
+      inlineComponent: SetInlineComponent,
       icon: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });
     this._artefactService.register('Sleep', {
       icon: 'coffee',
       component: SleepComponent,
+      inlineComponent: SleepInlineComponent,
       description: 'Causes the thread to sleep',
     });
     this._artefactService.register('Script', {
@@ -236,6 +263,7 @@ export class ArtefactsModule {
     this._artefactService.register('Case', {
       icon: 'minus',
       component: CaseComponent,
+      inlineComponent: CaseInlineComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
     });
     this._artefactService.register('RetryIfFails', {
@@ -246,12 +274,14 @@ export class ArtefactsModule {
     this._artefactService.register('Check', {
       icon: 'check',
       component: CheckComponent,
+      inlineComponent: CheckInlineComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
     this._artefactService.register('Assert', {
       icon: 'check',
       component: AssertComponent,
+      inlineComponent: AssertInlineComponent,
       description: 'Validates the output of a keyword execution.',
     });
     this._artefactService.register('Placeholder', {
@@ -270,6 +300,7 @@ export class ArtefactsModule {
     this._artefactService.register('PerformanceAssert', {
       icon: 'check',
       component: AssertPerformanceComponent,
+      inlineComponent: AssertPerformanceInlineComponent,
     });
 
     /* plan type control only */

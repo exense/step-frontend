@@ -47,9 +47,14 @@
               />
               <label for="collapsable-tab-{{ mainMenuEntry.title }}">
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                <span data-step-testid="sidebar-main-menu-title" class="sidebar-aligned-text">{{
-                  mainMenuEntry.title
-                }}</span>
+                <span
+                  data-step-testid="sidebar-main-menu-title"
+                  class="sidebar-aligned-text main-menu-name"
+                  [attr.data-icon]="mainMenuEntry.icon"
+                  [attr.data-id]="mainMenuEntry.id"
+                  [attr.data-title]="mainMenuEntry.title"
+                  >{{ mainMenuEntry.title }}</span
+                >
                 <span><step-icon class="chevron" name="chevron-right" /></span>
               </label>
             } @else {
@@ -59,7 +64,13 @@
                 (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
               >
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
-                <span class="sidebar-aligned-text">{{ mainMenuEntry.title }}</span>
+                <span
+                  class="sidebar-aligned-text main-menu-name"
+                  [attr.data-icon]="mainMenuEntry.icon"
+                  [attr.data-id]="mainMenuEntry.id"
+                  [attr.data-title]="mainMenuEntry.title"
+                  >{{ mainMenuEntry.title }}</span
+                >
               </label>
             }
             <div class="content">
@@ -71,9 +82,14 @@
                     (stepSideBarClick)="navigateTo(entry.id, $event)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
-                    <span data-step-testid="sidebar-sub-menu-title" class="sidebar-aligned-subtext">{{
-                      entry.title
-                    }}</span>
+                    <span
+                      data-step-testid="sidebar-sub-menu-title"
+                      class="sidebar-aligned-subtext sub-menu-name"
+                      [attr.data-icon]="entry.icon"
+                      [attr.data-id]="entry.id"
+                      [attr.data-title]="entry.title"
+                      >{{ entry.title }}</span
+                    >
                   </div>
                   <div class="sidebar-subtab-content">
                     @for (subEntry of entry.children; track subEntry.id) {
@@ -81,7 +97,7 @@
                         <div
                           class="sidebar-sub-subtab"
                           [class.sidebar-highlighted-subtab]="subEntry.id | isMenuItemActive | async"
-                          (mouseup)="navigateTo(entry.id, $event, entry.isBookmark)"
+                          (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark)"
                         >
                           <step-icon class="visible-when-collapsed" [name]="subEntry.icon || 'minus'" />
                           <span class="sidebar-aligned-sub-subtext" [matTooltip]="subEntry.title">

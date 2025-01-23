@@ -1,20 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueInteger,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface RetryIfFailsArtefact extends AbstractArtefact {
-  maxRetries: DynamicValueInteger;
-  gracePeriod: DynamicValueInteger;
-  timeout: DynamicValueInteger;
-  releaseTokens: DynamicValueBoolean;
-  reportLastTryOnly: DynamicValueBoolean;
-}
+import { RetryIfFailsArtefact } from '../../types/retry-if-fails.artefact';
 
 @Component({
   selector: 'step-retry-if-fails',

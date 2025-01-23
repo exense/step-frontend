@@ -1,15 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import {
-  AbstractArtefact,
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueInteger,
-} from '@exense/step-core';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface TestSetArtefact extends AbstractArtefact {
-  threads: DynamicValueInteger;
-}
+import { TestSetArtefact } from '../../types/test-set.artefact';
 
 @Component({
   selector: 'step-test-set',

@@ -2,7 +2,7 @@
   <ng-container [formGroup]="form">
     @if (!!primaryFields?.length) {
       @if (primaryFieldsLabel) {
-        <h5>{{ primaryFieldsLabel }}</h5>
+        <h5 data-step-testid>{{ primaryFieldsLabel }}</h5>
       }
       @if (primaryFieldsDescription) {
         <p class="description">{{ primaryFieldsDescription }}</p>

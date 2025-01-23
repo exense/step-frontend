@@ -3,6 +3,9 @@
 /* eslint-disable */
 export const $Filter = {
   properties: {
+    field: {
+      type: 'string',
+    },
     children: {
       type: 'array',
       contains: {

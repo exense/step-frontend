@@ -1,25 +1,20 @@
 <div
   class="tree-node"
-  [class.tree-node-selected]="isSelected()"
-  [class.tree-node-selected-for-insert]="isSelectedForInsert()"
-  [class.tree-node-hidden]="isHidden()"
-  [class.skipped]="node().isVisuallySkipped"
-  [class.root-node]="isRootNode()"
+  [class.tree-node-selected]="_treeNode.isSelected()"
+  [class.tree-node-selected-for-insert]="_treeNode.isSelectedForInsert()"
+  [class.tree-node-hidden]="_treeNode.isHidden()"
+  [class.skipped]="_treeNode.node().isVisuallySkipped"
+  [class.root-node]="_treeNode.isRootNode()"
 >
-  @if (canToggle) {
-    <button mat-icon-button (click)="toggle()">
-      <step-icon class="toggle-state" [name]="toggleStateIcon()" />
+  @if (_treeNode.canToggle()) {
+    <button mat-icon-button (click)="_treeNode.toggle()">
+      <step-icon class="toggle-state" [name]="_treeNode.toggleStateIcon()" />
     </button>
   } @else {
     <div class="no-toggle"></div>
   }
-  @if (node(); as n) {
-    <div
-      class="node-content"
-      (contextmenu)="openContextMenu($event)"
-      [stepDragItem]="n.id"
-      [dragDisabled]="dragDisabled"
-    >
+  @if (_treeNode.node(); as n) {
+    <div class="node-content" (contextmenu)="_treeNode.openContextMenu($event)">
       @if (n.icon) {
         <div class="node-icon">
           <step-icon [name]="n.icon" [class]="n.iconClassName" />
@@ -29,3 +24,15 @@
     </div>
   }
 </div>
+@if (_treeNode.node(); as n) {
+  @for (pId of n.parentPath; track pId; let idx = $index) {
+    <div draggable="false" [style.--idx]="idx" class="node-line"></div>
+  }
+}
+@if (_treeNodeTemplateContainer.treeNodeDetailsTemplate(); as detailsTemplate) {
+  @if (_treeNode.node(); as n) {
+    <div class="tree-node-details">
+      <ng-container *ngTemplateOutlet="detailsTemplate.templateRef; context: { $implicit: n }" />
+    </div>
+  }
+}

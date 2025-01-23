@@ -1,23 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
-import { DataSourceConf } from '../../shared/data-source-conf';
-import {
-  ArtefactFormChangeHelperService,
-  BaseArtefactComponent,
-  DynamicValueBoolean,
-  DynamicValueString,
-} from '@exense/step-core';
-import { DataSourceConfigurationArtefact } from '../../shared/data-source-configuration-artefact';
+import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
-
-interface DataSetDataSource extends DataSourceConf {
-  forWrite: DynamicValueBoolean;
-}
-
-interface DataSetArtefact extends DataSourceConfigurationArtefact {
-  dataSource?: DataSetDataSource;
-  item: DynamicValueString;
-  resetAtEnd: DynamicValueBoolean;
-}
+import { DataSetArtefact } from '../../types/data-set.artefact';
 
 @Component({
   selector: 'step-data-set',

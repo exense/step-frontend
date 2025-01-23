@@ -28,6 +28,7 @@ export type ReportNode = {
     | 'RUNNING';
   error?: Error;
   customAttributes?: Record<string, string>;
+  parentSource?: 'BEFORE' | 'BEFORE_THREAD' | 'MAIN' | 'SUB_PLAN' | 'AFTER_THREAD' | 'AFTER';
   resolvedArtefact?: AbstractArtefact;
   orphan?: boolean;
   contributingError?: boolean;

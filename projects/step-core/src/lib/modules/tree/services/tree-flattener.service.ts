@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { TreeNode } from '../shared/tree-node';
-import { TreeFlatNode } from '../shared/tree-flat-node';
-import { FlattenTreeData } from '../shared/flatten-tree-data';
+import { TreeNode } from '../types/tree-node';
+import { TreeFlatNode } from '../types/tree-flat-node';
+import { FlattenTreeData } from '../types/flatten-tree-data';
 
 @Injectable({
   providedIn: 'root',
