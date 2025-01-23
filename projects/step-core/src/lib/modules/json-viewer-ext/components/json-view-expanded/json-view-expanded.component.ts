@@ -13,6 +13,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   imports: [DetailedValueComponent, MatIconButton, StepBasicsModule],
   host: {
     '(click)': 'toggleCollapse()',
+    '[class.collapsable]': 'hasCollapseButton()',
   },
 })
 export class JsonViewExpandedComponent {

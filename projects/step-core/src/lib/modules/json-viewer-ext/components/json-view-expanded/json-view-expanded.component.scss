@@ -5,7 +5,9 @@
   flex-direction: column;
   gap: 0.5rem;
   position: relative;
-  cursor: pointer;
+  &.collapsable {
+    cursor: pointer;
+  }
 }
 
 .json-node {
@@ -17,6 +19,7 @@
 .name {
   white-space: nowrap;
   padding: 0.2rem 0;
+  user-select: none;
 }
 
 button {
