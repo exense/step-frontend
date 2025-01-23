@@ -15,7 +15,10 @@ export class DetailedValueComponent {
   /** @Input() **/
   readonly value = input.required<string>();
 
-  protected openDetailedInfo(): void {
+  protected openDetailedInfo($event?: MouseEvent): void {
+    $event?.preventDefault();
+    $event?.stopPropagation();
+    $event?.stopImmediatePropagation();
     const value = this.value();
     this._richEditorDialog.editText(value, {
       isReadOnly: true,

@@ -1,6 +1,6 @@
 @if (keywordInputs(); as inputs) {
   <section class="json-container">
-    <step-json-view-expanded class="pointer" [data]="inputs" [limit]="5">
+    <step-json-view-expanded [data]="inputs" [limit]="7">
       <label>Inputs</label>
     </step-json-view-expanded>
     <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
@@ -10,7 +10,7 @@
 }
 @if (keywordOutputs(); as outputs) {
   <section class="json-container">
-    <step-json-view-expanded class="pointer" [data]="outputs" [limit]="5">
+    <step-json-view-expanded [data]="outputs" [limit]="7">
       <label>Outputs</label>
     </step-json-view-expanded>
     <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
@@ -18,13 +18,13 @@
     </button>
   </section>
 }
-@if (children(); as children) {
+@if (failedChildren(); as children) {
   @if (children.length) {
     <section class="data-container">
       <label>Errors</label>
       <div>
         @for (child of children; track child.id) {
-          <step-assert-report-node-short [node]="child" />
+          <step-report-node-error [node]="child" />
         }
       </div>
     </section>

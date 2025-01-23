@@ -20,7 +20,6 @@ export class ReportNodeArtefactDetailsComponent<R extends ReportNode> {
   protected componentToRender = computed(() => {
     const artefactClass = this.artefactClass();
     const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
-    console.log('COMPONENT', meta?.reportDetailsComponent);
     return meta?.reportDetailsComponent;
   });
 }

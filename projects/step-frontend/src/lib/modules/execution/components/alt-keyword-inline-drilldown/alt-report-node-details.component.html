@@ -10,7 +10,7 @@
           <label>Errors</label>
           <div>
             @for (child of children; track child.id) {
-              <step-assert-report-node-short [node]="child" />
+              <step-report-node-error [node]="child" />
             }
           </div>
         </section>

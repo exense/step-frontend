@@ -27,6 +27,13 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
   private _window = inject(DOCUMENT).defaultView!;
   private clipboard = this._window.navigator.clipboard;
 
+  private reportNodesToRender = new Set([
+    ReportNodeType.ASSERT_REPORT_NODE,
+    ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE,
+    ReportNodeType.CHECK_REPORT_NODE,
+    ReportNodeType.SET_REPORT_NODE,
+  ]);
+
   protected readonly execution = toSignal(this._altExecutionState?.execution$ ?? of(undefined), {
     initialValue: undefined,
   });
@@ -59,7 +66,7 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     return result;
   });
 
-  private children$ = toObservable(this.contextInternal).pipe(
+  private failedChildren$ = toObservable(this.contextInternal).pipe(
     switchMap((node) => {
       if (!node || node.status !== 'FAILED') {
         return of(undefined);
@@ -68,15 +75,12 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     }),
     map((children: ReportNode[] | undefined) => {
       return (children ?? []).filter(
-        (child) =>
-          (child._class === ReportNodeType.ASSERT_REPORT_NODE ||
-            child._class === ReportNodeType.PERFORMANCE_ASSERT_REPORT_NODE) &&
-          child.status !== 'PASSED',
+        (child) => this.reportNodesToRender.has(child._class as ReportNodeType) && child.status !== 'PASSED',
       );
     }),
   );
 
-  protected readonly children = toSignal(this.children$, { initialValue: [] });
+  protected readonly failedChildren = toSignal(this.failedChildren$, { initialValue: [] });
 
   protected readonly measuresDataSource = computed(() => {
     const measures = this.node()?.measures;

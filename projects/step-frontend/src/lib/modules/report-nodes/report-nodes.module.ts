@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { AttachmentsComponent } from './components/attachments/attachments.component';
 import { AttachmentUrlPipe } from './pipes/attachment-url.pipe';
-import { AssertReportNodeShortComponent } from './components/assert-report-node-short/assert-report-node-short.component';
+import { ReportNodeErrorComponent } from './components/report-node-error/report-node-error.component';
 import { AttachmentIsImagePipe } from './pipes/attachment-is-image.pipe';
 import { AttachmentIsTextPipe } from './pipes/attachment-is-text.pipe';
 import { AttachmentShowLabelPipe } from './pipes/attachment-show-label.pipe';
@@ -19,7 +19,7 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
   declarations: [
     AttachmentsComponent,
     AttachmentUrlPipe,
-    AssertReportNodeShortComponent,
+    ReportNodeErrorComponent,
     AttachmentIsImagePipe,
     AttachmentIsTextPipe,
     AttachmentShowLabelPipe,
@@ -36,7 +36,7 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
   exports: [
     ReportNodeShortComponent,
     ReportNodeComponent,
-    AssertReportNodeShortComponent,
+    ReportNodeErrorComponent,
     AttachmentPreviewComponent,
     AttachmentsPreviewComponent,
     CallFunctionReportNodeComponent,

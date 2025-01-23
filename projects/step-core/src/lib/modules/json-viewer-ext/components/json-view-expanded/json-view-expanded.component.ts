@@ -11,6 +11,9 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   styleUrl: './json-view-expanded.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DetailedValueComponent, MatIconButton, StepBasicsModule],
+  host: {
+    '(click)': 'toggleCollapse()',
+  },
 })
 export class JsonViewExpandedComponent {
   private _jsonParser = inject(JsonParserService);
