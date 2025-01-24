@@ -11,7 +11,7 @@
     <th mat-header-cell *matHeaderCellDef></th>
     <td class="move" mat-cell *matCellDef="let element">
       <step-drag-drop-container stepDropAreaId="planTree">
-        <step-icon name="drag-handle" [stepDragItem]="element | artefactDropInfo" />
+        <step-icon name="drag-handle" [stepDragItem]="element | artefactDropInfo" matTooltip="drag & drop into tree" />
         <step-drag-preview>
           <step-plan-nodes-drag-preview />
         </step-drag-preview>
