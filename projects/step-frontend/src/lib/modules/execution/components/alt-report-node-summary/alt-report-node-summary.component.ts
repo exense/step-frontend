@@ -108,7 +108,7 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
 
   private createChart(canvas: HTMLCanvasElement): Chart {
     return new Chart(canvas, {
-      type: 'donut',
+      type: 'doughnut',
       data: {
         labels: [],
         datasets: [
