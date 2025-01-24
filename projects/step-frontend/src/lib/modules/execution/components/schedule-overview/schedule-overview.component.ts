@@ -1,6 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, effect, inject, OnInit, Signal, signal } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
@@ -25,12 +24,17 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeseriesColorsPool, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime, Duration } from 'luxon';
+import { TooltipContextData } from '../../../timeseries/modules/chart/injectables/tooltip-context-data';
 
 declare const uPlot: any;
+
+interface UrlParams {
+  timeRangeSelection?: TimeRangePickerSelection;
+}
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -64,82 +68,108 @@ interface TableErrorEntry {
 })
 export class ScheduleOverviewComponent implements OnInit {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
+  readonly URL_PARAMS_PREFIX = 'q_';
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
   private _executionService = inject(ExecutionsService);
-  private _dateUtils = inject(DateUtilsService);
-  private _fb = inject(FormBuilder);
+  protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
+  private _router = inject(Router);
 
-  readonly RELATIVE_TIME_RANGES: TimeOption[] = [
-    { label: 'Last day', value: { isRelative: true, msFromNow: TimeUnit.DAY } },
-    { label: 'Last week', value: { isRelative: true, msFromNow: TimeUnit.DAY * 7 } },
-    { label: 'Last 2 weeks', value: { isRelative: true, msFromNow: TimeUnit.DAY * 14 } },
-    { label: 'Last month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 } },
-    { label: 'Last 3 month', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 3 } },
-    { label: 'Last 6 months', value: { isRelative: true, msFromNow: TimeUnit.DAY * 30 * 6 } },
-    { label: 'Last year', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 } },
-    { label: 'Last 3 years', value: { isRelative: true, msFromNow: TimeUnit.DAY * 365 * 3 } },
+  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'RELATIVE', relativeSelection: { label: 'Last day', timeInMs: TimeUnit.DAY } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last week', timeInMs: TimeUnit.DAY * 7 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.DAY * 14 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last month', timeInMs: TimeUnit.DAY * 30 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 months', timeInMs: TimeUnit.DAY * 30 * 3 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 6 months', timeInMs: TimeUnit.DAY * 30 * 6 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last year', timeInMs: TimeUnit.DAY * 365 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.DAY * 365 * 3 } },
   ];
 
   // generate bar builder with 60% bar (40% gap) & 100px max bar width
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
 
-  private relativeTime?: number;
-  now = DateTime.now();
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>({
-    start: this.now.minus({ months: 1 }),
-    end: this.now,
+  protected plan?: Partial<Plan>;
+  protected error = '';
+  protected repositoryId?: string;
+
+  task = signal<ExecutiontTaskParameters | undefined>(undefined);
+  activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+
+  timeRange: Signal<TimeRange | undefined> = computed(() => {
+    let selection = this.activeTimeRangeSelection();
+    if (selection) {
+      return this.calculateTimeRange(selection);
+    } else {
+      return undefined;
+    }
   });
 
   lastExecution?: Execution;
-  selectedTask?: ExecutiontTaskParameters;
   summary?: ReportNodeSummary;
   executionsChartSettings?: TSChartSettings;
   keywordsChartSettings?: TSChartSettings;
   testCasesChartSettings?: TSChartSettings;
   emptyTestCasesResponse = false;
-  noExecutionsFound = false;
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   lastKeywordsExecutions: Execution[] = [];
 
-  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
-    startWith(this.dateRangeCtrl.value),
-    map((range) => range ?? undefined),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly timeRangeChange$: Observable<TimeRange> = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange) as TimeRange),
-    filter((v) => v !== undefined),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly taskId$ = this._activatedRoute.params.pipe(
-    map((params) => params?.['id'] as string),
-    filter((id) => !!id),
-  );
+  constructor() {
+    const urlParams = this.collectUrlParams();
+    if (urlParams.timeRangeSelection) {
+      this.activeTimeRangeSelection.set(urlParams.timeRangeSelection!);
+    } else {
+      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
+    }
+    effect(() => {
+      let range = this.timeRange();
+      if (range) {
+        this.updateUrlParams();
+        this.refreshCharts(this._taskId, range);
+      }
+    });
+  }
 
   ngOnInit(): void {
-    const fetchTask$: Observable<ExecutiontTaskParameters> = this.taskId$.pipe(
-      switchMap((taskId) => this._scheduleApi.getExecutionTaskById(taskId)),
-    );
-    combineLatest([fetchTask$, this.timeRangeChange$]).subscribe(([task, fullRange]) => {
-      this.selectedTask = task;
-      let taskId = task.id!;
-      this.createPieChart(taskId, fullRange);
-      this.createExecutionsChart(taskId, fullRange);
-      this.createErrorsChart(taskId, fullRange);
-      this.fetchLastExecution(taskId);
-      this.getLastExecutionsSorted(taskId, fullRange).subscribe((executions) => {
-        this.fetchAndCreateKeywordsChart(fullRange, executions);
-        this.fetchAndCreateTestCasesChart(fullRange, executions);
-      });
+    this._scheduleApi.getExecutionTaskById(this._taskId).subscribe((task) => {
+      this.task.set(task);
     });
+  }
+
+  private findRelativeTimeOption(ms: number): TimeRangePickerSelection {
+    return this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === ms) || this.timeRangeOptions[0];
+  }
+
+  private refreshCharts(taskId: string, fullRange: TimeRange) {
+    if (!taskId) {
+      return;
+    }
+    console.log('refreshing charts');
+    this.createPieChart(taskId, fullRange);
+    this.createExecutionsChart(taskId, fullRange);
+    this.fetchLastExecution(taskId);
+    this.createErrorsChart(taskId, fullRange);
+    this.getLastExecutionsSorted(taskId, fullRange).subscribe((executions) => {
+      this.fetchAndCreateKeywordsChart(fullRange, executions);
+      this.fetchAndCreateTestCasesChart(fullRange, executions);
+    });
+  }
+
+  private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
+    switch (selection.type) {
+      case 'ABSOLUTE':
+        return selection.absoluteSelection!;
+      case 'RELATIVE':
+        const relativeSelection = selection.relativeSelection!;
+        const now = new Date().getTime();
+        const from = now - relativeSelection!.timeInMs!;
+        return { from: from, to: now };
+      default:
+        throw new Error('Unhandled type: ' + selection.type);
+    }
   }
 
   private cumulateSeriesData(series: TSChartSeries[]): void {
@@ -523,14 +553,9 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
-  updateRange(timeRange?: DateRange): void {
-    this.dateRangeCtrl.setValue(timeRange);
-  }
-
-  updateRelativeTime(time?: number): void {
-    this.relativeTime = time;
-    let now = DateTime.now();
-    this.updateRange({ start: now.minus({ millisecond: time }), end: now });
+  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.activeTimeRangeSelection.set(selection);
+    // this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
   private createErrorsChart(taskId: string, timeRange: TimeRange) {
@@ -576,5 +601,35 @@ export class ScheduleOverviewComponent implements OnInit {
       });
       this.errorsDataSource = new TableLocalDataSource(data, {});
     });
+  }
+
+  private updateUrlParams() {
+    const timeRangeSelection = this.activeTimeRangeSelection()!;
+    const params = TimeSeriesUtils.convertTimeRangeSelectionToUrlParams(timeRangeSelection);
+    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
+      accumulator[this.URL_PARAMS_PREFIX + key] = params[key];
+      return accumulator;
+    }, {});
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: prefixedParams,
+    });
+  }
+
+  private collectUrlParams(): UrlParams {
+    let params = this._activatedRoute.snapshot.queryParams;
+    params = Object.keys(params)
+      .filter((key) => key.startsWith(this.URL_PARAMS_PREFIX))
+      .reduce((acc, key) => {
+        acc[key.substring(this.URL_PARAMS_PREFIX.length)] = params[key];
+        return acc;
+      }, {} as Params);
+    let timeRangeSelection = TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
+    if (timeRangeSelection?.type === 'RELATIVE') {
+      timeRangeSelection = this.findRelativeTimeOption(timeRangeSelection.relativeSelection!.timeInMs!);
+    }
+    return {
+      timeRangeSelection: timeRangeSelection,
+    };
   }
 }
