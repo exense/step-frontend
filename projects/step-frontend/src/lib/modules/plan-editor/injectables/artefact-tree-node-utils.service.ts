@@ -337,26 +337,31 @@ export class ArtefactTreeNodeUtilsService
 
     const id = `${nodeType}|${parentId}`;
     let name = '';
+    let icon = '';
     let childContainer: ChildrenBlock | undefined = undefined;
     let childArtefacts: AbstractArtefact[] | undefined = undefined;
     switch (nodeType) {
       case ArtefactNodeSource.AFTER:
         name = 'After';
+        icon = 'chevron-right';
         childContainer = originalArtefact.after;
         break;
       case ArtefactNodeSource.AFTER_THREAD:
         if (isThreadGroup) {
           name = 'After Thread';
+          icon = 'chevrons-right';
           childContainer = threadGroupArtefact!.afterThread;
         }
         break;
       case ArtefactNodeSource.BEFORE:
         name = 'Before';
+        icon = 'chevron-left';
         childContainer = originalArtefact.before;
         break;
       case ArtefactNodeSource.BEFORE_THREAD:
         if (isThreadGroup) {
           name = 'Before Thread';
+          icon = 'chevrons-left';
           childContainer = threadGroupArtefact!.beforeThread;
         }
         break;
@@ -377,7 +382,6 @@ export class ArtefactTreeNodeUtilsService
     const isDropDisabled = false;
     const isSkipped = false;
     const isVisuallySkipped = isParentVisuallySkipped ?? false;
-    const icon = 'chevron-left';
     const children = (childArtefacts ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
     );

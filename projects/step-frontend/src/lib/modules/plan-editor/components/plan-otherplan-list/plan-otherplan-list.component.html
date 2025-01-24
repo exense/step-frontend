@@ -25,7 +25,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="move" mat-cell *matCellDef="let element">
         <step-drag-drop-container stepDropAreaId="planTree">
-          <step-icon name="move" [stepDragItem]="element | planDropInfo" />
+          <step-icon name="drag-handle" [stepDragItem]="element | planDropInfo" />
           <step-drag-preview>
             <step-plan-nodes-drag-preview />
           </step-drag-preview>
