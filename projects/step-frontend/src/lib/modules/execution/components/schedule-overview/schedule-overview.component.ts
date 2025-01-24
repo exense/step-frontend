@@ -24,7 +24,7 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { DateTime, Duration } from 'luxon';
@@ -74,8 +74,6 @@ export class ScheduleOverviewComponent implements OnInit {
   private _timeSeriesService = inject(TimeSeriesService);
   private _executionService = inject(ExecutionsService);
   protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
-  private _dateUtils = inject(DateUtilsService);
-  private _fb = inject(FormBuilder);
   private _statusColors = inject(STATUS_COLORS);
   private _router = inject(Router);
 
@@ -148,9 +146,11 @@ export class ScheduleOverviewComponent implements OnInit {
     if (!taskId) {
       return;
     }
+    console.log('refreshing charts');
     this.createPieChart(taskId, fullRange);
     this.createExecutionsChart(taskId, fullRange);
     this.fetchLastExecution(taskId);
+    this.createErrorsChart(taskId, fullRange);
     this.getLastExecutionsSorted(taskId, fullRange).subscribe((executions) => {
       this.createKeywordsChart(fullRange, executions);
       this.createTestCasesChart(fullRange, executions);
