@@ -1,5 +1,5 @@
 <section class="header">
-  @if (selectedTask; as task) {
+  @if (task(); as task) {
     <div class="title">
       <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       <h3>{{ task.attributes?.['name'] }}</h3>
@@ -13,23 +13,13 @@
     </div>
   }
   <div class="range-picker">
-    <step-form-field>
-      <step-prefix class="icon-prefix">
-        <step-icon name="calendar" (click)="picker.open()" />
-      </step-prefix>
-      <input
-        type="text"
-        placeholder="From - To"
-        [formControl]="dateRangeCtrl"
-        [stepDateRangePicker]="picker"
-        [showRelativeTime]="true"
-        (relativeOptionChange)="updateRelativeTime($event)"
-        [matTooltip]="rangePicker.formattedValue()"
-        matTooltipPosition="before"
-        #rangePicker="DateRangePicker"
+    @if (activeTimeRangeSelection()) {
+      <step-time-range-picker
+        (selectionChange)="handleTimeRangeChange($event)"
+        [selectOptions]="timeRangeOptions"
+        [activeSelection]="activeTimeRangeSelection()!"
       />
-    </step-form-field>
-    <step-date-picker [relativeRangeOptions]="RELATIVE_TIME_RANGES" #picker></step-date-picker>
+    }
   </div>
 </section>
 <section>
