@@ -100,6 +100,7 @@ import { AltReportNodeDetailsStateService } from './services/alt-report-node-det
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
 
 @NgModule({
   declarations: [
@@ -177,6 +178,8 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
+    GridsterItemComponent,
+    GridsterComponent,
   ],
   exports: [
     ExecutionListComponent,
