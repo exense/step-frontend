@@ -118,7 +118,6 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   private setInterval(interval: number): void {
-    console.log('SETTING INTERVAL', interval);
     if (this.isExternalModel) {
       return;
     }

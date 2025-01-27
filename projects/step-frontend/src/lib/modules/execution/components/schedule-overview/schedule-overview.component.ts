@@ -34,7 +34,6 @@ declare const uPlot: any;
 
 interface UrlParams {
   timeRangeSelection?: TimeRangePickerSelection;
-  refresh: number;
 }
 
 interface EntityWithKeywordsStats {
@@ -69,7 +68,7 @@ interface TableErrorEntry {
 })
 export class ScheduleOverviewComponent implements OnInit {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
-  readonly URL_PARAMS_PREFIX = 'sd_'; // scheduler dashboard
+  readonly URL_PARAMS_PREFIX = 'q_';
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(TimeSeriesService);
@@ -117,11 +116,9 @@ export class ScheduleOverviewComponent implements OnInit {
   errorsDataSource?: TableDataSource<TableErrorEntry>;
 
   lastKeywordsExecutions: Execution[] = [];
-  refreshInterval: number = 0;
 
   constructor() {
     const urlParams = this.collectUrlParams();
-    this.refreshInterval = urlParams.refresh;
     if (urlParams.timeRangeSelection) {
       this.activeTimeRangeSelection.set(urlParams.timeRangeSelection!);
     } else {
@@ -140,16 +137,6 @@ export class ScheduleOverviewComponent implements OnInit {
     this._scheduleApi.getExecutionTaskById(this._taskId).subscribe((task) => {
       this.task.set(task);
     });
-  }
-
-  refresh() {
-    // signal is triggered
-    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
-  }
-
-  handleRefreshIntervalChange(interval: number) {
-    this.refreshInterval = interval;
-    this.updateUrlParams();
   }
 
   private findRelativeTimeOption(ms: number): TimeRangePickerSelection {
@@ -617,10 +604,8 @@ export class ScheduleOverviewComponent implements OnInit {
   }
 
   private updateUrlParams() {
-    console.log('updating params');
     const timeRangeSelection = this.activeTimeRangeSelection()!;
     const params = TimeSeriesUtils.convertTimeRangeSelectionToUrlParams(timeRangeSelection);
-    params['refresh'] = this.refreshInterval;
     const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
       accumulator[this.URL_PARAMS_PREFIX + key] = params[key];
       return accumulator;
@@ -645,7 +630,6 @@ export class ScheduleOverviewComponent implements OnInit {
     }
     return {
       timeRangeSelection: timeRangeSelection,
-      refresh: parseInt(params['refresh'] || 0),
     };
   }
 }
