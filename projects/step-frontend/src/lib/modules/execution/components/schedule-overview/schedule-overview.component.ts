@@ -139,6 +139,11 @@ export class ScheduleOverviewComponent implements OnInit {
     });
   }
 
+  handleMainChartZoom(timeRange: TimeRange) {
+    timeRange = { from: Math.round(timeRange.from), to: Math.round(timeRange.to) };
+    this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+  }
+
   private findRelativeTimeOption(ms: number): TimeRangePickerSelection {
     return this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === ms) || this.timeRangeOptions[0];
   }
