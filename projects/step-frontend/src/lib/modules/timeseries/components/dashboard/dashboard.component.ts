@@ -32,7 +32,6 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
-  RelativeTimeSelection,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
   TimeRangePickerSelection,
@@ -43,6 +42,7 @@ import {
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
+import { TimeRangeRelativeSelection } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
@@ -144,6 +144,14 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  get activeMainTimeRange() {
+    return this.mainEngine.state.context.timeRangeSettings;
+  }
+
+  get getCompareModeTimeRange() {
+    return this.compareEngine?.state?.context?.timeRangeSettings;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     let fullTimeRangeChange = changes['defaultFullTimeRange'];
     if (
@@ -242,7 +250,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   saveEditChanges() {
     this.editMode = false;
     this.dashboard.grouping = this.mainEngine.state.context.getGroupDimensions();
-    this.dashboard.timeRange = this.mainEngine.state.context.getTimeRangeSettings();
+    this.dashboard.timeRange = this.mainEngine.state.context.getTimeRangeSettings().pickerSelection;
     this.dashboard.refreshInterval = this.refreshInterval;
     this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
@@ -349,10 +357,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
    * @private
    */
   private updateRelativeRangeIfNeeded(settings: DashboardTimeRangeSettings): DashboardTimeRangeSettings {
-    const wasFullSelection = TimeSeriesUtils.intervalsEqual(settings.fullRange, settings.selectedRange);
-    if (settings.type === 'RELATIVE') {
+    const wasFullSelection = TimeSeriesUtils.timeRangesEqual(settings.fullRange, settings.selectedRange);
+    if (settings.pickerSelection.type === 'RELATIVE') {
       const now = new Date().getTime() - 5000;
-      const newFullRange = { from: now - settings.relativeSelection!.timeInMs, to: now };
+      const newFullRange = { from: now - settings.pickerSelection.relativeSelection!.timeInMs, to: now };
       let newSelection: TimeRange = newFullRange;
       if (!wasFullSelection) {
         newSelection = TimeSeriesUtils.cropInterval(settings.selectedRange, newFullRange) || newFullRange;
@@ -380,7 +388,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         to: this.defaultFullTimeRange!.to || now,
       };
       return {
-        type: 'FULL',
+        pickerSelection: { type: 'FULL' },
         fullRange: fullRange,
         defaultFullRange: this.defaultFullTimeRange,
         selectedRange: urlParams.selectedTimeRange || fullRange,
@@ -389,7 +397,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     let timeRangeSelection: TimeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-      let foundRelativeOption: RelativeTimeSelection = this.timeRangeOptions.find((o) => {
+      let foundRelativeOption: TimeRangeRelativeSelection = this.timeRangeOptions.find((o) => {
         return timeInMs === o.relativeSelection?.timeInMs;
       })?.relativeSelection || {
         label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
@@ -397,18 +405,17 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       };
       const fullRange = { from: now - foundRelativeOption.timeInMs, to: now };
       return {
-        type: 'RELATIVE',
+        pickerSelection: { type: 'RELATIVE', relativeSelection: foundRelativeOption },
         fullRange: fullRange,
         selectedRange: urlParams.selectedTimeRange
           ? TimeSeriesUtils.cropInterval(urlParams.selectedTimeRange, fullRange) || fullRange
           : fullRange,
-        relativeSelection: foundRelativeOption,
         defaultFullRange: this.defaultFullTimeRange,
       };
     } else if (timeRangeSelection.type === 'ABSOLUTE') {
       // absolute
       return {
-        type: 'ABSOLUTE',
+        pickerSelection: timeRangeSelection,
         fullRange: timeRangeSelection.absoluteSelection!,
         selectedRange: urlParams.selectedTimeRange || timeRangeSelection.absoluteSelection!,
         defaultFullRange: this.defaultFullTimeRange,
@@ -420,7 +427,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       }
       const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
       return {
-        type: 'FULL',
+        pickerSelection: { type: 'FULL' },
         fullRange: range,
         selectedRange: urlParams.selectedTimeRange || range,
         defaultFullRange: this.defaultFullTimeRange,

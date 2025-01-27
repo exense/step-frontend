@@ -17,7 +17,13 @@
           {{ activeSelection.relativeSelection!.label }}
         }
         @case ('ABSOLUTE') {
-          Custom Selection
+          @if (activeSelection.absoluteSelection?.from && activeSelection.absoluteSelection?.to) {
+            {{ fromDateString + ' - ' + toDateString }}
+          } @else if (activeSelection.absoluteSelection?.from) {
+            after {{ fromDateString }}
+          } @else {
+            before {{ toDateString }}
+          }
         }
         @default {}
       }

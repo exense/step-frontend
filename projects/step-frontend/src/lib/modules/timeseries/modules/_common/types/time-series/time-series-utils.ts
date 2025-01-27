@@ -38,7 +38,7 @@ export class TimeSeriesUtils {
     return range1.from! <= range2.to! && range2.from! <= range1.to!;
   }
 
-  static intervalsEqual(range1?: TimeRange, range2?: TimeRange) {
+  static timeRangesEqual(range1?: TimeRange, range2?: TimeRange) {
     return range1 && range2 && range1.from! === range2.from! && range1.to! === range2.to!;
   }
 

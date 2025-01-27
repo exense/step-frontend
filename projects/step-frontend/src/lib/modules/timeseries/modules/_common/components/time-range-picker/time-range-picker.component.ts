@@ -17,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { TimeRange } from '@exense/step-core';
+import { JsonPipe } from '@angular/common';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -27,7 +28,7 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, JsonPipe],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
   private _snackBar = inject(MatSnackBar);
@@ -40,8 +41,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Input() compact = false;
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
-
-  @Output() activeSelectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
@@ -118,6 +117,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
           type: 'ABSOLUTE',
           absoluteSelection: { from: from, to: to },
         };
+        this.activeSelection = newSelection;
         this.emitSelectionChange(newSelection);
         this.closeMenu();
       } else {
