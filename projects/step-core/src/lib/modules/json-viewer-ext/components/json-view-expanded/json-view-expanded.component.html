@@ -12,12 +12,6 @@
 @if (hasCollapseButton()) {
   @if (isCollapsed()) {
     <div class="fade"></div>
+    <button mat-button type="button" class="btn-more">More ...</button>
   }
-  <button mat-icon-button [matTooltip]="isCollapsed() ? 'Show all' : 'Collapse'">
-    @if (isCollapsed()) {
-      <step-icon name="more-horizontal" />
-    } @else {
-      <step-icon name="chevron-up" />
-    }
-  </button>
 }
