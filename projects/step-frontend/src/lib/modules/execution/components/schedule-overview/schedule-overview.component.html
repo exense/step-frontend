@@ -27,23 +27,34 @@
     <div class="piechart-container">
       @if (summary) {
         <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" />
+      } @else {
+        <step-alt-report-widget title="Summary: Executions">
+          <step-alt-report-widget-content class="widget-content">
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          </step-alt-report-widget-content>
+        </step-alt-report-widget>
       }
     </div>
-    <step-alt-report-widget class="flex-grow-1">
-      <step-alt-report-widget-content>
+    <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
+      <step-alt-report-widget-content class="widget-content">
         @if (executionsChartSettings) {
           <step-timeseries-chart [settings]="executionsChartSettings">
             <ng-template tooltipContent let-data>
               <step-executions-chart-tooltip [data]="data" />
             </ng-template>
           </step-timeseries-chart>
+        } @else {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
   <div class="row">
-    <step-alt-report-widget class="flex-grow-1">
-      <step-alt-report-widget-content>
+    <step-alt-report-widget
+      class="flex-grow-1"
+      [title]="'Keywords calls by execution (last ' + LAST_EXECUTIONS_TO_DISPLAY + ')'"
+    >
+      <step-alt-report-widget-content class="widget-content">
         @if (keywordsChartSettings) {
           <step-timeseries-chart [settings]="keywordsChartSettings">
             <ng-template tooltipContent let-data>
@@ -59,36 +70,45 @@
               </div>
             </ng-template>
           </step-timeseries-chart>
+        } @else {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
-  @if (testCasesChartSettings) {
+  @if (!emptyTestCasesResponse) {
     <div class="row">
-      <step-alt-report-widget class="flex-grow-1">
-        <step-alt-report-widget-content>
-          <step-timeseries-chart [settings]="testCasesChartSettings">
-            <ng-template tooltipContent let-data>
-              <div class="container">
-                <div
-                  class="link-item"
-                  (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
-                  title="See Execution"
-                >
-                  <span>{{ lastKeywordsExecutions[data.idx!].description || 'Unnamed' }}</span>
-                  <span class="link-icon"></span>
+      <step-alt-report-widget
+        class="flex-grow-1"
+        [title]="'Test cases by execution (last ' + LAST_EXECUTIONS_TO_DISPLAY + ')'"
+      >
+        @if (testCasesChartSettings) {
+          <step-alt-report-widget-content class="widget-content">
+            <step-timeseries-chart [settings]="testCasesChartSettings">
+              <ng-template tooltipContent let-data>
+                <div class="container">
+                  <div
+                    class="link-item"
+                    (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
+                    title="See Execution"
+                  >
+                    <span>{{ lastKeywordsExecutions[data.idx!].description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
                 </div>
-              </div>
-            </ng-template>
-          </step-timeseries-chart>
-        </step-alt-report-widget-content>
+              </ng-template>
+            </step-timeseries-chart>
+          </step-alt-report-widget-content>
+        } @else {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
+        }
       </step-alt-report-widget>
     </div>
   }
 </section>
 <div class="row">
   <step-alt-report-widget class="flex-grow-1" title="Errors">
-    <step-alt-report-widget-content style="height: 100%">
+    <step-alt-report-widget-content class="widget-content">
       <div class="widget">
         @if (errorsDataSource) {
           <step-table
@@ -147,8 +167,16 @@
               <td mat-cell *matCellDef="let element">{{ element.percentage }}%</td>
             </ng-container>
           </step-table>
+        } @else {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
       </div>
     </step-alt-report-widget-content>
   </step-alt-report-widget>
 </div>
+
+<ng-template #loadingSpinner>
+  <div class="spinner-container">
+    <mat-spinner [diameter]="40" />
+  </div>
+</ng-template>
