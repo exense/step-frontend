@@ -1,4 +1,4 @@
-<h4 data-step-testid>Every</h4>
+<h4 data-step-testid="title-hours-editor">Every</h4>
 <section class="editor-content">
   <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)">
     <mat-option *ngFor="let h of _HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
