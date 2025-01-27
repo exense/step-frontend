@@ -10,14 +10,22 @@ import { ForReportNode } from '../../types/for.report-node';
   styleUrl: './for-inline.component.scss',
 })
 export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact, ForReportNode> {
-  protected getReportNodeItems(info?: ForReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+  protected getItems(
+    artefact?: ForArtefact,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] | undefined {
+    return undefined;
+  }
+
+  protected override getReportNodeItems(info?: ForReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
     return this.convert([
       ['Count', info?.count],
       ['Error Count', info?.errorCount],
     ]);
   }
 
-  protected getArtefactItems(
+  protected override getArtefactItems(
     info?: AggregatedArtefactInfo<ForArtefact>,
     isVertical?: boolean,
     isResolved?: boolean,

@@ -21,7 +21,7 @@
               <step-icon name="circle" class="drag-icon" />
             </div>
             @if (_state.testCases$ | async) {
-              <step-alt-report-nodes-testcases />
+              <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
             }
           </div>
         </gridster-item>
