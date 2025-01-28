@@ -1,6 +1,6 @@
 <step-modal-window [title]="_data.title" [stepZIndex]="1000" [hideButtonsSection]="true" [disableCloseByEsc]="true">
   <div step-modal-window-body>
-    <h5 execution_report_beta *ngIf="_data.additionalDescription">{{ _data.additionalDescription }}</h5>
+    <h5 *ngIf="_data.additionalDescription">{{ _data.additionalDescription }}</h5>
     <step-wizard-steps
       [steps]="_data.steps"
       [initialModel]="_data.initialModel"
