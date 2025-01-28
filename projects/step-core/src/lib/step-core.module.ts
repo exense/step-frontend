@@ -78,6 +78,8 @@ import { ArtefactInlineDetailsComponent } from './components/artefact-inline-det
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 import { ArtefactChildContainerSettingsComponent } from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
+import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
+import { ReportNodeArtefactDetailsComponent } from './components/report-node-artefact-details/report-node-artefact-details.component';
 
 @NgModule({
   declarations: [
@@ -118,6 +120,7 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
+    ReportNodeArtefactDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -156,6 +159,7 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
     AUTO_SHRANK_LIST_EXPORTS,
+    JSON_VIEWER_EXT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -226,9 +230,11 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
     AUTO_SHRANK_LIST_EXPORTS,
+    JSON_VIEWER_EXT_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
+    ReportNodeArtefactDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -309,6 +315,7 @@ export * from './modules/tabs';
 export * from './modules/tree/tree.module';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
+export * from './modules/json-viewer-ext';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
@@ -367,3 +374,4 @@ export * from './modules/info-banner';
 export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
+export * from './components/report-node-artefact-details/report-node-artefact-details.component';

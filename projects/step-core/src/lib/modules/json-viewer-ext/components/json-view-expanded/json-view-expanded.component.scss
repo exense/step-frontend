@@ -1,0 +1,40 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  &.collapsable {
+    cursor: pointer;
+  }
+}
+
+.json-node {
+  display: flex;
+  gap: 0.5rem;
+  padding-left: calc(var(--level, 0) * 1.5rem);
+}
+
+.name {
+  white-space: nowrap;
+  padding: 0.2rem 0;
+  user-select: none;
+}
+
+button.btn-more {
+  position: absolute;
+  left: -1rem;
+  bottom: -0.8rem;
+  font-weight: bold;
+}
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8rem;
+  pointer-events: none;
+  background: linear-gradient(transparent, var.$white);
+}

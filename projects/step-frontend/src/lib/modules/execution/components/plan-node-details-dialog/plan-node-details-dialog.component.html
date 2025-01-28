@@ -1,0 +1,19 @@
+<step-modal-window title="Details">
+  <div step-modal-window-body>
+    @if (artefact(); as artefact) {
+      <step-artefact-details [artefact]="artefact" [readonly]="true" />
+    }
+  </div>
+  <div step-modal-window-buttons>
+    <button
+      type="button"
+      mat-stroked-button
+      [routerLink]="['..']"
+      [relativeTo]="_activatedRoute"
+      queryParamsHandling="preserve"
+    >
+      Close
+    </button>
+    <button type="button" mat-flat-button color="primary" (click)="openPlan()">Show in plan</button>
+  </div>
+</step-modal-window>

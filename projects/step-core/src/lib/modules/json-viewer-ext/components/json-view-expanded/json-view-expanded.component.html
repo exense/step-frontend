@@ -1,0 +1,17 @@
+<ng-content />
+@for (node of items(); track node.id) {
+  <div class="json-node" [style.--level]="node.level">
+    @if (node.name) {
+      <strong class="name">{{ node.name }}:</strong>
+    }
+    @if (node.value?.toString(); as value) {
+      <step-detailed-value [value]="value" />
+    }
+  </div>
+}
+@if (hasCollapseButton()) {
+  @if (isCollapsed()) {
+    <div class="fade"></div>
+    <button mat-button type="button" class="btn-more">More ...</button>
+  }
+}
