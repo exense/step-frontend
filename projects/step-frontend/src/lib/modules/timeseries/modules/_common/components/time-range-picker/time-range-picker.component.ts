@@ -11,13 +11,11 @@ import {
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeRangePickerSelection } from '../../types/time-selection/time-range-picker-selection';
-import { ExecutionTimeSelection } from '../../types/time-selection/execution-time-selection';
 import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { TimeRange } from '@exense/step-core';
-import { JsonPipe } from '@angular/common';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -28,7 +26,7 @@ import { JsonPipe } from '@angular/common';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, JsonPipe],
+  imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
   private _snackBar = inject(MatSnackBar);
