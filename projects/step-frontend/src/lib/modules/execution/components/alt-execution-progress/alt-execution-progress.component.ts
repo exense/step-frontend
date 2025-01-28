@@ -1,4 +1,4 @@
-import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   combineLatest,
@@ -22,12 +22,10 @@ import {
   DateUtilsService,
   DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
-  ExecutiontTaskParameters,
   IS_SMALL_SCREEN,
   RegistrationStrategy,
   RELATIVE_TIME_OPTIONS,
   ReportNode,
-  ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
@@ -35,8 +33,6 @@ import {
   TableLocalDataSource,
   TimeOption,
   TimeRange,
-  TreeNodeUtilsService,
-  TreeStateService,
   ViewRegistryService,
   PopoverMode,
   IncludeTestcases,
@@ -47,8 +43,10 @@ import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { FormBuilder } from '@angular/forms';
 import { DateTime } from 'luxon';
-import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AGGREGATED_TREE_WIDGET_STATE,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -58,6 +56,8 @@ import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-r
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 import { KeyValue } from '@angular/common';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { EXECUTION_ID } from '../../services/execution-id.token';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
 
@@ -89,6 +89,13 @@ interface DateRangeExt extends DateRange {
   providers: [
     AltExecutionTabsService,
     {
+      provide: EXECUTION_ID,
+      useFactory: () => {
+        const _activatedRoute = inject(ActivatedRoute);
+        return () => _activatedRoute.snapshot.params?.['id'] ?? '';
+      },
+    },
+    {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
     },
@@ -103,16 +110,6 @@ interface DateRangeExt extends DateRange {
           map((fullRangeOption) => [..._defaultOptions, fullRangeOption]),
         );
       },
-    },
-    AggregatedReportViewTreeNodeUtilsService,
-    {
-      provide: TreeNodeUtilsService,
-      useExisting: AggregatedReportViewTreeNodeUtilsService,
-    },
-    AggregatedReportViewTreeStateService,
-    {
-      provide: TreeStateService,
-      useExisting: AggregatedReportViewTreeStateService,
     },
     AltExecutionViewAllService,
     AltKeywordNodesStateService,
@@ -142,31 +139,32 @@ interface DateRangeExt extends DateRange {
       },
       AutoDeselectStrategy.KEEP_SELECTION,
     ),
+    AltExecutionDialogsService,
     {
       provide: SchedulerInvokerService,
-      useExisting: forwardRef(() => AltExecutionProgressComponent),
+      useExisting: AltExecutionDialogsService,
     },
   ],
 })
-export class AltExecutionProgressComponent
-  implements OnInit, OnDestroy, AltExecutionStateService, SchedulerInvokerService
-{
+export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _plansApi = inject(AugmentedPlansService);
-  private _router = inject(Router);
-  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
   private _fb = inject(FormBuilder);
-  private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
+  private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
+  private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   private _dateUtils = inject(DateUtilsService);
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _executionId = inject(EXECUTION_ID);
+  protected readonly _dialogs = inject(AltExecutionDialogsService);
+  private _router = inject(Router);
 
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
@@ -179,11 +177,6 @@ export class AltExecutionProgressComponent
   private isTreeInitialized = false;
 
   private relativeTime = signal<number | undefined>(undefined);
-
-  get executionIdSnapshot(): string {
-    const routeSnapshot = this._activatedRoute.snapshot;
-    return routeSnapshot.params?.['id'] ?? '';
-  }
 
   updateRelativeTime(time?: number) {
     this.relativeTime.set(time);
@@ -375,7 +368,7 @@ export class AltExecutionProgressComponent
       if (this._viewAllService.isViewAll) {
         return;
       }
-      const executionId = this.executionIdSnapshot;
+      const executionId = this._executionId();
       if (!range || !executionId) {
         return;
       }
@@ -399,10 +392,24 @@ export class AltExecutionProgressComponent
 
     combineLatest([this.executionId$, range$])
       .pipe(
-        switchMap(([executionId, range]) => this._aggregatedTreeState.loadTree(executionId, range)),
+        switchMap(([executionId, range]) => {
+          if (!range) {
+            return this._executionsApi.getFullAggregatedReportView(executionId);
+          }
+          const from = range.start?.toMillis();
+          const to = range.end?.toMillis();
+          return this._executionsApi.getAggregatedReportView(executionId, { range: { from, to } });
+        }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((isTreeInitialized) => (this.isTreeInitialized = isTreeInitialized));
+      .subscribe((root) => {
+        if (!root) {
+          this.isTreeInitialized = false;
+        }
+        this._aggregatedTreeTabState.init(root);
+        this._aggregatedTreeWidgetState.init(root);
+        this.isTreeInitialized = true;
+      });
   }
 
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {
@@ -433,11 +440,6 @@ export class AltExecutionProgressComponent
 
   relaunchExecution(): void {
     this._router.navigate([{ outlets: { modal: ['launch'] } }], { relativeTo: this._activatedRoute });
-  }
-
-  openScheduler(task: ExecutiontTaskParameters): void {
-    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
-    this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
   }
 
   manualRefresh(): void {

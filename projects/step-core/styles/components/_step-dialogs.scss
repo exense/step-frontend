@@ -56,4 +56,23 @@
   .cdk-overlay-dark-backdrop {
     background: rgba(0, 0, 0, 0.12);
   }
+
+  .side-dialog {
+    .mat-mdc-dialog-container {
+      .mat-mdc-dialog-surface {
+        min-width: 572px;
+        box-shadow:
+          -20px 0 24px -4px rgba(16, 24, 40, 0.08),
+          -8px 0 8px -4px rgba(16, 24, 40, 0.03);
+        border-radius: 0;
+
+        step-modal-window {
+          height: 100%;
+          div[mat-dialog-content] {
+            min-height: calc(100% - 15rem);
+          }
+        }
+      }
+    }
+  }
 }
