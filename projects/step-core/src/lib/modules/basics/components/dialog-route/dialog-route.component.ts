@@ -80,7 +80,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
   private exitRoute(result?: DialogRouteResult): void {
     if (this._dialogParent?.navigateBack) {
-      this._dialogParent.navigateBack(result);
+      this._dialogParent.navigateBack(result, this._activatedRoute);
       return;
     }
 
