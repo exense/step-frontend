@@ -15,9 +15,11 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import {
+  AugmentedExecutionsService,
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
+  IncludeTestcases,
   NavigatorService,
   preloadScreenDataResolver,
   schedulePlanRoute,
@@ -88,8 +90,10 @@ import { AltExecutionRepositoryComponent } from './components/alt-execution-repo
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
-import { RepoRefHolderService } from './services/repo-ref-holder.service';
+import { ActiveExecutionsService } from './services/active-executions.service';
+import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -334,6 +338,7 @@ export class ExecutionModule {
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
+      providers: [ActiveExecutionsService],
       children: [
         {
           path: '',
@@ -347,7 +352,6 @@ export class ExecutionModule {
           path: ':id',
           component: AltExecutionProgressComponent,
           providers: [
-            RepoRefHolderService,
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: TreeNodeUtilsService,
@@ -362,6 +366,14 @@ export class ExecutionModule {
               useClass: AggregatedReportViewTreeStateService,
             },
             AltReportNodeDetailsStateService,
+            ActiveExecutionContextService,
+          ],
+          canActivate: [
+            (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            },
           ],
           children: [
             {
@@ -434,15 +446,61 @@ export class ExecutionModule {
               path: 'launch',
               outlet: 'modal',
               dialogComponent: AltExecutionLaunchDialogComponent,
-              resolve: {
-                repoRef: () => {
-                  const repoRefHolder = inject(RepoRefHolderService);
-                  return repoRefHolder.repoRef();
-                },
-              },
               data: {
                 title: 'Relaunch Execution',
-                schedulePath: '',
+              },
+              resolve: {
+                repoRef: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.executionParameters?.repositoryObject),
+                  );
+                },
+                parameters: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.executionParameters?.customParameters),
+                  );
+                },
+                testCases: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  const _executionsApi = inject(AugmentedExecutionsService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.id),
+                    switchMap((id) => {
+                      if (!id) {
+                        return of([]);
+                      }
+                      return _executionsApi.getReportNodesByExecutionId(
+                        id,
+                        'step.artefacts.reports.TestCaseReportNode',
+                        500,
+                      );
+                    }),
+                    catchError(() => of(undefined)),
+                    map((testCases) => {
+                      const list = testCases
+                        ?.filter((item) => !!item && item?.status !== 'SKIPPED')
+                        ?.map((item) => item?.artefactID!);
+                      if (list?.length === testCases?.length) {
+                        return undefined;
+                      }
+                      return list;
+                    }),
+                    map((list) => {
+                      if (!list?.length) {
+                        return undefined;
+                      }
+                      return {
+                        list,
+                        by: 'id',
+                      } as IncludeTestcases;
+                    }),
+                  );
+                },
               },
             }),
             dialogRoute(
