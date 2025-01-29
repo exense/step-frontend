@@ -16,12 +16,20 @@
   </div>
   <div id="sidebar-home-and-settings">
     @if (isOpened$ | async) {
-      <span class="visible-when-collapsed sidebar-home-button" (stepSideBarClick)="navigateTo('home', $event)">
+      <span
+        data-step-testid="sidebar-home-button"
+        class="visible-when-collapsed sidebar-home-button"
+        (stepSideBarClick)="navigateTo('home', $event)"
+      >
         <step-icon name="home" />
       </span>
     }
     @if (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) {
-      <step-settings-button class="sidebar-home-and-settings-icon" matTooltip="Project Settings" />
+      <step-settings-button
+        data-step-testid="sidebar-settings-button"
+        class="sidebar-home-and-settings-icon"
+        matTooltip="Project Settings"
+      />
     }
   </div>
   <div id="sidebar-categories">
@@ -40,6 +48,7 @@
               <label for="collapsable-tab-{{ mainMenuEntry.title }}">
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
                 <span
+                  data-step-testid="sidebar-main-menu-title"
                   class="sidebar-aligned-text main-menu-name"
                   [attr.data-icon]="mainMenuEntry.icon"
                   [attr.data-id]="mainMenuEntry.id"
@@ -74,6 +83,7 @@
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
                     <span
+                      data-step-testid="sidebar-sub-menu-title"
                       class="sidebar-aligned-subtext sub-menu-name"
                       [attr.data-icon]="entry.icon"
                       [attr.data-id]="entry.id"

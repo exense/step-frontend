@@ -1,16 +1,22 @@
-<h3 data-step-testid>Project Settings</h3>
+<h3 data-step-testid="title-project-settings">Project Settings</h3>
 <mat-nav-list>
   @for (menuItem of _configurationItems; track menuItem.path) {
-    <a mat-list-item [routerLink]="menuItem.path" [relativeTo]="_activatedRoute" routerLinkActive="active-list-item">
+    <a
+      data-step-testid="project-settings-menu-item"
+      mat-list-item
+      [routerLink]="menuItem.path"
+      [relativeTo]="_activatedRoute"
+      routerLinkActive="active-list-item"
+    >
       {{ menuItem.label }}
     </a>
   }
 </mat-nav-list>
 <section class="addon">
   <mat-nav-list>
-    <a mat-list-item [routerLink]="userSettings">User Settings</a>
+    <a data-step-testid="user-settings-link" mat-list-item [routerLink]="userSettings">User Settings</a>
     @if ('admin-ui-menu' | hasRight | async) {
-      <a mat-list-item [routerLink]="adminSettings">Admin Settings</a>
+      <a data-step-testid="admin-settings-link" mat-list-item [routerLink]="adminSettings">Admin Settings</a>
     }
   </mat-nav-list>
 </section>
