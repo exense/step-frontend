@@ -367,6 +367,7 @@ export class ArtefactTreeNodeUtilsService
         break;
       default:
         name = 'Steps';
+        icon = 'circle';
         childArtefacts = originalArtefact.children;
         break;
     }
