@@ -127,7 +127,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.oqlValue = contextFiltering.oql || '';
     this.activeMode = contextFiltering.mode;
     this._internalFilters = contextFiltering.filterItems;
-    this.activeTimeRange;
     this.context
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))

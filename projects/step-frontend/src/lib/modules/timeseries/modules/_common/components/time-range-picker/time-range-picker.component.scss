@@ -4,17 +4,13 @@
 .time-selector-container {
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid #d7d7d7;
+  padding: 2rem;
+  padding-bottom: 0;
+  gap: 2rem;
 
   .left-section {
-    border-right: 1px solid #d7d7d7;
     white-space: nowrap;
-    padding: 1.2rem;
     width: 232px;
-  }
-
-  .title {
-    font-weight: bold;
   }
 
   .right-section {
@@ -31,7 +27,7 @@
       padding: 4px 12px;
 
       &.full-range {
-        border-top: 1px solid var.$gray-200;
+        margin: 1.2rem 0;
       }
 
       &.active {

@@ -166,16 +166,16 @@ export class DashboardUrlParamsService {
     timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
     const params: Record<string, any> = {
-      rangeType: timeRangeSettings.type,
+      rangeType: timeRangeSettings.pickerSelection.type,
     };
     if (context.getGroupDimensions().length > 0) {
       params['grouping'] = context.getGroupDimensions().join(',');
     }
-    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
+    if (timeRangeSettings.pickerSelection.type === TimeRangeType.ABSOLUTE) {
       params['from'] = timeRangeSettings.fullRange.from;
       params['to'] = timeRangeSettings.fullRange.to;
-    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
-      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
+    } else if (timeRangeSettings.pickerSelection.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = timeRangeSettings.pickerSelection.relativeSelection!.timeInMs;
     }
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();
