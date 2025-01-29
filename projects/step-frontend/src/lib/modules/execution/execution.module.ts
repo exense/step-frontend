@@ -290,7 +290,7 @@ export class ExecutionModule {
     );
 
     this._viewRegistry.registerRoute({
-      path: 'executions',
+      path: 'legacy-executions',
       canActivate: [executionGuard],
       canDeactivate: [executionDeactivateGuard],
       resolve: {
@@ -326,7 +326,7 @@ export class ExecutionModule {
     });
 
     this._viewRegistry.registerRoute({
-      path: 'alt-executions',
+      path: 'executions',
       component: AltExecutionsComponent,
       canActivate: [altExecutionGuard],
       resolve: {

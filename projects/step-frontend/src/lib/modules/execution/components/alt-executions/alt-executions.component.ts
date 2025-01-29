@@ -1,13 +1,12 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { CustomMenuEntriesService, IS_SMALL_SCREEN } from '@exense/step-core';
+import { CustomMenuEntriesService, IS_SMALL_SCREEN, provideExecutionViewMode } from '@exense/step-core';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { filter, map, of, startWith, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
 
-const URL_PREFIX = 'alt-executions';
+const URL_PREFIX = 'executions';
 const MENU_ENTRY_ID = 'executions';
 const MAX_OPENED_EXECUTIONS = 5;
 

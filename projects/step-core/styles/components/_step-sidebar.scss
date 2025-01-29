@@ -359,8 +359,13 @@ $menu-sub-item-height: 3.2rem;
         display: flex;
         align-items: center;
         height: $menu-sub-item-height;
-        padding: 0 1.4rem 0 4.7rem;
+        padding: 0 1.4rem 0 1rem;
         cursor: pointer;
+        justify-content: space-between;
+
+        step-icon {
+          stroke-width: 1px;
+        }
       }
 
       input:checked ~ .content {
@@ -425,7 +430,6 @@ $menu-sub-item-height: 3.2rem;
 
     .sidebar-aligned-sub-subtext {
       margin-left: 0.5rem;
-      max-width: 15rem;
       font-weight: 200;
       overflow: hidden;
       text-overflow: ellipsis;

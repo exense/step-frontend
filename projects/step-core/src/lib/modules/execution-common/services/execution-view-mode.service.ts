@@ -1,0 +1,72 @@
+import { inject, Injectable, Provider } from '@angular/core';
+import { map, Observable, of, tap } from 'rxjs';
+import { Mutable } from '../../basics/types/mutable';
+import { Execution, ExecutionsService, UserService } from '../../../client/generated';
+import { LOCAL_STORAGE } from '../../basics/types/storage.token';
+import { ExecutionViewMode } from '../types/execution-view-mode';
+import { EXECUTION_VIEW_MODE } from '../injectables/execution-view-mode.token';
+import { switchMap } from 'rxjs/operators';
+
+type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'mode'>>;
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ExecutionViewModeService {
+  private _userService = inject(UserService);
+  private _localStorage = inject(LOCAL_STORAGE);
+  private _executionService = inject(ExecutionsService);
+
+  readonly mode?: ExecutionViewMode;
+
+  loadExecutionMode(): Observable<ExecutionViewMode> {
+    if (this.mode) {
+      return of(this.mode);
+    }
+    return this._userService.getPreferences().pipe(
+      map((preferences) => preferences?.preferences?.['forceLegacyReporting'] === 'true'),
+      map((forceLegacyReporting) => (forceLegacyReporting ? ExecutionViewMode.LEGACY : ExecutionViewMode.NEW)),
+      tap((mode) => ((this as FieldAccessor).mode = mode)),
+    );
+  }
+
+  public resolveExecution(idOrExecution: string | Execution): Observable<Execution> {
+    if (typeof idOrExecution !== 'string') {
+      return of(idOrExecution);
+    }
+
+    return this._executionService.getExecutionById(idOrExecution).pipe(
+      switchMap((execution) => {
+        if (!execution) {
+          throw new Error(`Execution with ID ${idOrExecution} not found`);
+        }
+        return of(execution);
+      }),
+    );
+  }
+
+  getExecutionMode(execution: Execution): ExecutionViewMode {
+    const localStorageOverride = this._localStorage.getItem('executionViewMode');
+    const localStorageForcesLegacy = localStorageOverride === 'legacyExecution';
+
+    const useNewView =
+      this.mode === ExecutionViewMode.NEW &&
+      !localStorageForcesLegacy &&
+      execution.resolvedPlanRootNodeId !== undefined &&
+      execution.customFields?.['hasReportNodeTimeSeries'] === true &&
+      execution.description !== 'LegacyPlan'; // debug name, remove before finalizing ticket
+
+    return useNewView ? ExecutionViewMode.NEW : ExecutionViewMode.LEGACY;
+  }
+
+  cleanup(): void {
+    (this as FieldAccessor).mode = undefined;
+  }
+}
+
+export const provideExecutionViewMode = (): Provider[] => [
+  {
+    provide: EXECUTION_VIEW_MODE,
+    useFactory: () => inject(ExecutionViewModeService).mode ?? ExecutionViewMode.LEGACY,
+  },
+];

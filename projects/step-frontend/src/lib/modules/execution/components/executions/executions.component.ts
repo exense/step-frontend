@@ -4,9 +4,8 @@ import { ExecutionTab } from '../../shared/execution-tab';
 import { filter, map, of, startWith, switchMap } from 'rxjs';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { IS_SMALL_SCREEN } from '@exense/step-core';
+import { IS_SMALL_SCREEN, provideExecutionViewMode } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
 
 const ID_LIST = 'list';
 const ID_OPEN = 'open';

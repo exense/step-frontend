@@ -34,7 +34,7 @@
       </th>
       <td mat-cell *matCellDef="let element" class="description-cell">
         <step-report-node-icon [class.is-importing]="element.status === 'IMPORTING'" [node]="element.rootReportNode" />
-        <a [routerLink]="element | executionUrl" queryParamsHandling="preserve">{{ element?.description }}</a>
+        <a [routerLink]="element | executionUrl | async" queryParamsHandling="preserve">{{ element?.description }}</a>
       </td>
     </ng-container>
     <ng-container matColumnDef="executionTime" stepActivityCol="Execution Time" stepSearchCol>
