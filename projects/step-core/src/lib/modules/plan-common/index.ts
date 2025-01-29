@@ -26,6 +26,7 @@ export * from './injectables/plan-interactive-session.service';
 export * from './injectables/plan-open.service';
 export * from './injectables/plan-context-initializer.service';
 export * from './injectables/artefact-form-change-helper.service';
+export * from './injectables/plan-filters-factory.service';
 
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';

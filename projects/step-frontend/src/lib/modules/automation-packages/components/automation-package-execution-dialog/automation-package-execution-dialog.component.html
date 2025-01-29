@@ -1,0 +1,24 @@
+<step-modal-window [title]="title">
+  <div step-modal-window-body>
+    <ng-container [formGroup]="executionConfigForm">
+      <step-form-field alignLabelAddon="near">
+        <step-label>Wrap into TestSet</step-label>
+        <step-label-addon>
+          <mat-slide-toggle color="primary" formControlName="wrapIntoTestSet" />
+        </step-label-addon>
+      </step-form-field>
+      <step-form-field>
+        <step-label>Number of threads</step-label>
+        <input type="number" formControlName="numberOfThreads" />
+      </step-form-field>
+      <step-string-array-input label="Included names" formControlName="includedNames" />
+      <step-string-array-input label="Excluded names" formControlName="excludedNames" />
+      <step-string-array-input label="Included categories" formControlName="includedCategories" />
+      <step-string-array-input label="Excluded categories" formControlName="excludedCategories" />
+    </ng-container>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" (click)="execute()">Execute</button>
+  </div>
+</step-modal-window>

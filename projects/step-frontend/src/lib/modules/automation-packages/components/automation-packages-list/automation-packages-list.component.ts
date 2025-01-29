@@ -77,6 +77,10 @@ export class AutomationPackagesListComponent implements OnInit, DialogParentServ
     this._actions.createAutomationPackage();
   }
 
+  executePackage(automationPackage: AutomationPackage): void {
+    this._actions.executeAutomationPackage(automationPackage);
+  }
+
   editPackage(automationPackage: AutomationPackage): void {
     this._actions.editAutomationPackage(automationPackage);
   }

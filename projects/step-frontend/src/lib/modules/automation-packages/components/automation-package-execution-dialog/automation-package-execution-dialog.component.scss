@@ -1,0 +1,6 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+div[step-modal-window-body] {
+  padding-top: 1rem;
+  @include core.common-dialog-content;
+}

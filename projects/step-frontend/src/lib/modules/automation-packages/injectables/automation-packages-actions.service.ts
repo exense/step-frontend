@@ -43,6 +43,10 @@ export class AutomationPackagesActionsService {
     this._router.navigateByUrl(`${ROOT_URL}/upload/new`);
   }
 
+  executeAutomationPackage(automationPackage: AutomationPackage): void {
+    this._router.navigateByUrl(`/${ROOT_URL}/execute/${automationPackage.id}`);
+  }
+
   editAutomationPackage(automationPackage: AutomationPackage): void {
     const url = `${ROOT_URL}/upload/${automationPackage.id}`;
     if (this._multipleProjects.isEntityBelongsToCurrentProject(automationPackage)) {
