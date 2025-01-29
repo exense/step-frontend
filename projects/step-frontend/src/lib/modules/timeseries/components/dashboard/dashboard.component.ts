@@ -130,7 +130,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       throw new Error('Dashboard id input is mandatory');
     }
     if (this.defaultFullTimeRange?.from) {
-      this.timeRangeOptions.push({ type: 'FULL' });
+      this.timeRangeOptions.unshift({ type: 'FULL' });
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
     this.resolution = urlParams.resolution;

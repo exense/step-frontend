@@ -2,6 +2,7 @@ import { Execution, TimeRange } from '@exense/step-core';
 import { TimeRangePickerSelection } from './../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from './time-series.config';
 import { ChartAggregation } from '../chart-aggregation';
+import { DateTime } from 'luxon';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -97,12 +98,23 @@ export class TimeSeriesUtils {
     }
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const isoDate = `${date.getFullYear()}-${month}-${day}`;
+    const isoDate = `${day}.${month}.${date.getFullYear()}`;
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
     const isoTime = `${hours}:${minutes}:${seconds}`;
     return `${isoDate} ${includeTime ? isoTime : ''}`;
+  }
+
+  static parseFormattedDate(dateString: string | undefined, includeTime = true): Date | undefined {
+    if (!dateString) {
+      return undefined;
+    }
+    const format = includeTime ? 'dd.MM.yyyy HH:mm:ss' : 'dd.MM.yyyy';
+    const dateTime = DateTime.fromFormat(dateString, format);
+
+    // Check if the date is valid
+    return dateTime.isValid ? dateTime.toJSDate() : undefined;
   }
 
   static ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {

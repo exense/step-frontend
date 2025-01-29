@@ -17,13 +17,7 @@
           {{ activeSelection.relativeSelection!.label }}
         }
         @case ('ABSOLUTE') {
-          @if (activeSelection.absoluteSelection?.from && activeSelection.absoluteSelection?.to) {
-            {{ fromDateString + ' - ' + toDateString }}
-          } @else if (activeSelection.absoluteSelection?.from) {
-            after {{ fromDateString }}
-          } @else {
-            before {{ toDateString }}
-          }
+          {{ absoluteRangeLabel }}
         }
         @default {}
       }
@@ -33,7 +27,6 @@
     <div (click)="$event.stopPropagation()">
       <div class="time-selector-container">
         <div class="left-section">
-          <div class="title bottom-gap">Absolute time range</div>
           <div class="bottom-gap">
             <step-form-field>
               <step-label>From</step-label>
@@ -42,7 +35,11 @@
                 <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [stepDatePicker]="fromPicker" (dateChange)="setFromDate($event)" />
+            <input
+              class="hidden-input"
+              [stepDatePicker]="fromPicker"
+              (dateChange)="setFromDate($event); fromPicker.close()"
+            />
             <step-date-picker #fromPicker></step-date-picker>
           </div>
           <div class="bottom-gap">
@@ -53,17 +50,21 @@
                 <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [stepDatePicker]="toPicker" (dateChange)="setToDate($event)" />
+            <input
+              class="hidden-input"
+              [stepDatePicker]="toPicker"
+              (dateChange)="setToDate($event); toPicker.close()"
+            />
             <step-date-picker #toPicker></step-date-picker>
           </div>
           <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
         </div>
         <div class="right-section" (click)="closeMenu()">
-          <div class="title">Relative time ranges</div>
           @for (rangeOption of selectOptions; track rangeOption.relativeSelection?.label) {
             <div
               (click)="onRelativeSelectionSelected(rangeOption)"
               class="time-option"
+              [class.full-range]="rangeOption.type === 'FULL'"
               [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
             >
               {{ rangeOption.relativeSelection?.label }}

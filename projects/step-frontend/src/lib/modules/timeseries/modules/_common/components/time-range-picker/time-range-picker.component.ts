@@ -41,6 +41,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   fromDateString: string | undefined; // used for formatting the date together with time
+  absoluteRangeLabel: string | undefined;
   toDateString: string | undefined;
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -65,6 +66,13 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (range) {
       this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(range.from));
       this.toDateString = TimeSeriesUtils.formatInputDate(new Date(range.to));
+      if (this.fromDateString && this.toDateString) {
+        this.absoluteRangeLabel = `${this.fromDateString} - ${this.toDateString}`;
+      } else if (this.fromDateString) {
+        this.absoluteRangeLabel = `after ${this.fromDateString}`;
+      } else {
+        this.absoluteRangeLabel = `before ${this.toDateString}`;
+      }
     }
   }
 
@@ -81,14 +89,16 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   applyAbsoluteInterval() {
     let from = 0;
     let to = 0;
-    if (this.fromDateString && this.isValidDate(this.fromDateString)) {
-      from = new Date(this.fromDateString).getTime();
+    const fromDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
+    const toDate = TimeSeriesUtils.parseFormattedDate(this.toDateString);
+    if (fromDate) {
+      from = fromDate.getTime();
     } else {
       // the date is invalid
       this.fromDateString = undefined;
     }
-    if (this.toDateString && this.isValidDate(this.toDateString)) {
-      to = new Date(this.toDateString).getTime();
+    if (toDate) {
+      to = toDate.getTime();
     } else {
       // the date is invalid
       this.toDateString = undefined;
@@ -172,11 +182,5 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   closeMenu() {
     this.menuTrigger.closeMenu();
-  }
-
-  isValidDate(stringValue: string): boolean {
-    const dateObject = new Date(stringValue);
-    // @ts-ignore
-    return dateObject !== 'Invalid Date' && !isNaN(dateObject); // from mozilla+chrome and IE8
   }
 }
