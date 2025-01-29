@@ -11,12 +11,9 @@ export const executionGuard: CanActivateFn = (route, state) => {
     switchMap(() => {
       const urlSegments = state.url.split('/');
       const executionId = urlSegments[urlSegments.length - 1];
-      console.log(' executionId', executionId);
 
       return _executionViewMode.resolveExecution(executionId).pipe(
         map((execution) => {
-          console.log('execution', execution);
-
           const mode = _executionViewMode.getExecutionMode(execution);
 
           if (mode !== ExecutionViewMode.LEGACY) {
