@@ -101,7 +101,7 @@ import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-e
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
 import { StepGridContainerComponent } from '../_common/components/grid-layout/container/grid-container.component';
-import { StepGridItemComponent } from '../_common/components/grid-layout/item/grid-item.component';
+import { GridsterItemResponsiveDirective } from '../_common/components/grid-layout/item/grid-item.component';
 import { GridsterModule } from 'angular-gridster2';
 
 @NgModule({
@@ -181,8 +181,8 @@ import { GridsterModule } from 'angular-gridster2';
     ArtefactsModule,
     DoughnutChartComponent,
     StepGridContainerComponent,
-    StepGridItemComponent,
     GridsterModule,
+    GridsterItemResponsiveDirective,
   ],
   exports: [
     ExecutionListComponent,

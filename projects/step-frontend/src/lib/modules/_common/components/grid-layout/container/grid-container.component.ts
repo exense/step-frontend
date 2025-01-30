@@ -8,25 +8,45 @@ import {
   ViewContainerRef,
   ComponentRef,
   ChangeDetectorRef,
+  forwardRef,
+  Optional,
+  Inject,
+  Provider,
 } from '@angular/core';
-import { GridsterConfig, GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
-import { StepGridItemComponent } from '../item/grid-item.component';
+import { GridsterConfig, GridsterComponent, GridsterModule } from 'angular-gridster2';
 import { GridLayoutSettings } from './grid-layout-settings';
+
+export const GRIDSTER_PROVIDER: Provider = {
+  provide: GridsterComponent,
+  useFactory: (gridster: GridsterComponent) => gridster,
+  deps: [[new Inject(forwardRef(() => GridsterComponent)), new Optional()]],
+};
 
 @Component({
   selector: 'step-gridster-container',
   template: `
     <div style="height: 1000px">
       <gridster #gridster [options]="config">
+        <!--        @if (gridsterReady) {-->
         <ng-content></ng-content>
+        <!--        }-->
       </gridster>
     </div>
   `,
-  imports: [GridsterComponent],
+  imports: [GridsterModule],
+  providers: [GRIDSTER_PROVIDER],
   standalone: true,
 })
 export class StepGridContainerComponent implements AfterViewInit {
   @Input() settings: GridLayoutSettings | undefined;
+
+  gridsterReady = false;
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.gridsterReady = true;
+    }, 10000);
+  }
 
   config: GridsterConfig = {
     yGrid: 'onDrag&Resize',
@@ -44,47 +64,4 @@ export class StepGridContainerComponent implements AfterViewInit {
     maxRows: 2,
     fixedRowHeight: 450,
   };
-
-  @ViewChild('gridsterContainer', { read: ViewContainerRef }) gridsterContainer!: ViewContainerRef;
-  @ViewChild('gridster') gridster!: GridsterComponent;
-  @ContentChildren(StepGridItemComponent) items!: QueryList<StepGridItemComponent>;
-
-  private gridsterItems: ComponentRef<GridsterItemComponent>[] = [];
-
-  ngAfterViewInit() {
-    // setTimeout(() => this.gridster?.options?.api?.resize?.(), 100);
-    this.createGridsterItems();
-  }
-
-  constructor(private cdr: ChangeDetectorRef) {}
-
-  ngAfterContentInit() {
-    // Initial setup of items
-    console.log('AFTER CONTENT INIT');
-    this.items.changes.subscribe(() => {
-      this.createGridsterItems();
-    });
-    // this.previousItemCount = this.items.length;
-    // this.createGridsterItems();
-  }
-
-  private createGridsterItems() {
-    this.gridsterContainer.clear(); // Remove existing items
-
-    this.items.forEach((item, index) => {
-      const componentRef = this.gridsterContainer.createComponent(GridsterItemComponent);
-      console.log(item.x, item.y, item.width, item.height);
-      componentRef.instance.item = {
-        x: item.x,
-        y: item.y,
-        cols: item.width,
-        rows: item.height,
-      };
-      this.cdr.detectChanges();
-      componentRef.location.nativeElement.appendChild(item.content.nativeElement);
-
-      this.gridsterItems.push(componentRef);
-      this.gridster.options?.api?.optionsChanged?.();
-    });
-  }
 }

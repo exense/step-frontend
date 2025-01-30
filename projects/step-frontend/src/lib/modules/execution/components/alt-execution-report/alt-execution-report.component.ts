@@ -6,6 +6,7 @@ import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-st
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { map, Observable } from 'rxjs';
+import { GridsterComponent } from 'angular-gridster2';
 
 @Component({
   selector: 'step-alt-execution-report',

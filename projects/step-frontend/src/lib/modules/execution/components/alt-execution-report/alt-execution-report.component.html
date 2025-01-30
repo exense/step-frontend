@@ -1,81 +1,82 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
   <step-gridster-container>
-    @if (hasTestCases$ | async) {
-      <gridster-item [x]="0" [y]="0" [width]="1" [height]="1">
-        <div class="widget">
-          <div class="icons">
-            <step-icon name="circle" class="drag-icon" />
-          </div>
-          @if (testCasesSummary$ | async; as testCasesSummary) {
-            <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
-          }
-        </div>
-      </gridster-item>
-      <gridster-item
-        specialItemDirective
-        item-m="{x: 0, y: 0, cols: 1, rows: 1}"
-        [x]="1"
-        [y]="0"
-        [width]="3"
-        [height]="1"
-      >
-        <div class="widget">
-          <div class="icons">
-            <step-icon name="circle" class="drag-icon" />
-          </div>
-          @if (_state.testCases$ | async) {
-            <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
-          }
-        </div>
-      </gridster-item>
-    }
-    <gridster-item [x]="0" [y]="1" [width]="1" [height]="1">
-      <div class="widget">
-        <div class="icons">
-          <step-icon name="circle" class="drag-icon" />
-        </div>
-        @if (keywordsSummary$ | async; as keywordsSummary) {
-          <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
-        }
-      </div>
-    </gridster-item>
-    @if (_mode === ViewMode.VIEW) {
-      <gridster-item [x]="1" [y]="1" [width]="3" [height]="1">
-        <div class="widget">
-          <div class="icons">
-            <step-icon name="circle" class="drag-icon" />
-          </div>
-          <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />
-        </div>
-      </gridster-item>
-    }
-    <gridster-item [x]="0" [y]="2" [width]="3" [height]="1">
-      <div class="widget">
-        <div class="icons">
-          <step-icon name="circle" class="drag-icon" />
-        </div>
-        @if (_state.executionId$ | async; as executionId) {
-          <step-alt-report-performance-overview-chart
-            [executionId]="executionId"
-            [timeRange]="(_state.timeRange$ | async)!"
-            (timeRangeChange)="_state.updateRange($event)"
-            [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
-            (fullRange)="_state.selectFullRange()"
-          />
-        }
-      </div>
+    <!--    @if (hasTestCases$ | async) {-->
+    <!--      <gridster-item itemM="{ cols: 1, rows: 1, x: 0, y: 0 }">-->
+    <!--        <div class="widget">-->
+    <!--          <div class="icons">-->
+    <!--            <step-icon name="circle" class="drag-icon" />-->
+    <!--          </div>-->
+    <!--          @if (testCasesSummary$ | async; as testCasesSummary) {-->
+    <!--            <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />-->
+    <!--          }-->
+    <!--        </div>-->
+    <!--      </gridster-item>-->
+    <!--      <gridster-item-->
+    <!--        specialItemDirective-->
+    <!--        item-m="{x: 0, y: 0, cols: 1, rows: 1}"-->
+    <!--        [x]="1"-->
+    <!--        [y]="0"-->
+    <!--        [width]="3"-->
+    <!--        [height]="1"-->
+    <!--      >-->
+    <!--        <div class="widget">-->
+    <!--          <div class="icons">-->
+    <!--            <step-icon name="circle" class="drag-icon" />-->
+    <!--          </div>-->
+    <!--          @if (_state.testCases$ | async) {-->
+    <!--            <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />-->
+    <!--          }-->
+    <!--        </div>-->
+    <!--      </gridster-item>-->
+    <!--    }-->
+    <!--    <gridster-item [x]="0" [y]="1" [width]="1" [height]="1">-->
+    <!--      <div class="widget">-->
+    <!--        <div class="icons">-->
+    <!--          <step-icon name="circle" class="drag-icon" />-->
+    <!--        </div>-->
+    <!--        @if (keywordsSummary$ | async; as keywordsSummary) {-->
+    <!--          <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />-->
+    <!--        }-->
+    <!--      </div>-->
+    <!--    </gridster-item>-->
+    <!--    @if (_mode === ViewMode.VIEW) {-->
+    <!--      <gridster-item [x]="1" [y]="1" [width]="3" [height]="1">-->
+    <!--        <div class="widget">-->
+    <!--          <div class="icons">-->
+    <!--            <step-icon name="circle" class="drag-icon" />-->
+    <!--          </div>-->
+    <!--          <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />-->
+    <!--        </div>-->
+    <!--      </gridster-item>-->
+    <!--    }-->
+    <gridster-item [item]="{ x: 0, y: 0, cols: 2, rows: 1 }">
+      test
+      <!--      <div class="widget">-->
+      <!--        <div class="icons">-->
+      <!--          <step-icon name="circle" class="drag-icon" />-->
+      <!--        </div>-->
+      <!--        @if (_state.executionId$ | async; as executionId) {-->
+      <!--          <step-alt-report-performance-overview-chart-->
+      <!--            [executionId]="executionId"-->
+      <!--            [timeRange]="(_state.timeRange$ | async)!"-->
+      <!--            (timeRangeChange)="_state.updateRange($event)"-->
+      <!--            [isFullRange]="!!(_state.isFullRangeSelected$ | async)"-->
+      <!--            (fullRange)="_state.selectFullRange()"-->
+      <!--          />-->
+      <!--        }-->
+      <!--      </div>-->
     </gridster-item>
 
-    @if (_state.currentOperations$ | async; as currentOperations) {
-      <gridster-item [x]="3" [y]="3" [width]="1" [height]="1">
-        <div class="widget">
-          <div class="icons">
-            <step-icon name="circle" class="drag-icon" />
-          </div>
-          <step-alt-report-current-operations [operations]="currentOperations" />
-        </div>
-      </gridster-item>
-    }
+    <!--    @if (_state.currentOperations$ | async; as currentOperations) {-->
+    <!--      <gridster-item [x]="3" [y]="3" [width]="1" [height]="1">-->
+    <!--        <div class="widget">-->
+    <!--          <div class="icons">-->
+    <!--            <step-icon name="circle" class="drag-icon" />-->
+    <!--          </div>-->
+    <!--          <step-alt-report-current-operations [operations]="currentOperations" />-->
+    <!--        </div>-->
+    <!--      </gridster-item>-->
+    <!--    }-->
   </step-gridster-container>
 
   @if (_mode === ViewMode.PRINT) {
