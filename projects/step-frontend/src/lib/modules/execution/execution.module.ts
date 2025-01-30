@@ -100,7 +100,9 @@ import { AltReportNodeDetailsStateService } from './services/alt-report-node-det
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
-import { GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
+import { StepGridContainerComponent } from '../_common/components/grid-layout/container/grid-container.component';
+import { StepGridItemComponent } from '../_common/components/grid-layout/item/grid-item.component';
+import { GridsterModule } from 'angular-gridster2';
 
 @NgModule({
   declarations: [
@@ -178,8 +180,9 @@ import { GridsterComponent, GridsterItemComponent } from 'angular-gridster2';
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
-    GridsterItemComponent,
-    GridsterComponent,
+    StepGridContainerComponent,
+    StepGridItemComponent,
+    GridsterModule,
   ],
   exports: [
     ExecutionListComponent,
