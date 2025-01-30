@@ -28,9 +28,10 @@ export class NavigatorService {
 
   isViewIdActive(viewId: string): Observable<boolean> {
     const viewLink = `/${viewId}`;
+
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      map((url) => (this.forcedActivatedViewId ? viewId === this.forcedActivatedViewId : url.startsWith(viewLink))),
+      map((url) => this.forcedActivatedViewId === viewId || url.startsWith(viewLink)),
     );
   }
 

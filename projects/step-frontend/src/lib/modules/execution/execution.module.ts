@@ -12,8 +12,6 @@ import { PanelIdPipe } from './pipes/panel-id.pipe';
 import { OperationsModule } from '../operations/operations.module';
 import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
-import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
-import './components/execution-tabs/execution-tabs.component';
 import {
   DashletRegistryService,
   dialogRoute,
@@ -43,7 +41,6 @@ import { RepositoryComponent } from './components/repository/repository.componen
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
-import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
@@ -110,7 +107,6 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     ExecutionStepComponent,
     PanelIdPipe,
     KeywordCallsComponent,
-    ExecutionTabsComponent,
     RepositoryPlanTestcaseListComponent,
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
@@ -129,7 +125,6 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     PanelOperationsComponent,
     ExecutionSelectionTableComponent,
     IsExecutionProgressPipe,
-    ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
@@ -181,7 +176,6 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
-    ExecutionTabsComponent,
     ExecutionErrorsComponent,
     KeywordCallsComponent,
     ExecutionTreeComponent,
@@ -295,8 +289,9 @@ export class ExecutionModule {
       canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
-      component: ExecutionsComponent,
+      component: AltExecutionsComponent,
       children: [
         {
           path: '',
@@ -331,7 +326,6 @@ export class ExecutionModule {
       canActivate: [altExecutionGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
-        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
       children: [

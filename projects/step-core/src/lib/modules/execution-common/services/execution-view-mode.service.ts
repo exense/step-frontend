@@ -6,6 +6,7 @@ import { LOCAL_STORAGE } from '../../basics/types/storage.token';
 import { ExecutionViewMode } from '../types/execution-view-mode';
 import { EXECUTION_VIEW_MODE } from '../injectables/execution-view-mode.token';
 import { switchMap } from 'rxjs/operators';
+import { CommonEntitiesUrlsService } from '../../basics/injectables/common-entities-urls.service';
 
 type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'mode'>>;
 
@@ -16,6 +17,7 @@ export class ExecutionViewModeService {
   private _userService = inject(UserService);
   private _localStorage = inject(LOCAL_STORAGE);
   private _executionService = inject(ExecutionsService);
+  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
   readonly mode?: ExecutionViewMode;
 
@@ -57,6 +59,13 @@ export class ExecutionViewModeService {
       execution.description !== 'LegacyPlan'; // debug name, remove before finalizing ticket
 
     return useNewView ? ExecutionViewMode.NEW : ExecutionViewMode.LEGACY;
+  }
+
+  determineUrl(execution: Execution): string {
+    const mode = this.getExecutionMode(execution);
+    return mode === ExecutionViewMode.NEW
+      ? this._commonEntitiesUrls.executionUrl(execution)
+      : this._commonEntitiesUrls.legacyExecutionUrl(execution);
   }
 
   cleanup(): void {

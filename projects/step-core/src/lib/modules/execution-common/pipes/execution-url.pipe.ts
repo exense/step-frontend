@@ -1,29 +1,19 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { CommonEntitiesUrlsService } from '../../basics/step-basics.module';
-import { Execution } from '../../../client/step-client-module';
+import { Execution } from '../../../client/generated';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ExecutionViewModeService } from '../services/execution-view-mode.service';
-import { ExecutionViewMode } from '../types/execution-view-mode';
 
 @Pipe({
   name: 'executionUrl',
   standalone: true,
 })
 export class ExecutionUrlPipe implements PipeTransform {
-  private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _executionViewMode = inject(ExecutionViewModeService);
 
   transform(idOrExecution: string | Execution): Observable<string> {
     return this._executionViewMode
       .resolveExecution(idOrExecution)
-      .pipe(switchMap((execution: Execution) => of(this.determineUrl(execution))));
-  }
-
-  private determineUrl(execution: Execution): string {
-    const mode = this._executionViewMode.getExecutionMode(execution);
-    return mode === ExecutionViewMode.NEW
-      ? this._commonEntitiesUrls.executionUrl(execution)
-      : this._commonEntitiesUrls.legacyExecutionUrl(execution);
+      .pipe(switchMap((execution: Execution) => of(this._executionViewMode.determineUrl(execution))));
   }
 }

@@ -395,6 +395,11 @@ $menu-sub-item-height: 3.2rem;
       color: map.get($config, menu-text) !important;
     }
 
+    .sidebar-sub-subtab.sidebar-highlighted-subtab {
+      background-color: map.get($config, divider-color);
+      color: map.get($config, menu-text) !important;
+    }
+
     .sidebar-subtab:hover,
     .sidebar-sub-subtab:hover {
       background: map.get($config, selection-color);
