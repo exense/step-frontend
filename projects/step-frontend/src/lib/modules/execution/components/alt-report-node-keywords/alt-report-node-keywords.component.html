@@ -42,6 +42,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openDetails(element)">
+          <step-report-node-icon [node]="element" />
           {{ element.name }}
           <step-artefact-inline-details [reportInfo]="element" [overflowContent]="true" />
         </div>

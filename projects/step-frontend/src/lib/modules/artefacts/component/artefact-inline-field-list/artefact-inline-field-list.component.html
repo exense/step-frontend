@@ -1,5 +1,27 @@
 <section class="list" [class.vertical]="isVertical()" [class.wrap]="wrap()">
-  @for (item of items(); track item.label) {
+  @for (item of displayItems(); track item.label) {
     <step-artefact-inline-field [item]="item" />
   }
 </section>
+@if (hasHiddenItems()) {
+  <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
+    <button
+      class="more-button"
+      type="button"
+      matTooltip="Show more"
+      matTooltipPosition="below"
+      mat-icon-button
+      [color]="isHiddenVisible() ? 'primary' : 'default'"
+    >
+      <step-icon name="more-horizontal" />
+    </button>
+    <step-popover-content>
+      @for (item of hiddenItems(); track item.label; let isLast = $last) {
+        <step-artefact-inline-field [item]="item" />
+        @if (!isLast) {
+          <br />
+        }
+      }
+    </step-popover-content>
+  </step-popover>
+}
