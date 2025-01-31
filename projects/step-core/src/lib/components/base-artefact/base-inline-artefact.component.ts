@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactInlineItem } from './artefact-inline-item';
 import { AggregatedArtefactInfo } from '../../shared';
@@ -12,6 +12,7 @@ import {
   DynamicValueString,
   ReportNode,
 } from '../../client/step-client-module';
+import { ArtefactService } from '../../services/artefact.service';
 
 interface ReportNodeWithArtefact<A extends AbstractArtefact> extends ReportNode {
   resolvedArtefact?: A;
@@ -31,11 +32,14 @@ export abstract class BaseInlineArtefactComponent<
   R extends ReportNode = ReportNodeWithArtefact<A>,
 > implements CustomComponent
 {
+  private _artefactService = inject(ArtefactService);
+
   private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
   protected info = computed(() => this.contextInternal()?.aggregatedInfo);
   protected isVertical = computed(() => !!this.contextInternal()?.isVertical);
 
-  private context$ = toObservable(this.contextInternal);
+  protected readonly currentContext = this.contextInternal.asReadonly();
+  protected context$ = toObservable(this.contextInternal);
   private aggregatedInfoItems$ = this.context$.pipe(
     switchMap((context) => {
       if (!context?.aggregatedInfo) {
@@ -96,7 +100,7 @@ export abstract class BaseInlineArtefactComponent<
     return of(this.getItems(artefact, isVertical, isResolved));
   }
 
-  private isResolved(info?: AggregatedArtefactInfo<A>): boolean {
+  protected isResolved(info?: AggregatedArtefactInfo<A>): boolean {
     if (!info) {
       return false;
     }
@@ -117,21 +121,26 @@ export abstract class BaseInlineArtefactComponent<
     isResolved?: boolean,
   ): ArtefactInlineItem[] {
     return items.map(([label, value]) => {
-      const valueType = typeof value;
-      if (valueType === 'string' || valueType === 'number' || valueType === 'boolean' || valueType === 'undefined') {
+      const isDynamic = this._artefactService.isDynamicValue(value);
+      if (isDynamic) {
         return {
           label,
-          value: {
-            value: value as string | number | boolean,
-            dynamic: false,
-          },
-          isResolved: true,
+          value: value as DynamicValueString | DynamicValueInteger | DynamicValueBoolean,
+          isResolved,
         };
       }
+
+      if (typeof value === 'object') {
+        value = JSON.stringify(value);
+      }
+
       return {
         label,
-        value: value as DynamicValueString | DynamicValueInteger | DynamicValueBoolean,
-        isResolved,
+        value: {
+          value: value as string | number | boolean,
+          dynamic: false,
+        },
+        isResolved: true,
       };
     });
   }

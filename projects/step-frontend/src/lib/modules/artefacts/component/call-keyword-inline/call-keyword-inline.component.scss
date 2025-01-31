@@ -1,0 +1,25 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+.error-container,
+:host {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+step-icon {
+  @include core.step-icon-size(1.6rem);
+}
+
+.error-container {
+  step-icon {
+    color: map-get(var.$statuses, 'FAILED');
+  }
+  div {
+    overflow: hidden;
+    max-width: 20rem;
+    text-overflow: ellipsis;
+  }
+}

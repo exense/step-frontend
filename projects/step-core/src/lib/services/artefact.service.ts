@@ -1,6 +1,11 @@
 import { inject, Injectable, Type } from '@angular/core';
 import { map } from 'rxjs';
-import { PlansService } from '../client/step-client-module';
+import {
+  DynamicValueBoolean,
+  DynamicValueInteger,
+  DynamicValueString,
+  PlansService,
+} from '../client/step-client-module';
 import {
   CustomRegistryType,
   CustomRegistryService,
@@ -14,6 +19,9 @@ export interface ArtefactType extends CustomRegistryItem {
   isSelectable?: boolean;
   inlineComponent?: Type<CustomComponent>;
 }
+
+export type SimpleValue = undefined | null | string | boolean | number | object | Array<unknown>;
+export type ArtefactFieldValue = SimpleValue | DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
 
 @Injectable({
   providedIn: 'root',
@@ -55,5 +63,12 @@ export class ArtefactService {
     }
     const item = this._customRegistry.getRegisteredItem(this.registryType, typeName);
     return item as ArtefactType;
+  }
+
+  isDynamicValue(value: ArtefactFieldValue): boolean {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+    return value.hasOwnProperty('dynamic') && (value.hasOwnProperty('value') || value.hasOwnProperty('expression'));
   }
 }

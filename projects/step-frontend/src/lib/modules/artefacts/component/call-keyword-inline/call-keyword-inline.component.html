@@ -1,1 +1,11 @@
-<step-artefact-inline-field-list [items]="items()" [isVertical]="isVertical()" />
+@if (attachmentsCountTooltip(); as tooltip) {
+  <step-icon name="paperclip" [matTooltip]="tooltip" />
+}
+@if (error(); as error) {
+  <div class="error-container">
+    <step-icon name="alert-triangle" />
+    <div [stepOverflowTooltip]="error" matTooltipPosition="below">{{ error }}</div>
+  </div>
+}
+<step-artefact-inline-field-list [items]="inputItems()" [displayLimit]="3" />
+<step-artefact-inline-field-list [items]="outputItems()" [displayLimit]="3" />
