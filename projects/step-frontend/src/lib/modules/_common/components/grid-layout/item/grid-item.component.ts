@@ -1,53 +1,39 @@
-import {
-  Directive,
-  Input,
-  ElementRef,
-  Renderer2,
-  AfterViewInit,
-  HostListener,
-  OnChanges,
-  SimpleChanges,
-  input,
-} from '@angular/core';
-import { GridsterComponent } from 'angular-gridster2';
+import { Directive, AfterViewInit, input, Input, OnInit, effect } from '@angular/core';
+import { GridsterItemComponent } from 'angular-gridster2';
 
 interface GridsterItemConfig {
-  cols?: number;
-  rows?: number;
-  x?: number;
-  y?: number;
+  cols: number;
+  rows: number;
+  x: number;
+  y: number;
 }
 
 @Directive({
   standalone: true,
-  selector: '[itemS], [itemM], [itemL]',
-  providers: [GridsterComponent],
+  selector: '[itemM]',
 })
-export class GridsterItemResponsiveDirective implements AfterViewInit, OnChanges {
+export class GridsterItemResponsiveDirective {
   itemS = input<GridsterItemConfig | undefined>(); // Small
   itemM = input<GridsterItemConfig | undefined>(); // Medium
   itemL = input<GridsterItemConfig | undefined>(); // Large
 
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-  ) {}
-
-  ngAfterViewInit() {
-    this.applyCorrectConfig();
+  constructor(private item: GridsterItemComponent) {
+    this.item.item = { x: -1, y: -1, cols: -1, rows: -1 };
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['itemS'] || changes['itemM'] || changes['itemL']) {
-      this.applyCorrectConfig();
-    }
-  }
+  inputsEffect = effect(() => {
+    const itemS = this.itemS();
+    const itemM = this.itemM();
+    const itemL = this.itemL();
 
-  private applyCorrectConfig() {
-    const selectedItem = this.itemM();
-
-    if (selectedItem) {
-      // this.renderer.setAttribute(this.el.nativeElement, 'item', JSON.stringify(selectedItem));
-    }
-  }
+    // TODO decide best input based of availability and resolution
+    const selectedConfig = itemM!;
+    this.item.item = {
+      x: selectedConfig.x,
+      y: selectedConfig.y,
+      cols: selectedConfig.cols,
+      rows: selectedConfig.rows,
+    };
+    this.item.updateOptions();
+  });
 }

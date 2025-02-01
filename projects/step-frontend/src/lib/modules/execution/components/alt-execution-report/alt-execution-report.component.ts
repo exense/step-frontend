@@ -1,12 +1,12 @@
-import { Component, inject, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { map, Observable } from 'rxjs';
-import { GridsterComponent } from 'angular-gridster2';
+import { delay, map, Observable } from 'rxjs';
+import { GridsterComponent, GridsterConfig } from 'angular-gridster2';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -24,6 +24,8 @@ import { GridsterComponent } from 'angular-gridster2';
   encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionReportComponent {
+  @ViewChild(GridsterComponent) gridster?: GridsterComponent;
+
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
 
@@ -35,26 +37,9 @@ export class AltExecutionReportComponent {
   protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
-  protected readonly _mode = inject(VIEW_MODE);
+  protected readonly layoutStructureInitialized = this._state.testCases$.pipe(map((testCases) => true));
 
-  // protected readonly gridSettings$: Observable<GridsterConfig> = this.hasTestCases$.pipe(
-  //   map((hasTestCases) => {
-  //     return {
-  //       gridType: 'verticalFixed',
-  //       displayGrid: 'onDrag&Resize',
-  //       compactType: 'compactUp',
-  //       draggable: { enabled: true, dragHandleClass: 'drag-icon', ignoreContent: true },
-  //       resizable: { enabled: false },
-  //       margin: 12,
-  //       minCols: 4,
-  //       maxCols: 4,
-  //       minRows: 4,
-  //       maxRows: 4,
-  //       fixedRowHeight: 450,
-  //       pushItems: true,
-  //     };
-  //   }),
-  // );
+  protected readonly _mode = inject(VIEW_MODE);
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
