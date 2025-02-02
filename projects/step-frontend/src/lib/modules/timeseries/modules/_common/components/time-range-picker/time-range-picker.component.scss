@@ -43,6 +43,33 @@
 
 .range-btn {
   @include core.button-round;
+
+  display: flex;
+  max-width: 260px;
+  align-items: center;
+  width: 260px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  justify-content: space-between;
+  height: 36px;
+
+  .text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 8px;
+  }
+
+  .suffix-icon {
+  }
+
+  .warn {
+    color: var.$orange;
+  }
+
   &.compact-btn {
     height: 40px;
     padding: 0 4px;

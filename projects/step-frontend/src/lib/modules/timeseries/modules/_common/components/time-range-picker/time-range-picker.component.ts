@@ -16,6 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
 import { TimeRange } from '@exense/step-core';
+import { MatTooltip } from '@angular/material/tooltip';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -26,7 +27,7 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, MatTooltip],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
   private _snackBar = inject(MatSnackBar);
@@ -41,7 +42,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   fromDateString: string | undefined; // used for formatting the date together with time
-  absoluteRangeLabel: string | undefined;
+  mainPickerLabel: string = '';
   toDateString: string | undefined;
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -49,40 +50,66 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (!this.selectOptions) {
       throw new Error('Options param is mandatory');
     }
+    console.log(this.selectOptions);
     if (this.initialSelectionIndex != undefined) {
       this.activeSelection = this.selectOptions[0];
     } else {
       if (!this.activeSelection) {
         this.activeSelection = this.selectOptions[0];
-      } else {
-        if (this.activeSelection.type === 'ABSOLUTE') {
-          this.formatAbsoluteValues(this.activeSelection.absoluteSelection!);
+      }
+    }
+    this.formatSelectionLabel(this.activeSelection);
+  }
+
+  private formatSelectionLabel(selection: TimeRangePickerSelection) {
+    console.log('formatting', selection);
+    let range: TimeRange;
+    if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
+      const range = selection.absoluteSelection;
+      if (range) {
+        const fromDate = new Date(range.from);
+        const toDate = range.to ? new Date(range.to) : undefined;
+
+        this.fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
+        this.toDateString = TimeSeriesUtils.formatInputDate(toDate);
+
+        if (this.fromDateString && this.toDateString) {
+          if (this.datesHaveSameDate(fromDate, toDate!)) {
+            this.mainPickerLabel = `${TimeSeriesUtils.formatInputDate(fromDate)} - ${TimeSeriesUtils.formatTime(toDate)}`;
+          } else {
+            this.mainPickerLabel = `${this.fromDateString} - ${this.toDateString}`;
+          }
+        } else if (this.fromDateString) {
+          this.mainPickerLabel = `${this.fromDateString} - now`;
+        } else {
+          this.mainPickerLabel = `before ${this.toDateString}`;
+        }
+        if (selection.type === 'FULL') {
+          this.fromDateString = '';
+          this.toDateString = '';
         }
       }
+    } else {
+      // relative selection
+      this.fromDateString = '';
+      this.toDateString = '';
+      this.mainPickerLabel = selection.relativeSelection!.label!;
     }
   }
 
-  private formatAbsoluteValues(range: TimeRange) {
-    if (range) {
-      this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(range.from));
-      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(range.to));
-      if (this.fromDateString && this.toDateString) {
-        this.absoluteRangeLabel = `${this.fromDateString} - ${this.toDateString}`;
-      } else if (this.fromDateString) {
-        this.absoluteRangeLabel = `after ${this.fromDateString}`;
-      } else {
-        this.absoluteRangeLabel = `before ${this.toDateString}`;
-      }
-    }
+  datesHaveSameDate(date1: Date, date2: Date) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const selectionChange = changes['activeSelection'];
     if (selectionChange?.previousValue !== selectionChange?.currentValue) {
       const selection: TimeRangePickerSelection = selectionChange.currentValue;
-      if (selection.type === 'ABSOLUTE') {
-        this.formatAbsoluteValues(selection.absoluteSelection!);
-      }
+      this.formatSelectionLabel(selection);
     }
   }
 
@@ -136,27 +163,18 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     }
   }
 
-  onRelativeSelectionSelected(option: TimeRangePickerSelection) {
+  onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
     this.fromDateString = undefined;
     this.toDateString = undefined;
-    if (option.type === 'FULL') {
-      this.onFullRangeSelect();
-      return;
-    }
+    console.log(this.activeSelection);
     if (
+      option.type === 'RELATIVE' &&
       this.activeSelection.type === 'RELATIVE' &&
       this.activeSelection.relativeSelection!.timeInMs === option.relativeSelection!.timeInMs
     ) {
       return;
     }
     this.emitSelectionChange(option);
-  }
-
-  /**
-   * This method reacts to the component html selection change, and should NOT be used from exterior
-   */
-  onFullRangeSelect(): void {
-    this.emitSelectionChange({ type: 'FULL' });
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {

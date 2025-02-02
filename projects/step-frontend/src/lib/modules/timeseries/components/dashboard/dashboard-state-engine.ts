@@ -115,6 +115,7 @@ export class DashboardStateEngine {
         newSettings = {
           pickerSelection: {
             type: TimeRangeType.FULL,
+            absoluteSelection: fullRange,
           },
           defaultFullRange: oldSettings.defaultFullRange,
           fullRange: fullRange,

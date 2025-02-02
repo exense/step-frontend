@@ -92,18 +92,24 @@ export class TimeSeriesUtils {
     return newFullRange;
   }
 
-  static formatInputDate(date: Date, includeTime = true): string {
+  static formatInputDate(date?: Date, includeTime = true): string {
     if (!date) {
       return '';
     }
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const isoDate = `${day}.${month}.${date.getFullYear()}`;
+    return `${isoDate} ${includeTime ? this.formatTime(date) : ''}`;
+  }
+
+  static formatTime(date?: Date): string {
+    if (!date) {
+      return '';
+    }
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    const isoTime = `${hours}:${minutes}:${seconds}`;
-    return `${isoDate} ${includeTime ? isoTime : ''}`;
+    return `${hours}:${minutes}:${seconds}`;
   }
 
   static parseFormattedDate(dateString: string | undefined, includeTime = true): Date | undefined {

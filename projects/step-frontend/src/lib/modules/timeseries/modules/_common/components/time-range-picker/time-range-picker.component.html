@@ -1,28 +1,17 @@
 <div>
-  <button
-    mat-raised-button
-    class="range-btn grey-border"
-    [matMenuTriggerFor]="menu"
-    [title]="compact ? 'Time Range' : ''"
-    [class.compact-btn]="compact"
-  >
+  <div class="range-btn grey-border" [matMenuTriggerFor]="menu" [class.compact-btn]="compact">
     @if (compact) {
       <step-icon name="clock" />
     } @else {
-      @switch (activeSelection.type) {
-        @case ('FULL') {
-          Full time range
-        }
-        @case ('RELATIVE') {
-          {{ activeSelection.relativeSelection!.label }}
-        }
-        @case ('ABSOLUTE') {
-          {{ absoluteRangeLabel }}
-        }
-        @default {}
+      <step-icon name="calendar" />
+      <div class="text" [matTooltip]="mainPickerLabel">{{ mainPickerLabel }}</div>
+      @if (activeSelection.type === 'ABSOLUTE') {
+        <div class="suffix-icon warn">
+          <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>
+        </div>
       }
     }
-  </button>
+  </div>
   <mat-menu #menu="matMenu" class="time-selector-menu">
     <div (click)="$event.stopPropagation()">
       <div class="time-selector-container">
@@ -60,12 +49,16 @@
           <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
         </div>
         <div class="right-section" (click)="closeMenu()">
-          @for (rangeOption of selectOptions; track rangeOption.relativeSelection?.label) {
+          @for (rangeOption of selectOptions; track rangeOption) {
             <div
-              (click)="onRelativeSelectionSelected(rangeOption)"
+              (click)="onRelativeOrFullSelectionSelected(rangeOption)"
               class="time-option"
               [class.full-range]="rangeOption.type === 'FULL'"
-              [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
+              [class.active]="
+                (activeSelection.type === 'FULL' && rangeOption.type === 'FULL') ||
+                (rangeOption.type === 'RELATIVE' &&
+                  rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs)
+              "
             >
               {{ rangeOption.relativeSelection?.label }}
               {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}

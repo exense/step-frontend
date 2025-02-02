@@ -130,7 +130,11 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       throw new Error('Dashboard id input is mandatory');
     }
     if (this.defaultFullTimeRange?.from) {
-      this.timeRangeOptions.unshift({ type: 'FULL' });
+      // for running executions we don't have the end time, setting to 0 instead.
+      this.timeRangeOptions.unshift({
+        type: 'FULL',
+        absoluteSelection: { from: this.defaultFullTimeRange.from, to: this.defaultFullTimeRange.to || 0 },
+      });
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
     this.resolution = urlParams.resolution;
@@ -388,7 +392,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         to: this.defaultFullTimeRange!.to || now,
       };
       return {
-        pickerSelection: { type: 'FULL' },
+        pickerSelection: { type: 'FULL', absoluteSelection: fullRange },
         fullRange: fullRange,
         defaultFullRange: this.defaultFullTimeRange,
         selectedRange: urlParams.selectedTimeRange || fullRange,
@@ -427,7 +431,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       }
       const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
       return {
-        pickerSelection: { type: 'FULL' },
+        pickerSelection: { type: 'FULL', absoluteSelection: range },
         fullRange: range,
         selectedRange: urlParams.selectedTimeRange || range,
         defaultFullRange: this.defaultFullTimeRange,
