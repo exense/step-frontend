@@ -1,7 +1,7 @@
-import { Directive, AfterViewInit, input, Input, OnInit, effect, inject } from '@angular/core';
+import { Directive, input, effect, inject } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
 
-interface GridsterItemConfig {
+export interface GridsterItemConfig {
   cols: number;
   rows: number;
   x: number;
@@ -17,25 +17,25 @@ export class GridsterItemResponsiveDirective {
   readonly itemM = input<GridsterItemConfig | undefined>(); // Medium
   readonly itemL = input<GridsterItemConfig | undefined>(); // Large
 
-  item: GridsterItemComponent = inject(GridsterItemComponent);
+  private _item = inject(GridsterItemComponent);
 
   constructor() {
-    this.item.item = { x: -1, y: -1, cols: -1, rows: -1 };
+    this._item.item = { x: -1, y: -1, cols: -1, rows: -1 };
   }
 
-  inputsEffect = effect(() => {
+  private inputsEffect = effect(() => {
     const itemS = this.itemS();
     const itemM = this.itemM();
     const itemL = this.itemL();
 
     // TODO decide best input based of availability and resolution
     const selectedConfig = itemM!;
-    this.item.item = {
+    this._item.item = {
       x: selectedConfig.x,
       y: selectedConfig.y,
       cols: selectedConfig.cols,
       rows: selectedConfig.rows,
     };
-    this.item.updateOptions();
+    this._item.updateOptions();
   });
 }

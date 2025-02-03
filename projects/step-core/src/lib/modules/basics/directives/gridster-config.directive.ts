@@ -1,15 +1,4 @@
-import {
-  AfterViewInit,
-  DestroyRef,
-  Directive,
-  ElementRef,
-  Host,
-  inject,
-  input,
-  Input,
-  Optional,
-  Renderer2,
-} from '@angular/core';
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ElementResizeDirective } from '@exense/step-core';
 import { GridsterConfig, GridsterComponent } from 'angular-gridster2';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,8 +9,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class StepGridsterConfigDirective implements AfterViewInit {
   private _destroyRef = inject(DestroyRef);
-  options = input<GridsterConfig>(); // User-provided options (optional)
   private _resizeDirective = inject(ElementResizeDirective, { optional: true, host: true });
+  private _gridster = inject(GridsterComponent);
+  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
+  private _renderer = inject(Renderer2);
+
+  readonly options = input<GridsterConfig | undefined>(); // User-provided options (optional)
 
   private defaultConfig: GridsterConfig = {
     yGrid: 'onDrag&Resize',
@@ -41,21 +34,14 @@ export class StepGridsterConfigDirective implements AfterViewInit {
     fixedRowHeight: 450,
   };
 
-  constructor(
-    private gridster: GridsterComponent,
-    private el: ElementRef,
-  ) {
+  constructor() {
     // it is mandatory that these
-    this.gridster.options = { ...this.defaultConfig, ...this.options };
-    this.gridster.optionsChanged();
-  }
-
-  resize() {
-    this.gridster?.onResize();
+    this._gridster.options = { ...this.defaultConfig, ...(this.options() ?? {}) };
+    this._gridster.optionsChanged();
   }
 
   ngAfterViewInit(): void {
-    this.el.nativeElement.style = 'background-color: #fff; position: unset;';
+    this._renderer.setAttribute(this._el.nativeElement, 'style', 'background-color: #fff; position: unset;');
     if (this._resizeDirective) {
       this._resizeDirective.elementResize.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
         this.resize();
@@ -64,5 +50,9 @@ export class StepGridsterConfigDirective implements AfterViewInit {
     } else {
       console.warn('stepElementResize directive not found!');
     }
+  }
+
+  private resize() {
+    this._gridster?.onResize();
   }
 }

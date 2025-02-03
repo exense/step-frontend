@@ -67,9 +67,22 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
 import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
+import { GridsterModule } from 'angular-gridster2';
+import { GridsterItemResponsiveDirective } from './directives/grid-item.directive';
+import { StepGridsterConfigDirective } from './directives/gridster-config.directive';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StepMaterialModule,
+    RouterModule,
+    NgxMatSelectSearchModule,
+    GridsterModule,
+    GridsterItemResponsiveDirective,
+    StepGridsterConfigDirective,
+  ],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -204,6 +217,9 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
+    GridsterModule,
+    GridsterItemResponsiveDirective,
+    StepGridsterConfigDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -326,3 +342,5 @@ export * from './pipes/status-icon.pipe';
 export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/select-extra-options.directive';
+export * from './directives/grid-item.directive';
+export * from './directives/gridster-config.directive';
