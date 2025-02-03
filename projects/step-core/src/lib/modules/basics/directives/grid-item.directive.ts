@@ -10,7 +10,7 @@ export interface GridsterItemConfig {
 
 @Directive({
   standalone: true,
-  selector: '[itemM]',
+  selector: 'gridster-item[itemM]',
 })
 export class GridsterItemResponsiveDirective {
   readonly itemS = input<GridsterItemConfig | undefined>(); // Small

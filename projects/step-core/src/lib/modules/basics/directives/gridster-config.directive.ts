@@ -4,7 +4,7 @@ import { GridsterConfig, GridsterComponent } from 'angular-gridster2';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
-  selector: '[stepGridsterConfig]', // Apply this directive on <gridster>
+  selector: 'gridster[stepGridsterConfig]', // Apply this directive on <gridster>
   standalone: true,
 })
 export class StepGridsterConfigDirective implements AfterViewInit {
