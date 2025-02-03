@@ -3,6 +3,17 @@
     <button
       type="button"
       mat-icon-button
+      aria-label="Left Align"
+      [disabled]="!('plan-execute' | hasRight | async)"
+      [matTooltip]="tooltips().link"
+      matTooltipPosition="below"
+      (click)="copyLink.emit()"
+    >
+      <step-icon name="link" aria-hidden="true" />
+    </button>
+    <button
+      type="button"
+      mat-icon-button
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
       [matTooltip]="tooltips().simulate"
@@ -16,11 +27,11 @@
       mat-icon-button
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
-      [matTooltip]="tooltips().execute"
+      [matTooltip]="tooltips().schedule"
       matTooltipPosition="below"
-      (click)="execute.emit(false)"
+      (click)="schedule.emit()"
     >
-      <step-icon name="play-circle" aria-hidden="true" />
+      <step-icon name="clock" aria-hidden="true" />
     </button>
     @if (allowExecuteWithContent()) {
       <button
@@ -48,13 +59,14 @@
     <button
       type="button"
       mat-icon-button
+      class="mat-primary"
       [disabled]="!('plan-execute' | hasRight | async)"
       aria-label="Left Align"
-      [matTooltip]="tooltips().schedule"
+      [matTooltip]="tooltips().execute"
       matTooltipPosition="below"
-      (click)="schedule.emit()"
+      (click)="execute.emit(false)"
     >
-      <step-icon name="clock" aria-hidden="true" />
+      <step-icon name="play-circle" aria-hidden="true" />
     </button>
     @if (execution()?.status; as status) {
       @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {
@@ -86,15 +98,4 @@
       }
     }
   </div>
-  <button
-    type="button"
-    mat-icon-button
-    aria-label="Left Align"
-    [disabled]="!('plan-execute' | hasRight | async)"
-    [matTooltip]="tooltips().link"
-    matTooltipPosition="below"
-    (click)="copyLink.emit()"
-  >
-    <step-icon name="link" aria-hidden="true" />
-  </button>
 </step-btn-group>

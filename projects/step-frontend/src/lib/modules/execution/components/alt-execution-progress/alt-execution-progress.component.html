@@ -75,6 +75,7 @@
           [description]="execution.description"
           [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
           [execution]="execution"
+          [includedTestcases]="testCasesForRelaunch$ | async"
           (refresh)="manualRefresh()"
         >
           <button
