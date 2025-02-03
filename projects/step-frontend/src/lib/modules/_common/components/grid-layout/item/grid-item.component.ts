@@ -13,9 +13,9 @@ interface GridsterItemConfig {
   selector: '[itemM]',
 })
 export class GridsterItemResponsiveDirective {
-  itemS = input<GridsterItemConfig | undefined>(); // Small
-  itemM = input<GridsterItemConfig | undefined>(); // Medium
-  itemL = input<GridsterItemConfig | undefined>(); // Large
+  readonly itemS = input<GridsterItemConfig | undefined>(); // Small
+  readonly itemM = input<GridsterItemConfig | undefined>(); // Medium
+  readonly itemL = input<GridsterItemConfig | undefined>(); // Large
 
   constructor(private item: GridsterItemComponent) {
     this.item.item = { x: -1, y: -1, cols: -1, rows: -1 };

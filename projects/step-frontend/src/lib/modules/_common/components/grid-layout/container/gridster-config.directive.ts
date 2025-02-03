@@ -5,6 +5,7 @@ import {
   ElementRef,
   Host,
   inject,
+  input,
   Input,
   Optional,
   Renderer2,
@@ -19,7 +20,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class StepGridsterConfigDirective implements AfterViewInit {
   private _destroyRef = inject(DestroyRef);
-  @Input() options: GridsterConfig = {}; // User-provided options (optional)
+  options = input<GridsterConfig>(); // User-provided options (optional)
+  private _resizeDirective = inject(ElementResizeDirective, { optional: true, host: true });
 
   private defaultConfig: GridsterConfig = {
     yGrid: 'onDrag&Resize',
@@ -42,10 +44,9 @@ export class StepGridsterConfigDirective implements AfterViewInit {
   constructor(
     private gridster: GridsterComponent,
     private el: ElementRef,
-    @Optional() @Host() private resizeDirective: ElementResizeDirective,
   ) {
     // it is mandatory that these
-    this.gridster.options = this.defaultConfig;
+    this.gridster.options = { ...this.defaultConfig, ...this.options };
     this.gridster.optionsChanged();
   }
 
@@ -55,8 +56,8 @@ export class StepGridsterConfigDirective implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.el.nativeElement.style = 'background-color: #fff; position: unset;';
-    if (this.resizeDirective) {
-      this.resizeDirective.elementResize.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
+    if (this._resizeDirective) {
+      this._resizeDirective.elementResize.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
         this.resize();
         // Perform your resize logic here
       });

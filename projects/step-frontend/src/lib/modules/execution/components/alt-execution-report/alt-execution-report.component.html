@@ -1,5 +1,5 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
-  @if (layoutStructureInitialized | async) {
+  @if (layoutStructureInitialized$ | async) {
     <gridster stepGridsterConfig stepElementResize>
       @if (hasTestCases$ | async) {
         <gridster-item [itemM]="{ x: 0, y: 0, cols: 1, rows: 1 }">
