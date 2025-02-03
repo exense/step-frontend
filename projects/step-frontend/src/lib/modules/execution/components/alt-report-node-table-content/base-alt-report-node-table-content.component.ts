@@ -6,11 +6,13 @@ import {
   ItemsPerPageService,
   TableRemoteDataSource,
   TableSearch,
+  DateRange,
 } from '@exense/step-core';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, combineLatest } from 'rxjs';
+import { DateTime } from 'luxon';
 
 const VIEW_PAGE_SIZE = 10;
 const PRINT_PAGE_SIZE = 50_000;
@@ -56,7 +58,12 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
 
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
-        map(([dateRange, isRemote]) => {
+        map(([pickerSelection, isRemote]) => {
+          const absoluteSelection = pickerSelection.absoluteSelection!;
+          const dateRange: DateRange = {
+            start: DateTime.fromMillis(absoluteSelection.from),
+            end: DateTime.fromMillis(absoluteSelection.to),
+          };
           if (isRemote) {
             // Remote dataSource test case
             return this._filterConditionFactory.dateRangeFilterCondition(dateRange);

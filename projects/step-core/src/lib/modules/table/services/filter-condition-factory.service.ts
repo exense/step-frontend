@@ -14,7 +14,7 @@ import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { FilterConditionType } from '../shared/filter-condition-type.enum';
 import { BooleanFilterCondition } from '../shared/boolean-filter-condition';
 import { DateRangeFilterCondition } from '../shared/date-range-filter-condition';
-import { DateRange } from '../../date-picker/date-picker.module';
+import { DateRange } from '../../date-picker/types/date-range';
 import { ArrayFilterCondition } from '../shared/array-filter-condition';
 import { REQUEST_FILTERS_INTERCEPTORS } from './request-filter-interceptors.token';
 import { BooleanArrayFilterCondition } from '../shared/boolean-array-filter-condition';

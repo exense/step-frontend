@@ -1,6 +1,6 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
+import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
@@ -48,6 +48,10 @@ export class AltExecutionReportComponent {
       return;
     }
     this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
+  }
+
+  handleChartZooming(range: TimeRange) {
+    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
   protected readonly ViewMode = ViewMode;

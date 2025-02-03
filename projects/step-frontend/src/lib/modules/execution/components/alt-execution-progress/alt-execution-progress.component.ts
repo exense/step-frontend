@@ -12,6 +12,9 @@ import {
   take,
   tap,
   distinctUntilChanged,
+  Observable,
+  BehaviorSubject,
+  skip,
 } from 'rxjs';
 import {
   AugmentedControllerService,
@@ -49,6 +52,8 @@ import { AltExecutionReportPrintService } from '../../services/alt-execution-rep
 import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
+import { TimeRangePickerSelection, TimeSeriesConfig } from '../../../timeseries/modules/_common';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -58,6 +63,7 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [
+    DashboardUrlParamsService,
     AltExecutionTabsService,
     {
       provide: AltExecutionStateService,
@@ -109,6 +115,7 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
+  private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -126,6 +133,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
+  private timeRangeSelection$: BehaviorSubject<TimeRangePickerSelection> =
+    new BehaviorSubject<TimeRangePickerSelection>(undefined!);
+
+  readonly timeRangeChange$ = this.timeRangeSelection$.asObservable().pipe(skip(1));
+
   private isTreeInitialized = false;
 
   private relativeTime?: number;
@@ -139,33 +151,47 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.relativeTime = time;
   }
 
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
+  updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
+    this.timeRangeSelection$.next(selection);
+  }
 
-  private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe((range) => {
-      // Ignore synchronization in case of view all mode
-      if (this._viewAllService.isViewAll) {
-        return;
-      }
-      this.saveRangeToStorage(range);
-    });
+  // readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
 
-  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
-    startWith(this.dateRangeCtrl.value),
-    map((range) => range ?? undefined),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
+  // private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
+  //   .pipe(takeUntilDestroyed())
+  //   .subscribe((range) => {
+  //     // Ignore synchronization in case of view all mode
+  //     if (this._viewAllService.isViewAll) {
+  //       return;
+  //     }
+  //     this.saveRangeToStorage(range);
+  //   });
 
-  readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
+  private timeRangeChangeSubscription = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((timeRange) => {
+    if (timeRange) {
+      this.saveRangeSelectionToStorage(timeRange);
+    }
+  });
 
-  updateRange(timeRange?: TimeRange | null) {
-    this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
+  // readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
+  //   startWith(this.dateRangeCtrl.value),
+  //   map((range) => range ?? undefined),
+  //   shareReplay(1),
+  //   takeUntilDestroyed(),
+  // );
+
+  // readonly timeRange$ = this.dateRange$.pipe(
+  //   map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
+  //   shareReplay(1),
+  //   takeUntilDestroyed(),
+  // );
+
+  updateTimeRange(timeRange?: TimeRange | null) {
+    if (!timeRange) {
+      return;
+    }
+    this.timeRangeSelection$.next({ type: 'ABSOLUTE', absoluteSelection: timeRange! });
+    // this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
   }
 
   selectFullRange(): void {
@@ -193,13 +219,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
 
-  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
-    map(([selectedRange, fullRange]) => {
-      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
-      return startEq && endEq;
-    }),
-  );
+  // readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
+  //   map(([selectedRange, fullRange]) => {
+  //     const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
+  //     const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
+  //     return startEq && endEq;
+  //   }),
+  // );
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
@@ -259,6 +285,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         this.refreshExecutionTree(execution);
         this.applyDefaultRange(execution, !isIgnoreFilter);
       });
+    this.timeRangeChange$.subscribe((newTimeRange) => {
+      this._urlParamsService.updateUrlParams(newTimeRange);
+    });
   }
 
   ngOnDestroy(): void {
@@ -301,6 +330,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
   }
 
+  private saveRangeSelectionToStorage(selection: TimeRangePickerSelection) {}
+
   handleTaskSchedule(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
@@ -312,7 +343,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
+    let fullRange = { from: execution.startTime!, to: execution.endTime || 0 };
+
+    const fullRangeOption: TimeRangePickerSelection = { type: 'FULL', absoluteSelection: fullRange };
+    // this.timeRangeOptions.unshift(fullRangeOption);
+    this.updateTimeRangeSelection(fullRangeOption);
+    // this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
   }
 
   private refreshExecutionTree(execution: Execution): void {

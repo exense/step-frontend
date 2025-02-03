@@ -1,18 +1,18 @@
-@if (viewAll) {
-  <step-form-field>
-    <input type="text" readonly [ngModel]="fullRange" [size]="fullRange.length" />
-  </step-form-field>
-} @else {
-  @if (showBothRanges$ | async) {
-    <step-form-field>
-      <step-label>Execution time</step-label>
-      <input type="text" readonly [ngModel]="fullRange" [size]="fullRange.length" />
-    </step-form-field>
-  }
-  <step-form-field>
-    @if (showBothRanges$ | async) {
-      <step-label>Filtered time</step-label>
-    }
-    <input type="text" readonly [ngModel]="selectedRange" [size]="selectedRange.length" />
-  </step-form-field>
-}
+<!--@if (viewAll) {-->
+<!--  <step-form-field>-->
+<!--    <input type="text" readonly [ngModel]="fullRange" [size]="fullRange.length" />-->
+<!--  </step-form-field>-->
+<!--} @else {-->
+<!--  @if (showBothRanges$ | async) {-->
+<!--    <step-form-field>-->
+<!--      <step-label>Execution time</step-label>-->
+<!--      <input type="text" readonly [ngModel]="fullRange" [size]="fullRange.length" />-->
+<!--    </step-form-field>-->
+<!--  }-->
+<!--  <step-form-field>-->
+<!--    @if (showBothRanges$ | async) {-->
+<!--      <step-label>Filtered time</step-label>-->
+<!--    }-->
+<!--    <input type="text" readonly [ngModel]="selectedRange" [size]="selectedRange.length" />-->
+<!--  </step-form-field>-->
+<!--}-->

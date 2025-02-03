@@ -238,7 +238,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private updateUrl(): void {
-    this._urlParamsService.updateUrlParams(this.mainEngine.state.context);
+    this._urlParamsService.updateUrlParamsFromContext(this.mainEngine.state.context);
   }
 
   enableEditMode() {

@@ -62,7 +62,9 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   }
 
   private formatSelectionLabel(selection: TimeRangePickerSelection) {
-    console.log('formatting', selection);
+    if (!selection) {
+      return;
+    }
     let range: TimeRange;
     if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
       const range = selection.absoluteSelection;

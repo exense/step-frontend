@@ -75,7 +75,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     takeUntilDestroyed(),
   );
 
-  readonly dateRange$ = this._executionState.dateRange$;
+  readonly dateRange$ = this._executionState.timeRangeChange$;
 
   readonly statuses = REPORT_NODE_STATUS;
 
