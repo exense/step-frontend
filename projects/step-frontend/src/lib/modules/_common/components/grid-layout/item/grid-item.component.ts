@@ -1,4 +1,4 @@
-import { Directive, AfterViewInit, input, Input, OnInit, effect } from '@angular/core';
+import { Directive, AfterViewInit, input, Input, OnInit, effect, inject } from '@angular/core';
 import { GridsterItemComponent } from 'angular-gridster2';
 
 interface GridsterItemConfig {
@@ -17,7 +17,9 @@ export class GridsterItemResponsiveDirective {
   readonly itemM = input<GridsterItemConfig | undefined>(); // Medium
   readonly itemL = input<GridsterItemConfig | undefined>(); // Large
 
-  constructor(private item: GridsterItemComponent) {
+  item: GridsterItemComponent = inject(GridsterItemComponent);
+
+  constructor() {
     this.item.item = { x: -1, y: -1, cols: -1, rows: -1 };
   }
 
