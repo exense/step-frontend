@@ -1,5 +1,5 @@
 import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, Renderer2 } from '@angular/core';
-import { ElementResizeDirective } from '@exense/step-core';
+import { ElementResizeDirective } from './element-resize.directive';
 import { GridsterConfig, GridsterComponent } from 'angular-gridster2';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

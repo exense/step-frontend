@@ -18,7 +18,6 @@ import { SplitGutterComponent } from './components/split-gutter/split-gutter.com
 import { SplitComponent } from './components/split/split.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
-import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -95,7 +94,6 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
     SplitComponent,
     SplitAreaComponent,
     SplitGutterComponent,
-    ElementResizeDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -188,7 +186,6 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
     SplitComponent,
     SplitAreaComponent,
     SplitGutterComponent,
-    ElementResizeDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -286,7 +283,6 @@ export * from './components/artefact-child-container-settings/artefact-child-con
 export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
-export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';

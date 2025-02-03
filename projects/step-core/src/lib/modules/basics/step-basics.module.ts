@@ -70,6 +70,7 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { GridsterModule } from 'angular-gridster2';
 import { GridsterItemResponsiveDirective } from './directives/grid-item.directive';
 import { StepGridsterConfigDirective } from './directives/gridster-config.directive';
+import { ElementResizeDirective } from './directives/element-resize.directive';
 
 @NgModule({
   imports: [
@@ -80,6 +81,7 @@ import { StepGridsterConfigDirective } from './directives/gridster-config.direct
     RouterModule,
     NgxMatSelectSearchModule,
     GridsterModule,
+    ElementResizeDirective,
     GridsterItemResponsiveDirective,
     StepGridsterConfigDirective,
   ],
@@ -218,6 +220,7 @@ import { StepGridsterConfigDirective } from './directives/gridster-config.direct
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     GridsterModule,
+    ElementResizeDirective,
     GridsterItemResponsiveDirective,
     StepGridsterConfigDirective,
   ],
@@ -341,6 +344,7 @@ export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
 export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
+export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
 export * from './directives/grid-item.directive';
 export * from './directives/gridster-config.directive';
