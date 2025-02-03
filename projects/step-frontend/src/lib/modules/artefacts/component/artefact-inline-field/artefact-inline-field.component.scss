@@ -18,7 +18,7 @@ step-artefact-inline-field {
       display: none;
     }
 
-    &.step-overflow-tooltip-has-overflow + .ellipsis::after {
+    &.step-overflow-indicator-has-overflow + .ellipsis::after {
       display: block;
       content: '...';
     }

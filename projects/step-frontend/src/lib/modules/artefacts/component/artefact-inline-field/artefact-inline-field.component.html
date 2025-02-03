@@ -2,7 +2,7 @@
   @if (item.icon) {
     <step-icon class="field-icon" [name]="item.icon" [matTooltip]="item.iconTooltip ?? ''" matTooltipPosition="below" />
   }
-  <section [stepOverflowTooltip]="tooltipMessage()" matTooltipPosition="below">
+  <section [stepOverflowIndicator]="tooltipMessage()" [matTooltip]="tooltipMessage()" matTooltipPosition="below">
     <label>{{ item.label }}:</label>
     @if (item.value; as value) {
       <span

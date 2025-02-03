@@ -1,5 +1,5 @@
-import { Component, computed, input, signal } from '@angular/core';
-import { ArtefactInlineItem, PopoverMode } from '@exense/step-core';
+import { Component, computed, input } from '@angular/core';
+import { ArtefactInlineItem } from '@exense/step-core';
 
 @Component({
   selector: 'step-artefact-inline-field-list',
@@ -15,8 +15,6 @@ export class ArtefactInlineFieldListComponent {
     transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],
   });
 
-  protected isHiddenVisible = signal(false);
-
   protected readonly displayItems = computed(() => {
     const items = this.items();
     const limit = this.displayLimit();
@@ -26,15 +24,12 @@ export class ArtefactInlineFieldListComponent {
     return items.slice(0, limit);
   });
 
-  protected readonly hiddenItems = computed(() => {
+  protected readonly hasHiddenItems = computed(() => {
     const items = this.items();
     const limit = this.displayLimit();
     if (limit === undefined) {
-      return [];
+      return false;
     }
-    return items.slice(limit);
+    return limit < items.length;
   });
-
-  protected readonly hasHiddenItems = computed(() => this.hiddenItems().length > 0);
-  protected readonly PopoverMode = PopoverMode;
 }

@@ -68,6 +68,7 @@ import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
+import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 
 @NgModule({
   imports: [
@@ -78,6 +79,7 @@ import { OverflowTooltipDirective } from './directives/overflow-tooltip.directiv
     RouterModule,
     NgxMatSelectSearchModule,
     OverflowTooltipDirective,
+    OverflowIndicatorDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -214,6 +216,7 @@ import { OverflowTooltipDirective } from './directives/overflow-tooltip.directiv
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     OverflowTooltipDirective,
+    OverflowIndicatorDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -336,4 +339,5 @@ export * from './pipes/status-icon.pipe';
 export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/select-extra-options.directive';
+export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';

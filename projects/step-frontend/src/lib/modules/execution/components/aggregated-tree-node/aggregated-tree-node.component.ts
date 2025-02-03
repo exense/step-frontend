@@ -22,7 +22,9 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
-  protected showIterations(status?: Status): void {
+  protected showIterations(status?: Status, event?: MouseEvent): void {
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
     const nodeId = this.nodeId();
     if (!nodeId) {
       return;

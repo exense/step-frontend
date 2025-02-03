@@ -1,5 +1,3 @@
-@use 'projects/step-core/styles/core-variables' as var;
-
 :host {
   width: 100%;
   position: relative;
@@ -10,10 +8,6 @@
   cursor: pointer;
   padding: 0.2rem 0.6rem;
   border-radius: 1rem;
-  &:hover {
-    padding: 0.1rem 0.5rem;
-    border: solid 0.1rem var.$blue-600;
-  }
 }
 
 .aggregated-info {

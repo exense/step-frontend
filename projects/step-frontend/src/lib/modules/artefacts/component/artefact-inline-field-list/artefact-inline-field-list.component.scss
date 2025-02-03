@@ -17,14 +17,6 @@ section.list {
   }
 }
 
-step-popover,
-button.more-button {
-  width: 1.6rem !important;
-  height: 1.6rem !important;
-}
-
-button.more-button {
-  step-icon {
-    @include core.step-icon-size(1.6rem);
-  }
+step-icon.more-icon {
+  @include core.step-icon-size(1.6rem);
 }

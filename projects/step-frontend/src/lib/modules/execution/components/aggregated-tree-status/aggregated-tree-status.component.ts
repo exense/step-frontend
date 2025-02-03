@@ -29,7 +29,7 @@ export class AggregatedTreeStatusComponent {
    * **/
   readonly node = input<AggregatedTreeNode>();
 
-  readonly statusClick = output<Status>();
+  readonly statusClick = output<{ status: Status; event: MouseEvent }>();
 
   protected status = computed(() => {
     let node = this.node();
@@ -44,6 +44,10 @@ export class AggregatedTreeStatusComponent {
       .map(([status, count]) => this.createStatusItem(status, count))
       .filter((item) => !!item) as StatusItem[];
   });
+
+  protected handleClick(status: Status, event: MouseEvent): void {
+    this.statusClick.emit({ status, event });
+  }
 
   private createStatusItem(status?: Status | string, count?: number): StatusItem | undefined {
     if (!status || !count) {

@@ -5,7 +5,7 @@
       [class]="item.className"
       [matTooltip]="item.tooltipMessage"
       matTooltipPosition="below"
-      (click)="statusClick.emit(item.status)"
+      (click)="handleClick(item.status, $event)"
     >
       {{ item.count | shortenNumber: 'x' }}
     </div>

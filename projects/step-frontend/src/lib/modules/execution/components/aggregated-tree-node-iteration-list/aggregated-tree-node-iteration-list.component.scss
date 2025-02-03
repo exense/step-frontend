@@ -12,12 +12,15 @@ step-table {
 
 .name {
   width: 100%;
+  white-space: nowrap;
+  padding-left: 0;
 }
 
 .details-trigger {
   cursor: pointer;
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .sort-handler {
