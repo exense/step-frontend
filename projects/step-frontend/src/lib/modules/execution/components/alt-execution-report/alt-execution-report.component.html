@@ -1,33 +1,63 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
-  @if (hasTestCases$ | async) {
-    @if (testCasesSummary$ | async; as testCasesSummary) {
-      <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
-    }
-    @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
-    }
+  @if (layoutStructureInitialized$ | async) {
+    <gridster stepGridsterConfig stepElementResize>
+      @if (hasTestCases$ | async) {
+        <gridster-item [itemM]="{ x: 0, y: 0, cols: 1, rows: 1 }">
+          <div class="widget">
+            @if (testCasesSummary$ | async; as testCasesSummary) {
+              <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
+            }
+          </div>
+        </gridster-item>
+        <gridster-item [itemM]="{ x: 1, y: 0, cols: 3, rows: 1 }">
+          <div class="widget">
+            @if (_state.testCases$ | async) {
+              <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
+            }
+          </div>
+        </gridster-item>
+      }
+      <gridster-item [itemM]="{ x: 0, y: 1, cols: 1, rows: 1 }">
+        <div class="widget">
+          @if (keywordsSummary$ | async; as keywordsSummary) {
+            <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
+          }
+        </div>
+      </gridster-item>
+      @if (_mode === ViewMode.VIEW) {
+        <gridster-item [itemM]="{ x: 1, y: 1, cols: 3, rows: 1 }">
+          <div class="widget">
+            <step-alt-report-node-keywords
+              class="keywords"
+              (openKeywordInTreeView)="handleOpenNodeInTreeView($event)"
+            />
+          </div>
+        </gridster-item>
+      }
+      <gridster-item [itemM]="{ x: 0, y: 2, cols: 3, rows: 1 }">
+        <div class="widget">
+          @if (_state.executionId$ | async; as executionId) {
+            <step-alt-report-performance-overview-chart
+              [executionId]="executionId"
+              [timeRange]="(_state.timeRange$ | async)!"
+              (timeRangeChange)="_state.updateRange($event)"
+              [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
+              (fullRange)="_state.selectFullRange()"
+            />
+          }
+        </div>
+      </gridster-item>
+
+      @if (_state.currentOperations$ | async; as currentOperations) {
+        <gridster-item [itemM]="{ x: 3, y: 3, cols: 1, rows: 1 }">
+          <div class="widget">
+            <step-alt-report-current-operations [operations]="currentOperations" />
+          </div>
+        </gridster-item>
+      }
+    </gridster>
   }
-  @if (keywordsSummary$ | async; as keywordsSummary) {
-    <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
-  }
-  @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget />
-  }
-  @if (_state.executionId$ | async; as executionId) {
-    <step-alt-report-performance-overview-chart
-      [executionId]="executionId"
-      [timeRange]="(_state.timeRange$ | async)!"
-      (timeRangeChange)="_state.updateRange($event)"
-      [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
-      (fullRange)="_state.selectFullRange()"
-    />
-  }
-  @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />
-  }
-  @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations [operations]="currentOperations" />
-  }
+
   @if (_mode === ViewMode.PRINT) {
     <div class="print-footer"></div>
   }
