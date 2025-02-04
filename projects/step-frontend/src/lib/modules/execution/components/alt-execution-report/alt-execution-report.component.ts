@@ -34,6 +34,8 @@ export class AltExecutionReportComponent {
   protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
+  protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
+
   protected readonly _mode = inject(VIEW_MODE);
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {

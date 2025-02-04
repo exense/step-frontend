@@ -15,10 +15,12 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
 import './components/execution-tabs/execution-tabs.component';
 import {
+  AugmentedExecutionsService,
   AugmentedControllerService,
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
+  IncludeTestcases,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   NavigatorService,
   preloadScreenDataResolver,
@@ -85,12 +87,15 @@ import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-d
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
+import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/doughnut-chart.component';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
-import { RepoRefHolderService } from './services/repo-ref-holder.service';
+import { ActiveExecutionsService } from './services/active-executions.service';
+import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -175,7 +180,14 @@ import { ExecutionNavigatorQueryParamsCleanupService } from './services/executio
     AggregatedTreeNodeDialogComponent,
     PlanNodeDetailsDialogComponent,
   ],
-  imports: [StepCommonModule, OperationsModule, ReportNodesModule, TimeSeriesModule, ArtefactsModule],
+  imports: [
+    StepCommonModule,
+    OperationsModule,
+    ReportNodesModule,
+    TimeSeriesModule,
+    ArtefactsModule,
+    DoughnutChartComponent,
+  ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
@@ -339,6 +351,7 @@ export class ExecutionModule {
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
+      providers: [ActiveExecutionsService],
       children: [
         {
           path: '',
@@ -352,7 +365,6 @@ export class ExecutionModule {
           path: ':id',
           component: AltExecutionProgressComponent,
           providers: [
-            RepoRefHolderService,
             AggregatedReportViewTreeNodeUtilsService,
             {
               provide: TreeNodeUtilsService,
@@ -367,6 +379,14 @@ export class ExecutionModule {
               useClass: AggregatedReportViewTreeStateService,
             },
             AltReportNodeDetailsStateService,
+            ActiveExecutionContextService,
+          ],
+          canActivate: [
+            (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            },
           ],
           children: [
             {
@@ -439,15 +459,61 @@ export class ExecutionModule {
               path: 'launch',
               outlet: 'modal',
               dialogComponent: AltExecutionLaunchDialogComponent,
-              resolve: {
-                repoRef: () => {
-                  const repoRefHolder = inject(RepoRefHolderService);
-                  return repoRefHolder.repoRef();
-                },
-              },
               data: {
                 title: 'Relaunch Execution',
-                schedulePath: '',
+              },
+              resolve: {
+                repoRef: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.executionParameters?.repositoryObject),
+                  );
+                },
+                parameters: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.executionParameters?.customParameters),
+                  );
+                },
+                testCases: () => {
+                  const _context = inject(ActiveExecutionContextService);
+                  const _executionsApi = inject(AugmentedExecutionsService);
+                  return _context.execution$.pipe(
+                    take(1),
+                    map((execution) => execution?.id),
+                    switchMap((id) => {
+                      if (!id) {
+                        return of([]);
+                      }
+                      return _executionsApi.getReportNodesByExecutionId(
+                        id,
+                        'step.artefacts.reports.TestCaseReportNode',
+                        500,
+                      );
+                    }),
+                    catchError(() => of(undefined)),
+                    map((testCases) => {
+                      const list = testCases
+                        ?.filter((item) => !!item && item?.status !== 'SKIPPED')
+                        ?.map((item) => item?.artefactID!);
+                      if (list?.length === testCases?.length) {
+                        return undefined;
+                      }
+                      return list;
+                    }),
+                    map((list) => {
+                      if (!list?.length) {
+                        return undefined;
+                      }
+                      return {
+                        list,
+                        by: 'id',
+                      } as IncludeTestcases;
+                    }),
+                  );
+                },
               },
             }),
             dialogRoute(

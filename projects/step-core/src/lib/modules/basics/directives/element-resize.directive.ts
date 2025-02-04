@@ -2,6 +2,7 @@ import { Directive, ElementRef, EventEmitter, inject, OnDestroy, OnInit, Output 
 
 @Directive({
   selector: '[stepElementResize]',
+  standalone: true,
 })
 export class ElementResizeDirective implements OnInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
