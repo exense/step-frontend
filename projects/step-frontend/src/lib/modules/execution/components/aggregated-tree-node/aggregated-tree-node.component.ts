@@ -22,6 +22,8 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
+  protected readonly detailsTooltip = 'Open execution details';
+
   protected showIterations(status?: Status, event?: MouseEvent): void {
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();

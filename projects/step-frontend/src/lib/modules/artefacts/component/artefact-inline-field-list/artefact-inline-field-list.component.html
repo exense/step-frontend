@@ -4,5 +4,5 @@
   }
 </section>
 @if (hasHiddenItems()) {
-  <step-icon class="more-icon" name="more-horizontal" />
+  <step-icon class="more-icon" name="more-horizontal" [matTooltip]="hiddenItemsTooltip()" matTooltipPosition="below" />
 }

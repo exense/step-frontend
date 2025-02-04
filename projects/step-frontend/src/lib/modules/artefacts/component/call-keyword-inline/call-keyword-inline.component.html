@@ -7,5 +7,13 @@
     <div [matTooltip]="error" matTooltipPosition="below">{{ error }}</div>
   </div>
 }
-<step-artefact-inline-field-list [items]="inputItems()" [displayLimit]="3" />
-<step-artefact-inline-field-list [items]="outputItems()" [displayLimit]="3" />
+<step-artefact-inline-field-list
+  [items]="inputItems()"
+  [displayLimit]="3"
+  hiddenItemsTooltipSuffix="additional input(s)"
+/>
+<step-artefact-inline-field-list
+  [items]="outputItems()"
+  [displayLimit]="3"
+  hiddenItemsTooltipSuffix="additional output(s)"
+/>
