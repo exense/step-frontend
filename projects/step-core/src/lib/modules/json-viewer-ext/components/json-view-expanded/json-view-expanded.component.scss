@@ -13,7 +13,37 @@
 .json-node {
   display: flex;
   gap: 0.5rem;
+  align-items: flex-start;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
   padding-left: calc(var(--level, 0) * 1.5rem);
+  &.additional-shift {
+    padding-left: calc(var(--level, 0) * 1.5rem + 3rem);
+  }
+  border-radius: 1rem;
+  cursor: pointer;
+  &:hover {
+    border: solid 0.1rem var.$blue-600;
+    margin-left: -0.1rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+}
+
+.name-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.value-container {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: break-spaces;
+  word-break: break-all;
+  padding-top: 0.2rem;
 }
 
 .name {
@@ -24,9 +54,18 @@
 
 button.btn-more {
   position: absolute;
-  left: -1rem;
+  width: 100%;
   bottom: -0.8rem;
-  font-weight: bold;
+  height: 3rem;
+  border-color: var.$blue-600 !important;
+  background: var.$white;
+  &:not(.visible) {
+    opacity: 0;
+    &:hover {
+      opacity: 1;
+    }
+    transition: opacity 0.3s;
+  }
 }
 
 .fade {

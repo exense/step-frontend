@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { JsonParserService } from '../../injectables/json-parser.service';
-import { DetailedValueComponent } from '../detailed-value/detailed-value.component';
-import { MatIconButton } from '@angular/material/button';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { JsonParserIconDictionaryConfig } from '../../types/json-parser-icon-dictionary';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
+import { JsonNode } from '../../types/json-node';
 
 @Component({
   selector: 'step-json-view-expanded',
@@ -10,24 +11,34 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   templateUrl: './json-view-expanded.component.html',
   styleUrl: './json-view-expanded.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DetailedValueComponent, MatIconButton, StepBasicsModule],
+  imports: [StepBasicsModule],
   host: {
-    '(click)': 'toggleCollapse()',
     '[class.collapsable]': 'hasCollapseButton()',
   },
 })
 export class JsonViewExpandedComponent {
   private _jsonParser = inject(JsonParserService);
+  private _richEditorDialog = inject(RichEditorDialogService);
 
   /** @Input() **/
   readonly data = input.required<Record<string, unknown>>();
 
   /** @Input() **/
+  readonly iconsDictionary = input<JsonParserIconDictionaryConfig | undefined>(undefined);
+
+  /** @Input() **/
   readonly limit = input<number | undefined>(undefined);
 
+  /** @Input() **/
+  readonly labelExpand = input('Expand');
+
+  /** @Input() **/
+  readonly labelCollapse = input('Collapse');
+
   private jsonParsed = computed(() => {
+    const iconsDictionary = this.iconsDictionary();
     const data = this.data();
-    return this._jsonParser.parse(data);
+    return this._jsonParser.parse(data, iconsDictionary);
   });
 
   protected isCollapsed = signal(true);
@@ -53,5 +64,18 @@ export class JsonViewExpandedComponent {
 
   protected toggleCollapse(): void {
     this.isCollapsed.update((value) => !value);
+  }
+
+  protected displayNode(node: JsonNode): void {
+    if (!node.value) {
+      return;
+    }
+    const text = node.value.toString();
+    this._richEditorDialog.editText(text, {
+      isReadOnly: true,
+      title: node.name,
+      predefinedMode: AceMode.TEXT,
+      wrapText: true,
+    });
   }
 }

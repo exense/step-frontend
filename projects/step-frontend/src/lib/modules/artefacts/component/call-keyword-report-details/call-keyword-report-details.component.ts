@@ -3,6 +3,7 @@ import {
   AugmentedControllerService,
   CustomComponent,
   DateFormat,
+  JsonParserIconDictionaryConfig,
   JsonViewerFormatterService,
   Measure,
   ReportNode,
@@ -49,7 +50,10 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
       return result;
     }
     try {
-      result = JSON.parse(context.input);
+      const json = JSON.parse(context.input);
+      if (Object.keys(json).length) {
+        result = json;
+      }
     } catch (e) {}
     return result;
   });
@@ -61,10 +65,20 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
       return result;
     }
     try {
-      result = JSON.parse(context.output);
+      const json = JSON.parse(context.input);
+      if (Object.keys(json).length) {
+        result = json;
+      }
     } catch (e) {}
     return result;
   });
+
+  protected readonly keywordInputIcons: JsonParserIconDictionaryConfig = [
+    { key: '*', icon: 'chevron-right', tooltip: 'Input', levels: 0 },
+  ];
+  protected readonly keywordOutputIcons: JsonParserIconDictionaryConfig = [
+    { key: '*', icon: 'chevron-left', tooltip: 'Output', levels: 0 },
+  ];
 
   private failedChildren$ = toObservable(this.contextInternal).pipe(
     switchMap((node) => {

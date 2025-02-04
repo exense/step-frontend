@@ -1,8 +1,12 @@
 @if (keywordInputs(); as inputs) {
   <section class="json-container">
-    <step-json-view-expanded [data]="inputs" [limit]="7">
-      <label>Inputs</label>
-    </step-json-view-expanded>
+    <step-json-view-expanded
+      [data]="inputs"
+      [limit]="7"
+      [iconsDictionary]="keywordInputIcons"
+      labelExpand="Expand all inputs"
+      labelCollapse="Collapse inputs"
+    />
     <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
       <step-icon name="copy" />
     </button>
@@ -10,9 +14,13 @@
 }
 @if (keywordOutputs(); as outputs) {
   <section class="json-container">
-    <step-json-view-expanded [data]="outputs" [limit]="7">
-      <label>Outputs</label>
-    </step-json-view-expanded>
+    <step-json-view-expanded
+      [data]="outputs"
+      [limit]="7"
+      [iconsDictionary]="keywordOutputIcons"
+      labelExpand="Expand all outputs"
+      labelCollapse="Collapse outputs"
+    />
     <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
       <step-icon name="copy" />
     </button>
@@ -21,7 +29,6 @@
 @if (failedChildren(); as children) {
   @if (children.length) {
     <section class="data-container">
-      <label>Errors</label>
       <div>
         @for (child of children; track child.id) {
           <step-report-node-error [node]="child" />
@@ -32,7 +39,6 @@
 }
 @if (node()?.error; as err) {
   <section class="data-container error">
-    <label>Error</label>
     <div>
       {{ err.msg }}
       {{ !!node()?.attachments?.length ? '. Check the attachments for more details.' : '' }}
@@ -42,7 +48,6 @@
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
     <section class="data-container">
-      <label>Attachments</label>
       <div>
         <step-attachments-preview [attachments]="attachments" />
       </div>
@@ -51,7 +56,6 @@
 }
 @if (measuresDataSource(); as measuresDataSource) {
   <section class="data-container">
-    <label>Performance Measurements</label>
     <div>
       <step-table [dataSource]="measuresDataSource" matSort>
         <ng-container matColumnDef="begin">
@@ -91,7 +95,6 @@
 @if (node(); as node) {
   @if (node.tokenId || node.agentUrl) {
     <section class="data-container tech-details">
-      <label>Technical details</label>
       <div>
         @if (node.agentUrl) {
           <span>Agent:</span>
