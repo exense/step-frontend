@@ -74,10 +74,10 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
   });
 
   protected readonly keywordInputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'chevron-right', tooltip: 'Input', levels: 0 },
+    { key: '*', icon: 'log-in', tooltip: 'Input', levels: 0 },
   ];
   protected readonly keywordOutputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'chevron-left', tooltip: 'Output', levels: 0 },
+    { key: '*', icon: 'log-out', tooltip: 'Output', levels: 0 },
   ];
 
   private failedChildren$ = toObservable(this.contextInternal).pipe(
