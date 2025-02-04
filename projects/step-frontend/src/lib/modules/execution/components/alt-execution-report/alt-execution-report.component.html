@@ -27,14 +27,11 @@
       @if (_mode === ViewMode.VIEW) {
         <gridster-item [itemM]="{ x: 1, y: 1, cols: 3, rows: 1 }">
           <div class="widget">
-            <step-alt-report-node-keywords
-              class="keywords"
-              (openKeywordInTreeView)="handleOpenNodeInTreeView($event)"
-            />
+            <step-alt-execution-tree-widget />
           </div>
         </gridster-item>
       }
-      <gridster-item [itemM]="{ x: 0, y: 2, cols: 3, rows: 1 }">
+      <gridster-item [itemM]="{ x: 0, y: 2, cols: 1, rows: 1 }">
         <div class="widget">
           @if (_state.executionId$ | async; as executionId) {
             <step-alt-report-performance-overview-chart
@@ -47,7 +44,16 @@
           }
         </div>
       </gridster-item>
-
+      @if (_mode === ViewMode.VIEW) {
+        <gridster-item [itemM]="{ x: 1, y: 2, cols: 3, rows: 1 }">
+          <div class="widget">
+            <step-alt-report-node-keywords
+              class="keywords"
+              (openKeywordInTreeView)="handleOpenNodeInTreeView($event)"
+            />
+          </div>
+        </gridster-item>
+      }
       @if (_state.currentOperations$ | async; as currentOperations) {
         <gridster-item [itemM]="{ x: 3, y: 3, cols: 1, rows: 1 }">
           <div class="widget">
