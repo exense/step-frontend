@@ -67,9 +67,6 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
 import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
-import { GridsterModule } from 'angular-gridster2';
-import { GridsterItemResponsiveDirective } from './directives/grid-item.directive';
-import { StepGridsterConfigDirective } from './directives/gridster-config.directive';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
@@ -82,10 +79,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     StepMaterialModule,
     RouterModule,
     NgxMatSelectSearchModule,
-    GridsterModule,
     ElementResizeDirective,
-    GridsterItemResponsiveDirective,
-    StepGridsterConfigDirective,
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
   ],
@@ -223,10 +217,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
-    GridsterModule,
     ElementResizeDirective,
-    GridsterItemResponsiveDirective,
-    StepGridsterConfigDirective,
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
   ],
@@ -352,7 +343,5 @@ export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
-export * from './directives/grid-item.directive';
-export * from './directives/gridster-config.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';
