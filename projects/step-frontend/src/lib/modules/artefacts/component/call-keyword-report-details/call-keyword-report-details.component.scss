@@ -1,7 +1,10 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 4rem;
   font-size: 1.2rem;
 }
 
@@ -39,6 +42,9 @@ step-json-view-expanded label {
   div {
     width: min-content;
     min-width: 95%;
+  }
+  step-icon {
+    color: map-get(var.$statuses, 'FAILED');
   }
 }
 
