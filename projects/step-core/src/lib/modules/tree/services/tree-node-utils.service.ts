@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { TreeNode } from '../shared/tree-node';
+import { TreeNode } from '../types/tree-node';
 
 export abstract class TreeNodeUtilsService<T, N extends TreeNode> {
   abstract updateChildren(root: T, nodeId: string, children: N[], updateType: 'append' | 'replace'): void;

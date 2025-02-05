@@ -3,24 +3,28 @@
 step-tree {
   padding-left: 2.4rem;
   padding-bottom: 4rem;
+  display: block;
 
   .node-container {
-    display: flex;
-    position: relative;
-    padding-left: calc(var(--level, 0) * 3rem);
+    // display: flex;
+    // position: relative;
+    // padding-left: calc(var(--level, 0) * 3rem);
 
-    .node-line {
-      position: absolute;
-      top: 0;
-      left: calc(var(--idx) * 3rem + 1.5rem);
-      border-right: 1px solid var.$gray-100;
-      height: 100%;
-    }
+    // .node-line {
+    //   position: absolute;
+    //   top: 0;
+    //   left: calc(var(--idx) * 3rem + 1.5rem);
+    //   border-right: 1px solid var.$gray-100;
+    //   height: 100%;
+    // }
 
+    /*
     step-tree-node {
       flex: 1;
     }
+    */
 
+    /*
     section.middle-drop-container {
       min-height: 2.4rem;
       padding: 0.3rem 0;
@@ -48,6 +52,7 @@ step-tree {
       min-height: 2.4rem;
       z-index: 1 !important;
     }
+    */
   }
 
   .node-context-menu-trigger {

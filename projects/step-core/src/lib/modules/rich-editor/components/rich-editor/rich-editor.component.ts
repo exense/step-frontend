@@ -41,7 +41,10 @@ type OnTouch = () => void;
 })
 export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   /** @Input() **/
-  syntaxMode = input<AceMode | string>('');
+  readonly syntaxMode = input<AceMode | string>('');
+
+  /** @Input() **/
+  readonly wrapText = input<boolean | undefined>(undefined);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
@@ -96,6 +99,9 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     if (this.isDisabled !== undefined) {
       this.editor.setReadOnly(this.isDisabled);
       setTimeout(() => this.clearSelection(), 100);
+    }
+    if (this.wrapText()) {
+      this.editor.setOption('wrap', true);
     }
     this.editor.on('change', this.handleChanges);
     this.editor.on('blur', this.handleBlur);

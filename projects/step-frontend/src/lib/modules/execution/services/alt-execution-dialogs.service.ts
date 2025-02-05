@@ -12,6 +12,7 @@ import { from, map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
+import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './report-node-details-query-params.token';
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -22,6 +23,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService);
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   private _executionId = inject(EXECUTION_ID);
+  private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
 
   openIterations(nodeId: string, nodeStatus?: Status): void {
     const node = this._treeState.findNodeById(nodeId)!;
@@ -49,17 +51,17 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status): void {
-    this.openNodeDetails({
-      aggregatedNodeId,
-      searchStatus,
-    });
+    const queryParams: Params = {};
+    queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
+    queryParams[this._queryParamsNames.searchStatus] = searchStatus;
+    this.openNodeDetails(queryParams);
   }
 
   private navigateToIterationDetails(reportNodeId: string, aggregatedNodeId?: string): void {
-    this.openNodeDetails({
-      reportNodeId,
-      aggregatedNodeId,
-    });
+    const queryParams: Params = {};
+    queryParams[this._queryParamsNames.reportNodeId] = reportNodeId;
+    queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
+    this.openNodeDetails(queryParams);
   }
 
   private openNodeDetails(queryParams: Params): void {

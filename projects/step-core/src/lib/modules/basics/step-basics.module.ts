@@ -68,6 +68,7 @@ import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 
@@ -147,6 +148,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
+    DynamicInputWidthDirective,
   ],
   exports: [
     CommonModule,
@@ -218,6 +220,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     ElementResizeDirective,
+    DynamicInputWidthDirective,
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
   ],
@@ -343,5 +346,6 @@ export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
+export * from './directives/dynamic-input-width.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';

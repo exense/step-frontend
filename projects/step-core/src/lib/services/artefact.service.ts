@@ -18,6 +18,7 @@ export interface ArtefactType extends CustomRegistryItem {
   description?: string;
   isSelectable?: boolean;
   inlineComponent?: Type<CustomComponent>;
+  reportDetailsComponent?: Type<CustomComponent>;
 }
 
 export type SimpleValue = undefined | null | string | boolean | number | object | Array<unknown>;

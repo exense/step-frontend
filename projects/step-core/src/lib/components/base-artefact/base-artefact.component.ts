@@ -2,8 +2,7 @@ import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
 import { AbstractArtefact, DynamicValueString } from '../../client/step-client-module';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
-import { ArtefactFormChangeHelperService } from '../../services/artefact-form-change-helper.service';
-import { ArtefactContext } from '../../shared';
+import { ArtefactFormChangeHelperService, ArtefactContext } from '../../modules/plan-common';
 import { Subscription } from 'rxjs';
 import { ArtefactFieldValue, ArtefactService, SimpleValue } from '../../services/artefact.service';
 

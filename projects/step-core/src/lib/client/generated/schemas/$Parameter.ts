@@ -15,6 +15,13 @@ export const $Parameter = {
         type: 'string',
       },
     },
+    creationDate: {
+      type: 'string',
+      format: 'date-time',
+    },
+    creationUser: {
+      type: 'string',
+    },
     lastModificationDate: {
       type: 'string',
       format: 'date-time',
