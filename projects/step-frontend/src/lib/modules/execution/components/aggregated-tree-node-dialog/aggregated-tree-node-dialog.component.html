@@ -16,7 +16,11 @@
         <step-icon class="artefact-icon" [name]="icon" />
       }
       <span>{{ reportNode.name }}</span>
-      <step-alt-execution-time [startTime]="reportNode.executionTime" [duration]="reportNode.duration" />
+      <step-alt-execution-time
+        [startTime]="reportNode.executionTime"
+        [duration]="reportNode.duration"
+        [timeOnly]="true"
+      />
       <step-status [status]="reportNode.status" />
       @if (reportNodeArtefactClass() === 'CallKeyword') {
         <div class="btn-show-details-container">

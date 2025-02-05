@@ -29,21 +29,33 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
-  readonly startTime = input<number | undefined>(undefined);
+  /** @Input() **/
+  readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
+
+  /** @Input() **/
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
+
+  /** @Input() **/
   readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
 
-  protected readonly date = computed(() => {
-    const startTime = this.startTime();
+  /** @Input() **/
+  readonly timeOnly = input(false);
+
+  protected readonly displayDate = computed(() => {
+    const startTime = this.startTimeInput();
+    const isTimeOnly = this.timeOnly();
     if (!startTime) {
       return '';
+    }
+    if (isTimeOnly) {
+      return this._datePipe.transform(startTime, DateFormat.TIME);
     }
     const date = this._datePipe.transform(startTime, DateFormat.DATE_SHORT);
     return date === this.todayDate ? 'Today' : date;
   });
 
   private endTime = computed(() => {
-    const startTime = this.startTime();
+    const startTime = this.startTimeInput();
     let endTime = this.endTimeInput();
     const duration = this.durationInput();
 
@@ -59,7 +71,7 @@ export class AltExecutionTimeComponent {
   });
 
   protected readonly duration = computed(() => {
-    const startTime = this.startTime();
+    const startTime = this.startTimeInput();
     const endTime = this.endTime();
 
     if (startTime === undefined || endTime === undefined) {
@@ -70,7 +82,7 @@ export class AltExecutionTimeComponent {
   });
 
   protected readonly dateTooltip = computed(() => {
-    const startTime = this.startTime();
+    const startTime = this.startTimeInput();
     const endTime = this.endTime();
     const start = startTime ? DateTime.fromMillis(startTime) : undefined;
     const end = endTime ? DateTime.fromMillis(endTime) : undefined;
