@@ -9,4 +9,8 @@ step-alt-report-performance-overview-chart {
   button {
     white-space: nowrap;
   }
+
+  step-alt-report-widget mat-card-header {
+    overflow: hidden;
+  }
 }
