@@ -6,6 +6,7 @@ import { SplitComponent } from '../split/split.component';
   selector: 'step-split-gutter',
   templateUrl: './split-gutter.component.html',
   styleUrls: ['./split-gutter.component.scss'],
+  standalone: true,
 })
 export class SplitGutterComponent implements AfterViewInit {
   private _splitComponent = inject(SplitComponent);

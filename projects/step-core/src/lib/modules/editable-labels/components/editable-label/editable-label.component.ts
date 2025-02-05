@@ -3,7 +3,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent } from '../editable-component/editable.component';
 import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-common-imports.constant';
 import { EditableActionsComponent } from '../editable-actions/editable-actions.component';
-import { DynamicInputWidthDirective } from '../../directives/dynamic-input-width.directive';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-editable-label',
@@ -18,7 +18,7 @@ import { DynamicInputWidthDirective } from '../../directives/dynamic-input-width
   ],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
-  imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent, DynamicInputWidthDirective],
+  imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent, StepBasicsModule],
 })
 export class EditableLabelComponent extends EditableComponent<string> {
   @ViewChild('input') input?: ElementRef<HTMLElement>;

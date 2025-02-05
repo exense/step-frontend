@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, ViewEncapsulation } from '@angular/core';
-import { TreeNode } from '../../shared/tree-node';
-import { TreeStateService } from '../../services/tree-state.service';
-import { TreeFlatNode } from '../../shared/tree-flat-node';
+import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
-
-const ICON_EXPANDED = 'chevron-down';
-const ICON_COLLAPSED = 'chevron-right';
+import { TreeNodeDirective } from '../../directives/tree-node.directive';
+import { NgTemplateOutlet } from '@angular/common';
+import { StepIconsModule } from '../../../step-icons/step-icons.module';
+import { TreeNodeNameComponent } from '../tree-node-name/tree-node-name.component';
+import { StepMaterialModule } from '../../../step-material/step-material.module';
 
 @Component({
   selector: 'step-tree-node',
@@ -13,41 +12,17 @@ const ICON_COLLAPSED = 'chevron-right';
   styleUrl: './tree-node.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [NgTemplateOutlet, StepIconsModule, StepMaterialModule, TreeNodeNameComponent],
+  hostDirectives: [
+    {
+      directive: TreeNodeDirective,
+      inputs: ['node'],
+      outputs: ['contextMenu'],
+    },
+  ],
 })
 export class TreeNodeComponent {
-  private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
+  protected readonly _treeNode = inject(TreeNodeDirective, { self: true });
   protected readonly _treeNodeTemplateContainer = inject(TreeNodeTemplateContainerService);
-
-  readonly node = input.required<TreeFlatNode>();
-  readonly isRootNode = computed(() => this.node().id === this._treeState.rootNodeId());
-  readonly isSelected = computed(() => this._treeState.selectedNodeIds().includes(this.node().id));
-  readonly isExpanded = computed(() => this._treeState.expandedNodeIds().includes(this.node().id));
-  readonly isHidden = computed(() => this._treeState.hideRoot() && this.isRootNode());
-  readonly isSelectedForInsert = computed(() => {
-    const nodeId = this.node().id;
-    const candidate = this._treeState.selectedForInsertCandidate();
-    if (candidate === null) {
-      return false;
-    }
-    return candidate === nodeId;
-  });
-  readonly toggleStateIcon = computed(() => (this.isExpanded() ? ICON_EXPANDED : ICON_COLLAPSED));
-
-  /** @Input() **/
-  readonly canToggle = input(false);
-
-  /** @Input() **/
-  readonly dragDisabled = input(false);
-
-  /** @Output() **/
-  readonly contextMenu = output<{ event: MouseEvent; nodeId: string }>();
-
-  toggle(): void {
-    this._treeState.toggleNode(this.node().id);
-  }
-
-  openContextMenu(event: MouseEvent): void {
-    const nodeId = this.node().id;
-    this.contextMenu.emit({ event, nodeId });
-  }
 }

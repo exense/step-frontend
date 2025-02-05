@@ -68,6 +68,7 @@ import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { ElementResizeDirective } from './directives/element-resize.directive';
+import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
 
 @NgModule({
   imports: [
@@ -143,6 +144,7 @@ import { ElementResizeDirective } from './directives/element-resize.directive';
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
+    DynamicInputWidthDirective,
   ],
   exports: [
     CommonModule,
@@ -214,6 +216,7 @@ import { ElementResizeDirective } from './directives/element-resize.directive';
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     ElementResizeDirective,
+    DynamicInputWidthDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -337,3 +340,4 @@ export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
 export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
+export * from './directives/dynamic-input-width.directive';

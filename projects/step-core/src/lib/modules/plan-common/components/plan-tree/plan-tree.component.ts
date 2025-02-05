@@ -1,34 +1,34 @@
 import {
+  AfterViewInit,
   Component,
   computed,
-  effect,
+  DestroyRef,
   ElementRef,
   forwardRef,
   inject,
   Input,
   output,
+  viewChild,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
-import { AbstractArtefact } from '../../client/generated';
-import {
-  TreeAction,
-  TreeActionsService,
-  TreeComponent,
-  TreeNode,
-  TreeStateService,
-} from '../../modules/tree/tree.module';
-import {
-  ArtefactNodeSource,
-  ArtefactTreeNode,
-  PlanArtefactResolverService,
-  PlanEditorPersistenceStateService,
-  PlanEditorService,
-  PlanInteractiveSessionService,
-  PlanTreeAction,
-} from '../../modules/plan-common';
-import { DropInfo } from '../../modules/drag-drop';
+import { filter, map, Observable, of, partition } from 'rxjs';
+import { AbstractArtefact } from '../../../../client/generated';
+import { TreeAction, TreeActionsService, TreeComponent, TreeNode, TreeStateService, TREE_EXPORTS } from '../../../tree';
+import { ArtefactChildContainerSettingsComponent } from '../artefact-child-container-settings/artefact-child-container-settings.component';
+import { ArtefactDetailsComponent } from '../artefact-details/artefact-details.component';
+import { ArtefactTreeNode } from '../../types/artefact-tree-node';
+import { PlanArtefactResolverService } from '../../injectables/plan-artefact-resolver.service';
+import { PlanEditorPersistenceStateService } from '../../injectables/plan-editor-persistence-state.service';
+import { PlanEditorService } from '../../injectables/plan-editor.service';
+import { PlanInteractiveSessionService } from '../../injectables/plan-interactive-session.service';
+import { PlanTreeAction } from '../../types/plan-tree-action.enum';
+import { DragDataService, DropInfo, DragEndType, DRAG_DROP_EXPORTS } from '../../../drag-drop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SPLIT_EXPORTS } from '../../../split';
+import { StepIconsModule } from '../../../step-icons/step-icons.module';
+import { AsyncPipe } from '@angular/common';
+import { StepMaterialModule } from '../../../step-material/step-material.module';
 
 const TREE_SIZE = 'TREE_SIZE';
 const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
@@ -38,14 +38,27 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
   templateUrl: './plan-tree.component.html',
   styleUrl: './plan-tree.component.scss',
   encapsulation: ViewEncapsulation.None,
+  imports: [
+    SPLIT_EXPORTS,
+    DRAG_DROP_EXPORTS,
+    StepMaterialModule,
+    TREE_EXPORTS,
+    StepIconsModule,
+    ArtefactDetailsComponent,
+    ArtefactChildContainerSettingsComponent,
+    AsyncPipe,
+  ],
   providers: [
     {
       provide: TreeActionsService,
       useExisting: forwardRef(() => PlanTreeComponent),
     },
   ],
+  standalone: true,
 })
-export class PlanTreeComponent implements TreeActionsService {
+export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
+  private _destroyRef = inject(DestroyRef);
+
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
   private _planPersistenceState = inject(PlanEditorPersistenceStateService);
@@ -64,6 +77,9 @@ export class PlanTreeComponent implements TreeActionsService {
   @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
 
   @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
+
+  /** @ViewChild **/
+  private dragData = viewChild(DragDataService);
 
   protected treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
   protected artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);
@@ -97,6 +113,13 @@ export class PlanTreeComponent implements TreeActionsService {
     { id: PlanTreeAction.MOVE_LEFT, label: 'Move Left All Selected (Ctrl + ⬅️)' },
     { id: PlanTreeAction.MOVE_RIGHT, label: 'Move Right All Selected (Ctrl + ➡️)' },
   ];
+
+  private candidatesForDropInsert: string[] = [];
+
+  ngAfterViewInit(): void {
+    this.setupDragStart();
+    this.setupDragEnd();
+  }
 
   getActionsForNode(node: ArtefactTreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const isSkipped = node.isSkipped;
@@ -157,6 +180,48 @@ export class PlanTreeComponent implements TreeActionsService {
     }
     event.preventDefault();
     this._planArtefactResolver.openArtefact(node.originalArtefact);
+  }
+
+  handleDragOver(event: DropInfo): void {
+    if (!this._treeState.rootNodeId()) {
+      return;
+    }
+    const isTreeNode = typeof event.draggedElement === 'string';
+    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
+    if (isTreeNode && !this._treeState.canInsertTo(this.candidatesForDropInsert, newParentId)) {
+      return;
+    }
+    this._treeState.notifyPotentialInsert?.(newParentId);
+  }
+
+  handleDropNode(event: DropInfo): void {
+    if (!this._treeState.rootNodeId()) {
+      this._treeState.notifyInsertionComplete?.();
+      return;
+    }
+    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
+    const dropAdditionalInfo = event.additionalInfo as string | undefined;
+
+    const isTreeNode = typeof event.draggedElement === 'string';
+    if (!isTreeNode) {
+      this.externalObjectDrop.emit(event);
+      return;
+    }
+
+    if (!this._treeState.canInsertTo(this.candidatesForDropInsert, newParentId)) {
+      this._treeState.notifyInsertionComplete?.();
+      return;
+    }
+
+    if (!dropAdditionalInfo) {
+      this._treeState.insertNodesTo(this.candidatesForDropInsert, newParentId);
+    } else if (dropAdditionalInfo === 'first') {
+      this._treeState.insertNodesTo(this.candidatesForDropInsert, newParentId, { insertAtFirstPosition: true });
+    } else {
+      const insertAfterSiblingId = dropAdditionalInfo as string;
+      this._treeState.insertNodesTo(this.candidatesForDropInsert, newParentId, { insertAfterSiblingId });
+    }
+    this._treeState.notifyInsertionComplete?.();
   }
 
   proceedAction(actionId: string, node?: ArtefactTreeNode, multipleNodes?: boolean): void {
@@ -221,5 +286,42 @@ export class PlanTreeComponent implements TreeActionsService {
       return false;
     }
     return ['CallPlan', 'CallKeyword'].includes(artefact._class);
+  }
+
+  private setupDragStart(): void {
+    const dragData = this.dragData()!;
+    const dragData$ = dragData.dragData$.pipe(
+      filter((dragItemId) => !!dragItemId),
+      takeUntilDestroyed(this._destroyRef),
+    );
+
+    const [internalDrag$, externalDrag$] = partition(dragData$, (dragData) => typeof dragData === 'string');
+
+    (internalDrag$ as Observable<string>).subscribe((dragItemId) => {
+      this.candidatesForDropInsert = this._treeState.selectedNodeIds();
+      if (!this.candidatesForDropInsert.includes(dragItemId)) {
+        this.candidatesForDropInsert.push(dragItemId);
+      }
+    });
+
+    externalDrag$.subscribe(() => {
+      const selectedForInsert = this._treeState.selectedForInsertCandidate();
+      if (selectedForInsert) {
+        this._treeState.notifyPotentialInsert?.(selectedForInsert);
+      }
+    });
+  }
+
+  private setupDragEnd(): void {
+    const dragData = this.dragData()!;
+    dragData.dragEnd$
+      .pipe(
+        filter((dragEndType) => dragEndType === DragEndType.STOP),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => {
+        this.candidatesForDropInsert = [];
+        this._treeState.notifyInsertionComplete?.();
+      });
   }
 }

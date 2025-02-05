@@ -8,14 +8,10 @@ import { StepGeneratedClientModule } from './client/generated';
 import { AutorefreshToggleComponent } from './components/autorefresh-toggle/autorefresh-toggle.component';
 import { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 import { PlanNameComponent } from './components/plan-name/plan-name.component';
-import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 import { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 import { ReportNodeStatusComponent } from './components/report-node-status/report-node-status.component';
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
-import { SplitAreaComponent } from './components/split-area/split-area.component';
-import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
-import { SplitComponent } from './components/split/split.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
 import { FocusableDirective } from './directives/focusable.directive';
@@ -34,11 +30,10 @@ import { EntitiesSelectionModule } from './modules/entities-selection/entities-s
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
-import { TreeModule } from './modules/tree/tree.module';
+import { TREE_EXPORTS } from './modules/tree';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
-import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
@@ -75,7 +70,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
-import { ArtefactChildContainerSettingsComponent } from './components/artefact-child-container-settings/artefact-child-container-settings.component';
+import { SPLIT_EXPORTS } from './modules/split';
 import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
 import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
 import { ReportNodeArtefactDetailsComponent } from './components/report-node-artefact-details/report-node-artefact-details.component';
@@ -89,13 +84,9 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     ReportNodeIconComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
-    PlanTreeComponent,
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    SplitComponent,
-    SplitAreaComponent,
-    SplitGutterComponent,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -104,8 +95,6 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     ReferenceArtefactNameComponent,
     PlanNameComponent,
     PredefinedOptionsInputComponent,
-    ArtefactDetailsComponent,
-    ArtefactChildContainerSettingsComponent,
     WaitingArtefactsAdvancedComponent,
     UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
@@ -132,7 +121,6 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     EntitiesSelectionModule,
     StepGeneratedClientModule,
     CustomRegistriesModule,
-    TreeModule,
     AngularSplitModule,
     DynamicFormsModule,
     JsonViewerModule,
@@ -156,6 +144,8 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
+    SPLIT_EXPORTS,
+    TREE_EXPORTS,
     AUTO_SHRANK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
   ],
@@ -175,21 +165,16 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     StepGeneratedClientModule,
     CustomRegistriesModule,
     TooltipImmediateCloseDirective,
-    TreeModule,
     AngularSplitModule,
     WizardModule,
     ReportNodeStatusComponent,
     ReportNodeIconComponent,
-    PlanTreeComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
     DynamicFormsModule,
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    SplitComponent,
-    SplitAreaComponent,
-    SplitGutterComponent,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -198,8 +183,6 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     PlanNameComponent,
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
-    ArtefactDetailsComponent,
-    ArtefactChildContainerSettingsComponent,
     WaitingArtefactsAdvancedComponent,
     ResourceInputModule,
     KeywordsCommonModule,
@@ -228,6 +211,8 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     LIST_SELECTION_EXPORTS,
     AUTO_SHRANK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
+    SPLIT_EXPORTS,
+    TREE_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
@@ -275,17 +260,13 @@ export * from './components/html-description-cell/html-description-cell.componen
 export { ReferenceArtefactNameComponent } from './components/reference-artefact-name/reference-artefact-name.component';
 export { KeywordNameComponent } from './components/keyword-name/keyword-name.component';
 export { PlanNameComponent } from './components/plan-name/plan-name.component';
-export * from './components/plan-tree/plan-tree.component';
 export { PredefinedOptionsInputComponent } from './components/predefined-options-input/predefined-options-input.component';
 export * from './components/report-node-status/report-node-status.component';
 export * from './components/setting-button/setting-button.component';
 export * from './components/link-button/link-button.component';
 export * from './components/user-settings-button/user-settings-button.component';
-export { SplitAreaComponent } from './components/split-area/split-area.component';
-export { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
-export { SplitComponent } from './components/split/split.component';
-export * from './components/artefact-details/artefact-details.component';
-export * from './components/artefact-child-container-settings/artefact-child-container-settings.component';
+export * from './modules/plan-common/components/artefact-details/artefact-details.component';
+export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
@@ -308,7 +289,7 @@ export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';
 export * from './modules/table/table.module';
 export * from './modules/tabs';
-export * from './modules/tree/tree.module';
+export * from './modules/tree';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/json-viewer-ext';
@@ -336,7 +317,7 @@ export * from './services/link-processor.service';
 export * from './services/task-by-id-cache.service';
 export * from './services/plugin-info-registry.service';
 export * from './services/artefact.service';
-export * from './services/artefact-form-change-helper.service';
+export * from './modules/plan-common/injectables/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
 export * from './shared';
 export * from './modules/basics/types/api-token.interface';
@@ -344,11 +325,12 @@ export * from './modules/editable-labels';
 export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
 export * from './modules/execution-common';
+export * from './modules/split';
 export * from './components/base-artefact/base-artefact.component';
 export * from './components/base-artefact/base-inline-artefact.component';
 export * from './components/base-artefact/artefact-inline-item';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
-export * from './components/artefact-details/artefact-details.component';
+export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
