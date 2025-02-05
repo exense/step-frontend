@@ -29,7 +29,7 @@
       </h3>
     </div>
     <div class="sub-title">
-      <step-alt-execution-time [execution]="execution" />
+      <step-alt-execution-time [startTime]="execution.startTime" [endTime]="execution.endTime" />
       @if (displayStatus$ | async; as status) {
         <step-status [status]="status" />
       }

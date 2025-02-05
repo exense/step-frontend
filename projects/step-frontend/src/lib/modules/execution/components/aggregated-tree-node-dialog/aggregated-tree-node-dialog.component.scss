@@ -3,8 +3,22 @@
   align-items: center;
   gap: 1rem;
 
+  step-status,
   button {
     font-size: 1.4rem;
+  }
+
+  .artefact-icon {
+    line-height: 2rem;
+  }
+
+  step-status {
+    line-height: 1.6rem;
+  }
+
+  .btn-show-details-container {
+    flex: 1;
+    text-align: right;
   }
 }
 
