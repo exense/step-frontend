@@ -110,66 +110,7 @@
   <step-alt-report-widget class="flex-grow-1" title="Errors">
     <step-alt-report-widget-content class="widget-content">
       <div class="widget">
-        @if (errorsDataSource) {
-          <step-table
-            #table
-            [dataSource]="errorsDataSource!"
-            matSort
-            noResultsPlaceholder="No errors"
-            matSortActive="count"
-            matSortDirection="desc"
-          >
-            <ng-container matColumnDef="errorMessage" stepSearchCol>
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
-              <td mat-cell *matCellDef="let element">
-                <span class="error-name">
-                  <span>{{ element.errorMessage }}</span>
-                  <step-icon
-                    class="icon"
-                    matTooltip="See executions"
-                    name="external-link"
-                    [matMenuTriggerFor]="menu"
-                  ></step-icon>
-                </span>
-
-                <mat-menu #menu="matMenu" class="wide-menu">
-                  <step-error-details-menu
-                    [executionIds]="element.executionIds"
-                    [truncated]="element.executionIdsTruncated"
-                  ></step-error-details-menu>
-                </mat-menu>
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="errorCode" stepSearchCol>
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Code</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.errorCode }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="types" stepSearchCol>
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Type</th>
-              <td mat-cell *matCellDef="let element">
-                <div class="types-column">
-                  @for (type of element.types; track type) {
-                    <step-status [status]="type" />
-                  }
-                </div>
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="count">
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Count</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.count }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="percentage">
-              <th mat-header-cell mat-sort-header *matHeaderCellDef>Percentage</th>
-              <td mat-cell *matCellDef="let element">{{ element.percentage }}%</td>
-            </ng-container>
-          </step-table>
-        } @else {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
-        }
+        <step-alt-execution-errors [dataSource]="errorsDataSource" />
       </div>
     </step-alt-report-widget-content>
   </step-alt-report-widget>

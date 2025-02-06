@@ -87,14 +87,15 @@ import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
+import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { MatSort } from '@angular/material/sort';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 
 @NgModule({
   declarations: [
@@ -161,6 +162,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     AggregatedTreeNodeInfoComponent,
     ExecutionsChartTooltipComponent,
     ErrorDetailsMenuComponent,
+    AltExecutionErrorsComponent,
   ],
   imports: [
     StepCommonModule,

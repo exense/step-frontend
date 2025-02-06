@@ -24,6 +24,13 @@
       (fullRange)="_state.selectFullRange()"
     />
   }
+  @if (_state.errorsDataSource$ | async; as errorsDataSource) {
+    <step-alt-report-widget title="Errors">
+      <step-alt-report-widget-content>
+        <step-alt-execution-errors [dataSource]="errorsDataSource" [showExecutionsMenu]="false" />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  }
   @if (_state.currentOperations$ | async; as currentOperations) {
     <step-alt-report-current-operations [operations]="currentOperations" />
   }
