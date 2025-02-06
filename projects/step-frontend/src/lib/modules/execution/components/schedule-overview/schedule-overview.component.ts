@@ -3,23 +3,17 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
-  DateRange,
-  DateUtilsService,
   Execution,
   ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
-  TimeOption,
   STATUS_COLORS,
-  TableDataSource,
-  TableLocalDataSource,
   TimeRange,
-  TimeSeriesService,
   TimeUnit,
+  AugmentedTimeSeriesService,
 } from '@exense/step-core';
-import { combineLatest, filter, map, Observable, of, shareReplay, startWith, switchMap, take } from 'rxjs';
-import { FormBuilder } from '@angular/forms';
+import { map, Observable } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
@@ -27,8 +21,6 @@ import { Status } from '../../../_common/shared/status.enum';
 import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { DateTime, Duration } from 'luxon';
-import { TooltipContextData } from '../../../timeseries/modules/chart/injectables/tooltip-context-data';
 
 declare const uPlot: any;
 
@@ -40,16 +32,6 @@ interface EntityWithKeywordsStats {
   entity: string;
   timestamp: number;
   statuses: Record<string, number>;
-}
-
-interface TableErrorEntry {
-  errorMessage: string;
-  errorCode: string;
-  count: number;
-  percentage: number;
-  executionIds: string[];
-  executionIdsTruncated: boolean;
-  types: string[]; // can be more when using same error code/message
 }
 
 @Component({
@@ -71,7 +53,7 @@ export class ScheduleOverviewComponent implements OnInit {
   readonly URL_PARAMS_PREFIX = 'q_';
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
-  private _timeSeriesService = inject(TimeSeriesService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionService = inject(ExecutionsService);
   protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
@@ -113,7 +95,7 @@ export class ScheduleOverviewComponent implements OnInit {
   keywordsChartSettings?: TSChartSettings;
   testCasesChartSettings?: TSChartSettings;
   emptyTestCasesResponse = false;
-  errorsDataSource?: TableDataSource<TableErrorEntry>;
+  protected readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
 
   lastKeywordsExecutions: Execution[] = [];
 
@@ -151,7 +133,7 @@ export class ScheduleOverviewComponent implements OnInit {
     this.createPieChart(taskId, fullRange);
     this.createExecutionsChart(taskId, fullRange);
     this.fetchLastExecution(taskId);
-    this.createErrorsChart(taskId, fullRange);
+    this.errorsDataSource.reload({ request: { taskId, timeRange: fullRange } });
     this.getLastExecutionsSorted(taskId, fullRange).subscribe((executions) => {
       this.fetchAndCreateKeywordsChart(fullRange, executions);
       this.fetchAndCreateTestCasesChart(fullRange, executions);
@@ -556,51 +538,6 @@ export class ScheduleOverviewComponent implements OnInit {
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
     // this.timeRangeChange.next({ selection, triggerRefresh: true });
-  }
-
-  private createErrorsChart(taskId: string, timeRange: TimeRange) {
-    const executionsAttributesLimit = 10;
-    const request: FetchBucketsRequest = {
-      start: timeRange.from,
-      end: timeRange.to,
-      numberOfBuckets: 1,
-      oqlFilter: `attributes.taskId = ${taskId}`,
-      groupDimensions: ['errorMessage', 'errorCode'],
-      collectAttributeKeys: ['status', 'executionId'],
-      collectAttributesValuesLimit: executionsAttributesLimit,
-    };
-    this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((response) => {
-      let totalCountWithErrors = 0;
-      const data: TableErrorEntry[] = response.matrixKeys
-        .map((keyAttributes, index) => {
-          const errorCode = keyAttributes['errorCode'];
-          const errorMessage = keyAttributes['errorMessage'];
-          const bucket = response.matrix[index][0];
-          const bucketCount = bucket.count;
-
-          if (errorCode === undefined && errorMessage === undefined) {
-            return undefined;
-          } else {
-            totalCountWithErrors += bucketCount;
-            return {
-              errorCode: errorCode,
-              errorMessage: errorMessage,
-              count: bucketCount,
-              percentage: 0,
-              overallPercentage: 0,
-              executionIds: bucket.attributes['executionId'] as string[],
-              executionIdsTruncated: (bucket.attributes['executionId'] || []).length >= executionsAttributesLimit,
-              types: (bucket.attributes['status'] as string[]) || [],
-            } as TableErrorEntry;
-          }
-        })
-        .filter((item) => !!item) as TableErrorEntry[];
-      // update the percentages
-      data.forEach((entry) => {
-        entry.percentage = Number(((entry.count / totalCountWithErrors) * 100).toFixed(2));
-      });
-      this.errorsDataSource = new TableLocalDataSource(data, {});
-    });
   }
 
   private updateUrlParams() {

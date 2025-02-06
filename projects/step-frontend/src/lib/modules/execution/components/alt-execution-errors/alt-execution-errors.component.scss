@@ -1,0 +1,16 @@
+.error-name {
+  gap: 0.4rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .icon {
+    cursor: pointer;
+    transform: scale(0.8);
+    padding: 0.2rem;
+  }
+}
+
+.wide-menu {
+  max-width: 40rem;
+}

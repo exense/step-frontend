@@ -16,6 +16,7 @@ import {
 import {
   AugmentedControllerService,
   AugmentedExecutionsService,
+  AugmentedTimeSeriesService,
   DateRange,
   DateUtilsService,
   DEFAULT_RELATIVE_TIME_OPTIONS,
@@ -123,6 +124,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
@@ -236,6 +238,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
+  private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
+  readonly errorsDataSource$ = of(this.errorsDataSource);
+
   readonly currentOperations$ = this.execution$.pipe(
     map((execution) => {
       if (!execution || execution.status === 'ENDED') {
@@ -253,17 +258,26 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   ngOnInit(): void {
     const isIgnoreFilter$ = this._viewAllService.isViewAll$;
+
     combineLatest([this.execution$, isIgnoreFilter$])
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(([execution, isIgnoreFilter]) => {
         this.refreshExecutionTree(execution);
         this.applyDefaultRange(execution, !isIgnoreFilter);
       });
+
+    combineLatest([this.execution$, this.timeRange$])
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(([execution, timeRange]) => {
+        const executionId = execution.id!;
+        this.errorsDataSource.reload({ request: { executionId, timeRange } });
+      });
   }
 
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
+    this.errorsDataSource.destroy();
   }
 
   private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
