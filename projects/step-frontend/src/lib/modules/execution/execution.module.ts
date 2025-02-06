@@ -97,6 +97,7 @@ import { AltReportNodeDetailsStateService } from './services/alt-report-node-det
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 
 @NgModule({
   declarations: [
@@ -164,6 +165,7 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
+    ExecutionLegacySwitcherComponent,
   ],
   imports: [
     StepCommonModule,
@@ -198,6 +200,7 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
+    ExecutionLegacySwitcherComponent,
   ],
 })
 export class ExecutionModule {
@@ -285,7 +288,6 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'legacy-executions',
-      canActivate: [executionGuard],
       canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
@@ -314,6 +316,7 @@ export class ExecutionModule {
             }
             return { consumed: url };
           },
+          canActivate: [executionGuard],
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
@@ -323,7 +326,6 @@ export class ExecutionModule {
     this._viewRegistry.registerRoute({
       path: 'executions',
       component: AltExecutionsComponent,
-      canActivate: [altExecutionGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
@@ -338,7 +340,14 @@ export class ExecutionModule {
           component: ExecutionListComponent,
         },
         {
+          // This additional route is required, to rerender the execution progress component properly
+          // when the user navigates from one execution to another
+          path: 'open/:id',
+          component: ExecutionOpenerComponent,
+        },
+        {
           path: ':id',
+          canActivate: [altExecutionGuard],
           component: AltExecutionProgressComponent,
           providers: [
             RepoRefHolderService,

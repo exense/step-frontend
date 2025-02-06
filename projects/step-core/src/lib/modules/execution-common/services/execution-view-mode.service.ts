@@ -48,17 +48,25 @@ export class ExecutionViewModeService {
   }
 
   getExecutionMode(execution: Execution): ExecutionViewMode {
-    const localStorageOverride = this._localStorage.getItem('executionViewMode');
-    const localStorageForcesLegacy = localStorageOverride === 'legacyExecution';
+    return this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution)
+      ? ExecutionViewMode.LEGACY
+      : ExecutionViewMode.NEW;
+  }
 
-    const useNewView =
-      this.mode === ExecutionViewMode.NEW &&
-      !localStorageForcesLegacy &&
+  isNewExecutionAvailable(execution: Execution): boolean {
+    return (
       execution.resolvedPlanRootNodeId !== undefined &&
       execution.customFields?.['hasReportNodeTimeSeries'] === true &&
-      execution.description !== 'LegacyPlan'; // debug name, remove before finalizing ticket
+      execution.description !== 'LegacyPlan'
+    );
+  }
 
-    return useNewView ? ExecutionViewMode.NEW : ExecutionViewMode.LEGACY;
+  isLocalStorageForcingLegacy(): boolean {
+    return this._localStorage.getItem('executionViewMode') === 'legacyExecution';
+  }
+
+  setForceLegacyView(forceLegacy: boolean): void {
+    this._localStorage.setItem('executionViewMode', forceLegacy ? 'legacyExecution' : 'newExecution');
   }
 
   determineUrl(execution: Execution): string {

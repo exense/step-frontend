@@ -1,6 +1,6 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { map, switchMap } from 'rxjs';
+import { map, of, switchMap } from 'rxjs';
 import { ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
 export const executionGuard: CanActivateFn = (route, state) => {
@@ -9,8 +9,16 @@ export const executionGuard: CanActivateFn = (route, state) => {
 
   return _executionViewMode.loadExecutionMode().pipe(
     switchMap(() => {
+      let executionId: string;
       const urlSegments = state.url.split('/');
-      const executionId = urlSegments[urlSegments.length - 1];
+      const executionIndex = urlSegments.indexOf('legacy-executions');
+
+      if (executionIndex !== -1 && executionIndex + 1 < urlSegments.length) {
+        executionId = urlSegments[executionIndex + 1];
+      } else {
+        console.error('Execution ID not found');
+        return of(true);
+      }
 
       return _executionViewMode.resolveExecution(executionId).pipe(
         map((execution) => {

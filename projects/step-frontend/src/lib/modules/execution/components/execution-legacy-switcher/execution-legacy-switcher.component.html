@@ -1,0 +1,15 @@
+<step-btn-group class="new-execution-report">
+  <mat-slide-toggle
+    [formControl]="toggleControl"
+    color="primary"
+    name="new-execution-report"
+    [disabled]="isDisabled"
+    [matTooltip]="
+      isDisabled
+        ? 'For this execution the new executions view is not available'
+        : 'Select if you prefer the legacy or the new execution view. (stored in the browsers local storage)'
+    "
+  >
+    New Execution Report&nbsp;
+  </mat-slide-toggle>
+</step-btn-group>
