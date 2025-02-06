@@ -1,0 +1,5 @@
+step-alt-execution-report > section:not(.print):not(.small-screen) {
+  step-alt-panel.widget-panel-default {
+    grid-column: span var(--colSpan, 0);
+  }
+}

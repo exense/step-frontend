@@ -109,6 +109,7 @@ import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
+import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 
 @NgModule({
   declarations: [
@@ -179,6 +180,7 @@ import { ExecutionNavigatorQueryParamsCleanupService } from './services/executio
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
     PlanNodeDetailsDialogComponent,
+    AltPanelComponent,
   ],
   imports: [
     StepCommonModule,
