@@ -30,8 +30,8 @@ export type ReportNode = {
   customAttributes?: Record<string, string>;
   parentSource?: 'BEFORE' | 'BEFORE_THREAD' | 'MAIN' | 'SUB_PLAN' | 'AFTER_THREAD' | 'AFTER';
   resolvedArtefact?: AbstractArtefact;
-  orphan?: boolean;
   contributingError?: boolean;
+  orphan?: boolean;
   id?: string;
   _class: string;
 };
