@@ -9,7 +9,7 @@ import { Execution, ExecutionViewMode, ExecutionViewModeService } from '@exense/
 })
 export class ExecutionLegacySwitcherComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
-  private _executionViewModeService = inject(ExecutionViewModeService);
+  protected _executionViewModeService = inject(ExecutionViewModeService);
 
   protected isDisabled = true;
   protected toggleControl = new FormControl(false);

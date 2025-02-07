@@ -61,6 +61,26 @@ export class ExecutionViewModeService {
     );
   }
 
+  getNewExecutionDeactivatedReason(execution: Execution): string {
+    if (execution.customFields?.['hasReportNodeTimeSeries'] == null) {
+      return 'The Execution Report Beta view is only available for Executions started in Step 27 or later.';
+    }
+
+    if (!execution.customFields?.['hasReportNodeTimeSeries']) {
+      return 'The Execution Report Beta requires report node collection in the TimeSeries.';
+    }
+
+    if (!execution.resolvedPlanRootNodeId) {
+      return 'The Execution Report Beta requires report node aggregation.';
+    }
+
+    if (execution.description === 'LegacyPlan') {
+      return 'The Execution Report Beta is disabled for plans called "LegacyPlan".';
+    }
+
+    return 'The Execution Report Beta view is not available.';
+  }
+
   isLocalStorageForcingLegacy(): boolean {
     return this._localStorage.getItem('executionViewMode') === 'legacyExecution';
   }

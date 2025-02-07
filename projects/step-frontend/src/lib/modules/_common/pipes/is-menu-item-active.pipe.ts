@@ -1,6 +1,7 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Observable } from 'rxjs';
-import { NavigatorService } from '@exense/step-core';
+import { MenuEntry, NavigatorService } from '@exense/step-core';
+import { DisplayMenuEntry } from '../components/sidebar/sidebar.component';
 
 @Pipe({
   name: 'isMenuItemActive',
@@ -8,7 +9,7 @@ import { NavigatorService } from '@exense/step-core';
 export class IsMenuItemActivePipe implements PipeTransform {
   private _navigator = inject(NavigatorService);
 
-  transform(menuItemId: string): Observable<boolean> {
-    return this._navigator.isViewIdActive(menuItemId);
+  transform(menuItem: MenuEntry | DisplayMenuEntry): Observable<boolean> {
+    return this._navigator.isViewIdActive(menuItem);
   }
 }

@@ -5,6 +5,13 @@ import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
 import { filter, from, map, Observable, shareReplay, startWith, switchMap, tap, timer } from 'rxjs';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
+import { MenuEntry } from '../types/menu-entry';
+
+export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFct'> & {
+  isBookmark?: boolean;
+  hasChildren?: boolean;
+  children?: DisplayMenuEntry[];
+};
 
 @Injectable({
   providedIn: 'root',
@@ -26,12 +33,21 @@ export class NavigatorService {
     shareReplay(1),
   );
 
-  isViewIdActive(viewId: string): Observable<boolean> {
-    const viewLink = `/${viewId}`;
+  isViewIdActive(view: MenuEntry | DisplayMenuEntry): Observable<boolean> {
+    const viewLink = `/${view.id}`;
 
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      map((url) => this.forcedActivatedViewId === viewId || url.startsWith(viewLink)),
+      tap((url) => view.id === 'executions' && console.log('url', url)),
+      tap(
+        (url) =>
+          view.id === 'executions' &&
+          console.log('isActiveFct', view.isActiveFct ? view.isActiveFct(url) : 'no isActiveFct'),
+      ),
+      tap((url) => view.id === 'executions' && console.log('view', view)),
+      map((url) =>
+        view.isActiveFct ? view.isActiveFct(url) : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
+      ),
     );
   }
 

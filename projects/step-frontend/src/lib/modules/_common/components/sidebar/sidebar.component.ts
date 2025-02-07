@@ -30,7 +30,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MIDDLE_BUTTON = 1;
 
-export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom'> & {
+export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFct'> & {
   isBookmark?: boolean;
   hasChildren?: boolean;
   children?: DisplayMenuEntry[];
@@ -211,12 +211,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       return a.weight - b.weight;
     };
 
-    const convert = ({ id, title, icon, isCustom, parentId }: MenuEntry): DisplayMenuEntry => ({
+    const convert = ({ id, title, icon, isCustom, parentId, isActiveFct }: MenuEntry): DisplayMenuEntry => ({
       id,
       title,
       icon,
       isCustom,
       isBookmark: parentId === BOOKMARKS_ROOT,
+      isActiveFct: isActiveFct,
     });
 
     const findChildren = (parent: DisplayMenuEntry) => {
