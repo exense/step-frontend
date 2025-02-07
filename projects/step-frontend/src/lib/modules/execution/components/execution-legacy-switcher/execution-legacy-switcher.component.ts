@@ -1,6 +1,7 @@
 import { Component, Input, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Execution, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'step-execution-legacy-switcher',
@@ -13,6 +14,7 @@ export class ExecutionLegacySwitcherComponent implements OnInit, OnChanges {
 
   protected isDisabled = true;
   protected toggleControl = new FormControl(false);
+  protected forceLegacyReporting: Observable<boolean> = this._executionViewModeService.checkForceLegacyReporting();
 
   ngOnInit() {
     this.updateToggleState();
@@ -39,7 +41,11 @@ export class ExecutionLegacySwitcherComponent implements OnInit, OnChanges {
       this.toggleControl.enable({ emitEvent: false });
     }
 
-    const isLegacyMode = this._executionViewModeService.getExecutionMode(this.execution) !== ExecutionViewMode.LEGACY;
-    this.toggleControl.setValue(isLegacyMode, { emitEvent: false });
+    this._executionViewModeService
+      .getExecutionMode(this.execution)
+      .pipe(map((mode) => mode !== ExecutionViewMode.LEGACY))
+      .subscribe((isLegacyMode) => {
+        this.toggleControl.setValue(isLegacyMode, { emitEvent: false });
+      });
   }
 }

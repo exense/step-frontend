@@ -38,13 +38,6 @@ export class NavigatorService {
 
     return this.activeUrl$.pipe(
       startWith(this._router.url),
-      tap((url) => view.id === 'executions' && console.log('url', url)),
-      tap(
-        (url) =>
-          view.id === 'executions' &&
-          console.log('isActiveFct', view.isActiveFct ? view.isActiveFct(url) : 'no isActiveFct'),
-      ),
-      tap((url) => view.id === 'executions' && console.log('view', view)),
       map((url) =>
         view.isActiveFct ? view.isActiveFct(url) : this.forcedActivatedViewId === view.id || url.startsWith(viewLink),
       ),

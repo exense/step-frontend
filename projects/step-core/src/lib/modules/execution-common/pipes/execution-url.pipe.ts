@@ -14,6 +14,6 @@ export class ExecutionUrlPipe implements PipeTransform {
   transform(idOrExecution: string | Execution): Observable<string> {
     return this._executionViewMode
       .resolveExecution(idOrExecution)
-      .pipe(switchMap((execution: Execution) => of(this._executionViewMode.determineUrl(execution))));
+      .pipe(switchMap((execution: Execution) => this._executionViewMode.determineUrl(execution)));
   }
 }

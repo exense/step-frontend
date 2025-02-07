@@ -1,14 +1,13 @@
-import { inject, Injectable, Provider } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 import { Mutable } from '../../basics/types/mutable';
 import { Execution, ExecutionsService, UserService } from '../../../client/generated';
 import { LOCAL_STORAGE } from '../../basics/types/storage.token';
 import { ExecutionViewMode } from '../types/execution-view-mode';
-import { EXECUTION_VIEW_MODE } from '../injectables/execution-view-mode.token';
 import { switchMap } from 'rxjs/operators';
 import { CommonEntitiesUrlsService } from '../../basics/injectables/common-entities-urls.service';
 
-type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'mode'>>;
+type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'forceLegacyReporting'>>;
 
 @Injectable({
   providedIn: 'root',
@@ -19,16 +18,17 @@ export class ExecutionViewModeService {
   private _executionService = inject(ExecutionsService);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
 
-  readonly mode?: ExecutionViewMode;
+  readonly forceLegacyReporting?: boolean;
 
-  loadExecutionMode(): Observable<ExecutionViewMode> {
-    if (this.mode) {
-      return of(this.mode);
+  checkForceLegacyReporting(): Observable<boolean> {
+    console.log('forceLegacyReporting', this.forceLegacyReporting);
+
+    if (this.forceLegacyReporting !== undefined) {
+      return of(this.forceLegacyReporting);
     }
     return this._userService.getPreferences().pipe(
       map((preferences) => preferences?.preferences?.['forceLegacyReporting'] === 'true'),
-      map((forceLegacyReporting) => (forceLegacyReporting ? ExecutionViewMode.LEGACY : ExecutionViewMode.NEW)),
-      tap((mode) => ((this as FieldAccessor).mode = mode)),
+      tap((forceLegacyReporting) => ((this as FieldAccessor).forceLegacyReporting = forceLegacyReporting)),
     );
   }
 
@@ -47,10 +47,14 @@ export class ExecutionViewModeService {
     );
   }
 
-  getExecutionMode(execution: Execution): ExecutionViewMode {
-    return this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution)
-      ? ExecutionViewMode.LEGACY
-      : ExecutionViewMode.NEW;
+  getExecutionMode(execution: Execution): Observable<ExecutionViewMode> {
+    return this.checkForceLegacyReporting().pipe(
+      map((isForceLegacy) =>
+        this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution) || isForceLegacy
+          ? ExecutionViewMode.LEGACY
+          : ExecutionViewMode.NEW,
+      ),
+    );
   }
 
   isNewExecutionAvailable(execution: Execution): boolean {
@@ -89,21 +93,17 @@ export class ExecutionViewModeService {
     this._localStorage.setItem('executionViewMode', forceLegacy ? 'legacyExecution' : 'newExecution');
   }
 
-  determineUrl(execution: Execution): string {
-    const mode = this.getExecutionMode(execution);
-    return mode === ExecutionViewMode.NEW
-      ? this._commonEntitiesUrls.executionUrl(execution)
-      : this._commonEntitiesUrls.legacyExecutionUrl(execution);
+  determineUrl(execution: Execution): Observable<string> {
+    return this.getExecutionMode(execution).pipe(
+      map((mode) =>
+        mode === ExecutionViewMode.NEW
+          ? this._commonEntitiesUrls.executionUrl(execution)
+          : this._commonEntitiesUrls.legacyExecutionUrl(execution),
+      ),
+    );
   }
 
   cleanup(): void {
-    (this as FieldAccessor).mode = undefined;
+    (this as FieldAccessor).forceLegacyReporting = undefined;
   }
 }
-
-export const provideExecutionViewMode = (): Provider[] => [
-  {
-    provide: EXECUTION_VIEW_MODE,
-    useFactory: () => inject(ExecutionViewModeService).mode ?? ExecutionViewMode.LEGACY,
-  },
-];

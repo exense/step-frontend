@@ -7,23 +7,21 @@ export const executionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
   const _executionViewMode: ExecutionViewModeService = inject(ExecutionViewModeService);
 
-  return _executionViewMode.loadExecutionMode().pipe(
-    switchMap(() => {
-      let executionId: string;
-      const urlSegments = state.url.split('/');
-      const executionIndex = urlSegments.indexOf('legacy-executions');
+  let executionId: string;
+  const urlSegments = state.url.split('/');
+  const executionIndex = urlSegments.indexOf('legacy-executions');
 
-      if (executionIndex !== -1 && executionIndex + 1 < urlSegments.length) {
-        executionId = urlSegments[executionIndex + 1];
-      } else {
-        console.error('Execution ID not found');
-        return of(true);
-      }
+  if (executionIndex !== -1 && executionIndex + 1 < urlSegments.length) {
+    executionId = urlSegments[executionIndex + 1];
+  } else {
+    console.error('Execution ID not found');
+    return of(true);
+  }
 
-      return _executionViewMode.resolveExecution(executionId).pipe(
-        map((execution) => {
-          const mode = _executionViewMode.getExecutionMode(execution);
-
+  return _executionViewMode.resolveExecution(executionId).pipe(
+    switchMap((execution) =>
+      _executionViewMode.getExecutionMode(execution).pipe(
+        map((mode) => {
           if (mode !== ExecutionViewMode.LEGACY) {
             let url = state.url.replace('/legacy-executions', '/executions');
             if (url.includes('/open')) {
@@ -31,10 +29,9 @@ export const executionGuard: CanActivateFn = (route, state) => {
             }
             return _router.parseUrl(url);
           }
-
           return true;
         }),
-      );
-    }),
+      ),
+    ),
   );
 };
