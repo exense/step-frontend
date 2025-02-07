@@ -1,5 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { MEMORY_STORAGE } from '@exense/step-core';
+import { TimeRangePickerSelection } from '../../timeseries/modules/_common';
+
+export interface ExecutionContext {
+  eId: string;
+  timeRange: TimeRangePickerSelection;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -7,6 +13,20 @@ import { MEMORY_STORAGE } from '@exense/step-core';
 export class AltExecutionStorageService implements Storage {
   private _memoryStorage = inject(MEMORY_STORAGE);
   private usedKeys = new Set<string>();
+
+  private executionsContexts = new Map<string, any>();
+
+  saveExecutionContext(context: ExecutionContext) {
+    this.executionsContexts.set(context.eId, context);
+  }
+
+  getExecutionContext(executionId: string): ExecutionContext | null {
+    return this.executionsContexts.get(executionId);
+  }
+
+  clearExecutionContext(executionId: string) {
+    this.executionsContexts.delete(executionId);
+  }
 
   get length(): number {
     return this.usedKeys.size;

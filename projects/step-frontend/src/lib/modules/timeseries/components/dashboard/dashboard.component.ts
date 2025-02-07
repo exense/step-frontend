@@ -2,11 +2,13 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   QueryList,
   SimpleChanges,
   ViewChild,
@@ -101,12 +103,15 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input('id') dashboardId!: string;
   @Input() storageId?: string;
   @Input() editable: boolean = true;
+  @Input() initialTimeSelection?: TimeRangePickerSelection;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
   @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
+
+  @Output() timeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -137,6 +142,9 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       });
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    if (this.initialTimeSelection) {
+      urlParams.timeRange = this.initialTimeSelection;
+    }
     this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
@@ -177,6 +185,12 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
+    if (existingContext && urlParams.timeRange) {
+      // update the existing context with url params
+      existingContext.updateTimeRangeSettings(
+        this.transformTimePickerSelectionIntoDashboardSettings(urlParams.timeRange!, urlParams),
+      );
+    }
     const context = existingContext || this.createContext(this.dashboard, urlParams, existingContext);
     this.resolution = context.getChartsResolution();
     this.refreshInterval = context.getRefreshInterval();
@@ -193,7 +207,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     context.stateChange$.subscribe((stateChanged) => {
       this.updateUrl();
     });
-
+    // notify the outside regarding the time picker selection
+    context.onTimePickerOptionChange().subscribe((selection) => this.timeRangeChange.next(selection));
     if (urlParams.editMode && this.hasWritePermission && this.editable) {
       this.enableEditMode();
     }
@@ -380,12 +395,20 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
   ): DashboardTimeRangeSettings {
-    // priority of time ranges property: 1. existingCustomSelection 2. URL 3. Default full selection 4. Dashboard
+    // priority of time ranges property: 1. URL, 2. existingCustomSelection 3. Default full selection 4. Dashboard
+
+    const now = new Date().getTime() - 5000;
+
+    if (urlParams.timeRange) {
+      return this.transformTimePickerSelectionIntoDashboardSettings(urlParams.timeRange!, urlParams);
+    }
     if (existingSettings) {
       return this.updateRelativeRangeIfNeeded(existingSettings);
     }
-    const now = new Date().getTime() - 5000;
-    if (!urlParams.timeRange && this.defaultFullTimeRange?.from) {
+    if (dashboard.timeRange) {
+      return this.transformTimePickerSelectionIntoDashboardSettings(dashboard.timeRange!, urlParams);
+    }
+    if (this.defaultFullTimeRange?.from) {
       // no custom selection in the URL
       const fullRange = {
         from: this.defaultFullTimeRange!.from,
@@ -397,8 +420,16 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         defaultFullRange: this.defaultFullTimeRange,
         selectedRange: urlParams.selectedTimeRange || fullRange,
       };
+    } else {
+      throw new Error('Not enough properties to set the default time range');
     }
-    let timeRangeSelection: TimeRangeSelection = urlParams.timeRange || dashboard.timeRange!;
+  }
+
+  private transformTimePickerSelectionIntoDashboardSettings(
+    timeRangeSelection: TimeRangePickerSelection,
+    urlParams: DashboardUrlParams,
+  ): DashboardTimeRangeSettings {
+    const now = new Date().getTime() - 5000;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
       let foundRelativeOption: TimeRangeRelativeSelection = this.timeRangeOptions.find((o) => {
@@ -444,6 +475,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     urlParams: DashboardUrlParams,
     existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
+    console.log(urlParams);
     const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
       dashboard,

@@ -1,26 +1,3 @@
-<!--<step-form-field>-->
-<!--  <step-prefix class="icon-prefix">-->
-<!--    <step-icon name="calendar" (click)="picker.open()" />-->
-<!--  </step-prefix>-->
-<!--  <input-->
-<!--    type="text"-->
-<!--    placeholder="From - To"-->
-<!--    [formControl]="_state.dateRangeCtrl"-->
-<!--    [stepDateRangePicker]="picker"-->
-<!--    [showRelativeTime]="true"-->
-<!--    (relativeOptionChange)="_state.updateRelativeTime($event)"-->
-<!--    [matTooltip]="rangePicker.formattedValue()"-->
-<!--    matTooltipPosition="before"-->
-<!--    #rangePicker="DateRangePicker"-->
-<!--  />-->
-<!--  @if (!(_state.isFullRangeSelected$ | async)) {-->
-<!--    <step-suffix class="icon-suffix">-->
-<!--      <step-icon name="alert-circle" class="full-range-warn" matTooltip="Not full range is selected" />-->
-<!--    </step-suffix>-->
-<!--  }-->
-<!--</step-form-field>-->
-<!--<step-date-picker #picker />-->
-
 <step-time-range-picker
   [activeSelection]="(_state.timeRangeChange$ | async)!"
   [selectOptions]="timeRangeOptions"

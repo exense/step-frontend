@@ -1,10 +1,23 @@
-import { Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  input,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
   TimeRangePickerComponent,
+  TimeRangePickerSelection,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -39,7 +52,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class ExecutionPageComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
+  initialTimeRange = input<TimeRangePickerSelection | undefined>(undefined);
+
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
+
+  @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
 
   private _authService = inject(AuthService);
 
@@ -84,6 +101,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         this.executionHasToBeBuilt = true;
       }
     });
+    console.log(this.initialTimeRange());
   }
 
   getExecutionRange(execution: Execution): Partial<TimeRange> {

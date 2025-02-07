@@ -1,10 +1,12 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
 @Component({
@@ -22,8 +24,9 @@ import { map } from 'rxjs';
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class AltExecutionReportComponent {
+export class AltExecutionReportComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
+  protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
 
   protected readonly _state = inject(AltExecutionStateService);
@@ -36,7 +39,15 @@ export class AltExecutionReportComponent {
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
-  protected readonly _mode = inject(VIEW_MODE);
+  private _urlParamsService = inject(DashboardUrlParamsService);
+  private _destroyRef = inject(DestroyRef);
+
+  ngOnInit(): void {
+    this._state.timeRangeChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
+      // update URL every time the page is accessed
+      this._urlParamsService.updateUrlParams(timeRange);
+    });
+  }
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;

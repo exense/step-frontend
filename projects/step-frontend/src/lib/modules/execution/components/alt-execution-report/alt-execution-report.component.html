@@ -16,6 +16,7 @@
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
       [executionId]="executionId"
+      [isFullRange]="(_state.timeRangeChange$ | async)?.type === 'FULL'"
       (timeRangeChange)="handleChartZooming($event)"
       (fullRange)="_state.selectFullRange()"
     />
