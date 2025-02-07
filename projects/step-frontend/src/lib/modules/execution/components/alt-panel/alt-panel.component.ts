@@ -22,6 +22,9 @@ export class AltPanelComponent {
   protected readonly type = computed(() => this.info().type);
 
   private metadata = computed(() => this.info().metadata);
-  protected readonly className = computed(() => this.metadata()?.cssClassName ?? 'widget-panel-default');
+  protected readonly className = computed(() => {
+    const customClass = this.metadata()?.cssClassName;
+    return ['widget', customClass].filter((item) => !!item).join(' ');
+  });
   protected readonly colSpan = computed(() => this.metadata()?.colSpan ?? 1);
 }
