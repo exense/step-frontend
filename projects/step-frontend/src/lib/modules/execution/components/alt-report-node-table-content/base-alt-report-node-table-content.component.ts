@@ -21,10 +21,10 @@ const PRINT_PAGE_SIZE = 50_000;
   template: '',
 })
 export abstract class BaseAltReportNodeTableContentComponent implements ItemsPerPageService, AfterViewInit {
-  private _state = inject(AltReportNodesStateService);
-  private _filterConditionFactory = inject(FilterConditionFactoryService);
-  private _destroyRef = inject(DestroyRef);
-  private _dateUtils = inject(DateUtilsService);
+  protected _state = inject(AltReportNodesStateService);
+  protected _filterConditionFactory = inject(FilterConditionFactoryService);
+  protected _destroyRef = inject(DestroyRef);
+  protected _dateUtils = inject(DateUtilsService);
   protected readonly _mode = inject(VIEW_MODE);
 
   protected abstract tableSearch: Signal<TableSearch | undefined>;
@@ -34,7 +34,9 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   private isRemoteDataSource$ = this.dataSource$.pipe(map((dataSource) => dataSource instanceof TableRemoteDataSource));
 
   ngAfterViewInit(): void {
-    this.setupFilters();
+    this.setupSearchFilter();
+    this.setupStatusesFilter();
+    this.setupDateRangeFilter();
   }
 
   getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[] {
@@ -42,11 +44,13 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
     return [allowedPageSize];
   }
 
-  private setupFilters(): void {
+  protected setupSearchFilter(): void {
     this._state.search$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
       this.tableSearch()?.onSearch('name', value);
     });
+  }
 
+  protected setupStatusesFilter(): void {
     this._state.selectedStatuses$
       .pipe(
         map((statuses) => arrayToRegex(Array.from(statuses))),
@@ -55,7 +59,9 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
       .subscribe((statuses) => {
         this.tableSearch()?.onSearch('status', { value: statuses, regex: true });
       });
+  }
 
+  protected setupDateRangeFilter(): void {
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
         map(([pickerSelection, isRemote]) => {

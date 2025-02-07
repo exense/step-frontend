@@ -313,5 +313,6 @@ export { ZapCircle } from './svg/zap-circle';
 export { ZoomIn } from './svg/zoom-in';
 export { ChevronDown } from './svg/chevron-down';
 export { ZoomOut } from './svg/zoom-out';
+export { DragHandle } from './svg/drag-handle';
 
 export { allIcons } from './all';

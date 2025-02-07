@@ -1,11 +1,5 @@
-:host {
-  min-width: 20px;
-  min-height: 20px;
+entity-icon {
+  min-width: 2rem;
+  min-height: 2rem;
   display: inline-block;
-}
-
-mat-icon {
-  font-size: 18px;
-  vertical-align: middle;
-  padding: 3px;
 }

@@ -14,9 +14,14 @@ import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constan
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ExecutionModule } from '../execution/execution.module';
+import { AutomationPackageExecutionDialogComponent } from './components/automation-package-execution-dialog/automation-package-execution-dialog.component';
 
 @NgModule({
-  declarations: [AutomationPackagesListComponent, AutomationPackageUploadDialogComponent],
+  declarations: [
+    AutomationPackagesListComponent,
+    AutomationPackageUploadDialogComponent,
+    AutomationPackageExecutionDialogComponent,
+  ],
   imports: [StepCommonModule, StepCoreModule, ExecutionModule],
 })
 export class AutomationPackagesModule {
@@ -68,6 +73,14 @@ export class AutomationPackagesModule {
                   }),
                 ],
               },
+              dialogRoute({
+                path: 'execute/:id',
+                dialogComponent: AutomationPackageExecutionDialogComponent,
+                resolve: {
+                  automationPackage: (route: ActivatedRouteSnapshot) =>
+                    inject(AugmentedAutomationPackagesService).getAutomationPackage(route.params['id']),
+                },
+              }),
             ],
           },
         ],

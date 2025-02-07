@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ExecutionViewServices } from '../../shared/execution-view-services';
+import { ExecutionViewServices } from '../../types/execution-view-services';
 import { Operation, SystemService } from '@exense/step-core';
 
 @Component({
