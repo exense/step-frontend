@@ -2,11 +2,12 @@ import { Observable } from 'rxjs';
 import { DateRange, Execution, Operation, ReportNode, TableDataSource, TimeRange } from '@exense/step-core';
 import { FormControl } from '@angular/forms';
 import { KeywordParameters } from '../shared/keyword-parameters';
-import { TimeRangePickerSelection } from '../../timeseries/modules/_common';
+import { TimeRangePickerSelection, TimeSeriesConfig } from '../../timeseries/modules/_common';
 
 export abstract class AltExecutionStateService {
   abstract readonly dateRangeCtrl: FormControl<DateRange | null | undefined>;
   abstract readonly timeRangeChange$: Observable<TimeRangePickerSelection>;
+  abstract timeRangeOptions: TimeRangePickerSelection[];
   abstract readonly executionIdSnapshot?: string;
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;
@@ -18,7 +19,6 @@ export abstract class AltExecutionStateService {
   abstract readonly testCases$: Observable<ReportNode[] | undefined>;
   abstract readonly testCasesDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
-  abstract readonly dateRange$: Observable<DateRange | undefined>;
   abstract readonly timeRange$: Observable<TimeRange | undefined>;
   abstract updateRange(timeRange: TimeRange | null | undefined): void;
   abstract getTimeRange(): TimeRangePickerSelection;

@@ -16,6 +16,7 @@ import {
   skip,
   from,
   range,
+  filter,
 } from 'rxjs';
 import {
   ArtefactFilter,
@@ -177,6 +178,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
 
+  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'FULL' },
+    ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+  ];
+
   protected readonly executionTooltips: ExecutionActionsTooltips = {
     simulate: 'Relaunch execution in simulation mode',
     execute: 'Relaunch execution with same parameters',
@@ -188,7 +194,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private timeRangeSelection$: BehaviorSubject<TimeRangePickerSelection> =
     new BehaviorSubject<TimeRangePickerSelection>(undefined!);
 
-  readonly timeRangeChange$ = this.timeRangeSelection$.asObservable().pipe(skip(1));
+  readonly timeRangeChange$ = this.timeRangeSelection$.asObservable().pipe(skip(1), shareReplay(1));
 
   private isTreeInitialized = false;
 
@@ -226,32 +232,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   //     this.saveRangeToStorage(range);
   //   });
 
-  readonly dateRange$ = combineLatest([
-    this.dateRangeCtrl.valueChanges.pipe(startWith(this.dateRangeCtrl.value)),
-    toObservable(this.relativeTime),
-  ]).pipe(
-    map(([range, relativeTime]) => {
-      if (!range) {
-        return undefined;
-      }
-      return {
-        ...range,
-        isDefault: range.isDefault || !!relativeTime,
-        relativeTime,
-      } as DateRangeExt;
-    }),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  private isNotDefaultRangeSelected = toSignal(this.dateRange$.pipe(map((range) => !!range && !range.isDefault)));
-
-  readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
   updateRange(timeRange?: TimeRange | null) {
     this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
   }
@@ -286,11 +266,9 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
 
-  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
-    map(([selectedRange, fullRange]) => {
-      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end, COMPARE_MEASUREMENT_ERROR_MS);
-      return startEq && endEq;
+  readonly isFullRangeSelected$ = this.timeRangeSelection$.asObservable().pipe(
+    map((selection) => {
+      return selection.type === 'FULL';
     }),
   );
 
@@ -393,8 +371,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
 
+  readonly timeRange$ = this.timeRangeSelection$.pipe(
+    filter((s) => !!s),
+    map((selection) => selection.absoluteSelection),
+  );
+
   ngOnInit(): void {
     this.timeRangeChange$.subscribe((x) => this.saveContextToStorage());
+
+    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: execution.endTime || 0 };
+    });
 
     this.setupRangeSyncWithStorage();
     this.setupDateRangeSyncOnExecutionRefresh();
@@ -404,13 +391,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     combineLatest([this.execution$, isIgnoreFilter$])
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(([execution, isIgnoreFilter]) => {
-        // this.refreshExecutionTree(execution);
-        const existingContext = this._executionStorage.getExecutionContext(execution.id!);
-        if (existingContext) {
-          console.log('EXECUTION CONTEXT FOUND', existingContext);
-          this.updateTimeRangeSelection(existingContext.timeRange);
+        const urlParams = this._urlParamsService.collectUrlParams();
+        if (urlParams.timeRange) {
+          // url params take priority
+          this.updateTimeRangeSelection(urlParams.timeRange);
         } else {
-          this.applyDefaultRange(execution);
+          const existingContext = this._executionStorage.getExecutionContext(execution.id!);
+          if (existingContext) {
+            this.updateTimeRangeSelection(existingContext.timeRange);
+          } else {
+            this.applyDefaultRange(execution);
+          }
         }
         this._urlParamsService.updateUrlParams(this.getTimeRange());
       });
@@ -420,6 +411,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
   }
+
+  private isNotDefaultRangeSelected = toSignal(
+    this.timeRangeSelection$.pipe(map((range) => !!range && range.type !== 'FULL')),
+  );
 
   private setupRangeSyncWithStorage(): void {
     this.dateRangeCtrl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((range) => {
@@ -447,17 +442,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private setupTreeRefresh(): void {
-    const range$ = this.dateRange$.pipe(map((range) => (!range?.relativeTime && range?.isDefault ? undefined : range)));
-
-    combineLatest([this.executionId$, range$])
+    combineLatest([this.executionId$, this.timeRangeChange$])
       .pipe(
-        switchMap(([executionId, range]) => {
-          if (!range) {
+        switchMap(([executionId, timeSelection]) => {
+          console.log('TIME', timeSelection);
+          if (timeSelection.type === 'FULL') {
             return this._executionsApi.getFullAggregatedReportView(executionId);
           }
-          const from = range.start?.toMillis();
-          const to = range.end?.toMillis();
-          return this._executionsApi.getAggregatedReportView(executionId, { range: { from, to } });
+          return this._executionsApi.getAggregatedReportView(executionId, { range: timeSelection.absoluteSelection! });
         }),
         takeUntilDestroyed(this._destroyRef),
       )
@@ -552,6 +544,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
+    if (selection.type === 'RELATIVE') {
+      let time = selection.relativeSelection!.timeInMs;
+      let now = new Date().getTime() - 5000;
+      selection!.absoluteSelection = { from: now - time, to: now };
+      if (!selection.relativeSelection!.label) {
+        let foundRelativeOption = this.timeRangeOptions.find(
+          (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+        );
+        selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+      }
+    }
     this.timeRangeSelection$.next(selection);
   }
 }

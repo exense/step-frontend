@@ -15,23 +15,9 @@ import { Execution } from '@exense/step-core';
 export class AltExecutionRangePickerComponent {
   protected readonly _state = inject(AltExecutionStateService);
 
-  timeRangeOptions: TimeRangePickerSelection[] = [
-    { type: 'FULL' },
-    ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
-  ];
-
-  constructor() {
-    this._state.execution$.pipe(takeUntilDestroyed()).subscribe((execution) => {
-      this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: execution.endTime || 0 };
-    });
-  }
+  constructor() {}
 
   handleSelectionChange(selection: TimeRangePickerSelection) {
-    if (selection.type === 'RELATIVE') {
-      let time = selection.relativeSelection!.timeInMs;
-      let now = new Date().getTime() - 5000;
-      selection.absoluteSelection = { from: now - time, to: now };
-    }
     this._state.updateTimeRangeSelection(selection);
   }
 }
