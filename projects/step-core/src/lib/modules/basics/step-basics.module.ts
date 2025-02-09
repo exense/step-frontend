@@ -63,6 +63,7 @@ import { ControlHasWarningsPipe } from './pipes/control-has-warnings.pipe';
 import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
+import { PasswordComponent } from './components/password/password.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
@@ -98,6 +99,7 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -163,6 +165,7 @@ import { BooleanFilterComponent } from './components/boolean-filter/boolean-filt
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -214,6 +217,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
+export * from './components/password/password.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
