@@ -416,11 +416,6 @@ export class ExecutionModule {
                   component: AltExecutionReportControlsComponent,
                   outlet: 'controls',
                 },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
-                },
               ],
             },
             {
@@ -433,11 +428,6 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportComponent,
                 },
-                {
-                  path: '',
-                  component: AltExecutionRangePrintComponent,
-                  outlet: 'rangePicker',
-                },
               ],
             },
             {
@@ -446,11 +436,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionTreeTabComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
                 },
               ],
             },
