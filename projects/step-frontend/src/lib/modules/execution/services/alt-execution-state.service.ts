@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { DateRange, Execution, Operation, ReportNode, TableDataSource, TimeRange } from '@exense/step-core';
 import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common';
+import { TimeSeriesConfig } from '../../timeseries/modules/_common/types/time-series/time-series.config';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeChange$: Observable<TimeRangePickerSelection>;

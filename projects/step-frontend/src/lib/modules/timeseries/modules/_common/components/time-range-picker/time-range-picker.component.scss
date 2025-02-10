@@ -42,6 +42,15 @@
 }
 
 .range-btn {
+  @media print {
+    width: unset;
+    max-width: unset;
+
+    .warn {
+      display: none;
+    }
+  }
+
   @include core.button-round;
 
   display: flex;

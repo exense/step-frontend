@@ -101,7 +101,6 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         this.executionHasToBeBuilt = true;
       }
     });
-    console.log(this.initialTimeRange());
   }
 
   getExecutionRange(execution: Execution): Partial<TimeRange> {

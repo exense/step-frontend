@@ -79,7 +79,6 @@ import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/a
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
-import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
@@ -170,7 +169,6 @@ import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
     AltExecutionRangePickerComponent,
-    AltExecutionRangePrintComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     ExecutionDetailsComponent,

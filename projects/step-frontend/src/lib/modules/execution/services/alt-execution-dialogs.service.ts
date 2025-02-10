@@ -65,7 +65,6 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private openNodeDetails(queryParams: Params): void {
-    console.log('OPEN NODE DETAILS');
     const isDetailsOpened = this._router.url.includes('node-details');
     const closePrevious$ = isDetailsOpened ? this.closeNodeDetails() : of(undefined);
     closePrevious$.subscribe(() => {
@@ -78,7 +77,6 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private closeNodeDetails(): Observable<unknown> {
-    console.log('CLOSEEEEE==========="');
     const closePromise = this._router.navigate([{ outlets: { nodeDetails: null } }], {
       relativeTo: this._activatedRoute,
     });

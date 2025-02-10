@@ -11,11 +11,8 @@ import {
   take,
   tap,
   distinctUntilChanged,
-  Observable,
   BehaviorSubject,
   skip,
-  from,
-  range,
   filter,
 } from 'rxjs';
 import {
@@ -24,31 +21,25 @@ import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   AugmentedPlansService,
-  DateRange,
   DateUtilsService,
-  DEFAULT_RELATIVE_TIME_OPTIONS,
   Execution,
   IS_SMALL_SCREEN,
   RegistrationStrategy,
-  RELATIVE_TIME_OPTIONS,
   ReportNode,
   selectionCollectionProvider,
   SelectionCollector,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  TimeOption,
-  TimeRange,
   ViewRegistryService,
   PopoverMode,
   IncludeTestcases,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
 import { FormBuilder } from '@angular/forms';
-import { DateTime } from 'luxon';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
@@ -69,8 +60,7 @@ import { ActiveExecutionContextService } from '../../services/active-execution-c
 import { TimeRangePickerSelection, TimeSeriesConfig } from '../../../timeseries/modules/_common';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
-
-const rangeKey = (executionId: string) => `${executionId}_range`;
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -81,13 +71,6 @@ enum UpdateSelection {
 interface RefreshParams {
   execution?: Execution;
   updateSelection?: UpdateSelection;
-}
-
-const COMPARE_MEASUREMENT_ERROR_MS = 30_000;
-
-interface DateRangeExt extends DateRange {
-  isDefault?: boolean;
-  relativeTime?: number;
 }
 
 @Component({
@@ -146,7 +129,6 @@ interface DateRangeExt extends DateRange {
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private _activeExecutions = inject(ActiveExecutionsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
@@ -402,7 +384,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     combineLatest([this.executionId$, this.timeRangeChange$])
       .pipe(
         switchMap(([executionId, timeSelection]) => {
-          console.log('TIME', timeSelection);
           if (timeSelection.type === 'FULL') {
             return this._executionsApi.getFullAggregatedReportView(executionId);
           }

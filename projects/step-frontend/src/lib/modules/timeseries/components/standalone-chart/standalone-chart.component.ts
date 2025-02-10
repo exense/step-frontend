@@ -67,7 +67,6 @@ export class StandaloneChartComponent implements OnChanges {
   chartSettings?: TSChartSettings;
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('changes');
     this.fetchDataAndCreateChart(this.timeRange).subscribe();
   }
 

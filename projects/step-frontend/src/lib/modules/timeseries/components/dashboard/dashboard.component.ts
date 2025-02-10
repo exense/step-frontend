@@ -475,7 +475,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     urlParams: DashboardUrlParams,
     existingContext?: TimeSeriesContext,
   ): TimeSeriesContext {
-    console.log(urlParams);
     const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
       dashboard,

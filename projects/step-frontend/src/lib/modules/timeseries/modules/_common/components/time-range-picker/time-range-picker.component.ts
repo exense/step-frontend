@@ -50,7 +50,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (!this.selectOptions) {
       throw new Error('Options param is mandatory');
     }
-    console.log(this.selectOptions);
     if (this.initialSelectionIndex != undefined) {
       this.activeSelection = this.selectOptions[0];
     } else {
@@ -168,7 +167,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
     this.fromDateString = undefined;
     this.toDateString = undefined;
-    console.log(this.activeSelection);
     if (
       option.type === 'RELATIVE' &&
       this.activeSelection.type === 'RELATIVE' &&

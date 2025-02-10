@@ -9,7 +9,6 @@ export class ExecutionNavigatorQueryParamsCleanupService implements NavigatorQue
   private keysToCleanup = new Set(Object.values(this._queryParamNames) as string[]);
 
   isCleanUpRequired(queryParams: Params): boolean {
-    console.log('CLEANUP REQUIRED????');
     return Object.keys(queryParams).some((key) => this.keysToCleanup.has(key));
   }
 
