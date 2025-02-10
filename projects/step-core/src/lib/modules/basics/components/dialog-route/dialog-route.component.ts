@@ -83,9 +83,11 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
   private exitRoute(result?: DialogRouteResult): void {
     if (this._dialogParent?.navigateBack) {
-      this._dialogParent.navigateBack(result);
+      this._dialogParent.navigateBack(result, this._activatedRoute);
       return;
     }
+
+    console.log('THE NAVIGATE BACK NOT CALLED');
 
     if (result?.canNavigateBack) {
       if (this._dialogParent?.returnParentUrl) {

@@ -28,6 +28,7 @@ import {
   stepRouteAdditionalConfig,
   TreeNodeUtilsService,
   ViewRegistryService,
+  DialogParentService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -110,6 +111,7 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common';
+import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 
 @NgModule({
   declarations: [
@@ -368,6 +370,10 @@ export class ExecutionModule {
           component: AltExecutionProgressComponent,
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
+            {
+              provide: DialogParentService,
+              useClass: ExecutionViewDialogUrlCleanupService,
+            },
             {
               provide: TreeNodeUtilsService,
               useExisting: AggregatedReportViewTreeNodeUtilsService,

@@ -109,18 +109,6 @@ interface DateRangeExt extends DateRange {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
     },
-    {
-      provide: RELATIVE_TIME_OPTIONS,
-      useFactory: () => {
-        const _state = inject(AltExecutionStateService);
-        const _defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
-
-        return _state.executionFulLRange$.pipe(
-          map((value) => ({ value, label: 'Full Range' }) as TimeOption),
-          map((fullRangeOption) => [..._defaultOptions, fullRangeOption]),
-        );
-      },
-    },
     AltExecutionViewAllService,
     AltKeywordNodesStateService,
     AltTestCasesNodesStateService,
@@ -198,14 +186,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private isTreeInitialized = false;
 
-  private relativeTime = signal<number | undefined>(undefined);
-
-  updateRelativeTime(time?: number) {
-    this.relativeTime.set(time);
-  }
-
-  readonly dateRangeCtrl = this._fb.control<DateRangeExt | null | undefined>(null);
-
   private saveContextToStorage(): void {
     const executionId = this._executionId();
     if (!executionId) {
@@ -231,10 +211,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   //     }
   //     this.saveRangeToStorage(range);
   //   });
-
-  updateRange(timeRange?: TimeRange | null) {
-    this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
-  }
 
   selectFullRange(): void {
     this.execution$.pipe(take(1)).subscribe((execution) => {
@@ -263,8 +239,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
   );
-
-  readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
 
   readonly isFullRangeSelected$ = this.timeRangeSelection$.asObservable().pipe(
     map((selection) => {
@@ -383,7 +357,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: execution.endTime || 0 };
     });
 
-    this.setupRangeSyncWithStorage();
     this.setupDateRangeSyncOnExecutionRefresh();
     this.setupTreeRefresh();
 
@@ -416,22 +389,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.timeRangeSelection$.pipe(map((range) => !!range && range.type !== 'FULL')),
   );
 
-  private setupRangeSyncWithStorage(): void {
-    this.dateRangeCtrl.valueChanges.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((range) => {
-      // Ignore synchronization in case of view all mode
-      if (this._viewAllService.isViewAll) {
-        return;
-      }
-      const executionId = this._executionId();
-      if (!range || !executionId) {
-        return;
-      }
-      const start = range.start?.toMillis();
-      const end = range.end?.toMillis();
-      this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
-    });
-  }
-
   private setupDateRangeSyncOnExecutionRefresh(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
       if (this.isNotDefaultRangeSelected()) {
@@ -461,32 +418,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         this._aggregatedTreeWidgetState.init(root);
         this.isTreeInitialized = true;
       });
-  }
-
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRangeExt {
-    let start: DateTime;
-    let end: DateTime;
-    const relativeTime = this.relativeTime();
-
-    if (execution.endTime) {
-      const storedRange = useStorage ? this._executionStorage.getItem(rangeKey(execution.id!)) : undefined;
-      if (storedRange) {
-        const parsed = JSON.parse(storedRange) as { start?: number; end?: number };
-        start = DateTime.fromMillis(parsed.start ?? execution.startTime!);
-        end = DateTime.fromMillis(parsed.end ?? execution.endTime);
-      } else {
-        start = DateTime.fromMillis(execution.startTime!);
-        end = DateTime.fromMillis(execution.endTime);
-      }
-    } else if (relativeTime) {
-      end = DateTime.now();
-      start = end.set({ millisecond: end.millisecond - relativeTime });
-    } else {
-      start = DateTime.fromMillis(execution.startTime!);
-      end = DateTime.now();
-    }
-
-    return { start, end, isDefault: true };
   }
 
   relaunchExecution(): void {

@@ -17,8 +17,9 @@ import { map } from 'rxjs';
     {
       provide: VIEW_MODE,
       useFactory: () => {
-        const _activatedRoute = inject(ActivatedRoute);
-        return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
+        return ViewMode.PRINT;
+        // const _activatedRoute = inject(ActivatedRoute);
+        // return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
   ],
