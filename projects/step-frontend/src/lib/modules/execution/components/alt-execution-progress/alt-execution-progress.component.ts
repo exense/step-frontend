@@ -135,10 +135,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _plansApi = inject(AugmentedPlansService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
-  private _fb = inject(FormBuilder);
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
-  private _dateUtils = inject(DateUtilsService);
   private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
@@ -172,26 +170,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     if (!executionId) {
       return;
     }
-    // const start = range.start?.toMillis();
-    // const end = range.end?.toMillis();
     const context: ExecutionContext = {
       eId: executionId,
       timeRange: this.getTimeRange(),
     };
     this._executionStorage.saveExecutionContext(context);
   }
-
-  // readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
-
-  // private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
-  //   .pipe(takeUntilDestroyed())
-  //   .subscribe((range) => {
-  //     // Ignore synchronization in case of view all mode
-  //     if (this._viewAllService.isViewAll) {
-  //       return;
-  //     }
-  //     this.saveRangeToStorage(range);
-  //   });
 
   selectFullRange(): void {
     this.execution$.pipe(take(1)).subscribe((execution) => {

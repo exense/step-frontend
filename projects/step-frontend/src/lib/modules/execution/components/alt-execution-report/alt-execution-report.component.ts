@@ -37,8 +37,6 @@ export class AltExecutionReportComponent implements OnInit {
   protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
-  protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
-
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
 

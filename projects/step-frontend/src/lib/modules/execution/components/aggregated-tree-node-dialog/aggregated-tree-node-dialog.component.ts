@@ -1,10 +1,9 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ArtefactService, NAVIGATOR_QUERY_PARAMS_CLEANUP, ReportNode } from '@exense/step-core';
+import { ArtefactService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { Status } from '../../../_common/shared/status.enum';
 import { ActivatedRoute } from '@angular/router';
-import { ExecutionNavigatorQueryParamsCleanupService } from '../../services/execution-navigator-query-params-cleanup.service';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNode?: AggregatedTreeNode;
