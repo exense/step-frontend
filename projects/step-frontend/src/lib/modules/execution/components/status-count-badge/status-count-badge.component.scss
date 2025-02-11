@@ -1,0 +1,44 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+section {
+  border-radius: 1.6rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  padding: 0.3rem 1rem 0.3rem 0.3rem;
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+  font-weight: 500;
+  position: relative;
+  background: var(--statusColor);
+}
+
+.background {
+  background: var.$white;
+  border-radius: 1.6rem;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0.3;
+}
+
+.status-icon,
+.status-count {
+  color: var.$white;
+  z-index: 1;
+}
+
+.status-icon {
+  background: var(--statusColor);
+  border-radius: 1.6rem;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  step-icon {
+    @include core.step-icon-size(1.6rem);
+  }
+}

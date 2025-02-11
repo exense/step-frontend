@@ -26,6 +26,9 @@ step-alt-execution-tree {
 
   .tree-node {
     flex: 1;
+    .node-content {
+      align-items: flex-start !important;
+    }
   }
 
   .step-tree-node-container {
@@ -43,7 +46,7 @@ step-alt-execution-tree {
     display: flex;
     flex-wrap: nowrap;
     gap: 1rem;
-    align-items: center;
+    // align-items: center;
     width: 100%;
   }
 

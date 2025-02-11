@@ -1,17 +1,10 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
-import {
-  AbstractArtefact,
-  DynamicValueBoolean,
-  DynamicValueInteger,
-  DynamicValueString,
-} from '../../client/step-client-module';
+import { AbstractArtefact, DynamicValueString } from '../../client/step-client-module';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactFormChangeHelperService, ArtefactContext } from '../../modules/plan-common';
 import { Subscription } from 'rxjs';
-
-type SimpleValue = undefined | null | string | boolean | number;
-type PossibleField = SimpleValue | DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
+import { ArtefactFieldValue, ArtefactService, SimpleValue } from '../../services/artefact.service';
 
 @Component({
   template: '',
@@ -19,6 +12,7 @@ type PossibleField = SimpleValue | DynamicValueString | DynamicValueInteger | Dy
 export abstract class BaseArtefactComponent<T extends AbstractArtefact>
   implements CustomComponent, AfterViewInit, OnDestroy
 {
+  private _artefactService = inject(ArtefactService);
   protected _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
   protected abstract form: NgForm | FormGroup;
@@ -41,12 +35,12 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
     this._artefactFormChangeHelper.setupFormBehavior(form, () => this.context.save());
   }
 
-  protected determineEmptyGroup(fields: PossibleField[], emptyValues: SimpleValue[] = [undefined, null, '', 0, false]) {
-    const isDynamic = (field: PossibleField) =>
-      !!field && field.hasOwnProperty('dynamic') && field.hasOwnProperty('value') && field.hasOwnProperty('expression');
-
-    const extractValue = (field: PossibleField): SimpleValue => {
-      if (!isDynamic(field)) {
+  protected determineEmptyGroup(
+    fields: ArtefactFieldValue[],
+    emptyValues: SimpleValue[] = [undefined, null, '', 0, false],
+  ) {
+    const extractValue = (field: ArtefactFieldValue): SimpleValue => {
+      if (!this._artefactService.isDynamicValue(field)) {
         return field as SimpleValue;
       }
       const dynamicField = field as Omit<DynamicValueString, 'value'> & { value: SimpleValue };

@@ -1,16 +1,19 @@
-import { Component, HostBinding, Input, input, ViewEncapsulation } from '@angular/core';
+import { Component, input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'step-alt-report-widget',
   templateUrl: './alt-report-widget.component.html',
   styleUrl: './alt-report-widget.component.scss',
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[attr.title]': 'null',
+    '[class.overflow-content]': 'applyOverflow()',
+  },
 })
 export class AltReportWidgetComponent {
   /** @Input() **/
-  title = input<string>();
+  readonly title = input<string>();
 
-  @HostBinding('class.overflow-content')
-  @Input()
-  applyOverflow = false;
+  /** @Input() **/
+  readonly applyOverflow = input<boolean>(false);
 }

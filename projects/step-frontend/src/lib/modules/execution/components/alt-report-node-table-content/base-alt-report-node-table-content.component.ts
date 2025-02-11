@@ -12,7 +12,7 @@ import { AltReportNodesStateService } from '../../services/alt-report-nodes-stat
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, combineLatest } from 'rxjs';
 
-const VIEW_PAGE_SIZE = 10;
+const VIEW_PAGE_SIZE = 100;
 const PRINT_PAGE_SIZE = 50_000;
 
 @Component({

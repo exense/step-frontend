@@ -12,10 +12,10 @@ step-alt-report-node-summary {
   }
 
   .summary {
-    display: grid;
-    grid-template-columns: 99fr 1fr;
-    gap: 0.5rem;
+    display: flex;
     align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
     width: 100%;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { ArtefactService } from '../../services/artefact.service';
 import { ReportNode } from '../../client/step-client-module';
 
@@ -6,33 +6,45 @@ import { ReportNode } from '../../client/step-client-module';
   selector: 'step-report-node-icon',
   templateUrl: './report-node-icon.component.html',
   styleUrls: ['./report-node-icon.component.scss'],
+  host: {
+    '[class.round-box]': 'roundBox()',
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReportNodeIconComponent implements OnChanges {
+export class ReportNodeIconComponent {
   private _artefactTypes = inject(ArtefactService);
 
-  protected statusClass?: string;
-  protected icon?: string;
+  /** @Input() **/
+  readonly node = input<ReportNode | undefined>();
 
-  @Input() node?: ReportNode;
+  /** @Input() **/
+  readonly highlightStatus = input(true);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cNode = changes['node'];
-    if (cNode?.previousValue !== cNode?.currentValue) {
-      this.determineClassAndIcon(cNode?.currentValue);
-    }
-  }
+  /** @Input() **/
+  readonly roundBox = input(false);
 
-  private determineClassAndIcon(node?: ReportNode): void {
+  protected readonly icon = computed(() => {
+    const node = this.node();
     if (!node) {
-      this.statusClass = undefined;
-      this.icon = undefined;
-      return;
+      return undefined;
     }
+    return this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
+  });
 
-    const icon =
-      this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
+  protected readonly artefactClass = computed(() => {
+    const node = this.node();
+    if (!node) {
+      return '';
+    }
+    return node.resolvedArtefact?._class ?? '';
+  });
 
-    this.statusClass = `step-node-status-${node.status}`;
-    this.icon = icon;
-  }
+  protected readonly statusClass = computed(() => {
+    const node = this.node();
+    const highlightStatus = this.highlightStatus();
+    if (!node || !highlightStatus) {
+      return undefined;
+    }
+    return `step-node-status-${node.status}`;
+  });
 }

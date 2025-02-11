@@ -69,6 +69,8 @@ import { SelectExtraOptionsDirective } from './directives/select-extra-options.d
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
+import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
+import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 
 @NgModule({
   imports: [
@@ -79,6 +81,8 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     RouterModule,
     NgxMatSelectSearchModule,
     ElementResizeDirective,
+    OverflowTooltipDirective,
+    OverflowIndicatorDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -217,6 +221,8 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     ShortenNumberPipe,
     ElementResizeDirective,
     DynamicInputWidthDirective,
+    OverflowTooltipDirective,
+    OverflowIndicatorDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -341,3 +347,5 @@ export * from './components/select/select.component';
 export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
 export * from './directives/dynamic-input-width.directive';
+export * from './directives/overflow-indicator.directive';
+export * from './directives/overflow-tooltip.directive';

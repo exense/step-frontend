@@ -6,5 +6,8 @@ export const $AggregatedReportViewRequest = {
     range: {
       type: 'Range',
     },
+    resolveSingleInstanceReport: {
+      type: 'boolean',
+    },
   },
 } as const;
