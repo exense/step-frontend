@@ -2,7 +2,6 @@ import { Component, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildre
 import {
   COMMON_IMPORTS,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
   TimeSeriesConfig,
   TimeSeriesEntityService,
 } from '../../modules/_common';
@@ -11,6 +10,7 @@ import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component'
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { AuthService } from '@exense/step-core';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
 @Component({
   selector: 'step-analytics-page',

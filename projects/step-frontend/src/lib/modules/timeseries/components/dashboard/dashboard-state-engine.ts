@@ -1,9 +1,10 @@
 import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
+import { TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { TimeRangeType } from './time-range-type';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 
 export class DashboardStateEngine {
   private terminator$ = new Subject<void>();

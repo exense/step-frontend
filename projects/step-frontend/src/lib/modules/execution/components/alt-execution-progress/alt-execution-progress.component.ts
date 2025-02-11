@@ -57,10 +57,9 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { EXECUTION_ID } from '../../services/execution-id.token';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
-import { TimeRangePickerSelection, TimeSeriesConfig } from '../../../timeseries/modules/_common';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { TimeSeriesConfig } from '../../../timeseries/modules/_common';
 
 enum UpdateSelection {
   ALL = 'all',

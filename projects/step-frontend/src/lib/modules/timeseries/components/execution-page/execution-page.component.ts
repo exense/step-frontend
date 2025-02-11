@@ -16,8 +16,6 @@ import {
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
-  TimeRangePickerSelection,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -32,8 +30,9 @@ import {
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
-import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 
 @Component({
   selector: 'step-execution-page',

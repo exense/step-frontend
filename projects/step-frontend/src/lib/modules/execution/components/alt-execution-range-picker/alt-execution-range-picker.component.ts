@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 @Component({
   selector: 'step-alt-execution-range-picker',

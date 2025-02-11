@@ -35,8 +35,6 @@ import {
   FilterBarItem,
   FilterUtils,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
-  TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
@@ -64,6 +62,8 @@ import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 
 @Component({
   selector: 'step-timeseries-dashboard',
