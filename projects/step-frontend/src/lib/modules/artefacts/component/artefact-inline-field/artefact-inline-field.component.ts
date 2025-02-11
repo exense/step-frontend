@@ -17,7 +17,7 @@ export class ArtefactInlineFieldComponent {
       return '[unresolved]';
     }
     if (!item.value) {
-      return item.value;
+      return item.value as undefined;
     }
     if (item.value.dynamic) {
       return item.value.expression;
@@ -31,6 +31,8 @@ export class ArtefactInlineFieldComponent {
     }
     return value;
   });
+
+  protected readonly itemValueTooltip = computed(() => this.itemValue()?.toString() ?? '');
 
   protected readonly tooltipMessage = computed(() => {
     const label = this.item().label;

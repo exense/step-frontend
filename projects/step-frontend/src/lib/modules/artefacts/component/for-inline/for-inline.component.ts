@@ -26,7 +26,7 @@ export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact,
   }
 
   protected override getArtefactItems(
-    info?: AggregatedArtefactInfo<ForArtefact>,
+    info?: AggregatedArtefactInfo<ForArtefact, ForReportNode>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[]> {

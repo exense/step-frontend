@@ -12,7 +12,6 @@ step-table {
 
 .name {
   width: 100%;
-  white-space: nowrap;
   padding-left: 0;
 }
 
@@ -20,7 +19,13 @@ step-table {
   cursor: pointer;
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  flex-direction: column;
+  max-width: 60rem;
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 .sort-handler {

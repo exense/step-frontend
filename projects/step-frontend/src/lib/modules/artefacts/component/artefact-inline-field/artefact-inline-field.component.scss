@@ -10,30 +10,23 @@ step-artefact-inline-field > section {
 }
 
 step-artefact-inline-field {
-  section {
+  label,
+  span {
+    display: block;
     max-width: 10rem;
     overflow: hidden;
-
-    .ellipsis {
-      display: none;
-    }
-
-    &.step-overflow-indicator-has-overflow + .ellipsis::after {
-      display: block;
-      content: '...';
-    }
+    text-overflow: ellipsis;
   }
 
   & > step-icon.field-icon {
     @include core.step-icon-size(1.6rem);
   }
 
-  .resolved {
+  label {
     font-weight: bold;
   }
 
   .dynamic-resolved {
-    font-weight: bold;
     color: var.$dark-blue;
   }
 

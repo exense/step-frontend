@@ -10,8 +10,13 @@
 .details-trigger {
   cursor: pointer;
   display: flex;
-  align-items: center;
   gap: 0.5rem;
+  flex-direction: column;
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 step-table {
@@ -22,12 +27,6 @@ step-table {
     vertical-align: top;
     padding-top: 0.5rem !important;
   }
-}
-
-.name {
-  width: 100%;
-  white-space: nowrap;
-  padding-left: 0;
 }
 
 .actions {

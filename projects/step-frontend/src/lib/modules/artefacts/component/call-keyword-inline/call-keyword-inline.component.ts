@@ -20,43 +20,52 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     const ctx = this.currentContext();
     const aggregated = ctx?.aggregatedInfo;
     const reportNode = ctx?.reportInfo;
+    let result: ArtefactInlineItem[] | undefined = undefined;
     if (aggregated) {
-      return this.getAggregatedArtefactInputs(aggregated);
+      result = this.getAggregatedArtefactInputs(aggregated);
     } else if (reportNode) {
-      return this.getReportNodeInfoInputs(reportNode);
+      result = this.getReportNodeInfoInputs(reportNode);
     }
-    return [];
+    return !!result?.length ? result : undefined;
   });
 
   protected readonly outputItems = computed(() => {
     const ctx = this.currentContext();
+    const aggregated = ctx?.aggregatedInfo;
     const reportNode = ctx?.reportInfo;
-    if (reportNode) {
-      return this.getReportNodeInfoOutputs(reportNode);
+    let result: ArtefactInlineItem[] | undefined = undefined;
+    if (aggregated) {
+      result = this.getAggregatedArtefactOutputs(aggregated);
+    } else if (reportNode) {
+      result = this.getReportNodeInfoOutputs(reportNode);
     }
-    return [];
+    return !!result?.length ? result : undefined;
   });
 
   protected readonly attachmentsCountTooltip = computed(() => {
     const ctx = this.currentContext();
-    const reportNode = ctx?.reportInfo;
+    const reportNode = ctx?.aggregatedInfo?.singleInstanceReportNode ?? ctx?.reportInfo;
     const count = reportNode?.attachments?.length;
     return !count ? undefined : `${count} attachment(s)`;
   });
 
   protected readonly error = computed(() => {
     const ctx = this.currentContext();
-    const reportNode = ctx?.reportInfo;
+    const reportNode = ctx?.aggregatedInfo?.singleInstanceReportNode ?? ctx?.reportInfo;
     return reportNode?.error?.msg;
   });
 
   private getAggregatedArtefactInputs(
-    info?: AggregatedArtefactInfo<KeywordArtefact>,
+    info?: AggregatedArtefactInfo<KeywordArtefact, KeywordReportNode>,
   ): ArtefactInlineItem[] | undefined {
     if (!info?.originalArtefact) {
       return undefined;
     }
     const isResolved = this.isResolved(info);
+
+    if (info.singleInstanceReportNode) {
+      return this.getReportNodeInfoInputs(info.singleInstanceReportNode, isResolved);
+    }
 
     const keywordArgument = info.originalArtefact?.argument;
     let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
@@ -72,10 +81,25 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       value,
     ]);
 
-    return this.convert(inputs, isResolved, 'chevron-right', 'Input');
+    return this.convert(inputs, isResolved, 'log-in', 'Input');
   }
 
-  private getReportNodeInfoInputs(info?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+  private getAggregatedArtefactOutputs(
+    info?: AggregatedArtefactInfo<KeywordArtefact, KeywordReportNode>,
+  ): ArtefactInlineItem[] | undefined {
+    if (!info?.originalArtefact) {
+      return undefined;
+    }
+    const isResolved = this.isResolved(info);
+
+    if (info.singleInstanceReportNode) {
+      return this.getReportNodeInfoOutputs(info.singleInstanceReportNode, isResolved);
+    }
+
+    return undefined;
+  }
+
+  private getReportNodeInfoInputs(info?: KeywordReportNode, isResolved?: boolean): ArtefactInlineItem[] | undefined {
     if (!info?.input) {
       return undefined;
     }
@@ -89,10 +113,10 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       return undefined;
     }
     const inputValues: [string, string | undefined][] = Object.entries(inputParams).map(([key, value]) => [key, value]);
-    return this.convert(inputValues, undefined, 'chevron-right', 'Input');
+    return this.convert(inputValues, isResolved, 'log-in', 'Input');
   }
 
-  private getReportNodeInfoOutputs(info?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+  private getReportNodeInfoOutputs(info?: KeywordReportNode, isResolved?: boolean): ArtefactInlineItem[] | undefined {
     if (!info?.output) {
       return undefined;
     }
@@ -109,7 +133,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       key,
       value,
     ]);
-    return this.convert(outputValues, undefined, 'chevron-left', 'Output');
+    return this.convert(outputValues, isResolved, 'log-out', 'Output');
   }
 
   protected getItems(

@@ -45,6 +45,14 @@ export class AggregatedTreeStatusComponent {
       .filter((item) => !!item) as StatusItem[];
   });
 
+  protected singleStatus = computed(() => {
+    const items = this.statusItems();
+    if (items.length === 1 && items[0].count === 1) {
+      return items[0];
+    }
+    return undefined;
+  });
+
   protected handleClick(status: Status, event: MouseEvent): void {
     this.statusClick.emit({ status, event });
   }

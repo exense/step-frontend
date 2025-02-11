@@ -2,15 +2,24 @@
 @use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
+.etc-container,
 .error-container,
 :host {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+}
+
+:host {
+  flex-direction: column;
+  gap: 1rem;
 }
 
 step-icon {
   @include core.step-icon-size(1.6rem);
+}
+
+.error-container,
+.etc-container {
+  gap: 0.5rem;
 }
 
 .error-container {
@@ -19,7 +28,8 @@ step-icon {
   }
   div {
     overflow: hidden;
-    max-width: 20rem;
+    max-width: 100%;
     text-overflow: ellipsis;
+    white-space: break-spaces;
   }
 }

@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CustomComponent } from '../../modules/custom-registeries/custom-registries.module';
 import { ArtefactInlineItem } from './artefact-inline-item';
-import { AggregatedArtefactInfo } from '../../shared';
+import { AggregatedArtefactInfo, InlineArtefactContext, ReportNodeWithArtefact } from '../../shared';
 import { Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
@@ -13,16 +13,6 @@ import {
   ReportNode,
 } from '../../client/step-client-module';
 import { ArtefactService } from '../../services/artefact.service';
-
-interface ReportNodeWithArtefact<A extends AbstractArtefact> extends ReportNode {
-  resolvedArtefact?: A;
-}
-
-export interface InlineArtefactContext<A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>> {
-  aggregatedInfo?: AggregatedArtefactInfo<A>;
-  reportInfo?: R;
-  isVertical?: boolean;
-}
 
 @Component({
   template: '',
@@ -46,6 +36,10 @@ export abstract class BaseInlineArtefactComponent<
         return of(undefined);
       }
       const isResolved = this.isResolved(context?.aggregatedInfo);
+      if (context?.aggregatedInfo?.singleInstanceReportNode) {
+        const items = this.getReportNodeItems(context?.aggregatedInfo?.singleInstanceReportNode, context?.isVertical);
+        return of(items);
+      }
       return this.getArtefactItems(context?.aggregatedInfo, context?.isVertical, isResolved);
     }),
     takeUntilDestroyed(),
@@ -89,7 +83,7 @@ export abstract class BaseInlineArtefactComponent<
   }
 
   protected getArtefactItems(
-    info?: AggregatedArtefactInfo<A>,
+    info?: AggregatedArtefactInfo<A, R>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[] | undefined> {
@@ -100,7 +94,7 @@ export abstract class BaseInlineArtefactComponent<
     return of(this.getItems(artefact, isVertical, isResolved));
   }
 
-  protected isResolved(info?: AggregatedArtefactInfo<A>): boolean {
+  protected isResolved(info?: AggregatedArtefactInfo<A, R>): boolean {
     if (!info) {
       return false;
     }
