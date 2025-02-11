@@ -2,6 +2,8 @@ import { Component, computed, inject, input, output, ViewEncapsulation } from '@
 import { TimeRange } from '@exense/step-core';
 import { FilterBarItem, FilterBarItemType, StandaloneChartConfig } from '../../../timeseries/time-series.module';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-alt-report-performance-overview-chart',
@@ -10,6 +12,9 @@ import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
   encapsulation: ViewEncapsulation.None,
 })
 export class AltReportPerformanceOverviewChartComponent {
+  protected readonly _mode = inject(VIEW_MODE);
+  private _state = inject(AltExecutionStateService);
+
   protected readonly chartConfig: StandaloneChartConfig = {
     showTooltip: true,
     showLegend: true,
@@ -24,7 +29,6 @@ export class AltReportPerformanceOverviewChartComponent {
   };
 
   protected readonly metricKey = 'response-time';
-  protected readonly _mode = inject(VIEW_MODE);
 
   /** @Input() **/
   isFullRange = input<boolean>(true);
@@ -32,14 +36,13 @@ export class AltReportPerformanceOverviewChartComponent {
   /** @Input() **/
   executionId = input.required<string>();
 
-  /** @Input() **/
-  timeRange = input<TimeRange>();
-
   /** @Output() **/
   timeRangeChange = output<TimeRange>();
 
   /** @Output() **/
   fullRange = output();
+
+  activeTimeRange = this._state.timeRangeChange$.pipe(map((s) => s.absoluteSelection!));
 
   chartFilters = computed(() => {
     const executionId = this.executionId();

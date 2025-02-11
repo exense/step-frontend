@@ -2,6 +2,7 @@ import { computed, DestroyRef, inject, Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
+  BehaviorSubject,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
@@ -50,7 +51,7 @@ export abstract class AltReportNodesStateService {
 
   abstract readonly summary$: Observable<ReportNodeSummary>;
 
-  readonly dateRange$ = this._executionState.dateRange$;
+  readonly dateRange$ = this._executionState.timeRangeChange$;
 
   readonly statuses = REPORT_NODE_STATUS;
 

@@ -51,7 +51,6 @@ export class PlanModule {
       },
       canActivate: [
         () => {
-          console.log('PLANS CAN ACTIVATE');
           return true;
         },
       ],

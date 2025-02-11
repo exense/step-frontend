@@ -7,12 +7,12 @@
     }
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
-    @if (timeRange(); as range) {
+    @if (activeTimeRange | async; as range) {
       <step-standalone-dashlet
         [metricKey]="metricKey"
         [config]="chartConfig"
         [filters]="chartFilters()"
-        [timeRange]="range"
+        [timeRange]="range!"
         (zoomChange)="timeRangeChange.emit($event)"
         [class.print]="_mode === ViewMode.PRINT"
       />

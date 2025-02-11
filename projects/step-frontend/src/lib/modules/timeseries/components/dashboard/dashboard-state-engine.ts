@@ -1,9 +1,10 @@
 import { defaultIfEmpty, forkJoin, merge, Observable, of, skip, Subject, switchMap, takeUntil, tap } from 'rxjs';
-import { TimeRangePickerSelection, TimeSeriesUtils } from '../../modules/_common';
+import { TimeSeriesUtils } from '../../modules/_common';
 import { TimeRange, TimeRangeSelection, TimeSeriesAPIResponse } from '@exense/step-core';
 import { DashboardState } from './dashboard-state';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { TimeRangeType } from './time-range-type';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 
 export class DashboardStateEngine {
   private terminator$ = new Subject<void>();
@@ -43,7 +44,7 @@ export class DashboardStateEngine {
     }
     const timeRangeSettings = state.context.getTimeRangeSettings();
     const now = new Date().getTime() - 5000;
-    switch (timeRangeSettings.type) {
+    switch (timeRangeSettings.pickerSelection.type) {
       case 'FULL':
         if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
           timeRangeSettings.fullRange.to = now;
@@ -52,11 +53,11 @@ export class DashboardStateEngine {
       case 'ABSOLUTE':
         break;
       case 'RELATIVE':
-        const isFullTimeSelection = TimeSeriesUtils.intervalsEqual(
+        const isFullTimeSelection = TimeSeriesUtils.timeRangesEqual(
           timeRangeSettings.selectedRange,
           timeRangeSettings.fullRange,
         );
-        const fullRange = { from: now - timeRangeSettings.relativeSelection!.timeInMs, to: now };
+        const fullRange = { from: now - timeRangeSettings.pickerSelection.relativeSelection!.timeInMs, to: now };
         timeRangeSettings.fullRange = fullRange;
         if (isFullTimeSelection) {
           timeRangeSettings.selectedRange = { ...timeRangeSettings.fullRange };
@@ -113,7 +114,10 @@ export class DashboardStateEngine {
           to: oldSettings.defaultFullRange?.to || new Date().getTime(),
         };
         newSettings = {
-          type: TimeRangeType.FULL,
+          pickerSelection: {
+            type: TimeRangeType.FULL,
+            absoluteSelection: fullRange,
+          },
           defaultFullRange: oldSettings.defaultFullRange,
           fullRange: fullRange,
           selectedRange: fullRange,
@@ -121,7 +125,10 @@ export class DashboardStateEngine {
         break;
       case 'ABSOLUTE':
         newSettings = {
-          type: TimeRangeType.ABSOLUTE,
+          pickerSelection: {
+            type: TimeRangeType.ABSOLUTE,
+            absoluteSelection: params.selection.absoluteSelection!,
+          },
           defaultFullRange: oldSettings.defaultFullRange,
           fullRange: params.selection.absoluteSelection!,
           selectedRange: params.selection.absoluteSelection!,
@@ -132,11 +139,13 @@ export class DashboardStateEngine {
         const now = new Date().getTime();
         const from = now - relativeSelection!.timeInMs!;
         newSettings = {
-          type: TimeRangeType.RELATIVE,
+          pickerSelection: {
+            type: TimeRangeType.RELATIVE,
+            relativeSelection: relativeSelection,
+          },
           defaultFullRange: oldSettings.defaultFullRange,
           fullRange: { from: from, to: now },
           selectedRange: { from: from, to: now },
-          relativeSelection: relativeSelection,
         };
         break;
     }
