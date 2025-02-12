@@ -3,14 +3,14 @@
     @if (_state.testCases$ | async) {
       <step-alt-report-nodes-testcases
         class="widget"
-        [style.--colSpan]="3"
+        [style.--colSpan]="9"
         (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)"
       />
     }
     @if (testCasesSummary$ | async; as testCasesSummary) {
       <step-alt-report-node-summary
-        class="widget"
-        [style.--colSpan]="1"
+        class="widget chart"
+        [style.--colSpan]="3"
         title="Summary: Testcases"
         [summary]="testCasesSummary"
       />
@@ -18,26 +18,26 @@
   }
   @if (keywordsSummary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary
-      class="widget"
-      [style.--colSpan]="1"
+      class="widget chart"
+      [style.--colSpan]="3"
       title="Summary: Keyword Calls"
       [summary]="keywordsSummary"
     />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget class="widget" [style.--colSpan]="3" />
+    <step-alt-execution-tree-widget class="widget" [style.--colSpan]="9" />
   }
   @if (_mode === ViewMode.VIEW) {
     <step-alt-report-node-keywords
       class="keywords widget"
-      [style.--colSpan]="3"
+      [style.--colSpan]="9"
       (openKeywordInTreeView)="handleOpenNodeInTreeView($event)"
     />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
-      class="widget"
-      [style.--colSpan]="1"
+      class="widget chart"
+      [style.--colSpan]="3"
       [executionId]="executionId"
       [timeRange]="(_state.timeRange$ | async)!"
       (timeRangeChange)="_state.updateRange($event)"
@@ -46,7 +46,7 @@
     />
   }
   @if (_state.currentOperations$ | async; as currentOperations) {
-    <step-alt-report-current-operations [operations]="currentOperations" class="widget" [style.--colSpan]="1" />
+    <step-alt-report-current-operations [operations]="currentOperations" class="widget chart" [style.--colSpan]="3" />
   }
   @if (_state.execution$ | async; as execution) {
     @for (panel of customPanels; track panel.type) {
