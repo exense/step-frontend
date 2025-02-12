@@ -20,13 +20,9 @@ step-alt-execution-report {
         @include single-col-view;
       }
 
-      .widget.chart {
-        min-width: 30rem;
-      }
-
       &:not(.small-screen) {
         width: 100%;
-        grid-template-columns: repeat(12, 1fr);
+        grid-template-columns: repeat(4, 1fr);
 
         .widget {
           grid-column: span var(--colSpan, 1);
