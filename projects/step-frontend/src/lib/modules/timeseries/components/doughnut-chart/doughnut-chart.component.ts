@@ -1,18 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  effect,
-  ElementRef,
-  input,
-  Input,
-  OnChanges,
-  OnDestroy,
-  signal,
-  SimpleChanges,
-  TemplateRef,
-  viewChild,
-  ViewChild,
-} from '@angular/core';
+import { Component, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
 import { DoughnutChartSettings } from './doughnut-chart-settings';
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -27,32 +13,22 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   standalone: true,
 })
 export class DoughnutChartComponent implements OnDestroy {
-  settings = input<DoughnutChartSettings>({ items: [] });
-  canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
-  // @ViewChild('canvas') private canvas!: ElementRef<HTMLCanvasElement>;
+  /** @Input() **/
+  readonly settings = input.required<DoughnutChartSettings>();
+
+  /** @ViewChild() **/
+  private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+
   private chart: Chart | undefined;
 
-  // ngAfterViewInit(): void {
-  //   if (this.settings) {
-  //     this.chart = this.createChart();
-  //   }
-  // }
-
-  effect = effect(() => {
+  private effectRecreateChart = effect(() => {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
-      this.createChart(settings, canvas);
+      this.chart?.destroy();
+      this.chart = this.createChart(settings, canvas);
     }
   });
-
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   const settings = changes['settings'];
-  //   if (settings && this.canvas) {
-  //     this.chart?.destroy();
-  //     this.createChart();
-  //   }
-  // }
 
   private createChart(settings: DoughnutChartSettings, canvas: ElementRef<HTMLCanvasElement>): Chart {
     return new Chart(canvas.nativeElement, {

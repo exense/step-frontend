@@ -39,6 +39,9 @@ export class PlanNodeDetailsDialogComponent {
       .getReportNodeRootPlan(node.id!)
       .pipe(
         map((plan) => {
+          if (!plan) {
+            throw `Plan for current report node doesn't exist.`;
+          }
           let url = this._commonEntitiesUrls.planEditorUrl(plan)!;
           url = `${url}?artefactId=${node.artefactID!}`;
           return url;

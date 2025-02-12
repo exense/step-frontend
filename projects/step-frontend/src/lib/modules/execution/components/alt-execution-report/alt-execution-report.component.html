@@ -4,14 +4,17 @@
       <step-alt-report-node-summary title="Summary: Testcases" [summary]="testCasesSummary" />
     }
     @if (_state.testCases$ | async) {
-      <step-alt-report-nodes-testcases (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)" />
+      <step-alt-report-nodes-testcases
+        (reportNodeClick)="handleOpenNodeInTreeWidget($event)"
+        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
+      />
     }
   }
   @if (keywordsSummary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary title="Summary: Keyword Calls" [summary]="keywordsSummary" />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget />
+    <step-alt-execution-tree-widget #treeWidget />
   }
   @if (_state.executionId$ | async; as executionId) {
     <step-alt-report-performance-overview-chart
@@ -23,7 +26,7 @@
     />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreeView($event)" />
+    <step-alt-report-node-keywords class="keywords" (openKeywordInTreeView)="handleOpenNodeInTreePage($event)" />
   }
   @if (_state.currentOperations$ | async; as currentOperations) {
     <step-alt-report-current-operations [operations]="currentOperations" />

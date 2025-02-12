@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, viewChild } from '@angular/core';
 import { TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
+import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -20,4 +21,11 @@ import {
     },
   ],
 })
-export class AltExecutionTreeWidgetComponent {}
+export class AltExecutionTreeWidgetComponent {
+  /** @ViewChild **/
+  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+
+  focusNode(nodeId: string): void {
+    this.tree()?.focusNode(nodeId);
+  }
+}

@@ -1,16 +1,19 @@
-import { Component, computed, effect, inject, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { VIEW_MODE } from '../../shared/view-mode';
 import { STATUS_COLORS } from '@exense/step-core';
 import {
   DoughnutChartItem,
   DoughnutChartSettings,
 } from '../../../timeseries/components/doughnut-chart/doughnut-chart-settings';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'step-alt-report-node-summary',
   templateUrl: './alt-report-node-summary.component.html',
   styleUrl: './alt-report-node-summary.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
 export class AltReportNodeSummaryComponent {
@@ -18,12 +21,10 @@ export class AltReportNodeSummaryComponent {
   protected readonly _mode = inject(VIEW_MODE);
 
   /** @Input() **/
-  title = input('');
+  readonly title = input('');
 
   /** @Input() **/
-  summary = input.required<ReportNodeSummary>();
-
-  chartSettings: DoughnutChartSettings | undefined;
+  readonly summary = input.required<ReportNodeSummary>();
 
   protected readonly legend = computed(() => {
     const summary = this.summary();
@@ -40,8 +41,15 @@ export class AltReportNodeSummaryComponent {
     return items;
   });
 
+  private summaryDistinct = toSignal(
+    toObservable(this.summary).pipe(
+      distinctUntilChanged((previous, current) => this.areSummariesEqual(previous, current)),
+    ),
+  );
+
   private dictionary = computed(() => {
-    const summary = this.summary();
+    const summary = this.summaryDistinct();
+
     if (!summary?.total) {
       return {
         ['EMPTY']: { value: 100, percent: 100 },
@@ -60,11 +68,12 @@ export class AltReportNodeSummaryComponent {
     );
   });
 
-  private updateChartEffect = effect(() => {
+  protected readonly chartSettings = computed<DoughnutChartSettings | undefined>(() => {
     const dictionary = this.dictionary();
+    const total = this.summaryDistinct()?.total ?? 0;
 
     if (!dictionary) {
-      return;
+      return undefined;
     }
 
     const items: DoughnutChartItem[] = Object.entries(this._statusColors)
@@ -74,14 +83,36 @@ export class AltReportNodeSummaryComponent {
       })
       .filter((item) => item.value > 0);
 
-    this.chartSettings = {
+    return {
       items: items,
-      total: this.summary().total,
+      total,
       viewMode: this._mode,
     };
   });
 
   private calcPercent(count: number, total: number): number {
     return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);
+  }
+
+  private areSummariesEqual(a?: ReportNodeSummary, b?: ReportNodeSummary): boolean {
+    if (a === b) {
+      return true;
+    }
+    if ((!!a && !b) || (!a && !!b)) {
+      return false;
+    }
+    const keysA = Object.keys(a!);
+    const keysB = Object.keys(b!);
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+
+    for (const key of keysA) {
+      if (a![key] !== b![key]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
