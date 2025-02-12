@@ -161,7 +161,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private timeRangeSelection$: BehaviorSubject<TimeRangePickerSelection> =
     new BehaviorSubject<TimeRangePickerSelection>(undefined!);
 
-  readonly timeRangeChange$ = this.timeRangeSelection$.asObservable().pipe(skip(1), shareReplay(1));
+  readonly timeRangePickerChange$ = this.timeRangeSelection$.asObservable().pipe(skip(1), shareReplay(1));
 
   private isTreeInitialized = false;
 
@@ -316,33 +316,79 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   ngOnInit(): void {
-    this.timeRangeChange$.subscribe((x) => this.saveContextToStorage());
-
-    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
-      this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: execution.endTime || 0 };
+    this.timeRangePickerChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
+      // update URL every time the page is accessed
+      this.saveContextToStorage();
+      this._urlParamsService.updateUrlParams(timeRange);
     });
-
-    this.setupDateRangeSyncOnExecutionRefresh();
     this.setupTreeRefresh();
 
-    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    combineLatest([this.execution$, isIgnoreFilter$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, isIgnoreFilter]) => {
-        const urlParams = this._urlParamsService.collectUrlParams();
-        if (urlParams.timeRange) {
-          // url params take priority
-          this.updateTimeRangeSelection(urlParams.timeRange);
-        } else {
-          const existingContext = this._executionStorage.getExecutionContext(execution.id!);
-          if (existingContext) {
-            this.updateTimeRangeSelection(existingContext.timeRange);
-          } else {
-            this.applyDefaultRange(execution);
-          }
-        }
-        this._urlParamsService.updateUrlParams(this.getTimeRange());
-      });
+    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
+      console.log('EXECUTION', execution.id);
+      // called on auto-refresh
+      const endTime = execution.endTime || new Date().getTime();
+      this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: endTime };
+      const activeTimeRangeSelection = this.timeRangeSelection$.getValue();
+      console.log('FIRST RUN: ', !activeTimeRangeSelection);
+      if (!activeTimeRangeSelection) {
+        // first run
+        this.initTimeRangeSelection(execution);
+      } else {
+        // auto-refresh
+        this.handleAutoRefresh(execution);
+      }
+    });
+
+    // const isIgnoreFilter$ = this._viewAllService.isViewAll$;
+    // combineLatest([this.execution$, isIgnoreFilter$])
+    //   .pipe(takeUntilDestroyed(this._destroyRef))
+    //   .subscribe(([execution, isIgnoreFilter]) => {
+    //     console.log('UPDATING URL PARAMS');
+    //     const urlParams = this._urlParamsService.collectUrlParams();
+    //     if (urlParams.timeRange) {
+    //       // url params take priority
+    //       this.updateTimeRangeSelection(urlParams.timeRange);
+    //     } else {
+    //       const existingContext = this._executionStorage.getExecutionContext(execution.id!);
+    //       if (existingContext) {
+    //         this.updateTimeRangeSelection(existingContext.timeRange);
+    //       } else {
+    //         this.applyDefaultRange(execution);
+    //       }
+    //     }
+    //     this._urlParamsService.updateUrlParams(this.getTimeRange());
+    //   });
+  }
+
+  handleAutoRefresh(execution: Execution) {
+    const activeTimeRangeSelection = this.timeRangeSelection$.getValue()!;
+    switch (activeTimeRangeSelection.type) {
+      case 'FULL':
+        activeTimeRangeSelection.absoluteSelection!.to = execution.endTime || new Date().getTime();
+        this.updateTimeRangeSelection({ ...activeTimeRangeSelection });
+        break;
+      case 'ABSOLUTE':
+        // do nothing
+        break;
+      case 'RELATIVE':
+        this.updateTimeRangeSelection({ ...activeTimeRangeSelection });
+        break;
+    }
+  }
+
+  initTimeRangeSelection(execution: Execution) {
+    const urlParams = this._urlParamsService.collectUrlParams();
+    if (urlParams.timeRange) {
+      // url params take priority
+      this.updateTimeRangeSelection(urlParams.timeRange);
+    } else {
+      const existingContext = this._executionStorage.getExecutionContext(execution.id!);
+      if (existingContext) {
+        this.updateTimeRangeSelection(existingContext.timeRange);
+      } else {
+        this.applyDefaultRange(execution);
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -350,21 +396,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.testCasesDataSource?.destroy();
   }
 
-  private isNotDefaultRangeSelected = toSignal(
-    this.timeRangeSelection$.pipe(map((range) => !!range && range.type !== 'FULL')),
-  );
-
-  private setupDateRangeSyncOnExecutionRefresh(): void {
-    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
-      if (this.isNotDefaultRangeSelected()) {
-        return;
-      }
-      this.applyDefaultRange(execution);
-    });
-  }
-
   private setupTreeRefresh(): void {
-    combineLatest([this.executionId$, this.timeRangeChange$])
+    combineLatest([this.executionId$, this.timeRangePickerChange$])
       .pipe(
         switchMap(([executionId, timeSelection]) => {
           if (timeSelection.type === 'FULL') {
@@ -393,7 +426,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private applyDefaultRange(execution: Execution, useStorage = false): void {
-    const fullRange = { from: execution.startTime!, to: execution.endTime || 0 };
+    const fullRange = { from: execution.startTime!, to: execution.endTime || new Date().getTime() };
     const fullRangeOption: TimeRangePickerSelection = { type: 'FULL', absoluteSelection: fullRange };
     this.updateTimeRangeSelection(fullRangeOption);
   }

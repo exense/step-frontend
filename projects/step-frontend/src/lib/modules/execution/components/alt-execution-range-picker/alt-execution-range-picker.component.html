@@ -1,5 +1,5 @@
 <step-time-range-picker
-  [activeSelection]="(_state.timeRangeChange$ | async)!"
+  [activeSelection]="(_state.timeRangePickerChange$ | async)!"
   [selectOptions]="_state.timeRangeOptions"
   (selectionChange)="handleSelectionChange($event)"
 />

@@ -29,30 +29,16 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 export class DoughnutChartComponent implements OnDestroy {
   settings = input<DoughnutChartSettings>({ items: [] });
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
-  // @ViewChild('canvas') private canvas!: ElementRef<HTMLCanvasElement>;
   private chart: Chart | undefined;
-
-  // ngAfterViewInit(): void {
-  //   if (this.settings) {
-  //     this.chart = this.createChart();
-  //   }
-  // }
 
   effect = effect(() => {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
-      this.createChart(settings, canvas);
+      this.chart?.destroy();
+      this.chart = this.createChart(settings, canvas);
     }
   });
-
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   const settings = changes['settings'];
-  //   if (settings && this.canvas) {
-  //     this.chart?.destroy();
-  //     this.createChart();
-  //   }
-  // }
 
   private createChart(settings: DoughnutChartSettings, canvas: ElementRef<HTMLCanvasElement>): Chart {
     return new Chart(canvas.nativeElement, {

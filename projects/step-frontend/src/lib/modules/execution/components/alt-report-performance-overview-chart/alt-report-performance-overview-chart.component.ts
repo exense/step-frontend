@@ -42,7 +42,7 @@ export class AltReportPerformanceOverviewChartComponent {
   /** @Output() **/
   fullRange = output();
 
-  activeTimeRange = this._state.timeRangeChange$.pipe(map((s) => s.absoluteSelection!));
+  activeTimeRange = this._state.timeRangePickerChange$.pipe(map((s) => s.absoluteSelection!));
 
   chartFilters = computed(() => {
     const executionId = this.executionId();

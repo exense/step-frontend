@@ -1,27 +1,28 @@
 import { inject, Injectable } from '@angular/core';
-import { ActiveExecutionsService } from './active-executions.service';
-import { BehaviorSubject, filter, map, of, shareReplay, switchMap } from 'rxjs';
+import { ActiveExecution, ActiveExecutionsService } from './active-executions.service';
+import { BehaviorSubject, filter, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Execution } from '@exense/step-core';
 
 @Injectable()
 export class ActiveExecutionContextService {
-  private _activeExecutions = inject(ActiveExecutionsService);
+  private _activeExecutionsService = inject(ActiveExecutionsService);
 
   private executionIdInternal$ = new BehaviorSubject<string>('');
 
-  readonly executionId$ = this.executionIdInternal$.pipe(
+  readonly executionId$: Observable<string> = this.executionIdInternal$.pipe(
     filter((id) => !!id),
     takeUntilDestroyed(),
   );
 
-  readonly activeExecution$ = this.executionId$.pipe(
-    map((id) => this._activeExecutions.getActiveExecution(id)),
+  readonly activeExecution$: Observable<ActiveExecution> = this.executionId$.pipe(
+    map((id) => this._activeExecutionsService.getActiveExecution(id)),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
-  readonly execution$ = this.executionId$.pipe(
-    map((id) => this._activeExecutions.getActiveExecution(id)),
+  readonly execution$: Observable<Execution> = this.executionId$.pipe(
+    map((id) => this._activeExecutionsService.getActiveExecution(id)),
     switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -29,7 +30,7 @@ export class ActiveExecutionContextService {
 
   manualRefresh(): void {
     const executionId = this.executionIdInternal$.value;
-    this._activeExecutions.getActiveExecution(executionId)?.manualRefresh();
+    this._activeExecutionsService.getActiveExecution(executionId)?.manualRefresh();
   }
 
   setupExecutionId(executionId: string): void {

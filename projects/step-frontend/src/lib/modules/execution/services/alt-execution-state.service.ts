@@ -4,7 +4,7 @@ import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 export abstract class AltExecutionStateService {
-  abstract readonly timeRangeChange$: Observable<TimeRangePickerSelection>;
+  abstract readonly timeRangePickerChange$: Observable<TimeRangePickerSelection>;
   abstract timeRangeOptions: TimeRangePickerSelection[];
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;

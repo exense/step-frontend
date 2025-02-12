@@ -41,7 +41,7 @@ export class AltExecutionReportComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this._state.timeRangeChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
+    this._state.timeRangePickerChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
       // update URL every time the page is accessed
       this._urlParamsService.updateUrlParams(timeRange);
     });
