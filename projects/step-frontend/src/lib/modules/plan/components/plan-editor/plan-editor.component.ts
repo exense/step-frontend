@@ -1,15 +1,15 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import { PurePlanContextApiService } from '../../injectables/pure-plan-context-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import {
   Plan,
-  PlanContextApiService,
   PlanEditorService,
   ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SchedulerInvokerService } from '../../../execution/execution.module';
 
 @Component({
   selector: 'step-plan-editor',
@@ -17,12 +17,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./plan-editor.component.scss'],
   providers: [
     {
-      provide: PlanContextApiService,
-      useExisting: PurePlanContextApiService,
+      provide: SchedulerInvokerService,
+      useExisting: forwardRef(() => PlanEditorComponent),
     },
   ],
 })
-export class PlanEditorComponent implements OnInit {
+export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
   private _destroyRef = inject(DestroyRef);
   private _cd = inject(ChangeDetectorRef);
   private _purePlanContextApi = inject(PurePlanContextApiService);
@@ -43,7 +43,11 @@ export class PlanEditorComponent implements OnInit {
       .subscribe(() => this._cd.detectChanges());
   }
 
-  handleTaskSchedule(task: ExecutiontTaskParameters): void {
+  launchPlan(): void {
+    this._router.navigate(['.', 'launch'], { relativeTo: this._activatedRoute });
+  }
+
+  openScheduler(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate(['.', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
   }

@@ -18,7 +18,7 @@ step-execution-actions {
 }
 
 @include common.custom-menu('execution-content');
-$menu-selector: common.custom-menu-selector('execution-content');
+$menu-selector: common.custom-menu-item-selector('execution-content');
 
 #{$menu-selector} {
   .execution-params-popover {

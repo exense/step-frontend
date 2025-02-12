@@ -39,7 +39,7 @@ export class AltExecutionTabsService {
     return {
       id,
       label,
-      link: link ?? id,
+      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
     };
   }
 }

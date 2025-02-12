@@ -10,7 +10,15 @@ import { EchoReportNode } from '../../types/echo.report-node';
   styleUrl: './echo-inline.component.scss',
 })
 export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoArtefact, EchoReportNode> {
-  protected getReportNodeItems(info?: EchoReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+  protected getItems(
+    artefact?: EchoArtefact,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] | undefined {
+    return undefined;
+  }
+
+  protected override getReportNodeItems(info?: EchoReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
     const echo = info?.echo;
     if (!echo) {
       return undefined;
@@ -18,7 +26,7 @@ export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoArtefac
     return this.convert([['Text', echo]]);
   }
 
-  protected getArtefactItems(
+  protected override getArtefactItems(
     reportView?: AggregatedArtefactInfo<EchoArtefact>,
     isVertical?: boolean,
     isResolved: boolean = false,

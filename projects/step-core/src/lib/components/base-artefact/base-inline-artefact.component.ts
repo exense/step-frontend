@@ -13,7 +13,11 @@ import {
   ReportNode,
 } from '../../client/step-client-module';
 
-export interface InlineArtefactContext<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
+interface ReportNodeWithArtefact<A extends AbstractArtefact> extends ReportNode {
+  resolvedArtefact?: A;
+}
+
+export interface InlineArtefactContext<A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>> {
   aggregatedInfo?: AggregatedArtefactInfo<A>;
   reportInfo?: R;
   isVertical?: boolean;
@@ -22,8 +26,10 @@ export interface InlineArtefactContext<A extends AbstractArtefact, R extends Rep
 @Component({
   template: '',
 })
-export abstract class BaseInlineArtefactComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode>
-  implements CustomComponent
+export abstract class BaseInlineArtefactComponent<
+  A extends AbstractArtefact,
+  R extends ReportNode = ReportNodeWithArtefact<A>,
+> implements CustomComponent
 {
   private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
   protected info = computed(() => this.contextInternal()?.aggregatedInfo);
@@ -46,7 +52,7 @@ export abstract class BaseInlineArtefactComponent<A extends AbstractArtefact, R 
     const ctx = this.contextInternal();
     const reportInfo = ctx?.reportInfo;
     const isVertical = ctx?.isVertical;
-    if (!reportInfo || !this.getReportNodeItems) {
+    if (!reportInfo) {
       return undefined;
     }
     return this.getReportNodeItems(reportInfo, isVertical);
@@ -64,13 +70,31 @@ export abstract class BaseInlineArtefactComponent<A extends AbstractArtefact, R 
     this.contextInternal.set(currentContext);
   }
 
-  protected abstract getReportNodeItems?(info?: R, isVertical?: boolean): ArtefactInlineItem[] | undefined;
+  protected abstract getItems(
+    artefact?: A,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] | undefined;
 
-  protected abstract getArtefactItems(
+  protected getReportNodeItems(info?: R, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+    const artefact = info?.resolvedArtefact as A;
+    if (!artefact) {
+      return undefined;
+    }
+    return this.getItems(artefact, isVertical, true);
+  }
+
+  protected getArtefactItems(
     info?: AggregatedArtefactInfo<A>,
     isVertical?: boolean,
     isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[] | undefined>;
+  ): Observable<ArtefactInlineItem[] | undefined> {
+    const artefact = info?.originalArtefact;
+    if (!artefact) {
+      return of(undefined);
+    }
+    return of(this.getItems(artefact, isVertical, isResolved));
+  }
 
   private isResolved(info?: AggregatedArtefactInfo<A>): boolean {
     if (!info) {

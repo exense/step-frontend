@@ -1,0 +1,45 @@
+@if (node(); as node) {
+  @if (artefactClass() === 'CallKeyword') {
+    <step-report-node-artefact-details [reportInfo]="node" />
+  } @else {
+    <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
+    <!--Assertion errors-->
+    @if (children(); as children) {
+      @if (children.length) {
+        <section>
+          <label>Errors</label>
+          <div>
+            @for (child of children; track child.id) {
+              <step-report-node-error [node]="child" />
+            }
+          </div>
+        </section>
+      }
+    }
+    <!--Error-->
+    @if (node.error; as err) {
+      <section>
+        <label>Error</label>
+        <div>
+          {{ err.msg }}
+          {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
+        </div>
+      </section>
+    }
+    <!--Attachments-->
+    @if (!!node.attachments?.length) {
+      <section>
+        <step-attachments-preview [attachments]="node.attachments" />
+      </section>
+    }
+    <!--Details-->
+    <section>
+      <step-report-node [reportNodeId]="node.id" [showArtefact]="showArtefact()" />
+    </section>
+    <hr />
+    <section class="footer">
+      <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
+      <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
+    </section>
+  }
+}

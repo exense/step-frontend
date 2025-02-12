@@ -1,0 +1,59 @@
+@if (operation(); as operation) {
+  @if (!showOnlyDetails()) {
+    <strong>{{ operation.name }}</strong>
+  }
+  <div class="details">
+    @switch (operation.name) {
+      @case (SpecificOperations.KEYWORD_CALL) {
+        @if (operation?.details[0]; as detailsName) {
+          <div>{{ detailsName.name }}</div>
+        }
+        @if (operation?.details[1]; as detailsId) {
+          <small>{{ detailsId.id }}</small>
+        }
+        @if (operation?.details[2]; as detailsUrl) {
+          <small>{{ detailsUrl.agentUrl }}</small>
+        }
+      }
+      @case (SpecificOperations.QUOTA_ACQUISITION) {
+        @if (operation?.details) {
+          <small>ID: {{ operation!.details!.id }}({{ operation!.details!.permits }})</small>
+        }
+        @if (operation?.details?.description; as description) {
+          <small>{{ operation!.details!.description }})</small>
+        }
+      }
+      @case (SpecificOperations.TOKEN_SELECTION) {
+        @if (operation?.details; as details) {
+          <small>
+            <label>Criteria: </label>
+            @for (item of details | keyvalue; track item.key) {
+              <span
+                ><strong>{{ item.key }}=</strong>{{ $any(item.value).selectionPattern }}</span
+              >
+            }
+          </small>
+        }
+      }
+      @case (SpecificOperations.WAITING_FOR_LOCK) {
+        @if (operation?.details; as lockName) {
+          <small>Lock name: {{ lockName }}</small>
+        }
+      }
+      @case (SpecificOperations.WAITING_FOR_GLOBAL_LOCK) {
+        @if (operation?.details; as lockName) {
+          <small>Lock name: {{ lockName }}</small>
+        }
+      }
+      @default {
+        @if (!isObject()) {
+          <small>{{ operation?.details }}</small>
+        } @else {
+          @for (item of operation!.details! | keyvalue; track item.key) {
+            <small>{{ item.key }}: {{ item.value }}</small>
+          }
+        }
+      }
+    }
+  </div>
+}

@@ -1,4 +1,7 @@
 step-execution-commands {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   step-execution-actions step-btn-group {
     justify-content: space-between;
   }
