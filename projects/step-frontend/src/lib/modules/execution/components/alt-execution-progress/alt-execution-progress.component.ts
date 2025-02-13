@@ -61,6 +61,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { EXECUTION_ID } from '../../services/execution-id.token';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
 import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
+import { Status } from '../../../_common/step-common.module';
 
 const rangeKey = (executionId: string) => `${executionId}_range`;
 
@@ -340,6 +341,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
   readonly errorsDataSource$ = of(this.errorsDataSource);
+  readonly availableErrorTypes$ = this.errorsDataSource.allData$.pipe(
+    map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+    map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly currentOperations$ = this.execution$.pipe(
     map((execution) => {

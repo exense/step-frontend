@@ -1,6 +1,6 @@
 export interface TimeSeriesErrorEntry {
   errorMessage: string;
-  errorCode: string;
+  errorCode: number;
   count: number;
   percentage: number;
   executionIds: string[];

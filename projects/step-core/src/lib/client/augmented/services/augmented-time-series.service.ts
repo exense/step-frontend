@@ -89,13 +89,19 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
 
         return result;
       }),
-      tap((result) => console.log('RESULT', result)),
     );
   }
 
   createErrorsDataSource(): TableFetchLocalDataSource<TimeSeriesErrorEntry> {
-    return new TableFetchLocalDataSource((request?: TimeSeriesErrorsRequest) =>
-      !request ? of([]) : this.findErrors(request),
+    return new TableFetchLocalDataSource(
+      (request?: TimeSeriesErrorsRequest) => (!request ? of([]) : this.findErrors(request)),
+      TableFetchLocalDataSource.configBuilder<TimeSeriesErrorEntry>()
+        .addSearchNumberPredicate('errorCode', (item) => item.errorCode)
+        .addCustomSearchPredicate('types', (item, searchValue) => {
+          const search = new RegExp(searchValue, 'ig');
+          return item.types.some((type) => search.test(type));
+        })
+        .build(),
     );
   }
 }

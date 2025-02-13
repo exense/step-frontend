@@ -13,7 +13,7 @@ import {
   TimeUnit,
   AugmentedTimeSeriesService,
 } from '@exense/step-core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, shareReplay } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
@@ -21,6 +21,7 @@ import { Status } from '../../../_common/shared/status.enum';
 import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 declare const uPlot: any;
 
@@ -96,6 +97,13 @@ export class ScheduleOverviewComponent implements OnInit {
   testCasesChartSettings?: TSChartSettings;
   emptyTestCasesResponse = false;
   protected readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
+  protected readonly availableErrorTypes = toSignal(
+    this.errorsDataSource.allData$.pipe(
+      map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+      map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
+    ),
+    { initialValue: [] },
+  );
 
   lastKeywordsExecutions: Execution[] = [];
 
