@@ -89,6 +89,8 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
           this.fromDateString = '';
           this.toDateString = '';
         }
+      } else {
+        this.mainPickerLabel = 'Full range';
       }
     } else {
       // relative selection

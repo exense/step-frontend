@@ -64,11 +64,10 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   protected setupDateRangeFilter(): void {
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
-        map(([pickerSelection, isRemote]) => {
-          const absoluteSelection = pickerSelection.absoluteSelection!;
+        map(([range, isRemote]) => {
           const dateRange: DateRange = {
-            start: DateTime.fromMillis(absoluteSelection.from),
-            end: DateTime.fromMillis(absoluteSelection.to),
+            start: DateTime.fromMillis(range!.from),
+            end: DateTime.fromMillis(range!.to),
           };
           if (isRemote) {
             // Remote dataSource test case

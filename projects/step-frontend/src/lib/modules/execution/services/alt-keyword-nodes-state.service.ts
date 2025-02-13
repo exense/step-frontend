@@ -32,7 +32,6 @@ export class AltKeywordNodesStateService extends AltReportNodesStateService impl
     this._executionState.timeRange$.pipe(filter((range) => !!range)),
   ]).pipe(
     map(([execution, timeRange]) => {
-      console.log('UPDATED');
       const request: FetchBucketsRequest = {
         start: timeRange!.from,
         end: timeRange!.to,

@@ -139,7 +139,12 @@
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">
-      <step-alt-execution-range-picker />
+      <!--      <step-alt-execution-range-picker />-->
+      <step-time-range-picker
+        [activeSelection]="(timeRangeSelection$ | async)!"
+        [selectOptions]="timeRangeOptions"
+        (selectionChange)="handleTimeRangeChange($event)"
+      />
     </div>
   }
 </section>

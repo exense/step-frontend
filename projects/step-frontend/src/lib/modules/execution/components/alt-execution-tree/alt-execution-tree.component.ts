@@ -9,15 +9,8 @@ import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/i
   styleUrl: './alt-execution-tree.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class AltExecutionTreeComponent implements OnInit {
+export class AltExecutionTreeComponent {
   protected readonly _state = inject(AltExecutionStateService);
   private _destroyRef = inject(DestroyRef);
   private _urlParamsService = inject(DashboardUrlParamsService);
-
-  ngOnInit(): void {
-    this._state.timeRangePickerChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
-      // update URL every time the page is accessed
-      this._urlParamsService.updateUrlParams(timeRange);
-    });
-  }
 }

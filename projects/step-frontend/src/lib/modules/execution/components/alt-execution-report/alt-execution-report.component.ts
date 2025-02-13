@@ -24,7 +24,7 @@ import { map } from 'rxjs';
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class AltExecutionReportComponent implements OnInit {
+export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
   protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
@@ -39,13 +39,6 @@ export class AltExecutionReportComponent implements OnInit {
 
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
-
-  ngOnInit(): void {
-    this._state.timeRangePickerChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
-      // update URL every time the page is accessed
-      this._urlParamsService.updateUrlParams(timeRange);
-    });
-  }
 
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;

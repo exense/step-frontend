@@ -13,7 +13,7 @@ import { map } from 'rxjs';
 })
 export class AltReportPerformanceOverviewChartComponent {
   protected readonly _mode = inject(VIEW_MODE);
-  private _state = inject(AltExecutionStateService);
+  _state = inject(AltExecutionStateService);
 
   protected readonly chartConfig: StandaloneChartConfig = {
     showTooltip: true,
@@ -41,8 +41,6 @@ export class AltReportPerformanceOverviewChartComponent {
 
   /** @Output() **/
   fullRange = output();
-
-  activeTimeRange = this._state.timeRangePickerChange$.pipe(map((s) => s.absoluteSelection!));
 
   chartFilters = computed(() => {
     const executionId = this.executionId();

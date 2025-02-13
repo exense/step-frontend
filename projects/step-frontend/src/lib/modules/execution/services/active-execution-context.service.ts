@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ActiveExecution, ActiveExecutionsService } from './active-executions.service';
-import { BehaviorSubject, filter, map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Execution } from '@exense/step-core';
 
@@ -12,6 +12,7 @@ export class ActiveExecutionContextService {
 
   readonly executionId$: Observable<string> = this.executionIdInternal$.pipe(
     filter((id) => !!id),
+    distinctUntilChanged((a, b) => a === b),
     takeUntilDestroyed(),
   );
 
