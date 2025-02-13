@@ -429,7 +429,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     timeRangeSelection: TimeRangePickerSelection,
     urlParams: DashboardUrlParams,
   ): DashboardTimeRangeSettings {
-    const now = new Date().getTime() - 5000;
+    const end = this.defaultFullTimeRange?.to || new Date().getTime() - 5000;
     if (timeRangeSelection.type === 'RELATIVE') {
       const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
       let foundRelativeOption: TimeRangeRelativeSelection = this.timeRangeOptions.find((o) => {
@@ -438,7 +438,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
         timeInMs: timeInMs,
       };
-      const fullRange = { from: now - foundRelativeOption.timeInMs, to: now };
+      const fullRange = { from: end - foundRelativeOption.timeInMs, to: end };
       return {
         pickerSelection: { type: 'RELATIVE', relativeSelection: foundRelativeOption },
         fullRange: fullRange,
@@ -460,7 +460,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       if (!this.defaultFullTimeRange) {
         throw new Error('Default time range must be specified when using a FULL range');
       }
-      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || now };
+      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || end };
       return {
         pickerSelection: { type: 'FULL', absoluteSelection: range },
         fullRange: range,

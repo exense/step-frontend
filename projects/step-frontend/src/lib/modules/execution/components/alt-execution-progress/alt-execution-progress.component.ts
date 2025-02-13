@@ -517,17 +517,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly PopoverMode = PopoverMode;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
-    // if (selection.type === 'RELATIVE') {
-    //   let time = selection.relativeSelection!.timeInMs;
-    //   let now = new Date().getTime() - 5000;
-    //   selection!.absoluteSelection = { from: now - time, to: now };
-    //   if (!selection.relativeSelection!.label) {
-    //     let foundRelativeOption = this.timeRangeOptions.find(
-    //       (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
-    //     );
-    //     selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
-    //   }
-    // }
-    // this.timeRangeSelection$.next(selection);
+    if (selection.type === 'RELATIVE') {
+      let time = selection.relativeSelection!.timeInMs;
+      let now = new Date().getTime() - 5000;
+      selection!.absoluteSelection = { from: now - time, to: now };
+      if (!selection.relativeSelection!.label) {
+        let foundRelativeOption = this.timeRangeOptions.find(
+          (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+        );
+        selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+      }
+    }
+    this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
   }
 }

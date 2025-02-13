@@ -136,16 +136,16 @@ export class DashboardStateEngine {
         break;
       case 'RELATIVE':
         const relativeSelection = params.selection.relativeSelection!;
-        const now = new Date().getTime();
-        const from = now - relativeSelection!.timeInMs!;
+        const end = oldSettings.defaultFullRange?.to || new Date().getTime();
+        const from = end - relativeSelection!.timeInMs!;
         newSettings = {
           pickerSelection: {
             type: TimeRangeType.RELATIVE,
             relativeSelection: relativeSelection,
           },
           defaultFullRange: oldSettings.defaultFullRange,
-          fullRange: { from: from, to: now },
-          selectedRange: { from: from, to: now },
+          fullRange: { from: from, to: end },
+          selectedRange: { from: from, to: end },
         };
         break;
     }
