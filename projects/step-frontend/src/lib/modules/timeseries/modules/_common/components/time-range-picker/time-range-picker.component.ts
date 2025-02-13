@@ -38,6 +38,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Input() selectOptions!: TimeRangePickerSelection[];
   @Input() initialSelectionIndex: number | undefined;
   @Input() compact = false;
+  @Input() fullRangeLabel?: string; // used to override the "Full Selection" default label
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
@@ -68,23 +69,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
       const range = selection.absoluteSelection;
       if (range) {
-        const fromDate = new Date(range.from);
-        const toDate = range.to ? new Date(range.to) : undefined;
-
-        this.fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
-        this.toDateString = TimeSeriesUtils.formatInputDate(toDate);
-
-        if (this.fromDateString && this.toDateString) {
-          if (this.datesHaveSameDate(fromDate, toDate!)) {
-            this.mainPickerLabel = `${TimeSeriesUtils.formatInputDate(fromDate)} - ${TimeSeriesUtils.formatTime(toDate)}`;
-          } else {
-            this.mainPickerLabel = `${this.fromDateString} - ${this.toDateString}`;
-          }
-        } else if (this.fromDateString) {
-          this.mainPickerLabel = `${this.fromDateString} - now`;
-        } else {
-          this.mainPickerLabel = `before ${this.toDateString}`;
-        }
+        this.mainPickerLabel = TimeSeriesUtils.formatRange(range);
         if (selection.type === 'FULL') {
           this.fromDateString = '';
           this.toDateString = '';
@@ -98,14 +83,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
       this.toDateString = '';
       this.mainPickerLabel = selection.relativeSelection!.label!;
     }
-  }
-
-  datesHaveSameDate(date1: Date, date2: Date) {
-    return (
-      date1.getFullYear() === date2.getFullYear() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getDate() === date2.getDate()
-    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {

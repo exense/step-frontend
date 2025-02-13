@@ -140,11 +140,14 @@
     </div>
     <div class="range-picker">
       <!--      <step-alt-execution-range-picker />-->
-      <step-time-range-picker
-        [activeSelection]="(timeRangeSelection$ | async)!"
-        [selectOptions]="timeRangeOptions"
-        (selectionChange)="handleTimeRangeChange($event)"
-      />
+      @if (!(isAnalyticsRoute$ | async)) {
+        <step-time-range-picker
+          [activeSelection]="(timeRangeSelection$ | async)!"
+          [selectOptions]="timeRangeOptions"
+          (selectionChange)="handleTimeRangeChange($event)"
+          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+        />
+      }
     </div>
   }
 </section>

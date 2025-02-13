@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
   map,
@@ -63,7 +63,7 @@ import { SchedulerInvokerService } from '../../services/scheduler-invoker.servic
 import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { TimeSeriesConfig } from '../../../timeseries/modules/_common';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 
 enum UpdateSelection {
@@ -150,6 +150,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
+
+  isAnalyticsRoute$ = this._router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    startWith(null), // Emit an initial value when the component loads
+    map(() => this._router.url.includes('/analytics')),
+  );
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -333,6 +339,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     filter((range) => !!range),
   ) as Observable<TimeRange>;
 
+  readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
+
   ngOnInit(): void {
     this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((e) => {
       console.log('EXECUTION CHANGED', e.id);
@@ -436,13 +444,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   }
 
   private setupTreeRefresh(): void {
-    combineLatest([this.executionId$, this.timeRangeSelection$])
+    combineLatest([this.execution$, this.timeRangeSelection$])
       .pipe(
-        switchMap(([executionId, timeSelection]) => {
+        switchMap(([execution, timeSelection]) => {
           if (timeSelection.type === 'FULL') {
-            return this._executionsApi.getFullAggregatedReportView(executionId);
+            return this._executionsApi.getFullAggregatedReportView(execution.id!);
           }
-          return this._executionsApi.getAggregatedReportView(executionId, { range: timeSelection.absoluteSelection! });
+          return this._executionsApi.getAggregatedReportView(execution.id!, {
+            range: timeSelection.absoluteSelection!,
+          });
         }),
         takeUntilDestroyed(this._destroyRef),
       )

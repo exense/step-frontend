@@ -4,7 +4,9 @@
       <step-icon name="clock" />
     } @else {
       <step-icon name="calendar" />
-      <div class="text" [matTooltip]="mainPickerLabel">{{ mainPickerLabel }}</div>
+      <div class="text" [matTooltip]="mainPickerLabel">
+        {{ (activeSelection.type === 'FULL' && fullRangeLabel) || mainPickerLabel }}
+      </div>
       @if (activeSelection.type === 'ABSOLUTE') {
         <div class="suffix-icon warn">
           <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>

@@ -92,6 +92,34 @@ export class TimeSeriesUtils {
     return newFullRange;
   }
 
+  static formatRange(range: TimeRange) {
+    const fromDate = new Date(range.from);
+    const toDate = range.to ? new Date(range.to) : undefined;
+
+    const fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
+    const toDateString = TimeSeriesUtils.formatInputDate(toDate);
+
+    if (fromDateString && toDateString) {
+      if (TimeSeriesUtils.datesHaveSameDate(fromDate, toDate!)) {
+        return `${TimeSeriesUtils.formatInputDate(fromDate)} - ${TimeSeriesUtils.formatTime(toDate)}`;
+      } else {
+        return `${fromDateString} - ${toDateString}`;
+      }
+    } else if (fromDateString) {
+      return `${fromDateString} - now`;
+    } else {
+      return `before ${toDateString}`;
+    }
+  }
+
+  private static datesHaveSameDate(date1: Date, date2: Date) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
   static formatInputDate(date?: Date, includeTime = true): string {
     if (!date) {
       return '';

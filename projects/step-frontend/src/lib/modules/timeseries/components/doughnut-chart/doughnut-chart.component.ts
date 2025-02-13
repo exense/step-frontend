@@ -35,8 +35,14 @@ export class DoughnutChartComponent implements OnDestroy {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
-      this.chart?.destroy();
-      this.chart = this.createChart(settings, canvas);
+      if (this.chart) {
+        this.chart.data.labels = settings.items.map((i) => i.label);
+        this.chart.data.datasets[0].data = settings.items.map((i) => i.value);
+        this.chart.data.datasets[0].backgroundColor = settings.items.map((i) => i.background);
+        this.chart.update();
+      } else {
+        this.chart = this.createChart(settings, canvas);
+      }
     }
   });
 

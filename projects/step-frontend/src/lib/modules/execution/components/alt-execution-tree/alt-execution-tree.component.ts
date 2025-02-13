@@ -10,7 +10,7 @@ import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/i
   encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionTreeComponent {
-  protected readonly _state = inject(AltExecutionStateService);
+  // protected readonly _state = inject(AltExecutionStateService);
   private _destroyRef = inject(DestroyRef);
   private _urlParamsService = inject(DashboardUrlParamsService);
 }
