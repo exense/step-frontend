@@ -1,0 +1,58 @@
+<step-modal-window>
+  <div class="tree-node-modal-header" step-modal-window-title>
+    @if (selectedReportNode(); as reportNode) {
+      @if (hasBackButton) {
+        <button
+          type="button"
+          mat-icon-button
+          (click)="selectedReportNode.set(undefined)"
+          matTooltip="Back to iteration's list"
+          matTooltipPosition="below"
+        >
+          <step-icon name="arrow-left" />
+        </button>
+      }
+      @if (reportNodeIcon(); as icon) {
+        <step-icon class="artefact-icon" [name]="icon" />
+      }
+      <span>{{ reportNode.name }}</span>
+      <step-alt-execution-time
+        [startTime]="reportNode.executionTime"
+        [duration]="reportNode.duration"
+        [timeOnly]="true"
+      />
+      <step-status [status]="reportNode.status" />
+      @if (reportNodeArtefactClass() === 'CallKeyword') {
+        <div class="btn-show-details-container">
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Show plan node details"
+            matTooltipPosition="below"
+            [routerLink]="['.', 'plan-node']"
+            [relativeTo]="_activatedRoute"
+            [queryParams]="{ reportNodeId: reportNode.id }"
+            queryParamsHandling="merge"
+          >
+            <step-icon name="external-link" />
+          </button>
+        </div>
+      }
+    } @else {
+      <span>Iteration list</span>
+    }
+  </div>
+  <div step-modal-window-body>
+    @if (hasData) {
+      @if (selectedReportNode(); as reportNode) {
+        <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
+      } @else {
+        <step-aggregated-tree-node-iteration-list
+          [node]="aggregatedNode!"
+          [initialStatus]="initialSearchStatus"
+          (showDetails)="selectedReportNode.set($event)"
+        />
+      }
+    }
+  </div>
+</step-modal-window>

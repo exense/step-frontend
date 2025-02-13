@@ -6,7 +6,7 @@
       @if (lastExecution) {
         <div class="last-execution-container">
           <span>Last execution:</span>
-          <step-alt-execution-time [execution]="lastExecution" />
+          <step-alt-execution-time [startTime]="lastExecution.startTime" [endTime]="lastExecution.endTime" />
           <step-status [status]="lastExecution!.result" />
         </div>
       }

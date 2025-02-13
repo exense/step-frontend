@@ -64,10 +64,23 @@ import { ControlWarningsPipe } from './pipes/control-warnings.pipe';
 import { BigNumberPipe } from './pipes/big-number.pipe';
 import { BooleanFilterComponent } from './components/boolean-filter/boolean-filter.component';
 import { StatusIconPipe } from './pipes/status-icon.pipe';
+import { SelectComponent } from './components/select/select.component';
+import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
+import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
+import { ElementResizeDirective } from './directives/element-resize.directive';
 import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
+import { PasswordComponent } from './components/password/password.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StepMaterialModule,
+    RouterModule,
+    NgxMatSelectSearchModule,
+    ElementResizeDirective,
+  ],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -100,6 +113,7 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -129,6 +143,9 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
+    SelectComponent,
+    SelectExtraOptionsDirective,
+    ShortenNumberPipe,
     DynamicInputWidthDirective,
   ],
   exports: [
@@ -167,6 +184,7 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -197,6 +215,10 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
+    SelectComponent,
+    SelectExtraOptionsDirective,
+    ShortenNumberPipe,
+    ElementResizeDirective,
     DynamicInputWidthDirective,
   ],
 })
@@ -220,6 +242,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
+export * from './components/password/password.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
@@ -317,4 +340,8 @@ export * from './injectables/time-converters-factory.service';
 export * from './components/simple-object-input/simple-object-input.component';
 export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
+export * from './pipes/shorten-number.pipe';
+export * from './components/select/select.component';
+export * from './directives/element-resize.directive';
+export * from './directives/select-extra-options.directive';
 export * from './directives/dynamic-input-width.directive';

@@ -1,11 +1,16 @@
-@function custom-menu-selector($name) {
+@function custom-menu-panel-selector($name) {
+  $selector: 'div.mat-mdc-menu-panel.' + $name;
+  @return $selector;
+}
+
+@function custom-menu-item-selector($name) {
   $selector: 'span.mat-mdc-menu-item.' + $name;
   @return $selector;
 }
 
 @mixin custom-menu($name) {
-  $selector: custom-menu-selector($name);
-  #{$selector} {
+  $item-selector: custom-menu-item-selector($name);
+  #{$item-selector} {
     height: auto;
     font-size: inherit;
     line-height: initial;

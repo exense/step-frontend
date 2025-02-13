@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 import type { AutomationPackage } from '../models/AutomationPackage';
+import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
 import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
 import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
@@ -124,6 +125,27 @@ export class AutomationPackagesService {
       url: '/automation-packages/execute',
       formData: formData,
       mediaType: 'multipart/form-data',
+    });
+  }
+
+  /**
+   * @param id
+   * @param requestBody
+   * @returns string default response
+   * @throws ApiError
+   */
+  public executeDeployedAutomationPackage(
+    id: string,
+    requestBody?: AutomationPackageExecutionParameters,
+  ): Observable<Array<string>> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/execute/{id}',
+      path: {
+        id: id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
     });
   }
 

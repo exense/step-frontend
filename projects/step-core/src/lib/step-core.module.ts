@@ -14,7 +14,6 @@ import { ReportNodeStatusComponent } from './components/report-node-status/repor
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
-import { ElementResizeDirective } from './directives/element-resize.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -72,6 +71,9 @@ import { TAB_EXPORTS } from './modules/tabs';
 import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 import { SPLIT_EXPORTS } from './modules/split';
+import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
+import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
+import { ReportNodeArtefactDetailsComponent } from './components/report-node-artefact-details/report-node-artefact-details.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +87,6 @@ import { SPLIT_EXPORTS } from './modules/split';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    ElementResizeDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -106,6 +107,7 @@ import { SPLIT_EXPORTS } from './modules/split';
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
+    ReportNodeArtefactDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -144,6 +146,8 @@ import { SPLIT_EXPORTS } from './modules/split';
     LIST_SELECTION_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
+    AUTO_SHRANK_LIST_EXPORTS,
+    JSON_VIEWER_EXT_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -171,7 +175,6 @@ import { SPLIT_EXPORTS } from './modules/split';
     IsChartEmptyPipe,
     KeywordNameComponent,
     DynamicAttributePipe,
-    ElementResizeDirective,
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
@@ -206,11 +209,14 @@ import { SPLIT_EXPORTS } from './modules/split';
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
+    AUTO_SHRANK_LIST_EXPORTS,
+    JSON_VIEWER_EXT_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     ArtefactInlineDetailsComponent,
+    ReportNodeArtefactDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -264,7 +270,6 @@ export * from './modules/plan-common/components/artefact-child-container-setting
 export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
-export { ElementResizeDirective } from './directives/element-resize.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -287,6 +292,7 @@ export * from './modules/tabs';
 export * from './modules/tree';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
+export * from './modules/json-viewer-ext';
 export * from './modules/resource-input/resource-input.module';
 export * from './modules/keywords-common/keywords-common.module';
 export * from './modules/wizard/wizards.module';
@@ -343,5 +349,7 @@ export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
+export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
+export * from './components/report-node-artefact-details/report-node-artefact-details.component';

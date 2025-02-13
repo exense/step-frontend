@@ -1,11 +1,5 @@
 import { Component } from '@angular/core';
-import {
-  AggregatedArtefactInfo,
-  ArtefactInlineItem,
-  BaseInlineArtefactComponent,
-  DynamicValueString,
-} from '@exense/step-core';
-import { Observable, of } from 'rxjs';
+import { ArtefactInlineItem, BaseInlineArtefactComponent, DynamicValueString } from '@exense/step-core';
 import { KeywordArtefact } from '../../types/keyword.artefact';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 
@@ -15,7 +9,35 @@ import { KeywordReportNode } from '../../types/keyword.report-node';
   styleUrl: './call-keyword-inline.component.scss',
 })
 export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<KeywordArtefact, KeywordReportNode> {
-  protected getReportNodeItems(info?: KeywordReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+  protected getItems(
+    artefact?: KeywordArtefact,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] | undefined {
+    const keywordArgument = artefact?.argument;
+    let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
+
+    try {
+      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : {};
+    } catch (err) {}
+    if (!keywordInputs) {
+      return undefined;
+    }
+    const inputs: [string, DynamicValueString | undefined][] = Object.entries(keywordInputs).map(([label, value]) => [
+      label,
+      value,
+    ]);
+
+    if (isVertical && inputs.length) {
+      inputs.unshift(['Inputs', undefined]);
+    }
+    return this.convert(inputs, isResolved);
+  }
+
+  protected override getReportNodeItems(
+    info?: KeywordReportNode,
+    isVertical?: boolean,
+  ): ArtefactInlineItem[] | undefined {
     let inputParams: Record<string, string> | undefined;
     let outputParams: Record<string, string> | undefined;
     try {
@@ -46,31 +68,5 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       items.push(...outputs);
     }
     return this.convert(items);
-  }
-
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<KeywordArtefact>,
-    isVertical: boolean = false,
-    isResolved: boolean = false,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const keywordArgument = info?.originalArtefact?.argument;
-    let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
-
-    try {
-      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : {};
-    } catch (err) {}
-    if (!keywordInputs) {
-      return of(undefined);
-    }
-    const inputs: [string, DynamicValueString | undefined][] = Object.entries(keywordInputs).map(([label, value]) => [
-      label,
-      value,
-    ]);
-
-    if (isVertical && inputs.length) {
-      inputs.unshift(['Inputs', undefined]);
-    }
-
-    return of(this.convert(inputs, isResolved));
   }
 }

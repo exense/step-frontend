@@ -1,19 +1,11 @@
-import {
-  Component,
-  computed,
-  effect,
-  ElementRef,
-  inject,
-  input,
-  OnDestroy,
-  viewChild,
-  ViewEncapsulation,
-} from '@angular/core';
-import Chart from 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Component, computed, effect, inject, input, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { STATUS_COLORS } from '@exense/step-core';
+import {
+  DoughnutChartItem,
+  DoughnutChartSettings,
+} from '../../../timeseries/components/doughnut-chart/doughnut-chart-settings';
 
 @Component({
   selector: 'step-alt-report-node-summary',
@@ -21,7 +13,7 @@ import { STATUS_COLORS } from '@exense/step-core';
   styleUrl: './alt-report-node-summary.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class AltReportNodeSummaryComponent implements OnDestroy {
+export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
   protected readonly _mode = inject(VIEW_MODE);
 
@@ -30,6 +22,8 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
 
   /** @Input() **/
   summary = input.required<ReportNodeSummary>();
+
+  chartSettings: DoughnutChartSettings | undefined;
 
   protected readonly legend = computed(() => {
     const summary = this.summary();
@@ -45,8 +39,6 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
 
     return items;
   });
-
-  private canvas = viewChild<ElementRef<HTMLCanvasElement>>('cnv');
 
   private dictionary = computed(() => {
     const summary = this.summary();
@@ -68,75 +60,28 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
     );
   });
 
-  private chart = computed(() => {
-    const canvas = this.canvas()?.nativeElement;
-    if (!canvas) {
-      return undefined;
-    }
-    return this.createChart(canvas);
-  });
-
   private updateChartEffect = effect(() => {
     const dictionary = this.dictionary();
-    const chart = this.chart();
 
-    if (!dictionary || !chart) {
+    if (!dictionary) {
       return;
     }
 
-    const items = Object.entries(this._statusColors)
+    const items: DoughnutChartItem[] = Object.entries(this._statusColors)
       .map(([status, color]) => {
         const value = dictionary[status]?.percent ?? 0;
-        return { status, color, value };
+        return { label: status, background: color, value };
       })
       .filter((item) => item.value > 0);
 
-    chart.data.labels = items.map((item) => item.status);
-    chart.data.datasets[0]!.data = items.map((item) => item.value);
-    chart.data.datasets[0]!.backgroundColor = items.map((item) => item.color);
-    chart.data.datasets[0]!.borderColor = items.map((item) => item.color);
-    chart.update();
+    this.chartSettings = {
+      items: items,
+      total: this.summary().total,
+      viewMode: this._mode,
+    };
   });
-
-  ngOnDestroy(): void {
-    this.chart()?.destroy();
-  }
 
   private calcPercent(count: number, total: number): number {
     return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);
-  }
-
-  private createChart(canvas: HTMLCanvasElement): Chart {
-    return new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Dataset 1',
-            data: [],
-            backgroundColor: [],
-          },
-        ],
-      },
-      plugins: [ChartDataLabels],
-      options: {
-        animation: {
-          duration: this._mode === ViewMode.PRINT ? 0 : 500,
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          datalabels: {
-            color: '#fff',
-            formatter: () => '',
-          },
-          tooltip: {
-            enabled: false,
-          },
-        },
-      },
-    });
   }
 }

@@ -313,6 +313,7 @@ import { ZapCircle } from './svg/zap-circle';
 import { ZoomIn } from './svg/zoom-in';
 import { ChevronDown } from './svg/chevron-down';
 import { ZoomOut } from './svg/zoom-out';
+import { DragHandle } from './svg/drag-handle';
 
 export const allIcons = {
   ActivityHeart,
@@ -630,4 +631,5 @@ export const allIcons = {
   ZoomIn,
   ChevronDown,
   ZoomOut,
+  DragHandle,
 };

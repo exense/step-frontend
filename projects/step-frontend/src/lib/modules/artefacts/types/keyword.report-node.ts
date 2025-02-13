@@ -1,4 +1,4 @@
-import { ReportNode } from '@exense/step-core';
+import { Measure, ReportNode } from '@exense/step-core';
 
 export interface KeywordReportNode extends ReportNode {
   functionId: string;
@@ -7,4 +7,5 @@ export interface KeywordReportNode extends ReportNode {
   tokenId: string;
   input: string;
   output: string;
+  measures?: Measure[];
 }
