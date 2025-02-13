@@ -1,6 +1,6 @@
 import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
+import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
@@ -26,6 +26,7 @@ import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/al
 export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
+  private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
 
@@ -53,15 +54,7 @@ export class AltExecutionReportComponent {
     this.treeWidget()?.focusNode(node.artefactID!);
   }
 
-  /*
-  protected handleOpenKeywordDrilldown(keyword: ReportNode): void {
-    const id = keyword.id;
-    if (!id) {
-      return;
-    }
-    this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
-  }
-*/
+  protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   protected readonly ViewMode = ViewMode;
 }
