@@ -15,6 +15,7 @@ import {
   ImportDialogComponent,
   ExportDialogComponent,
   preloadScreenDataResolver,
+  stepRouteAdditionalConfig,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -63,80 +64,87 @@ export class SchedulerModule {
   }
 
   private registerViews(): void {
-    this._viewRegistry.registerRoute({
-      path: 'scheduler',
-      resolve: {
-        executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
-      },
-      component: ScheduledTaskListComponent,
-      children: [
+    this._viewRegistry.registerRoute(
+      stepRouteAdditionalConfig(
         {
-          path: 'editor',
-          component: SimpleOutletComponent,
-          children: [
-            dialogRoute({
-              path: 'new',
-              dialogComponent: EditSchedulerTaskDialogComponent,
-              resolve: {
-                taskAndConfig: () => {
-                  const _api = inject(AugmentedSchedulerService);
-                  const _dialogs = inject(EditSchedulerTaskDialogUtilsService);
-                  return _api.createExecutionTask().pipe(switchMap((task) => _dialogs.prepareTaskAndConfig(task)));
-                },
-              },
-            }),
-            editScheduledTaskRoute({
-              path: ':id',
-              getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
-            }),
-          ],
+          quickAccessAlias: 'scheduler',
         },
-        dialogRoute({
-          path: 'import',
-          dialogComponent: ImportDialogComponent,
-          data: {
-            title: 'Schedule import',
-            entity: 'tasks',
-            overwrite: false,
-            importAll: false,
+        {
+          path: 'scheduler',
+          resolve: {
+            executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
           },
-        }),
-        {
-          path: 'export',
-          component: SimpleOutletComponent,
+          component: ScheduledTaskListComponent,
           children: [
+            {
+              path: 'editor',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'new',
+                  dialogComponent: EditSchedulerTaskDialogComponent,
+                  resolve: {
+                    taskAndConfig: () => {
+                      const _api = inject(AugmentedSchedulerService);
+                      const _dialogs = inject(EditSchedulerTaskDialogUtilsService);
+                      return _api.createExecutionTask().pipe(switchMap((task) => _dialogs.prepareTaskAndConfig(task)));
+                    },
+                  },
+                }),
+                editScheduledTaskRoute({
+                  path: ':id',
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
+                }),
+              ],
+            },
             dialogRoute({
-              path: 'all',
-              dialogComponent: ExportDialogComponent,
+              path: 'import',
+              dialogComponent: ImportDialogComponent,
               data: {
-                title: 'Schedules export',
+                title: 'Schedule import',
                 entity: 'tasks',
-                filename: 'allSchedules.sta',
+                overwrite: false,
+                importAll: false,
               },
             }),
-            dialogRoute({
-              path: ':id',
-              dialogComponent: ExportDialogComponent,
-              resolve: {
-                id: (route: ActivatedRouteSnapshot) => route.params['id'],
-                filename: (route: ActivatedRouteSnapshot) => {
-                  const api = inject(AugmentedSchedulerService);
-                  const id = route.params['id'];
-                  return api.getExecutionTaskById(id).pipe(
-                    map((task) => task.attributes!['name']),
-                    map((name) => `${name}.sta`),
-                  );
-                },
-              },
-              data: {
-                title: 'Schedules export',
-                entity: 'tasks',
-              },
-            }),
+            {
+              path: 'export',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'all',
+                  dialogComponent: ExportDialogComponent,
+                  data: {
+                    title: 'Schedules export',
+                    entity: 'tasks',
+                    filename: 'allSchedules.sta',
+                  },
+                }),
+                dialogRoute({
+                  path: ':id',
+                  dialogComponent: ExportDialogComponent,
+                  resolve: {
+                    id: (route: ActivatedRouteSnapshot) => route.params['id'],
+                    filename: (route: ActivatedRouteSnapshot) => {
+                      const api = inject(AugmentedSchedulerService);
+                      const id = route.params['id'];
+                      return api.getExecutionTaskById(id).pipe(
+                        map((task) => task.attributes!['name']),
+                        map((name) => `${name}.sta`),
+                      );
+                    },
+                  },
+                  data: {
+                    title: 'Schedules export',
+                    entity: 'tasks',
+                  },
+                }),
+              ],
+            },
           ],
         },
-      ],
-    });
+      ),
+    );
   }
 
   private registerSettings(): void {
