@@ -1,0 +1,26 @@
+@if (transformedData().length) {
+  <div class="container">
+    <div>
+      @for (series of transformedData(); track series.label) {
+        <div class="row" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
+          <div class="step-marker-filled-square" [style.--item-color]="series.color"></div>
+          <div>{{ series.label }} ({{ series.value }})</div>
+        </div>
+      }
+    </div>
+    <div>
+      @if (selectedSeries) {
+        <div class="separator"></div>
+        @for (exec of selectedSeriesExecutions; track exec.id) {
+          <div class="link-item" (click)="jumpToExecution(exec)" title="See Execution">
+            <span>{{ exec.name }}</span>
+            <span class="link-icon"></span>
+          </div>
+        }
+        @if (executionsListTruncated) {
+          <div class="dots">...</div>
+        }
+      }
+    </div>
+  </div>
+}

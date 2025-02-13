@@ -174,7 +174,10 @@ export class StandaloneChartComponent implements OnChanges {
 
     this.chartSettings = {
       title: this.config.title || '',
-      xValues: xLabels,
+      xAxesSettings: {
+        values: xLabels,
+        show: this.config.showTimeAxes,
+      },
       series: series,
       tooltipOptions: {
         enabled: this.config.showTooltip ?? true,
@@ -184,7 +187,6 @@ export class StandaloneChartComponent implements OnChanges {
       zoomEnabled: this.config.zoomEnabled,
       showLegend: this.config.showLegend,
       showCursor: this.config.showCursor,
-      showTimeAxes: this.config.showTimeAxes,
       axes: axes,
       truncated: response.truncated,
     };

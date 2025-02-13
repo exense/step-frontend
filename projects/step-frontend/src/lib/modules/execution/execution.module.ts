@@ -52,6 +52,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -110,6 +111,11 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
+import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
+import { TimeRangePickerComponent } from '../timeseries/modules/_common';
 
 @NgModule({
   declarations: [
@@ -144,6 +150,7 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -181,6 +188,8 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
     AggregatedTreeNodeDialogComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
+    ExecutionsChartTooltipComponent,
+    ErrorDetailsMenuComponent,
   ],
   imports: [
     StepCommonModule,
@@ -189,6 +198,9 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
+    TimeSeriesChartComponent,
+    TooltipContentDirective,
+    TimeRangePickerComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -343,7 +355,10 @@ export class ExecutionModule {
         },
       ],
     });
-
+    this._viewRegistry.registerRoute({
+      path: 'cross-executions/:id',
+      component: ScheduleOverviewComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,

@@ -47,7 +47,7 @@
     <tr class="mat-mdc-row" *matNoDataRow>
       <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
         @if ((tableDataSource?.total$ | async) === 0) {
-          No data available in table
+          {{ noResultsPlaceholder() || 'No data available in table' }}
         } @else {
           No matching records found
         }

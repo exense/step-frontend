@@ -1,19 +1,31 @@
-import { Axis, Cursor, Hooks } from 'uplot';
+import { Axis, Band, Cursor, Hooks, Scale, Scales } from 'uplot';
 import { TsTooltipOptions } from './ts-tooltip-options';
 import { TSChartSeries } from './ts-chart-series';
+import uPlot from '../../_common/types/uPlot';
 
 export interface TSChartSettings {
   title: string;
-  xValues: number[]; // in milliseconds
+  xAxesSettings: XAxesSettings;
+  showDefaultLegend?: boolean;
   cursor?: Cursor; // cursor related settings and events
   series: TSChartSeries[];
+  scales?: Scales;
   autoResize?: boolean; // autoresize on window size change
   axes: Axis[];
+  bands?: Band[];
   tooltipOptions: TsTooltipOptions;
   showLegend?: boolean; // default true
   hooks?: Hooks.Arrays; // if some hooks have to be override
   truncated?: boolean;
   showCursor?: boolean;
-  showTimeAxes?: boolean;
   zoomEnabled?: boolean;
+}
+
+export interface XAxesSettings {
+  values: number[];
+  show?: boolean; // default true
+  time?: boolean; // default true
+  label?: string;
+  gridDisplayMultipliers?: number[]; // see uPlot "incrs" property for more details
+  valueFormatFn?: (self: any, rawValue: number, seriesIdx: number, idx: number) => string | number;
 }
