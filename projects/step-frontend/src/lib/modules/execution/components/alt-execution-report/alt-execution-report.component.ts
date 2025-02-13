@@ -1,10 +1,11 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
+import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -24,17 +25,21 @@ import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
   private _router = inject(Router);
+  private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
 
-  readonly _state = inject(AltExecutionStateService);
+  protected readonly _state = inject(AltExecutionStateService);
 
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
 
-  readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
-  readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
+  protected readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
+  protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
-  readonly _mode = inject(VIEW_MODE);
+  protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
-  handleOpenKeywordInTreeView(keyword: ReportNode): void {
+  protected readonly _mode = inject(VIEW_MODE);
+
+  protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
@@ -42,13 +47,7 @@ export class AltExecutionReportComponent {
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
   }
 
-  handleOpenKeywordDrilldown(keyword: ReportNode): void {
-    const id = keyword.id;
-    if (!id) {
-      return;
-    }
-    this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
-  }
+  protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   protected readonly ViewMode = ViewMode;
 }

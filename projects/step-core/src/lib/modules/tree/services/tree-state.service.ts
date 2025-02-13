@@ -152,6 +152,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const selectedNodeIds = new Set(this.selectedNodeIdsInternal());
 
     if (preventIfAlreadySelected && selectedNodeIds.has(nId)) {
+      if (this.selectedInsertionParentId() !== nId) {
+        this.selectedInsertionParentId.set(nId);
+      }
       return;
     }
 

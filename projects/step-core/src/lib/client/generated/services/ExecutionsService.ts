@@ -186,6 +186,64 @@ export class ExecutionsService {
   }
 
   /**
+   * Returns the custom report for several executions
+   * @param customReportType
+   * @param ids
+   * @param includeAttachments
+   * @param attachmentsRootFolder
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getCustomMultiReport(
+    customReportType: string,
+    ids?: string,
+    includeAttachments?: boolean,
+    attachmentsRootFolder?: string,
+  ): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/report/multi/{customReportType}',
+      path: {
+        customReportType: customReportType,
+      },
+      query: {
+        ids: ids,
+        includeAttachments: includeAttachments,
+        attachmentsRootFolder: attachmentsRootFolder,
+      },
+    });
+  }
+
+  /**
+   * Returns the custom report for the execution
+   * @param id
+   * @param customReportType
+   * @param includeAttachments
+   * @param attachmentsRootFolder
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getCustomReport(
+    id: string,
+    customReportType: string,
+    includeAttachments?: boolean,
+    attachmentsRootFolder?: string,
+  ): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/report/{customReportType}',
+      path: {
+        id: id,
+        customReportType: customReportType,
+      },
+      query: {
+        includeAttachments: includeAttachments,
+        attachmentsRootFolder: attachmentsRootFolder,
+      },
+    });
+  }
+
+  /**
    * Returns the executions matching the provided attributes.
    * @param requestBody
    * @returns Execution default response
@@ -248,13 +306,20 @@ export class ExecutionsService {
   }
 
   /**
-   * Returns a map of execution ID to names by the provided ids.
+   * Returns the last execution triggered by a specific task.
    * @param taskId
    * @param limit
+   * @param from
+   * @param to
    * @returns Execution default response
    * @throws ApiError
    */
-  public getLastExecutionsByTaskId(taskId: string, limit: number, from?: number, to?: number): Observable<Execution[]> {
+  public getLastExecutionsByTaskId(
+    taskId: string,
+    limit?: number,
+    from?: number,
+    to?: number,
+  ): Observable<Array<Execution>> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/executions/search/last/by/task-id/{taskId}',

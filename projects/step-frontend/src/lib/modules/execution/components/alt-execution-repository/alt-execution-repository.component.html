@@ -1,0 +1,21 @@
+<step-popover>
+  <div>
+    @switch (repositoryId()) {
+      @case ('azure-devops') {
+        <step-icon name="azure" />
+      }
+      @default {
+        <span>{{ repositoryKey() }}</span>
+      }
+    }
+  </div>
+  <step-popover-content>
+    <section>
+      @for (item of repositoryItems() | keyvalue; track item.key) {
+        <span>{{ item.key }}</span>
+        <span>=</span>
+        <span>{{ item.value }}</span>
+      }
+    </section>
+  </step-popover-content>
+</step-popover>

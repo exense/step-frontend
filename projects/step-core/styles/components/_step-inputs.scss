@@ -47,10 +47,12 @@
 }
 
 @mixin highlight($highlight-color) {
+  step-select,
   mat-select,
   input,
   pre,
   step-array-input,
+  step-password,
   step-simple-object-input,
   step-autocomplete-input,
   mat-date-range-input,
@@ -67,11 +69,13 @@
   }
 
   & > .form-field-content {
+    & > step-select,
     & > mat-select,
     & > step-multi-level-select,
     & > input,
     & > pre,
     & > step-array-input,
+    & > step-password,
     & > step-simple-object-input,
     & > step-autocomplete-input,
     & > mat-date-range-input,
@@ -185,6 +189,7 @@
         }
       }
       & > .form-field-content {
+        & > step-select,
         & > mat-select,
         & > step-multi-level-select,
         & > mat-radio-group,
@@ -194,6 +199,7 @@
         & > input,
         & > pre,
         & > step-array-input,
+        & > step-password,
         & > step-simple-object-input,
         & > step-autocomplete-input,
         & > textarea,
@@ -224,6 +230,7 @@
       display: inline-flex;
       width: 100%;
 
+      & > step-select,
       & > mat-select,
       & > step-multi-level-select,
       & > mat-radio-group,
@@ -233,6 +240,7 @@
       & > input,
       & > pre,
       & > step-array-input,
+      & > step-password,
       & > step-simple-object-input,
       & > step-autocomplete-input,
       & > textarea {
@@ -256,6 +264,7 @@
         padding: 0;
       }
 
+      & > step-select,
       & > mat-select,
       & > step-multi-level-select,
       & > mat-radio-group,
@@ -265,6 +274,7 @@
       & > input,
       pre,
       step-array-input,
+      step-password,
       step-simple-object-input,
       step-autocomplete-input,
       step-rich-editor,
