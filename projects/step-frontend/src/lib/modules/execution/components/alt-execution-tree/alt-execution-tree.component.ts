@@ -32,7 +32,10 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   }
 
   hasActionsForNode(node: TreeNode): boolean {
-    return !!node.children?.length;
+    if (!node.children?.length) {
+      return false;
+    }
+    return node.children.some((child) => !!child.children?.length);
   }
 
   focusNode(nodeId: string): void {

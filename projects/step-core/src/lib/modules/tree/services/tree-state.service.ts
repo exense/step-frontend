@@ -822,7 +822,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     for (let i = subRootIndex + 1; i < tree.length; i++) {
       const node = tree[i];
       const level = node.parentPath.length;
-      if (level === subRootLevel) {
+      if (level <= subRootLevel) {
         break;
       }
       result.push(node);
