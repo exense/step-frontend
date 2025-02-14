@@ -144,7 +144,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
 
-  isAnalyticsRoute$ = this._router.events.pipe(
+  protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads
     map(() => this._router.url.includes('/analytics')),
