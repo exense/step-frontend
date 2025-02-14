@@ -1,11 +1,5 @@
 import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import {
-  ControllerService,
-  DialogsService,
-  PlanUrlPipe,
-  ReportNode,
-  CommonEntitiesUrlsService,
-} from '@exense/step-core';
+import { ControllerService, DialogsService, ReportNode, CommonEntitiesUrlsService } from '@exense/step-core';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { Router } from '@angular/router';

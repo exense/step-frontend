@@ -50,7 +50,7 @@ export abstract class AltReportNodesStateService {
 
   abstract readonly summary$: Observable<ReportNodeSummary>;
 
-  readonly dateRange$ = this._executionState.dateRange$;
+  readonly dateRange$ = this._executionState.timeRange$;
 
   readonly statuses = REPORT_NODE_STATUS;
 

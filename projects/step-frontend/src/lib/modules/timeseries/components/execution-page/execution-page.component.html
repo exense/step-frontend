@@ -4,11 +4,13 @@
     [storageId]="execution.id"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
+    [initialTimeSelection]="initialTimeRange()"
     [defaultFullTimeRange]="executionRange"
     [showExecutionLinks]="false"
     [showRefreshOption]="false"
     [showDashboardName]="false"
     [showHeaderBar]="false"
+    (timeRangeChange)="timeRangePickerChange.emit($event)"
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

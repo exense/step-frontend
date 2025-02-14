@@ -27,32 +27,28 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   standalone: true,
 })
 export class DoughnutChartComponent implements OnDestroy {
-  settings = input<DoughnutChartSettings>({ items: [] });
-  canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
-  // @ViewChild('canvas') private canvas!: ElementRef<HTMLCanvasElement>;
+  /** @Input() **/
+  readonly settings = input.required<DoughnutChartSettings>();
+
+  /** @ViewChild() **/
+  private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+
   private chart: Chart | undefined;
 
-  // ngAfterViewInit(): void {
-  //   if (this.settings) {
-  //     this.chart = this.createChart();
-  //   }
-  // }
-
-  effect = effect(() => {
+  updateChartEffect = effect(() => {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
-      this.createChart(settings, canvas);
+      if (this.chart) {
+        this.chart.data.labels = settings.items.map((i) => i.label);
+        this.chart.data.datasets[0].data = settings.items.map((i) => i.value);
+        this.chart.data.datasets[0].backgroundColor = settings.items.map((i) => i.background);
+        this.chart.update();
+      } else {
+        this.chart = this.createChart(settings, canvas);
+      }
     }
   });
-
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   const settings = changes['settings'];
-  //   if (settings && this.canvas) {
-  //     this.chart?.destroy();
-  //     this.createChart();
-  //   }
-  // }
 
   private createChart(settings: DoughnutChartSettings, canvas: ElementRef<HTMLCanvasElement>): Chart {
     return new Chart(canvas.nativeElement, {
