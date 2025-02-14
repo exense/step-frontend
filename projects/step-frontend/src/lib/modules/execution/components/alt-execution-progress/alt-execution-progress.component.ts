@@ -47,7 +47,6 @@ import { AltExecutionTabsService } from '../../services/alt-execution-tabs.servi
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
-import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
@@ -184,6 +183,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
+        this._urlParamsService.updateUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
