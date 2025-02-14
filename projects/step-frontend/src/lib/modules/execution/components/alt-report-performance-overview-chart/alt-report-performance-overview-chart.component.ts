@@ -37,10 +37,10 @@ export class AltReportPerformanceOverviewChartComponent {
   executionId = input.required<string>();
 
   /** @Output() **/
-  timeRangeChange = output<TimeRange>();
+  protected timeRangeChange = output<TimeRange>();
 
   /** @Output() **/
-  fullRange = output();
+  protected fullRange = output();
 
   chartFilters = computed(() => {
     const executionId = this.executionId();

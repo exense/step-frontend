@@ -78,7 +78,6 @@ import { AltExecutionReportControlsComponent } from './components/alt-execution-
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
-import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
@@ -168,7 +167,6 @@ import { TimeRangePickerComponent } from '../timeseries/modules/_common/componen
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
-    AltExecutionRangePickerComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     ExecutionDetailsComponent,

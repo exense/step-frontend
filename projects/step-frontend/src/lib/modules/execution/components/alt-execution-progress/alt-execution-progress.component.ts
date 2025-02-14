@@ -12,9 +12,7 @@ import {
   distinctUntilChanged,
   filter,
   Observable,
-  debounceTime,
   skip,
-  delay,
   take,
 } from 'rxjs';
 import {
@@ -37,7 +35,7 @@ import {
   IncludeTestcases,
   TimeRange,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -49,7 +47,7 @@ import { AltExecutionTabsService } from '../../services/alt-execution-tabs.servi
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
-import { AltExecutionStorageService, ExecutionContext } from '../../services/alt-execution-storage.service';
+import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
 import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
@@ -140,7 +138,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _systemService = inject(SystemService);
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
-  private _executionStorage = inject(AltExecutionStorageService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
@@ -178,6 +175,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((active) => active.execution$),
     shareReplay(1),
+    takeUntilDestroyed(),
   );
 
   readonly timeChangeTriggerOnExecutionChange = this.activeExecution$
@@ -193,6 +191,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
     switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(skip(1))),
     shareReplay(1),
+    takeUntilDestroyed(),
   );
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {

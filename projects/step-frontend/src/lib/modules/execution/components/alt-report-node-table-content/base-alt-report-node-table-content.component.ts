@@ -65,10 +65,8 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
         map(([range, isRemote]) => {
-          const dateRange: DateRange = {
-            start: DateTime.fromMillis(range!.from),
-            end: DateTime.fromMillis(range!.to),
-          };
+          const dateRange: DateRange = this._dateUtils.timeRange2DateRange(range)!;
+
           if (isRemote) {
             // Remote dataSource test case
             return this._filterConditionFactory.dateRangeFilterCondition(dateRange);
