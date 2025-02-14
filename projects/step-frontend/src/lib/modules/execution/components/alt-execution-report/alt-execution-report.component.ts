@@ -39,9 +39,8 @@ export class AltExecutionReportComponent {
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
-  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+  updateUrlParamsSubscription = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
     this._urlParamsService.updateUrlParams(range);
   });
 

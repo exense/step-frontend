@@ -139,7 +139,6 @@
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">
-      <!--      <step-alt-execution-range-picker />-->
       @if (!(isAnalyticsRoute$ | async)) {
         <step-time-range-picker
           [activeSelection]="(timeRangeSelection$ | async)!"

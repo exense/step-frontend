@@ -27,7 +27,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, MatTooltip],
+  imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
   private _snackBar = inject(MatSnackBar);
@@ -43,7 +43,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
   fromDateString: string | undefined; // used for formatting the date together with time
-  mainPickerLabel: string = '';
+  protected mainPickerLabel: string = '';
   toDateString: string | undefined;
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 

@@ -177,7 +177,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly timeChangeTriggerOnExecutionChange = this.activeExecution$
+  readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed())
     .subscribe((activeExecution) => {
       // force trigger time range change
@@ -194,7 +194,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.updateTimeRangeSelection(selection);
   }
 
