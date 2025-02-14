@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { FetchBucketsRequest, TimeRange, TimeSeriesService } from '../../generated';
-import { map, Observable, of, OperatorFunction, switchMap, tap } from 'rxjs';
+import { FetchBucketsRequest, TimeSeriesService } from '../../generated';
+import { map, Observable, of, OperatorFunction, switchMap } from 'rxjs';
 import { TableApiWrapperService } from '../../table/step-table-client.module';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
@@ -8,9 +8,7 @@ import { HttpRequestContextHolderService } from './http-request-context-holder.s
 import { HttpEvent } from '@angular/common/http';
 import { TimeSeriesErrorEntry } from '../shared/time-series-error-entry';
 import { TimeSeriesErrorsRequest } from '../shared/time-series-errors-request';
-import { TableDataSource } from '../../../modules/table/shared/table-data-source';
 import { TableFetchLocalDataSource } from '../../../modules/table/shared/table-fetch-local-data-source';
-import { TableLocalDataSource } from '../../../modules/table/shared/table-local-data-source';
 
 @Injectable({
   providedIn: 'root',
@@ -101,6 +99,9 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
           const search = new RegExp(searchValue, 'ig');
           return item.types.some((type) => search.test(type));
         })
+        .addSortNumberPredicate('errorCode', (item) => item.errorCode)
+        .addSortNumberPredicate('count', (item) => item.count)
+        .addSortNumberPredicate('percentage', (item) => item.percentage)
         .build(),
     );
   }

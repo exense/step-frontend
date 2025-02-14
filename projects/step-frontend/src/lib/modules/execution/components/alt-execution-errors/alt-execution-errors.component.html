@@ -11,7 +11,7 @@
     <th mat-header-cell mat-sort-header *matHeaderCellDef>Error Message</th>
     <td mat-cell *matCellDef="let element">
       <div class="error-name">
-        <span>{{ element.errorMessage }}</span>
+        <div class="message" (click)="showError(element.errorMessage)">{{ element.errorMessage }}</div>
         @if (showExecutionsMenu()) {
           <step-icon class="icon" matTooltip="See executions" name="external-link" [matMenuTriggerFor]="menu" />
           <mat-menu #menu="matMenu" class="wide-menu">
