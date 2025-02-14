@@ -27,11 +27,15 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   standalone: true,
 })
 export class DoughnutChartComponent implements OnDestroy {
-  settings = input<DoughnutChartSettings>({ items: [] });
-  canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  /** @Input() **/
+  readonly settings = input.required<DoughnutChartSettings>();
+
+  /** @ViewChild() **/
+  private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+
   private chart: Chart | undefined;
 
-  effect = effect(() => {
+  updateChartEffect = effect(() => {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
