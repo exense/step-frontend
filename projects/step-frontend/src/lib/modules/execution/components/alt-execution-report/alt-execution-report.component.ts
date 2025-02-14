@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -28,6 +29,7 @@ export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
   protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
+  private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -52,15 +54,7 @@ export class AltExecutionReportComponent {
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
   }
 
-  /*
-  protected handleOpenKeywordDrilldown(keyword: ReportNode): void {
-    const id = keyword.id;
-    if (!id) {
-      return;
-    }
-    this._router.navigate(['..', 'keyword-drilldown', id], { relativeTo: this._activatedRoute });
-  }
-*/
+  protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   handleChartZooming(range: TimeRange) {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
