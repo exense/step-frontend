@@ -114,8 +114,9 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
-import { ErrorDetailsMenuComponent } from './components/schedule-overview/error-details-menu/error-details-menu.component';
+import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common';
+import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 
 @NgModule({
   declarations: [
@@ -190,6 +191,7 @@ import { TimeRangePickerComponent } from '../timeseries/modules/_common';
     AltPanelComponent,
     ExecutionsChartTooltipComponent,
     ErrorDetailsMenuComponent,
+    AltExecutionErrorsComponent,
   ],
   imports: [
     StepCommonModule,
