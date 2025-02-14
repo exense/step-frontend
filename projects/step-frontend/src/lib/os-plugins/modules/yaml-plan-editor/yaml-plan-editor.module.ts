@@ -10,7 +10,7 @@ import { YamlPlanEditorComponent } from './components/yaml-plan-editor/yaml-plan
 export class YamlPlanEditorModule {
   constructor(_panTypeRegistry: PlanTypeRegistryService) {
     _panTypeRegistry.register(
-      'step.plans.parser.yaml.editor.YamlEditorPlanType',
+      'step.plans.parser.yaml.editor.YamlEditorPlan',
       'Yaml Plan Editor',
       YamlPlanEditorComponent,
     );
