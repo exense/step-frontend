@@ -30,6 +30,9 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
   /** @Output() **/
   readonly openTestCaseInTreeView = output<ReportNode>();
 
+  /** @Output() **/
+  readonly reportNodeClick = output<ReportNode>();
+
   protected hasTestCasesFilter = toSignal(this._executionState.hasTestCasesFilter$, { initialValue: false });
 
   protected toggleSelection(item: ReportNode, $event: MouseEvent): void {

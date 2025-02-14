@@ -1,14 +1,12 @@
-@if (settings()) {
-  <section class="chart-container">
-    <div class="total-value">
-      <span>
-        @if (settings().total; as total) {
-          {{ total | bigNumber }}
-        } @else {
-          0
-        }
-      </span>
-    </div>
-    <canvas #canvas></canvas>
-  </section>
-}
+<section class="chart-container">
+  <div class="total-value">
+    <span>
+      @if (settings().total; as total) {
+        {{ total | bigNumber }}
+      } @else {
+        0
+      }
+    </span>
+  </div>
+  <canvas #canvas></canvas>
+</section>

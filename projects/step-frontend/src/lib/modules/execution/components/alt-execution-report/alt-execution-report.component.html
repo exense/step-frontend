@@ -4,7 +4,8 @@
       <step-alt-report-nodes-testcases
         class="widget"
         [style.--colSpan]="3"
-        (openTestCaseInTreeView)="handleOpenNodeInTreeView($event)"
+        (reportNodeClick)="handleOpenNodeInTreeWidget($event)"
+        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
       />
     }
     @if (testCasesSummary$ | async; as testCasesSummary) {
@@ -25,13 +26,13 @@
     />
   }
   @if (_mode === ViewMode.VIEW) {
-    <step-alt-execution-tree-widget class="widget" [style.--colSpan]="3" />
+    <step-alt-execution-tree-widget #treeWidget class="widget" [style.--colSpan]="3" />
   }
   @if (_mode === ViewMode.VIEW) {
     <step-alt-report-node-keywords
       class="keywords widget"
       [style.--colSpan]="3"
-      (openKeywordInTreeView)="handleOpenNodeInTreeView($event)"
+      (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
     />
   }
   @if (_state.executionId$ | async; as executionId) {

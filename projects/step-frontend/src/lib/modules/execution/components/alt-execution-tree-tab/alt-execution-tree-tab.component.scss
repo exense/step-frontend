@@ -1,6 +1,29 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-alt-execution-tree-tab {
+  position: relative;
+
   step-alt-execution-tree {
     height: 60vh;
     max-height: 60vh;
+  }
+
+  .buttons-container {
+    position: absolute;
+    right: 0;
+    z-index: 3;
+    width: 21rem;
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      position: fixed;
+
+      button {
+        min-width: 10rem;
+        white-space: nowrap;
+        background: var.$white;
+      }
+    }
   }
 }

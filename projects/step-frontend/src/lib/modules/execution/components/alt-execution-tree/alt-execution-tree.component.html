@@ -1,5 +1,9 @@
-<step-tree [dragDisabled]="true" [forceFocus]="true">
+<step-tree
+  [dragDisabled]="true"
+  [forceFocus]="true"
+  (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
+>
   <div *stepTreeNodeNameTemplate="let node" class="node-name">
-    <step-aggregated-tree-node [nodeId]="node.id" />
+    <step-aggregated-tree-node [nodeId]="node.id" [attr.data-node-id]="node.id" />
   </div>
 </step-tree>
