@@ -40,6 +40,10 @@ export class AltExecutionReportComponent {
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _destroyRef = inject(DestroyRef);
 
+  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range);
+  });
+
   protected handleOpenNodeInTreeView(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
     if (!artefactId) {

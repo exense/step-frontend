@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ActiveExecution, ActiveExecutionsService } from './active-executions.service';
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Execution } from '@exense/step-core';
 

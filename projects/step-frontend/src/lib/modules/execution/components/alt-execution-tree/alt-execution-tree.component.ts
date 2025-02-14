@@ -10,7 +10,11 @@ import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/i
   encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionTreeComponent {
-  // protected readonly _state = inject(AltExecutionStateService);
-  private _destroyRef = inject(DestroyRef);
+  protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
+  private _destroyRef = inject(DestroyRef);
+
+  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range);
+  });
 }

@@ -6,7 +6,7 @@ import {
   AutoRefreshModelFactoryService,
   Execution,
 } from '@exense/step-core';
-import { BehaviorSubject, concatMap, filter, Observable, shareReplay, startWith, Subject } from 'rxjs';
+import { BehaviorSubject, concatMap, filter, Observable, shareReplay, startWith, Subject, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';

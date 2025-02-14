@@ -8,15 +8,14 @@ import {
   shareReplay,
   startWith,
   switchMap,
-  take,
   tap,
   distinctUntilChanged,
-  BehaviorSubject,
-  skip,
   filter,
   Observable,
-  debounce,
   debounceTime,
+  skip,
+  delay,
+  take,
 } from 'rxjs';
 import {
   ArtefactFilter,
@@ -24,7 +23,6 @@ import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   AugmentedPlansService,
-  DateUtilsService,
   Execution,
   IS_SMALL_SCREEN,
   RegistrationStrategy,
@@ -43,7 +41,6 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import { FormBuilder } from '@angular/forms';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
@@ -173,27 +170,33 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private isTreeInitialized = false;
 
   selectFullRange(): void {
-    this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange({ type: 'FULL' });
+    this.updateTimeRangeSelection({ type: 'FULL' });
   }
 
   readonly executionId$ = this._activeExecutionContext.executionId$;
   readonly activeExecution$ = this._activeExecutionContext.activeExecution$;
-  readonly execution$ = this._activeExecutionContext.execution$.pipe(debounceTime(100));
+  readonly execution$ = this.activeExecution$.pipe(
+    switchMap((active) => active.execution$),
+    shareReplay(1),
+  );
 
   readonly timeChangeTriggerOnExecutionChange = this.activeExecution$
     .pipe(takeUntilDestroyed())
     .subscribe((activeExecution) => {
       // force trigger time range change
-      activeExecution.updateTimeRange(activeExecution.getTimeRangeSelection());
+      const timeRangeSelection = activeExecution.getTimeRangeSelection();
+      setTimeout(() => {
+        this.updateTimeRangeSelection({ ...timeRangeSelection });
+      }, 100);
     });
 
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$),
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(skip(1))),
+    shareReplay(1),
   );
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    const activeExecution = this._activeExecutionsService.getActiveExecution(this._executionId());
-    activeExecution.updateTimeRange(selection);
+    this.updateTimeRangeSelection(selection);
   }
 
   readonly executionPlan$ = this.execution$.pipe(
@@ -322,7 +325,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
     map(([execution, rangeSelection]) => {
       if (execution.id !== this._executionId()) {
-        // console.log('execution has changed', execution.id, this._executionId());
         // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
         return undefined;
       }
@@ -342,100 +344,18 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
 
   ngOnInit(): void {
-    this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((e) => {
-      console.log('EXECUTION CHANGED', e.id);
-    });
-
-    this.timeRangeSelection$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((e) => {
-      console.log('time range selection change', e);
-    });
-
-    this.timeRange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((range) => {
-      console.log('TIME RANGE CHANGED!!!', range);
-    });
-    this.setupTreeRefresh();
-    // this._activeExecutionContext.activeExecution$
-    //   .pipe(takeUntilDestroyed(this._destroyRef))
-    //   .subscribe(activeExecution => {
-    //     console.log('ACTIVE EXECUTION CHANGED', activeExecution);
-    //   })
-    // this.timeRangePickerChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
-    //   // update URL every time the page is accessed
-    //   this.saveContextToStorage();
-    //   this._urlParamsService.updateUrlParams(timeRange);
-    // });
-    // this.setupTreeRefresh();
-    //
-    // this.activeExecution$.subscribe(active => {
-    //   console.log('ACTIVE EXECUTION', active.executionId);
-    // });
-    //
-    // this.execution$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((execution) => {
-    //   console.log('EXECUTION', execution.id);
-    //   // called on auto-refresh
-    //   const endTime = execution.endTime || new Date().getTime();
-    //   this.timeRangeOptions[0].absoluteSelection = { from: execution.startTime!, to: endTime };
-    //   const activeTimeRangeSelection = this.timeRangeSelection$.getValue();
-    //   console.log('FIRST RUN: ', !activeTimeRangeSelection);
-    //   if (!activeTimeRangeSelection) {
-    //     // first run
-    //     this.initTimeRangeSelection(execution);
-    //   } else {
-    //     // auto-refresh
-    //     this.handleAutoRefresh(execution);
-    //   }
-    // });
-
-    // const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    // combineLatest([this.execution$, isIgnoreFilter$])
-    //   .pipe(takeUntilDestroyed(this._destroyRef))
-    //   .subscribe(([execution, isIgnoreFilter]) => {
-    //     console.log('UPDATING URL PARAMS');
-    //     const urlParams = this._urlParamsService.collectUrlParams();
-    //     if (urlParams.timeRange) {
-    //       // url params take priority
-    //       this.updateTimeRangeSelection(urlParams.timeRange);
-    //     } else {
-    //       const existingContext = this._executionStorage.getExecutionContext(execution.id!);
-    //       if (existingContext) {
-    //         this.updateTimeRangeSelection(existingContext.timeRange);
-    //       } else {
-    //         this.applyDefaultRange(execution);
-    //       }
-    //     }
-    //     this._urlParamsService.updateUrlParams(this.getTimeRange());
-    //   });
-  }
-
-  handleAutoRefresh(execution: Execution) {
-    // const activeTimeRangeSelection = this.timeRangeSelection$.getValue()!;
-    // switch (activeTimeRangeSelection.type) {
-    //   case 'FULL':
-    //     activeTimeRangeSelection.absoluteSelection!.to = execution.endTime || new Date().getTime();
-    //     this.updateTimeRangeSelection({ ...activeTimeRangeSelection });
-    //     break;
-    //   case 'ABSOLUTE':
-    //     // do nothing
-    //     break;
-    //   case 'RELATIVE':
-    //     this.updateTimeRangeSelection({ ...activeTimeRangeSelection });
-    //     break;
-    // }
-  }
-
-  initTimeRangeSelection(execution: Execution) {
     const urlParams = this._urlParamsService.collectUrlParams();
+
+    // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
     if (urlParams.timeRange) {
-      // url params take priority
       this.updateTimeRangeSelection(urlParams.timeRange);
     } else {
-      const existingContext = this._executionStorage.getExecutionContext(execution.id!);
-      if (existingContext) {
-        this.updateTimeRangeSelection(existingContext.timeRange);
-      } else {
-        this.applyDefaultRange(execution);
-      }
+      // force event
+      let activeExecution = this._activeExecutionsService.getActiveExecution(this._executionId());
+      this.updateTimeRangeSelection({ ...activeExecution.getTimeRangeSelection() });
     }
+
+    this.setupTreeRefresh();
   }
 
   ngOnDestroy(): void {
@@ -472,12 +392,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   manualRefresh(): void {
     this._activeExecutionContext.manualRefresh();
-  }
-
-  private applyDefaultRange(execution: Execution, useStorage = false): void {
-    const fullRange = { from: execution.startTime!, to: execution.endTime || new Date().getTime() };
-    const fullRangeOption: TimeRangePickerSelection = { type: 'FULL', absoluteSelection: fullRange };
-    this.updateTimeRangeSelection(fullRangeOption);
   }
 
   private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
@@ -517,17 +431,19 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly PopoverMode = PopoverMode;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
-    if (selection.type === 'RELATIVE') {
-      let time = selection.relativeSelection!.timeInMs;
-      let now = new Date().getTime() - 5000;
-      selection!.absoluteSelection = { from: now - time, to: now };
-      if (!selection.relativeSelection!.label) {
-        let foundRelativeOption = this.timeRangeOptions.find(
-          (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
-        );
-        selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+    this.execution$.pipe(take(1)).subscribe((execution) => {
+      if (selection.type === 'RELATIVE') {
+        let time = selection.relativeSelection!.timeInMs;
+        let end = execution.endTime || new Date().getTime() - 5000;
+        selection!.absoluteSelection = { from: end - time, to: end };
+        if (!selection.relativeSelection!.label) {
+          let foundRelativeOption = this.timeRangeOptions.find(
+            (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+          );
+          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+        }
       }
-    }
-    this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
+      this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
+    });
   }
 }
