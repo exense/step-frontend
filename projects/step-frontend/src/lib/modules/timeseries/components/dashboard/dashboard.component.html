@@ -173,7 +173,8 @@
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
       <button
-        class="menu-btn grey-border"
+        class="menu-btn"
+        [class.grey-border]="settingsButtonPosition !== SETTINGS_LOCATION.ABOVE_FILTER_BAR"
         #menuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="settingsMenu"
         mat-icon-button
