@@ -1,3 +1,8 @@
 @if (dashboardId) {
-  <step-timeseries-dashboard [id]="dashboardId" [showExecutionLinks]="true" [showRefreshOption]="true" />
+  <step-timeseries-dashboard
+    [id]="dashboardId"
+    [showExecutionLinks]="true"
+    [showRefreshOption]="true"
+    [settingsButtonPosition]="SETTINGS_LOCATION.HEADER_BAR"
+  />
 }
