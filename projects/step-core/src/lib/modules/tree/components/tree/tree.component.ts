@@ -1,8 +1,6 @@
 import {
-  AfterViewInit,
   Component,
   contentChild,
-  DestroyRef,
   effect,
   ElementRef,
   EventEmitter,
@@ -12,7 +10,6 @@ import {
   inject,
   input,
   Input,
-  output,
   Output,
   ViewChild,
   ViewEncapsulation,
@@ -20,18 +17,20 @@ import {
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TreeActionsService } from '../../services/tree-actions.service';
 import { TreeStateService } from '../../services/tree-state.service';
-import { TreeAction } from '../../shared/tree-action';
-import { TreeNode } from '../../shared/tree-node';
+import { TreeAction } from '../../types/tree-action';
+import { TreeNode } from '../../types/tree-node';
 import { TreeNodeTemplateDirective } from '../../directives/tree-node-template.directive';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
-import { DragDataService, DropInfo } from '../../../drag-drop';
-import { filter } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TreeFlatNode } from '../../shared/tree-flat-node';
+import { DragDataService } from '../../../drag-drop';
+import { TreeFlatNode } from '../../types/tree-flat-node';
 import { TreeFocusStateService } from '../../services/tree-focus-state.service';
-import { DOCUMENT } from '@angular/common';
+import { AsyncPipe, DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { TreeNodeDetailsTemplateDirective } from '../../directives/tree-node-details-template.directive';
-import { DragEndType } from '../../../drag-drop/types/drag-end-type.enum';
+import { TreeNodeNameTemplateDirective } from '../../directives/tree-node-name-template.directive';
+import { TreeNodeComponent } from '../tree-node/tree-node.component';
+import { TreeNodeActionsPipe } from '../../pipes/tree-node-actions.pipe';
+import { StepMaterialModule } from '../../../step-material/step-material.module';
+import { OriginalNodePipe } from '../../pipes/original-node.pipe';
 
 @Component({
   selector: 'step-tree',
@@ -43,10 +42,11 @@ import { DragEndType } from '../../../drag-drop/types/drag-end-type.enum';
       useExisting: forwardRef(() => TreeComponent),
     },
   ],
+  standalone: true,
   encapsulation: ViewEncapsulation.None,
+  imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })
-export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNodeTemplateContainerService {
-  private _destroyRef = inject(DestroyRef);
+export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContainerService {
   private _treeActions = inject(TreeActionsService, { optional: true });
   private _treeFocusState = inject(TreeFocusStateService, { optional: true });
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -64,6 +64,7 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
   @ViewChild('nodeContextMenuTrigger', { static: true, read: MatMenuTrigger }) contextMenuTrigger!: MatMenuTrigger;
 
   readonly treeNodeTemplate = contentChild(TreeNodeTemplateDirective);
+  readonly treeNodeNameTemplate = contentChild(TreeNodeNameTemplateDirective);
   readonly treeNodeDetailsTemplate = contentChild(TreeNodeDetailsTemplateDirective);
 
   @Input() dragDisabled: boolean = false;
@@ -75,31 +76,13 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   @Output() nodeDblClick = new EventEmitter<{ node: N | TreeNode; event: MouseEvent }>();
 
-  /** @Output() **/
-  readonly externalObjectDrop = output<DropInfo>();
-
-  protected openedMenuNodeId?: string;
+  openedMenuNodeId?: string;
 
   private forceFocusChange = effect(() => {
     if (this.forceFocus()) {
       this.setFocus(true);
     }
   });
-
-  ngAfterViewInit(): void {
-    this.dragData.dragData$
-      .pipe(
-        filter((dragItemId) => !!dragItemId && typeof dragItemId === 'string'),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((dragItemId) => this._treeState.selectNode(dragItemId as string, undefined, true));
-    this.dragData.dragEnd$
-      .pipe(
-        filter((dragEndType) => dragEndType === DragEndType.STOP),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => this._treeState.notifyInsertionComplete?.());
-  }
 
   openContextMenu({ event, nodeId }: { event: MouseEvent; nodeId: string }): void {
     const node = this._treeState.findNodeById(nodeId);
@@ -134,48 +117,6 @@ export class TreeComponent<N extends TreeNode> implements AfterViewInit, TreeNod
 
   handleContextClose(): void {
     this.openedMenuNodeId = undefined;
-  }
-
-  handleDragOver(event: DropInfo): void {
-    if (!this._treeState.rootNodeId()) {
-      return;
-    }
-    const isTreeNode = typeof event.draggedElement === 'string';
-    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
-    if (isTreeNode && !this._treeState.canInsertTo(newParentId)) {
-      return;
-    }
-    this._treeState.notifyPotentialInsert?.(newParentId);
-  }
-
-  handleDropNode(event: DropInfo): void {
-    if (!this._treeState.rootNodeId()) {
-      this._treeState.notifyInsertionComplete?.();
-      return;
-    }
-    const newParentId = (event.droppedArea ?? this._treeState.rootNodeId()) as string;
-    const dropAdditionalInfo = event.additionalInfo as string | undefined;
-
-    const isTreeNode = typeof event.draggedElement === 'string';
-    if (!isTreeNode) {
-      this.externalObjectDrop.emit(event);
-      return;
-    }
-
-    if (!this._treeState.canInsertTo(newParentId)) {
-      this._treeState.notifyInsertionComplete?.();
-      return;
-    }
-
-    if (!dropAdditionalInfo) {
-      this._treeState.insertSelectedNodesTo(newParentId);
-    } else if (dropAdditionalInfo === 'first') {
-      this._treeState.insertSelectedNodesTo(newParentId, { insertAtFirstPosition: true });
-    } else {
-      const insertAfterSiblingId = dropAdditionalInfo as string;
-      this._treeState.insertSelectedNodesTo(newParentId, { insertAfterSiblingId });
-    }
-    this._treeState.notifyInsertionComplete?.();
   }
 
   private setFocus(isInFocus: boolean) {

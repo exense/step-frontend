@@ -1,0 +1,37 @@
+<ng-content />
+@for (node of items(); track node.id) {
+  <div
+    class="json-node"
+    [class.additional-shift]="node.isParentIconExist"
+    [style.--level]="node.level"
+    (click)="displayNode(node)"
+  >
+    @if (node.name || node.icon) {
+      <div class="name-container">
+        @if (node.icon) {
+          <step-icon [name]="node.icon" [matTooltip]="node.iconTooltip ?? ''" matTooltipPosition="below" />
+        }
+        @if (node.name) {
+          <strong class="name">{{ node.name }}:</strong>
+        }
+      </div>
+    }
+    @if (node.value?.toString(); as value) {
+      <div class="value-container">
+        {{ value }}
+      </div>
+    }
+  </div>
+}
+@if (hasCollapseButton()) {
+  @if (isCollapsed()) {
+    <div class="fade"></div>
+    <button mat-stroked-button color="primary" type="button" class="btn-more" (click)="toggleCollapse()">
+      {{ labelExpand() }}
+    </button>
+  } @else {
+    <button mat-stroked-button color="primary" type="button" class="btn-more visible" (click)="toggleCollapse()">
+      {{ labelCollapse() }}
+    </button>
+  }
+}

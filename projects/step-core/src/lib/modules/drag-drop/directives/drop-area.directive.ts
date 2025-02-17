@@ -1,8 +1,17 @@
-import { AfterViewInit, Directive, ElementRef, inject, input, NgZone, OnDestroy, output } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  ElementRef,
+  inject,
+  input,
+  NgZone,
+  OnDestroy,
+  output,
+  Renderer2,
+} from '@angular/core';
 import { DragDataService } from '../injectables/drag-data.service';
 import { DropInfo } from '../types/drop-info';
 import { DRAG_DROP_CLASS_NAMES } from '../injectables/drag-drop-class-names.token';
-import { DragDropListener } from '../types/drag-drop-listener';
 import { DragEndType } from '../types/drag-end-type.enum';
 
 @Directive({
@@ -13,17 +22,21 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _classNames = inject(DRAG_DROP_CLASS_NAMES);
   private _dragDataService = inject(DragDataService);
+  private _renderer = inject(Renderer2);
   private _zone = inject(NgZone);
 
-  private dragOverListener?: DragDropListener;
-  private dragLeaveListener?: DragDropListener;
-  private dropListener?: DragDropListener;
+  private stopListenDragOver?: () => void;
+  private stopListenDragLeave?: () => void;
+  private stopListenDrop?: () => void;
 
   /** @Input('stepDropArea') **/
   readonly dropArea = input<unknown | undefined>(undefined, { alias: 'stepDropArea' });
 
   /** @Input() **/
   readonly dropAdditionalInfo = input<unknown | undefined>(undefined);
+
+  /** @Input() **/
+  readonly dropDisabled = input(false);
 
   /** @Output() **/
   readonly dropItem = output<DropInfo>();
@@ -36,14 +49,18 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initListeners();
+    this._zone.runOutsideAngular(() => this.initListeners());
   }
 
   ngOnDestroy(): void {
-    this.destroyListeners();
+    this.stopListenDragOver?.();
+    this.stopListenDragLeave?.();
+    this.stopListenDrop?.();
   }
 
   private handleDragOver(event: DragEvent): void {
     if (
+      this.dropDisabled() ||
       !this._dragDataService.isDragStarted ||
       this._elRef.nativeElement.classList.contains(this._classNames.DRAG_IN_PROGRESS) ||
       (!!this.dropArea() && this.dropArea() === this._dragDataService.dragData)
@@ -57,11 +74,17 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   }
 
   private handleDragLeave(event: DragEvent): void {
+    if (this.dropDisabled()) {
+      return;
+    }
     this._elRef.nativeElement.classList.remove(this._classNames.DRAG_OVER);
     this.dragLeave.emit(this.getDropInfo());
   }
 
   private handleDrop(event: DragEvent): void {
+    if (this.dropDisabled()) {
+      return;
+    }
     event.preventDefault();
     this._zone.run(() => {
       this.dropItem.emit(this.getDropInfo());
@@ -78,30 +101,13 @@ export class DropAreaDirective implements AfterViewInit, OnDestroy {
   }
 
   private initListeners(): void {
-    this._zone.runOutsideAngular(() => {
-      this.dragOverListener = (event) => this.handleDragOver(event);
-      this.dragLeaveListener = (event) => this.handleDragLeave(event);
-      this.dropListener = (event) => this.handleDrop(event);
-      this._elRef.nativeElement.addEventListener('dragover', this.dragOverListener);
-      this._elRef.nativeElement.addEventListener('dragleave', this.dragLeaveListener);
-      this._elRef.nativeElement.addEventListener('drop', this.dropListener);
-    });
-  }
-
-  private destroyListeners(): void {
-    this._zone.runOutsideAngular(() => {
-      if (this.dragOverListener) {
-        this._elRef.nativeElement.removeEventListener('dragover', this.dragOverListener);
-        this.dragOverListener = undefined;
-      }
-      if (this.dragLeaveListener) {
-        this._elRef.nativeElement.removeEventListener('dragleave', this.dragLeaveListener);
-        this.dragLeaveListener = undefined;
-      }
-      if (this.dropListener) {
-        this._elRef.nativeElement.removeEventListener('drop', this.dropListener);
-        this.dropListener = undefined;
-      }
-    });
+    const element = this._elRef.nativeElement;
+    this.stopListenDragOver = this._renderer.listen(element, 'dragover', (event: DragEvent) =>
+      this.handleDragOver(event),
+    );
+    this.stopListenDragLeave = this._renderer.listen(element, 'dragleave', (event: DragEvent) =>
+      this.handleDragLeave(event),
+    );
+    this.stopListenDrop = this._renderer.listen(element, 'drop', (event: DragEvent) => this.handleDrop(event));
   }
 }

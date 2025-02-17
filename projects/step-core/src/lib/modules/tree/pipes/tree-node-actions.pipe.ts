@@ -1,11 +1,12 @@
 import { inject, Optional, Pipe, PipeTransform } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { TreeAction } from '../shared/tree-action';
+import { TreeAction } from '../types/tree-action';
 import { TreeActionsService } from '../services/tree-actions.service';
-import { TreeNode } from '../shared/tree-node';
+import { TreeNode } from '../types/tree-node';
 
 @Pipe({
   name: 'treeNodeActions',
+  standalone: true,
 })
 export class TreeNodeActionsPipe implements PipeTransform {
   private _treeActions? = inject(TreeActionsService, { optional: true });

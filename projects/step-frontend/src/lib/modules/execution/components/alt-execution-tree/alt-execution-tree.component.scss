@@ -3,8 +3,6 @@
 
 step-alt-execution-tree {
   display: block;
-  height: 60vh;
-  max-height: 60vh;
 
   @include core.reportNodeStatuses;
 
@@ -12,13 +10,26 @@ step-alt-execution-tree {
     background: transparent !important;
   }
 
-  .tree-container {
+  .tree-panel {
     overflow: auto !important;
+    padding-right: 1rem;
+  }
+
+  .node-details-panel {
+    padding-left: 1rem;
   }
 
   step-report-node-short {
     display: block;
     margin-left: 0.8rem;
+  }
+
+  .tree-node {
+    flex: 1;
+  }
+
+  .step-tree-node-container {
+    flex-direction: column;
   }
 
   step-tree-node-name {

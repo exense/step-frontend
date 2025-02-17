@@ -1,0 +1,17 @@
+:host,
+.json-node {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.json-node > span {
+  white-space: nowrap;
+}
+
+.value.long-line {
+  &:after {
+    display: inline-block;
+    content: '...';
+  }
+}
