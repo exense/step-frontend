@@ -172,13 +172,7 @@
 
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
-      <button
-        class="menu-btn"
-        [class.grey-border]="settingsButtonPosition !== SETTINGS_LOCATION.ABOVE_FILTER_BAR"
-        #menuTrigger="matMenuTrigger"
-        [matMenuTriggerFor]="settingsMenu"
-        mat-icon-button
-      >
+      <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu" mat-icon-button>
         <step-icon name="settings" />
       </button>
       @if (showRefreshOption) {
