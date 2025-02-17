@@ -178,7 +178,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
-    .pipe(takeUntilDestroyed())
+    .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
     .subscribe((activeExecution) => {
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();

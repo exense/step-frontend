@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
-import { TimeRange, TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
+import { TimeRange, TimeRangeSelection } from '@exense/step-core';
 import { TimeRangePickerSelection, TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
@@ -9,7 +9,6 @@ import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
-import { merge } from 'rxjs';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -45,6 +44,7 @@ export class DashboardUrlParamsService {
         acc[key.substring(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX.length)] = params[key];
         return acc;
       }, {} as Params);
+    console.log(params);
     const editModeValue = params['edit'];
     const timeRange = this.extractTimeRange(params);
     return {
@@ -81,6 +81,8 @@ export class DashboardUrlParamsService {
       case TimeRangeType.RELATIVE:
         const relativeRange = parseInt(params['relativeRange']);
         return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
+      case TimeRangeType.FULL:
+        return { type: 'FULL' };
       default:
         return undefined;
     }
