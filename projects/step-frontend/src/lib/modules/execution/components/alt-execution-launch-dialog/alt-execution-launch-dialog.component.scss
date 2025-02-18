@@ -6,6 +6,19 @@ div[step-modal-window-body] {
 
 .artefact-info {
   gap: 1rem;
+  & > section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    h4 {
+      margin: 0;
+    }
+  }
+}
+
+hr {
+  width: 100%;
+  margin: 0;
 }
 
 div[step-modal-window-body] {

@@ -24,6 +24,14 @@ step-alt-execution-tree {
     margin-left: 0.8rem;
   }
 
+  .tree-node {
+    flex: 1;
+  }
+
+  .step-tree-node-container {
+    flex-direction: column;
+  }
+
   step-tree-node-name {
     width: 100%;
     &.not-selectable {

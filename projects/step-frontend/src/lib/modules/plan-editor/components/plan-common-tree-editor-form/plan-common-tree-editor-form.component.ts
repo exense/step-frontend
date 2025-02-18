@@ -79,8 +79,20 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
     if (!artefact$) {
       return;
     }
+
+    let insertIndex: number | undefined = undefined;
+    if (event.additionalInfo === 'first') {
+      insertIndex = 0;
+    } else if (!!event.additionalInfo) {
+      const parent = this._treeState.findNodeById(parentNodeId);
+      const index = (parent?.children ?? []).findIndex((child) => child.id === event.additionalInfo);
+      if (index >= 0) {
+        insertIndex = index + 1;
+      }
+    }
+
     artefact$.subscribe((artefact) => {
-      this._treeState.insertChildren(parentNodeId, [artefact]);
+      this._treeState.insertChildren(parentNodeId, [artefact], insertIndex);
       this._treeState.notifyInsertionComplete?.();
     });
   }

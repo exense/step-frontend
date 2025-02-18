@@ -20,7 +20,6 @@ const MAX_OPENED_EXECUTIONS = 5;
       provide: ExecutionTabManagerService,
       useExisting: AltExecutionsComponent,
     },
-    ActiveExecutionsService,
   ],
 })
 export class AltExecutionsComponent implements OnInit, ExecutionTabManagerService {

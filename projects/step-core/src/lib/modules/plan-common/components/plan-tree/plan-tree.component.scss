@@ -1,0 +1,84 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-plan-tree {
+  display: flex;
+  height: 100%;
+
+  step-tree {
+    overflow: hidden;
+    margin-top: 2rem;
+    padding-right: 6.5rem;
+    &:hover {
+      overflow: auto;
+    }
+  }
+
+  step-tree-node-draggable.step-tree-node-container.empty-pseudo-node {
+    .tree-node .node-content step-tree-node-name {
+      border: dashed 0.1rem var.$muted;
+      min-width: 8rem;
+    }
+  }
+
+  step-tree-node-draggable {
+    .tree-node {
+      .node-content .node-name {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        button {
+          padding: 0 0.1rem;
+          min-width: 0;
+          background: none;
+        }
+
+        button.actions-button {
+          visibility: hidden;
+        }
+
+        &.node-displayed {
+          font-weight: 500;
+          color: var.$blue-600;
+        }
+      }
+
+      &.skipped {
+        .node-content .node-name.node-displayed {
+          color: var.$blue-50 !important;
+        }
+      }
+
+      &.tree-node-selected-for-insert {
+        .node-content .node-icon {
+          border: 0.1rem solid var.$blue-600;
+        }
+        &:not(.skipped) .node-content .node-icon {
+          background: var.$white;
+          color: var.$blue-600;
+        }
+      }
+    }
+
+    .tree-node {
+      .node-content.dragover {
+        .node-icon {
+          border: 0.1rem solid var.$blue-600;
+        }
+        .node-name {
+          color: var.$blue-600;
+          font-weight: 500;
+        }
+      }
+      &:not(.skipped) .node-content.dragover .node-icon {
+        background: var.$white;
+        color: var.$blue-600;
+      }
+    }
+
+    .node-content:hover .node-name button.actions-button,
+    &.context-menu-open .node-content .node-name button.actions-button {
+      visibility: visible;
+    }
+  }
+}

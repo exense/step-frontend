@@ -67,9 +67,20 @@ import { StatusIconPipe } from './pipes/status-icon.pipe';
 import { SelectComponent } from './components/select/select.component';
 import { SelectExtraOptionsDirective } from './directives/select-extra-options.directive';
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
+import { ElementResizeDirective } from './directives/element-resize.directive';
+import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
+import { PasswordComponent } from './components/password/password.component';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StepMaterialModule, RouterModule, NgxMatSelectSearchModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StepMaterialModule,
+    RouterModule,
+    NgxMatSelectSearchModule,
+    ElementResizeDirective,
+  ],
   declarations: [
     ResourceLabelComponent,
     ArrayFilterComponent,
@@ -102,6 +113,7 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -134,6 +146,7 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
+    DynamicInputWidthDirective,
   ],
   exports: [
     CommonModule,
@@ -171,6 +184,7 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -204,6 +218,8 @@ import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
     SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
+    ElementResizeDirective,
+    DynamicInputWidthDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -226,6 +242,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
+export * from './components/password/password.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
@@ -325,4 +342,6 @@ export * from './injectables/statuses-colors.token';
 export * from './pipes/status-icon.pipe';
 export * from './pipes/shorten-number.pipe';
 export * from './components/select/select.component';
+export * from './directives/element-resize.directive';
 export * from './directives/select-extra-options.directive';
+export * from './directives/dynamic-input-width.directive';

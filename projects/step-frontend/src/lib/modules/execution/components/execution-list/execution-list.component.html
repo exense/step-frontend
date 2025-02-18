@@ -1,5 +1,6 @@
 <step-drag-drop-container>
   <step-table
+    data-step-testid="execution-table"
     [dataSource]="dataSource"
     matSort
     matSortActive="executionTime"
@@ -7,6 +8,7 @@
     [matSortDisableClear]="true"
   >
     <step-bulk-operations
+      data-step-testid="execution-bulk-operations"
       *stepAdditionalHeader="'btngroup-bulk-new'"
       entity="executions"
       (selectionTypeChange)="changeType($event)"
@@ -14,21 +16,26 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>
         <step-autorefresh-toggle
-          stepTestId="execution-auto-refresh"
+          data-step-testid="execution-auto-refresh"
           [(disabled)]="autoRefreshDisabled"
           [interval]="5000"
           (refresh)="refreshTable()"
         />
       </step-btn-group>
     </section>
-    <ng-container matColumnDef="bulkSelection">
+    <ng-container data-step-testid="execution-bulk-selection" matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
       <td mat-cell *matCellDef="let element">
         <step-entity-selection-di [entity]="element" />
       </td>
     </ng-container>
     <step-entity-column-container entityName="executions" />
-    <ng-container matColumnDef="description" stepActivityCol="Description" stepSearchCol>
+    <ng-container
+      data-step-testid="execution-description"
+      matColumnDef="description"
+      stepActivityCol="Description"
+      stepSearchCol
+    >
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Description</step-drag-column-caption>
       </th>
@@ -39,7 +46,7 @@
     </ng-container>
     <ng-container matColumnDef="executionTime" stepActivityCol="Execution Time" stepSearchCol>
       <step-range-filter
-        stepTestId="execution-time-select"
+        data-step-testid="execution-time-select"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.dateRangeFilterCondition"
@@ -53,7 +60,7 @@
     </ng-container>
     <ng-container matColumnDef="startTime" stepActivityCol="Start Time" stepSearchCol [isHiddenByDefault]="true">
       <step-date-filter
-        stepTestId="start-time-filter"
+        data-step-testid="start-time-filter"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
@@ -67,7 +74,7 @@
     </ng-container>
     <ng-container matColumnDef="endTime" stepActivityCol="End Time" stepSearchCol [isHiddenByDefault]="true">
       <step-date-filter
-        stepTestId="end-time-filter"
+        data-step-testid="end-time-filter"
         *stepSearchCellDef
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.singleDateFilterCondition"
@@ -79,7 +86,7 @@
         {{ element?.endTime | date: DateFormat.DATE }}
       </td>
     </ng-container>
-    <ng-container matColumnDef="user" stepActivityCol="User" stepSearchCol>
+    <ng-container data-step-testid="execution-user" matColumnDef="user" stepActivityCol="User" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>User</step-drag-column-caption>
       </th>
@@ -87,7 +94,7 @@
     </ng-container>
     <ng-container matColumnDef="status" stepActivityCol="Status" stepSearchCol>
       <step-multi-level-array-filter
-        stepTestId="status-select"
+        data-step-testid="status-select"
         *stepSearchCellDef
         #statusFilter
         stepFilterConnect
@@ -109,7 +116,7 @@
         <step-execution-status [execution]="element" />
       </td>
     </ng-container>
-    <ng-container matColumnDef="executionSummary" stepActivityCol="Summary">
+    <ng-container data-step-testid="execution-summary" matColumnDef="executionSummary" stepActivityCol="Summary">
       <th mat-header-cell *matHeaderCellDef>
         <step-drag-column-caption>Summary</step-drag-column-caption>
       </th>
@@ -119,7 +126,7 @@
         </div>
       </td>
     </ng-container>
-    <ng-container matColumnDef="actions" stepActionCol>
+    <ng-container data-step-testid="execution-actions" matColumnDef="actions" stepActionCol>
       <th mat-header-cell *matHeaderCellDef>
         <step-column-settings />
       </th>
