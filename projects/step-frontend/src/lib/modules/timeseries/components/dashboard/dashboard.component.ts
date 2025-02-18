@@ -62,6 +62,7 @@ import { DashboardState } from './dashboard-state';
 import { TimeSeriesEntityService } from '../../modules/_common';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
+import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-location';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -106,7 +107,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
-  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
+  @Input() showHeaderBar = true;
+  @Input() settingsButtonPosition: DashboardViewSettingsBtnLocation = DashboardViewSettingsBtnLocation.HEADER_BAR;
+
+  SETTINGS_LOCATION = DashboardViewSettingsBtnLocation;
 
   private exportInProgress = false;
   dashboard!: DashboardView;
