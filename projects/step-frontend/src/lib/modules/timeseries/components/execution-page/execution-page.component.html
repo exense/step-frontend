@@ -10,7 +10,9 @@
     [showDashboardName]="false"
     [showHeaderBar]="false"
     [settingsButtonPosition]="
-      isNewMode ? SETTINGS_BTN_LOCATION.ABOVE_FILTER_BAR : SETTINGS_BTN_LOCATION.SHIFTED_TO_TABS
+      (executionMode | async) === ExecutionViewMode.NEW
+        ? SETTINGS_BTN_LOCATION.ABOVE_FILTER_BAR
+        : SETTINGS_BTN_LOCATION.SHIFTED_TO_TABS
     "
   />
 } @else if (executionHasToBeBuilt) {

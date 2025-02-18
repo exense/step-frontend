@@ -15,14 +15,15 @@ import {
   AsyncTasksService,
   AuthService,
   Execution,
+  ExecutionViewMode,
+  ExecutionViewModeService,
   pollAsyncTask,
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
-import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
 import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'step-execution-page',
@@ -44,7 +45,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);
-  readonly isNewMode = inject(ExecutionViewModeService).mode;
+  protected _executionViewModeService = inject(ExecutionViewModeService);
+  protected executionMode?: Observable<ExecutionViewMode>;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -98,6 +100,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
+      this.executionMode = this._executionViewModeService.getExecutionMode(this.execution);
       this.executionRange = this.getExecutionRange(this.execution);
       this.dashboard.refresh();
     }
@@ -123,4 +126,6 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         },
       });
   }
+
+  protected readonly ExecutionViewMode = ExecutionViewMode;
 }

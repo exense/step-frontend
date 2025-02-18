@@ -386,13 +386,6 @@ export class ExecutionModule {
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
           ],
-          canActivate: [
-            (route: ActivatedRouteSnapshot) => {
-              const id = route.params['id'];
-              inject(ActiveExecutionContextService).setupExecutionId(id);
-              return true;
-            },
-          ],
           children: [
             {
               path: '',
