@@ -23,11 +23,11 @@ export class AggregatedTreeNodeComponent {
   });
 
   protected showIterations(status?: Status): void {
-    const nodeId = this.nodeId();
-    if (!nodeId) {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    this._treeState.selectNode(nodeId);
-    this._executionDialogs.openIterations(nodeId, status);
+    this._treeState.selectNode(node);
+    this._executionDialogs.openIterations(node, status);
   }
 }

@@ -19,11 +19,22 @@ export class AltExecutionTabsService {
 
   readonly tabs = this.tabsInternal.asReadonly();
 
-  addTab(id: string, label: string, link?: string): void {
+  addTab(id: string, label: string, link?: string, before?: string | STATIC_TABS): void {
     if (this.addedTabs.has(id)) {
       return;
     }
-    this.tabsInternal.update((tabs) => [...tabs, this.createTab(id, label, link)]);
+    this.tabsInternal.update((tabs) => {
+      if (!before) {
+        return [...tabs, this.createTab(id, label, link)];
+      }
+      const index = tabs.findIndex((tab) => tab.id === before);
+      if (index < 0) {
+        return [...tabs, this.createTab(id, label, link)];
+      }
+      const result = [...tabs];
+      result.splice(index, 0, this.createTab(id, label, link));
+      return result;
+    });
     this.addedTabs.add(id);
   }
 

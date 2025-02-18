@@ -110,6 +110,7 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
 
 @NgModule({
   declarations: [
@@ -171,6 +172,7 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
     AltExecutionRangePrintComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
+    AltExecutionTreePartialTabComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -440,6 +442,20 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionTreeTabComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
+                },
+              ],
+            },
+            {
+              path: 'sub-tree/:reportNodeId',
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionTreePartialTabComponent,
                 },
                 {
                   path: '',
