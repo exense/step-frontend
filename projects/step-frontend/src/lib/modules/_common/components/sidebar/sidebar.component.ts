@@ -27,14 +27,9 @@ import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.comp
 import { combineLatest, first, map, startWith } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DisplayMenuEntry } from '../../types/display-menu-entry.type';
 
 const MIDDLE_BUTTON = 1;
-
-export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom' | 'isActiveFct'> & {
-  isBookmark?: boolean;
-  hasChildren?: boolean;
-  children?: DisplayMenuEntry[];
-};
 
 const BOOKMARKS_ROOT = 'bookmarks-root';
 

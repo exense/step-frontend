@@ -1,7 +1,7 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MenuEntry, NavigatorService } from '@exense/step-core';
-import { DisplayMenuEntry } from '../components/sidebar/sidebar.component';
+import { DisplayMenuEntry } from '../types/display-menu-entry.type';
 
 @Pipe({
   name: 'isMenuItemActive',
