@@ -18,15 +18,22 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import {
+  TimeRangePickerSelection,
+  TimeSeriesConfig,
+  TimeSeriesContext,
+  TimeSeriesUtils,
+} from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 declare const uPlot: any;
 
 interface UrlParams {
   timeRangeSelection?: TimeRangePickerSelection;
+  refresh: number;
 }
 
 interface EntityWithKeywordsStats {
@@ -40,6 +47,7 @@ interface EntityWithKeywordsStats {
   templateUrl: './schedule-overview.component.html',
   styleUrls: ['./schedule-overview.component.scss'],
   providers: [
+    DashboardUrlParamsService,
     {
       provide: VIEW_MODE,
       useFactory: () => {
@@ -51,7 +59,8 @@ interface EntityWithKeywordsStats {
 })
 export class ScheduleOverviewComponent implements OnInit {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
-  readonly URL_PARAMS_PREFIX = 'q_';
+  readonly URL_PARAMS_PREFIX = 'dc_';
+  private _urlParamService = inject(DashboardUrlParamsService);
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
@@ -79,6 +88,7 @@ export class ScheduleOverviewComponent implements OnInit {
   protected repositoryId?: string;
 
   task = signal<ExecutiontTaskParameters | undefined>(undefined);
+  refreshInterval = signal<number>(0);
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
@@ -87,6 +97,18 @@ export class ScheduleOverviewComponent implements OnInit {
       return this.calculateTimeRange(selection);
     } else {
       return undefined;
+    }
+  });
+
+  urlUpdateEffect = effect(() => {
+    let timeRange = this.activeTimeRangeSelection();
+    let refreshInterval = this.refreshInterval();
+  });
+
+  refreshEffect = effect(() => {
+    let range = this.timeRange();
+    if (range) {
+      this.refreshCharts(this._taskId, range);
     }
   });
 
@@ -108,19 +130,12 @@ export class ScheduleOverviewComponent implements OnInit {
   lastKeywordsExecutions: Execution[] = [];
 
   constructor() {
-    const urlParams = this.collectUrlParams();
-    if (urlParams.timeRangeSelection) {
-      this.activeTimeRangeSelection.set(urlParams.timeRangeSelection!);
+    const urlParams = this._urlParamService.collectUrlParams();
+    if (urlParams.timeRange) {
+      this.activeTimeRangeSelection.set(urlParams.timeRange!);
     } else {
-      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
+      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]); // hourly default
     }
-    effect(() => {
-      let range = this.timeRange();
-      if (range) {
-        this.updateUrlParams();
-        this.refreshCharts(this._taskId, range);
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -146,6 +161,15 @@ export class ScheduleOverviewComponent implements OnInit {
       this.fetchAndCreateKeywordsChart(fullRange, executions);
       this.fetchAndCreateTestCasesChart(fullRange, executions);
     });
+  }
+
+  triggerRefresh() {
+    // signal is triggered
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+  }
+
+  handleRefreshIntervalChange(interval: number) {
+    this.refreshInterval.set(interval);
   }
 
   private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
@@ -545,36 +569,5 @@ export class ScheduleOverviewComponent implements OnInit {
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
-    // this.timeRangeChange.next({ selection, triggerRefresh: true });
-  }
-
-  private updateUrlParams() {
-    const timeRangeSelection = this.activeTimeRangeSelection()!;
-    const params = TimeSeriesUtils.convertTimeRangeSelectionToUrlParams(timeRangeSelection);
-    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
-      accumulator[this.URL_PARAMS_PREFIX + key] = params[key];
-      return accumulator;
-    }, {});
-    this._router.navigate([], {
-      relativeTo: this._activatedRoute,
-      queryParams: prefixedParams,
-    });
-  }
-
-  private collectUrlParams(): UrlParams {
-    let params = this._activatedRoute.snapshot.queryParams;
-    params = Object.keys(params)
-      .filter((key) => key.startsWith(this.URL_PARAMS_PREFIX))
-      .reduce((acc, key) => {
-        acc[key.substring(this.URL_PARAMS_PREFIX.length)] = params[key];
-        return acc;
-      }, {} as Params);
-    let timeRangeSelection = TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
-    if (timeRangeSelection?.type === 'RELATIVE') {
-      timeRangeSelection = this.findRelativeTimeOption(timeRangeSelection.relativeSelection!.timeInMs!);
-    }
-    return {
-      timeRangeSelection: timeRangeSelection,
-    };
   }
 }
