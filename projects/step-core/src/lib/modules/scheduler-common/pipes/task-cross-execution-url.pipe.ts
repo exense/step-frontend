@@ -1,5 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { CommonEntitiesUrlsService, ExecutiontTaskParameters } from '@exense/step-core';
+import { CommonEntitiesUrlsService } from '../../basics/step-basics.module';
+import { ExecutiontTaskParameters } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'taskCrossExecutionUrl',
