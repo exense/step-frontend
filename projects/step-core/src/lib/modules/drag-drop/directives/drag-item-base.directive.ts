@@ -10,9 +10,11 @@ import {
   Renderer2,
   Signal,
 } from '@angular/core';
-import { DRAG_DROP_CLASS_NAMES, DragDataService, DragEndType } from '@exense/step-core';
 import { DragDropContainerService } from '../injectables/drag-drop-container.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DragDataService } from '../injectables/drag-data.service';
+import { DRAG_DROP_CLASS_NAMES } from '../injectables/drag-drop-class-names.token';
+import { DragEndType } from '../types/drag-end-type.enum';
 
 @Directive()
 export abstract class DragItemBaseDirective implements AfterViewInit, OnDestroy {
