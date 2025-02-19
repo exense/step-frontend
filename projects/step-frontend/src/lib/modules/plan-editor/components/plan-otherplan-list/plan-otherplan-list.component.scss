@@ -17,6 +17,9 @@ step-plan-otherplan-list {
       justify-content: flex-end;
       padding-right: 1.2rem;
     }
+    tbody > tr.step-draggable-item {
+      cursor: grab;
+    }
   }
 
   .additional-header {

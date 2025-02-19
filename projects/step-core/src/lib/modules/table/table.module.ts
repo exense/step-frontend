@@ -47,6 +47,8 @@ import { ActionColDirective } from './directives/action-col.directive';
 import { CustomCellColInputPipe } from './pipe/custom-cell-col-input.pipe';
 import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pipe';
 import { SettingsInsideActionColDirective } from './directives/settings-inside-action-col.directive';
+import { RowsExtensionDirective } from './directives/rows-extension.directive';
+import { RowDirective } from './directives/row.directive';
 
 @NgModule({
   imports: [
@@ -89,6 +91,8 @@ import { SettingsInsideActionColDirective } from './directives/settings-inside-a
     CustomCellColInputPipe,
     CustomCellApplySubPathPipe,
     SettingsInsideActionColDirective,
+    RowDirective,
+    RowsExtensionDirective,
   ],
   exports: [
     TableComponent,
@@ -112,6 +116,7 @@ import { SettingsInsideActionColDirective } from './directives/settings-inside-a
     HeaderCellContainerComponent,
     ColumnSettingsSaveDashletComponent,
     SettingsInsideActionColDirective,
+    RowsExtensionDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -153,6 +158,7 @@ export * from './components/header-cell-container/header-cell-container.componen
 export * from './components/base-column-container/base-column-container.component';
 export * from './components/paginator/paginator.component';
 export * from './components/column-settings-save-dashlet/column-settings-save-dashlet.component';
+export * from './directives/rows-extension.directive';
 export * from './directives/column.directive';
 export * from './directives/activity-col.directive';
 export * from './directives/action-col.directive';
@@ -188,3 +194,4 @@ export * from './services/table-highlight-item-container.service';
 export * from './services/table-columns-config.provider';
 export * from './services/table-columns.service';
 export * from './services/items-per-page.service';
+export * from './types/row-info.interface';
