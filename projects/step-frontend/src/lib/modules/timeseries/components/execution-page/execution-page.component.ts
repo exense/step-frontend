@@ -16,6 +16,7 @@ import {
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
+  TimeRangePickerComponent,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -31,8 +32,9 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
+import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
+import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 
 @Component({
   selector: 'step-execution-page',
@@ -58,6 +60,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
 
   private _authService = inject(AuthService);
+  readonly isNewMode = inject(ExecutionViewModeService).mode;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -71,6 +74,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   private _asyncTaskService = inject(AsyncTasksService);
 
   private _destroyRef = inject(DestroyRef);
+
+  readonly SETTINGS_BTN_LOCATION = DashboardViewSettingsBtnLocation;
 
   ngOnInit(): void {
     if (!this.execution) {

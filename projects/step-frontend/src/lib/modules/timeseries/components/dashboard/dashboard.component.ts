@@ -2,7 +2,6 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
   Input,
   OnChanges,
@@ -64,6 +63,7 @@ import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
+import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-location';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -109,7 +109,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input() showExecutionLinks = true;
   @Input() showRefreshOption = true;
   @Input() showDashboardName = true;
-  @Input() showHeaderBar = true; // if false, the settings button will be shifted out of the component
+  @Input() showHeaderBar = true;
+  @Input() settingsButtonPosition: DashboardViewSettingsBtnLocation = DashboardViewSettingsBtnLocation.HEADER_BAR;
+
+  SETTINGS_LOCATION = DashboardViewSettingsBtnLocation;
 
   @Output() timeRangeChange = new EventEmitter<TimeRangePickerSelection>();
 
