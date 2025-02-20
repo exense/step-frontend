@@ -22,14 +22,10 @@ step-alt-execution-report {
 
       &:not(.small-screen) {
         width: 100%;
-        grid-template-columns: max(25%, 30rem) repeat(2, 25%) 1fr;
+        grid-template-columns: repeat(4, 1fr);
 
-        & > *:nth-child(2n + 1) {
-          grid-column: 1 / 2;
-        }
-
-        & > *:nth-child(2n + 2) {
-          grid-column: 2 / 5;
+        .widget {
+          grid-column: span var(--colSpan, 1);
         }
       }
     }

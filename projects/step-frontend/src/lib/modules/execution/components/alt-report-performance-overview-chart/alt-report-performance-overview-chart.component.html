@@ -1,8 +1,15 @@
 <step-alt-report-widget title="Performance Overview (avg)">
   <step-alt-report-widget-filter>
     @if (_mode === ViewMode.VIEW) {
-      <button type="button" mat-stroked-button [disabled]="isFullRange()" (click)="fullRange.emit()">
-        Select full range
+      <button
+        type="button"
+        mat-stroked-button
+        [disabled]="isFullRange()"
+        (click)="fullRange.emit()"
+        matTooltip="Select the full range"
+        matTooltipPosition="below"
+      >
+        Reset range
       </button>
     }
   </step-alt-report-widget-filter>

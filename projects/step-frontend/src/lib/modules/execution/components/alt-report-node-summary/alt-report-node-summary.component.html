@@ -1,7 +1,7 @@
 <step-alt-report-widget [title]="title()">
   <step-alt-report-widget-content>
-    @if (chartSettings) {
-      <step-doughnut-chart [settings]="chartSettings!" />
+    @if (chartSettings(); as chartSettings) {
+      <step-doughnut-chart [settings]="chartSettings" />
     }
 
     @if (legend(); as legend) {
