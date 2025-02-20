@@ -111,12 +111,14 @@ import { ExecutionNavigatorQueryParamsCleanupService } from './services/executio
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
+import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 
 @NgModule({
   declarations: [
     ExecutionListComponent,
     StatusComponent,
     StatusDistributionComponent,
+    StatusCountBadgeComponent,
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,

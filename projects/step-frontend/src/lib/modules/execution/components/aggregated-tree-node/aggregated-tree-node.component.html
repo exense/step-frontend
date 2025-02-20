@@ -1,10 +1,12 @@
 @if (node(); as node) {
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
-      <div class="aggregated-info">
-        <span class="name" (click)="showIterations()">{{ node?.name }}</span>
-        <step-aggregated-tree-status [node]="node" (statusClick)="showIterations($event)" />
-        <span>{{ node?.originalArtefact?.description | treeNodeDescription }}</span>
+      <div class="aggregated-info" (click)="showIterations()">
+        <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
+        <step-aggregated-tree-status [node]="node" (statusClick)="showIterations($event.status, $event.event)" />
+        <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
+          node?.originalArtefact?.description | treeNodeDescription
+        }}</span>
         <step-artefact-inline-details [aggregatedInfo]="node" />
       </div>
     }

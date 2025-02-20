@@ -29,7 +29,7 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
   }
 
   protected override getArtefactItems(
-    info?: AggregatedArtefactInfo<SetArtefact>,
+    info?: AggregatedArtefactInfo<SetArtefact, SetReportNode>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[]> {
