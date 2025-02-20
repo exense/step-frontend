@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';

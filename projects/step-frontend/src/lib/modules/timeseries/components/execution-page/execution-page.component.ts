@@ -16,7 +16,6 @@ import {
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -35,6 +34,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
 import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
 @Component({
   selector: 'step-execution-page',

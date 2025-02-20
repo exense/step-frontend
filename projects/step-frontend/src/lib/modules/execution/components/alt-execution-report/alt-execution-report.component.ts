@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';

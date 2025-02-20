@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
