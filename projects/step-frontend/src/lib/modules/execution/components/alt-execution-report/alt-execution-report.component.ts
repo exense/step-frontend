@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-st
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { map, switchMap } from 'rxjs';
+import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -27,6 +28,8 @@ export class AltExecutionReportComponent {
   private _router = inject(Router);
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
 
+  private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+
   protected readonly _state = inject(AltExecutionStateService);
 
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
@@ -39,12 +42,16 @@ export class AltExecutionReportComponent {
 
   protected readonly _mode = inject(VIEW_MODE);
 
-  protected handleOpenNodeInTreeView(keyword: ReportNode): void {
+  protected handleOpenNodeInTreePage(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
+  }
+
+  protected handleOpenNodeInTreeWidget(node: ReportNode): void {
+    this.treeWidget()?.focusNode(node.artefactID!);
   }
 
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
