@@ -40,7 +40,6 @@ export class ResourceLabelComponent implements OnChanges {
             pipe(
               catchError((error: HttpHeaderResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
-                  console.log('ERROR OVERRIDE');
                   const empty = new HttpResponse({ status: HttpStatusCode.NoContent });
                   return of(empty);
                 }
