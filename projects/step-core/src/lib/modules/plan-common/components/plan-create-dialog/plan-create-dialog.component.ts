@@ -69,12 +69,14 @@ export class PlanCreateDialogComponent implements AfterContentInit {
   }
 
   save(editAfterSave?: boolean): void {
+    const planAttributes = this.plan.attributes;
+    const planName = this.plan.attributes?.['name'];
     this.customForm()!
       .readyToProceed()
       .pipe(
-        switchMap(() => this._api.newPlan(this.planType, this.template)),
+        switchMap(() => this._api.newPlan(this.planType, this.template, planName)),
         tap((createdPlan) => {
-          createdPlan.attributes = this.plan.attributes;
+          createdPlan.attributes = planAttributes;
           if (createdPlan.root) {
             createdPlan.root.attributes = createdPlan.attributes;
           }
