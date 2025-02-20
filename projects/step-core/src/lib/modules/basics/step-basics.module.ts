@@ -69,6 +69,7 @@ import { SelectExtraOptionsDirective } from './directives/select-extra-options.d
 import { ShortenNumberPipe } from './pipes/shorten-number.pipe';
 import { ElementResizeDirective } from './directives/element-resize.directive';
 import { DynamicInputWidthDirective } from './directives/dynamic-input-width.directive';
+import { PasswordComponent } from './components/password/password.component';
 
 @NgModule({
   imports: [
@@ -112,6 +113,7 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -182,6 +184,7 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
+    PasswordComponent,
     StringArrayInputComponent,
     ArrayItemLabelPipe,
     AllowCharsDirective,
@@ -239,6 +242,7 @@ export * from './components/progress-bar/progress-bar.component';
 export * from './components/upload-container/upload-container.component';
 export * from './components/status-common/status-common.component';
 export * from './components/array-input/array-input.component';
+export * from './components/password/password.component';
 export * from './components/autocomplete-input/autocomplete-input.component';
 export * from './components/alerts-container/alerts-container.component';
 export { TimeUnitDictionary } from './components/time-input/base-time-converter.component';
