@@ -111,12 +111,14 @@ import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
+import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 
 @NgModule({
   declarations: [
     ExecutionListComponent,
     StatusComponent,
     StatusDistributionComponent,
+    StatusCountBadgeComponent,
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,

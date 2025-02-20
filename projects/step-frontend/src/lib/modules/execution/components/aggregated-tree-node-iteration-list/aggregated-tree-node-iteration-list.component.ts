@@ -13,19 +13,33 @@ import {
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
-import { arrayToRegex, AugmentedExecutionsService, ReportNode, TableSearch } from '@exense/step-core';
+import {
+  arrayToRegex,
+  AugmentedExecutionsService,
+  ItemsPerPageService,
+  ReportNode,
+  TableSearch,
+} from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 
+const PAGE_SIZE = 25;
+
 @Component({
   selector: 'step-aggregated-tree-node-iteration-list',
   templateUrl: './aggregated-tree-node-iteration-list.component.html',
   styleUrl: './aggregated-tree-node-iteration-list.component.scss',
+  providers: [
+    {
+      provide: ItemsPerPageService,
+      useExisting: AggregatedTreeNodeIterationListComponent,
+    },
+  ],
 })
-export class AggregatedTreeNodeIterationListComponent implements AfterViewInit {
+export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
   private _fb = inject(FormBuilder).nonNullable;
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
@@ -109,6 +123,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit {
     if (treeNodeName) {
       this._renderer.addClass(treeNodeName, 'not-selectable');
     }
+  }
+
+  getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[] {
+    return [PAGE_SIZE];
   }
 
   protected openNodeDetails(node: ReportNode): void {

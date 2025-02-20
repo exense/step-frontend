@@ -12,12 +12,20 @@ step-table {
 
 .name {
   width: 100%;
+  padding-left: 0;
 }
 
 .details-trigger {
   cursor: pointer;
   display: flex;
   gap: 0.5rem;
+  flex-direction: column;
+  max-width: 60rem;
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 .sort-handler {

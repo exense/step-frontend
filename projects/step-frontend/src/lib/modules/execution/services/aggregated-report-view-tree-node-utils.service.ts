@@ -62,6 +62,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       children,
       parentId,
       originalArtefact,
+      singleInstanceReportNode: item.singleInstanceReportNode,
       artefactHash: item.artefactHash,
       countByStatus: item.countByStatus,
       nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
