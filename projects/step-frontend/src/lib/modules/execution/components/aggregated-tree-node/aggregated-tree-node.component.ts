@@ -22,7 +22,11 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
-  protected showIterations(status?: Status): void {
+  protected readonly detailsTooltip = 'Open execution details';
+
+  protected showIterations(status?: Status, event?: MouseEvent): void {
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
     const nodeId = this.nodeId();
     if (!nodeId) {
       return;
