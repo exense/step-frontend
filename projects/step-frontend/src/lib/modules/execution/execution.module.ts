@@ -111,6 +111,7 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
@@ -123,6 +124,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     ExecutionListComponent,
     StatusComponent,
     StatusDistributionComponent,
+    StatusCountBadgeComponent,
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,

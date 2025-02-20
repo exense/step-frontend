@@ -7,8 +7,7 @@
     @if (legend(); as legend) {
       <section class="summary">
         @for (item of legend; track item.status) {
-          <step-status [status]="item.status" class="full-width" />
-          <span [title]="item.value">{{ item.value | bigNumber }}</span>
+          <step-status-count-badge [status]="item.status" [count]="item.value" />
         }
       </section>
     }

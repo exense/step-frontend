@@ -1,0 +1,9 @@
+<section [matTooltip]="tooltip()" matTooltipPosition="below" [style.--statusColor]="color()">
+  <div class="background"></div>
+  <div class="status-icon">
+    <step-icon [name]="status() | statusIcon" />
+  </div>
+  <div class="status-count">
+    {{ count() | bigNumber }}
+  </div>
+</section>
