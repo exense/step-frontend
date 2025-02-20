@@ -25,17 +25,15 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   private _treeSate = inject(TreeStateService);
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
+    const disabled = !node.children?.length;
     return of([
-      { id: TreeNodeAction.EXPAND_CHILDREN, label: 'Expand all children' },
-      { id: TreeNodeAction.COLLAPSE_CHILDREN, label: 'Collapse all children' },
+      { id: TreeNodeAction.EXPAND_CHILDREN, label: 'Expand all children', disabled },
+      { id: TreeNodeAction.COLLAPSE_CHILDREN, label: 'Collapse all children', disabled },
     ]);
   }
 
   hasActionsForNode(node: TreeNode): boolean {
-    if (!node.children?.length) {
-      return false;
-    }
-    return node.children.some((child) => !!child.children?.length);
+    return true;
   }
 
   focusNode(nodeId: string): void {

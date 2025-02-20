@@ -650,6 +650,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const subTreeIds = this.getSubTree(subRootNodeId)
       .filter((node) => node.hasChild)
       .map((node) => node.id);
+    subTreeIds.unshift(subRootNodeId);
 
     const idsToCollapse = new Set(subTreeIds);
 
