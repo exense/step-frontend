@@ -49,6 +49,10 @@ export class DashboardStateEngine {
         if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
           timeRangeSettings.fullRange.to = now;
         }
+        if (timeRangeSettings.pickerSelection.type === 'FULL') {
+          // force a new instance
+          timeRangeSettings.pickerSelection = { type: 'FULL', absoluteSelection: { ...timeRangeSettings.fullRange } };
+        }
         break;
       case 'ABSOLUTE':
         break;
