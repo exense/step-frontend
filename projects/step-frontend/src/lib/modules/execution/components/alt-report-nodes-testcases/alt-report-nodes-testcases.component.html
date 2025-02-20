@@ -12,7 +12,7 @@
         <span
           class="test-case-name"
           [class.is-selected]="hasTestCasesFilter() && (element.artefactID | isSelected | async)"
-          (click)="toggleSelection(element, $event)"
+          (click)="reportNodeClick.emit(element)"
         >
           {{ element.name }}
         </span>
