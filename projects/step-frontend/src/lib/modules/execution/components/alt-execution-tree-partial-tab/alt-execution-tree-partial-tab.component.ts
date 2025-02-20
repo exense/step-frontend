@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import {
   AggregatedReportViewRequest,
   AugmentedControllerService,
@@ -8,7 +8,7 @@ import {
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, filter, map, shareReplay, switchMap } from 'rxjs';
+import { catchError, combineLatest, filter, finalize, map, of, shareReplay, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-execution-tabs.service';
 
@@ -56,6 +56,8 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
     }),
   );
 
+  protected showSpinner = signal(false);
+
   ngOnInit(): void {
     this.setupTree();
     this.initializeTab();
@@ -65,10 +67,13 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
     combineLatest([this._executionState.executionId$, this.range$, this.reportNode$])
       .pipe(
         switchMap(([executionId, range, reportNode]) => {
+          this.showSpinner.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
-          return this._executionsApi
-            .getAggregatedReportView(executionId, request)
-            .pipe(map((tree) => (!tree ? undefined : { tree, artefactId: reportNode.artefactID ?? undefined })));
+          return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
+            map((tree) => (!tree ? undefined : { tree, artefactId: reportNode.artefactID ?? undefined })),
+            catchError(() => of(undefined)),
+            finalize(() => this.showSpinner.set(false)),
+          );
         }),
         takeUntilDestroyed(this._destroyRef),
       )
