@@ -108,12 +108,14 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 
 @NgModule({
   declarations: [
     ExecutionListComponent,
     StatusComponent,
     StatusDistributionComponent,
+    StatusCountBadgeComponent,
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,

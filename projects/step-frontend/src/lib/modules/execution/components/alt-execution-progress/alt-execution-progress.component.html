@@ -31,7 +31,7 @@
     <div class="sub-title">
       <step-alt-execution-time [startTime]="execution.startTime" [endTime]="execution.endTime" />
       @if (displayStatus$ | async; as status) {
-        <step-status [status]="status" />
+        <step-status [status]="status" [iconMode]="true" />
       }
       <div class="user">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
