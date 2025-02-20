@@ -53,4 +53,12 @@ export class AltExecutionTreeTabComponent implements OnInit {
         this._executionDialogs.openIterations(node);
       });
   }
+
+  protected collapseAll(): void {
+    this._treeState.collapseAll();
+  }
+
+  protected expandAll(): void {
+    this._treeState.expandAll();
+  }
 }
