@@ -40,9 +40,8 @@
       class="widget"
       [style.--colSpan]="1"
       [executionId]="executionId"
-      [timeRange]="(_state.timeRange$ | async)!"
-      (timeRangeChange)="_state.updateRange($event)"
-      [isFullRange]="!!(_state.isFullRangeSelected$ | async)"
+      [isFullRange]="(_state.timeRangeSelection$ | async)?.type === 'FULL'"
+      (timeRangeChange)="handleChartZooming($event)"
       (fullRange)="_state.selectFullRange()"
     />
   }

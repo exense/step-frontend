@@ -1,4 +1,18 @@
-import { Component, effect, ElementRef, input, OnDestroy, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  input,
+  Input,
+  OnChanges,
+  OnDestroy,
+  signal,
+  SimpleChanges,
+  TemplateRef,
+  viewChild,
+  ViewChild,
+} from '@angular/core';
 import { DoughnutChartSettings } from './doughnut-chart-settings';
 import Chart from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -21,12 +35,18 @@ export class DoughnutChartComponent implements OnDestroy {
 
   private chart: Chart | undefined;
 
-  private effectRecreateChart = effect(() => {
+  updateChartEffect = effect(() => {
     let settings = this.settings();
     let canvas = this.canvas();
     if (settings && canvas) {
-      this.chart?.destroy();
-      this.chart = this.createChart(settings, canvas);
+      if (this.chart) {
+        this.chart.data.labels = settings.items.map((i) => i.label);
+        this.chart.data.datasets[0].data = settings.items.map((i) => i.value);
+        this.chart.data.datasets[0].backgroundColor = settings.items.map((i) => i.background);
+        this.chart.update();
+      } else {
+        this.chart = this.createChart(settings, canvas);
+      }
     }
   });
 

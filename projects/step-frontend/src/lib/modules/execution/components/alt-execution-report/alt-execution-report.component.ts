@@ -1,11 +1,13 @@
 import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode } from '@exense/step-core';
+import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { map, switchMap } from 'rxjs';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 
 @Component({
@@ -25,6 +27,7 @@ import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/al
 })
 export class AltExecutionReportComponent {
   private _activatedRoute = inject(ActivatedRoute);
+  protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
 
@@ -40,7 +43,11 @@ export class AltExecutionReportComponent {
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
-  protected readonly _mode = inject(VIEW_MODE);
+  private _urlParamsService = inject(DashboardUrlParamsService);
+
+  updateUrlParamsSubscription = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range);
+  });
 
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {
     const artefactId = keyword.artefactID;
@@ -52,6 +59,10 @@ export class AltExecutionReportComponent {
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
     this.treeWidget()?.focusNode(node.artefactID!);
+  }
+
+  handleChartZooming(range: TimeRange) {
+    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();

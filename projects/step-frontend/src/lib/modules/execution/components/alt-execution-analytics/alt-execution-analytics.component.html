@@ -1,3 +1,7 @@
-@if (_state.execution$ | async) {
-  <step-execution-page [execution]="(_state.execution$ | async)!" />
+@if (_state.execution$ | async; as execution) {
+  <step-execution-page
+    [execution]="execution!"
+    [initialTimeRange]="(_state.timeRangeSelection$ | async) || undefined"
+    (timeRangePickerChange)="handlePickerTimeRangeChange($event)"
+  />
 }

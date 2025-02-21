@@ -1,9 +1,10 @@
-import { TimeRange, TimeRangeSelection } from '@exense/step-core';
+import { TimeRange } from '@exense/step-core';
+import { TimeRangeRelativeSelection } from '@exense/step-core';
 
-export interface TimeRangePickerSelection extends TimeRangeSelection {
-  // type: 'FULL' | 'ABSOLUTE' | 'RELATIVE';
-  // absoluteSelection?: TimeRange;
-  // relativeSelection?: RelativeTimeSelection;
+export interface TimeRangePickerSelection {
+  type: 'FULL' | 'ABSOLUTE' | 'RELATIVE';
+  absoluteSelection?: TimeRange;
+  relativeSelection?: TimeRangeRelativeSelection;
 }
 
 export enum TimeRangeType {
