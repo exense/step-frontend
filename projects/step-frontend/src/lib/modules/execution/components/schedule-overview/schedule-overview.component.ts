@@ -1,19 +1,19 @@
-import { Component, computed, effect, inject, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, Signal, signal } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
   Execution,
   ExecutionsService,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
   STATUS_COLORS,
   TimeRange,
   TimeUnit,
   AugmentedTimeSeriesService,
+  SchedulerOverviewTaskChangeService,
 } from '@exense/step-core';
-import { map, Observable, shareReplay } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
@@ -21,7 +21,7 @@ import { Status } from '../../../_common/shared/status.enum';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 declare const uPlot: any;
@@ -50,15 +50,15 @@ interface EntityWithKeywordsStats {
     },
   ],
 })
-export class ScheduleOverviewComponent implements OnInit {
+export class ScheduleOverviewComponent {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
   readonly URL_PARAMS_PREFIX = 'q_';
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionService = inject(ExecutionsService);
-  protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
+  private _scheduleOverviewTaskChange = inject(SchedulerOverviewTaskChangeService);
   private _router = inject(Router);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -79,10 +79,17 @@ export class ScheduleOverviewComponent implements OnInit {
   protected error = '';
   protected repositoryId?: string;
 
-  task = signal<ExecutiontTaskParameters | undefined>(undefined);
-  activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+  private taskId$ = this._activatedRoute.params.pipe(map((params) => params['id'] as string));
 
-  timeRange: Signal<TimeRange | undefined> = computed(() => {
+  private task$ = this.taskId$.pipe(
+    switchMap((taskId) => (!taskId ? of(undefined) : this._scheduleApi.getExecutionTaskById(taskId))),
+  );
+
+  protected readonly taskId = toSignal(this.taskId$, { initialValue: this._activatedRoute.snapshot.params['id'] });
+  protected readonly task = toSignal(this.task$, { initialValue: undefined });
+  protected readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+
+  protected readonly timeRange: Signal<TimeRange | undefined> = computed(() => {
     let selection = this.activeTimeRangeSelection();
     if (selection) {
       return this.calculateTimeRange(selection);
@@ -116,18 +123,20 @@ export class ScheduleOverviewComponent implements OnInit {
       this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
     effect(() => {
-      let range = this.timeRange();
+      const range = this.timeRange();
+      const taskId = this.taskId();
       if (range) {
         this.updateUrlParams();
-        this.refreshCharts(this._taskId, range);
+        this.refreshCharts(taskId, range);
       }
     });
-  }
-
-  ngOnInit(): void {
-    this._scheduleApi.getExecutionTaskById(this._taskId).subscribe((task) => {
-      this.task.set(task);
-    });
+    effect(
+      () => {
+        const task = this.task();
+        this._scheduleOverviewTaskChange.taskChanged(task);
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   private findRelativeTimeOption(ms: number): TimeRangePickerSelection {
