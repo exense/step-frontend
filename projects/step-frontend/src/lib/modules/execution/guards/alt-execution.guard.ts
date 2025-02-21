@@ -19,16 +19,13 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
   }
 
   return _executionViewMode.resolveExecution(executionId).pipe(
-    switchMap((execution) =>
-      _executionViewMode.getExecutionMode(execution).pipe(
-        map((mode) => {
+    switchMap((execution) => _executionViewMode.getExecutionMode(execution)),
+    map((mode) => {
           if (mode === ExecutionViewMode.NEW) {
             return true;
           }
           const url = state.url.replace('/executions', '/legacy-executions');
           return _router.parseUrl(url);
-        }),
-      ),
-    ),
+    }),
   );
 };

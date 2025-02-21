@@ -11,7 +11,7 @@ import { map } from 'rxjs';
 })
 export class ExecutionLegacySwitcherComponent {
   /** @Input() **/
-  execution = input<Execution | undefined>();
+readonly execution = input<Execution | undefined>();
 
   protected _executionViewModeService = inject(ExecutionViewModeService);
 
