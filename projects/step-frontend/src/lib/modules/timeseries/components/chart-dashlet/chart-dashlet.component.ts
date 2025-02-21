@@ -435,14 +435,17 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
         aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
         break;
       case ChartAggregation.RATE:
-        aggregationLabel =
-          'RATE/' + this.item.chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+        aggregationLabel = 'RATE/' + this.getRateUnit(aggregation);
         break;
       default:
         aggregationLabel = aggregation.type;
         break;
     }
     return `${title} (${aggregationLabel})`;
+  }
+
+  private getRateUnit(aggregation: MetricAggregation) {
+    return aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM] || 's';
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
@@ -546,7 +549,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private getAxesFormatFunction(aggregation: MetricAggregation, unit?: string): (v: number) => string {
     if (aggregation.type === ChartAggregation.RATE) {
-      const rateUnit = aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+      const rateUnit = this.getRateUnit(aggregation);
       return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + rateUnit;
     }
     if (!unit) {
@@ -566,7 +569,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private getUnitLabel(aggregation: MetricAggregation, unit: string): string {
     if (aggregation.type === 'RATE') {
-      return '/ ' + aggregation.params?.['rateUnit'];
+      return '/ ' + this.getRateUnit(aggregation);
     }
     switch (unit) {
       case '%':
@@ -612,7 +615,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       case 'COUNT':
         return b.count;
       case 'RATE':
-        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[aggregation.params?.['rateUnit']];
+        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
       case 'MEDIAN':
         return b.pclValues?.['50.0'];
       case 'PERCENTILE':
