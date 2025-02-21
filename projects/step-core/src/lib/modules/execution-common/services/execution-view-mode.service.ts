@@ -6,6 +6,7 @@ import { LOCAL_STORAGE } from '../../basics/types/storage.token';
 import { ExecutionViewMode } from '../types/execution-view-mode';
 import { switchMap } from 'rxjs/operators';
 import { CommonEntitiesUrlsService } from '../../basics/injectables/common-entities-urls.service';
+import { AppConfigContainerService } from '../../basics/injectables/app-config-container.service';
 
 type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'forceLegacyReporting'>>;
 
@@ -17,17 +18,16 @@ export class ExecutionViewModeService {
   private _localStorage = inject(LOCAL_STORAGE);
   private _executionService = inject(ExecutionsService);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
+  private _serviceContext = inject(AppConfigContainerService);
 
   readonly forceLegacyReporting?: boolean;
 
   checkForceLegacyReporting(): Observable<boolean> {
-    if (this.forceLegacyReporting !== undefined) {
-      return of(this.forceLegacyReporting);
+    (this as FieldAccessor).forceLegacyReporting = this._serviceContext?.conf?.forceLegacyReporting;
+    if (this.forceLegacyReporting) {
+      return of(this._serviceContext?.conf?.forceLegacyReporting!);
     }
-    return this._userService.getPreferences().pipe(
-      map((preferences) => preferences?.preferences?.['forceLegacyReporting'] === 'true'),
-      tap((forceLegacyReporting) => ((this as FieldAccessor).forceLegacyReporting = forceLegacyReporting)),
-    );
+    return of(false);
   }
 
   public resolveExecution(idOrExecution: string | Execution): Observable<Execution> {
@@ -56,11 +56,7 @@ export class ExecutionViewModeService {
   }
 
   isNewExecutionAvailable(execution: Execution): boolean {
-    return (
-      execution.resolvedPlanRootNodeId !== undefined &&
-      execution.customFields?.['hasReportNodeTimeSeries'] === true &&
-      execution.description !== 'LegacyPlan'
-    );
+    return execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true;
   }
 
   getNewExecutionDeactivatedReason(execution: Execution): string {
