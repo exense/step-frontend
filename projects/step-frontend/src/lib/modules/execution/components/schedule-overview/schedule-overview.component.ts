@@ -18,10 +18,11 @@ import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import { TimeRangePickerSelection, TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 declare const uPlot: any;
 

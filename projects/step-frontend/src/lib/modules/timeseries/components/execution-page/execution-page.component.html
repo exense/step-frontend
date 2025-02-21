@@ -4,11 +4,13 @@
     [storageId]="execution.id"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
+    [initialTimeSelection]="initialTimeRange()"
     [defaultFullTimeRange]="executionRange"
     [showExecutionLinks]="false"
     [showRefreshOption]="false"
     [showDashboardName]="false"
     [showHeaderBar]="false"
+    (timeRangeChange)="timeRangePickerChange.emit($event)"
     [settingsButtonPosition]="
       isNewMode ? SETTINGS_BTN_LOCATION.ABOVE_FILTER_BAR : SETTINGS_BTN_LOCATION.SHIFTED_TO_TABS
     "
