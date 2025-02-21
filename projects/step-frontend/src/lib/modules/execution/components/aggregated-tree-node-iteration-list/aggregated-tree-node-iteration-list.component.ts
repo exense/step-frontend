@@ -66,7 +66,11 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   /** @Input() **/
   readonly initialStatus = input<Status | undefined>(undefined);
 
+  /** @Output() **/
   readonly showDetails = output<ReportNode>();
+
+  /** @Output() **/
+  readonly openTreeView = output<ReportNode>();
 
   private artefactHash = computed(() => this.node().artefactHash);
 

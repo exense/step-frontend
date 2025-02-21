@@ -51,6 +51,7 @@
           [node]="aggregatedNode!"
           [initialStatus]="initialSearchStatus"
           (showDetails)="selectedReportNode.set($event)"
+          (openTreeView)="handleOpenTreeView($event)"
         />
       }
     }

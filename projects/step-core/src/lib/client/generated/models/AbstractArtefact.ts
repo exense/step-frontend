@@ -20,6 +20,7 @@ export type AbstractArtefact = {
   continueParentNodeExecutionOnError?: DynamicValueBoolean;
   before?: ChildrenBlock;
   after?: ChildrenBlock;
+  workArtefact?: boolean;
   id?: string;
   _class: string;
 };

@@ -58,6 +58,9 @@ export const $AbstractArtefact = {
     after: {
       type: 'ChildrenBlock',
     },
+    workArtefact: {
+      type: 'boolean',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

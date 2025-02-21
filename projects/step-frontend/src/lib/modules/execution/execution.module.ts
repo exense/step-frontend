@@ -109,6 +109,7 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
@@ -172,6 +173,7 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
+    AltExecutionTreePartialTabComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -436,6 +438,20 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionTreeTabComponent,
+                },
+              ],
+            },
+            {
+              path: 'sub-tree/:reportNodeId',
+              children: [
+                {
+                  path: '',
+                  component: AltExecutionTreePartialTabComponent,
+                },
+                {
+                  path: '',
+                  component: AltExecutionRangePickerComponent,
+                  outlet: 'rangePicker',
                 },
               ],
             },

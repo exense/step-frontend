@@ -24,5 +24,6 @@ export type CallPlan = {
   planId?: string;
   selectionAttributes?: DynamicValueString;
   input?: DynamicValueString;
+  workArtefact?: boolean;
   id?: string;
 };
