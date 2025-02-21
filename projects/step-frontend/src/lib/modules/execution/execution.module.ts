@@ -53,6 +53,7 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -112,6 +113,11 @@ import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
+import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
+import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 
 @NgModule({
   declarations: [
@@ -147,6 +153,7 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -182,6 +189,9 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     AggregatedTreeNodeDialogComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
+    ExecutionsChartTooltipComponent,
+    ErrorDetailsMenuComponent,
+    AltExecutionErrorsComponent,
   ],
   imports: [
     StepCommonModule,
@@ -190,6 +200,8 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
+    TimeSeriesChartComponent,
+    TooltipContentDirective,
     TimeRangePickerComponent,
   ],
   exports: [
@@ -345,7 +357,10 @@ export class ExecutionModule {
         },
       ],
     });
-
+    this._viewRegistry.registerRoute({
+      path: 'cross-executions/:id',
+      component: ScheduleOverviewComponent,
+    });
     this._viewRegistry.registerRoute({
       path: 'alt-executions',
       component: AltExecutionsComponent,

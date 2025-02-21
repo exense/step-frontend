@@ -383,7 +383,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.fetchLegendEntities(series).subscribe((v) => {
       this._internalSettings = {
         title: this.getChartTitle(),
-        xValues: xLabels,
+        xAxesSettings: {
+          values: xLabels,
+        },
         series: series,
         tooltipOptions: {
           enabled: true,

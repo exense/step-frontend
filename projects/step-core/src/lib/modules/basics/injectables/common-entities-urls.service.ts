@@ -52,6 +52,14 @@ export class CommonEntitiesUrlsService {
     return `/scheduler/editor/${id}`;
   }
 
+  schedulerCrossExecutionUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+    if (!idOrTask) {
+      return '';
+    }
+    const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
+    return `/cross-executions/${id}`;
+  }
+
   executionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
     if (!idOrExecution) {
       return '';
