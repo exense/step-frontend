@@ -140,7 +140,14 @@
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">
-      <router-outlet name="rangePicker" />
+      @if (!(isAnalyticsRoute$ | async)) {
+        <step-time-range-picker
+          [activeSelection]="(timeRangeSelection$ | async)!"
+          [selectOptions]="timeRangeOptions"
+          (selectionChange)="handleTimeRangeChange($event)"
+          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+        />
+      }
     </div>
   }
 </section>

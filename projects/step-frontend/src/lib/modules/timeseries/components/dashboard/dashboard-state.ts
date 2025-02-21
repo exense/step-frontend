@@ -1,4 +1,4 @@
-import { TimeRangePickerSelection, TimeSeriesContext } from '../../modules/_common';
+import { TimeSeriesContext } from '../../modules/_common';
 import { QueryList } from '@angular/core';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';

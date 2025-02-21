@@ -1,4 +1,14 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   AxesSettings,
   BucketResponse,
@@ -65,7 +75,7 @@ const resolutionLabels: Record<string, string> = {
     MatTooltip,
   ],
 })
-export class ChartDashletComponent extends ChartDashlet implements OnInit {
+export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
 
@@ -425,14 +435,17 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
         aggregationLabel = `PCL ${this.getPrimaryPclValue()}`;
         break;
       case ChartAggregation.RATE:
-        aggregationLabel =
-          'RATE/' + this.item.chartSettings!.primaryAxes.aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+        aggregationLabel = 'RATE/' + this.getRateUnit(aggregation);
         break;
       default:
         aggregationLabel = aggregation.type;
         break;
     }
     return `${title} (${aggregationLabel})`;
+  }
+
+  private getRateUnit(aggregation: MetricAggregation) {
+    return aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM] || 's';
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
@@ -536,7 +549,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private getAxesFormatFunction(aggregation: MetricAggregation, unit?: string): (v: number) => string {
     if (aggregation.type === ChartAggregation.RATE) {
-      const rateUnit = aggregation.params?.[TimeSeriesConfig.RATE_UNIT_PARAM];
+      const rateUnit = this.getRateUnit(aggregation);
       return (v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.bigNumber(v) + '/' + rateUnit;
     }
     if (!unit) {
@@ -556,7 +569,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
 
   private getUnitLabel(aggregation: MetricAggregation, unit: string): string {
     if (aggregation.type === 'RATE') {
-      return '/ ' + aggregation.params?.['rateUnit'];
+      return '/ ' + this.getRateUnit(aggregation);
     }
     switch (unit) {
       case '%':
@@ -602,7 +615,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit {
       case 'COUNT':
         return b.count;
       case 'RATE':
-        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[aggregation.params?.['rateUnit']];
+        return b.throughputPerHour / this.RATE_UNITS_DIVIDERS[this.getRateUnit(aggregation)];
       case 'MEDIAN':
         return b.pclValues?.['50.0'];
       case 'PERCENTILE':
