@@ -21,8 +21,6 @@ export class ExecutionViewModeService {
   readonly forceLegacyReporting?: boolean;
 
   checkForceLegacyReporting(): Observable<boolean> {
-    console.log('forceLegacyReporting', this.forceLegacyReporting);
-
     if (this.forceLegacyReporting !== undefined) {
       return of(this.forceLegacyReporting);
     }
