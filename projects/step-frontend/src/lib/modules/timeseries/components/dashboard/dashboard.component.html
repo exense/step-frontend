@@ -1,35 +1,39 @@
 @if (dashboard) {
-  <div class="page-container">
-    <mat-menu #settingsMenu="matMenu">
-      <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
-      <mat-menu #resolutionsMenu="matMenu" class="wide">
-        <div (click)="$event.stopPropagation()" class="resolution-select-container">
-          <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
-        </div>
-      </mat-menu>
-      <button mat-menu-item (click)="toggleCompareMode()" [disabled]="editMode">
-        <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
-        {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
-      </button>
-      <button mat-menu-item (click)="exportRawData()">
-        <step-icon name="download" />
-        <span>Export Raw Measurements</span>
-      </button>
-      <button mat-menu-item (click)="resetDashboard()">
-        <step-icon name="refresh-cw" />
-        <span>Reset dashboard</span>
-      </button>
+  <mat-menu #settingsMenu="matMenu">
+    <button mat-menu-item [matMenuTriggerFor]="resolutionsMenu">Charts Resolution</button>
+    <mat-menu #resolutionsMenu="matMenu" class="wide">
+      <div (click)="$event.stopPropagation()" class="resolution-select-container">
+        <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
+      </div>
     </mat-menu>
-    @if (!showHeaderBar) {
-      <button
-        class="menu-btn grey-border floating-settings-btn"
-        #menuTrigger="matMenuTrigger"
-        [matMenuTriggerFor]="settingsMenu"
-        mat-icon-button
-      >
-        <step-icon name="settings" />
-      </button>
-    } @else {
+    <button mat-menu-item (click)="toggleCompareMode()" [disabled]="editMode">
+      <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
+      {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
+    </button>
+    <button mat-menu-item (click)="exportRawData()">
+      <step-icon name="download" />
+      <span>Export Raw Measurements</span>
+    </button>
+    <button mat-menu-item (click)="resetDashboard()">
+      <step-icon name="refresh-cw" />
+      <span>Reset dashboard</span>
+    </button>
+  </mat-menu>
+
+  <div class="page-container">
+    @if (settingsButtonPosition === SETTINGS_LOCATION.SHIFTED_TO_TABS) {
+      <div class="floating-settings-btn">
+        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+      </div>
+    }
+
+    @if (settingsButtonPosition === SETTINGS_LOCATION.ABOVE_FILTER_BAR) {
+      <div class="above-filter-bar">
+        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+      </div>
+    }
+
+    @if (showHeaderBar) {
       <div class="header-container">
         <div class="dashboard-title">
           @if (showDashboardName) {
@@ -52,54 +56,9 @@
             </div>
           }
         </div>
-        <div class="header-buttons-container">
-          <button
-            class="menu-btn grey-border"
-            #menuTrigger="matMenuTrigger"
-            [matMenuTriggerFor]="settingsMenu"
-            mat-icon-button
-          >
-            <step-icon name="settings" />
-          </button>
-          @if (showRefreshOption) {
-            <step-autorefresh-toggle
-              [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-              [disableAutoRefreshButton]="compareModeEnabled"
-              [interval]="refreshInterval"
-              (refresh)="mainEngine.triggerRefresh()"
-              (intervalChange)="handleRefreshIntervalChange($event)"
-            />
-          }
-          @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
-            @if (editMode) {
-              <step-alert class="edit-alert" type="WARNING"
-                >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
-              >
-              <button
-                [disabled]="!dashboard.attributes!['name']"
-                mat-button
-                mat-flat-button
-                color="primary"
-                (click)="saveEditChanges()"
-              >
-                Save
-              </button>
-              <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-            } @else {
-              <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
-                <button
-                  mat-button
-                  mat-flat-button
-                  color="primary"
-                  [disabled]="!hasWritePermission || compareModeEnabled"
-                  (click)="enableEditMode()"
-                >
-                  Edit
-                </button>
-              </div>
-            }
-          }
-        </div>
+        @if (settingsButtonPosition === SETTINGS_LOCATION.HEADER_BAR) {
+          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+        }
       </div>
     }
 
@@ -112,7 +71,7 @@
             [context]="mainEngine.state.context"
             (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
             [timeRangeOptions]="timeRangeOptions"
-            [activeTimeRange]="mainEngine.state.context.timeRangeSettings"
+            [activeTimeRange]="mainEngine!.state.context.timeRangeSettings.pickerSelection"
             [compactView]="compareModeEnabled"
           />
         </div>
@@ -124,7 +83,7 @@
               [context]="compareEngine!.state.context"
               (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
               [timeRangeOptions]="timeRangeOptions"
-              [activeTimeRange]="compareEngine!.state.context.timeRangeSettings"
+              [activeTimeRange]="compareEngine!.state.context.timeRangeSettings.pickerSelection"
               [compactView]="compareModeEnabled"
             />
           </div>
@@ -210,4 +169,50 @@
       }
     </div>
   </div>
+
+  <ng-template #settingsButtonsTemplate>
+    <div class="header-buttons-container">
+      <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu" mat-icon-button>
+        <step-icon name="settings" />
+      </button>
+      @if (showRefreshOption) {
+        <step-autorefresh-toggle
+          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
+          [disableAutoRefreshButton]="compareModeEnabled"
+          [interval]="refreshInterval"
+          (refresh)="mainEngine.triggerRefresh()"
+          (intervalChange)="handleRefreshIntervalChange($event)"
+        />
+      }
+      @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
+        @if (editMode) {
+          <step-alert class="edit-alert" type="WARNING"
+            >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
+          >
+          <button
+            [disabled]="!dashboard.attributes!['name']"
+            mat-button
+            mat-flat-button
+            color="primary"
+            (click)="saveEditChanges()"
+          >
+            Save
+          </button>
+          <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
+        } @else {
+          <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
+            <button
+              mat-button
+              mat-flat-button
+              color="primary"
+              [disabled]="!hasWritePermission || compareModeEnabled"
+              (click)="enableEditMode()"
+            >
+              Edit
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </ng-template>
 }

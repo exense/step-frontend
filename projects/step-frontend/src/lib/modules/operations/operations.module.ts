@@ -4,11 +4,19 @@ import { CurrentOperationsComponent } from './components/current-operations/curr
 import { OperationComponent } from './components/operation/operation.component';
 import './components/operations-list/operations-list.component';
 import { OperationsListComponent } from './components/operations-list/operations-list.component';
+import { AltOperationComponent } from './components/alt-operation/alt-operation.component';
+import { AltCurrentOperationsComponent } from './components/alt-current-operations/alt-current-operations.component';
 
 @NgModule({
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, AltOperationComponent, AltCurrentOperationsComponent],
   declarations: [OperationComponent, CurrentOperationsComponent, OperationsListComponent],
-  exports: [CurrentOperationsComponent, OperationComponent, OperationsListComponent],
+  exports: [
+    CurrentOperationsComponent,
+    OperationComponent,
+    OperationsListComponent,
+    AltOperationComponent,
+    AltCurrentOperationsComponent,
+  ],
 })
 export class OperationsModule {
   constructor(private _viewRegistryService: ViewRegistryService) {
@@ -23,4 +31,5 @@ export class OperationsModule {
   }
 }
 
-export * from './shared/execution-view-services';
+export * from './types/execution-view-services';
+export * from './types/specific-operations.enum';

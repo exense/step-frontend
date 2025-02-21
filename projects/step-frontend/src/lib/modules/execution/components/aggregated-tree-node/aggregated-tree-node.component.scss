@@ -1,20 +1,27 @@
 :host {
   width: 100%;
   position: relative;
+  font-size: 1.2rem;
+}
+
+.name {
+  cursor: pointer;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
 }
 
 .aggregated-info {
   display: flex;
   flex-wrap: nowrap;
   gap: 1rem;
-  align-items: center;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0.5rem;
+}
+
+step-aggregated-tree-status {
+  align-self: flex-start;
 }
 
 step-artefact-inline-details {
   overflow: hidden;
   width: 100%;
+  margin-top: 0.2rem;
 }

@@ -1,6 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -9,6 +11,7 @@ import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 })
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
@@ -19,25 +22,16 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
-  protected isHideInlineInfo = computed(() => {
+  protected readonly detailsTooltip = 'Open execution details';
+
+  protected showIterations(status?: Status, event?: MouseEvent): void {
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
     const nodeId = this.nodeId();
-    const visibleInfos = this._treeState.visibleInfos();
-    return !!visibleInfos[nodeId];
-  });
-
-  protected toggleInfo(): void {
-    const node = this.node();
-    if (!node) {
+    if (!nodeId) {
       return;
     }
-    this._treeState.toggleInfo(node);
-  }
-
-  protected showAggregatedDetails(): void {
-    const node = this.node();
-    if (!node) {
-      return;
-    }
-    this._treeState.showAggregatedDetails(node);
+    this._treeState.selectNode(nodeId);
+    this._executionDialogs.openIterations(nodeId, status);
   }
 }

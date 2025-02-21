@@ -2,13 +2,17 @@
 
 @mixin executions-menu {
   @include customMenu.custom-menu('execution-menu');
-  $menu-selector: customMenu.custom-menu-selector('execution-menu');
+  $panel-selector: customMenu.custom-menu-panel-selector('execution-menu');
+  $item-selector: customMenu.custom-menu-item-selector('execution-menu');
 
-  #{$menu-selector} {
+  #{$panel-selector} {
+    max-width: none;
+  }
+
+  #{$item-selector} {
     .interactive-parameters,
     step-execution-commands {
-      width: 25rem;
-      display: block;
+      min-width: 25rem;
       padding: 0.5rem;
     }
 

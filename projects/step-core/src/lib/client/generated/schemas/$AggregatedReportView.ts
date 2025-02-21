@@ -25,5 +25,8 @@ export const $AggregatedReportView = {
     parentSource: {
       type: 'Enum',
     },
+    singleInstanceReportNode: {
+      type: 'ReportNode',
+    },
   },
 } as const;

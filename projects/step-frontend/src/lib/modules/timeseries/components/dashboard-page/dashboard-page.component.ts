@@ -1,11 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { COMMON_IMPORTS, ResolutionPickerComponent, TimeRangePickerComponent } from '../../modules/_common';
+import { COMMON_IMPORTS, ResolutionPickerComponent } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ActivatedRoute } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
 @Component({
   selector: 'step-dashboard-page',

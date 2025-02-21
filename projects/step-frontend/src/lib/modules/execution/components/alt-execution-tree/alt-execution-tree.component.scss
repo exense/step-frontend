@@ -3,8 +3,6 @@
 
 step-alt-execution-tree {
   display: block;
-  height: 60vh;
-  max-height: 60vh;
 
   @include core.reportNodeStatuses;
 
@@ -12,8 +10,13 @@ step-alt-execution-tree {
     background: transparent !important;
   }
 
-  .tree-container {
+  .tree-panel {
     overflow: auto !important;
+    padding-right: 1rem;
+  }
+
+  .node-details-panel {
+    padding-left: 1rem;
   }
 
   step-report-node-short {
@@ -23,6 +26,9 @@ step-alt-execution-tree {
 
   .tree-node {
     flex: 1;
+    .node-content {
+      align-items: flex-start !important;
+    }
   }
 
   .step-tree-node-container {
@@ -40,7 +46,7 @@ step-alt-execution-tree {
     display: flex;
     flex-wrap: nowrap;
     gap: 1rem;
-    align-items: center;
+    // align-items: center;
     width: 100%;
   }
 

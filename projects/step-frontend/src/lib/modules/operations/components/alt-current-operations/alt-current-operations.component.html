@@ -1,0 +1,14 @@
+@if (showAll()) {
+  @for (operation of currentOperations(); track operation.name) {
+    <step-alt-operation [operation]="operation" />
+  }
+} @else {
+  @if (firstOperation(); as firstOperation) {
+    <step-alt-operation [operation]="firstOperation" />
+  }
+}
+@if (isToggleVisible()) {
+  <button type="button" mat-icon-button (click)="toggleShowAll()">
+    <step-icon name="more-horizontal" />
+  </button>
+}

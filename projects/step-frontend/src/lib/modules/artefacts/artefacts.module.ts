@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ArtefactService, RichEditorComponent } from '@exense/step-core';
+import { ArtefactService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
@@ -40,6 +40,8 @@ import { AssertPerformanceInlineComponent } from './component/assert-performance
 import { CallPlanInlineComponent } from './component/call-plan-inline/call-plan-inline.component';
 import { CaseInlineComponent } from './component/case-inline/case-inline.component';
 import { CheckInlineComponent } from './component/check-inline/check-inline.component';
+import { CallKeywordReportDetailsComponent } from './component/call-keyword-report-details/call-keyword-report-details.component';
+import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 
 @NgModule({
   declarations: [
@@ -76,6 +78,7 @@ import { CheckInlineComponent } from './component/check-inline/check-inline.comp
     CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
+    CallKeywordReportDetailsComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
@@ -83,7 +86,7 @@ import { CheckInlineComponent } from './component/check-inline/check-inline.comp
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
-  imports: [StepCommonModule, RichEditorComponent],
+  imports: [StepCommonModule, ReportNodesModule],
   exports: [
     EchoComponent,
     EchoInlineComponent,
@@ -117,6 +120,7 @@ import { CheckInlineComponent } from './component/check-inline/check-inline.comp
     CallPlanInlineComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
+    CallKeywordReportDetailsComponent,
     ScriptComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
@@ -155,6 +159,7 @@ export class ArtefactsModule {
       icon: 'keyword',
       component: CallKeywordComponent,
       inlineComponent: CallKeywordInlineComponent,
+      reportDetailsComponent: CallKeywordReportDetailsComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
     });

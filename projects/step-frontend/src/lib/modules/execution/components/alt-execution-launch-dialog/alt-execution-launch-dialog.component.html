@@ -1,0 +1,52 @@
+<step-modal-window [title]="title" class="slim-actions">
+  <div step-modal-window-body>
+    @if (error(); as error) {
+      <step-alert type="danger" role="alert">
+        <step-icon name="alert-circle" aria-hidden="true" />
+        <span class="sr-only">Error:</span>
+        {{ error }}
+      </step-alert>
+    }
+    @if (loading()) {
+      <step-icon name="refresh-cw" class="icon-refresh-animate" />
+    }
+    @if (artefact(); as artefact) {
+      <div class="artefact-info">
+        <section>
+          @if (artefact.icon; as icon) {
+            <step-icon [name]="icon" />
+          }
+          <h4>{{ artefact.name }}</h4>
+          @if (repoRef.repositoryID !== 'local') {
+            <step-alt-execution-repository [repositoryParams]="repoRef" />
+          }
+        </section>
+        @if (parameters(); as params) {
+          <step-custom-forms [stModel]="params" stScreen="executionParameters" />
+        }
+      </div>
+      @if (artefact.type === 'TestSet') {
+        <hr />
+        <step-repository-plan-testcase-list
+          #testCases
+          [repoRef]="repoRef"
+          (includedTestCasesChange)="testcases.set($event)"
+        />
+      }
+    }
+  </div>
+  <div step-modal-window-buttons>
+    <step-btn-group class="btn-group-close">
+      @if (showCancel) {
+        <button type="button" mat-button mat-dialog-close>Cancel</button>
+      }
+    </step-btn-group>
+    <step-execution-actions
+      [tooltips]="tooltips()"
+      [isExecutionIsolated]="executionIsolation"
+      (execute)="execute($event)"
+      (schedule)="schedule()"
+      (copyLink)="copyExecutionServiceAsCurlToClipboard()"
+    />
+  </div>
+</step-modal-window>

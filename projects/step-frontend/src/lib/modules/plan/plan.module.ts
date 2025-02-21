@@ -15,8 +15,9 @@ import {
   stepRouteAdditionalConfig,
   SimpleOutletComponent,
   ViewRegistryService,
+  PlanContextApiService,
 } from '@exense/step-core';
-import { ExecutionModule } from '../execution/execution.module';
+import { AltExecutionLaunchDialogComponent, ExecutionModule } from '../execution/execution.module';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanListComponent } from './components/plan-list/plan-list.component';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -25,6 +26,7 @@ import { PlanSelectionComponent } from './components/plan-selection/plan-selecti
 import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-operations-register.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
+import { PurePlanContextApiService } from './injectables/pure-plan-context-api.service';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
@@ -49,7 +51,6 @@ export class PlanModule {
       },
       canActivate: [
         () => {
-          console.log('PLANS CAN ACTIVATE');
           return true;
         },
       ],
@@ -63,6 +64,27 @@ export class PlanModule {
           path: 'list',
           component: PlanListComponent,
           children: [
+            {
+              path: 'execute',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: ':id',
+                  dialogComponent: AltExecutionLaunchDialogComponent,
+                  resolve: {
+                    repoRef: (route: ActivatedRouteSnapshot) => {
+                      const planContextApi = inject(PurePlanContextApiService);
+                      const planId = route.params['id'];
+                      return planContextApi.createRepositoryObjectReference(planId);
+                    },
+                  },
+                  data: {
+                    title: 'Execute Plan',
+                  },
+                }),
+              ],
+            },
+            schedulePlanRoute(),
             dialogRoute({
               path: 'new',
               dialogComponent: PlanCreateDialogComponent,
@@ -121,6 +143,12 @@ export class PlanModule {
           {
             path: 'editor/:id',
             component: PlanEditorComponent,
+            providers: [
+              {
+                provide: PlanContextApiService,
+                useExisting: PurePlanContextApiService,
+              },
+            ],
             canActivate: [
               checkEntityGuardFactory({
                 entityType: 'plan',
@@ -154,7 +182,23 @@ export class PlanModule {
                 return true;
               },
             ],
-            children: [schedulePlanRoute()],
+            children: [
+              schedulePlanRoute(),
+              dialogRoute({
+                path: 'launch',
+                dialogComponent: AltExecutionLaunchDialogComponent,
+                resolve: {
+                  repoRef: (route: ActivatedRouteSnapshot) => {
+                    const _planContextApi = inject(PlanContextApiService);
+                    const planId = route.parent!.params['id'];
+                    return _planContextApi.createRepositoryObjectReference(planId);
+                  },
+                },
+                data: {
+                  title: 'Execute Plan',
+                },
+              }),
+            ],
           },
         ),
       ],

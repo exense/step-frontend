@@ -8,6 +8,9 @@ import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@a
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatusComponent {
+  /** @Input() **/
   readonly status = input<string | undefined>();
+
+  /** @Input() **/
   readonly iconMode = input(false);
 }

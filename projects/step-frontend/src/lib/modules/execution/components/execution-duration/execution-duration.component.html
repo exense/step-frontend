@@ -2,7 +2,9 @@
   <step-popover yPosition="below">
     <div class="execution-time">
       {{ execution()?.startTime | date: DateFormat.DATE }}
-      <span class="duration" [class.running]="isRunning()">{{ endTime() | duration: execution()?.startTime }}</span>
+      <span class="duration" [class.running]="isRunning()">{{
+        endTime() | duration: execution()?.startTime : { shortenMs: true }
+      }}</span>
     </div>
     <step-popover-content>
       <section class="execution-duration-description">
@@ -15,7 +17,7 @@
           <div>{{ execution()?.endTime | date: DateFormat.DATE }}</div>
         }
         <div>Duration:</div>
-        <div>{{ endTime() | duration: execution()?.startTime : true }}</div>
+        <div>{{ endTime() | duration: execution()?.startTime : { shortenMs: true, displayFull: true } }}</div>
       </section>
     </step-popover-content>
   </step-popover>

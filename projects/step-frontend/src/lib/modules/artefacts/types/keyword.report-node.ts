@@ -1,4 +1,5 @@
-import { ReportNode } from '@exense/step-core';
+import { Measure, ReportNode } from '@exense/step-core';
+import { KeywordArtefact } from './keyword.artefact';
 
 export interface KeywordReportNode extends ReportNode {
   functionId: string;
@@ -7,4 +8,6 @@ export interface KeywordReportNode extends ReportNode {
   tokenId: string;
   input: string;
   output: string;
+  measures?: Measure[];
+  resolvedArtefact?: KeywordArtefact;
 }

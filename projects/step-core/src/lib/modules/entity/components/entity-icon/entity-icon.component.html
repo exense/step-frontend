@@ -1,1 +1,3 @@
-<step-icon *ngIf="icon" [matTooltip]="tooltip" matTooltipPosition="below" [name]="icon"></step-icon>
+@if (iconInfo(); as info) {
+  <step-icon [matTooltip]="info.tooltip" matTooltipPosition="below" [name]="info.icon" />
+}

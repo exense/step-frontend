@@ -10,7 +10,15 @@ import { SetReportNode } from '../../types/set.report-node';
   styleUrl: './set-inline.component.scss',
 })
 export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact, SetReportNode> {
-  protected getReportNodeItems(info?: SetReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
+  protected getItems(
+    artefact?: SetArtefact,
+    isVertical?: boolean,
+    isResolved?: boolean,
+  ): ArtefactInlineItem[] | undefined {
+    return undefined;
+  }
+
+  protected override getReportNodeItems(info?: SetReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
     if (!info?.key) {
       return undefined;
     }
@@ -20,8 +28,8 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
     ]);
   }
 
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<SetArtefact>,
+  protected override getArtefactItems(
+    info?: AggregatedArtefactInfo<SetArtefact, SetReportNode>,
     isVertical?: boolean,
     isResolved?: boolean,
   ): Observable<ArtefactInlineItem[]> {

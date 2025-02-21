@@ -1,10 +1,21 @@
-import { Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  input,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -19,8 +30,11 @@ import {
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
-import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
+import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
+import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
 @Component({
   selector: 'step-execution-page',
@@ -39,9 +53,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class ExecutionPageComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
+  initialTimeRange = input<TimeRangePickerSelection | undefined>(undefined);
+
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
+  @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
+
   private _authService = inject(AuthService);
+  readonly isNewMode = inject(ExecutionViewModeService).mode;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -55,6 +74,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   private _asyncTaskService = inject(AsyncTasksService);
 
   private _destroyRef = inject(DestroyRef);
+
+  readonly SETTINGS_BTN_LOCATION = DashboardViewSettingsBtnLocation;
 
   ngOnInit(): void {
     if (!this.execution) {

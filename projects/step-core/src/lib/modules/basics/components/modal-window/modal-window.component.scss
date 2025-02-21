@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   position: relative;
   display: block;
@@ -24,4 +26,8 @@
   width: 0;
   opacity: 0;
   z-index: -1;
+}
+
+.dialog-content {
+  color: var.$blue-700;
 }

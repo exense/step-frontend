@@ -1,13 +1,6 @@
-import { Component, computed } from '@angular/core';
-import {
-  AggregatedArtefactInfo,
-  ArtefactInlineItem,
-  BaseInlineArtefactComponent,
-  DynamicValueString,
-  ReportNode,
-} from '@exense/step-core';
+import { Component } from '@angular/core';
+import { ArtefactInlineItem, BaseInlineArtefactComponent, DynamicValueString } from '@exense/step-core';
 import { CallPlanArtefact } from '../../types/call-plan.artefact';
-import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'step-call-plan-inline',
@@ -15,33 +8,27 @@ import { Observable, of } from 'rxjs';
   styleUrl: './call-plan-inline.component.scss',
 })
 export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPlanArtefact> {
-  protected getReportNodeItems = undefined;
-
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<CallPlanArtefact>,
+  protected getItems(
+    artefact?: CallPlanArtefact,
     isVertical?: boolean,
     isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const originalArtefact = info?.originalArtefact;
-    if (!originalArtefact?.input?.value) {
-      return of(undefined);
+  ): ArtefactInlineItem[] | undefined {
+    if (!artefact?.input?.value) {
+      return undefined;
     }
-
     let input: Record<string, DynamicValueString> = {};
     try {
-      input = JSON.parse(originalArtefact?.input?.value);
+      input = JSON.parse(artefact?.input?.value);
     } catch {
-      return of(undefined);
+      return undefined;
     }
 
-    return of(
-      this.convert(
-        [
-          ['Input', undefined],
-          ...(Object.entries(input).map(([key, value]) => [key, value]) as [string, DynamicValueString][]),
-        ],
-        isResolved,
-      ),
+    return this.convert(
+      [
+        ['Input', undefined],
+        ...(Object.entries(input).map(([key, value]) => [key, value]) as [string, DynamicValueString][]),
+      ],
+      isResolved,
     );
   }
 }

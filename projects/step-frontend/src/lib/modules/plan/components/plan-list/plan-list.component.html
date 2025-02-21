@@ -85,8 +85,7 @@
             mat-icon-button
             matTooltip="Execute plan"
             [disabled]="!('plan-execute' | hasRight | async)"
-            routerLink="/repository"
-            [queryParams]="{ repositoryId: 'local', planid: element.id }"
+            [routerLink]="['/', 'plans', 'list', 'execute', element.id]"
           >
             <step-icon name="play-circle" />
           </a>

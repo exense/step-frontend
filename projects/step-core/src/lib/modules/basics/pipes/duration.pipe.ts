@@ -1,16 +1,27 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DateTime, Duration } from 'luxon';
 
+export interface DurationPipeParams {
+  displayFull?: boolean;
+  shortenMs?: boolean;
+}
+
 @Pipe({
   name: 'duration',
 })
 export class DurationPipe implements PipeTransform {
-  transform(end?: number | Date | DateTime, start: number | Date | DateTime = 0, displayFull = false): string {
+  transform(
+    end?: number | Date | DateTime,
+    start: number | Date | DateTime = 0,
+    param?: DurationPipeParams | boolean,
+  ): string {
     const endMs = this.getMs(end);
 
     if (!endMs) {
       return '';
     }
+
+    const { displayFull, shortenMs } = this.getParams(param);
 
     const startMs = start !== undefined ? this.getMs(start)! : 0;
     const duration = Duration.fromMillis(endMs - startMs).rescale();
@@ -23,8 +34,14 @@ export class DurationPipe implements PipeTransform {
 
     const ms = duration.get('millisecond');
 
-    let partsToDisplay = [year, month, day, hour, minute, second].filter((item) => !!item);
-    if (partsToDisplay.length === 0 && ms > 0) {
+    let partsToDisplay = [year, month, day, hour, minute, second];
+    if (!shortenMs) {
+      const milliseconds = this.addSuffix(ms, 'ms');
+      partsToDisplay.push(milliseconds);
+    }
+    partsToDisplay = partsToDisplay.filter((item) => !!item);
+
+    if (!shortenMs && partsToDisplay.length === 0 && ms > 0) {
       return '< 1s';
     }
 
@@ -53,5 +70,24 @@ export class DurationPipe implements PipeTransform {
       return value;
     }
     return undefined;
+  }
+
+  private getParams(params?: boolean | DurationPipeParams): Required<DurationPipeParams> {
+    if (!params) {
+      return {
+        displayFull: true,
+        shortenMs: false,
+      };
+    }
+    if (typeof params === 'boolean') {
+      return {
+        displayFull: !params,
+        shortenMs: false,
+      };
+    }
+    return {
+      displayFull: !!params.displayFull,
+      shortenMs: !!params.shortenMs,
+    };
   }
 }

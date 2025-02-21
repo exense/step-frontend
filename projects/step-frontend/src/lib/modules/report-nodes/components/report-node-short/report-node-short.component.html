@@ -73,8 +73,8 @@
 <div *ngIf="!showDetails && children && children.length > 0" class="detail-container wordbreak">
   <div class="detail-label m-right">Errors</div>
   <div class="detail">
-    <step-assert-report-node-short *ngFor="let child of children; trackBy: trackByReportNode" [node]="child">
-    </step-assert-report-node-short>
+    <step-report-node-error *ngFor="let child of children; trackBy: trackByReportNode" [node]="child">
+    </step-report-node-error>
   </div>
 </div>
 <!-- Errors -->

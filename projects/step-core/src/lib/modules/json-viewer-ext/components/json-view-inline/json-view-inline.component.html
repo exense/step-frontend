@@ -1,0 +1,17 @@
+<ng-content />
+@for (node of jsonParsed(); track node.id) {
+  <div class="json-node">
+    @if (node.prefix) {
+      <span class="prefix">{{ node.prefix }}</span>
+    }
+    @if (node.name) {
+      <strong class="name">{{ node.name }}:</strong>
+    }
+    @if (node.value?.toString(); as value) {
+      <span class="value" [class.long-line]="value.length > 20">{{ value | slice: 0 : 20 }}</span>
+    }
+    @if (node.suffix) {
+      <span class="suffix">{{ node.suffix }}</span>
+    }
+  </div>
+}

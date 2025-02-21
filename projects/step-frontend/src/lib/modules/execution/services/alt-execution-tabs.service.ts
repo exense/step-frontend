@@ -13,8 +13,8 @@ export class AltExecutionTabsService {
 
   private tabsInternal = signal<Tab<string>[]>([
     this.createTab(STATIC_TABS.REPORT, 'Report'),
-    this.createTab(STATIC_TABS.TREE, 'Tree'),
-    this.createTab(STATIC_TABS.ANALYTICS, 'Analytics'),
+    this.createTab(STATIC_TABS.TREE, 'Execution Tree'),
+    this.createTab(STATIC_TABS.ANALYTICS, 'Performance'),
   ]);
 
   readonly tabs = this.tabsInternal.asReadonly();
@@ -39,7 +39,7 @@ export class AltExecutionTabsService {
     return {
       id,
       label,
-      link: link ?? id,
+      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
     };
   }
 }

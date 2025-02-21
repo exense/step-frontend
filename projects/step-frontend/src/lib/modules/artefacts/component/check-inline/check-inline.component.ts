@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent, ReportNode } from '@exense/step-core';
+import { ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
 import { CheckArtefact } from '../../types/check.artefact';
-import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'step-check-inline',
@@ -9,17 +8,14 @@ import { Observable, of } from 'rxjs';
   styleUrl: './check-inline.component.scss',
 })
 export class CheckInlineComponent extends BaseInlineArtefactComponent<CheckArtefact> {
-  protected getReportNodeItems = undefined;
-
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<CheckArtefact>,
+  protected getItems(
+    artefact?: CheckArtefact,
     isVertical?: boolean,
     isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const artefact = info?.originalArtefact;
+  ): ArtefactInlineItem[] | undefined {
     if (!artefact) {
-      return of(undefined);
+      return undefined;
     }
-    return of(this.convert([['Expression', artefact.expression]], isResolved));
+    return this.convert([['Expression', artefact.expression]], isResolved);
   }
 }
