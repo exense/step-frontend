@@ -5,8 +5,6 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { filter, map, of, startWith, switchMap, take, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 const URL_PREFIX = 'executions';
 const LEGACY_URL_PREFIX = 'legacy-executions';

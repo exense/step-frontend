@@ -1,48 +1,59 @@
-import { Component, Input, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Execution, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
-import { map, Observable } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'step-execution-legacy-switcher',
   templateUrl: './execution-legacy-switcher.component.html',
   styleUrl: './execution-legacy-switcher.component.scss',
 })
-export class ExecutionLegacySwitcherComponent implements OnInit, OnChanges {
-  @Input() execution!: Execution;
+export class ExecutionLegacySwitcherComponent {
+  /** @Input() **/
+  execution = input<Execution | undefined>();
+
   protected _executionViewModeService = inject(ExecutionViewModeService);
 
-  protected isDisabled = true;
+  protected isDisabled = computed(() => {
+    const exec = this.execution();
+    return !exec || !this._executionViewModeService.isNewExecutionAvailable(exec);
+  });
+
   protected toggleControl = new FormControl(false);
-  protected forceLegacyReporting: Observable<boolean> = this._executionViewModeService.checkForceLegacyReporting();
 
-  ngOnInit() {
-    this.updateToggleState();
+  protected forceLegacyReporting = toSignal(this._executionViewModeService.checkForceLegacyReporting(), {
+    initialValue: false,
+  });
 
-    // Listen for value changes and update view mode
+  constructor() {
+    effect(() => {
+      if (this.execution()) {
+        this.updateToggleState();
+      }
+    });
+
     this.toggleControl.valueChanges.subscribe((enabled) => {
       this._executionViewModeService.setForceLegacyView(!enabled);
       window.location.reload();
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['execution'] && changes['execution'].currentValue) {
-      this.updateToggleState();
-    }
-  }
-
   private updateToggleState() {
-    this.isDisabled = !this._executionViewModeService.isNewExecutionAvailable(this.execution);
+    const exec = this.execution();
+    if (!exec) {
+      this.toggleControl.disable({ emitEvent: false });
+      return;
+    }
 
-    if (this.isDisabled) {
+    if (this.isDisabled()) {
       this.toggleControl.disable({ emitEvent: false });
     } else {
       this.toggleControl.enable({ emitEvent: false });
     }
 
     this._executionViewModeService
-      .getExecutionMode(this.execution)
+      .getExecutionMode(exec)
       .pipe(map((mode) => mode !== ExecutionViewMode.LEGACY))
       .subscribe((isLegacyMode) => {
         this.toggleControl.setValue(isLegacyMode, { emitEvent: false });
