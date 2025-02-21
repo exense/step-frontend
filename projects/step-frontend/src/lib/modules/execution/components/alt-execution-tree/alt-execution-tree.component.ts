@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -7,6 +7,9 @@ enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
   COLLAPSE_CHILDREN = 'collapse_children',
 }
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 @Component({
   selector: 'step-alt-execution-tree',
@@ -23,6 +26,14 @@ enum TreeNodeAction {
 export class AltExecutionTreeComponent implements TreeActionsService {
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _treeSate = inject(TreeStateService);
+
+  protected readonly _state = inject(AltExecutionStateService);
+  private _urlParamsService = inject(DashboardUrlParamsService);
+  private _destroyRef = inject(DestroyRef);
+
+  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range);
+  });
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const disabled = !node.children?.length;
