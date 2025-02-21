@@ -28,6 +28,7 @@ import {
   stepRouteAdditionalConfig,
   TreeNodeUtilsService,
   ViewRegistryService,
+  DialogParentService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -77,8 +78,6 @@ import { AltExecutionReportControlsComponent } from './components/alt-execution-
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
-import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
-import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
@@ -110,6 +109,8 @@ import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-d
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
+import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 
 @NgModule({
@@ -169,8 +170,6 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
-    AltExecutionRangePickerComponent,
-    AltExecutionRangePrintComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     ExecutionDetailsComponent,
@@ -191,6 +190,7 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
+    TimeRangePickerComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -371,6 +371,10 @@ export class ExecutionModule {
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
             {
+              provide: DialogParentService,
+              useClass: ExecutionViewDialogUrlCleanupService,
+            },
+            {
               provide: TreeNodeUtilsService,
               useExisting: AggregatedReportViewTreeNodeUtilsService,
             },
@@ -412,11 +416,6 @@ export class ExecutionModule {
                   component: AltExecutionReportControlsComponent,
                   outlet: 'controls',
                 },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
-                },
               ],
             },
             {
@@ -429,11 +428,6 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportComponent,
                 },
-                {
-                  path: '',
-                  component: AltExecutionRangePrintComponent,
-                  outlet: 'rangePicker',
-                },
               ],
             },
             {
@@ -442,11 +436,6 @@ export class ExecutionModule {
                 {
                   path: '',
                   component: AltExecutionTreeTabComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
                 },
               ],
             },

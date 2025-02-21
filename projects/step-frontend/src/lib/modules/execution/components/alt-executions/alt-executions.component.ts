@@ -6,6 +6,7 @@ import { ActiveExecutionsService } from '../../services/active-executions.servic
 import { filter, map, of, startWith, switchMap, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { provideExecutionViewMode } from '../../services/execution-view-mode.service';
+import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 
 const URL_PREFIX = 'alt-executions';
 const MENU_ENTRY_ID = 'executions';
