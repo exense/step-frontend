@@ -315,6 +315,7 @@ export class ExecutionModule {
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       component: AltExecutionsComponent,
+      providers: [ActiveExecutionsService],
       children: [
         {
           path: '',
@@ -369,7 +370,14 @@ export class ExecutionModule {
         },
         {
           path: ':id',
-          canActivate: [altExecutionGuard],
+          canActivate: [
+            altExecutionGuard,
+            (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            },
+          ],
           component: AltExecutionProgressComponent,
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
