@@ -26,13 +26,15 @@ import {
   AsyncTasksService,
   AuthService,
   Execution,
+  ExecutionViewMode,
+  ExecutionViewModeService,
   pollAsyncTask,
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { ExecutionViewModeService } from '../../../execution/services/execution-view-mode.service';
 import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
@@ -60,7 +62,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
 
   private _authService = inject(AuthService);
-  readonly isNewMode = inject(ExecutionViewModeService).mode;
+  protected _executionViewModeService = inject(ExecutionViewModeService);
+  protected executionMode?: Observable<ExecutionViewMode>;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -114,6 +117,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
+      this.executionMode = this._executionViewModeService.getExecutionMode(this.execution);
       this.executionRange = this.getExecutionRange(this.execution);
       this.dashboard.refresh();
     }
@@ -139,4 +143,6 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         },
       });
   }
+
+  protected readonly ExecutionViewMode = ExecutionViewMode;
 }

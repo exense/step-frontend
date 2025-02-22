@@ -51,6 +51,10 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   private setupExecutionRefresh(): void {
+    if (this.executionId === 'open') {
+      return;
+    }
+
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),

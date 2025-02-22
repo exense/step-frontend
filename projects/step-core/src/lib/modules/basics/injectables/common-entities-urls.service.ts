@@ -67,16 +67,15 @@ export class CommonEntitiesUrlsService {
     const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
     // /executions/open/id route is required, when one execution is opened from another
     // for proper content rerender
-    return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
+    return isDirectLink ? `/legacy-executions/${id}` : `/legacy-executions/open/${id}`;
   }
 
-  altExecutionUrl(idOrExecution?: string | Execution): string {
+  executionUrl(idOrExecution?: string | Execution | Execution, isDirectLink = true): string {
     if (!idOrExecution) {
       return '';
     }
     const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
-    // /executions/open/id route is required, when one execution is opened from another
-    // for proper content rerender
-    return `/alt-executions/${id}`;
+    // /executions/open/id route is required, when one execution is opened from another for proper content rerender
+    return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
   }
 }
