@@ -60,7 +60,7 @@ export class CommonEntitiesUrlsService {
     return `/cross-executions/${id}`;
   }
 
-  executionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
+  legacyExecutionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
     if (!idOrExecution) {
       return '';
     }
