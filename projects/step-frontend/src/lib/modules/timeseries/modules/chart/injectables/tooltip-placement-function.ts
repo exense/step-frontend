@@ -54,14 +54,6 @@ export class TooltipPlacementFunction {
     const marginEnd = parseInt(overlayStyle[secondaryAttributes.marginAfter]);
     const totalMargin = marginStart + marginEnd;
 
-    const availableSpace =
-      screenBoundaries[secondaryAttributes.after] - screenBoundaries[secondaryAttributes.before] - totalMargin;
-    const overlayMaxSize = parseInt(overlayStyle[secondaryAttributes.maxSize]);
-
-    if (!overlayMaxSize || availableSpace < overlayMaxSize) {
-      overlay.style[secondaryAttributes.maxSize] = `${availableSpace}px`;
-    }
-
     const offsetMarginStart = parseInt(overlayStyle[primaryAttributes.marginBefore]);
     const offsetMarginEnd = parseInt(overlayStyle[primaryAttributes.marginAfter]);
     const totalOffsetMargin = offsetMarginStart + offsetMarginEnd;

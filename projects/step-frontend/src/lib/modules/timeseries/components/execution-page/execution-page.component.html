@@ -4,11 +4,18 @@
     [storageId]="execution.id"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
+    [initialTimeSelection]="initialTimeRange()"
     [defaultFullTimeRange]="executionRange"
     [showExecutionLinks]="false"
     [showRefreshOption]="false"
     [showDashboardName]="false"
     [showHeaderBar]="false"
+    (timeRangeChange)="timeRangePickerChange.emit($event)"
+    [settingsButtonPosition]="
+      (executionMode | async) === ExecutionViewMode.NEW
+        ? SETTINGS_BTN_LOCATION.ABOVE_FILTER_BAR
+        : SETTINGS_BTN_LOCATION.SHIFTED_TO_TABS
+    "
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

@@ -1,10 +1,21 @@
-import { Component, DestroyRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  EventEmitter,
+  inject,
+  input,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
   ResolutionPickerComponent,
-  TimeRangePickerComponent,
   TimeSeriesConfig,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -15,12 +26,17 @@ import {
   AsyncTasksService,
   AuthService,
   Execution,
+  ExecutionViewMode,
+  ExecutionViewModeService,
   pollAsyncTask,
   TimeRange,
   TimeSeriesService,
 } from '@exense/step-core';
-import { takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
+import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
+import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 
 @Component({
   selector: 'step-execution-page',
@@ -39,9 +55,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class ExecutionPageComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
+  initialTimeRange = input<TimeRangePickerSelection | undefined>(undefined);
+
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
+  @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
+
   private _authService = inject(AuthService);
+  protected _executionViewModeService = inject(ExecutionViewModeService);
+  protected executionMode?: Observable<ExecutionViewMode>;
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -55,6 +77,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   private _asyncTaskService = inject(AsyncTasksService);
 
   private _destroyRef = inject(DestroyRef);
+
+  readonly SETTINGS_BTN_LOCATION = DashboardViewSettingsBtnLocation;
 
   ngOnInit(): void {
     if (!this.execution) {
@@ -93,6 +117,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
+      this.executionMode = this._executionViewModeService.getExecutionMode(this.execution);
       this.executionRange = this.getExecutionRange(this.execution);
       this.dashboard.refresh();
     }
@@ -118,4 +143,6 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         },
       });
   }
+
+  protected readonly ExecutionViewMode = ExecutionViewMode;
 }

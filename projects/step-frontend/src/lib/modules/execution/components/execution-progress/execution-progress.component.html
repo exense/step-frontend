@@ -47,6 +47,7 @@
     </ng-template>
     <ng-template #executionParameters>
       <mat-accordion multi>
+        <step-execution-legacy-switcher [execution]="execution" />
         <mat-expansion-panel [expanded]="true" togglePosition="before">
           <mat-expansion-panel-header>
             <mat-panel-title>Execution parameters</mat-panel-title>

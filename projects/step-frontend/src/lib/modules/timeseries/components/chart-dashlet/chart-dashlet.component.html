@@ -9,7 +9,11 @@
       [settings]="_internalSettings!"
       (lockStateChange)="handleLockStateChange($event)"
       [height]="height"
-    />
+    >
+      <ng-template let-data>
+        <div style="background: red">Salut {{ data?.name }}</div>
+      </ng-template>
+    </step-timeseries-chart>
   }
 </div>
 

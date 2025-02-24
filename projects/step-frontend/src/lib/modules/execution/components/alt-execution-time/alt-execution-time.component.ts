@@ -4,7 +4,6 @@ import {
   DateRangeAdapterService,
   DateSingleAdapterService,
   DurationPipe,
-  Execution,
   STEP_DATE_TIME_FORMAT_PROVIDERS,
 } from '@exense/step-core';
 import { DatePipe } from '@angular/common';
@@ -30,27 +29,61 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
-  execution = input<Execution | undefined>(undefined);
+  /** @Input() **/
+  readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
 
-  readonly date = computed(() => {
-    const startTime = this.execution()?.startTime;
+  /** @Input() **/
+  readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
+
+  /** @Input() **/
+  readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
+
+  /** @Input() **/
+  readonly timeOnly = input(false);
+
+  protected readonly displayDate = computed(() => {
+    const startTime = this.startTimeInput();
+    const isTimeOnly = this.timeOnly();
     if (!startTime) {
       return '';
+    }
+    if (isTimeOnly) {
+      return this._datePipe.transform(startTime, DateFormat.TIME);
     }
     const date = this._datePipe.transform(startTime, DateFormat.DATE_SHORT);
     return date === this.todayDate ? 'Today' : date;
   });
 
-  readonly duration = computed(() => {
-    const execution = this.execution();
-    if (!execution?.endTime) {
-      return '';
+  private endTime = computed(() => {
+    const startTime = this.startTimeInput();
+    let endTime = this.endTimeInput();
+    const duration = this.durationInput();
+
+    if (endTime !== undefined) {
+      return endTime;
     }
-    return this._durationPipe.transform(execution.endTime, execution.startTime);
+
+    if (startTime !== undefined && duration !== undefined) {
+      return startTime + duration;
+    }
+
+    return undefined;
   });
 
-  readonly dateTooltip = computed(() => {
-    const { startTime, endTime } = this.execution() ?? {};
+  protected readonly duration = computed(() => {
+    const startTime = this.startTimeInput();
+    const endTime = this.endTime();
+
+    if (startTime === undefined || endTime === undefined) {
+      return '';
+    }
+
+    return this._durationPipe.transform(endTime, startTime);
+  });
+
+  protected readonly dateTooltip = computed(() => {
+    const startTime = this.startTimeInput();
+    const endTime = this.endTime();
     const start = startTime ? DateTime.fromMillis(startTime) : undefined;
     const end = endTime ? DateTime.fromMillis(endTime) : undefined;
     return this._dateRangeAdapter.format({ start, end }, true);

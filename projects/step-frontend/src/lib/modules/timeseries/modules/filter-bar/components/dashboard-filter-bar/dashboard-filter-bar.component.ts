@@ -25,8 +25,6 @@ import {
   FilterBarItemType,
   FilterUtils,
   OQLBuilder,
-  TimeRangePickerComponent,
-  TimeRangePickerSelection,
   TimeSeriesConfig,
   TimeSeriesContext,
   TsFilteringMode,
@@ -38,6 +36,8 @@ import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-s
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
 import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
+import { TimeRangePickerSelection } from '../../../_common/types/time-selection/time-range-picker-selection';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -127,7 +127,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     this.oqlValue = contextFiltering.oql || '';
     this.activeMode = contextFiltering.mode;
     this._internalFilters = contextFiltering.filterItems;
-    this.activeTimeRange;
     this.context
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))

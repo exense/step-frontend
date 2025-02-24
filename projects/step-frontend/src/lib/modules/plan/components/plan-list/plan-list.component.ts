@@ -10,8 +10,12 @@ import {
   STORE_ALL,
   tablePersistenceConfigProvider,
   tableColumnsConfigProvider,
+  ExecutiontTaskParameters,
+  ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { map, of, pipe, switchMap, tap } from 'rxjs';
+import { SchedulerInvokerService } from '../../../execution/services/scheduler-invoker.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'step-plan-list',
@@ -29,15 +33,23 @@ import { map, of, pipe, switchMap, tap } from 'rxjs';
       provide: DialogParentService,
       useExisting: forwardRef(() => PlanListComponent),
     },
+    {
+      provide: SchedulerInvokerService,
+      useExisting: forwardRef(() => PlanListComponent),
+    },
   ],
 })
-export class PlanListComponent implements DialogParentService {
+export class PlanListComponent implements DialogParentService, SchedulerInvokerService {
+  private _router = inject(Router);
+  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _isUsedByDialogs = inject(IsUsedByDialogService);
   private _dialogs = inject(DialogsService);
 
   readonly _plansApiService = inject(AugmentedPlansService);
 
   readonly dataSource = this._plansApiService.getPlansTableDataSource();
+
+  readonly returnParentUrl = '/plans/list';
 
   private updateDataSourceAfterChange = pipe(
     tap((changeResult?: Plan | boolean | string[]) => {
@@ -76,5 +88,10 @@ export class PlanListComponent implements DialogParentService {
 
   lookUp(id: string, name: string): void {
     this._isUsedByDialogs.displayDialog(`Plan "${name}" is used by`, 'PLAN_ID', id);
+  }
+
+  openScheduler(task: ExecutiontTaskParameters): void {
+    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
+    this._router.navigate(['/', 'plans', 'list', 'schedule', temporaryId]);
   }
 }

@@ -150,6 +150,9 @@ export class TableComponent<T>
   /** @Input() **/
   tableParams = input<TableParameters | undefined>(undefined);
 
+  /** @Input() **/
+  noResultsPlaceholder = input<string | undefined>(undefined);
+
   @ViewChild(MatTable) private table?: MatTable<any>;
   @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
 

@@ -52,23 +52,30 @@ export class CommonEntitiesUrlsService {
     return `/scheduler/editor/${id}`;
   }
 
-  executionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
-    if (!idOrExecution) {
+  schedulerCrossExecutionUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+    if (!idOrTask) {
       return '';
     }
-    const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
-    // /executions/open/id route is required, when one execution is opened from another
-    // for proper content rerender
-    return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
+    const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
+    return `/cross-executions/${id}`;
   }
 
-  altExecutionUrl(idOrExecution?: string | Execution): string {
+  legacyExecutionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {
     if (!idOrExecution) {
       return '';
     }
     const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
     // /executions/open/id route is required, when one execution is opened from another
     // for proper content rerender
-    return `/alt-executions/${id}`;
+    return isDirectLink ? `/legacy-executions/${id}` : `/legacy-executions/open/${id}`;
+  }
+
+  executionUrl(idOrExecution?: string | Execution | Execution, isDirectLink = true): string {
+    if (!idOrExecution) {
+      return '';
+    }
+    const id = typeof idOrExecution === 'string' ? idOrExecution : idOrExecution.id;
+    // /executions/open/id route is required, when one execution is opened from another for proper content rerender
+    return isDirectLink ? `/executions/${id}` : `/executions/open/${id}`;
   }
 }
