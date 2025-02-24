@@ -8,7 +8,6 @@ import {
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
-  RequestFilterInterceptor,
   selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,

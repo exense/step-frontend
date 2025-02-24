@@ -1,8 +1,9 @@
 import { Execution, TimeRange } from '@exense/step-core';
-import { TimeRangePickerSelection } from './../time-selection/time-range-picker-selection';
+import { TimeRangePickerSelection, TimeRangeType } from './../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from './time-series.config';
 import { ChartAggregation } from '../chart-aggregation';
 import { DateTime } from 'luxon';
+import { Params } from '@angular/router';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -76,6 +77,18 @@ export class TimeSeriesUtils {
     }
   }
 
+  public static convertTimeRangeSelectionToUrlParams(timeRangeSettings: TimeRangePickerSelection): Params {
+    const params: Record<string, any> = {};
+    params['rangeType'] = timeRangeSettings.type;
+    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
+      params['from'] = timeRangeSettings.absoluteSelection!.from;
+      params['to'] = timeRangeSettings.absoluteSelection!.to;
+    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
+    }
+    return params;
+  }
+
   static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TimeRange {
     let newFullRange: TimeRange;
     switch (selection.type) {
@@ -90,6 +103,24 @@ export class TimeSeriesUtils {
         break;
     }
     return newFullRange;
+  }
+
+  public static extractTimeRangeSelectionFromURLParams(params: Params): TimeRangePickerSelection | undefined {
+    const rangeType = params['rangeType'] as TimeRangeType;
+    switch (rangeType) {
+      case TimeRangeType.ABSOLUTE:
+        const from = parseInt(params['from']);
+        const to = parseInt(params['to']);
+        if (!from || !to) {
+          return undefined;
+        }
+        return { type: rangeType, absoluteSelection: { from: from, to: to } };
+      case TimeRangeType.RELATIVE:
+        const relativeRange = parseInt(params['relativeRange']);
+        return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
+      default:
+        return undefined;
+    }
   }
 
   static formatRange(range: TimeRange) {

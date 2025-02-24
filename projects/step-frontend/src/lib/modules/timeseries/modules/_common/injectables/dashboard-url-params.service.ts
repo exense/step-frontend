@@ -44,7 +44,6 @@ export class DashboardUrlParamsService {
         acc[key.substring(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX.length)] = params[key];
         return acc;
       }, {} as Params);
-    console.log(params);
     const editModeValue = params['edit'];
     const timeRange = this.extractTimeRange(params);
     return {

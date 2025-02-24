@@ -21,6 +21,7 @@ import {
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   AugmentedPlansService,
+  AugmentedTimeSeriesService,
   Execution,
   IS_SMALL_SCREEN,
   RegistrationStrategy,
@@ -59,6 +60,7 @@ import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/i
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { Status } from '../../../_common/step-common.module';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -139,6 +141,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
@@ -306,6 +309,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
+  private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
+  readonly errorsDataSource$ = of(this.errorsDataSource);
+  readonly availableErrorTypes$ = this.errorsDataSource.allData$.pipe(
+    map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+    map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   readonly currentOperations$ = this.execution$.pipe(
     map((execution) => {
       if (!execution || execution.status === 'ENDED') {
@@ -355,11 +367,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }
 
     this.setupTreeRefresh();
+    this.setupErrorsRefresh();
   }
 
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
+    this.errorsDataSource.destroy();
   }
 
   private setupTreeRefresh(): void {
@@ -382,6 +396,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         this._aggregatedTreeTabState.init(root);
         this._aggregatedTreeWidgetState.init(root);
         this.isTreeInitialized = true;
+      });
+  }
+
+  private setupErrorsRefresh(): void {
+    combineLatest([this.execution$, this.timeRange$])
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(([execution, timeRange]) => {
+        const executionId = execution.id!;
+        this.errorsDataSource.reload({ request: { executionId, timeRange } });
       });
   }
 

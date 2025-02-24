@@ -319,6 +319,7 @@ export * from './services/plugin-info-registry.service';
 export * from './services/artefact.service';
 export * from './modules/plan-common/injectables/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
+export * from './modules/execution-common/services/execution-view-mode.service';
 export * from './shared';
 export * from './modules/basics/types/api-token.interface';
 export * from './modules/editable-labels';

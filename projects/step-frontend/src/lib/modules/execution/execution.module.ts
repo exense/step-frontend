@@ -12,8 +12,6 @@ import { PanelIdPipe } from './pipes/panel-id.pipe';
 import { OperationsModule } from '../operations/operations.module';
 import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
-import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
-import './components/execution-tabs/execution-tabs.component';
 import {
   AugmentedExecutionsService,
   AugmentedControllerService,
@@ -48,11 +46,11 @@ import { RepositoryComponent } from './components/repository/repository.componen
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
-import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
+import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -105,6 +103,7 @@ import { AltReportNodeDetailsStateService } from './services/alt-report-node-det
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
@@ -113,6 +112,11 @@ import { AltExecutionTreePartialTabComponent } from './components/alt-execution-
 import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
+import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
+import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
+import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
+import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 
 @NgModule({
   declarations: [
@@ -124,7 +128,6 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     ExecutionStepComponent,
     PanelIdPipe,
     KeywordCallsComponent,
-    ExecutionTabsComponent,
     RepositoryPlanTestcaseListComponent,
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
@@ -143,11 +146,11 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     PanelOperationsComponent,
     ExecutionSelectionTableComponent,
     IsExecutionProgressPipe,
-    ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
+    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -182,8 +185,12 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
+    ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
+    ExecutionsChartTooltipComponent,
+    ErrorDetailsMenuComponent,
+    AltExecutionErrorsComponent,
   ],
   imports: [
     StepCommonModule,
@@ -192,12 +199,13 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     TimeSeriesModule,
     ArtefactsModule,
     DoughnutChartComponent,
+    TimeSeriesChartComponent,
+    TooltipContentDirective,
     TimeRangePickerComponent,
   ],
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
-    ExecutionTabsComponent,
     ExecutionErrorsComponent,
     KeywordCallsComponent,
     ExecutionTreeComponent,
@@ -220,6 +228,7 @@ import { StatusCountBadgeComponent } from './components/status-count-badge/statu
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
+    ExecutionLegacySwitcherComponent,
   ],
   providers: [
     {
@@ -313,13 +322,14 @@ export class ExecutionModule {
     );
 
     this._viewRegistry.registerRoute({
-      path: 'executions',
-      canActivate: [executionGuard],
+      path: 'legacy-executions',
       canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
-      component: ExecutionsComponent,
+      component: AltExecutionsComponent,
+      providers: [ActiveExecutionsService],
       children: [
         {
           path: '',
@@ -342,19 +352,21 @@ export class ExecutionModule {
             }
             return { consumed: url };
           },
+          canActivate: [executionGuard],
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
       ],
     });
-
     this._viewRegistry.registerRoute({
-      path: 'alt-executions',
+      path: 'cross-executions/:id',
+      component: ScheduleOverviewComponent,
+    });
+    this._viewRegistry.registerRoute({
+      path: 'executions',
       component: AltExecutionsComponent,
-      canActivate: [altExecutionGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
-        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
       providers: [ActiveExecutionsService],
@@ -368,7 +380,21 @@ export class ExecutionModule {
           component: ExecutionListComponent,
         },
         {
+          // This additional route is required, to rerender the execution progress component properly
+          // when the user navigates from one execution to another
+          path: 'open/:id',
+          component: ExecutionOpenerComponent,
+        },
+        {
           path: ':id',
+          canActivate: [
+            altExecutionGuard,
+            (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            },
+          ],
           component: AltExecutionProgressComponent,
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
@@ -390,13 +416,6 @@ export class ExecutionModule {
             },
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
-          ],
-          canActivate: [
-            (route: ActivatedRouteSnapshot) => {
-              const id = route.params['id'];
-              inject(ActiveExecutionContextService).setupExecutionId(id);
-              return true;
-            },
           ],
           children: [
             {
