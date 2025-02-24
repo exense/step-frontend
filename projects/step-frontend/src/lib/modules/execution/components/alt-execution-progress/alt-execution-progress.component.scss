@@ -5,47 +5,73 @@
 step-alt-execution-progress {
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
-  padding: 0 3.2rem;
+  gap: 2rem;
+  padding: 0 1.5rem;
 
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    grid-template-areas: 'title controls ranger';
-    gap: 1.5rem;
+    grid-template-areas:
+      'title controls ranger'
+      'sub-title sub-title sub-title';
+    gap: 0.5rem;
     align-items: flex-start;
 
     &.small-screen {
-      grid-template-columns: auto auto;
+      grid-template-columns: 1fr 1fr;
       grid-template-areas:
         'title title'
+        'sub-title sub-title'
         'controls ranger';
+
+      .controls {
+        justify-self: flex-start;
+      }
+    }
+
+    .sub-title {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      grid-area: sub-title;
+
+      step-alt-execution-parameters {
+        margin-left: 1rem;
+      }
     }
 
     .title {
       grid-area: title;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
       justify-content: flex-end;
-
-      .sub-title {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: 0.4rem;
-        white-space: nowrap;
-      }
 
       h3 {
         margin: 0;
-        font-size: 3rem;
         line-height: 3.8rem;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 2rem;
+
+        div {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          max-width: 90%;
+        }
       }
 
       .user {
         font-weight: 400;
         color: var.$gray-550;
+      }
+
+      entity-icon {
+        @include core.step-icon(2.4rem);
       }
     }
 
@@ -60,15 +86,41 @@ step-alt-execution-progress {
       display: flex;
       align-items: center;
       align-content: flex-end;
-      gap: 1rem;
+      gap: 0.25rem;
       flex-wrap: nowrap;
+
+      .controls-marker,
+      .mat-mdc-icon-button.mat-mdc-button-base {
+        width: 3.5rem;
+        height: 3.5rem;
+      }
+
+      .mat-mdc-icon-button.mat-mdc-button-base {
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+      }
+
+      .controls-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 0.1rem solid var.$gray-300;
+        background: var.$gray-200;
+        padding-left: 0.5rem;
+        border-top-left-radius: 1.7rem;
+        border-bottom-left-radius: 1.7rem;
+      }
     }
   }
 
   .main {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+
+    step-tabs .mat-mdc-tab-list {
+      margin-bottom: 0 !important;
+    }
   }
 
   @media screen {
@@ -101,6 +153,21 @@ step-alt-execution-progress {
     display: block;
     margin-bottom: 2em;
   }
+
+  entity-icon {
+    display: flex;
+    line-height: 1;
+  }
+
+  button.warning {
+    color: var.$red-50;
+  }
 }
 
 @include common.executions-menu;
+
+.execution-resolved-params {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

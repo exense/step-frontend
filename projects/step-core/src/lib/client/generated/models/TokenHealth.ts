@@ -16,8 +16,8 @@ export type TokenHealth = {
         methodName?: string;
         fileName?: string;
         lineNumber?: number;
-        nativeMethod?: boolean;
         className?: string;
+        nativeMethod?: boolean;
       }>;
       message?: string;
       localizedMessage?: string;
@@ -29,8 +29,8 @@ export type TokenHealth = {
       methodName?: string;
       fileName?: string;
       lineNumber?: number;
-      nativeMethod?: boolean;
       className?: string;
+      nativeMethod?: boolean;
     }>;
     message?: string;
     suppressed?: Array<{
@@ -41,8 +41,8 @@ export type TokenHealth = {
         methodName?: string;
         fileName?: string;
         lineNumber?: number;
-        nativeMethod?: boolean;
         className?: string;
+        nativeMethod?: boolean;
       }>;
       message?: string;
       localizedMessage?: string;

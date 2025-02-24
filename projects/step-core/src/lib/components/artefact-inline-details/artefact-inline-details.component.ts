@@ -14,7 +14,7 @@ import { AbstractArtefact, ReportNode } from '../../client/step-client-module';
 export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
   private _artefactService = inject(ArtefactService);
 
-  readonly aggregatedInfo = input<AggregatedArtefactInfo<A> | undefined>(undefined);
+  readonly aggregatedInfo = input<AggregatedArtefactInfo<A, R> | undefined>(undefined);
   readonly reportInfo = input<R | undefined>(undefined);
   readonly isVertical = input(false);
   readonly overflowContent = input(false);

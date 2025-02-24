@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: 100%;
+}
+step-alt-report-widget-content {
+  max-height: 38rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  button {
+    min-width: 10rem;
+    white-space: nowrap;
+  }
+}

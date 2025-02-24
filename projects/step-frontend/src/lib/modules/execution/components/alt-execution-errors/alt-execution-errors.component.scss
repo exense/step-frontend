@@ -1,0 +1,26 @@
+.error-name {
+  gap: 0.4rem;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  .icon {
+    cursor: pointer;
+    transform: scale(0.8);
+    padding: 0.2rem;
+  }
+
+  .message {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: break-spaces;
+    word-break: break-all;
+    cursor: pointer;
+  }
+}
+
+.wide-menu {
+  max-width: 40rem;
+}
