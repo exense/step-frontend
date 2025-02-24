@@ -49,6 +49,7 @@
       } @else {
         <step-aggregated-tree-node-iteration-list
           [node]="aggregatedNode!"
+          [resolvedPartialPath]="resolvedPartialPath"
           [initialStatus]="initialSearchStatus"
           (showDetails)="selectedReportNode.set($event)"
           (openTreeView)="handleOpenTreeView($event)"

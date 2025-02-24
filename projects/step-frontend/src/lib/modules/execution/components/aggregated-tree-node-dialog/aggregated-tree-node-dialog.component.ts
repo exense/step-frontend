@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNode?: AggregatedTreeNode;
+  resolvedPartialPath?: string;
   reportNode?: ReportNode;
   searchStatus?: Status;
   reportNodeChildren: ReportNode[];
@@ -26,6 +27,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   protected readonly selectedReportNode = signal(this._data.reportNode);
   protected readonly aggregatedNode = this._data.aggregatedNode;
+  protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;
   protected readonly hasData = !!this._data.aggregatedNode || !!this._data.reportNode;
   protected readonly hasBackButton = !this._data.reportNode;

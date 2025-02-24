@@ -16,13 +16,6 @@ import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-executi
   selector: 'step-alt-execution-tree-partial-tab',
   templateUrl: './alt-execution-tree-partial-tab.component.html',
   styleUrl: './alt-execution-tree-partial-tab.component.scss',
-  providers: [
-    AggregatedReportViewTreeStateService,
-    {
-      provide: TreeStateService,
-      useExisting: AggregatedReportViewTreeStateService,
-    },
-  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionTreePartialTabComponent implements OnInit {
@@ -45,17 +38,6 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
     takeUntilDestroyed(),
   );
 
-  private range$ = this._executionState.dateRange$.pipe(
-    map((range) => {
-      if (!range) {
-        return undefined;
-      }
-      const from = range.start?.toMillis();
-      const to = range.end?.toMillis();
-      return { from, to };
-    }),
-  );
-
   protected showSpinner = signal(false);
 
   ngOnInit(): void {
@@ -64,13 +46,22 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
   }
 
   private setupTree(): void {
-    combineLatest([this._executionState.executionId$, this.range$, this.reportNode$])
+    combineLatest([this._executionState.executionId$, this._executionState.timeRange$, this.reportNode$])
       .pipe(
         switchMap(([executionId, range, reportNode]) => {
           this.showSpinner.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
-            map((tree) => (!tree ? undefined : { tree, artefactId: reportNode.artefactID ?? undefined })),
+            map((response) => {
+              if (!response?.aggregatedReportView) {
+                return undefined;
+              }
+              const artefactId = reportNode.artefactID;
+              return {
+                ...response,
+                artefactId,
+              };
+            }),
             catchError(() => of(undefined)),
             finalize(() => this.showSpinner.set(false)),
           );
@@ -81,8 +72,9 @@ export class AltExecutionTreePartialTabComponent implements OnInit {
         if (!result) {
           return;
         }
-        const selectedNodeIds = result.artefactId ? [result.artefactId] : [];
-        this._treeState.init(result.tree, { selectedNodeIds });
+        const { aggregatedReportView, resolvedPartialPath, artefactId } = result;
+        const selectedNodeIds = artefactId ? [artefactId] : [];
+        this._treeState.init(aggregatedReportView!, { selectedNodeIds, resolvedPartialPath });
       });
   }
 

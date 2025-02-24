@@ -27,6 +27,7 @@ import {
   TreeNodeUtilsService,
   ViewRegistryService,
   DialogParentService,
+  TreeStateService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -97,6 +98,7 @@ import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-
 import {
   AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
+  AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
 } from './services/aggregated-report-view-tree-state.service';
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
@@ -416,6 +418,7 @@ export class ExecutionModule {
             },
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
+            AggregatedReportViewTreeStateContextService,
           ],
           children: [
             {
@@ -427,6 +430,14 @@ export class ExecutionModule {
               data: {
                 mode: ViewMode.VIEW,
               },
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
               children: [
                 {
                   path: '',
@@ -453,6 +464,14 @@ export class ExecutionModule {
             },
             {
               path: 'tree',
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
               children: [
                 {
                   path: '',
@@ -462,15 +481,25 @@ export class ExecutionModule {
             },
             {
               path: 'sub-tree/:reportNodeId',
+              providers: [
+                AggregatedReportViewTreeStateService,
+                {
+                  provide: TreeStateService,
+                  useExisting: AggregatedReportViewTreeStateService,
+                },
+              ],
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AggregatedReportViewTreeStateService);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
               children: [
                 {
                   path: '',
                   component: AltExecutionTreePartialTabComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
                 },
               ],
             },
@@ -550,7 +579,7 @@ export class ExecutionModule {
                 outlet: 'nodeDetails',
                 resolve: {
                   aggregatedNode: (route: ActivatedRouteSnapshot) => {
-                    const _state = inject(AGGREGATED_TREE_TAB_STATE);
+                    const _state = inject(AggregatedReportViewTreeStateContextService).getState();
                     const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                     const aggregatedNodeId = route.queryParams[_queryParamNames.aggregatedNodeId];
                     if (!aggregatedNodeId) {
@@ -558,6 +587,8 @@ export class ExecutionModule {
                     }
                     return _state.findNodeById(aggregatedNodeId);
                   },
+                  resolvedPartialPath: () =>
+                    inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
                   reportNode: (route: ActivatedRouteSnapshot) => {
                     const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
                     const _controllerService = inject(AugmentedControllerService);
