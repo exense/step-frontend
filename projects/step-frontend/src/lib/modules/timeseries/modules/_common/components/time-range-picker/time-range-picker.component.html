@@ -7,7 +7,7 @@
       <div class="text" [matTooltip]="mainPickerLabel">
         {{ (activeSelection.type === 'FULL' && fullRangeLabel) || mainPickerLabel }}
       </div>
-      @if (activeSelection.type === 'ABSOLUTE') {
+      @if (activeSelection.type === 'ABSOLUTE' && hasFullRangeOption()) {
         <div class="suffix-icon warn">
           <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>
         </div>
@@ -51,7 +51,7 @@
           <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
         </div>
         <div class="right-section" (click)="closeMenu()">
-          @for (rangeOption of selectOptions; track rangeOption) {
+          @for (rangeOption of selectOptions(); track rangeOption) {
             <div
               (click)="onRelativeOrFullSelectionSelected(rangeOption)"
               class="time-option"
