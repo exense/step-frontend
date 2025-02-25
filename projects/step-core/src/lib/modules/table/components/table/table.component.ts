@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   computed,
+  contentChild,
   contentChildren,
   ContentChildren,
   DestroyRef,
@@ -55,6 +56,8 @@ import { TableColumnsDictionaryService } from '../../services/table-columns-dict
 import { ColumnInfo } from '../../types/column-info';
 import { isValidRegex } from '../../../basics/step-basics.module';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
+import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
+import { RowDirective } from '../../directives/row.directive';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -155,6 +158,21 @@ export class TableComponent<T>
 
   @ContentChildren(AdditionalHeaderDirective) additionalHeaders?: QueryList<AdditionalHeaderDirective>;
   additionalHeaderGroups?: Array<Array<AdditionalHeaderDirective>>;
+
+  /** @ViewChildren **/
+  private rows = viewChildren(RowDirective);
+
+  protected readonly rowInfos = computed(() => {
+    const rows = this.rows();
+    const result = (rows ?? []).map((row) => row.getRowInfo()).filter((row) => !!row.data);
+    if (!result.length) {
+      return undefined;
+    }
+    return result;
+  });
+
+  /** @ContentChild **/
+  protected readonly rowsExtension = contentChild(RowsExtensionDirective);
 
   /**
    * @ContentChildrent(ColumnDirective)
