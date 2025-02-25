@@ -1,12 +1,24 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
 :host {
   display: inline-block;
+  &.round-box {
+    background: var.$gray-100;
+    border-radius: 50%;
+    padding: 0.5rem;
+    border: 0.1rem solid transparent;
+    step-icon {
+      @include core.step-icon-size(1.2rem);
+      display: flex;
+      margin-right: 0;
+    }
+  }
 }
 
 @include core.reportNodeStatuses;
 
 step-icon {
   background: none !important;
-  margin-right: 5px;
+  margin-right: 0.5rem;
 }

@@ -31,7 +31,7 @@
     #table
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
-    class="paddingless-full no-border hide-header"
+    class="paddingless no-border hide-header"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
@@ -41,24 +41,38 @@
         </div>
       </td>
     </ng-container>
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
-        <step-status
-          class="details-trigger"
-          [status]="element.status"
-          [iconMode]="true"
-          (click)="openNodeDetails(element)"
-        />
-      </td>
-    </ng-container>
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          {{ element.name }}
-          <step-artefact-inline-details [reportInfo]="element" [overflowContent]="true" />
+          <div>
+            <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+            <step-status
+              class="details-trigger"
+              [status]="element.status"
+              [iconMode]="true"
+              (click)="openNodeDetails(element)"
+            />
+            {{ element.name }}
+          </div>
+          <step-artefact-inline-details [reportInfo]="element" />
         </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <step-btn-group class="actions">
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Open tree for this iteration"
+            matTooltipPosition="below"
+            (click)="openTreeView.emit(element)"
+          >
+            <step-icon name="git-pull-request" />
+          </button>
+        </step-btn-group>
       </td>
     </ng-container>
   </step-table>

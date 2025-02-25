@@ -22,12 +22,16 @@ export class AggregatedTreeNodeComponent {
     return node;
   });
 
-  protected showIterations(status?: Status): void {
-    const nodeId = this.nodeId();
-    if (!nodeId) {
+  protected readonly detailsTooltip = 'Open execution details';
+
+  protected showIterations(status?: Status, event?: MouseEvent): void {
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
+    const node = this.node();
+    if (!node) {
       return;
     }
-    this._treeState.selectNode(nodeId);
-    this._executionDialogs.openIterations(nodeId, status);
+    this._treeState.selectNode(node);
+    this._executionDialogs.openIterations(node, status);
   }
 }

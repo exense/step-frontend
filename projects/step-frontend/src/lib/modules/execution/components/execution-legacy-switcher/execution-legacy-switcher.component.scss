@@ -1,0 +1,9 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'sass:map';
+
+.new-execution-report {
+  height: 3.5rem;
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+}

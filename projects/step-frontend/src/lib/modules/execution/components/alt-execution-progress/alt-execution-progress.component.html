@@ -31,7 +31,7 @@
     <div class="sub-title">
       <step-alt-execution-time [startTime]="execution.startTime" [endTime]="execution.endTime" />
       @if (displayStatus$ | async; as status) {
-        <step-status [status]="status" />
+        <step-status [status]="status" [iconMode]="true" />
       }
       <div class="user">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
@@ -68,6 +68,7 @@
       }
     </div>
     <div class="controls">
+      <step-execution-legacy-switcher [execution]="execution" />
       <step-btn-group class="with-round-borders">
         <ng-container
           stepExecutionCommands
@@ -139,7 +140,14 @@
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">
-      <router-outlet name="rangePicker" />
+      @if (!(isAnalyticsRoute$ | async)) {
+        <step-time-range-picker
+          [activeSelection]="(timeRangeSelection$ | async)!"
+          [selectOptions]="timeRangeOptions"
+          (selectionChange)="handleTimeRangeChange($event)"
+          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+        />
+      }
     </div>
   }
 </section>

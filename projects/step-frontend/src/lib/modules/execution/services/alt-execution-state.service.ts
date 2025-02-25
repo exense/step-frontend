@@ -1,13 +1,15 @@
 import { Observable } from 'rxjs';
-import { DateRange, Execution, Operation, ReportNode, TableDataSource, TimeSeriesErrorEntry } from '@exense/step-core';
+import { Execution, Operation, ReportNode, TableDataSource, TimeRange, TimeSeriesErrorEntry } from '@exense/step-core';
 import { KeywordParameters } from '../shared/keyword-parameters';
-import { RangePickerStatesService } from './range-picker-state.service';
-import { Status } from '../../_common/step-common.module';
+import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { Status } from '../../_common/shared/status.enum';
 
-export abstract class AltExecutionStateService extends RangePickerStatesService {
+export abstract class AltExecutionStateService {
+  abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
+  abstract timeRangeOptions: TimeRangePickerSelection[];
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;
-  abstract readonly executionFulLRange$: Observable<DateRange | null | undefined>;
+  abstract readonly isFullRangeSelected$: Observable<boolean>;
   abstract readonly keywordParameters$: Observable<KeywordParameters>;
   abstract readonly keywordsDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly hasTestCasesFilter$: Observable<boolean>;
@@ -16,4 +18,7 @@ export abstract class AltExecutionStateService extends RangePickerStatesService 
   abstract readonly testCases$: Observable<ReportNode[] | undefined>;
   abstract readonly testCasesDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly currentOperations$: Observable<Operation[] | undefined>;
+  abstract readonly timeRange$: Observable<TimeRange | undefined>;
+  abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
+  abstract selectFullRange(): void;
 }

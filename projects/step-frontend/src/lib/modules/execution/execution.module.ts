@@ -12,8 +12,6 @@ import { PanelIdPipe } from './pipes/panel-id.pipe';
 import { OperationsModule } from '../operations/operations.module';
 import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
-import { ExecutionTabsComponent } from './components/execution-tabs/execution-tabs.component';
-import './components/execution-tabs/execution-tabs.component';
 import {
   AugmentedExecutionsService,
   AugmentedControllerService,
@@ -28,6 +26,8 @@ import {
   stepRouteAdditionalConfig,
   TreeNodeUtilsService,
   ViewRegistryService,
+  DialogParentService,
+  TreeStateService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -47,7 +47,6 @@ import { RepositoryComponent } from './components/repository/repository.componen
 import { ExecutionSelectionTableComponent } from './components/execution-selection-table/execution-selection-table.component';
 import { ExecutionBulkOperationsRegisterService } from './services/execution-bulk-operations-register.service';
 import { IsExecutionProgressPipe } from './pipes/is-execution-progress.pipe';
-import { ExecutionsComponent } from './components/executions/executions.component';
 import { ExecutionOpenerComponent } from './components/execution-opener/execution-opener.component';
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
@@ -78,8 +77,6 @@ import { AltExecutionReportControlsComponent } from './components/alt-execution-
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
 import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
-import { AltExecutionRangePickerComponent } from './components/alt-execution-range-picker/alt-execution-range-picker.component';
-import { AltExecutionRangePrintComponent } from './components/alt-execution-range-print/alt-execution-range-print.component';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
 import { executionGuard } from './guards/execution.guard';
@@ -101,21 +98,26 @@ import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-
 import {
   AGGREGATED_TREE_TAB_STATE,
   AGGREGATED_TREE_WIDGET_STATE,
+  AggregatedReportViewTreeStateContextService,
   AggregatedReportViewTreeStateService,
 } from './services/aggregated-report-view-tree-state.service';
 import { AltReportNodeDetailsStateService } from './services/alt-report-node-details-state.service';
 import { AltExecutionTreeComponent } from './components/alt-execution-tree/alt-execution-tree.component';
 import { AltExecutionTreeWidgetComponent } from './components/alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { AggregatedTreeNodeDialogComponent } from './components/aggregated-tree-node-dialog/aggregated-tree-node-dialog.component';
+import { ExecutionLegacySwitcherComponent } from './components/execution-legacy-switcher/execution-legacy-switcher.component';
 import { PlanNodeDetailsDialogComponent } from './components/plan-node-details-dialog/plan-node-details-dialog.component';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './services/report-node-details-query-params.token';
 import { ExecutionNavigatorQueryParamsCleanupService } from './services/execution-navigator-query-params-cleanup.service';
 import { AltPanelComponent } from './components/alt-panel/alt-panel.component';
+import { AltExecutionTreePartialTabComponent } from './components/alt-execution-tree-partial-tab/alt-execution-tree-partial-tab.component';
+import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-dialog-url-cleanup-service';
+import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
+import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
 import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
-import { TimeRangePickerComponent } from '../timeseries/modules/_common';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 
 @NgModule({
@@ -123,11 +125,11 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     ExecutionListComponent,
     StatusComponent,
     StatusDistributionComponent,
+    StatusCountBadgeComponent,
     ExecutionResultComponent,
     ExecutionStepComponent,
     PanelIdPipe,
     KeywordCallsComponent,
-    ExecutionTabsComponent,
     RepositoryPlanTestcaseListComponent,
     ExecutionErrorsComponent,
     ExecutionTreeComponent,
@@ -146,7 +148,6 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     PanelOperationsComponent,
     ExecutionSelectionTableComponent,
     IsExecutionProgressPipe,
-    ExecutionsComponent,
     ExecutionOpenerComponent,
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
@@ -175,10 +176,9 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
-    AltExecutionRangePickerComponent,
-    AltExecutionRangePrintComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
+    AltExecutionTreePartialTabComponent,
     ExecutionDetailsComponent,
     AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
@@ -187,6 +187,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     ExecutionActionsExecuteContentDirective,
     AggregatedTreeNodeIterationListComponent,
     AggregatedTreeNodeDialogComponent,
+    ExecutionLegacySwitcherComponent,
     PlanNodeDetailsDialogComponent,
     AltPanelComponent,
     ExecutionsChartTooltipComponent,
@@ -207,7 +208,6 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
   exports: [
     ExecutionListComponent,
     ExecutionStepComponent,
-    ExecutionTabsComponent,
     ExecutionErrorsComponent,
     KeywordCallsComponent,
     ExecutionTreeComponent,
@@ -230,6 +230,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
+    ExecutionLegacySwitcherComponent,
   ],
   providers: [
     {
@@ -323,13 +324,14 @@ export class ExecutionModule {
     );
 
     this._viewRegistry.registerRoute({
-      path: 'executions',
-      canActivate: [executionGuard],
+      path: 'legacy-executions',
       canDeactivate: [executionDeactivateGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
+        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
-      component: ExecutionsComponent,
+      component: AltExecutionsComponent,
+      providers: [ActiveExecutionsService],
       children: [
         {
           path: '',
@@ -352,6 +354,7 @@ export class ExecutionModule {
             }
             return { consumed: url };
           },
+          canActivate: [executionGuard],
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
@@ -362,12 +365,10 @@ export class ExecutionModule {
       component: ScheduleOverviewComponent,
     });
     this._viewRegistry.registerRoute({
-      path: 'alt-executions',
+      path: 'executions',
       component: AltExecutionsComponent,
-      canActivate: [altExecutionGuard],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
-        forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
       providers: [ActiveExecutionsService],
@@ -381,10 +382,28 @@ export class ExecutionModule {
           component: ExecutionListComponent,
         },
         {
+          // This additional route is required, to rerender the execution progress component properly
+          // when the user navigates from one execution to another
+          path: 'open/:id',
+          component: ExecutionOpenerComponent,
+        },
+        {
           path: ':id',
+          canActivate: [
+            altExecutionGuard,
+            (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              inject(ActiveExecutionContextService).setupExecutionId(id);
+              return true;
+            },
+          ],
           component: AltExecutionProgressComponent,
           providers: [
             AggregatedReportViewTreeNodeUtilsService,
+            {
+              provide: DialogParentService,
+              useClass: ExecutionViewDialogUrlCleanupService,
+            },
             {
               provide: TreeNodeUtilsService,
               useExisting: AggregatedReportViewTreeNodeUtilsService,
@@ -399,13 +418,7 @@ export class ExecutionModule {
             },
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
-          ],
-          canActivate: [
-            (route: ActivatedRouteSnapshot) => {
-              const id = route.params['id'];
-              inject(ActiveExecutionContextService).setupExecutionId(id);
-              return true;
-            },
+            AggregatedReportViewTreeStateContextService,
           ],
           children: [
             {
@@ -417,6 +430,14 @@ export class ExecutionModule {
               data: {
                 mode: ViewMode.VIEW,
               },
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
               children: [
                 {
                   path: '',
@@ -426,11 +447,6 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportControlsComponent,
                   outlet: 'controls',
-                },
-                {
-                  path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
                 },
               ],
             },
@@ -444,24 +460,46 @@ export class ExecutionModule {
                   path: '',
                   component: AltExecutionReportComponent,
                 },
-                {
-                  path: '',
-                  component: AltExecutionRangePrintComponent,
-                  outlet: 'rangePicker',
-                },
               ],
             },
             {
               path: 'tree',
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AGGREGATED_TREE_TAB_STATE);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
               children: [
                 {
                   path: '',
                   component: AltExecutionTreeTabComponent,
                 },
+              ],
+            },
+            {
+              path: 'sub-tree/:reportNodeId',
+              providers: [
+                AggregatedReportViewTreeStateService,
+                {
+                  provide: TreeStateService,
+                  useExisting: AggregatedReportViewTreeStateService,
+                },
+              ],
+              canActivate: [
+                () => {
+                  const ctx = inject(AggregatedReportViewTreeStateContextService);
+                  const treeState = inject(AggregatedReportViewTreeStateService);
+                  ctx.setState(treeState);
+                  return true;
+                },
+              ],
+              children: [
                 {
                   path: '',
-                  component: AltExecutionRangePickerComponent,
-                  outlet: 'rangePicker',
+                  component: AltExecutionTreePartialTabComponent,
                 },
               ],
             },
@@ -541,7 +579,7 @@ export class ExecutionModule {
                 outlet: 'nodeDetails',
                 resolve: {
                   aggregatedNode: (route: ActivatedRouteSnapshot) => {
-                    const _state = inject(AGGREGATED_TREE_TAB_STATE);
+                    const _state = inject(AggregatedReportViewTreeStateContextService).getState();
                     const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                     const aggregatedNodeId = route.queryParams[_queryParamNames.aggregatedNodeId];
                     if (!aggregatedNodeId) {
@@ -549,6 +587,8 @@ export class ExecutionModule {
                     }
                     return _state.findNodeById(aggregatedNodeId);
                   },
+                  resolvedPartialPath: () =>
+                    inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
                   reportNode: (route: ActivatedRouteSnapshot) => {
                     const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
                     const _controllerService = inject(AugmentedControllerService);

@@ -1,14 +1,12 @@
 import { TimeRange, type TimeRangeRelativeSelection, TimeRangeSelection } from '@exense/step-core';
-import { RelativeTimeSelection } from '../../modules/_common';
-import { TimeRangeType } from './time-range-type';
+import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 
 /**
  * This entity will store all the settings for a dashboard regarding time selection.
  */
 export interface DashboardTimeRangeSettings {
-  type: 'FULL' | 'ABSOLUTE' | 'RELATIVE';
+  pickerSelection: TimeRangePickerSelection;
   defaultFullRange?: Partial<TimeRange>; // used for reset (usually an execution range)
-  fullRange: TimeRange; // absolute range. should be set for any situation
+  fullRange: TimeRange; // absolute range. should represent the active range
   selectedRange: TimeRange;
-  relativeSelection?: TimeRangeRelativeSelection;
 }

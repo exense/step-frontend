@@ -1,31 +1,27 @@
-import { Component, computed, effect, inject, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, Signal, signal } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
   Execution,
   ExecutionsService,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
   STATUS_COLORS,
   TimeRange,
   TimeUnit,
   AugmentedTimeSeriesService,
+  SchedulerOverviewTaskChangeService,
 } from '@exense/step-core';
 import { map, Observable, shareReplay } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
-import {
-  TimeRangePickerSelection,
-  TimeSeriesConfig,
-  TimeSeriesContext,
-  TimeSeriesUtils,
-} from '../../../timeseries/modules/_common';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
@@ -67,6 +63,7 @@ export class ScheduleOverviewComponent implements OnInit {
   private _executionService = inject(ExecutionsService);
   protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
+  private _scheduleOverviewTaskChange = inject(SchedulerOverviewTaskChangeService);
   private _router = inject(Router);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -91,7 +88,9 @@ export class ScheduleOverviewComponent implements OnInit {
   refreshInterval = signal<number>(0);
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
 
-  timeRange: Signal<TimeRange | undefined> = computed(() => {
+  protected readonly taskId = toSignal(this.taskId$, { initialValue: this._activatedRoute.snapshot.params['id'] });
+
+  protected readonly timeRange: Signal<TimeRange | undefined> = computed(() => {
     let selection = this.activeTimeRangeSelection();
     if (selection) {
       return this.calculateTimeRange(selection);
@@ -134,7 +133,7 @@ export class ScheduleOverviewComponent implements OnInit {
     if (urlParams.timeRange) {
       this.activeTimeRangeSelection.set(urlParams.timeRange!);
     } else {
-      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]); // hourly default
+      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
   }
 
@@ -569,5 +568,36 @@ export class ScheduleOverviewComponent implements OnInit {
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
+    // this.timeRangeChange.next({ selection, triggerRefresh: true });
+  }
+
+  private updateUrlParams() {
+    const timeRangeSelection = this.activeTimeRangeSelection()!;
+    const params = TimeSeriesUtils.convertTimeRangeSelectionToUrlParams(timeRangeSelection);
+    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
+      accumulator[this.URL_PARAMS_PREFIX + key] = params[key];
+      return accumulator;
+    }, {});
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      queryParams: prefixedParams,
+    });
+  }
+
+  private collectUrlParams(): UrlParams {
+    let params = this._activatedRoute.snapshot.queryParams;
+    params = Object.keys(params)
+      .filter((key) => key.startsWith(this.URL_PARAMS_PREFIX))
+      .reduce((acc, key) => {
+        acc[key.substring(this.URL_PARAMS_PREFIX.length)] = params[key];
+        return acc;
+      }, {} as Params);
+    let timeRangeSelection = TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
+    if (timeRangeSelection?.type === 'RELATIVE') {
+      timeRangeSelection = this.findRelativeTimeOption(timeRangeSelection.relativeSelection!.timeInMs!);
+    }
+    return {
+      timeRangeSelection: timeRangeSelection,
+    };
   }
 }

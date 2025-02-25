@@ -1,18 +1,30 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { ExecutionViewModeService } from '../services/execution-view-mode.service';
-import { map } from 'rxjs';
-import { ExecutionViewMode } from '@exense/step-core';
+import { map, switchMap } from 'rxjs';
+import { ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
 export const altExecutionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
   const _executionViewMode = inject(ExecutionViewModeService);
-  return _executionViewMode.loadExecutionMode().pipe(
+
+  let executionId: string;
+  const urlSegments = state.url.split('/');
+  const executionIndex = urlSegments.indexOf('executions');
+
+  if (executionIndex !== -1 && executionIndex + 1 < urlSegments.length) {
+    executionId = urlSegments[executionIndex + 1];
+  } else {
+    console.error('Execution ID not found');
+    return true;
+  }
+
+  return _executionViewMode.resolveExecution(executionId).pipe(
+    switchMap((execution) => _executionViewMode.getExecutionMode(execution)),
     map((mode) => {
       if (mode === ExecutionViewMode.NEW) {
         return true;
       }
-      const url = state.url.replace('/alt-executions', '/executions');
+      const url = state.url.replace('/executions', '/legacy-executions');
       return _router.parseUrl(url);
     }),
   );

@@ -27,7 +27,7 @@ export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoArtefac
   }
 
   protected override getArtefactItems(
-    reportView?: AggregatedArtefactInfo<EchoArtefact>,
+    reportView?: AggregatedArtefactInfo<EchoArtefact, EchoReportNode>,
     isVertical?: boolean,
     isResolved: boolean = false,
   ): Observable<ArtefactInlineItem[] | undefined> {
