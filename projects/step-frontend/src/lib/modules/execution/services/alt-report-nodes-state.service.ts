@@ -1,17 +1,31 @@
-import { computed, DestroyRef, inject, Injectable } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
+  BehaviorSubject,
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  filter,
+  finalize,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
-import { ReportNode, TableDataSource } from '@exense/step-core';
+import {
+  Execution,
+  FetchBucketsRequest,
+  ReportNode,
+  TableDataSource,
+  TimeRange,
+  TimeSeriesAPIResponse,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
@@ -20,7 +34,7 @@ import { AltExecutionViewAllService } from './alt-execution-view-all.service';
 import { EXECUTION_ID } from './execution-id.token';
 
 @Injectable()
-export abstract class AltReportNodesStateService {
+export abstract class AltReportNodesStateService implements OnDestroy {
   protected constructor(
     readonly datasource$: Observable<TableDataSource<ReportNode>>,
     private storagePrefix: string,
@@ -39,16 +53,31 @@ export abstract class AltReportNodesStateService {
   protected _executionState = inject(AltExecutionStateService);
   private _fb = inject(FormBuilder);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _timeSeriesService = inject(TimeSeriesService);
 
   private get isIgnoreFilter(): boolean {
     return this._viewAllService.isViewAll;
   }
 
-  abstract readonly summaryInProgress$: Observable<boolean>;
+  protected summaryInProgressInternal$ = new BehaviorSubject(false);
+  readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
 
   readonly listInProgress$: Observable<boolean>;
 
-  abstract readonly summary$: Observable<ReportNodeSummary>;
+  readonly summary$ = combineLatest([
+    this._executionState.execution$,
+    this._executionState.timeRange$.pipe(filter((range) => !!range)),
+  ]).pipe(
+    map(([execution, timeRange]) => this.createFetchBucketRequest(execution, timeRange!)),
+    tap(() => this.summaryInProgressInternal$.next(true)),
+    switchMap((request) =>
+      this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+        catchError(() => of(undefined)),
+        finalize(() => this.summaryInProgressInternal$.next(false)),
+      ),
+    ),
+    map((response) => this.protectedTimeSeriesResponse(response)),
+  );
 
   readonly dateRange$ = this._executionState.timeRange$;
 
@@ -80,6 +109,10 @@ export abstract class AltReportNodesStateService {
     return statuses.size === this.statuses.length - 2 && !statuses.has(Status.PASSED) && !statuses.has(Status.RUNNING);
   });
 
+  ngOnDestroy(): void {
+    this.summaryInProgressInternal$.complete();
+  }
+
   toggleFilterNonPassedAndNoRunning(): void {
     const isFilteredByNonPassed = this.isFilteredByNonPassedAndNoRunning();
     const statuses = !isFilteredByNonPassed
@@ -110,6 +143,25 @@ export abstract class AltReportNodesStateService {
       return '';
     }
     return `Search: ${searchText}`;
+  }
+
+  protected abstract createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest;
+
+  protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse): ReportNodeSummary {
+    if (!response) {
+      return { total: 0 } as ReportNodeSummary;
+    }
+
+    return response.matrixKeys.reduce(
+      (res: ReportNodeSummary, keyAttributes, i) => {
+        const bucket = response.matrix[i][0];
+        const status = keyAttributes['status'] as string;
+        res[status] = bucket.count;
+        res.total += bucket.count;
+        return res;
+      },
+      { total: 0 },
+    ) as ReportNodeSummary;
   }
 
   private searchKey(executionId: string): string {
