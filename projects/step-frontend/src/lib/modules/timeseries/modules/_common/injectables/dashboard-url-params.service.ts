@@ -132,8 +132,11 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(timeRange: TimeRangePickerSelection) {
+  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number) {
     let params = this.convertTimeRange(timeRange);
+    if (refresh !== undefined) {
+      params['refreshInterval'] = refresh;
+    }
     this.prefixAndPushUrlParams(params);
   }
 
