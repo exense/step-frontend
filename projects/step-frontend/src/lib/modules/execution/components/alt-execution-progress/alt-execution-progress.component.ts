@@ -387,14 +387,16 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
             range: timeSelection.absoluteSelection!,
           });
         }),
+        map((response) => response ?? {}),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((root) => {
-        if (!root) {
+      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+        if (!aggregatedReportView) {
           this.isTreeInitialized = false;
+          return;
         }
-        this._aggregatedTreeTabState.init(root);
-        this._aggregatedTreeWidgetState.init(root);
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath });
         this.isTreeInitialized = true;
       });
   }

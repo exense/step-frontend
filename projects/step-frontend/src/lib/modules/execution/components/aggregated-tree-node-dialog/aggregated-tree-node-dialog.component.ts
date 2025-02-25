@@ -3,10 +3,11 @@ import { ArtefactService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { Status } from '../../../_common/shared/status.enum';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNode?: AggregatedTreeNode;
+  resolvedPartialPath?: string;
   reportNode?: ReportNode;
   searchStatus?: Status;
   reportNodeChildren: ReportNode[];
@@ -21,10 +22,12 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _artefactTypes = inject(ArtefactService);
+  private _router = inject(Router);
   protected readonly _activatedRoute = inject(ActivatedRoute);
 
   protected readonly selectedReportNode = signal(this._data.reportNode);
   protected readonly aggregatedNode = this._data.aggregatedNode;
+  protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;
   protected readonly hasData = !!this._data.aggregatedNode || !!this._data.reportNode;
   protected readonly hasBackButton = !this._data.reportNode;
@@ -48,6 +51,12 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
     }
     return reportNode.executionTime! + reportNode.duration!;
   });
+
+  protected handleOpenTreeView(node: ReportNode): void {
+    this._router
+      .navigate(['.', 'sub-tree', node.id], { relativeTo: this._activatedRoute.parent })
+      .then(() => this._dialogRef.close());
+  }
 
   ngOnInit(): void {
     if (!this.hasData) {

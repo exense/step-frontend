@@ -9,5 +9,11 @@ export const $AggregatedReportViewRequest = {
     resolveSingleInstanceReport: {
       type: 'boolean',
     },
+    selectedReportNodeId: {
+      type: 'string',
+    },
+    filterResolvedPlanNodes: {
+      type: 'boolean',
+    },
   },
 } as const;

@@ -49,3 +49,12 @@ button.details-trigger {
     @include core.step-icon-size(1.2rem);
   }
 }
+
+.actions {
+  gap: 1rem;
+  margin-right: 1rem;
+  & > button {
+    width: 2rem;
+    height: 2rem;
+  }
+}

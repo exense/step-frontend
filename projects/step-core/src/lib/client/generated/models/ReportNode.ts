@@ -9,6 +9,7 @@ import type { Error } from './Error';
 export type ReportNode = {
   customFields?: Record<string, any>;
   parentID?: string;
+  path?: string;
   name?: string;
   executionID?: string;
   artefactID?: string;
