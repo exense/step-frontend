@@ -7,12 +7,12 @@ import {
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
-import { AGGREGATED_TREE_TAB_STATE } from './aggregated-report-view-tree-state.service';
 import { from, map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './report-node-details-query-params.token';
+import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -21,12 +21,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService);
-  private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   private _executionId = inject(EXECUTION_ID);
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
 
-  openIterations(nodeId: string, nodeStatus?: Status): void {
-    const node = this._treeState.findNodeById(nodeId)!;
+  openIterations(node: AggregatedTreeNode, nodeStatus?: Status): void {
+    const nodeId = node.id;
     const itemsCounts = Object.values(node.countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1 && node.artefactHash) {
       this.getSingleRunReportNode(node.artefactHash).subscribe((reportNode) => {

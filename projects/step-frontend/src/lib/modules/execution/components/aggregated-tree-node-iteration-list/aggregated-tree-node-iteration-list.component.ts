@@ -66,13 +66,21 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   /** @Input() **/
   readonly initialStatus = input<Status | undefined>(undefined);
 
+  /** @Input() **/
+  readonly resolvedPartialPath = input<string | undefined>(undefined);
+
+  /** @Output() **/
   readonly showDetails = output<ReportNode>();
+
+  /** @Output() **/
+  readonly openTreeView = output<ReportNode>();
 
   private artefactHash = computed(() => this.node().artefactHash);
 
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
-    return this._augmentedExecutionService.getReportNodeDataSource(artefactHash);
+    const resolvedPartialPath = this.resolvedPartialPath();
+    return this._augmentedExecutionService.getReportNodeDataSource(artefactHash, resolvedPartialPath);
   });
 
   protected readonly keywordParameters = toSignal(
