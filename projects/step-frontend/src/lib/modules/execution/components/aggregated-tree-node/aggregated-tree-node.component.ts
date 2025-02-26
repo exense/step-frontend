@@ -32,6 +32,6 @@ export class AggregatedTreeNodeComponent {
       return;
     }
     this._treeState.selectNode(node);
-    this._executionDialogs.openIterations(node, status);
+    this._executionDialogs.openIterations(node, { nodeStatus: status });
   }
 }

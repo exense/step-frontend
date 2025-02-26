@@ -24,8 +24,15 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _executionId = inject(EXECUTION_ID);
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
 
-  openIterations(node: AggregatedTreeNode, nodeStatus?: Status): void {
+  openIterations(
+    node: AggregatedTreeNode,
+    { nodeStatus, reportNodeId }: { nodeStatus?: Status; reportNodeId?: string } = {},
+  ): void {
     const nodeId = node.id;
+    if (!!reportNodeId) {
+      this.navigateToIterationDetails(reportNodeId, nodeId);
+      return;
+    }
     const itemsCounts = Object.values(node.countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1 && node.artefactHash) {
       this.getSingleRunReportNode(node.artefactHash).subscribe((reportNode) => {
