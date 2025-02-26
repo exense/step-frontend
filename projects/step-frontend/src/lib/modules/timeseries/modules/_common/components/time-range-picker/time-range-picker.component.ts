@@ -1,7 +1,9 @@
 import {
   Component,
+  computed,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
@@ -35,7 +37,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   @Input() activeSelection!: TimeRangePickerSelection;
-  @Input() selectOptions!: TimeRangePickerSelection[];
+  selectOptions = input.required<TimeRangePickerSelection[]>();
   @Input() initialSelectionIndex: number | undefined;
   @Input() compact = false;
   @Input() fullRangeLabel?: string; // used to override the "Full Selection" default label
@@ -47,15 +49,19 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   toDateString: string | undefined;
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  hasFullRangeOption = computed(() => {
+    return this.selectOptions().some((option) => option.type === 'FULL');
+  });
+
   ngOnInit(): void {
-    if (!this.selectOptions) {
+    if (!this.selectOptions()) {
       throw new Error('Options param is mandatory');
     }
     if (this.initialSelectionIndex != undefined) {
-      this.activeSelection = this.selectOptions[0];
+      this.activeSelection = this.selectOptions()[0];
     } else {
       if (!this.activeSelection) {
-        this.activeSelection = this.selectOptions[0];
+        this.activeSelection = this.selectOptions()[0];
       }
     }
     this.formatSelectionLabel(this.activeSelection);
