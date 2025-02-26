@@ -192,7 +192,6 @@ export class DashboardUrlParamsService {
     this._router.navigate([], {
       relativeTo: this._activatedRoute,
       queryParams: prefixedParams,
-      replaceUrl: true,
     });
   }
 }

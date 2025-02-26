@@ -140,8 +140,10 @@ export class ScheduleOverviewComponent {
 
   constructor() {
     const urlParams = this._urlParamService.collectUrlParams();
-    if (urlParams.refreshInterval) {
-      this.refreshInterval.set(urlParams.refreshInterval || 0);
+    if (urlParams.refreshInterval !== undefined) {
+      this.refreshInterval.set(urlParams.refreshInterval);
+    } else {
+      this.refreshInterval.set(5000);
     }
     if (urlParams.timeRange) {
       let urlTimeRange = urlParams.timeRange!;
