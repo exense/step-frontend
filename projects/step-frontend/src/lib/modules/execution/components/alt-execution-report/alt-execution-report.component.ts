@@ -50,11 +50,15 @@ export class AltExecutionReportComponent {
   });
 
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {
+    const reportNodeId = keyword.id;
     const artefactId = keyword.artefactID;
     if (!artefactId) {
       return;
     }
-    this._router.navigate(['..', 'tree'], { queryParams: { artefactId }, relativeTo: this._activatedRoute });
+    this._router.navigate(['..', 'tree'], {
+      queryParams: { reportNodeId, artefactId },
+      relativeTo: this._activatedRoute,
+    });
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
