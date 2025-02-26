@@ -1,4 +1,4 @@
-import { inject, NgModule } from '@angular/core';
+import { inject, Injectable, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -325,7 +325,7 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'legacy-executions',
-      canDeactivate: [executionDeactivateGuard],
+      canDeactivate: [executionDeactivateGuard, () => inject(ActiveExecutionsService).cleanup()],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
@@ -370,7 +370,11 @@ export class ExecutionModule {
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
-      canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
+      canDeactivate: [
+        executionDeactivateGuard,
+        () => inject(NavigatorService).cleanupActivateView(),
+        () => inject(ActiveExecutionsService).cleanup(),
+      ],
       providers: [ActiveExecutionsService],
       children: [
         {
@@ -419,6 +423,12 @@ export class ExecutionModule {
             AltReportNodeDetailsStateService,
             ActiveExecutionContextService,
             AggregatedReportViewTreeStateContextService,
+          ],
+          canDeactivate: [
+            () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
+            () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+            () => inject(AltReportNodeDetailsStateService).cleanup(),
+            () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
           ],
           children: [
             {
@@ -496,6 +506,7 @@ export class ExecutionModule {
                   return true;
                 },
               ],
+              canDeactivate: [() => inject(TreeStateService).cleanup()],
               children: [
                 {
                   path: '',

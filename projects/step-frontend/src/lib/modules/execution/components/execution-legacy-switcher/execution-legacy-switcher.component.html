@@ -4,7 +4,6 @@
       [formControl]="toggleControl"
       color="primary"
       name="new-execution-report"
-      [disabled]="isDisabled()"
       [matTooltip]="
         isDisabled()
           ? _executionViewModeService.getNewExecutionDeactivatedReason(execution()!)

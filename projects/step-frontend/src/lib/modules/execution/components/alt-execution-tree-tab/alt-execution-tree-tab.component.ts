@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
-  AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
 import { ActivatedRoute } from '@angular/router';
