@@ -117,8 +117,13 @@ export class ActiveExecutionsService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.autoCloseExecutionInternal$.complete();
+    this.cleanup();
+  }
+
+  cleanup(): boolean {
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
+    return true;
   }
 
   private createActiveExecution(executionId: string): ActiveExecution {

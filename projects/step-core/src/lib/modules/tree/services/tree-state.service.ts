@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TreeNode } from '../types/tree-node';
@@ -85,6 +85,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     } else if (hideRoot) {
       this.expandNode(rootNode.id).subscribe();
     }
+  }
+
+  cleanup(): boolean {
+    this.originalRoot = undefined;
+    this.rootNode.set(undefined);
+    return true;
   }
 
   isMultipleNodesSelected(): boolean {

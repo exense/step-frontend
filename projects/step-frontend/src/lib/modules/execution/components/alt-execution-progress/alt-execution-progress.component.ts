@@ -14,6 +14,7 @@ import {
   Observable,
   skip,
   take,
+  debounceTime,
 } from 'rxjs';
 import {
   ArtefactFilter,
@@ -140,7 +141,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  private _viewAllService = inject(AltExecutionViewAllService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
@@ -172,8 +172,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.updateTimeRangeSelection({ type: 'FULL' });
   }
 
-  readonly executionId$ = this._activeExecutionContext.executionId$;
-  readonly activeExecution$ = this._activeExecutionContext.activeExecution$;
+  readonly executionId$ = this._activeExecutionContext.executionId$.pipe(shareReplay(1), takeUntilDestroyed());
+
+  readonly activeExecution$ = this._activeExecutionContext.activeExecution$.pipe(shareReplay(1), takeUntilDestroyed());
+
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((active) => active.execution$),
     shareReplay(1),
@@ -192,7 +194,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     });
 
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(skip(1))),
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(300))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
