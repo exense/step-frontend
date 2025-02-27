@@ -133,7 +133,7 @@ export class PlanEditorBaseComponent
     showExecuteButton: true,
     showExportSourceButton: true,
   };
-  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
+  @Output() runPlan = new EventEmitter<void>();
 
   selectedTab = 'controls';
 

@@ -1,23 +1,21 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import { AltReportNodesStateService } from './alt-report-nodes-state.service';
-import { ReportNode } from '@exense/step-core';
+import { Execution, FetchBucketsRequest, TimeRange } from '@exense/step-core';
 
 @Injectable()
 export class AltKeywordNodesStateService extends AltReportNodesStateService {
   constructor(_executionState: AltExecutionStateService) {
-    super(_executionState.keywordsDataSource$, 'statusDistributionForFunctionCalls', 'keywords');
+    super(_executionState.keywordsDataSource$, 'keywords');
   }
 
-  private visibleDetailsInternal = signal<Record<string, boolean>>({});
-
-  readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
-
-  toggleDetail(node: ReportNode): void {
-    const isVisible = !!this.visibleDetailsInternal()[node.id!];
-    this.visibleDetailsInternal.update((value) => ({
-      ...value,
-      [node.id!]: !isVisible,
-    }));
+  protected override createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest {
+    return {
+      start: timeRange.from,
+      end: timeRange.to,
+      numberOfBuckets: 1,
+      oqlFilter: `(attributes.type = CallFunction) and (attributes.executionId = ${execution.id})`,
+      groupDimensions: ['status'],
+    };
   }
 }
