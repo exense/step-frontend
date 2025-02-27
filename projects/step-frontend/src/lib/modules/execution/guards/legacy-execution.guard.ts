@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { map, of, switchMap } from 'rxjs';
 import { ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
-export const executionGuard: CanActivateFn = (route, state) => {
+export const legacyExecutionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
   const _executionViewMode: ExecutionViewModeService = inject(ExecutionViewModeService);
 
@@ -23,6 +23,7 @@ export const executionGuard: CanActivateFn = (route, state) => {
       _executionViewMode.getExecutionMode(execution).pipe(
         map((mode) => {
           if (mode !== ExecutionViewMode.LEGACY) {
+            console.error('getExecutionMode NOT Legacy', mode);
             let url = state.url.replace('/legacy-executions', '/executions');
             if (url.includes('/open')) {
               url = url.replace('/open', '');
