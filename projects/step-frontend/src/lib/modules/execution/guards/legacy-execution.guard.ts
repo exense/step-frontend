@@ -23,7 +23,6 @@ export const legacyExecutionGuard: CanActivateFn = (route, state) => {
       _executionViewMode.getExecutionMode(execution).pipe(
         map((mode) => {
           if (mode !== ExecutionViewMode.LEGACY) {
-            console.error('getExecutionMode NOT Legacy', mode);
             let url = state.url.replace('/legacy-executions', '/executions');
             if (url.includes('/open')) {
               url = url.replace('/open', '');

@@ -47,11 +47,6 @@ export class ExecutionViewModeService {
 
   getExecutionMode(execution: Execution): Observable<ExecutionViewMode> {
     return this.checkForceLegacyReporting().pipe(
-      tap((isForceLegacy) => console.log('isForceLegacy', isForceLegacy)),
-      tap((isForceLegacy) => console.log('this.isLocalStorageForcingLegacy()', this.isLocalStorageForcingLegacy())),
-      tap((isForceLegacy) =>
-        console.log('this.isNewExecutionAvailable(execution)', this.isNewExecutionAvailable(execution)),
-      ),
       map((isForceLegacy) =>
         this.isLocalStorageForcingLegacy() || !this.isNewExecutionAvailable(execution) || isForceLegacy
           ? ExecutionViewMode.LEGACY
@@ -61,7 +56,10 @@ export class ExecutionViewModeService {
   }
 
   isNewExecutionAvailable(execution: Execution): boolean {
-    return execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true;
+    return (
+      execution.status !== 'ENDED' ||
+      (execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true)
+    );
   }
 
   getNewExecutionDeactivatedReason(execution: Execution): string {
