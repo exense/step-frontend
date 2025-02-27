@@ -56,7 +56,10 @@ export class ExecutionViewModeService {
   }
 
   isNewExecutionAvailable(execution: Execution): boolean {
-    return execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true;
+    return (
+      execution.status !== 'ENDED' ||
+      (execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true)
+    );
   }
 
   getNewExecutionDeactivatedReason(execution: Execution): string {

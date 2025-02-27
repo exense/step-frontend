@@ -79,7 +79,7 @@ import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
-import { executionGuard } from './guards/execution.guard';
+import { legacyExecutionGuard } from './guards/legacy-execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-drilldown/alt-report-node-details.component';
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
@@ -354,7 +354,7 @@ export class ExecutionModule {
             }
             return { consumed: url };
           },
-          canActivate: [executionGuard],
+          canActivate: [legacyExecutionGuard],
           component: ExecutionProgressComponent,
           children: [schedulePlanRoute('modal')],
         },
