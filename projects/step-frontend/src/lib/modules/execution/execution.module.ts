@@ -347,17 +347,22 @@ export class ExecutionModule {
           path: 'open/:id',
           component: ExecutionOpenerComponent,
         },
-        {
-          matcher: (url) => {
-            if (url[0].path === 'list' || url[0].path === 'open') {
-              return null;
-            }
-            return { consumed: url };
+        stepRouteAdditionalConfig(
+          {
+            quickAccessAlias: 'executionProgress',
           },
-          canActivate: [legacyExecutionGuard],
-          component: ExecutionProgressComponent,
-          children: [schedulePlanRoute('modal')],
-        },
+          {
+            matcher: (url) => {
+              if (url[0].path === 'list' || url[0].path === 'open') {
+                return null;
+              }
+              return { consumed: url };
+            },
+            canActivate: [legacyExecutionGuard],
+            component: ExecutionProgressComponent,
+            children: [schedulePlanRoute('modal')],
+          },
+        ),
       ],
     });
     this._viewRegistry.registerRoute({
