@@ -1,7 +1,9 @@
 import { Execution, TimeRange } from '@exense/step-core';
-import { TimeRangePickerSelection } from './../time-selection/time-range-picker-selection';
+import { TimeRangePickerSelection, TimeRangeType } from './../time-selection/time-range-picker-selection';
 import { TimeSeriesConfig } from './time-series.config';
 import { ChartAggregation } from '../chart-aggregation';
+import { DateTime } from 'luxon';
+import { Params } from '@angular/router';
 
 export class TimeSeriesUtils {
   static createTimeLabels(start: number, end: number, interval: number): number[] {
@@ -38,7 +40,7 @@ export class TimeSeriesUtils {
     return range1.from! <= range2.to! && range2.from! <= range1.to!;
   }
 
-  static intervalsEqual(range1?: TimeRange, range2?: TimeRange) {
+  static timeRangesEqual(range1?: TimeRange, range2?: TimeRange) {
     return range1 && range2 && range1.from! === range2.from! && range1.to! === range2.to!;
   }
 
@@ -75,6 +77,18 @@ export class TimeSeriesUtils {
     }
   }
 
+  public static convertTimeRangeSelectionToUrlParams(timeRangeSettings: TimeRangePickerSelection): Params {
+    const params: Record<string, any> = {};
+    params['rangeType'] = timeRangeSettings.type;
+    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
+      params['from'] = timeRangeSettings.absoluteSelection!.from;
+      params['to'] = timeRangeSettings.absoluteSelection!.to;
+    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
+    }
+    return params;
+  }
+
   static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TimeRange {
     let newFullRange: TimeRange;
     switch (selection.type) {
@@ -91,18 +105,81 @@ export class TimeSeriesUtils {
     return newFullRange;
   }
 
-  static formatInputDate(date: Date, includeTime = true): string {
+  public static extractTimeRangeSelectionFromURLParams(params: Params): TimeRangePickerSelection | undefined {
+    const rangeType = params['rangeType'] as TimeRangeType;
+    switch (rangeType) {
+      case TimeRangeType.ABSOLUTE:
+        const from = parseInt(params['from']);
+        const to = parseInt(params['to']);
+        if (!from || !to) {
+          return undefined;
+        }
+        return { type: rangeType, absoluteSelection: { from: from, to: to } };
+      case TimeRangeType.RELATIVE:
+        const relativeRange = parseInt(params['relativeRange']);
+        return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
+      default:
+        return undefined;
+    }
+  }
+
+  static formatRange(range: TimeRange) {
+    const fromDate = new Date(range.from);
+    const toDate = range.to ? new Date(range.to) : undefined;
+
+    const fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
+    const toDateString = TimeSeriesUtils.formatInputDate(toDate);
+
+    if (fromDateString && toDateString) {
+      if (TimeSeriesUtils.datesHaveSameDate(fromDate, toDate!)) {
+        return `${TimeSeriesUtils.formatInputDate(fromDate)} - ${TimeSeriesUtils.formatTime(toDate)}`;
+      } else {
+        return `${fromDateString} - ${toDateString}`;
+      }
+    } else if (fromDateString) {
+      return `${fromDateString} - now`;
+    } else {
+      return `before ${toDateString}`;
+    }
+  }
+
+  private static datesHaveSameDate(date1: Date, date2: Date) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
+  static formatInputDate(date?: Date, includeTime = true): string {
     if (!date) {
       return '';
     }
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const isoDate = `${date.getFullYear()}-${month}-${day}`;
+    const isoDate = `${day}.${month}.${date.getFullYear()}`;
+    return `${isoDate} ${includeTime ? this.formatTime(date) : ''}`;
+  }
+
+  static formatTime(date?: Date): string {
+    if (!date) {
+      return '';
+    }
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    const isoTime = `${hours}:${minutes}:${seconds}`;
-    return `${isoDate} ${includeTime ? isoTime : ''}`;
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  static parseFormattedDate(dateString: string | undefined, includeTime = true): Date | undefined {
+    if (!dateString) {
+      return undefined;
+    }
+    const format = includeTime ? 'dd.MM.yyyy HH:mm:ss' : 'dd.MM.yyyy';
+    const dateTime = DateTime.fromFormat(dateString, format);
+
+    // Check if the date is valid
+    return dateTime.isValid ? dateTime.toJSDate() : undefined;
   }
 
   static ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {

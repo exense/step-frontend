@@ -13,6 +13,9 @@ export const $ReportNode = {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
     },
+    path: {
+      type: 'string',
+    },
     name: {
       type: 'string',
     },
@@ -58,10 +61,10 @@ export const $ReportNode = {
     resolvedArtefact: {
       type: 'AbstractArtefact',
     },
-    contributingError: {
+    orphan: {
       type: 'boolean',
     },
-    orphan: {
+    contributingError: {
       type: 'boolean',
     },
     id: {

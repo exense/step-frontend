@@ -26,7 +26,6 @@ export class PlanEditorActionsComponent {
   @Input() hasUndo?: boolean | null;
   @Input() hasRedo?: boolean | null;
   @Input() isInteractiveSessionActive?: boolean | null;
-  @Input() description?: string;
   @Input() repositoryObjectRef?: RepositoryObjectReference;
   @Input() showExecuteButton?: boolean;
   @Input() showExportSourceButton?: boolean;
@@ -40,7 +39,7 @@ export class PlanEditorActionsComponent {
   @Output() reset = new EventEmitter<void>();
   @Output() stop = new EventEmitter<void>();
   @Output() showSource = new EventEmitter<void>();
-  @Output() scheduleTask = new EventEmitter<ExecutiontTaskParameters>();
+  @Output() runPlan = new EventEmitter<void>();
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
 

@@ -1,16 +1,22 @@
 @if (item(); as item) {
-  <label>{{ item.label }}:</label>
+  @if (item.icon) {
+    <step-icon class="field-icon" [name]="item.icon" [matTooltip]="item.iconTooltip ?? ''" matTooltipPosition="below" />
+  }
+  <label [stepOverflowIndicator]="item.label" [matTooltip]="item.label" matTooltipPosition="below"
+    >{{ item.label }}:</label
+  >
   @if (item.value; as value) {
-    <div>
-      @if (item.isResolved) {
-        @if (!value.dynamic) {
-          <span class="resolved">{{ value.value }}</span>
-        } @else {
-          <span class="dynamic-resolved">{{ value.expression }}</span>
-        }
-      } @else {
-        <span class="unresolved">[unresolved]</span>
-      }
-    </div>
+    <span
+      [stepOverflowIndicator]="itemValueTooltip()"
+      [matTooltip]="itemValueTooltip()"
+      matTooltipPosition="below"
+      [ngClass]="{
+        unresolved: !item.isResolved,
+        resolved: item.isResolved && !value.dynamic,
+        'dynamic-resolved': item.isResolved && value.dynamic
+      }"
+    >
+      {{ itemValue() }}
+    </span>
   }
 }

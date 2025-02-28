@@ -17,7 +17,7 @@
     @switch (context.artefact!.dataSourceType) {
       @case (DataSourceType.EXCEL) {
         <step-dynamic-resource
-          label="Exel file"
+          label="Excel file"
           type="datasource"
           [(ngModel)]="context.artefact!.dataSource!.file"
           [disabled]="context.readonly"

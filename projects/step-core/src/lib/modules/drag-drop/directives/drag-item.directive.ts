@@ -1,113 +1,21 @@
-import {
-  AfterViewInit,
-  Directive,
-  effect,
-  ElementRef,
-  inject,
-  Injector,
-  input,
-  NgZone,
-  OnDestroy,
-  Renderer2,
-} from '@angular/core';
-import { DragDataService } from '../injectables/drag-data.service';
-import { DRAG_DROP_CLASS_NAMES } from '../injectables/drag-drop-class-names.token';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DragDropContainerService } from '../injectables/drag-drop-container.service';
-import { DragEndType } from '../types/drag-end-type.enum';
+import { Directive, ElementRef, inject, input, signal } from '@angular/core';
+import { DragItemBaseDirective } from './drag-item-base.directive';
 
 @Directive({
   selector: '[stepDragItem]',
   standalone: true,
 })
-export class DragItemDirective implements AfterViewInit, OnDestroy {
-  private _injector = inject(Injector);
+export class DragItemDirective extends DragItemBaseDirective {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private _dragDataService = inject(DragDataService);
-  private _dragDropContainer = inject(DragDropContainerService);
-  private _classNames = inject(DRAG_DROP_CLASS_NAMES);
-  private _zone = inject(NgZone);
-  private _renderer = inject(Renderer2);
 
-  private stopListenMouseDown?: () => void;
-  private stopListenDragStart?: () => void;
-  private stopListenDragEnd?: () => void;
-
-  private dragImage?: HTMLElement;
-
-  private cleanupDragImage = this._dragDataService.dragEnd$
-    .pipe(takeUntilDestroyed())
-    .subscribe(() => (this.dragImage = undefined));
+  override readonly elRef = signal(this._elRef).asReadonly();
 
   /** @Input() **/
-  dragNodeData = input<unknown>(undefined, { alias: 'stepDragItem' });
+  override readonly dragNodeData = input<unknown>(undefined, { alias: 'stepDragItem' });
 
   /** @Input() **/
-  dragDisabled = input(false);
+  override readonly dragDisabled = input(false);
 
   /** @Input() **/
-  dragExternalImage = input<HTMLElement | undefined>(undefined, { alias: 'dragImage' });
-
-  ngAfterViewInit(): void {
-    effect(
-      () => {
-        this._elRef.nativeElement.draggable = !this.dragDisabled();
-      },
-      { injector: this._injector },
-    );
-    this._zone.runOutsideAngular(() => this.initListeners());
-  }
-
-  ngOnDestroy(): void {
-    this.stopListenMouseDown?.();
-    this.stopListenDragEnd?.();
-    this.stopListenDragStart?.();
-    this.dragImage = undefined;
-  }
-
-  private mouseDown(event: MouseEvent): void {
-    if (this.dragDisabled()) {
-      return;
-    }
-    // DOM manipulation inside the dragstart event, may cause
-    // immediate firing of dragend event. To prevent it dragimage is created in mousedown handler
-    this.dragImage = this._dragDataService.createDragImageForElement(
-      this.dragExternalImage() ?? this._elRef.nativeElement,
-      this._dragDropContainer,
-    );
-  }
-
-  private dragStart(event: DragEvent): void {
-    if (this.dragDisabled()) {
-      return;
-    }
-    event.dataTransfer!.effectAllowed = 'move';
-    if (this.dragImage) {
-      event.dataTransfer!.setDragImage(this.dragImage, 15, 15);
-    }
-    this._elRef.nativeElement.classList.add(this._classNames.DRAG_IN_PROGRESS);
-    this._zone.run(() => {
-      this._dragDataService.dragStart(this.dragNodeData());
-    });
-  }
-
-  private dragEnd(event: DragEvent): void {
-    if (this.dragDisabled()) {
-      return;
-    }
-    this.dragImage = undefined;
-    this._elRef.nativeElement.classList.remove(this._classNames.DRAG_IN_PROGRESS);
-    this._zone.run(() => {
-      this._dragDataService.dragEnd(DragEndType.STOP);
-    });
-  }
-
-  private initListeners(): void {
-    const element = this._elRef.nativeElement;
-    this.stopListenMouseDown = this._renderer.listen(element, 'mousedown', (event: MouseEvent) =>
-      this.mouseDown(event),
-    );
-    this.stopListenDragStart = this._renderer.listen(element, 'dragstart', (event: DragEvent) => this.dragStart(event));
-    this.stopListenDragEnd = this._renderer.listen(element, 'dragend', (event: DragEvent) => this.dragEnd(event));
-  }
+  override readonly dragExternalImage = input<HTMLElement | undefined>(undefined, { alias: 'dragImage' });
 }

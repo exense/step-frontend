@@ -38,15 +38,6 @@ export class TimeSeriesConfig {
   static readonly SERIES_LABEL_EMPTY = '<Empty>';
   static readonly SERIES_LABEL_VALUE = 'Value';
 
-  static readonly AUTO_REFRESH_INTERVALS: RefreshInterval[] = [
-    { label: '5 Sec', value: 5000 },
-    { label: '30 Sec', value: 30 * 1000 },
-    { label: '1 Min', value: 60 * 1000 },
-    { label: '5 Min', value: 5 * 60 * 1000 },
-    { label: '30 Min', value: 30 * 60 * 1000 },
-    { label: 'Off', value: 0 },
-  ];
-
   static readonly DEFAULT_GROUPING_OPTIONS = [
     { label: 'Name', attributes: ['name'] },
     { label: 'Name & Status', attributes: ['name', 'rnStatus'] },

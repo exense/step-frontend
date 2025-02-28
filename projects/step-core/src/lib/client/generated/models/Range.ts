@@ -2,4 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Range = {};
+export type Range = {
+  from?: number;
+  to?: number;
+};

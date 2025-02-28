@@ -1,14 +1,15 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
-import { TimeRange, TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
-import { TimeRangeType } from '../types/time-selection/time-range-picker-selection';
+import { TimeRange, TimeRangeSelection } from '@exense/step-core';
+import { TimeRangePickerSelection, TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
 import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
+import { filter, first, map, of } from 'rxjs';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -80,6 +81,8 @@ export class DashboardUrlParamsService {
       case TimeRangeType.RELATIVE:
         const relativeRange = parseInt(params['relativeRange']);
         return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
+      case TimeRangeType.FULL:
+        return { type: 'FULL' };
       default:
         return undefined;
     }
@@ -145,37 +148,26 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(context: TimeSeriesContext) {
+  updateUrlParams(timeRange: TimeRangePickerSelection) {
+    let params = this.convertTimeRange(timeRange);
+    this.prefixAndPushUrlParams(params);
+  }
+
+  updateUrlParamsFromContext(context: TimeSeriesContext) {
     const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
     mergedParams['refreshInterval'] = context.getRefreshInterval();
-    const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
-      accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
-      return accumulator;
-    }, {});
-
-    this._router.navigate([], {
-      relativeTo: this._activatedRoute,
-      queryParams: prefixedParams,
-    });
+    this.prefixAndPushUrlParams(mergedParams);
   }
 
   private convertContextToUrlParams(
     context: TimeSeriesContext,
     timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
-    const params: Record<string, any> = {
-      rangeType: timeRangeSettings.type,
-    };
+    const params = this.convertTimeRange(timeRangeSettings.pickerSelection);
     if (context.getGroupDimensions().length > 0) {
       params['grouping'] = context.getGroupDimensions().join(',');
-    }
-    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
-      params['from'] = timeRangeSettings.fullRange.from;
-      params['to'] = timeRangeSettings.fullRange.to;
-    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
-      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
     }
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();
@@ -189,5 +181,43 @@ export class DashboardUrlParamsService {
     params['refreshInterval'] = context.getRefreshInterval();
 
     return params;
+  }
+
+  private convertTimeRange(pickerSelection: TimeRangePickerSelection): Record<string, any> {
+    const params: Record<string, any> = {
+      rangeType: pickerSelection.type,
+    };
+    if (pickerSelection.type === TimeRangeType.ABSOLUTE) {
+      const fullRange = pickerSelection.absoluteSelection!;
+      params['from'] = fullRange.from;
+      params['to'] = fullRange.to;
+    } else if (pickerSelection.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = pickerSelection.relativeSelection!.timeInMs;
+    }
+    return params;
+  }
+
+  private prefixAndPushUrlParams(params: Record<string, any>): void {
+    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
+      accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = params[key];
+      return accumulator;
+    }, {});
+
+    // If current navigation is performing, update url parameters after the navigation is completed
+    // Otherwise running navigation might be prevented.
+    const previousNavigation$ = !this._router.getCurrentNavigation()
+      ? of(true)
+      : this._router.events.pipe(
+          first((event) => event instanceof NavigationEnd),
+          map(() => true),
+        );
+
+    previousNavigation$.subscribe(() => {
+      this._router.navigate([], {
+        relativeTo: this._activatedRoute,
+        queryParams: prefixedParams,
+        queryParamsHandling: 'merge',
+      });
+    });
   }
 }

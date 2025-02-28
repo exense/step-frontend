@@ -132,15 +132,6 @@
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group>
-          <a
-            data-step-testid="go-to-plan-btn"
-            mat-icon-button
-            matTooltip="Go to plan"
-            [disabled]="!element?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
-            [routerLink]="element.executionsParameters!.repositoryObject!.repositoryParameters!['planid']! | planUrl"
-          >
-            <step-icon name="file" />
-          </a>
           <button
             data-step-testid="execute-schedule-btn"
             mat-icon-button
@@ -151,24 +142,6 @@
             <step-icon name="play" />
           </button>
           <a
-            data-step-testid="edit-schedule-btn"
-            mat-icon-button
-            matTooltip="Edit schedule"
-            [disabled]="!('task-write' | hasRight | async)"
-            [routerLink]="element | taskUrl"
-          >
-            <step-icon name="edit-2" />
-          </a>
-          <button
-            data-step-testid="delete-schedule-btn"
-            mat-icon-button
-            matTooltip="Delete schedule"
-            [disabled]="!('task-delete' | hasRight | async)"
-            (click)="deleteTask(element)"
-          >
-            <step-icon name="trash-2" />
-          </button>
-          <a
             data-step-testid="analyze-performance-btn"
             mat-icon-button
             matTooltip="Analyze performance"
@@ -177,7 +150,16 @@
             [queryParams]="element | dashboardNavigationParams"
             queryParamsHandling="merge"
           >
-            <step-icon name="trending-up" />
+            <step-icon name="line-chart-up-01" />
+          </a>
+          <a
+            stepTestId="cross-execution-schedule-btn"
+            mat-icon-button
+            matTooltip="Cross-execution dashboard"
+            [disabled]="!('task-write' | hasRight | async)"
+            [routerLink]="element | taskCrossExecutionUrl"
+          >
+            <step-icon name="file-07" />
           </a>
           <step-entity-menu-button
             data-step-testid="task-entity-menu-btn"
@@ -199,6 +181,33 @@
   (entityOperationSuccess)="table.reload()"
 >
   <ng-container *stepEntityMenuContent="let element">
+    <a
+      data-step-testid="go-to-plan-btn"
+      mat-menu-item
+      [disabled]="!element?.executionsParameters?.repositoryObject?.repositoryParameters?.['planid']"
+      [routerLink]="element.executionsParameters!.repositoryObject!.repositoryParameters!['planid']! | planUrl"
+    >
+      <step-icon name="file" />
+      Go to plan
+    </a>
+    <a
+      data-step-testid="edit-schedule-btn"
+      mat-menu-item
+      [disabled]="!('task-write' | hasRight | async)"
+      [routerLink]="element | taskUrl"
+    >
+      <step-icon name="edit-2" />
+      Edit schedule
+    </a>
+    <button
+      data-step-testid="delete-schedule-btn"
+      mat-menu-item
+      [disabled]="!('task-delete' | hasRight | async)"
+      (click)="deleteTask(element)"
+    >
+      <step-icon name="trash-2" />
+      Delete schedule
+    </button>
     <a
       data-step-testid="export-schedule-btn"
       mat-menu-item

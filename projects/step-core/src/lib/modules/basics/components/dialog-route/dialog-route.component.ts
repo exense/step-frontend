@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, Type, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Data, Router } from '@angular/router';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { asyncScheduler, map, observeOn, Subject, switchMap, takeUntil, timer } from 'rxjs';
 import { DialogParentService } from '../../injectables/dialog-parent.service';
 import { DialogRouteResult } from '../../types/dialog-route-result';
@@ -39,12 +39,15 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
     this.closeModalAndTerminate();
 
     const dialogComponent: Type<unknown> = routeData['dialogComponent'];
+    const dialogConfig: MatDialogConfig = routeData['dialogConfig'] ?? {};
     const data = routeData;
     delete data['dialogComponent'];
+    delete data['hasBackdrop'];
 
     this.dialogCloseTerminator$ = new Subject<void>();
 
     this.modalRef = this._matDialog.open<unknown, unknown, DialogRouteResult>(dialogComponent, {
+      ...dialogConfig,
       data,
       viewContainerRef: this._viewContainerRef,
     });
@@ -80,7 +83,7 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
 
   private exitRoute(result?: DialogRouteResult): void {
     if (this._dialogParent?.navigateBack) {
-      this._dialogParent.navigateBack(result);
+      this._dialogParent.navigateBack(result, this._activatedRoute);
       return;
     }
 

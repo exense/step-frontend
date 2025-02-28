@@ -1,0 +1,79 @@
+<section matSort [matSortDisableClear]="true">
+  <div>
+    <div class="sort-container">
+      <button class="sort-handler" type="button" mat-icon-button (click)="toggleSort()">
+        <step-icon [name]="sort() === 'asc' ? 'arrow-up' : 'arrow-down'" />
+      </button>
+    </div>
+    <step-form-field>
+      <step-select [formControl]="statusesCtrl" [items]="statuses" [multiple]="true" />
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-flat-button
+          [color]="isFilteredByNonPassed() ? 'primary' : undefined"
+          [matTooltip]="isFilteredByNonPassed() ? 'Clear' : 'Filter for all status except passed'"
+          matTooltipPosition="below"
+          (click)="toggleFilterNonPassed()"
+        >
+          <step-icon name="alert-circle" />
+        </button>
+      </step-suffix>
+    </step-form-field>
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="search" />
+      </step-prefix>
+      <input type="text" class="search-input" [formControl]="searchCtrl" placeholder="Search" />
+    </step-form-field>
+  </div>
+  <step-table
+    #table
+    [dataSource]="dataSource()"
+    [tableParams]="keywordParameters()"
+    class="paddingless no-border hide-header"
+  >
+    <ng-container matColumnDef="executionTime">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <div class="details-trigger" (click)="openNodeDetails(element)">
+          {{ element.executionTime | date: 'HH:mm:ss' }}
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td class="name" mat-cell *matCellDef="let element">
+        <div class="details-trigger" (click)="openNodeDetails(element)">
+          <div>
+            <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+            <step-status
+              class="details-trigger"
+              [status]="element.status"
+              [iconMode]="true"
+              (click)="openNodeDetails(element)"
+            />
+            {{ element.name }}
+          </div>
+          <step-artefact-inline-details [reportInfo]="element" />
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <step-btn-group class="actions">
+          <button
+            type="button"
+            mat-icon-button
+            matTooltip="Open tree for this iteration"
+            matTooltipPosition="below"
+            (click)="openTreeView.emit(element)"
+          >
+            <step-icon name="git-pull-request" />
+          </button>
+        </step-btn-group>
+      </td>
+    </ng-container>
+  </step-table>
+</section>

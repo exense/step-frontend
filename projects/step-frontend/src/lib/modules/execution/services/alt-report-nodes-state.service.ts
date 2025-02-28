@@ -1,31 +1,42 @@
-import { DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, OnDestroy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { AltExecutionStateService } from './alt-execution-state.service';
 import {
   BehaviorSubject,
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
   filter,
+  finalize,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
   tap,
 } from 'rxjs';
-import { ExecutionSummaryDto, PrivateViewPluginService, ReportNode, TableDataSource } from '@exense/step-core';
+import {
+  Execution,
+  FetchBucketsRequest,
+  ReportNode,
+  TableDataSource,
+  TimeRange,
+  TimeSeriesAPIResponse,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { ReportNodeSummary } from '../shared/report-node-summary';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
 import { REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
 import { AltExecutionViewAllService } from './alt-execution-view-all.service';
+import { EXECUTION_ID } from './execution-id.token';
 
 @Injectable()
 export abstract class AltReportNodesStateService implements OnDestroy {
   protected constructor(
     readonly datasource$: Observable<TableDataSource<ReportNode>>,
-    private summaryView: string,
     private storagePrefix: string,
   ) {
     this.listInProgress$ = datasource$.pipe(
@@ -36,50 +47,45 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.setupSyncWithStorage();
   }
 
-  private _destroyRef = inject(DestroyRef);
-  private _viewService = inject(PrivateViewPluginService);
+  private _executionId = inject(EXECUTION_ID);
+  protected _destroyRef = inject(DestroyRef);
   private _executionStorage = inject(AltExecutionStorageService);
-  private _executionState = inject(AltExecutionStateService);
+  protected _executionState = inject(AltExecutionStateService);
   private _fb = inject(FormBuilder);
   private _viewAllService = inject(AltExecutionViewAllService);
+  private _timeSeriesService = inject(TimeSeriesService);
 
   private get isIgnoreFilter(): boolean {
     return this._viewAllService.isViewAll;
   }
 
-  private summaryInProgressInternal$ = new BehaviorSubject(false);
-
-  readonly summaryInProgress$ = this.summaryInProgressInternal$.pipe(distinctUntilChanged());
+  protected summaryInProgressInternal$ = new BehaviorSubject(false);
+  readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
 
   readonly listInProgress$: Observable<boolean>;
 
-  readonly summary$ = this._executionState.executionId$.pipe(
-    filter((executionId) => !!executionId),
+  readonly summary$ = combineLatest([
+    this._executionState.execution$,
+    this._executionState.timeRange$.pipe(filter((range) => !!range)),
+  ]).pipe(
+    map(([execution, timeRange]) => this.createFetchBucketRequest(execution, timeRange!)),
     tap(() => this.summaryInProgressInternal$.next(true)),
-    switchMap((executionId) => this._viewService.getView(this.summaryView, executionId)),
-    map((view) => (view as ExecutionSummaryDto).distribution),
-    map((distribution) =>
-      Object.values(distribution).reduce(
-        (res, value) => {
-          if (value.count > 0) {
-            res[value.status] = value.count;
-            res.total += value.count;
-          }
-          return res;
-        },
-        { total: 0 } as ReportNodeSummary,
+    switchMap((request) =>
+      this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+        catchError(() => of(undefined)),
+        finalize(() => this.summaryInProgressInternal$.next(false)),
       ),
     ),
-    tap(() => this.summaryInProgressInternal$.next(false)),
-    shareReplay(1),
-    takeUntilDestroyed(),
+    map((response) => this.protectedTimeSeriesResponse(response)),
   );
 
-  readonly dateRange$ = this._executionState.dateRange$;
+  readonly dateRange$ = this._executionState.timeRange$;
 
   readonly statuses = REPORT_NODE_STATUS;
 
   readonly statusesCtrl = this._fb.control<Status[]>([]);
+
+  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, { initialValue: this.statusesCtrl.value });
 
   readonly selectedStatuses$ = this.statusesCtrl.valueChanges.pipe(
     startWith(this.statusesCtrl.value),
@@ -98,12 +104,20 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     takeUntilDestroyed(),
   );
 
+  readonly isFilteredByNonPassedAndNoRunning = computed(() => {
+    const statuses = new Set(this.statusCtrlValue());
+    return statuses.size === this.statuses.length - 2 && !statuses.has(Status.PASSED) && !statuses.has(Status.RUNNING);
+  });
+
   ngOnDestroy(): void {
     this.summaryInProgressInternal$.complete();
   }
 
-  filterNonPassed(): void {
-    const statuses = this.statuses.filter((status) => status !== Status.PASSED);
+  toggleFilterNonPassedAndNoRunning(): void {
+    const isFilteredByNonPassed = this.isFilteredByNonPassedAndNoRunning();
+    const statuses = !isFilteredByNonPassed
+      ? this.statuses.filter((status) => status !== Status.PASSED && status !== Status.RUNNING)
+      : [];
     this.statusesCtrl.setValue(statuses);
   }
 
@@ -131,6 +145,25 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     return `Search: ${searchText}`;
   }
 
+  protected abstract createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest;
+
+  protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse): ReportNodeSummary {
+    if (!response) {
+      return { total: 0 } as ReportNodeSummary;
+    }
+
+    return response.matrixKeys.reduce(
+      (res: ReportNodeSummary, keyAttributes, i) => {
+        const bucket = response.matrix[i][0];
+        const status = keyAttributes['status'] as string;
+        res[status] = bucket.count;
+        res.total += bucket.count;
+        return res;
+      },
+      { total: 0 },
+    ) as ReportNodeSummary;
+  }
+
   private searchKey(executionId: string): string {
     return `${executionId}_${this.storagePrefix}_search`;
   }
@@ -139,7 +172,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     if (this.isIgnoreFilter) {
       return;
     }
-    const executionId = this._executionState.executionIdSnapshot;
+    const executionId = this._executionId();
     if (executionId && search) {
       this._executionStorage.setItem(this.searchKey(executionId), search);
     }
@@ -165,7 +198,7 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     if (this.isIgnoreFilter) {
       return;
     }
-    const executionId = this._executionState.executionIdSnapshot;
+    const executionId = this._executionId();
     if (executionId && statuses?.length) {
       const statusesString = statuses.join('|');
       this._executionStorage.setItem(this.statusesKey(executionId), statusesString);

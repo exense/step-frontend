@@ -18,11 +18,14 @@ step-alt-report-node-list {
     }
   }
 
-  step-alt-report-widget-content > div {
-    color: var.$gray-500;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: nowrap;
-    align-items: center;
+  step-alt-report-widget-content {
+    max-height: 38rem;
+    & > div {
+      color: var.$gray-500;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
   }
 }
