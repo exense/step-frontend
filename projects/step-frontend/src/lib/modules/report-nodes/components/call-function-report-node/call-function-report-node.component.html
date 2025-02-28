@@ -1,5 +1,5 @@
 <ng-container *ngFor="let child of displayChildren">
-  <step-assert-report-node-short [node]="child"> </step-assert-report-node-short>
+  <step-report-node-error [node]="child" />
 </ng-container>
 <div *ngIf="node.measures">
   <div class="section-header2 node-link">

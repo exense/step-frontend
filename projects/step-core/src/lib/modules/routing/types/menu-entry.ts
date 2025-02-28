@@ -7,4 +7,5 @@ export interface MenuEntry {
   isCustom?: boolean;
 
   isEnabledFct(): boolean;
+  isActiveFct?(url: string): boolean;
 }

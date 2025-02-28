@@ -1,5 +1,17 @@
-import { Component, input, output, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 import { Execution } from '@exense/step-core';
+
+const DEFAULT_TOOLTIPS = {
+  simulate: 'Simulate execution',
+  execute: 'New execution',
+  executeWithParams: 'New execution with parameters',
+  schedule: 'Schedule',
+  stop: 'Stop',
+  forceStop: 'Force stop',
+  link: 'Copy start request as curl command to clipboard',
+};
+
+export type ExecutionActionsTooltips = Partial<typeof DEFAULT_TOOLTIPS>;
 
 @Component({
   selector: 'step-execution-actions',
@@ -9,26 +21,34 @@ import { Execution } from '@exense/step-core';
 })
 export class ExecutionActionsComponent {
   /** @Input() **/
-  execution = input<Execution | undefined>();
+  readonly execution = input<Execution | undefined>();
 
   /** @Input() **/
-  isExecutionIsolated = input(false);
+  readonly isExecutionIsolated = input(false);
 
   /** @Input() **/
-  allowExecuteWithContent = input(false);
+  readonly allowExecuteWithContent = input(false);
+
+  /** @Input() **/
+  readonly externalTooltips = input<ExecutionActionsTooltips | undefined>(undefined, { alias: 'tooltips' });
+
+  protected readonly tooltips = computed<typeof DEFAULT_TOOLTIPS>(() => {
+    const externalTooltips = this.externalTooltips() ?? {};
+    return { ...DEFAULT_TOOLTIPS, ...externalTooltips };
+  });
 
   /** @Output() **/
-  execute = output<boolean>();
+  readonly execute = output<boolean>();
 
   /** @Output() **/
-  schedule = output();
+  readonly schedule = output();
 
   /** @Output() **/
-  stop = output();
+  readonly stop = output();
 
   /** @Output() **/
-  forceStop = output();
+  readonly forceStop = output();
 
   /** @Output() **/
-  copyLink = output();
+  readonly copyLink = output();
 }

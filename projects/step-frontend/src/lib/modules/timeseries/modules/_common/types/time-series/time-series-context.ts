@@ -1,4 +1,4 @@
-import { BehaviorSubject, merge, Observable, skip, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, map, merge, Observable, skip, Subject, Subscription } from 'rxjs';
 import { DashboardItem, Execution, MetricAttribute, MetricType, TimeRange } from '@exense/step-core';
 import { TimeSeriesContextParams } from './time-series-context-params';
 import { TsFilteringMode } from '../filter/ts-filtering-mode.enum';
@@ -10,6 +10,7 @@ import { OQLBuilder } from '../oql-builder';
 import { TimeSeriesSyncGroup } from './time-series-sync-group';
 import { SeriesStroke } from './series-stroke';
 import { DashboardTimeRangeSettings } from '../../../../components/dashboard/dashboard-time-range-settings';
+import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
 
 export interface TsCompareModeSettings {
   enabled: boolean;
@@ -38,6 +39,7 @@ export class TimeSeriesContext {
   private readonly fullTimeRangeChange$ = new Subject<TimeRange>();
   private readonly selectedTimeRangeChange$ = new Subject<TimeRange>();
   timeRangeSettings: DashboardTimeRangeSettings;
+  timeRangeSettingsChange = new Subject<DashboardTimeRangeSettings>();
 
   private readonly activeGroupings$: BehaviorSubject<string[]>;
 
@@ -109,6 +111,7 @@ export class TimeSeriesContext {
   updateTimeRangeSettings(settings: DashboardTimeRangeSettings) {
     this.timeRangeSettings = settings;
     this.stateChangeInternal$.next();
+    this.timeRangeSettingsChange.next(settings);
     // this.fullTimeRangeChange$.next(settings.fullRange);
   }
 
@@ -297,7 +300,7 @@ export class TimeSeriesContext {
           ? filteringSettings.oql!.replace('attributes.', '')
           : filteringSettings.oql!
         : FilterUtils.filtersToOQL(
-            filteringSettings.filterItems,
+            [...filteringSettings.filterItems, ...(filteringSettings.hiddenFilters || [])],
             undefined,
             TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION,
           );
@@ -316,6 +319,10 @@ export class TimeSeriesContext {
 
   onGroupingChange(): Observable<string[]> {
     return this.activeGroupings$.asObservable().pipe(skip(1));
+  }
+
+  onTimePickerOptionChange(): Observable<TimeRangePickerSelection> {
+    return this.timeRangeSettingsChange.asObservable().pipe(map((settings) => settings.pickerSelection));
   }
 
   onFilteringChange(): Observable<TsFilteringSettings> {

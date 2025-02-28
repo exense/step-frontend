@@ -1,0 +1,37 @@
+<mat-select
+  [multiple]="multiple()"
+  [ngModel]="value()"
+  (ngModelChange)="handleChange($event)"
+  (blur)="handleBlur()"
+  [disabled]="isDisabled()"
+  [placeholder]="emptyPlaceholder()"
+>
+  <mat-select-trigger>
+    @if (selection(); as selection) {
+      <div [matTooltip]="selection" matTooltipPosition="below">{{ selection }}</div>
+    }
+  </mat-select-trigger>
+  @if (useSearch()) {
+    <mat-option>
+      <ngx-mat-select-search
+        [formControl]="searchCtrl"
+        ngDefaultControl
+        placeholderLabel="Search..."
+        noEntriesFoundLabel="No matching entries found"
+      >
+        <step-icon name="trash-2" ngxMatSelectSearchClear />
+      </ngx-mat-select-search>
+    </mat-option>
+  }
+  @if (useClear()) {
+    <mat-option class="step-select-clear-value" [value]="clearValue()" (click)="clear($event)">{{
+      clearLabel()
+    }}</mat-option>
+  }
+  @for (item of extraItems(); track item.key) {
+    <mat-option [className]="item.className" [value]="item.key">{{ item.value }}</mat-option>
+  }
+  @for (item of displayItems(); track item.key) {
+    <mat-option [value]="item.key">{{ item.value }}</mat-option>
+  }
+</mat-select>

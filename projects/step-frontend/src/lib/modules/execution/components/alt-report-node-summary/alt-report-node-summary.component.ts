@@ -1,35 +1,30 @@
-import {
-  Component,
-  computed,
-  effect,
-  ElementRef,
-  inject,
-  input,
-  OnDestroy,
-  viewChild,
-  ViewEncapsulation,
-} from '@angular/core';
-import Chart from 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
+import { VIEW_MODE } from '../../shared/view-mode';
 import { STATUS_COLORS } from '@exense/step-core';
+import {
+  DoughnutChartItem,
+  DoughnutChartSettings,
+} from '../../../timeseries/components/doughnut-chart/doughnut-chart-settings';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'step-alt-report-node-summary',
   templateUrl: './alt-report-node-summary.component.html',
   styleUrl: './alt-report-node-summary.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class AltReportNodeSummaryComponent implements OnDestroy {
+export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
   protected readonly _mode = inject(VIEW_MODE);
 
   /** @Input() **/
-  title = input('');
+  readonly title = input('');
 
   /** @Input() **/
-  summary = input.required<ReportNodeSummary>();
+  readonly summary = input.required<ReportNodeSummary>();
 
   protected readonly legend = computed(() => {
     const summary = this.summary();
@@ -46,10 +41,15 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
     return items;
   });
 
-  private canvas = viewChild<ElementRef<HTMLCanvasElement>>('cnv');
+  private summaryDistinct = toSignal(
+    toObservable(this.summary).pipe(
+      distinctUntilChanged((previous, current) => this.areSummariesEqual(previous, current)),
+    ),
+  );
 
   private dictionary = computed(() => {
-    const summary = this.summary();
+    const summary = this.summaryDistinct();
+
     if (!summary?.total) {
       return {
         ['EMPTY']: { value: 100, percent: 100 },
@@ -68,75 +68,51 @@ export class AltReportNodeSummaryComponent implements OnDestroy {
     );
   });
 
-  private chart = computed(() => {
-    const canvas = this.canvas()?.nativeElement;
-    if (!canvas) {
+  protected readonly chartSettings = computed<DoughnutChartSettings | undefined>(() => {
+    const dictionary = this.dictionary();
+    const total = this.summaryDistinct()?.total ?? 0;
+
+    if (!dictionary) {
       return undefined;
     }
-    return this.createChart(canvas);
-  });
 
-  private updateChartEffect = effect(() => {
-    const dictionary = this.dictionary();
-    const chart = this.chart();
-
-    if (!dictionary || !chart) {
-      return;
-    }
-
-    const items = Object.entries(this._statusColors)
+    const items: DoughnutChartItem[] = Object.entries(this._statusColors)
       .map(([status, color]) => {
         const value = dictionary[status]?.percent ?? 0;
-        return { status, color, value };
+        return { label: status, background: color, value };
       })
       .filter((item) => item.value > 0);
 
-    chart.data.labels = items.map((item) => item.status);
-    chart.data.datasets[0]!.data = items.map((item) => item.value);
-    chart.data.datasets[0]!.backgroundColor = items.map((item) => item.color);
-    chart.data.datasets[0]!.borderColor = items.map((item) => item.color);
-    chart.update();
+    return {
+      items: items,
+      total,
+      viewMode: this._mode,
+    };
   });
-
-  ngOnDestroy(): void {
-    this.chart()?.destroy();
-  }
 
   private calcPercent(count: number, total: number): number {
     return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);
   }
 
-  private createChart(canvas: HTMLCanvasElement): Chart {
-    return new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Dataset 1',
-            data: [],
-            backgroundColor: [],
-          },
-        ],
-      },
-      plugins: [ChartDataLabels],
-      options: {
-        animation: {
-          duration: this._mode === ViewMode.PRINT ? 0 : 500,
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          datalabels: {
-            color: '#fff',
-            formatter: () => '',
-          },
-          tooltip: {
-            enabled: false,
-          },
-        },
-      },
-    });
+  private areSummariesEqual(a?: ReportNodeSummary, b?: ReportNodeSummary): boolean {
+    if (a === b) {
+      return true;
+    }
+    if ((!!a && !b) || (!a && !!b)) {
+      return false;
+    }
+    const keysA = Object.keys(a!);
+    const keysB = Object.keys(b!);
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+
+    for (const key of keysA) {
+      if (a![key] !== b![key]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

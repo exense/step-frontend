@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
-import { Observable, of } from 'rxjs';
+import { ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
 import { SleepArtefact } from '../../types/sleep.artefact';
 
 @Component({
@@ -9,22 +8,20 @@ import { SleepArtefact } from '../../types/sleep.artefact';
   styleUrl: './sleep-inline.component.scss',
 })
 export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtefact> {
-  protected getReportNodeItems = undefined;
-
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<SleepArtefact>,
+  protected getItems(
+    sleep?: SleepArtefact,
     isVertical?: boolean,
     isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[]> {
-    const sleep = info?.originalArtefact;
-    return of(
-      this.convert(
-        [
-          ['Duration', sleep?.duration],
-          ['Unit', sleep?.unit],
-        ],
-        isResolved,
-      ),
+  ): ArtefactInlineItem[] | undefined {
+    if (!sleep) {
+      return undefined;
+    }
+    return this.convert(
+      [
+        ['Duration', sleep?.duration],
+        ['Unit', sleep?.unit],
+      ],
+      isResolved,
     );
   }
 }

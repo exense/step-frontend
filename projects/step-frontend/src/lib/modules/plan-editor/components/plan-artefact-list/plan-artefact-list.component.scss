@@ -32,4 +32,8 @@ step-plan-artefact-list {
       cursor: grab;
     }
   }
+
+  table > tbody > tr.step-draggable-item {
+    cursor: grab;
+  }
 }
