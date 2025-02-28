@@ -27,6 +27,7 @@ export class CustomMenuEntriesService implements OnDestroy {
     if (this.registeredIds.has(id)) {
       return;
     }
+
     const item: MenuEntry = {
       parentId,
       id,
@@ -36,6 +37,7 @@ export class CustomMenuEntriesService implements OnDestroy {
       isCustom: true,
       isEnabledFct: () => true,
     };
+
     this.registeredIds.add(id);
     this.addEntryInternal$.next(id);
     this.customMenuEntries.update((items) => [...items, item]);

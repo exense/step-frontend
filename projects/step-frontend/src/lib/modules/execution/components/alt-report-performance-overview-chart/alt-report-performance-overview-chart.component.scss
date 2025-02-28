@@ -1,4 +1,6 @@
 step-alt-report-performance-overview-chart {
+  width: 100%;
+
   step-standalone-dashlet {
     step-timeseries-chart .chart-wrapper {
       overflow: hidden;
@@ -6,5 +8,9 @@ step-alt-report-performance-overview-chart {
   }
   button {
     white-space: nowrap;
+  }
+
+  step-alt-report-widget mat-card-header {
+    overflow: hidden;
   }
 }

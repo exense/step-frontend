@@ -1,4 +1,6 @@
-@if (execution()) {
-  <div class="date" [matTooltip]="dateTooltip()" matTooltipPosition="below">{{ date() }}</div>
-  <div class="duration">{{ duration() }}</div>
+@if (displayDate(); as date) {
+  <div class="date" [matTooltip]="dateTooltip()" matTooltipPosition="below">{{ date }}</div>
+}
+@if (duration(); as duration) {
+  <div class="duration">{{ duration }}</div>
 }

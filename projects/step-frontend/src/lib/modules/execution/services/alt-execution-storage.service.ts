@@ -1,5 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { MEMORY_STORAGE } from '@exense/step-core';
+import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+
+export interface ExecutionContext {
+  eId: string;
+  timeRange: TimeRangePickerSelection;
+}
 
 @Injectable({
   providedIn: 'root',

@@ -359,8 +359,19 @@ $menu-sub-item-height: 3.2rem;
         display: flex;
         align-items: center;
         height: $menu-sub-item-height;
-        padding: 0 1.4rem 0 4.7rem;
+        padding: 0 1.4rem 0 1rem;
         cursor: pointer;
+        justify-content: space-between;
+        color: map.get($config, menu-secondary);
+
+        step-icon {
+          stroke-width: 1px;
+        }
+
+        .sidebar-aligned-sub-subtext {
+          margin-left: 4.2rem;
+          font-size: 1.4rem;
+        }
       }
 
       input:checked ~ .content {
@@ -386,6 +397,11 @@ $menu-sub-item-height: 3.2rem;
     }
 
     .sidebar-highlighted-subtab {
+      background-color: map.get($config, selection-color);
+      color: map.get($config, menu-text) !important;
+    }
+
+    .sidebar-sub-subtab.sidebar-highlighted-subtab {
       background-color: map.get($config, selection-color);
       color: map.get($config, menu-text) !important;
     }
@@ -425,7 +441,6 @@ $menu-sub-item-height: 3.2rem;
 
     .sidebar-aligned-sub-subtext {
       margin-left: 0.5rem;
-      max-width: 15rem;
       font-weight: 200;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -488,6 +503,12 @@ $menu-sub-item-height: 3.2rem;
         padding: 0 12px;
       }
 
+      .sidebar-sub-subtab {
+        .sidebar-aligned-sub-subtext {
+          margin-left: 0;
+        }
+      }
+
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN BEGIN
       .sidebar-collapsable-tab > label:hover > .sidebar-aligned-text,
       .sidebar-subtab:hover > .sidebar-aligned-subtext,
@@ -528,12 +549,17 @@ $menu-sub-item-height: 3.2rem;
       .sidebar-sub-subtab:hover > .sidebar-aligned-sub-subtext {
         height: $menu-sub-item-height;
         min-width: 16rem;
-        left: 5.6rem;
-        margin: var(--scrollOffset, 0) 0 0 0;
+
+        &:not(.visible-when-collapsed) {
+          left: 5.6rem;
+          margin: var(--scrollOffset, 0) 0 0 0;
+        }
+
         &::after {
           @include overlay(map.get($config, selection-color));
         }
       }
+
       // MENU ITEMS TOOLTIPS FOR SMALL SCREEN END
 
       & ~ #project-select {

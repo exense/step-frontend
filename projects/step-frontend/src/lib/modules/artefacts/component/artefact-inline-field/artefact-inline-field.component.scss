@@ -1,22 +1,37 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
-:host {
+step-artefact-inline-field,
+step-artefact-inline-field > section {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   white-space: nowrap;
   align-items: center;
 }
 
-.resolved {
-  font-weight: bold;
-}
+step-artefact-inline-field {
+  label,
+  span {
+    display: block;
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.dynamic-resolved {
-  font-weight: bold;
-  color: var.$dark-blue;
-}
+  & > step-icon.field-icon {
+    @include core.step-icon-size(1.6rem);
+  }
 
-.unresolved {
-  font-style: italic;
-  color: var.$dark-blue;
+  label {
+    font-weight: bold;
+  }
+
+  .dynamic-resolved {
+    color: var.$dark-blue;
+  }
+
+  .unresolved {
+    font-style: italic;
+    color: var.$dark-blue;
+  }
 }

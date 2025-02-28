@@ -6,14 +6,18 @@ import {
   AutoRefreshModelFactoryService,
   Execution,
 } from '@exense/step-core';
-import { BehaviorSubject, concatMap, filter, Observable, startWith, Subject } from 'rxjs';
+import { BehaviorSubject, concatMap, filter, Observable, shareReplay, startWith, Subject, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
+import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 export interface ActiveExecution {
   readonly executionId: string;
   readonly execution$: Observable<Execution>;
   readonly autoRefreshModel: AutoRefreshModel;
+  readonly timeRangeSelectionChange$: Observable<TimeRangePickerSelection>;
+  updateTimeRange(timeRangeSelection: TimeRangePickerSelection): void;
+  getTimeRangeSelection(): TimeRangePickerSelection;
   destroy(): void;
   manualRefresh(): void;
 }
@@ -26,10 +30,20 @@ class ActiveExecutionImpl implements ActiveExecution {
   ) {
     this.setupExecutionRefresh();
   }
+  timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
+  timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
 
   private executionInternal$ = new BehaviorSubject<Execution | undefined>(undefined);
 
   readonly execution$ = this.executionInternal$.pipe(filter((execution) => !!execution)) as Observable<Execution>;
+
+  updateTimeRange(timeRangeSelection: TimeRangePickerSelection) {
+    this.timeRangeSelectionInternal$.next(timeRangeSelection);
+  }
+
+  getTimeRangeSelection(): TimeRangePickerSelection {
+    return this.timeRangeSelectionInternal$.getValue();
+  }
 
   destroy(): void {
     this.executionInternal$.complete();
@@ -37,6 +51,10 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   private setupExecutionRefresh(): void {
+    if (this.executionId === 'open') {
+      return;
+    }
+
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
@@ -99,8 +117,13 @@ export class ActiveExecutionsService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.autoCloseExecutionInternal$.complete();
+    this.cleanup();
+  }
+
+  cleanup(): boolean {
     this.executions.forEach((activeExecution) => activeExecution.destroy());
     this.executions.clear();
+    return true;
   }
 
   private createActiveExecution(executionId: string): ActiveExecution {

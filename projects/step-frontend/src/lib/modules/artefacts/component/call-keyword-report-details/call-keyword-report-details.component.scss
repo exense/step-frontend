@@ -1,0 +1,55 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  font-size: 1.2rem;
+}
+
+label {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+step-json-view-expanded label {
+  height: 3rem;
+}
+
+.json-container {
+  position: relative;
+  min-height: 2rem;
+  padding-right: 4rem;
+  width: min-content;
+  min-width: 100%;
+
+  button {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+.data-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.data-container.error {
+  flex-direction: row;
+  div {
+    width: min-content;
+    min-width: 95%;
+  }
+  step-icon {
+    color: map-get(var.$statuses, 'FAILED');
+  }
+}
+
+.tech-details div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+}

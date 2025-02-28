@@ -1,11 +1,5 @@
 import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import {
-  ControllerService,
-  DialogsService,
-  PlanUrlPipe,
-  ReportNode,
-  CommonEntitiesUrlsService,
-} from '@exense/step-core';
+import { ControllerService, DialogsService, ReportNode, CommonEntitiesUrlsService } from '@exense/step-core';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { ReportNodeType } from '../../shared/report-node-type.enum';
 import { Router } from '@angular/router';
@@ -52,11 +46,14 @@ export class ReportNodeComponent implements OnChanges {
     this._api
       .getReportNodeRootPlan(this.node!.id!)
       .pipe(
-        switchMap((plan) =>
-          this._router.navigateByUrl(
+        switchMap((plan) => {
+          if (!plan) {
+            throw `Plan for current report node doesn't exist.`;
+          }
+          return this._router.navigateByUrl(
             this._commonEntitiesUrls.planEditorUrl(plan)! + '?artefactId=' + this.node!.artefactID,
-          ),
-        ),
+          );
+        }),
         catchError((errorMessage) => {
           if (errorMessage) {
             console.error('reportNodes.openPlan', errorMessage);

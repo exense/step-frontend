@@ -42,6 +42,15 @@ export const EXECUTION_STATUS: ReadonlyArray<Status> = [
   Status.DEPROVISIONING,
 ];
 
+export const EXECUTION_ENDED_STATUSES: ReadonlyArray<Status> = [
+  Status.TECHNICAL_ERROR,
+  Status.FAILED,
+  Status.PASSED,
+  Status.INTERRUPTED,
+  Status.SKIPPED,
+  Status.IMPORT_ERROR,
+];
+
 export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
   ...[
     Status.INITIALIZING,
@@ -59,14 +68,7 @@ export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
   {
     key: Status.ENDED,
     value: Status.ENDED,
-    children: [
-      Status.TECHNICAL_ERROR,
-      Status.FAILED,
-      Status.PASSED,
-      Status.INTERRUPTED,
-      Status.SKIPPED,
-      Status.IMPORT_ERROR,
-    ].map((key) => ({
+    children: EXECUTION_ENDED_STATUSES.map((key) => ({
       key,
       value: key,
     })),
