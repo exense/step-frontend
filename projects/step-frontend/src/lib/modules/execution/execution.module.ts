@@ -349,7 +349,7 @@ export class ExecutionModule {
         },
         stepRouteAdditionalConfig(
           {
-            quickAccessAlias: 'executionProgress',
+            quickAccessAlias: 'legacyExecutionProgress',
           },
           {
             matcher: (url) => {
@@ -440,31 +440,36 @@ export class ExecutionModule {
               path: '',
               redirectTo: 'report',
             },
-            {
-              path: 'report',
-              data: {
-                mode: ViewMode.VIEW,
+            stepRouteAdditionalConfig(
+              {
+                quickAccessAlias: 'executionReport',
               },
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                  ctx.setState(treeState);
-                  return true;
+              {
+                path: 'report',
+                data: {
+                  mode: ViewMode.VIEW,
                 },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionReportComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionReportControlsComponent,
-                  outlet: 'controls',
-                },
-              ],
-            },
+                canActivate: [
+                  () => {
+                    const ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    ctx.setState(treeState);
+                    return true;
+                  },
+                ],
+                children: [
+                  {
+                    path: '',
+                    component: AltExecutionReportComponent,
+                  },
+                  {
+                    path: '',
+                    component: AltExecutionReportControlsComponent,
+                    outlet: 'controls',
+                  },
+                ],
+              },
+            ),
             {
               path: 'report-print',
               data: {
