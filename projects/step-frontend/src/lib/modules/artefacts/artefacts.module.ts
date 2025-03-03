@@ -6,6 +6,7 @@ import { ThreadGroupComponent } from './component/thread-group/thread-group.comp
 import { AssertComponent } from './component/assert/assert.component';
 import { ExportComponent } from './component/export/export.component';
 import { PlaceholderComponent } from './component/placeholder/placeholder.component';
+import { EmptyInlineComponent } from './component/empty-inline/empty-inline.component';
 import { CheckComponent } from './component/check/check.component';
 import { RetryIfFailsComponent } from './component/retry-if-fails/retry-if-fails.component';
 import { CaseComponent } from './component/case/case.component';
@@ -42,6 +43,19 @@ import { CaseInlineComponent } from './component/case-inline/case-inline.compone
 import { CheckInlineComponent } from './component/check-inline/check-inline.component';
 import { CallKeywordReportDetailsComponent } from './component/call-keyword-report-details/call-keyword-report-details.component';
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
+import { EmptyReportDetailsComponent } from './component/empty-report-details/empty-report-details.component';
+import { SetReportDetailsComponent } from './component/set-report-details/set-report-details.component';
+import { CheckReportDetailsComponent } from './component/check-report-details/check-report-details.component';
+import { CallPlanReportDetailsComponent } from './component/call-plan-report-details/call-plan-report-details.component';
+import { CaseReportDetailsComponent } from './component/case-report-details/case-report-details.component';
+import { SynchronizedInlineComponent } from './component/synchronized-inline/synchronized-inline.component';
+import { SynchronizedReportDetailsComponent } from './component/synchronized-report-details/synchronized-report-details.component';
+import { ExportInlineComponent } from './component/export-inline/export-inline.component';
+import { ExportReportDetailsComponent } from './component/export-report-details/export-report-details.component';
+import { ScriptInlineComponent } from './component/script-inline/script-inline.component';
+import { ScriptReportDetailsComponent } from './component/script-report-details/script-report-details.component';
+import { ReturnInlineComponent } from './component/return-inline/return-inline.component';
+import { ReturnReportDetailsComponent } from './component/return-report-details/return-report-details.component';
 
 @NgModule({
   declarations: [
@@ -51,35 +65,49 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
     AssertComponent,
     AssertInlineComponent,
     PlaceholderComponent,
+    EmptyInlineComponent,
+    EmptyReportDetailsComponent,
     ExportComponent,
+    ExportInlineComponent,
+    ExportReportDetailsComponent,
     CheckComponent,
     CheckInlineComponent,
+    CheckReportDetailsComponent,
     RetryIfFailsComponent,
     CaseComponent,
     CaseInlineComponent,
+    CaseReportDetailsComponent,
     SwitchComponent,
     SleepComponent,
     SleepInlineComponent,
     SetComponent,
     SetInlineComponent,
+    SetReportDetailsComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
+    SynchronizedInlineComponent,
+    SynchronizedReportDetailsComponent,
     TestSetComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
+    ReturnInlineComponent,
+    ReturnReportDetailsComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
+    CallPlanReportDetailsComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
     CallKeywordReportDetailsComponent,
     ScriptComponent,
+    ScriptInlineComponent,
+    ScriptReportDetailsComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
@@ -94,34 +122,48 @@ import { ReportNodesModule } from '../report-nodes/report-nodes.module';
     AssertComponent,
     AssertInlineComponent,
     PlaceholderComponent,
+    EmptyInlineComponent,
+    EmptyReportDetailsComponent,
     ExportComponent,
+    ExportInlineComponent,
+    ExportReportDetailsComponent,
     CheckComponent,
     CheckInlineComponent,
+    CheckReportDetailsComponent,
     RetryIfFailsComponent,
     CaseComponent,
     CaseInlineComponent,
+    CaseReportDetailsComponent,
     SwitchComponent,
     SleepComponent,
     SetComponent,
     SetInlineComponent,
+    SetReportDetailsComponent,
     IfComponent,
     SequenceComponent,
     SynchronizedComponent,
+    SynchronizedInlineComponent,
+    SynchronizedReportDetailsComponent,
     TestSetComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
     SessionComponent,
     ReturnComponent,
+    ReturnInlineComponent,
+    ReturnReportDetailsComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
     ForEachComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
+    CallPlanReportDetailsComponent,
     CallKeywordComponent,
     CallKeywordInlineComponent,
     CallKeywordReportDetailsComponent,
     ScriptComponent,
+    ScriptInlineComponent,
+    ScriptReportDetailsComponent,
     AssertionPlanComponent,
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
@@ -138,6 +180,8 @@ export class ArtefactsModule {
     this._artefactService.register('TestSet', {
       icon: 'plan-testset',
       component: TestSetComponent,
+      inlineComponent: EmptyInlineComponent,
+      reportDetailsComponent: EmptyReportDetailsComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {
@@ -148,11 +192,14 @@ export class ArtefactsModule {
     this._artefactService.register('TestScenario', {
       icon: 'plan-testscenario',
       description: 'Usually used to parallelize the execution of multiple ThreadGroups or ‘sub’ plans',
+      inlineComponent: EmptyInlineComponent,
+      reportDetailsComponent: EmptyReportDetailsComponent,
     });
     this._artefactService.register('CallPlan', {
       icon: 'external-link',
       component: CallPlanComponent,
       inlineComponent: CallPlanInlineComponent,
+      reportDetailsComponent: CallPlanReportDetailsComponent,
       description: 'Used to invoke a plan from within another plan',
     });
     this._artefactService.register('CallKeyword', {
@@ -187,6 +234,8 @@ export class ArtefactsModule {
     this._artefactService.register('Synchronized', {
       icon: 'align-justify',
       component: SynchronizedComponent,
+      inlineComponent: SynchronizedInlineComponent,
+      reportDetailsComponent: SynchronizedReportDetailsComponent,
       description:
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
     });
@@ -206,6 +255,8 @@ export class ArtefactsModule {
     this._artefactService.register('Return', {
       icon: 'corner-up-right',
       component: ReturnComponent,
+      inlineComponent: ReturnInlineComponent,
+      reportDetailsComponent: ReturnReportDetailsComponent,
       description: 'Used within a Composite Keyword, set the Composite output to the returned value(s)',
     });
     this._artefactService.register('Echo', {
@@ -227,6 +278,7 @@ export class ArtefactsModule {
     this._artefactService.register('Set', {
       component: SetComponent,
       inlineComponent: SetInlineComponent,
+      reportDetailsComponent: SetReportDetailsComponent,
       icon: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
     });
@@ -239,6 +291,8 @@ export class ArtefactsModule {
     this._artefactService.register('Script', {
       icon: 'align-left',
       component: ScriptComponent,
+      inlineComponent: ScriptInlineComponent,
+      reportDetailsComponent: ScriptReportDetailsComponent,
       description:
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
     });
@@ -269,6 +323,7 @@ export class ArtefactsModule {
       icon: 'minus',
       component: CaseComponent,
       inlineComponent: CaseInlineComponent,
+      reportDetailsComponent: CaseReportDetailsComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
     });
     this._artefactService.register('RetryIfFails', {
@@ -280,6 +335,7 @@ export class ArtefactsModule {
       icon: 'check',
       component: CheckComponent,
       inlineComponent: CheckInlineComponent,
+      reportDetailsComponent: CheckReportDetailsComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
     });
@@ -292,11 +348,15 @@ export class ArtefactsModule {
     this._artefactService.register('Placeholder', {
       icon: 'square',
       component: PlaceholderComponent,
+      inlineComponent: EmptyInlineComponent,
+      reportDetailsComponent: EmptyReportDetailsComponent,
       description: '',
     });
     this._artefactService.register('Export', {
       icon: 'upload',
       component: ExportComponent,
+      inlineComponent: ExportInlineComponent,
+      reportDetailsComponent: ExportReportDetailsComponent,
     });
     this._artefactService.register('Failure', {
       icon: 'x-octagon',

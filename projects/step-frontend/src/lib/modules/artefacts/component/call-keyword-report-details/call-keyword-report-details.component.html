@@ -37,22 +37,12 @@
     </section>
   }
 }
-@if (node()?.error; as err) {
-  <section class="data-container error">
-    <step-icon name="alert-triangle" />
-    <div>
-      {{ err.msg }}
-      {{ !!node()?.attachments?.length ? '. Check the attachments for more details.' : '' }}
-    </div>
-  </section>
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
 }
 @if (node()?.attachments; as attachments) {
   @if (attachments.length) {
-    <section class="data-container">
-      <div>
-        <step-attachments-preview [attachments]="attachments" />
-      </div>
-    </section>
+    <step-report-details-attachments [attachments]="attachments" />
   }
 }
 @if (measuresDataSource(); as measuresDataSource) {
@@ -96,7 +86,7 @@
 @if (node(); as node) {
   @if (node.tokenId || node.agentUrl) {
     <section class="data-container tech-details">
-      <div>
+      <div class="tech-details-content">
         @if (node.agentUrl) {
           <span>Agent:</span>
           <a [href]="node.agentUrl" target="_blank">{{ node.agentUrl }}</a>

@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { ArtefactService } from '../../../services/artefact.service';
+import { ArtefactService } from '../../artefacts-common/injectables/artefact.service';
 
 @Pipe({
   name: 'artefactIcon',

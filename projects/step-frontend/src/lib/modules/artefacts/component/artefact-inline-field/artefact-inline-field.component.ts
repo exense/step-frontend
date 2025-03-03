@@ -1,5 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
-import { ArtefactInlineItem } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import {
+  AceMode,
+  ArtefactInlineItem,
+  ArtefactService,
+  DynamicValueBoolean,
+  DynamicValueInteger,
+  DynamicValueString,
+  RichEditorDialogService,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-artefact-inline-field',
@@ -9,37 +17,48 @@ import { ArtefactInlineItem } from '@exense/step-core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArtefactInlineFieldComponent {
+  private _richEditorDialog = inject(RichEditorDialogService);
+  private _artefactsService = inject(ArtefactService);
+
   readonly item = input.required<ArtefactInlineItem>();
+
+  protected readonly itemLabel = computed(() => {
+    const item = this.item();
+    if (!item.isLabelResolved) {
+      return '[unresolved]';
+    }
+    return this._artefactsService.convertDynamicValue(item.label);
+  });
 
   protected readonly itemValue = computed(() => {
     const item = this.item();
-    if (!item.isResolved) {
+    if (!item.isValueResolved) {
       return '[unresolved]';
     }
-    if (!item.value) {
-      return item.value as undefined;
-    }
-    if (item.value.dynamic) {
-      return item.value.expression;
-    }
-    let value = item.value.value;
+    return this._artefactsService.convertDynamicValue(item.value);
+  });
+
+  protected readonly trackOverflowContent = computed(() => {
+    const hasIcon = !!this.item()?.icon;
+    const label = this.itemLabel()?.toString() ?? '';
+    const value = this.itemValue()?.toString() ?? '';
+    return `${hasIcon ? '   ' : ''}${label}:${value}`;
+  });
+
+  protected displayValue($event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
+    const label = this.itemLabel()?.toString() ?? '';
+    const value = this.itemValue()?.toString() ?? '';
     if (!value) {
-      return value;
+      return;
     }
-    if (typeof value === 'object') {
-      value = JSON.stringify(value);
-    }
-    return value;
-  });
-
-  protected readonly itemValueTooltip = computed(() => this.itemValue()?.toString() ?? '');
-
-  protected readonly tooltipMessage = computed(() => {
-    const label = this.item().label;
-    const value = (this.itemValue() ?? '').toString();
-    if (label && value) {
-      return `${label}:\n ${value}`;
-    }
-    return label ?? value;
-  });
+    this._richEditorDialog.editText(value, {
+      isReadOnly: true,
+      title: label,
+      predefinedMode: AceMode.TEXT,
+      wrapText: true,
+    });
+  }
 }

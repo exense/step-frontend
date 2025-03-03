@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ArtefactInlineItem, BaseInlineArtefactComponent, DynamicValueString } from '@exense/step-core';
+import { ArtefactInlineItem, BaseInlineArtefactLegacyComponent, DynamicValueString } from '@exense/step-core';
 import { AssertPerformanceArtefact } from '../../types/assert-performance.artefact';
 
 @Component({
@@ -7,7 +7,7 @@ import { AssertPerformanceArtefact } from '../../types/assert-performance.artefa
   templateUrl: './assert-performance-inline.component.html',
   styleUrl: './assert-performance-inline.component.scss',
 })
-export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponent<AssertPerformanceArtefact> {
+export class AssertPerformanceInlineComponent extends BaseInlineArtefactLegacyComponent<AssertPerformanceArtefact> {
   protected getItems(
     artefact?: AssertPerformanceArtefact,
     isVertical?: boolean,

@@ -10,15 +10,36 @@ step-artefact-inline-field > section {
 }
 
 step-artefact-inline-field {
+  border-radius: 1rem;
+  padding: 0.2rem;
+
+  &:hover {
+    border: solid 0.1rem var.$blue-600;
+    margin-left: -0.1rem;
+    margin-right: -0.1rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+
+  .ellipsis {
+    display: none;
+  }
+
+  & > section {
+    overflow: hidden;
+    max-width: 20rem;
+
+    &.step-overflow-indicator-has-overflow + .ellipsis {
+      display: block;
+    }
+  }
+
   label,
   span {
     display: block;
-    max-width: 10rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  & > step-icon.field-icon {
+  step-icon.field-icon {
     @include core.step-icon-size(1.6rem);
   }
 

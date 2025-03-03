@@ -1,0 +1,8 @@
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
+}
+@if (node()?.attachments; as attachments) {
+  @if (attachments.length) {
+    <step-report-details-attachments [attachments]="attachments" />
+  }
+}

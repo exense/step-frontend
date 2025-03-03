@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import { ArtefactInlineItem, BaseInlineArtefactLegacyComponent } from '@exense/step-core';
 import { SleepArtefact } from '../../types/sleep.artefact';
 
 @Component({
@@ -7,7 +7,7 @@ import { SleepArtefact } from '../../types/sleep.artefact';
   templateUrl: './sleep-inline.component.html',
   styleUrl: './sleep-inline.component.scss',
 })
-export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtefact> {
+export class SleepInlineComponent extends BaseInlineArtefactLegacyComponent<SleepArtefact> {
   protected getItems(
     sleep?: SleepArtefact,
     isVertical?: boolean,
