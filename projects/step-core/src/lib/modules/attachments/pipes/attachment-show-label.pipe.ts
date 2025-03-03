@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { AttachmentMeta } from '@exense/step-core';
+import { AttachmentMeta } from '../../../client/step-client-module';
 import { AttachmentIsTextPipe } from './attachment-is-text.pipe';
 
 @Pipe({
