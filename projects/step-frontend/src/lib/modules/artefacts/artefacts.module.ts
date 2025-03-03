@@ -56,11 +56,13 @@ import { ScriptInlineComponent } from './component/script-inline/script-inline.c
 import { ScriptReportDetailsComponent } from './component/script-report-details/script-report-details.component';
 import { ReturnInlineComponent } from './component/return-inline/return-inline.component';
 import { ReturnReportDetailsComponent } from './component/return-report-details/return-report-details.component';
+import { EchoReportDetailsComponent } from './component/echo-report-details/echo-report-details.component';
 
 @NgModule({
   declarations: [
     EchoComponent,
     EchoInlineComponent,
+    EchoReportDetailsComponent,
     ThreadGroupComponent,
     AssertComponent,
     AssertInlineComponent,
@@ -118,6 +120,7 @@ import { ReturnReportDetailsComponent } from './component/return-report-details/
   exports: [
     EchoComponent,
     EchoInlineComponent,
+    EchoReportDetailsComponent,
     ThreadGroupComponent,
     AssertComponent,
     AssertInlineComponent,
@@ -263,6 +266,7 @@ export class ArtefactsModule {
       icon: 'zoom-in',
       component: EchoComponent,
       inlineComponent: EchoInlineComponent,
+      reportDetailsComponent: EchoReportDetailsComponent,
       description: 'Used to print data in the report nodes of a plan, mostly for debugging or information purposes',
     });
     this._artefactService.register('If', {
