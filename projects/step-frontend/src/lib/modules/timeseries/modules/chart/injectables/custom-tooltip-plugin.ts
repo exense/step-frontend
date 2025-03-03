@@ -136,6 +136,7 @@ export class CustomTooltipPlugin {
             //@ts-ignore
             xValues: u.data[0],
             chartRef: u,
+            parentRef: ref,
           };
           let shouldBeVisible = renderContent(tooltip, contextData);
           if (!shouldBeVisible) {

@@ -43,6 +43,8 @@ import {
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TooltipContentDirective } from '../../modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ChartStandardTooltipComponent } from '../../modules/chart/components/tooltip/chart-standard-tooltip.component';
 
 declare const uPlot: any;
 
@@ -73,6 +75,8 @@ const resolutionLabels: Record<string, string> = {
     TimeSeriesChartComponent,
     TimeseriesAggregatePickerComponent,
     MatTooltip,
+    TooltipContentDirective,
+    ChartStandardTooltipComponent,
   ],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {

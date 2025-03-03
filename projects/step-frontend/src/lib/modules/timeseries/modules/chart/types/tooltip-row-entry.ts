@@ -6,4 +6,5 @@ export interface TooltipRowEntry {
   stroke: SeriesStroke;
   executions?: string[];
   bold?: boolean;
+  markerClassName?: string;
 }

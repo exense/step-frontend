@@ -1,0 +1,11 @@
+@for (entry of entries(); track entry.name) {
+  <div class="tooltip-row">
+    <div class="left">
+      <div [class]="entry.markerClassName" [style.--item-color]="entry.stroke.color"></div>
+      <div class="name">{{ entry.name }}</div>
+    </div>
+    <div class="right"></div>
+  </div>
+}
+<div class="separator"></div>
+<div class="timestamp">{{ timestamp() }}</div>
