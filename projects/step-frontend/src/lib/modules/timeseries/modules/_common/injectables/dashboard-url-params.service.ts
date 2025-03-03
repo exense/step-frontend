@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
 import { TimeRange, TimeRangeSelection } from '@exense/step-core';
 import { TimeRangePickerSelection, TimeRangeType } from '../types/time-selection/time-range-picker-selection';
@@ -9,6 +9,7 @@ import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
+import { filter, first, map, of } from 'rxjs';
 import { TimeSeriesUtils } from '../types/time-series/time-series-utils';
 
 const MIN_SUFFIX = '_min';
@@ -189,9 +190,22 @@ export class DashboardUrlParamsService {
       accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = params[key];
       return accumulator;
     }, {});
-    this._router.navigate([], {
-      relativeTo: this._activatedRoute,
-      queryParams: prefixedParams,
+
+    // If current navigation is performing, update url parameters after the navigation is completed
+    // Otherwise running navigation might be prevented.
+    const previousNavigation$ = !this._router.getCurrentNavigation()
+      ? of(true)
+      : this._router.events.pipe(
+          first((event) => event instanceof NavigationEnd),
+          map(() => true),
+        );
+
+    previousNavigation$.subscribe(() => {
+      this._router.navigate([], {
+        relativeTo: this._activatedRoute,
+        queryParams: prefixedParams,
+        queryParamsHandling: 'merge',
+      });
     });
   }
 }

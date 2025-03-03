@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { map, of, switchMap } from 'rxjs';
 import { ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
-export const executionGuard: CanActivateFn = (route, state) => {
+export const legacyExecutionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
   const _executionViewMode: ExecutionViewModeService = inject(ExecutionViewModeService);
 

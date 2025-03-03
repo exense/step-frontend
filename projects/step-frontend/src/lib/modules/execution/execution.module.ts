@@ -1,4 +1,4 @@
-import { inject, NgModule } from '@angular/core';
+import { inject, Injectable, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -79,7 +79,7 @@ import { ViewMode } from './shared/view-mode';
 import { TreeNodeDescriptionPipe } from './pipes/tree-node-description.pipe';
 import { ExecutionActionsExecuteContentDirective } from './directives/execution-actions-execute-content.directive';
 import { altExecutionGuard } from './guards/alt-execution.guard';
-import { executionGuard } from './guards/execution.guard';
+import { legacyExecutionGuard } from './guards/legacy-execution.guard';
 import { executionDeactivateGuard } from './guards/execution-deactivate.guard';
 import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-drilldown/alt-report-node-details.component';
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
@@ -325,7 +325,7 @@ export class ExecutionModule {
 
     this._viewRegistry.registerRoute({
       path: 'legacy-executions',
-      canDeactivate: [executionDeactivateGuard],
+      canDeactivate: [executionDeactivateGuard, () => inject(ActiveExecutionsService).cleanup()],
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
@@ -347,17 +347,22 @@ export class ExecutionModule {
           path: 'open/:id',
           component: ExecutionOpenerComponent,
         },
-        {
-          matcher: (url) => {
-            if (url[0].path === 'list' || url[0].path === 'open') {
-              return null;
-            }
-            return { consumed: url };
+        stepRouteAdditionalConfig(
+          {
+            quickAccessAlias: 'legacyExecutionProgress',
           },
-          canActivate: [executionGuard],
-          component: ExecutionProgressComponent,
-          children: [schedulePlanRoute('modal')],
-        },
+          {
+            matcher: (url) => {
+              if (url[0].path === 'list' || url[0].path === 'open') {
+                return null;
+              }
+              return { consumed: url };
+            },
+            canActivate: [legacyExecutionGuard],
+            component: ExecutionProgressComponent,
+            children: [schedulePlanRoute('modal')],
+          },
+        ),
       ],
     });
     this._viewRegistry.registerRoute({
@@ -370,7 +375,11 @@ export class ExecutionModule {
       resolve: {
         executionParametersScreenData: preloadScreenDataResolver('executionParameters'),
       },
-      canDeactivate: [executionDeactivateGuard, () => inject(NavigatorService).cleanupActivateView()],
+      canDeactivate: [
+        executionDeactivateGuard,
+        () => inject(NavigatorService).cleanupActivateView(),
+        () => inject(ActiveExecutionsService).cleanup(),
+      ],
       providers: [ActiveExecutionsService],
       children: [
         {
@@ -420,36 +429,47 @@ export class ExecutionModule {
             ActiveExecutionContextService,
             AggregatedReportViewTreeStateContextService,
           ],
+          canDeactivate: [
+            () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
+            () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
+            () => inject(AltReportNodeDetailsStateService).cleanup(),
+            () => inject(AggregatedReportViewTreeStateContextService).cleanup(),
+          ],
           children: [
             {
               path: '',
               redirectTo: 'report',
             },
-            {
-              path: 'report',
-              data: {
-                mode: ViewMode.VIEW,
+            stepRouteAdditionalConfig(
+              {
+                quickAccessAlias: 'executionReport',
               },
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                  ctx.setState(treeState);
-                  return true;
+              {
+                path: 'report',
+                data: {
+                  mode: ViewMode.VIEW,
                 },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionReportComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionReportControlsComponent,
-                  outlet: 'controls',
-                },
-              ],
-            },
+                canActivate: [
+                  () => {
+                    const ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    ctx.setState(treeState);
+                    return true;
+                  },
+                ],
+                children: [
+                  {
+                    path: '',
+                    component: AltExecutionReportComponent,
+                  },
+                  {
+                    path: '',
+                    component: AltExecutionReportControlsComponent,
+                    outlet: 'controls',
+                  },
+                ],
+              },
+            ),
             {
               path: 'report-print',
               data: {
@@ -496,6 +516,7 @@ export class ExecutionModule {
                   return true;
                 },
               ],
+              canDeactivate: [() => inject(TreeStateService).cleanup()],
               children: [
                 {
                   path: '',

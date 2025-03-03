@@ -15,6 +15,11 @@ export class AltReportNodeDetailsStateService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cleanup();
+  }
+
+  cleanup(): boolean {
     this.reportNodes.clear();
+    return true;
   }
 }

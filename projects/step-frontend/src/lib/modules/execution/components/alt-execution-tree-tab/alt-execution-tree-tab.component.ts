@@ -1,7 +1,6 @@
 import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
-  AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
 import { ActivatedRoute } from '@angular/router';
@@ -36,21 +35,25 @@ export class AltExecutionTreeTabComponent implements OnInit {
   ngOnInit(): void {
     this._activatedRoute.queryParams
       .pipe(
-        map((params) => params['artefactId']),
-        filter((artefactId) => !!artefactId),
-        takeUntilDestroyed(this._destroyRef),
-        switchMap((nodeId) => {
-          return this._treeState.expandNode(nodeId).pipe(map((isExpanded) => (isExpanded ? nodeId : undefined)));
+        map((params) => {
+          const artefactId = params['artefactId'];
+          const reportNodeId = params['reportNodeId'];
+          return { artefactId, reportNodeId };
         }),
-        filter((nodeId) => !!nodeId),
+        filter((data) => !!data.artefactId),
+        takeUntilDestroyed(this._destroyRef),
+        switchMap((data) => {
+          return this._treeState.expandNode(data.artefactId).pipe(map((isExpanded) => (isExpanded ? data : undefined)));
+        }),
+        filter((data) => !!data),
       )
-      .subscribe((nodeId) => {
-        const node = this._treeState.findNodeById(nodeId);
+      .subscribe((data) => {
+        const node = this._treeState.findNodeById(data!.artefactId);
         if (!node) {
           return;
         }
         this._treeState.selectNode(node);
-        this._executionDialogs.openIterations(node);
+        this._executionDialogs.openIterations(node, { reportNodeId: data!.reportNodeId });
       });
   }
 
