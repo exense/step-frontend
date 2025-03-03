@@ -59,6 +59,7 @@ import { ReturnReportDetailsComponent } from './component/return-report-details/
 import { EchoReportDetailsComponent } from './component/echo-report-details/echo-report-details.component';
 import { SequenceInlineComponent } from './component/sequence-inline/sequence-inline.component';
 import { SequenceReportDetailsComponent } from './component/sequence-report-details/sequence-report-details.component';
+import { SleepReportDetailsComponent } from './component/sleep-report-details/sleep-report-details.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { SequenceReportDetailsComponent } from './component/sequence-report-deta
     SwitchComponent,
     SleepComponent,
     SleepInlineComponent,
+    SleepReportDetailsComponent,
     SetComponent,
     SetInlineComponent,
     SetReportDetailsComponent,
@@ -143,6 +145,8 @@ import { SequenceReportDetailsComponent } from './component/sequence-report-deta
     CaseReportDetailsComponent,
     SwitchComponent,
     SleepComponent,
+    SleepInlineComponent,
+    SleepReportDetailsComponent,
     SetComponent,
     SetInlineComponent,
     SetReportDetailsComponent,
@@ -298,6 +302,7 @@ export class ArtefactsModule {
       icon: 'coffee',
       component: SleepComponent,
       inlineComponent: SleepInlineComponent,
+      reportDetailsComponent: SleepReportDetailsComponent,
       description: 'Causes the thread to sleep',
     });
     this._artefactService.register('Script', {
