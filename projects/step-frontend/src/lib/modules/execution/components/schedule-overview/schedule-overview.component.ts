@@ -186,7 +186,7 @@ export class ScheduleOverviewComponent {
   private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
     switch (selection.type) {
       case 'ABSOLUTE':
-        return selection.absoluteSelection!;
+        return { ...selection.absoluteSelection! };
       case 'RELATIVE':
         const relativeSelection = selection.relativeSelection!;
         const now = new Date().getTime();
