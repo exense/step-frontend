@@ -347,17 +347,22 @@ export class ExecutionModule {
           path: 'open/:id',
           component: ExecutionOpenerComponent,
         },
-        {
-          matcher: (url) => {
-            if (url[0].path === 'list' || url[0].path === 'open') {
-              return null;
-            }
-            return { consumed: url };
+        stepRouteAdditionalConfig(
+          {
+            quickAccessAlias: 'legacyExecutionProgress',
           },
-          canActivate: [legacyExecutionGuard],
-          component: ExecutionProgressComponent,
-          children: [schedulePlanRoute('modal')],
-        },
+          {
+            matcher: (url) => {
+              if (url[0].path === 'list' || url[0].path === 'open') {
+                return null;
+              }
+              return { consumed: url };
+            },
+            canActivate: [legacyExecutionGuard],
+            component: ExecutionProgressComponent,
+            children: [schedulePlanRoute('modal')],
+          },
+        ),
       ],
     });
     this._viewRegistry.registerRoute({
@@ -435,31 +440,36 @@ export class ExecutionModule {
               path: '',
               redirectTo: 'report',
             },
-            {
-              path: 'report',
-              data: {
-                mode: ViewMode.VIEW,
+            stepRouteAdditionalConfig(
+              {
+                quickAccessAlias: 'executionReport',
               },
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                  ctx.setState(treeState);
-                  return true;
+              {
+                path: 'report',
+                data: {
+                  mode: ViewMode.VIEW,
                 },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionReportComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionReportControlsComponent,
-                  outlet: 'controls',
-                },
-              ],
-            },
+                canActivate: [
+                  () => {
+                    const ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    ctx.setState(treeState);
+                    return true;
+                  },
+                ],
+                children: [
+                  {
+                    path: '',
+                    component: AltExecutionReportComponent,
+                  },
+                  {
+                    path: '',
+                    component: AltExecutionReportControlsComponent,
+                    outlet: 'controls',
+                  },
+                ],
+              },
+            ),
             {
               path: 'report-print',
               data: {
