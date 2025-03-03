@@ -57,6 +57,8 @@ import { ScriptReportDetailsComponent } from './component/script-report-details/
 import { ReturnInlineComponent } from './component/return-inline/return-inline.component';
 import { ReturnReportDetailsComponent } from './component/return-report-details/return-report-details.component';
 import { EchoReportDetailsComponent } from './component/echo-report-details/echo-report-details.component';
+import { SequenceInlineComponent } from './component/sequence-inline/sequence-inline.component';
+import { SequenceReportDetailsComponent } from './component/sequence-report-details/sequence-report-details.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +89,8 @@ import { EchoReportDetailsComponent } from './component/echo-report-details/echo
     SetReportDetailsComponent,
     IfComponent,
     SequenceComponent,
+    SequenceInlineComponent,
+    SequenceReportDetailsComponent,
     SynchronizedComponent,
     SynchronizedInlineComponent,
     SynchronizedReportDetailsComponent,
@@ -144,6 +148,8 @@ import { EchoReportDetailsComponent } from './component/echo-report-details/echo
     SetReportDetailsComponent,
     IfComponent,
     SequenceComponent,
+    SequenceInlineComponent,
+    SequenceReportDetailsComponent,
     SynchronizedComponent,
     SynchronizedInlineComponent,
     SynchronizedReportDetailsComponent,
@@ -245,6 +251,8 @@ export class ArtefactsModule {
     this._artefactService.register('Sequence', {
       icon: 'plan-sequence',
       component: SequenceComponent,
+      inlineComponent: SequenceInlineComponent,
+      reportDetailsComponent: SequenceReportDetailsComponent,
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
     });
     this._artefactService.register('BeforeSequence', {
