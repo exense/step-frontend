@@ -66,6 +66,8 @@ import { IfInlineComponent } from './component/if-inline/if-inline.component';
 import { IfReportDetailsComponent } from './component/if-report-details/if-report-details.component';
 import { TestSetInlineComponent } from './component/test-set-inline/test-set-inline.component';
 import { TestSetReportNodesComponent } from './component/test-set-report-nodes/test-set-report-nodes.component';
+import { SessionInlineComponent } from './component/session-inline/session-inline.component';
+import { SessionReportDetailsComponent } from './component/session-report-details/session-report-details.component';
 
 @NgModule({
   declarations: [
@@ -113,6 +115,8 @@ import { TestSetReportNodesComponent } from './component/test-set-report-nodes/t
     ForInlineComponent,
     WhileComponent,
     SessionComponent,
+    SessionInlineComponent,
+    SessionReportDetailsComponent,
     ReturnComponent,
     ReturnInlineComponent,
     ReturnReportDetailsComponent,
@@ -180,6 +184,8 @@ import { TestSetReportNodesComponent } from './component/test-set-report-nodes/t
     ForInlineComponent,
     WhileComponent,
     SessionComponent,
+    SessionInlineComponent,
+    SessionReportDetailsComponent,
     ReturnComponent,
     ReturnInlineComponent,
     ReturnReportDetailsComponent,
@@ -311,6 +317,8 @@ export class ArtefactsModule {
     this._artefactService.register('Session', {
       icon: 'briefcase',
       component: SessionComponent,
+      inlineComponent: SessionInlineComponent,
+      reportDetailsComponent: SessionReportDetailsComponent,
       description: 'Guarantees that Keywords are executed within the the same Session i.e. Agent Token',
     });
     this._artefactService.register('Set', {
