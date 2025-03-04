@@ -205,6 +205,8 @@ export class ArtefactsModule {
     });
     this._artefactService.register('TestCase', {
       icon: 'plan-testcase',
+      inlineComponent: EmptyInlineComponent,
+      reportDetailsComponent: EmptyReportDetailsComponent,
       description:
         'Specific container for a group of nodes, it will activate the top-level panel in the execution view for high-level test case execution monitoring',
     });
