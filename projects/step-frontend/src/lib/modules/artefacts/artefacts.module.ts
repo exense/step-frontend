@@ -62,6 +62,8 @@ import { SequenceReportDetailsComponent } from './component/sequence-report-deta
 import { SleepReportDetailsComponent } from './component/sleep-report-details/sleep-report-details.component';
 import { SwitchInlineComponent } from './component/switch-inline/switch-inline.component';
 import { SwitchReportDetailsComponent } from './component/switch-report-details/switch-report-details.component';
+import { IfInlineComponent } from './component/if-inline/if-inline.component';
+import { IfReportDetailsComponent } from './component/if-report-details/if-report-details.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +96,8 @@ import { SwitchReportDetailsComponent } from './component/switch-report-details/
     SetInlineComponent,
     SetReportDetailsComponent,
     IfComponent,
+    IfInlineComponent,
+    IfReportDetailsComponent,
     SequenceComponent,
     SequenceInlineComponent,
     SequenceReportDetailsComponent,
@@ -157,6 +161,8 @@ import { SwitchReportDetailsComponent } from './component/switch-report-details/
     SetInlineComponent,
     SetReportDetailsComponent,
     IfComponent,
+    IfInlineComponent,
+    IfReportDetailsComponent,
     SequenceComponent,
     SequenceInlineComponent,
     SequenceReportDetailsComponent,
@@ -292,6 +298,8 @@ export class ArtefactsModule {
     this._artefactService.register('If', {
       icon: 'square',
       component: IfComponent,
+      inlineComponent: IfInlineComponent,
+      reportDetailsComponent: IfReportDetailsComponent,
       description: 'Only executes the child nodes if the condition is met',
     });
     this._artefactService.register('Session', {
