@@ -64,6 +64,8 @@ import { SwitchInlineComponent } from './component/switch-inline/switch-inline.c
 import { SwitchReportDetailsComponent } from './component/switch-report-details/switch-report-details.component';
 import { IfInlineComponent } from './component/if-inline/if-inline.component';
 import { IfReportDetailsComponent } from './component/if-report-details/if-report-details.component';
+import { TestSetInlineComponent } from './component/test-set-inline/test-set-inline.component';
+import { TestSetReportNodesComponent } from './component/test-set-report-nodes/test-set-report-nodes.component';
 
 @NgModule({
   declarations: [
@@ -105,6 +107,8 @@ import { IfReportDetailsComponent } from './component/if-report-details/if-repor
     SynchronizedInlineComponent,
     SynchronizedReportDetailsComponent,
     TestSetComponent,
+    TestSetInlineComponent,
+    TestSetReportNodesComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
@@ -170,6 +174,8 @@ import { IfReportDetailsComponent } from './component/if-report-details/if-repor
     SynchronizedInlineComponent,
     SynchronizedReportDetailsComponent,
     TestSetComponent,
+    TestSetInlineComponent,
+    TestSetReportNodesComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
@@ -205,8 +211,8 @@ export class ArtefactsModule {
     this._artefactService.register('TestSet', {
       icon: 'plan-testset',
       component: TestSetComponent,
-      inlineComponent: EmptyInlineComponent,
-      reportDetailsComponent: EmptyReportDetailsComponent,
+      inlineComponent: TestSetInlineComponent,
+      reportDetailsComponent: TestSetReportNodesComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {
