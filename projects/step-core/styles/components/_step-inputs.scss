@@ -47,6 +47,7 @@
 }
 
 @mixin highlight($highlight-color) {
+  step-select,
   mat-select,
   input,
   pre,
@@ -68,6 +69,7 @@
   }
 
   & > .form-field-content {
+    & > step-select,
     & > mat-select,
     & > step-multi-level-select,
     & > input,
@@ -187,6 +189,7 @@
         }
       }
       & > .form-field-content {
+        & > step-select,
         & > mat-select,
         & > step-multi-level-select,
         & > mat-radio-group,
@@ -227,6 +230,7 @@
       display: inline-flex;
       width: 100%;
 
+      & > step-select,
       & > mat-select,
       & > step-multi-level-select,
       & > mat-radio-group,
@@ -260,6 +264,7 @@
         padding: 0;
       }
 
+      & > step-select,
       & > mat-select,
       & > step-multi-level-select,
       & > mat-radio-group,

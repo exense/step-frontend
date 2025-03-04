@@ -6,4 +6,7 @@ import type { Range } from './Range';
 
 export type AggregatedReportViewRequest = {
   range?: Range;
+  resolveSingleInstanceReport?: boolean;
+  selectedReportNodeId?: string;
+  filterResolvedPlanNodes?: boolean;
 };

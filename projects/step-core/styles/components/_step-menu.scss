@@ -2,6 +2,7 @@
   .mat-mdc-menu-panel {
     border-radius: 0.8rem;
     min-height: 3.2rem;
+    max-width: 50rem;
 
     .mat-mdc-menu-content:not(:empty) {
       padding-top: 0;

@@ -1,4 +1,3 @@
-export * from './components/time-range-picker/time-range-picker.component';
 export * from './components/discover/discover.component';
 export * from './components/resolution-picker/resolution-picker.component';
 export * from './components/grouping/ts-grouping.component';
@@ -7,8 +6,6 @@ export * from './injectables/time-series-entity.service';
 export * from './injectables/uplot-utils.service';
 export * from './injectables/chart-url-params.service';
 export * from './injectables/time-series-contexts-factory.service';
-export * from './types/time-selection/time-range-picker-selection';
-export * from './types/time-selection/relative-time-selection';
 export * from './types/time-series/time-series-utils';
 export * from './types/time-series/time-series.config';
 export * from './types/time-series/timeseries-colors-pool';

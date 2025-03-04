@@ -1,33 +1,23 @@
 <div>
-  <button
-    mat-raised-button
-    class="range-btn grey-border"
-    [matMenuTriggerFor]="menu"
-    [title]="compact ? 'Time Range' : ''"
-    [class.compact-btn]="compact"
-  >
+  <div class="range-btn grey-border" [matMenuTriggerFor]="menu" [class.compact-btn]="compact">
     @if (compact) {
       <step-icon name="clock" />
     } @else {
-      @switch (activeSelection.type) {
-        @case ('FULL') {
-          Full time range
-        }
-        @case ('RELATIVE') {
-          {{ activeSelection.relativeSelection!.label }}
-        }
-        @case ('ABSOLUTE') {
-          Custom Selection
-        }
-        @default {}
+      <step-icon name="calendar" />
+      <div class="text" [matTooltip]="mainPickerLabel">
+        {{ (activeSelection.type === 'FULL' && fullRangeLabel) || mainPickerLabel }}
+      </div>
+      @if (activeSelection.type === 'ABSOLUTE' && hasFullRangeOption()) {
+        <div class="suffix-icon warn">
+          <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>
+        </div>
       }
     }
-  </button>
+  </div>
   <mat-menu #menu="matMenu" class="time-selector-menu">
     <div (click)="$event.stopPropagation()">
       <div class="time-selector-container">
         <div class="left-section">
-          <div class="title bottom-gap">Absolute time range</div>
           <div class="bottom-gap">
             <step-form-field>
               <step-label>From</step-label>
@@ -36,7 +26,11 @@
                 <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [stepDatePicker]="fromPicker" (dateChange)="setFromDate($event)" />
+            <input
+              class="hidden-input"
+              [stepDatePicker]="fromPicker"
+              (dateChange)="setFromDate($event); fromPicker.close()"
+            />
             <step-date-picker #fromPicker></step-date-picker>
           </div>
           <div class="bottom-gap">
@@ -47,18 +41,26 @@
                 <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
               </step-suffix>
             </step-form-field>
-            <input class="hidden-input" [stepDatePicker]="toPicker" (dateChange)="setToDate($event)" />
+            <input
+              class="hidden-input"
+              [stepDatePicker]="toPicker"
+              (dateChange)="setToDate($event); toPicker.close()"
+            />
             <step-date-picker #toPicker></step-date-picker>
           </div>
           <button (click)="applyAbsoluteInterval()" mat-raised-button color="primary">Apply time range</button>
         </div>
         <div class="right-section" (click)="closeMenu()">
-          <div class="title">Relative time ranges</div>
-          @for (rangeOption of selectOptions; track rangeOption.relativeSelection?.label) {
+          @for (rangeOption of selectOptions(); track rangeOption) {
             <div
-              (click)="onRelativeSelectionSelected(rangeOption)"
+              (click)="onRelativeOrFullSelectionSelected(rangeOption)"
               class="time-option"
-              [class.active]="rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs"
+              [class.full-range]="rangeOption.type === 'FULL'"
+              [class.active]="
+                (activeSelection.type === 'FULL' && rangeOption.type === 'FULL') ||
+                (rangeOption.type === 'RELATIVE' &&
+                  rangeOption.relativeSelection?.timeInMs === activeSelection.relativeSelection?.timeInMs)
+              "
             >
               {{ rangeOption.relativeSelection?.label }}
               {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}

@@ -1,0 +1,11 @@
+<step-alt-report-widget title="Execution tree" [applyOverflow]="true">
+  <step-alt-report-widget-filter>
+    <section class="buttons">
+      <button type="button" mat-stroked-button (click)="collapseAll()">Collapse All</button>
+      <button type="button" mat-stroked-button (click)="expandAll()">Expand All</button>
+    </section>
+  </step-alt-report-widget-filter>
+  <step-alt-report-widget-content>
+    <step-alt-execution-tree #tree />
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

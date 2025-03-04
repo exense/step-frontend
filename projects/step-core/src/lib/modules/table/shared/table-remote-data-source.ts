@@ -174,15 +174,19 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _tableId: string,
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: Record<string, string>,
-    private _filters?: Record<string, string[]>,
+    private _filters?: Record<string, string | string[] | SearchValue>,
   ) {
     if (_filters) {
       for (const key in _filters) {
         const filter = _filters[key];
-        if (filter.length === 1) {
-          this.filters[key] = filter[0];
+        if (filter instanceof Array) {
+          if (filter.length === 1) {
+            this.filters[key] = filter[0];
+          } else {
+            this.filters[key] = { value: `(${filter.join('|')})`, regex: true };
+          }
         } else {
-          this.filters[key] = { value: `(${filter.join('|')})`, regex: true };
+          this.filters[key] = filter;
         }
       }
     }

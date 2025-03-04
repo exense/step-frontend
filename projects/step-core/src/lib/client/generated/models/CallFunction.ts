@@ -26,5 +26,6 @@ export type CallFunction = {
   function?: DynamicValueString;
   argument?: DynamicValueString;
   resultMap?: DynamicValueString;
+  workArtefact?: boolean;
   id?: string;
 };

@@ -5,8 +5,10 @@ import { DragPreviewDirective } from './directives/drag-preview.directive';
 import { IsDragDataPipe } from './pipes/is-drag-data.pipe';
 import { DragDropGroupContainerDirective } from './directives/drag-drop-group-container.directive';
 import { DropAreaIdDirective, GroupDropAreaIdDirective } from './directives/drop-area-id.directive';
+import { DragItemComponent } from './components/drag-item/drag-item.component';
 
 export * from './components/drag-drop-container/drag-drop-container.component';
+export * from './components/drag-item/drag-item.component';
 
 export * from './directives/drag-item.directive';
 export * from './directives/drop-area.directive';
@@ -26,6 +28,7 @@ export * from './types/drag-end-type.enum';
 export const DRAG_DROP_EXPORTS = [
   DragDropContainerComponent,
   DragItemDirective,
+  DragItemComponent,
   DropAreaDirective,
   DragPreviewDirective,
   DragDropGroupContainerDirective,
