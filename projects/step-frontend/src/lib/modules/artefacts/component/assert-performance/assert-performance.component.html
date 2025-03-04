@@ -11,7 +11,7 @@
   <div><b>Assert</b> that</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.aggregator" [disabled]="context.readonly" name="aggregator">
-      @for (item of aggregatorTypes; track item.key) {
+      @for (item of _lists.aggregatorTypes; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>
       }
     </mat-select>
@@ -27,7 +27,7 @@
   <div>are</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.comparator" [disabled]="context.readonly" name="comparator">
-      @for (item of operatorTypes; track item.key) {
+      @for (item of _lists.operatorTypes; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>
       }
     </mat-select>

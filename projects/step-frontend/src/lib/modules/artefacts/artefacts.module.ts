@@ -68,6 +68,7 @@ import { TestSetInlineComponent } from './component/test-set-inline/test-set-inl
 import { TestSetReportNodesComponent } from './component/test-set-report-nodes/test-set-report-nodes.component';
 import { SessionInlineComponent } from './component/session-inline/session-inline.component';
 import { SessionReportDetailsComponent } from './component/session-report-details/session-report-details.component';
+import { AssertPerformanceReportDetailsComponent } from './component/assert-performance-report-details/assert-performance-report-details.component';
 
 @NgModule({
   declarations: [
@@ -135,6 +136,7 @@ import { SessionReportDetailsComponent } from './component/session-report-detail
     AssertionPlanComponent,
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
+    AssertPerformanceReportDetailsComponent,
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
@@ -204,6 +206,7 @@ import { SessionReportDetailsComponent } from './component/session-report-detail
     AssertionPlanComponent,
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
+    AssertPerformanceReportDetailsComponent,
     ArtefactInlineFieldComponent,
     ArtefactInlineFieldListComponent,
   ],
@@ -415,6 +418,7 @@ export class ArtefactsModule {
       icon: 'check',
       component: AssertPerformanceComponent,
       inlineComponent: AssertPerformanceInlineComponent,
+      reportDetailsComponent: AssertPerformanceReportDetailsComponent,
     });
 
     /* plan type control only */

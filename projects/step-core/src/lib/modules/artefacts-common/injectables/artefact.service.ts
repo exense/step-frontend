@@ -15,6 +15,8 @@ import {
   CustomComponent,
 } from '../../custom-registeries/custom-registries.module';
 import { AggregatedArtefactInfo, ReportNodeWithArtefact } from '../types/artefact-types';
+import { TIME_UNIT_DICTIONARY, TIME_UNIT_LABELS, TimeUnit, TimeUnitDictKey } from '../../basics/types/time-unit.enum';
+import { TimeConvertersFactoryService } from '../../basics/injectables/time-converters-factory.service';
 
 export interface ArtefactType extends CustomRegistryItem {
   icon: string;
@@ -31,6 +33,7 @@ export type ArtefactFieldValue = SimpleValue | DynamicValueString | DynamicValue
   providedIn: 'root',
 })
 export class ArtefactService {
+  private _timeConverter = inject(TimeConvertersFactoryService).timeConverter();
   protected _customRegistry = inject(CustomRegistryService);
   protected _planApiService = inject(PlansService);
   protected readonly registryType = CustomRegistryType.ARTEFACT;
@@ -93,5 +96,17 @@ export class ArtefactService {
       result = JSON.stringify(result);
     }
     return result;
+  }
+
+  convertTimeDynamicValue(value: DynamicValueInteger, unit: TimeUnitDictKey = 'ms', allowedUnits?: TimeUnit[]): string {
+    if (value.dynamic) {
+      return `${value.expression}${unit}`;
+    }
+    allowedUnits = allowedUnits ?? Object.values(TIME_UNIT_DICTIONARY);
+    const measure = TIME_UNIT_DICTIONARY[unit] as TimeUnit;
+    const newMeasure = this._timeConverter.autoDetermineDisplayMeasure(value.value ?? 0, measure, allowedUnits);
+    const converted = this._timeConverter.calculateDisplayValue(value?.value ?? 0, measure, newMeasure);
+    const newUnit = TIME_UNIT_LABELS[newMeasure] as TimeUnitDictKey;
+    return `${converted}${newUnit}`;
   }
 }
