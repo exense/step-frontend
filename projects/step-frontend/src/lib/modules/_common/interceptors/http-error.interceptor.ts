@@ -34,12 +34,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         const jsonString = decoder.decode(new Uint8Array(error.error));
         jsonError = JSON.parse(jsonString);
       } catch (e) {
-        console.log('Error decoding ArrayBuffer response:', e);
-        jsonError = { errorMessage: 'Failed to decode error response' };
+        jsonError = { errorMessage: 'Failed to decode error response: ' + e };
       }
     }
 
-    const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(jsonError || error));
+    const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(jsonError || error.error || error));
 
     if (this.isConnectionError(parsedError)) {
       return throwError(() => new ConnectionError(error));
