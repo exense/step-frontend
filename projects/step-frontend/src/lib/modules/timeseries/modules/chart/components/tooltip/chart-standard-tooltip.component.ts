@@ -43,7 +43,8 @@ export class ChartStandardTooltipComponent {
     let summaryRow: TooltipRowEntry | undefined;
     // first series is x axis (time)
     const chartSeries = contextData.series;
-    for (let i = 1; i < chartSeries.length; i++) {
+    console.log(contextData);
+    for (let i = 0; i < chartSeries.length; i++) {
       const series = chartSeries[i];
       const bucketValue = series.data[idx];
       if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY && series.show) {
@@ -72,12 +73,11 @@ export class ChartStandardTooltipComponent {
           name: settings.zAxisLabel || 'Total',
         };
       }
-      yPoints.sort((a, b) => (a.value - b.value) * -1);
     }
-    const allSeriesLength = yPoints.length;
+    yPoints.sort((a, b) => (a.value - b.value) * -1);
     const elementsToSelect = 5;
-    let elipsisBefore = true;
-    let elipsisAfter = true;
+    let elipsisBefore = false;
+    let elipsisAfter = false;
     const closestIndex = this.getClosestIndex(hoveredValue, yPoints);
     if (closestIndex >= 0) {
       yPoints[closestIndex].bold = true;
@@ -85,12 +85,14 @@ export class ChartStandardTooltipComponent {
     if (yPoints.length > elementsToSelect) {
       if (closestIndex < elementsToSelect / 2) {
         yPoints = yPoints.slice(0, elementsToSelect);
-        elipsisBefore = false;
+        elipsisAfter = true;
       } else if (yPoints.length - closestIndex < elementsToSelect / 2) {
         yPoints = yPoints.slice(-elementsToSelect);
-        elipsisAfter = false;
+        elipsisBefore = true;
       } else {
         yPoints = yPoints.slice(closestIndex - elementsToSelect / 2, closestIndex + elementsToSelect / 2);
+        elipsisAfter = true;
+        elipsisBefore = true;
       }
     }
     this.elipsisBefore = elipsisBefore;
