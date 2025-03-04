@@ -217,6 +217,15 @@
       <step-icon name="upload" />
       Export schedule
     </a>
+    <a
+      stepTestId="export-schedule-btn"
+      mat-menu-item
+      [disabled]="!('task-write' | hasRight | async)"
+      [routerLink]="['/', 'cross-executions', element.id]"
+    >
+      <step-icon name="rocket" />
+      Cross-execution dashboard
+    </a>
   </ng-container>
 </step-entity-menu>
 <router-outlet />
