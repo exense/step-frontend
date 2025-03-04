@@ -20,24 +20,26 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
     this._errorLogger.log('Network Error', error);
+
     if (error.status === 401 && skip401) {
       return throwError(() => error);
     }
 
-    let jsonError = error.error;
-    if (typeof error.error === 'string' && error.headers.get('Content-Type') === 'application/json') {
-      jsonError = JSON.parse(error.error);
+    let jsonError: any = error.error;
+
+    // For some reason internal server errors are encoded as ArrayBuffer so we have to decode them first:
+    if (error.error instanceof ArrayBuffer) {
+      try {
+        const decoder = new TextDecoder('utf-8'); // Ensure UTF-8 decoding
+        const jsonString = decoder.decode(new Uint8Array(error.error));
+        jsonError = JSON.parse(jsonString);
+      } catch (e) {
+        console.log('Error decoding ArrayBuffer response:', e);
+        jsonError = { errorMessage: 'Failed to decode error response' };
+      }
     }
-    let parsedError;
-    if (jsonError?.errorMessage) {
-      parsedError = HttpErrorInterceptor.formatError(jsonError);
-    } else if (error.name && error.message) {
-      parsedError = HttpErrorInterceptor.formatError(`${error.name}: ${error.message}`);
-    } else if (jsonError) {
-      parsedError = HttpErrorInterceptor.formatError(jsonError);
-    } else {
-      parsedError = HttpErrorInterceptor.formatError('Unknown HTTP error');
-    }
+
+    const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(jsonError || error));
 
     if (this.isConnectionError(parsedError)) {
       return throwError(() => new ConnectionError(error));
@@ -46,6 +48,28 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     this.showError(parsedError);
 
     return throwError(() => error);
+  }
+
+  private parseHttpError(error: HttpErrorResponse): string {
+    let jsonError: any = error.error || error;
+    if (typeof jsonError === 'string' && error.headers.get('Content-Type')?.includes('application/json')) {
+      try {
+        jsonError = JSON.parse(jsonError);
+      } catch (e) {
+        console.log('Error parsing JSON response', e);
+      }
+    }
+
+    if (jsonError?.errorMessage) {
+      return jsonError.errorMessage;
+    }
+    if (error.name && error.message) {
+      return `${error.name}: ${error.message}`;
+    }
+    if (jsonError) {
+      return JSON.stringify(jsonError);
+    }
+    return 'Unknown HTTP error';
   }
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
@@ -57,21 +81,28 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return response;
   }
 
-  static formatError(error: any) {
-    let parsedError;
-    if (error?.errorName && error?.errorMessage) {
-      parsedError = `${error.errorName}: ${error.errorMessage}`;
-    } else if (error?.errorName || error?.errorMessage) {
-      parsedError = error.errorName || error.errorMessage;
-    } else if (error?.error && error?.text) {
-      parsedError = `${error.error}: ${error.text}`;
-    } else if (error?.error || error?.text) {
-      parsedError = error.error || error.text;
-    } else {
-      parsedError = error;
+  static formatError(error: any): string {
+    if (!error || typeof error !== 'object') {
+      return String(error);
     }
 
-    return parsedError;
+    if (error.errorName && error.errorMessage) {
+      return `${error.errorName}: ${error.errorMessage}`;
+    }
+
+    if (error.errorName || error.errorMessage) {
+      return error.errorName ?? error.errorMessage;
+    }
+
+    if (error.error && error.text) {
+      return `${error.error}: ${error.text}`;
+    }
+
+    if (error.error || error.text) {
+      return error.error ?? error.text;
+    }
+
+    return JSON.stringify(error);
   }
 
   private showError(error: any) {
