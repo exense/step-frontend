@@ -36,6 +36,7 @@ import {
   PopoverMode,
   IncludeTestcases,
   TimeRange,
+  AlertType,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -472,4 +473,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
     });
   }
+
+  protected readonly AlertType = AlertType;
 }
