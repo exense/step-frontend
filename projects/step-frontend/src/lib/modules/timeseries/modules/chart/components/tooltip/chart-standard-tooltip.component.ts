@@ -18,6 +18,9 @@ import { SeriesStroke } from '../../../_common/types/time-series/series-stroke';
 export class ChartStandardTooltipComponent {
   data = input.required<TooltipContextData>();
 
+  elipsisBefore = false;
+  elipsisAfter = false;
+
   timestamp = computed(() => {
     let idx = this.data().idx;
     if (idx !== undefined) {
@@ -32,10 +35,10 @@ export class ChartStandardTooltipComponent {
     const contextData = this.data();
     const settings = contextData.parentRef.settings.tooltipOptions;
     const idx: number = contextData.idx!;
-    if (idx === undefined) {
+    if (idx === undefined || contextData.idY === undefined) {
       return;
     }
-    const hoveredValue = contextData.idY;
+    const hoveredValue: number = contextData.idY!;
     let yPoints: TooltipRowEntry[] = [];
     let summaryRow: TooltipRowEntry | undefined;
     // first series is x axis (time)
@@ -46,8 +49,13 @@ export class ChartStandardTooltipComponent {
       if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY && series.show) {
         if (bucketValue != undefined) {
           const executionIds = contextData.parentRef.chartMetadata[i]?.[idx]?.[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+          let formattedValue = `${Math.trunc(bucketValue)} `;
+          if (settings.yAxisUnit) {
+            formattedValue += settings.yAxisUnit;
+          }
           yPoints.push({
             value: bucketValue,
+            formattedValue: formattedValue,
             name: series.label || '',
             // @ts-ignore
             stroke: series.strokeConfig,
@@ -70,22 +78,23 @@ export class ChartStandardTooltipComponent {
     const elementsToSelect = 5;
     let elipsisBefore = true;
     let elipsisAfter = true;
-    // const closestIndex = this.getClosestIndex(hoveredValue, yPoints);
-    // if (closestIndex >= 0) {
-    //   yPoints[closestIndex].bold = true;
-    // }
-    // if (yPoints.length > elementsToSelect) {
-    //   if (closestIndex < elementsToSelect / 2) {
-    //     yPoints = yPoints.slice(0, elementsToSelect);
-    //     elipsisBefore = false;
-    //   } else if (yPoints.length - closestIndex < elementsToSelect / 2) {
-    //     yPoints = yPoints.slice(-elementsToSelect);
-    //     elipsisAfter = false;
-    //   } else {
-    //     yPoints = yPoints.slice(closestIndex - elementsToSelect / 2, closestIndex + elementsToSelect / 2);
-    //   }
-    // }
-
+    const closestIndex = this.getClosestIndex(hoveredValue, yPoints);
+    if (closestIndex >= 0) {
+      yPoints[closestIndex].bold = true;
+    }
+    if (yPoints.length > elementsToSelect) {
+      if (closestIndex < elementsToSelect / 2) {
+        yPoints = yPoints.slice(0, elementsToSelect);
+        elipsisBefore = false;
+      } else if (yPoints.length - closestIndex < elementsToSelect / 2) {
+        yPoints = yPoints.slice(-elementsToSelect);
+        elipsisAfter = false;
+      } else {
+        yPoints = yPoints.slice(closestIndex - elementsToSelect / 2, closestIndex + elementsToSelect / 2);
+      }
+    }
+    this.elipsisBefore = elipsisBefore;
+    this.elipsisAfter = elipsisAfter;
     return yPoints;
   });
 
