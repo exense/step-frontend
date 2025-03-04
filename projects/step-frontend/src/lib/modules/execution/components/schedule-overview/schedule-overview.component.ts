@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, Signal, signal } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
@@ -12,8 +12,9 @@ import {
   TimeUnit,
   AugmentedTimeSeriesService,
   SchedulerOverviewTaskChangeService,
+  ExecutiontTaskParameters,
 } from '@exense/step-core';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
@@ -21,13 +22,15 @@ import { Status } from '../../../_common/shared/status.enum';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 declare const uPlot: any;
 
 interface UrlParams {
   timeRangeSelection?: TimeRangePickerSelection;
+  refresh: number;
 }
 
 interface EntityWithKeywordsStats {
@@ -41,6 +44,7 @@ interface EntityWithKeywordsStats {
   templateUrl: './schedule-overview.component.html',
   styleUrls: ['./schedule-overview.component.scss'],
   providers: [
+    DashboardUrlParamsService,
     {
       provide: VIEW_MODE,
       useFactory: () => {
@@ -52,11 +56,13 @@ interface EntityWithKeywordsStats {
 })
 export class ScheduleOverviewComponent {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
-  readonly URL_PARAMS_PREFIX = 'q_';
+  readonly URL_PARAMS_PREFIX = 'dc_';
+  private _urlParamService = inject(DashboardUrlParamsService);
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _executionService = inject(ExecutionsService);
+  protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
   private _scheduleOverviewTaskChange = inject(SchedulerOverviewTaskChangeService);
   private _router = inject(Router);
@@ -89,12 +95,29 @@ export class ScheduleOverviewComponent {
   protected readonly task = toSignal(this.task$, { initialValue: undefined });
   protected readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
 
+  refreshInterval = signal<number>(0);
+
   protected readonly timeRange: Signal<TimeRange | undefined> = computed(() => {
     let selection = this.activeTimeRangeSelection();
     if (selection) {
       return this.calculateTimeRange(selection);
     } else {
       return undefined;
+    }
+  });
+
+  urlUpdateEffect = effect(() => {
+    let timeRange = this.activeTimeRangeSelection();
+    let refreshInterval = this.refreshInterval();
+    if (timeRange) {
+      this._urlParamService.updateUrlParams(timeRange, refreshInterval);
+    }
+  });
+
+  refreshEffect = effect(() => {
+    let range = this.timeRange();
+    if (range) {
+      this.refreshCharts(this._taskId, range);
     }
   });
 
@@ -116,30 +139,24 @@ export class ScheduleOverviewComponent {
   lastKeywordsExecutions: Execution[] = [];
 
   constructor() {
-    const urlParams = this.collectUrlParams();
-    if (urlParams.timeRangeSelection) {
-      this.activeTimeRangeSelection.set(urlParams.timeRangeSelection!);
+    const urlParams = this._urlParamService.collectUrlParams();
+    if (urlParams.refreshInterval !== undefined) {
+      this.refreshInterval.set(urlParams.refreshInterval);
+    } else {
+      this.refreshInterval.set(5000);
+    }
+    if (urlParams.timeRange) {
+      let urlTimeRange = urlParams.timeRange!;
+      if (urlTimeRange.type === 'RELATIVE') {
+        urlTimeRange = this.findRelativeTimeOption(urlTimeRange?.relativeSelection?.timeInMs);
+      }
+      this.activeTimeRangeSelection.set(urlTimeRange);
     } else {
       this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
-    effect(() => {
-      const range = this.timeRange();
-      const taskId = this.taskId();
-      if (range) {
-        this.updateUrlParams();
-        this.refreshCharts(taskId, range);
-      }
-    });
-    effect(
-      () => {
-        const task = this.task();
-        this._scheduleOverviewTaskChange.taskChanged(task);
-      },
-      { allowSignalWrites: true },
-    );
   }
 
-  private findRelativeTimeOption(ms: number): TimeRangePickerSelection {
+  private findRelativeTimeOption(ms?: number): TimeRangePickerSelection {
     return this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === ms) || this.timeRangeOptions[0];
   }
 
@@ -147,7 +164,6 @@ export class ScheduleOverviewComponent {
     if (!taskId) {
       return;
     }
-    console.log('refreshing charts');
     this.createPieChart(taskId, fullRange);
     this.createExecutionsChart(taskId, fullRange);
     this.fetchLastExecution(taskId);
@@ -158,10 +174,19 @@ export class ScheduleOverviewComponent {
     });
   }
 
+  triggerRefresh() {
+    // signal is triggered
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+  }
+
+  handleRefreshIntervalChange(interval: number) {
+    this.refreshInterval.set(interval);
+  }
+
   private calculateTimeRange(selection: TimeRangePickerSelection): TimeRange {
     switch (selection.type) {
       case 'ABSOLUTE':
-        return selection.absoluteSelection!;
+        return { ...selection.absoluteSelection! };
       case 'RELATIVE':
         const relativeSelection = selection.relativeSelection!;
         const now = new Date().getTime();
@@ -556,35 +581,5 @@ export class ScheduleOverviewComponent {
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
     // this.timeRangeChange.next({ selection, triggerRefresh: true });
-  }
-
-  private updateUrlParams() {
-    const timeRangeSelection = this.activeTimeRangeSelection()!;
-    const params = TimeSeriesUtils.convertTimeRangeSelectionToUrlParams(timeRangeSelection);
-    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
-      accumulator[this.URL_PARAMS_PREFIX + key] = params[key];
-      return accumulator;
-    }, {});
-    this._router.navigate([], {
-      relativeTo: this._activatedRoute,
-      queryParams: prefixedParams,
-    });
-  }
-
-  private collectUrlParams(): UrlParams {
-    let params = this._activatedRoute.snapshot.queryParams;
-    params = Object.keys(params)
-      .filter((key) => key.startsWith(this.URL_PARAMS_PREFIX))
-      .reduce((acc, key) => {
-        acc[key.substring(this.URL_PARAMS_PREFIX.length)] = params[key];
-        return acc;
-      }, {} as Params);
-    let timeRangeSelection = TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
-    if (timeRangeSelection?.type === 'RELATIVE') {
-      timeRangeSelection = this.findRelativeTimeOption(timeRangeSelection.relativeSelection!.timeInMs!);
-    }
-    return {
-      timeRangeSelection: timeRangeSelection,
-    };
   }
 }
