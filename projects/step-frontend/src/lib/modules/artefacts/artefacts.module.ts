@@ -60,6 +60,8 @@ import { EchoReportDetailsComponent } from './component/echo-report-details/echo
 import { SequenceInlineComponent } from './component/sequence-inline/sequence-inline.component';
 import { SequenceReportDetailsComponent } from './component/sequence-report-details/sequence-report-details.component';
 import { SleepReportDetailsComponent } from './component/sleep-report-details/sleep-report-details.component';
+import { SwitchInlineComponent } from './component/switch-inline/switch-inline.component';
+import { SwitchReportDetailsComponent } from './component/switch-report-details/switch-report-details.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +85,8 @@ import { SleepReportDetailsComponent } from './component/sleep-report-details/sl
     CaseInlineComponent,
     CaseReportDetailsComponent,
     SwitchComponent,
+    SwitchInlineComponent,
+    SwitchReportDetailsComponent,
     SleepComponent,
     SleepInlineComponent,
     SleepReportDetailsComponent,
@@ -144,6 +148,8 @@ import { SleepReportDetailsComponent } from './component/sleep-report-details/sl
     CaseInlineComponent,
     CaseReportDetailsComponent,
     SwitchComponent,
+    SwitchInlineComponent,
+    SwitchReportDetailsComponent,
     SleepComponent,
     SleepInlineComponent,
     SleepReportDetailsComponent,
@@ -334,6 +340,8 @@ export class ArtefactsModule {
     this._artefactService.register('Switch', {
       icon: 'more-vertical',
       component: SwitchComponent,
+      inlineComponent: SwitchInlineComponent,
+      reportDetailsComponent: SwitchReportDetailsComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Case" control',
     });
     this._artefactService.register('Case', {
