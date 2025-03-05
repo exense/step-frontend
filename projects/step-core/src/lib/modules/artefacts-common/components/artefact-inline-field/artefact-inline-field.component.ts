@@ -1,18 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
-import {
-  AceMode,
-  ArtefactInlineItem,
-  ArtefactService,
-  DynamicValueBoolean,
-  DynamicValueInteger,
-  DynamicValueString,
-  RichEditorDialogService,
-} from '@exense/step-core';
+import { NgClass } from '@angular/common';
+import { AceMode, RichEditorDialogService } from '../../../rich-editor';
+import { ArtefactService } from '../../injectables/artefact.service';
+import { ArtefactInlineItem } from '../../types/artefact-inline-item';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-artefact-inline-field',
   templateUrl: './artefact-inline-field.component.html',
   styleUrl: './artefact-inline-field.component.scss',
+  imports: [NgClass, StepBasicsModule],
+  standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -29,9 +29,7 @@ import { CallKeywordComponent } from './component/call-keyword/call-keyword.comp
 import { ScriptComponent } from './component/script/script.component';
 import { AssertionPlanComponent } from './component/assertion-plan/assertion-plan.component';
 import { AssertPerformanceComponent } from './component/assert-performance/assert-performance.component';
-import { ArtefactInlineFieldComponent } from './component/artefact-inline-field/artefact-inline-field.component';
 import { EchoInlineComponent } from './component/echo-inline/echo-inline.component';
-import { ArtefactInlineFieldListComponent } from './component/artefact-inline-field-list/artefact-inline-field-list.component';
 import { CallKeywordInlineComponent } from './component/call-keyword-inline/call-keyword-inline.component';
 import { SetInlineComponent } from './component/set-inline/set-inline.component';
 import { ForInlineComponent } from './component/for-inline/for-inline.component';
@@ -137,8 +135,6 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
     AssertPerformanceReportDetailsComponent,
-    ArtefactInlineFieldComponent,
-    ArtefactInlineFieldListComponent,
   ],
   imports: [StepCommonModule, ReportNodesModule],
   exports: [
@@ -207,8 +203,6 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     AssertPerformanceComponent,
     AssertPerformanceInlineComponent,
     AssertPerformanceReportDetailsComponent,
-    ArtefactInlineFieldComponent,
-    ArtefactInlineFieldListComponent,
   ],
 })
 export class ArtefactsModule {

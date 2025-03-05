@@ -1,10 +1,15 @@
-import { Component, computed, input } from '@angular/core';
-import { ArtefactInlineItem } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ArtefactInlineItem } from '../../types/artefact-inline-item';
+import { ArtefactInlineFieldComponent } from '../artefact-inline-field/artefact-inline-field.component';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-artefact-inline-field-list',
   templateUrl: './artefact-inline-field-list.component.html',
   styleUrl: './artefact-inline-field-list.component.scss',
+  imports: [StepBasicsModule, ArtefactInlineFieldComponent],
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArtefactInlineFieldListComponent {
   /** @Input() **/
