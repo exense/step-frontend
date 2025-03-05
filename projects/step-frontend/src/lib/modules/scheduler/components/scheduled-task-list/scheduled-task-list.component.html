@@ -156,7 +156,7 @@
             stepTestId="cross-execution-schedule-btn"
             mat-icon-button
             matTooltip="Cross-execution dashboard"
-            [disabled]="!('task-write' | hasRight | async)"
+            [disabled]="!('execution-read' | hasRight | async)"
             [routerLink]="element | taskCrossExecutionUrl"
           >
             <step-icon name="file-07" />
@@ -216,15 +216,6 @@
     >
       <step-icon name="upload" />
       Export schedule
-    </a>
-    <a
-      stepTestId="export-schedule-btn"
-      mat-menu-item
-      [disabled]="!('task-write' | hasRight | async)"
-      [routerLink]="['/', 'cross-executions', element.id]"
-    >
-      <step-icon name="rocket" />
-      Cross-execution dashboard
     </a>
   </ng-container>
 </step-entity-menu>

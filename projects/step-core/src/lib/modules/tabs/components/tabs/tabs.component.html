@@ -1,4 +1,4 @@
-<nav mat-tab-nav-bar [disablePagination]="disablePagination()" [tabPanel]="tabPanel">
+<nav mat-tab-nav-bar [disablePagination]="disablePagination()" [tabPanel]="tabPanel" [class.compact]="compactTabs()">
   @if (userRouteLinks()) {
     @for (tab of tabs(); track tab.id) {
       <a

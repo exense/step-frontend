@@ -8,8 +8,7 @@
 }
 
 @mixin tabbar($primary-tabs-color) {
-  step-tabs,
-  .step-tabs {
+  step-tabs {
     .mat-mdc-tab-header {
       border-bottom: solid 1px rgba(0, 0, 0, 0.12);
     }
@@ -109,29 +108,17 @@
     }
   }
 
-  .step-legacy-tabs {
-    .mat-mdc-tab-links {
-      margin-left: 16px;
-    }
+  step-tabs {
+    nav.mat-mdc-tab-header.compact {
+      border-bottom: none;
 
-    step-ajs-icon {
-      @include tabbar-icon;
-    }
-
-    &.mat-mdc-primary {
-      .mat-mdc-tab-link.mat-mdc-tab-label-active {
-        color: $primary-tabs-color;
+      .mat-mdc-tab-links {
+        margin-left: 0;
       }
-    }
 
-    .mat-mdc-tab-link {
-      min-width: auto;
-      padding: 0 10px;
-      opacity: 1;
-    }
-
-    execution-result {
-      margin-right: 11px;
+      .mat-mdc-tab-link-container {
+        display: block;
+      }
     }
   }
 }

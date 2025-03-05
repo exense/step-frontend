@@ -7,6 +7,7 @@ import { PlanUrlPipe } from './pipes/plan-url.pipe';
 import { ArtefactChildContainerSettingsComponent } from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
+import { SourcePlanEditorComponent } from './components/source-plan-editor/source-plan-editor.component';
 
 export * from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/select-plan/select-plan.component';
@@ -15,6 +16,7 @@ export * from './components/thread-distribution-wizard-dialog/thread-distributio
 export * from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/plan-tree/plan-tree.component';
+export * from './components/source-plan-editor/source-plan-editor.component';
 
 export * from './injectables/plan-artefact-resolver.service';
 export * from './injectables/plan-by-id-cache.service';
@@ -27,6 +29,7 @@ export * from './injectables/plan-open.service';
 export * from './injectables/plan-context-initializer.service';
 export * from './injectables/artefact-form-change-helper.service';
 export * from './injectables/plan-filters-factory.service';
+export * from './injectables/source-editor-autocomplete.service';
 
 export * from './types/plan-editor-strategy';
 export * from './types/plan-tree-action.enum';
@@ -48,4 +51,5 @@ export const PLAN_COMMON_EXPORTS = [
   ArtefactChildContainerSettingsComponent,
   ArtefactDetailsComponent,
   PlanTreeComponent,
+  SourcePlanEditorComponent,
 ];
