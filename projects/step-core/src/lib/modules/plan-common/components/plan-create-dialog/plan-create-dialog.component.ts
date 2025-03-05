@@ -133,8 +133,32 @@ export class PlanCreateDialogComponent implements AfterContentInit {
       );
   }
 
-  @HostListener('keydown.enter')
-  private handleKeyEnter(): void {
+  @HostListener('keydown.enter', ['$event'])
+  private handleKeyEnter(event: KeyboardEvent): void {
+    const activeElement = document.activeElement as HTMLElement;
+
+    if (this.isInTextEditor(activeElement)) {
+      return; // Prevents triggering save when inside a text editor
+    }
+
     this.save(true);
+  }
+
+  /**
+   * Checks if the current active element is an input, textarea, or a rich text editor.
+   */
+  private isInTextEditor(element: HTMLElement | null): boolean {
+    if (!element) return false;
+
+    if (element.tagName.toLowerCase() === 'textarea') {
+      return true;
+    }
+
+    // Check if inside a contenteditable or a rich-text editor (Quill, TinyMCE, etc.)
+    if (element.isContentEditable) {
+      return true;
+    }
+
+    return false;
   }
 }
