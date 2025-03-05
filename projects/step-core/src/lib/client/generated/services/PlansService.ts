@@ -413,6 +413,21 @@ export class PlansService {
   }
 
   /**
+   * Returns a new plan instance created from the yaml source.
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public newPlanFromYaml(requestBody?: string): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/yaml',
+      body: requestBody,
+      mediaType: 'text/plain',
+    });
+  }
+
+  /**
    * Get the table view according to provided request
    * @param requestBody
    * @returns TableResponsePlan default response

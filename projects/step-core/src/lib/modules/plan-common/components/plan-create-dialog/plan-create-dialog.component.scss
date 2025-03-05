@@ -3,3 +3,7 @@
 div[step-modal-window-body] {
   @include core.common-dialog-content;
 }
+
+step-tabs {
+  margin-bottom: -1em;
+}
