@@ -334,6 +334,7 @@ export class ScheduleOverviewComponent {
       },
       axes: axes,
       bands: this.getDefaultBands(series.length),
+      zoomEnabled: false,
     };
   }
 
@@ -454,6 +455,7 @@ export class ScheduleOverviewComponent {
       },
       axes: axes,
       bands: this.getDefaultBands(series.length),
+      zoomEnabled: false,
     };
   }
 
