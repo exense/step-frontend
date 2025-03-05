@@ -7,3 +7,29 @@
 .bold {
   font-weight: bold;
 }
+
+.inline-menu {
+  position: fixed; /* Absolutely positioned to avoid layout issues */
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  white-space: nowrap;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.menu-item {
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #f0f0f0;
+}
+
+.link-icon {
+  cursor: pointer;
+  padding: 2px 4px;
+  display: inline-block;
+}

@@ -8,4 +8,5 @@ export interface TooltipRowEntry {
   executions?: string[];
   bold?: boolean;
   markerClassName?: string;
+  isSummary?: boolean;
 }

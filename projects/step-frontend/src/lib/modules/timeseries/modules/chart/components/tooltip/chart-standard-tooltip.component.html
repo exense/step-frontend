@@ -7,8 +7,8 @@
 @if (elipsisAfter) {
   <div class="dots">...</div>
 }
-<div class="separator"></div>
 @if (summaryEntry) {
+  <div class="separator"></div>
   <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: summaryEntry }" />
 }
 <div class="separator"></div>
@@ -22,6 +22,17 @@
     </div>
     <div class="right" [class.bold]="entry.bold">
       {{ entry.formattedValue || entry.value || 0 }}
+      @if (!entry.isSummary) {
+        <span class="link-icon" (click)="openMenu(entry, $event)"></span>
+        {{ menuX }}
+
+        @if (activeMenuEntry === entry) {
+          <div class="inline-menu" [style.top.px]="menuY" [style.left.px]="menuX" (click)="$event.stopPropagation()">
+            <div class="menu-item" (click)="onMenuAction('details', entry)">View Details</div>
+            <div class="menu-item" (click)="onMenuAction('delete', entry)">Delete</div>
+          </div>
+        }
+      }
     </div>
   </div>
 </ng-template>

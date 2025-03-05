@@ -1,10 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, input, Input, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  input,
+  Input,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../../_common';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipRowEntry } from '../../types/tooltip-row-entry';
 import { MarkerType } from '@exense/step-core';
 import { SeriesStroke } from '../../../_common/types/time-series/series-stroke';
 import { NgTemplateOutlet } from '@angular/common';
+import { TsTooltipOptions } from '../../types/ts-tooltip-options';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 
 /**
  * This component represents a visual effect for a loading chart.
@@ -14,14 +28,59 @@ import { NgTemplateOutlet } from '@angular/common';
   templateUrl: './chart-standard-tooltip.component.html',
   styleUrls: ['./chart-standard-tooltip.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, NgTemplateOutlet],
+  imports: [COMMON_IMPORTS, NgTemplateOutlet, MatProgressSpinner, MatMenuTrigger, MatTooltip],
 })
 export class ChartStandardTooltipComponent {
   data = input.required<TooltipContextData>();
 
+  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+
   elipsisBefore = false;
   elipsisAfter = false;
   summaryEntry: TooltipRowEntry | undefined;
+
+  activeMenuEntry: any = null;
+  menuX = 0;
+  menuY = 0;
+
+  // Open menu at mouse position
+  openMenu(entry: any, event: MouseEvent) {
+    // event.stopPropagation();
+    this.menuX = 100;
+    console.log('x', this.menuX);
+    this._changeDetectorRef.detectChanges();
+    // if (this.activeMenuEntry === entry) {
+    //   this.closeMenu();
+    //   return;
+    // }
+
+    this.activeMenuEntry = entry;
+    // this.menuX = event.clientX + 5; // Offset a bit
+    // this.menuY = event.clientY + 5;
+
+    // setTimeout(() => {
+    //   document.addEventListener('click', this.closeMenuOnOutsideClick, true);
+    // });
+  }
+
+  // Handle outside click
+  closeMenuOnOutsideClick = (event: MouseEvent) => {
+    if (!(event.target as HTMLElement)?.closest('.inline-menu')) {
+      this.closeMenu();
+    }
+  };
+
+  closeMenu() {
+    this.activeMenuEntry = null;
+    document.removeEventListener('click', this.closeMenuOnOutsideClick, true);
+  }
+
+  // Menu actions handler
+  onMenuAction(action: string, entry: any) {
+    console.log(`Action: ${action} for`, entry);
+    this.closeMenu();
+  }
 
   timestamp = computed(() => {
     let idx = this.data().idx;
@@ -35,7 +94,7 @@ export class ChartStandardTooltipComponent {
 
   entries = computed(() => {
     const contextData = this.data();
-    const settings = contextData.parentRef.settings.tooltipOptions;
+    const settings: TsTooltipOptions = contextData.parentRef.settings.tooltipOptions;
     const idx: number = contextData.idx!;
     if (idx === undefined || contextData.idY === undefined) {
       return;
@@ -68,6 +127,7 @@ export class ChartStandardTooltipComponent {
               value: bucketValue!,
               stroke: { color: TimeSeriesConfig.TOTAL_BARS_COLOR, type: MarkerType.SQUARE },
               name: settings.zAxisLabel || 'Total',
+              isSummary: true,
             };
           }
         }
