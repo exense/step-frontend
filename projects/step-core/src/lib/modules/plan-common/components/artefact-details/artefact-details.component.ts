@@ -11,7 +11,7 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { ArtefactService, ArtefactType } from '../../../../services/artefact.service';
+import { ArtefactService, ArtefactType } from '../../../artefacts-common/injectables/artefact.service';
 import { ArtefactContext } from '../../types/artefact-context';
 import { AbstractArtefact, DynamicValueString } from '../../../../client/step-client-module';
 import { FormsModule, NgForm } from '@angular/forms';

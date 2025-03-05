@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import { ArtefactInlineItem, BaseInlineArtefactLegacyComponent } from '@exense/step-core';
 import { AssertArtefact } from '../../types/assert.artefact';
 
 @Component({
@@ -7,7 +7,7 @@ import { AssertArtefact } from '../../types/assert.artefact';
   templateUrl: './assert-inline.component.html',
   styleUrl: './assert-inline.component.scss',
 })
-export class AssertInlineComponent extends BaseInlineArtefactComponent<AssertArtefact> {
+export class AssertInlineComponent extends BaseInlineArtefactLegacyComponent<AssertArtefact> {
   protected getItems(
     assert?: AssertArtefact,
     isVertical?: boolean,

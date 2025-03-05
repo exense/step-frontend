@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
+import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactLegacyComponent } from '@exense/step-core';
 import { Observable, of } from 'rxjs';
 import { ForArtefact } from '../../types/for.artefact';
 import { ForReportNode } from '../../types/for.report-node';
@@ -9,7 +9,7 @@ import { ForReportNode } from '../../types/for.report-node';
   templateUrl: './for-inline.component.html',
   styleUrl: './for-inline.component.scss',
 })
-export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact, ForReportNode> {
+export class ForInlineComponent extends BaseInlineArtefactLegacyComponent<ForArtefact, ForReportNode> {
   protected getItems(
     artefact?: ForArtefact,
     isVertical?: boolean,

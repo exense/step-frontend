@@ -1,0 +1,35 @@
+@if (item(); as item) {
+  <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
+    @if (item.icon) {
+      <step-icon
+        class="field-icon"
+        [name]="item.icon"
+        [matTooltip]="item.iconTooltip ?? ''"
+        matTooltipPosition="below"
+      />
+    }
+    @if (item.label; as label) {
+      <label
+        [ngClass]="{
+          unresolved: !item.isLabelResolved,
+          resolved: item.isLabelResolved && !label.dynamic,
+          'dynamic-resolved': item.isLabelResolved && label.dynamic
+        }"
+      >
+        {{ itemLabel() }}:
+      </label>
+    }
+    @if (item.value; as value) {
+      <span
+        [ngClass]="{
+          unresolved: !item.isValueResolved,
+          resolved: item.isValueResolved && !value.dynamic,
+          'dynamic-resolved': item.isValueResolved && value.dynamic
+        }"
+      >
+        {{ itemValue() }}
+      </span>
+    }
+  </section>
+  <div class="ellipsis">...</div>
+}

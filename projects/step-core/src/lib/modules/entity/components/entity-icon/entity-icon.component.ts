@@ -4,7 +4,7 @@ import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../injectables/entity-registry';
 
 import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
-import { ArtefactService } from '../../../../services/artefact.service';
+import { ArtefactService } from '../../../artefacts-common/injectables/artefact.service';
 
 @Component({
   selector: 'entity-icon', // eslint-disable-line @angular-eslint/component-selector
