@@ -7,22 +7,32 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { Observable, tap, throwError } from 'rxjs';
+import { Observable, of, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConnectionError } from '../shared/connection-error';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
+import { NavigatorService } from '@exense/step-core';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   private _snackBar = inject(MatSnackBar);
   private _errorLogger = inject(HttpErrorLoggerService);
+  private _navigator = inject(NavigatorService);
 
   private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
     this._errorLogger.log('Network Error', error);
 
     if (error.status === 401 && skip401) {
       return throwError(() => error);
+    }
+
+    if (
+      error.status === 403 &&
+      error.error?.errorMessage === "You're not allowed to access this object from within this context"
+    ) {
+      this._navigator.navigateToHome({ forceClientUrl: true });
+      return of(false);
     }
 
     let jsonError: any = error.error;
