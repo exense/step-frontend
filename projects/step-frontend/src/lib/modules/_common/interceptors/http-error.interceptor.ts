@@ -12,14 +12,13 @@ import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConnectionError } from '../shared/connection-error';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
-import { DOCUMENT } from '@angular/common';
 import { NavigatorService } from '@exense/step-core';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   private _snackBar = inject(MatSnackBar);
   private _errorLogger = inject(HttpErrorLoggerService);
-  protected _navigator = inject(NavigatorService);
+  private _navigator = inject(NavigatorService);
 
   private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
     this._errorLogger.log('Network Error', error);
