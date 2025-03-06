@@ -69,6 +69,8 @@ import { SessionReportDetailsComponent } from './component/session-report-detail
 import { AssertPerformanceReportDetailsComponent } from './component/assert-performance-report-details/assert-performance-report-details.component';
 import { DataSetInlineComponent } from './component/data-set-inline/data-set-inline.component';
 import { DataSetReportDetailsComponent } from './component/data-set-report-details/data-set-report-details.component';
+import { ForEachInlineComponent } from './component/for-each-inline/for-each-inline.component';
+import { ForEachReportDetailsComponent } from './component/for-each-report-details/for-each-report-details.component';
 
 @NgModule({
   declarations: [
@@ -126,6 +128,8 @@ import { DataSetReportDetailsComponent } from './component/data-set-report-detai
     DataSetInlineComponent,
     DataSetReportDetailsComponent,
     ForEachComponent,
+    ForEachInlineComponent,
+    ForEachReportDetailsComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
     CallPlanReportDetailsComponent,
@@ -196,6 +200,8 @@ import { DataSetReportDetailsComponent } from './component/data-set-report-detai
     DataSetInlineComponent,
     DataSetReportDetailsComponent,
     ForEachComponent,
+    ForEachInlineComponent,
+    ForEachReportDetailsComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
     CallPlanReportDetailsComponent,
@@ -261,6 +267,8 @@ export class ArtefactsModule {
     this._artefactService.register('ForEach', {
       icon: 'cpu',
       component: ForEachComponent,
+      inlineComponent: ForEachInlineComponent,
+      reportDetailsComponent: ForEachReportDetailsComponent,
       description: 'Creates a ForEach loop based on a collection and iterates through the child nodes',
     });
     this._artefactService.register('While', {
