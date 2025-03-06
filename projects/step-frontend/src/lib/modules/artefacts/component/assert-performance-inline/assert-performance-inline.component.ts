@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import {
   ArtefactInlineItemsBuilderService,
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseInlineArtefactComponent,
 } from '@exense/step-core';
 import { AssertPerformanceArtefact } from '../../types/assert-performance.artefact';
@@ -19,7 +18,6 @@ import { AssertPerformanceListService } from '../../injectables/assert-performan
 })
 export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponent<AssertPerformanceArtefact> {
   private _lists = inject(AssertPerformanceListService);
-  private _artefactService = inject(ArtefactService);
   private _artefactInlineUtilsService = inject(ArtefactInlineItemUtilsService);
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
@@ -31,11 +29,15 @@ export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponen
       const aggregator = this._lists.aggregatorTypeTexts[artefact.aggregator];
       const filter = artefact.filters![0]!.filter;
       const comparator = this._lists.operatorTypeTexts[artefact.comparator];
-      const expectedValue = this._artefactService.convertTimeDynamicValue(artefact.expectedValue);
+      const expectedValue = artefact.expectedValue;
       return this._artefactInlineUtilsService.convert(
         [
           [`${aggregator} of`, filter],
-          [comparator, expectedValue],
+          {
+            itemLabel: comparator,
+            itemValue: expectedValue,
+            itemTimeValueUnit: 'ms',
+          },
         ],
         isResolved,
       );

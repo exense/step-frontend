@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ArtefactInlineItemUtilsService, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
 import { ScriptArtefact } from '../../types/script.artefact';
 
 @Component({
@@ -12,16 +12,14 @@ import { ScriptArtefact } from '../../types/script.artefact';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScriptReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ScriptArtefact>> {
+  private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
+
   protected readonly items = computed(() => {
     const node = this.node();
     if (!node?.resolvedArtefact) {
       return undefined;
     }
 
-    const result: Record<string, unknown> = {
-      '': node.resolvedArtefact.script,
-    };
-
-    return result;
+    return this._artefactInlineUtils.convert([['script', node.resolvedArtefact.script, 'log-in']]);
   });
 }

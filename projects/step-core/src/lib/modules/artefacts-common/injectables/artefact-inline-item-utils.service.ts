@@ -9,13 +9,24 @@ import {
 import { AggregatedArtefactInfo, ReportNodeWithArtefact } from '../types/artefact-types';
 import { ArtefactInlineItem } from '../types/artefact-inline-item';
 import { ArtefactService } from './artefact.service';
+import { TimeUnitDictKey } from '../../basics/types/time-unit.enum';
 
 type DynamicValue = DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
 type PossibleValue = string | number | boolean | DynamicValue | undefined;
+
+export interface ArtefactInlineItemConfig {
+  itemLabel?: PossibleValue;
+  itemValue?: PossibleValue;
+  icon?: string;
+  iconTooltip?: string;
+  itemTimeValueUnit?: TimeUnitDictKey;
+}
+
 export type ArtefactInlineItemSource = (
   | [PossibleValue, PossibleValue]
-  | [PossibleValue, PossibleValue, string]
-  | [PossibleValue, PossibleValue, string, string]
+  | [PossibleValue, PossibleValue, string | undefined]
+  | [PossibleValue, PossibleValue, string | undefined, string | undefined]
+  | ArtefactInlineItemConfig
 )[];
 
 @Injectable({
@@ -40,17 +51,28 @@ export class ArtefactInlineItemUtilsService {
   }
 
   convert(items: ArtefactInlineItemSource, isResolved?: boolean): ArtefactInlineItem[] {
-    return items.map(([itemLabel, itemValue, icon, iconTooltip]) => {
-      const { value: label, isResolved: isLabelResolved } = this.prepareDynamicValue(itemLabel, isResolved);
-      const { value, isResolved: isValueResolved } = this.prepareDynamicValue(itemValue, isResolved);
+    return items.map((itemConfig) => {
+      let config: ArtefactInlineItemConfig;
+      if (itemConfig instanceof Array) {
+        const [itemLabel, itemValue, icon, iconTooltip] = itemConfig;
+        config = { itemLabel, itemValue, icon, iconTooltip };
+      } else {
+        config = itemConfig;
+      }
+
+      const { value: label, isResolved: isLabelResolved } = this.prepareDynamicValue(config.itemLabel, isResolved);
+      const { value, isResolved: isValueResolved } =
+        !!config.itemTimeValueUnit && this._artefactService.isDynamicValue(config.itemValue)
+          ? this.prepareTimeValue(config.itemValue as DynamicValueInteger, config.itemTimeValueUnit)
+          : this.prepareDynamicValue(config.itemValue, isResolved);
 
       return {
         label: label!,
         isLabelResolved,
         value,
         isValueResolved,
-        icon,
-        iconTooltip,
+        icon: config.icon,
+        iconTooltip: config.iconTooltip,
       };
     });
   }
@@ -64,7 +86,7 @@ export class ArtefactInlineItemUtilsService {
     }
     const isDynamic = this._artefactService.isDynamicValue(value);
     if (isDynamic) {
-      return { value: value as DynamicValue, isResolved };
+      return { value: value as DynamicValue, isResolved: true };
     }
     if (typeof value === 'object') {
       value = JSON.stringify(value);
@@ -72,6 +94,32 @@ export class ArtefactInlineItemUtilsService {
     return {
       value: {
         value: value as string | number | boolean,
+        dynamic: false,
+      },
+      isResolved: true,
+    };
+  }
+
+  private prepareTimeValue(
+    time: DynamicValueInteger,
+    initialUnit?: TimeUnitDictKey,
+  ): { value: DynamicValue | undefined; isResolved?: boolean } {
+    if (!time) {
+      return { value: undefined, isResolved: true };
+    }
+    const { value, unit } = this._artefactService.convertTimeDynamicValue(time, initialUnit);
+    if (time.dynamic) {
+      return {
+        value: {
+          expression: `${value} ${unit}`,
+          dynamic: true,
+        },
+        isResolved: true,
+      };
+    }
+    return {
+      value: {
+        value: `${value}${unit}`,
         dynamic: false,
       },
       isResolved: true,

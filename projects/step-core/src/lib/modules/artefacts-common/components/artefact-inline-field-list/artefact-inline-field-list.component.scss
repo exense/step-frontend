@@ -1,22 +1,31 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
-:host {
+step-artefact-inline-field-list {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-}
 
-section.list {
-  display: flex;
-  gap: 0.5rem;
-  &.vertical {
-    flex-direction: column;
-  }
-  &.wrap {
-    flex-wrap: wrap;
-  }
-}
+  section.list {
+    display: flex;
+    gap: 0.5rem;
 
-step-icon.more-icon {
-  @include core.step-icon-size(1.6rem);
+    &.vertical {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    &.wrap {
+      flex-wrap: wrap;
+    }
+
+    &:not(.vertical) {
+      step-artefact-inline-field step-icon.field-icon {
+        @include core.step-icon-size(1.6rem);
+      }
+    }
+  }
+
+  step-icon.more-icon {
+    @include core.step-icon-size(1.6rem);
+  }
 }

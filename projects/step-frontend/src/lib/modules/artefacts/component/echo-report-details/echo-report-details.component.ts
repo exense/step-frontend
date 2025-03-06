@@ -1,5 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { BaseReportDetailsComponent } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
+  BaseReportDetailsComponent,
+} from '@exense/step-core';
 import { EchoReportNode } from '../../types/echo.report-node';
 
 @Component({
@@ -12,13 +16,10 @@ import { EchoReportNode } from '../../types/echo.report-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EchoReportDetailsComponent extends BaseReportDetailsComponent<EchoReportNode> {
+  private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
+
   protected items = computed(() => {
     const echo = this.node()?.echo;
-    if (!echo) {
-      return undefined;
-    }
-    return {
-      '': echo,
-    } as Record<string, unknown>;
+    return this._artefactInlineUtils.convert([['text', echo, 'log-in']]);
   });
 }

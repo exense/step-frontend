@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { BaseReportDetailsComponent, ReportNode } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ArtefactInlineItemUtilsService,
+  BaseReportDetailsComponent,
+  ReportNode,
+  ReportNodeWithArtefact,
+} from '@exense/step-core';
 import { CaseArtefact } from '../../types/case.artefact';
 
 @Component({
@@ -11,17 +16,14 @@ import { CaseArtefact } from '../../types/case.artefact';
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CaseReportDetailsComponent extends BaseReportDetailsComponent<ReportNode> {
+export class CaseReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<CaseArtefact>> {
+  private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);
+
   protected readonly items = computed(() => {
     const node = this.node();
-    let result: Record<string, unknown> | undefined = undefined;
-    const artefact = node?.resolvedArtefact as CaseArtefact | undefined;
-    if (!artefact?.value) {
-      return result;
+    if (!node?.resolvedArtefact?.value) {
+      return undefined;
     }
-    result = {
-      '': artefact.value.dynamic ? artefact.value.expression : artefact.value.value,
-    };
-    return result;
+    return this._artefactInlineItems.convert([['value', node.resolvedArtefact.value, 'log-in']]);
   });
 }

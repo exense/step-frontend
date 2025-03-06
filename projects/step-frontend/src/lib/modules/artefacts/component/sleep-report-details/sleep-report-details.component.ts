@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
+  ArtefactInlineItemUtilsService,
   ArtefactService,
   BaseReportDetailsComponent,
   ReportNodeWithArtefact,
@@ -17,27 +18,24 @@ import { SleepArtefact } from '../../types/sleep.artefact';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SleepReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SleepArtefact>> {
-  private _artefactService = inject(ArtefactService);
+  private _artefactInlineService = inject(ArtefactInlineItemUtilsService);
 
   protected items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
-    let result: Record<string, unknown> | undefined = undefined;
     if (!artefact) {
-      return result;
+      return undefined;
     }
 
     const { duration, unit, releaseTokens } = artefact;
 
-    result = {
-      _hidden_sleep: this._artefactService.convertTimeDynamicValue(duration, unit.value as TimeUnitDictKey),
-    };
-
-    if (releaseTokens.dynamic) {
-      result['releaseToken'] = releaseTokens.expression;
-    } else if (releaseTokens.value) {
-      result['_hidden_releaseToken'] = 'release token';
-    }
-
-    return result;
+    return this._artefactInlineService.convert([
+      {
+        itemLabel: 'sleep',
+        itemValue: duration,
+        itemTimeValueUnit: unit.value as TimeUnitDictKey,
+        icon: 'log-in',
+      },
+      ['releaseToken', releaseTokens, 'log-in'],
+    ]);
   });
 }

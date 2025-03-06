@@ -5,25 +5,25 @@ import {
   BaseReportDetailsComponent,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
-import { IfArtefact } from '../../types/if.artefact';
+import { TestSetArtefact } from '../../types/test-set.artefact';
 
 @Component({
-  selector: 'step-if-report-details',
-  templateUrl: './if-report-details.component.html',
-  styleUrl: './if-report-details.component.scss',
+  selector: 'step-test-set-report-details',
+  templateUrl: './test-set-report-details.component.html',
+  styleUrl: './test-set-report-details.component.scss',
   host: {
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IfReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<IfArtefact>> {
+export class TestSetReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<TestSetArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
-  protected items = computed(() => {
+  protected readonly items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
     if (!artefact) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([['condition', artefact.condition, 'log-in']]);
+    return this._artefactInlineUtils.convert([['threads', artefact.threads, 'log-in']]);
   });
 }

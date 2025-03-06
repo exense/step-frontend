@@ -3,7 +3,6 @@ import {
   ArtefactInlineItemsBuilderService,
   ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
-  ArtefactService,
   BaseInlineArtefactComponent,
   TimeUnitDictKey,
 } from '@exense/step-core';
@@ -19,7 +18,6 @@ import { SleepArtefact } from '../../types/sleep.artefact';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtefact> {
-  private _artefactService = inject(ArtefactService);
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SleepArtefact>()
@@ -31,7 +29,11 @@ export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtef
       const items: ArtefactInlineItemSource = [];
 
       const { duration, unit, releaseTokens } = artefact;
-      items.push([undefined, this._artefactService.convertTimeDynamicValue(duration, unit.value as TimeUnitDictKey)]);
+
+      items.push({
+        itemValue: duration,
+        itemTimeValueUnit: unit.value as TimeUnitDictKey,
+      });
 
       if (releaseTokens.dynamic) {
         items.push([undefined, releaseTokens]);

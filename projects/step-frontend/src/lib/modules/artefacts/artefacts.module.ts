@@ -63,7 +63,7 @@ import { SwitchReportDetailsComponent } from './component/switch-report-details/
 import { IfInlineComponent } from './component/if-inline/if-inline.component';
 import { IfReportDetailsComponent } from './component/if-report-details/if-report-details.component';
 import { TestSetInlineComponent } from './component/test-set-inline/test-set-inline.component';
-import { TestSetReportNodesComponent } from './component/test-set-report-nodes/test-set-report-nodes.component';
+import { TestSetReportDetailsComponent } from './component/test-set-report-details/test-set-report-details.component';
 import { SessionInlineComponent } from './component/session-inline/session-inline.component';
 import { SessionReportDetailsComponent } from './component/session-report-details/session-report-details.component';
 import { AssertPerformanceReportDetailsComponent } from './component/assert-performance-report-details/assert-performance-report-details.component';
@@ -109,7 +109,7 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     SynchronizedReportDetailsComponent,
     TestSetComponent,
     TestSetInlineComponent,
-    TestSetReportNodesComponent,
+    TestSetReportDetailsComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
@@ -177,7 +177,7 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     SynchronizedReportDetailsComponent,
     TestSetComponent,
     TestSetInlineComponent,
-    TestSetReportNodesComponent,
+    TestSetReportDetailsComponent,
     ForComponent,
     ForInlineComponent,
     WhileComponent,
@@ -215,7 +215,7 @@ export class ArtefactsModule {
       icon: 'plan-testset',
       component: TestSetComponent,
       inlineComponent: TestSetInlineComponent,
-      reportDetailsComponent: TestSetReportNodesComponent,
+      reportDetailsComponent: TestSetReportDetailsComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
     });
     this._artefactService.register('TestCase', {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
 import { ArtefactInlineFieldComponent } from '../artefact-inline-field/artefact-inline-field.component';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
@@ -10,6 +10,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   imports: [StepBasicsModule, ArtefactInlineFieldComponent],
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class ArtefactInlineFieldListComponent {
   /** @Input() **/

@@ -1,8 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import {
-  ArtefactService,
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
   BaseReportDetailsComponent,
-  JsonParserIconDictionaryConfig,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
 import { SequenceArtefact } from '../../types/sequence.artefact';
@@ -18,35 +18,17 @@ import { SequenceArtefact } from '../../types/sequence.artefact';
 export class SequenceReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<SequenceArtefact>
 > {
-  private _artefactService = inject(ArtefactService);
+  private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
   protected items = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
-    let result: Record<string, unknown> | undefined = undefined;
     if (!artefact) {
-      return result;
+      return undefined;
     }
 
-    if (artefact.continueOnError) {
-      const value = this._artefactService.convertDynamicValue(artefact.continueOnError);
-      if (value) {
-        result = result ?? {};
-        result[''] = artefact.continueOnError.dynamic ? value : 'continue on error';
-      }
-    }
-
-    if (artefact.pacing) {
-      const value = this._artefactService.convertDynamicValue(artefact.pacing);
-      if (value) {
-        result = result ?? {};
-        result['pacing'] = value;
-      }
-    }
-
-    return result;
+    return this._artefactInlineUtils.convert([
+      ['continue on error', artefact.continueOnError, 'log-in'],
+      ['pacing', artefact.pacing, 'log-in'],
+    ]);
   });
-
-  protected readonly itemIcons: JsonParserIconDictionaryConfig = [
-    { key: '', icon: 'alert-circle', tooltip: 'Continue sequence execution on errors in child elements', levels: 0 },
-  ];
 }

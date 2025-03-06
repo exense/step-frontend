@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
-import { BaseReportDetailsComponent, JsonParserIconDictionaryConfig } from '@exense/step-core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
+  BaseReportDetailsComponent,
+  JsonParserIconDictionaryConfig,
+} from '@exense/step-core';
 import { SetReportNode } from '../../types/set.report-node';
 
 @Component({
@@ -12,16 +17,18 @@ import { SetReportNode } from '../../types/set.report-node';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetReportDetailsComponent extends BaseReportDetailsComponent<SetReportNode> {
+  private _artefactInlineService = inject(ArtefactInlineItemUtilsService);
+
   protected readonly items = computed(() => {
     const node = this.node();
-    let result: Record<string, unknown> | undefined = undefined;
     if (!node) {
-      return result;
+      return undefined;
     }
-    const { key, value } = node;
-    result = { key, value };
-    return result;
-  });
 
-  protected readonly icons: JsonParserIconDictionaryConfig = [{ key: '*', icon: 'log-in', levels: 0 }];
+    const { key, value } = node;
+    return this._artefactInlineService.convert([
+      ['key', key, 'log-in'],
+      ['value', value, 'log-in'],
+    ]);
+  });
 }

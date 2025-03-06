@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ArtefactService, BaseReportDetailsComponent, ReportNodeWithArtefact } from '@exense/step-core';
+import {
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
+  ArtefactService,
+  BaseReportDetailsComponent,
+  ReportNodeWithArtefact,
+} from '@exense/step-core';
 import { ExportArtefact } from '../../types/export.artefact';
 
 @Component({
@@ -12,7 +18,7 @@ import { ExportArtefact } from '../../types/export.artefact';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ExportArtefact>> {
-  private _artefactService = inject(ArtefactService);
+  private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);
 
   protected readonly items = computed(() => {
     const node = this.node();
@@ -22,20 +28,19 @@ export class ExportReportDetailsComponent extends BaseReportDetailsComponent<Rep
       return undefined;
     }
 
-    result['value'] = this._artefactService.convertDynamicValue(artefact.value);
-    result['file'] = this._artefactService.convertDynamicValue(artefact.file);
+    const source: ArtefactInlineItemSource = [
+      ['value', artefact.value, 'log-in'],
+      ['file', artefact.file, 'log-in'],
+    ];
 
-    const prefix = this._artefactService.convertDynamicValue(artefact.prefix);
-    const filter = this._artefactService.convertDynamicValue(artefact.filter);
-
-    if (artefact.prefix.dynamic || !!prefix) {
-      result['prefix'] = prefix;
+    if (artefact.prefix?.value || artefact.prefix?.expression) {
+      source.push(['prefix', artefact.prefix, 'log-in']);
     }
 
-    if (artefact.filter.dynamic || !!filter) {
-      result['filter'] = filter;
+    if (artefact.filter?.value || artefact.filter?.expression) {
+      source.push(['filter', artefact.filter, 'log-in']);
     }
 
-    return result;
+    return this._artefactInlineItems.convert(source);
   });
 }

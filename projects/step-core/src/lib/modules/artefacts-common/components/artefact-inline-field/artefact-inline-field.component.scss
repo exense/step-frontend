@@ -12,6 +12,7 @@ step-artefact-inline-field > section {
 step-artefact-inline-field {
   border-radius: 1rem;
   padding: 0.2rem;
+  cursor: pointer;
 
   &:hover {
     border: solid 0.1rem var.$blue-600;
@@ -37,10 +38,6 @@ step-artefact-inline-field {
   label,
   span {
     display: block;
-  }
-
-  step-icon.field-icon {
-    @include core.step-icon-size(1.6rem);
   }
 
   label {

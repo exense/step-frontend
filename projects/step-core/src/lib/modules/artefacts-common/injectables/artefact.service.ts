@@ -98,15 +98,19 @@ export class ArtefactService {
     return result;
   }
 
-  convertTimeDynamicValue(value: DynamicValueInteger, unit: TimeUnitDictKey = 'ms', allowedUnits?: TimeUnit[]): string {
+  convertTimeDynamicValue(
+    value: DynamicValueInteger,
+    unit: TimeUnitDictKey = 'ms',
+    allowedUnits?: TimeUnit[],
+  ): { value: string; unit: TimeUnitDictKey } {
     if (value.dynamic) {
-      return `${value.expression}${unit}`;
+      return { value: value.expression ?? '', unit };
     }
     allowedUnits = allowedUnits ?? Object.values(TIME_UNIT_DICTIONARY);
     const measure = TIME_UNIT_DICTIONARY[unit] as TimeUnit;
     const newMeasure = this._timeConverter.autoDetermineDisplayMeasure(value.value ?? 0, measure, allowedUnits);
     const converted = this._timeConverter.calculateDisplayValue(value?.value ?? 0, measure, newMeasure);
     const newUnit = TIME_UNIT_LABELS[newMeasure] as TimeUnitDictKey;
-    return `${converted}${newUnit}`;
+    return { value: converted.toString(), unit: newUnit };
   }
 }

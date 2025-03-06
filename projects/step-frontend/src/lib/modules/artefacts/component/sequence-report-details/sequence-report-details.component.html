@@ -1,6 +1,6 @@
 @if (items(); as items) {
-  <section class="json-container">
-    <step-json-view-expanded [data]="items" [iconsDictionary]="itemIcons" />
+  <section class="fields-container">
+    <step-artefact-inline-field-list [items]="items" [isVertical]="true" />
   </section>
 }
 @if (node()?.error) {
