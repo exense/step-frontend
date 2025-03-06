@@ -67,6 +67,8 @@ import { TestSetReportDetailsComponent } from './component/test-set-report-detai
 import { SessionInlineComponent } from './component/session-inline/session-inline.component';
 import { SessionReportDetailsComponent } from './component/session-report-details/session-report-details.component';
 import { AssertPerformanceReportDetailsComponent } from './component/assert-performance-report-details/assert-performance-report-details.component';
+import { DataSetInlineComponent } from './component/data-set-inline/data-set-inline.component';
+import { DataSetReportDetailsComponent } from './component/data-set-report-details/data-set-report-details.component';
 
 @NgModule({
   declarations: [
@@ -121,6 +123,8 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     ReturnReportDetailsComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
+    DataSetInlineComponent,
+    DataSetReportDetailsComponent,
     ForEachComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
@@ -189,6 +193,8 @@ import { AssertPerformanceReportDetailsComponent } from './component/assert-perf
     ReturnReportDetailsComponent,
     DataSourceConfigurationComponent,
     DataSetComponent,
+    DataSetInlineComponent,
+    DataSetReportDetailsComponent,
     ForEachComponent,
     CallPlanComponent,
     CallPlanInlineComponent,
@@ -265,6 +271,8 @@ export class ArtefactsModule {
     this._artefactService.register('DataSet', {
       icon: 'grid',
       component: DataSetComponent,
+      inlineComponent: DataSetInlineComponent,
+      reportDetailsComponent: DataSetReportDetailsComponent,
       description: 'Used to iterate over rows of data in a table',
     });
     this._artefactService.register('Synchronized', {
