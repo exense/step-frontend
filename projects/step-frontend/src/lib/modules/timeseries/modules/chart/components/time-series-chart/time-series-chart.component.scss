@@ -3,6 +3,14 @@
 step-timeseries-chart {
   display: block;
 
+  .tooltip-anchor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    pointer-events: none; /* Anchor itself should not block mouse events */
+    z-index: 1; /* Must be in chart stacking context */
+  }
+
   .chart-wrapper {
     display: flex;
     flex-direction: column;

@@ -6,6 +6,7 @@ import {
   inject,
   input,
   Input,
+  signal,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -31,7 +32,8 @@ import { MatTooltip } from '@angular/material/tooltip';
   imports: [COMMON_IMPORTS, NgTemplateOutlet, MatProgressSpinner, MatMenuTrigger, MatTooltip],
 })
 export class ChartStandardTooltipComponent {
-  data = input.required<TooltipContextData>();
+  //@ts-ignore
+  data = signal<TooltipContextData>(null);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   private _changeDetectorRef = inject(ChangeDetectorRef);
@@ -83,6 +85,9 @@ export class ChartStandardTooltipComponent {
   }
 
   timestamp = computed(() => {
+    if (!this.data()) {
+      return;
+    }
     let idx = this.data().idx;
     if (idx !== undefined) {
       let timestamp = this.data().xValues[idx];
@@ -93,7 +98,10 @@ export class ChartStandardTooltipComponent {
   });
 
   entries = computed(() => {
-    const contextData = this.data();
+    if (!this.data()) {
+      return;
+    }
+    const contextData = this.data()!;
     const settings: TsTooltipOptions = contextData.parentRef.settings.tooltipOptions;
     const idx: number = contextData.idx!;
     if (idx === undefined || contextData.idY === undefined) {

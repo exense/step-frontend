@@ -14,6 +14,7 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
+  ViewContainerRef,
   ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
@@ -29,6 +30,11 @@ import MouseListener = uPlot.Cursor.MouseListener;
 import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipContentDirective } from './tooltip-content.directive';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TooltipAnchor } from '../../types/tooltip-anchor';
+import { ChartStandardTooltipComponent } from '../tooltip/chart-standard-tooltip.component';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { TooltipEvent } from '../tooltip/tooltip-event';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -74,6 +80,82 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   @ContentChild(TooltipContentDirective, { static: true, read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
 
+  private overlayRef?: OverlayRef;
+  private tooltipPortal?: ComponentPortal<ChartStandardTooltipComponent>;
+  private tooltipInstance?: ChartStandardTooltipComponent;
+
+  tooltipEvents = new EventEmitter<TooltipEvent>();
+
+  constructor(
+    private overlay: Overlay,
+    private viewContainerRef: ViewContainerRef,
+  ) {
+    this.tooltipEvents.subscribe((event) => {
+      switch (event.type) {
+        case 'SHOW':
+          break;
+        case 'HIDE':
+          this.hideTooltip();
+          break;
+        case 'POSITION_CHANGED':
+          const { x, y, data } = event.payload!;
+          this.showTooltipAt(x, y, data);
+          break;
+      }
+    });
+  }
+
+  showTooltipAt(x: number, y: number, data: TooltipContextData) {
+    if (!this.overlayRef) {
+      this.overlayRef = this.overlay.create({
+        hasBackdrop: false,
+        panelClass: 'custom-tooltip-panel',
+        scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      });
+
+      const portal = new ComponentPortal(ChartStandardTooltipComponent);
+      const componentRef = this.overlayRef.attach(portal);
+
+      this.tooltipPortal = portal;
+      this.tooltipInstance = componentRef.instance;
+    }
+
+    // Update data every time cursor moves
+    this.tooltipInstance!.data.set(data);
+
+    const positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo({ x, y })
+      .withViewportMargin(4)
+      .withPositions([
+        {
+          originX: 'start',
+          originY: 'top',
+          overlayX: 'start',
+          overlayY: 'top',
+          offsetX: 8, // Horizontal gap (right of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+        {
+          originX: 'end',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'top',
+          offsetX: -8, // Horizontal gap (left of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+      ]);
+
+    this.overlayRef.updatePositionStrategy(positionStrategy);
+  }
+
+  hideTooltip() {
+    if (this.overlayRef) {
+      this.overlayRef.dispose(); // Fully destroys it (portal + container)
+      this.overlayRef = undefined; // Force recreation next time
+    }
+  }
+
   uplot!: uPlot;
 
   seriesIndexesByIds: { [key: string]: number } = {}; // for fast accessing
@@ -87,24 +169,10 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   tooltipEmbeddedView?: EmbeddedViewRef<any>;
 
-  // this will be called from the tooltip instance.
-  // returns true if the tooltip should be rendered. false otherwise
-  renderCustomTooltipFn = (container: any, data: TooltipContextData): boolean => {
-    if (this.tooltipEmbeddedView) {
-      this.tooltipEmbeddedView.context.$implicit = data;
-    } else {
-      this.tooltipEmbeddedView = this.tooltipTemplate.createEmbeddedView({ $implicit: data });
-      this.tooltipEmbeddedView.rootNodes.forEach((node) => {
-        container.appendChild(node); // Append each node to the target element
-      });
-    }
-    this.tooltipEmbeddedView.detectChanges();
-    if (!this.tooltipEmbeddedView || this.tooltipEmbeddedView.rootNodes.length === 0) {
-      container.innerHTML = '';
-      this.tooltipEmbeddedView?.destroy();
-      this.tooltipEmbeddedView = undefined;
-      return false;
-    }
+  renderCustomTooltipFn = (data: TooltipContextData): boolean => {
+    // const { x, y } = this.getCurrentCursorPosition(); // You'll need to calculate this
+    //
+    // this.showTooltipAt(x, y, data);  // This is the correct method call
     return true;
   };
 

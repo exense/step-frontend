@@ -1,38 +1,40 @@
-@if (elipsisBefore) {
-  <div class="dots">...</div>
-}
-@for (entry of entries(); track entry.name) {
-  <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: entry }" />
-}
-@if (elipsisAfter) {
-  <div class="dots">...</div>
-}
-@if (summaryEntry) {
+<div style="background: yellow; padding: 12px; min-width: 200px">
+  @if (elipsisBefore) {
+    <div class="dots">...</div>
+  }
+  @for (entry of entries(); track entry.name) {
+    <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: entry }" />
+  }
+  @if (elipsisAfter) {
+    <div class="dots">...</div>
+  }
+  @if (summaryEntry) {
+    <div class="separator"></div>
+    <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: summaryEntry }" />
+  }
   <div class="separator"></div>
-  <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: summaryEntry }" />
-}
-<div class="separator"></div>
-<div class="timestamp">{{ timestamp() }}</div>
+  <div class="timestamp">{{ timestamp() }}</div>
 
-<ng-template #tooltipTemplate let-entry="entry">
-  <div class="tooltip-row">
-    <div class="left">
-      <div [class]="entry.markerClassName" [style.--item-color]="entry.stroke.color"></div>
-      <div class="name" [class.bold]="entry.bold">{{ entry.name }}</div>
-    </div>
-    <div class="right" [class.bold]="entry.bold">
-      {{ entry.formattedValue || entry.value || 0 }}
-      @if (!entry.isSummary) {
-        <span class="link-icon" (click)="openMenu(entry, $event)"></span>
-        {{ menuX }}
+  <ng-template #tooltipTemplate let-entry="entry">
+    <div class="tooltip-row">
+      <div class="left">
+        <div [class]="entry.markerClassName" [style.--item-color]="entry.stroke.color"></div>
+        <div class="name" [class.bold]="entry.bold">{{ entry.name }}</div>
+      </div>
+      <div class="right" [class.bold]="entry.bold">
+        {{ entry.formattedValue || entry.value || 0 }}
+        @if (!entry.isSummary) {
+          <span class="link-icon" (click)="openMenu(entry, $event)" matTooltip="test"></span>
+          {{ menuX }}
 
-        @if (activeMenuEntry === entry) {
-          <div class="inline-menu" [style.top.px]="menuY" [style.left.px]="menuX" (click)="$event.stopPropagation()">
-            <div class="menu-item" (click)="onMenuAction('details', entry)">View Details</div>
-            <div class="menu-item" (click)="onMenuAction('delete', entry)">Delete</div>
-          </div>
+          @if (activeMenuEntry === entry) {
+            <div class="inline-menu" [style.top.px]="menuY" [style.left.px]="menuX" (click)="$event.stopPropagation()">
+              <div class="menu-item" (click)="onMenuAction('details', entry)">View Details</div>
+              <div class="menu-item" (click)="onMenuAction('delete', entry)">Delete</div>
+            </div>
+          }
         }
-      }
+      </div>
     </div>
-  </div>
-</ng-template>
+  </ng-template>
+</div>

@@ -45,11 +45,14 @@ export class CustomTooltipPlugin {
     }
 
     const hideTooltip = () => {
-      tooltip.style.display = 'none';
+      //@ts-ignore
+      ref.tooltipEvents.emit({ type: 'HIDE' });
+      // tooltip.style.display = 'none';
     };
 
     const showTooltip = () => {
-      tooltip.style.display = 'block';
+      //@ts-ignore
+      ref.tooltipEvents.emit({ type: 'SHOW' });
     };
 
     const tooltip = this.createTooltipElement();
@@ -108,6 +111,7 @@ export class CustomTooltipPlugin {
         },
         // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
+          //@ts-ignore
           // this is called for all linked charts
           if (chartIsLocked()) {
             return;
@@ -122,6 +126,7 @@ export class CustomTooltipPlugin {
           if (!cursorIsOnChartArea) {
             return;
           }
+          console.log('cursor inside');
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || idx === null || left === undefined) {
             // some weird uPlot behaviour. it happens to be -10 many times
@@ -138,18 +143,27 @@ export class CustomTooltipPlugin {
             chartRef: u,
             parentRef: ref,
           };
-          let shouldBeVisible = renderContent(tooltip, contextData);
+          //@ts-ignore
+          const shouldBeVisible = ref.renderCustomTooltipFn(contextData); // You can still check visibility logic here
           if (!shouldBeVisible) {
-            hideTooltip();
+            //@ts-ignore
+            ref.tooltipVisibilityChange.emit(false);
             return;
           }
 
-          // there is no easy way to cache these. when the div gets smaller without a resize, the bbox is not updated.
+          // Emit event to parent, which will handle positioning using cdkOverlay
           const boundingClientRect = over.getBoundingClientRect();
+          const padding = 20;
 
-          const anchor: TooltipAnchor = { left: left + boundingClientRect.left, top: top + boundingClientRect.top };
-          const container = this.getAdjustedBoundaries(bound);
-          TooltipPlacementFunction.placement(tooltip, anchor, 'right', 'start', container);
+          //@ts-ignore
+          ref.tooltipEvents.emit({
+            type: 'POSITION_CHANGED',
+            payload: {
+              x: left + boundingClientRect.left,
+              y: top + boundingClientRect.top,
+              data: contextData,
+            },
+          });
         },
       },
     };
