@@ -187,9 +187,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   showVersionsDialog(): void {
-    if (this._authService.hasRight$('admin-ui-menu')) {
-      this._matDialog.open(VersionsDialogComponent);
-    }
+    this._authService
+      .hasRight$('admin-ui-menu')
+      .subscribe((hasRight) => hasRight && this._matDialog.open(VersionsDialogComponent));
   }
 
   handleScroll($event: Event): void {
