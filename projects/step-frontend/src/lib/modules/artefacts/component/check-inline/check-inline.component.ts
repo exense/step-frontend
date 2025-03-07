@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactInlineItem,
   ArtefactInlineItemsBuilderService,
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,

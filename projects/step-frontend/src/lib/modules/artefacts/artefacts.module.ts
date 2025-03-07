@@ -74,6 +74,7 @@ import { ForEachReportDetailsComponent } from './component/for-each-report-detai
 import { AssertReportDetailsComponent } from './component/assert-report-details/assert-report-details.component';
 import { WhileInlineComponent } from './component/while-inline/while-inline.component';
 import { WhileReportDetailsComponent } from './component/while-report-details/while-report-details.component';
+import { ForReportDetailsComponent } from './component/for-report-details/for-report-details.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +121,7 @@ import { WhileReportDetailsComponent } from './component/while-report-details/wh
     TestSetReportDetailsComponent,
     ForComponent,
     ForInlineComponent,
+    ForReportDetailsComponent,
     WhileComponent,
     WhileInlineComponent,
     WhileReportDetailsComponent,
@@ -195,6 +197,7 @@ import { WhileReportDetailsComponent } from './component/while-report-details/wh
     TestSetReportDetailsComponent,
     ForComponent,
     ForInlineComponent,
+    ForReportDetailsComponent,
     WhileComponent,
     WhileInlineComponent,
     WhileReportDetailsComponent,
@@ -271,6 +274,7 @@ export class ArtefactsModule {
       icon: 'cpu',
       component: ForComponent,
       inlineComponent: ForInlineComponent,
+      reportDetailsComponent: ForReportDetailsComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
     });
     this._artefactService.register('ForEach', {

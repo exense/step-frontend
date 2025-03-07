@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactLegacyComponent } from '@exense/step-core';
-import { Observable, of } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ArtefactInlineItemsBuilderService,
+  ArtefactInlineItemUtilsService,
+  BaseInlineArtefactComponent,
+} from '@exense/step-core';
 import { ForArtefact } from '../../types/for.artefact';
 import { ForReportNode } from '../../types/for.report-node';
 
@@ -8,38 +11,27 @@ import { ForReportNode } from '../../types/for.report-node';
   selector: 'step-for-inline',
   templateUrl: './for-inline.component.html',
   styleUrl: './for-inline.component.scss',
+  host: {
+    class: 'execution-report-node-inline-details',
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ForInlineComponent extends BaseInlineArtefactLegacyComponent<ForArtefact, ForReportNode> {
-  protected getItems(
-    artefact?: ForArtefact,
-    isVertical?: boolean,
-    isResolved?: boolean,
-  ): ArtefactInlineItem[] | undefined {
-    return undefined;
-  }
+export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact, ForReportNode> {
+  private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
+  private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
+    .builder<ForArtefact, ForReportNode>()
+    .extractArtefactItems((artefact, isResolved) => {
+      if (!artefact) {
+        return undefined;
+      }
+      return this._artefactInlineItemUtils.convert([
+        [undefined, artefact.dataSource!.start],
+        ['to', artefact.dataSource!.end],
+        ['by', artefact.dataSource!.inc],
+        ['threads', artefact.threads],
+        ['max failures', artefact.maxFailedLoops],
+      ]);
+    });
 
-  protected override getReportNodeItems(info?: ForReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
-    return this.convert([
-      ['Count', info?.count],
-      ['Error Count', info?.errorCount],
-    ]);
-  }
-
-  protected override getArtefactItems(
-    info?: AggregatedArtefactInfo<ForArtefact, ForReportNode>,
-    isVertical?: boolean,
-    isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[]> {
-    const dataSource = info?.originalArtefact?.dataSource;
-    return of(
-      this.convert(
-        [
-          ['Start', dataSource?.start],
-          ['End', dataSource?.end],
-          ['Increment', dataSource?.inc],
-        ],
-        isResolved,
-      ),
-    );
-  }
+  protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));
 }
