@@ -1,4 +1,4 @@
-<div style="background: yellow; padding: 12px; min-width: 200px">
+<div class="tooltip-container">
   @if (elipsisBefore) {
     <div class="dots">...</div>
   }
@@ -24,15 +24,12 @@
       <div class="right" [class.bold]="entry.bold">
         {{ entry.formattedValue || entry.value || 0 }}
         @if (!entry.isSummary) {
-          <span class="link-icon" (click)="openMenu(entry, $event)" matTooltip="test"></span>
-          {{ menuX }}
-
-          @if (activeMenuEntry === entry) {
-            <div class="inline-menu" [style.top.px]="menuY" [style.left.px]="menuX" (click)="$event.stopPropagation()">
-              <div class="menu-item" (click)="onMenuAction('details', entry)">View Details</div>
-              <div class="menu-item" (click)="onMenuAction('delete', entry)">Delete</div>
-            </div>
-          }
+          <span matTooltip="See Execution" class="link-icon" [matMenuTriggerFor]="executionsMenu"></span>
+          <mat-menu #executionsMenu class="ts-tooltip" panelClass="tooltip-menu">
+            <ng-template matMenuContent>
+              <step-tooltip-executions-menu [executions]="entry.executionsFn | async" />
+            </ng-template>
+          </mat-menu>
         }
       </div>
     </div>

@@ -126,7 +126,6 @@ export class CustomTooltipPlugin {
           if (!cursorIsOnChartArea) {
             return;
           }
-          console.log('cursor inside');
           const { left, top, idx } = u.cursor;
           if (!top || top < 0 || idx === null || left === undefined) {
             // some weird uPlot behaviour. it happens to be -10 many times

@@ -1,0 +1,14 @@
+<div>
+  @if (executions() === null) {
+    <mat-spinner />
+  } @else {
+    @for (execution of transformedExecutions(); track execution.id) {
+      <div class="link-row" (click)="navigateToExecution(execution.id)">
+        {{ execution.name }} ({{ execution.formattedDate }})
+      </div>
+    }
+    @if (executions()!.length === 0) {
+      <div>No executions found</div>
+    }
+  }
+</div>

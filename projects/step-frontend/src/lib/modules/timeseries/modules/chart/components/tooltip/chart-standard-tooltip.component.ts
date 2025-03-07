@@ -13,13 +13,15 @@ import {
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../../_common';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipRowEntry } from '../../types/tooltip-row-entry';
-import { MarkerType } from '@exense/step-core';
+import { Execution, ExecutionsService, MarkerType } from '@exense/step-core';
 import { SeriesStroke } from '../../../_common/types/time-series/series-stroke';
 import { NgTemplateOutlet } from '@angular/common';
 import { TsTooltipOptions } from '../../types/ts-tooltip-options';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatMenuTrigger } from '@angular/material/menu';
+import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TooltipExecutionsMenuComponent } from './executions-menu/tooltip-executions-menu.component';
+import { Observable, of } from 'rxjs';
 
 /**
  * This component represents a visual effect for a loading chart.
@@ -29,59 +31,32 @@ import { MatTooltip } from '@angular/material/tooltip';
   templateUrl: './chart-standard-tooltip.component.html',
   styleUrls: ['./chart-standard-tooltip.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, NgTemplateOutlet, MatProgressSpinner, MatMenuTrigger, MatTooltip],
+  imports: [
+    COMMON_IMPORTS,
+    NgTemplateOutlet,
+    MatProgressSpinner,
+    MatMenuTrigger,
+    MatTooltip,
+    MatMenu,
+    TooltipExecutionsMenuComponent,
+    MatMenuContent,
+  ],
 })
 export class ChartStandardTooltipComponent {
   //@ts-ignore
   data = signal<TooltipContextData>(null);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
-  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _executionsService = inject(ExecutionsService);
 
   elipsisBefore = false;
   elipsisAfter = false;
   summaryEntry: TooltipRowEntry | undefined;
 
   activeMenuEntry: any = null;
-  menuX = 0;
-  menuY = 0;
 
-  // Open menu at mouse position
-  openMenu(entry: any, event: MouseEvent) {
-    // event.stopPropagation();
-    this.menuX = 100;
-    console.log('x', this.menuX);
-    this._changeDetectorRef.detectChanges();
-    // if (this.activeMenuEntry === entry) {
-    //   this.closeMenu();
-    //   return;
-    // }
-
-    this.activeMenuEntry = entry;
-    // this.menuX = event.clientX + 5; // Offset a bit
-    // this.menuY = event.clientY + 5;
-
-    // setTimeout(() => {
-    //   document.addEventListener('click', this.closeMenuOnOutsideClick, true);
-    // });
-  }
-
-  // Handle outside click
-  closeMenuOnOutsideClick = (event: MouseEvent) => {
-    if (!(event.target as HTMLElement)?.closest('.inline-menu')) {
-      this.closeMenu();
-    }
-  };
-
-  closeMenu() {
-    this.activeMenuEntry = null;
-    document.removeEventListener('click', this.closeMenuOnOutsideClick, true);
-  }
-
-  // Menu actions handler
-  onMenuAction(action: string, entry: any) {
-    console.log(`Action: ${action} for`, entry);
-    this.closeMenu();
+  constructor() {
+    console.log('CREATED===========');
   }
 
   timestamp = computed(() => {
@@ -101,7 +76,8 @@ export class ChartStandardTooltipComponent {
     if (!this.data()) {
       return;
     }
-    const contextData = this.data()!;
+    const contextData: TooltipContextData = this.data()!;
+    console.log('data updated');
     const settings: TsTooltipOptions = contextData.parentRef.settings.tooltipOptions;
     const idx: number = contextData.idx!;
     if (idx === undefined || contextData.idY === undefined) {
@@ -117,8 +93,12 @@ export class ChartStandardTooltipComponent {
       if (series.show) {
         if (series.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY) {
           if (bucketValue != undefined) {
-            const executionIds =
-              contextData.parentRef.chartMetadata[i]?.[idx]?.[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+            const executionIds: string[] =
+              contextData.parentRef.chartMetadata[i + 1]?.[idx]?.[TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
+            let executionFn: Observable<Execution[]> = of([]);
+            if (executionIds?.length > 0) {
+              executionFn = this._executionsService.getExecutionsByIds(executionIds);
+            }
             yPoints.push({
               value: bucketValue,
               formattedValue: this.formatValue(bucketValue, settings.yAxisUnit),
@@ -126,6 +106,7 @@ export class ChartStandardTooltipComponent {
               // @ts-ignore
               stroke: series.strokeConfig,
               executions: executionIds,
+              executionsFn: executionFn,
               markerClassName: this.getMarkerClass(series.strokeConfig!),
             });
           }

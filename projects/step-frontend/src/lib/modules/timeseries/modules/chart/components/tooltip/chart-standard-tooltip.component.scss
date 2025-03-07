@@ -1,3 +1,49 @@
+.tooltip-container {
+  z-index: 100;
+  display: block;
+  margin: 0 2.4rem;
+  top: 0; // this is a tricky fix. if top is not set it will make the container overflow
+  cursor: default;
+  background: #fffaf2d9;
+  padding: 8px 12px;
+  box-shadow: 2px 2px 5px 2px #a3a3a3;
+
+  .tooltip-row {
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-direction: row;
+    white-space: nowrap;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+
+    .left {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      margin-right: 2rem;
+    }
+
+    .right {
+      white-space: nowrap;
+      display: flex;
+    }
+
+    .color {
+      width: 2rem;
+      height: 1rem;
+      margin-right: 0.8rem;
+    }
+
+    .name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 40rem;
+    }
+  }
+}
+
 .tooltip-row {
   .left {
     gap: 0.8rem;
@@ -37,4 +83,12 @@
 .custom-tooltip-panel {
   opacity: 0;
   transition: opacity 50ms ease-in;
+}
+
+.separator {
+  height: 1px;
+  width: 100%;
+  background: #666666;
+  margin: 0.4rem 0;
+  opacity: 0.2;
 }
