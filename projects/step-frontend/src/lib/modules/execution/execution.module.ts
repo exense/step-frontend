@@ -119,6 +119,8 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
+import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
+import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 
 @NgModule({
   declarations: [
@@ -193,6 +195,8 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     ExecutionsChartTooltipComponent,
     ErrorDetailsMenuComponent,
     AltExecutionErrorsComponent,
+    AgentsCellComponent,
+    AgentsModalComponent,
   ],
   imports: [
     StepCommonModule,

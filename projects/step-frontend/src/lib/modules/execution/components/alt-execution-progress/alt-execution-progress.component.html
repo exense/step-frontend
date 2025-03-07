@@ -60,6 +60,17 @@
           </step-popover-content>
         </step-popover>
       }
+      @if (agentsInvolved$ | async; as agentsInvolved) {
+        <button
+          type="button"
+          mat-icon-button
+          color="default"
+          (click)="_dialogs.openAgentsModal(agentsInvolved, execution?.description || 'Unknown plan')"
+          matTooltip="Show agents"
+        >
+          <step-icon name="agent" />
+        </button>
+      }
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }

@@ -1,0 +1,7 @@
+<ng-container *ngIf="agentsArray().length > 1; else singleAgent">
+  <span>{{ agentsArray().length }} agents </span>
+  <a href="#" (click)="openModal($event)"> (show) </a>
+</ng-container>
+<ng-template #singleAgent>
+  <span>{{ agents() }}</span>
+</ng-template>

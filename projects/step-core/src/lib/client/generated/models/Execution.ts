@@ -9,6 +9,7 @@ import type { ImportResult } from './ImportResult';
 import type { ReportExport } from './ReportExport';
 
 export type Execution = {
+  agentsInvolved: string;
   customFields?: Record<string, any>;
   attributes?: Record<string, string>;
   startTime?: number;
