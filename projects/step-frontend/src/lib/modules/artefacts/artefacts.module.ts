@@ -75,6 +75,8 @@ import { AssertReportDetailsComponent } from './component/assert-report-details/
 import { WhileInlineComponent } from './component/while-inline/while-inline.component';
 import { WhileReportDetailsComponent } from './component/while-report-details/while-report-details.component';
 import { ForReportDetailsComponent } from './component/for-report-details/for-report-details.component';
+import { ThreadGroupInlineComponent } from './component/thread-group-inline/thread-group-inline.component';
+import { ThreadGroupReportDetailsComponent } from './component/thread-group-report-details/thread-group-report-details.component';
 
 @NgModule({
   declarations: [
@@ -82,6 +84,8 @@ import { ForReportDetailsComponent } from './component/for-report-details/for-re
     EchoInlineComponent,
     EchoReportDetailsComponent,
     ThreadGroupComponent,
+    ThreadGroupInlineComponent,
+    ThreadGroupReportDetailsComponent,
     AssertComponent,
     AssertInlineComponent,
     AssertReportDetailsComponent,
@@ -158,6 +162,8 @@ import { ForReportDetailsComponent } from './component/for-report-details/for-re
     EchoInlineComponent,
     EchoReportDetailsComponent,
     ThreadGroupComponent,
+    ThreadGroupInlineComponent,
+    ThreadGroupReportDetailsComponent,
     AssertComponent,
     AssertInlineComponent,
     AssertReportDetailsComponent,
@@ -374,6 +380,8 @@ export class ArtefactsModule {
     this._artefactService.register('ThreadGroup', {
       icon: 'plan-threadgroup',
       component: ThreadGroupComponent,
+      inlineComponent: ThreadGroupInlineComponent,
+      reportDetailsComponent: ThreadGroupReportDetailsComponent,
       description: 'Starts multiple threads which will execute the node content in parallel',
     });
     this._artefactService.register('BeforeThread', {
