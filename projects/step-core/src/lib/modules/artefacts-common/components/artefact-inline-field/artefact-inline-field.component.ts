@@ -20,6 +20,9 @@ export class ArtefactInlineFieldComponent {
 
   readonly item = input.required<ArtefactInlineItem>();
 
+  protected readonly prefix = computed(() => this.item()?.prefix);
+  protected readonly suffix = computed(() => this.item()?.suffix);
+
   protected readonly itemLabel = computed(() => {
     const item = this.item();
     if (!item.isLabelResolved) {

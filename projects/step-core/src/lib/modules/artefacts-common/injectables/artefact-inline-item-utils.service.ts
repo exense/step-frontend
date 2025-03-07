@@ -20,6 +20,9 @@ export interface ArtefactInlineItemConfig {
   icon?: string;
   iconTooltip?: string;
   itemTimeValueUnit?: TimeUnitDictKey;
+  isValueFirst?: boolean;
+  prefix?: string;
+  suffix?: string;
 }
 
 export type ArtefactInlineItemSource = (
@@ -66,13 +69,18 @@ export class ArtefactInlineItemUtilsService {
           ? this.prepareTimeValue(config.itemValue as DynamicValueInteger, config.itemTimeValueUnit)
           : this.prepareDynamicValue(config.itemValue, isResolved);
 
+      const { icon, iconTooltip, isValueFirst, prefix, suffix } = config;
+
       return {
-        label: label!,
+        label,
         isLabelResolved,
         value,
         isValueResolved,
-        icon: config.icon,
-        iconTooltip: config.iconTooltip,
+        icon,
+        iconTooltip,
+        isValueFirst,
+        prefix,
+        suffix,
       };
     });
   }
@@ -81,7 +89,7 @@ export class ArtefactInlineItemUtilsService {
     value: PossibleValue,
     isResolved?: boolean,
   ): { value: DynamicValue | undefined; isResolved?: boolean } {
-    if (!value) {
+    if (value === null || value === undefined) {
       return { value: value as undefined, isResolved: true };
     }
     const isDynamic = this._artefactService.isDynamicValue(value);

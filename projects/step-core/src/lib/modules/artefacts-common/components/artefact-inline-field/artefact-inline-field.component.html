@@ -1,4 +1,7 @@
 @if (item(); as item) {
+  @if (prefix(); as prefix) {
+    <span>{{ prefix }}</span>
+  }
   <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
     @if (item.icon) {
       <step-icon
@@ -8,28 +11,56 @@
         matTooltipPosition="below"
       />
     }
-    @if (item.label; as label) {
-      <label
-        [ngClass]="{
-          unresolved: !item.isLabelResolved,
-          resolved: item.isLabelResolved && !label.dynamic,
-          'dynamic-resolved': item.isLabelResolved && label.dynamic
-        }"
-      >
-        {{ itemLabel() }}:
-      </label>
-    }
-    @if (item.value; as value) {
-      <span
-        [ngClass]="{
-          unresolved: !item.isValueResolved,
-          resolved: item.isValueResolved && !value.dynamic,
-          'dynamic-resolved': item.isValueResolved && value.dynamic
-        }"
-      >
-        {{ itemValue() }}
-      </span>
+    @if (item.isValueFirst) {
+      @if (item.value; as value) {
+        <span
+          [ngClass]="{
+            unresolved: !item.isValueResolved,
+            resolved: item.isValueResolved && !value.dynamic,
+            'dynamic-resolved': item.isValueResolved && value.dynamic
+          }"
+        >
+          {{ itemValue() }}
+        </span>
+      }
+      @if (item.label; as label) {
+        <label
+          [ngClass]="{
+            unresolved: !item.isLabelResolved,
+            resolved: item.isLabelResolved && !label.dynamic,
+            'dynamic-resolved': item.isLabelResolved && label.dynamic
+          }"
+        >
+          {{ itemLabel() }}
+        </label>
+      }
+    } @else {
+      @if (item.label; as label) {
+        <label
+          [ngClass]="{
+            unresolved: !item.isLabelResolved,
+            resolved: item.isLabelResolved && !label.dynamic,
+            'dynamic-resolved': item.isLabelResolved && label.dynamic
+          }"
+        >
+          {{ itemLabel() }}:
+        </label>
+      }
+      @if (item.value; as value) {
+        <span
+          [ngClass]="{
+            unresolved: !item.isValueResolved,
+            resolved: item.isValueResolved && !value.dynamic,
+            'dynamic-resolved': item.isValueResolved && value.dynamic
+          }"
+        >
+          {{ itemValue() }}
+        </span>
+      }
     }
   </section>
   <div class="ellipsis">...</div>
+  @if (suffix(); as suffix) {
+    <span>{{ suffix }}</span>
+  }
 }

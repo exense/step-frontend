@@ -5,6 +5,9 @@ export interface ArtefactInlineItem {
   iconTooltip?: string;
   isLabelResolved?: boolean;
   isValueResolved?: boolean;
-  label: DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
+  label?: DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
   value?: DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
+  isValueFirst?: boolean;
+  prefix?: string;
+  suffix?: string;
 }

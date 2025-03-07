@@ -77,6 +77,8 @@ import { WhileReportDetailsComponent } from './component/while-report-details/wh
 import { ForReportDetailsComponent } from './component/for-report-details/for-report-details.component';
 import { ThreadGroupInlineComponent } from './component/thread-group-inline/thread-group-inline.component';
 import { ThreadGroupReportDetailsComponent } from './component/thread-group-report-details/thread-group-report-details.component';
+import { RetryIfFailsInlineComponent } from './component/retry-if-fails-inline/retry-if-fails-inline.component';
+import { RetryIfFailsReportDetailsComponent } from './component/retry-if-fails-report-details/retry-if-fails-report-details.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +101,8 @@ import { ThreadGroupReportDetailsComponent } from './component/thread-group-repo
     CheckInlineComponent,
     CheckReportDetailsComponent,
     RetryIfFailsComponent,
+    RetryIfFailsInlineComponent,
+    RetryIfFailsReportDetailsComponent,
     CaseComponent,
     CaseInlineComponent,
     CaseReportDetailsComponent,
@@ -177,6 +181,8 @@ import { ThreadGroupReportDetailsComponent } from './component/thread-group-repo
     CheckInlineComponent,
     CheckReportDetailsComponent,
     RetryIfFailsComponent,
+    RetryIfFailsInlineComponent,
+    RetryIfFailsReportDetailsComponent,
     CaseComponent,
     CaseInlineComponent,
     CaseReportDetailsComponent,
@@ -414,6 +420,8 @@ export class ArtefactsModule {
     this._artefactService.register('RetryIfFails', {
       icon: 'repeat',
       component: RetryIfFailsComponent,
+      inlineComponent: RetryIfFailsInlineComponent,
+      reportDetailsComponent: RetryIfFailsReportDetailsComponent,
       description: 'Retry mechanism with grace period',
     });
     this._artefactService.register('Check', {
