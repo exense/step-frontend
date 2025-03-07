@@ -12,6 +12,10 @@ step-artefact-inline-field-list {
     &.vertical {
       flex-direction: column;
       width: 100%;
+
+      step-artefact-inline-field section {
+        max-width: unset;
+      }
     }
 
     &.wrap {

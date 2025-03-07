@@ -71,6 +71,7 @@ import { DataSetInlineComponent } from './component/data-set-inline/data-set-inl
 import { DataSetReportDetailsComponent } from './component/data-set-report-details/data-set-report-details.component';
 import { ForEachInlineComponent } from './component/for-each-inline/for-each-inline.component';
 import { ForEachReportDetailsComponent } from './component/for-each-report-details/for-each-report-details.component';
+import { AssertReportDetailsComponent } from './component/assert-report-details/assert-report-details.component';
 
 @NgModule({
   declarations: [
@@ -80,6 +81,7 @@ import { ForEachReportDetailsComponent } from './component/for-each-report-detai
     ThreadGroupComponent,
     AssertComponent,
     AssertInlineComponent,
+    AssertReportDetailsComponent,
     PlaceholderComponent,
     EmptyInlineComponent,
     EmptyReportDetailsComponent,
@@ -152,6 +154,7 @@ import { ForEachReportDetailsComponent } from './component/for-each-report-detai
     ThreadGroupComponent,
     AssertComponent,
     AssertInlineComponent,
+    AssertReportDetailsComponent,
     PlaceholderComponent,
     EmptyInlineComponent,
     EmptyReportDetailsComponent,
@@ -405,6 +408,7 @@ export class ArtefactsModule {
       icon: 'check',
       component: AssertComponent,
       inlineComponent: AssertInlineComponent,
+      reportDetailsComponent: AssertReportDetailsComponent,
       description: 'Validates the output of a keyword execution.',
     });
     this._artefactService.register('Placeholder', {
