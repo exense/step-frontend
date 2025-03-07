@@ -132,7 +132,12 @@
   </div>
 
   <div id="sidebar-bottom">
-    <span class="version" title="{{ '${project.version}' }}" (click)="showVersionsDialog()">
+    <span
+      class="version"
+      title="{{ '${project.version}' }}"
+      [class.disabled]="!('admin-ui-menu' | hasRight | async)"
+      (click)="showVersionsDialog()"
+    >
       {{ '${project.version}' }}
       <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
       <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>

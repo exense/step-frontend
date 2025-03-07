@@ -411,10 +411,6 @@ $menu-sub-item-height: 3.2rem;
       background: map.get($config, selection-color);
     }
 
-    span.sidebar-version {
-      padding-left: 25px;
-    }
-
     .only-visible-when-collapsed {
       display: none;
     }
@@ -446,11 +442,13 @@ $menu-sub-item-height: 3.2rem;
       text-overflow: ellipsis;
     }
 
+    .version:not(.disabled) {
+      cursor: pointer;
+    }
     .version {
       max-height: 16px;
       max-width: 100%;
       overflow: hidden;
-      cursor: pointer;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
