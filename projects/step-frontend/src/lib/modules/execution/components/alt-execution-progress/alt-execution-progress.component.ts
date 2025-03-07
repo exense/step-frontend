@@ -399,8 +399,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           this.isTreeInitialized = false;
           return;
         }
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath });
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath });
+        // expand all items in tree, due first initialization
+        const expandAllByDefault = !this.isTreeInitialized;
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
   }
