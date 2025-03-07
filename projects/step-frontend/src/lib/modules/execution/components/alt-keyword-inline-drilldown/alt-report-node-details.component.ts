@@ -1,5 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { AugmentedControllerService, ReportNode } from '@exense/step-core';
+import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { catchError, map, of, switchMap } from 'rxjs';
 })
 export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
+  private _artefactService = inject(ArtefactService);
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
@@ -33,4 +34,10 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
   protected readonly children = toSignal(this.children$, { initialValue: [] });
   protected readonly artefactClass = computed(() => this.node().resolvedArtefact?._class);
+
+  protected readonly detailsComponent = computed(() => {
+    const artefactClass = this.artefactClass();
+    const meta = artefactClass ? this._artefactService.getArtefactType(artefactClass) : undefined;
+    return meta?.reportDetailsComponent;
+  });
 }

@@ -1,0 +1,36 @@
+@if (searchCriteria(); as searchCriteria) {
+  <section class="json-container">
+    <step-json-view-expanded
+      [data]="searchCriteria"
+      [limit]="7"
+      [iconsDictionary]="searchCriteriaIcons"
+      labelExpand="Expand all search parameters"
+      labelCollapse="Collapse search parameters"
+    />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copySearchCriteria()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (inputs(); as inputs) {
+  <section class="json-container">
+    <step-json-view-expanded
+      [data]="inputs"
+      [limit]="7"
+      [iconsDictionary]="inputIcons"
+      labelExpand="Expand all inputs"
+      labelCollapse="Collapse inputs"
+    />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInputs()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
+}
+@if (node()?.attachments; as attachments) {
+  @if (attachments.length) {
+    <step-report-details-attachments [attachments]="attachments" />
+  }
+}

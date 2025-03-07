@@ -3,22 +3,14 @@ import {
   AlertType,
   ArtefactFormChangeHelperService,
   BaseArtefactComponent,
+  TIME_UNIT_DICTIONARY,
   TimeConvertersFactoryService,
   TimeUnit,
+  TimeUnitDictKey,
 } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SleepArtefact } from '../../types/sleep.artefact';
-
-export const TIME_UNIT_DICTIONARY = {
-  ms: TimeUnit.MILLISECOND,
-  s: TimeUnit.SECOND,
-  m: TimeUnit.MINUTE,
-  h: TimeUnit.HOUR,
-  d: TimeUnit.DAY,
-};
-
-type DictKey = keyof typeof TIME_UNIT_DICTIONARY;
 
 @Component({
   selector: 'step-sleep',
@@ -56,7 +48,7 @@ export class SleepComponent extends BaseArtefactComponent<SleepArtefact> impleme
       !this.context?.artefact?.duration?.dynamic &&
       !this.context?.artefact?.unit?.dynamic
     ) {
-      const unitKey = this.context.artefact.unit.value.trim().toLowerCase() as DictKey;
+      const unitKey = this.context.artefact.unit.value.trim().toLowerCase() as TimeUnitDictKey;
       const unit = TIME_UNIT_DICTIONARY[unitKey];
 
       const oldValue = this.context.artefact.duration.value ?? 0;

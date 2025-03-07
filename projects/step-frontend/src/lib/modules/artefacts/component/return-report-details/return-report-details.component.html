@@ -1,0 +1,22 @@
+@if (outputItems(); as outputs) {
+  <section class="json-container">
+    <step-json-view-expanded
+      [data]="outputs"
+      [limit]="7"
+      [iconsDictionary]="itemIcons"
+      labelExpand="Expand all outputs"
+      labelCollapse="Collapse outputs"
+    />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
+}
+@if (node()?.attachments; as attachments) {
+  @if (attachments.length) {
+    <step-report-details-attachments [attachments]="attachments" />
+  }
+}

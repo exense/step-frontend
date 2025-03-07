@@ -1,0 +1,74 @@
+@if (item(); as item) {
+  @if (prefix(); as prefix) {
+    <span>{{ prefix }}</span>
+  }
+  <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
+    @if (item.icon) {
+      <step-icon
+        class="field-icon"
+        [name]="item.icon"
+        [matTooltip]="item.iconTooltip ?? ''"
+        matTooltipPosition="below"
+      />
+    }
+    @if (item.isValueFirst) {
+      @if (item.value; as value) {
+        <span
+          [ngClass]="{
+            unresolved: !item.isValueResolved,
+            resolved: item.isValueResolved && !value.dynamic,
+            'dynamic-resolved': item.isValueResolved && value.dynamic
+          }"
+          [matTooltip]="item.valueTooltip ?? ''"
+          matTooltipPosition="below"
+        >
+          {{ itemValue() }}
+        </span>
+      }
+      @if (item.label; as label) {
+        <label
+          [ngClass]="{
+            unresolved: !item.isLabelResolved,
+            resolved: item.isLabelResolved && !label.dynamic,
+            'dynamic-resolved': item.isLabelResolved && label.dynamic
+          }"
+          [matTooltip]="item.labelTooltip ?? ''"
+          matTooltipPosition="below"
+        >
+          {{ itemLabel() }}
+        </label>
+      }
+    } @else {
+      @if (item.label; as label) {
+        <label
+          [ngClass]="{
+            unresolved: !item.isLabelResolved,
+            resolved: item.isLabelResolved && !label.dynamic,
+            'dynamic-resolved': item.isLabelResolved && label.dynamic
+          }"
+          [matTooltip]="item.labelTooltip ?? ''"
+          matTooltipPosition="below"
+        >
+          {{ itemLabel() }}:
+        </label>
+      }
+      @if (item.value; as value) {
+        <span
+          [ngClass]="{
+            unresolved: !item.isValueResolved,
+            resolved: item.isValueResolved && !value.dynamic,
+            'dynamic-resolved': item.isValueResolved && value.dynamic
+          }"
+          [matTooltip]="item.valueTooltip ?? ''"
+          matTooltipPosition="below"
+        >
+          {{ itemValue() }}
+        </span>
+      }
+    }
+  </section>
+  <div class="ellipsis">...</div>
+  @if (suffix(); as suffix) {
+    <span>{{ suffix }}</span>
+  }
+}

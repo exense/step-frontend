@@ -15,7 +15,7 @@ import { map, Observable } from 'rxjs';
 import { AbstractArtefact, CallFunction, DynamicValueString } from '../../client/step-client-module';
 import { DynamicFieldObjectValue, SchemasFactoryService } from '../../modules/dynamic-forms/dynamic-forms.module';
 import { EntityTypeResolver } from '../../modules/entity/injectables/entity-type-resolver';
-import { ArtefactRefreshNotificationService } from '../../services/artefact-refresh-notification.service';
+import { ArtefactRefreshNotificationService } from '../../modules/artefacts-common/injectables/artefact-refresh-notification.service';
 import { DynamicAttributePipe } from '../../pipes/dynamic-attribute.pipe';
 import { Entity } from '../../modules/entity/types/entity';
 import { HintFor } from '../../shared/hint-for.enum';

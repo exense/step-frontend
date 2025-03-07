@@ -1,6 +1,6 @@
 @if (node(); as node) {
-  @if (artefactClass() === 'CallKeyword') {
-    <step-report-node-artefact-details [reportInfo]="node" />
+  @if (detailsComponent(); as detailsComponent) {
+    <step-custom-item-render [component]="detailsComponent" [context]="node" />
   } @else {
     <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
     <!--Assertion errors-->

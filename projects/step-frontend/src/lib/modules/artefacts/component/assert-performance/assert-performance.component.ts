@@ -1,17 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
-import { KeyValue } from '@angular/common';
+import { Component, inject, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { BaseArtefactComponent, dynamicValueFactory, ArtefactFormChangeHelperService } from '@exense/step-core';
-import { AggregatorType, AssertOperatorType } from '@exense/step-core';
+import { AssertOperatorType } from '@exense/step-core';
 import { AssertPerformanceArtefact } from '../../types/assert-performance.artefact';
+import { AssertPerformanceListService } from '../../injectables/assert-performance-list.service';
 
 const { createDynamicValueString } = dynamicValueFactory();
-
-type OperatorTypeItem = KeyValue<AssertOperatorType, string>;
-type AggregatorTypeItem = KeyValue<AggregatorType, string>;
-
-const createOperatorTypeItem = (key: AssertOperatorType, value: string): OperatorTypeItem => ({ key, value });
-const createAggregatorTypeItem = (key: AggregatorType, value: string): AggregatorTypeItem => ({ key, value });
 
 @Component({
   selector: 'step-assert-performance',
@@ -20,22 +14,10 @@ const createAggregatorTypeItem = (key: AggregatorType, value: string): Aggregato
   providers: [ArtefactFormChangeHelperService],
 })
 export class AssertPerformanceComponent extends BaseArtefactComponent<AssertPerformanceArtefact> {
+  protected readonly _lists = inject(AssertPerformanceListService);
+
   @ViewChild('form')
   protected form!: NgForm;
-
-  readonly operatorTypes: OperatorTypeItem[] = [
-    createOperatorTypeItem(AssertOperatorType.EQUALS, 'equals'),
-    createOperatorTypeItem(AssertOperatorType.HIGHER_THAN, 'higher than'),
-    createOperatorTypeItem(AssertOperatorType.LOWER_THAN, 'lower than'),
-  ];
-
-  readonly aggregatorTypes: AggregatorTypeItem[] = [
-    createAggregatorTypeItem(AggregatorType.AVG, 'average'),
-    createAggregatorTypeItem(AggregatorType.MAX, 'max'),
-    createAggregatorTypeItem(AggregatorType.MIN, 'min'),
-    createAggregatorTypeItem(AggregatorType.COUNT, 'count'),
-    createAggregatorTypeItem(AggregatorType.SUM, 'sum'),
-  ];
 
   override contextChange(): void {
     super.contextChange();

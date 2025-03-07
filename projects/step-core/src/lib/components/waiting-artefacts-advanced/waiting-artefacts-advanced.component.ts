@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractArtefact, DynamicValueBoolean } from '../../client/step-client-module';
-import { BaseArtefactComponent } from '../base-artefact/base-artefact.component';
+import { BaseArtefactComponent } from '../../modules/artefacts-common/components/base-artefact.component';
 import { NgForm } from '@angular/forms';
 import { ArtefactFormChangeHelperService, ArtefactContext } from '../../modules/plan-common';
 

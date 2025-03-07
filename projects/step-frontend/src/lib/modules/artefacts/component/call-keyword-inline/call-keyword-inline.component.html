@@ -4,16 +4,4 @@
 @if (outputItems(); as outputItems) {
   <step-artefact-inline-field-list [items]="outputItems" hiddenItemsTooltipSuffix="additional output(s)" />
 }
-@if (attachmentsCountTooltip() || error()) {
-  <section class="etc-container">
-    @if (attachmentsCountTooltip(); as tooltip) {
-      <step-icon name="paperclip" [matTooltip]="tooltip" />
-    }
-    @if (error(); as error) {
-      <div class="error-container">
-        <step-icon name="alert-triangle" />
-        <div [matTooltip]="error" matTooltipPosition="below">{{ error }}</div>
-      </div>
-    }
-  </section>
-}
+<step-artefact-inline-additional-info [context]="currentContext()" />

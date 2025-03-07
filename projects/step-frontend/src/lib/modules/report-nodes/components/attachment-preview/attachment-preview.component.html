@@ -1,7 +1,0 @@
-<a target="_blank" [href]="attachment | attachmentUrl: true">
-  <img *ngIf="attachment | attachmentIsImage" class="att-thumbnail" [src]="attachment | attachmentUrl" />
-  <div *ngIf="attachment | attachmentShowLabel" class="att-preview-label">
-    <step-icon *ngIf="attachment | attachmentIsText" name="file"></step-icon>
-    <span>{{ attachment?.name }}</span>
-  </div>
-</a>

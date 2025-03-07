@@ -1,0 +1,7 @@
+@if (hasAttachments()) {
+  <div class="att-preview">
+    @for (item of attachments(); track item.id) {
+      <step-attachment-preview [attachment]="item" />
+    }
+  </div>
+}
