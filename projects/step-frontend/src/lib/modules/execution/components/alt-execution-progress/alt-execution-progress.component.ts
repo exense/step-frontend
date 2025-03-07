@@ -147,6 +147,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
+  protected readonly AlertType = AlertType;
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -473,6 +474,4 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
     });
   }
-
-  protected readonly AlertType = AlertType;
 }
