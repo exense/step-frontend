@@ -72,6 +72,8 @@ import { DataSetReportDetailsComponent } from './component/data-set-report-detai
 import { ForEachInlineComponent } from './component/for-each-inline/for-each-inline.component';
 import { ForEachReportDetailsComponent } from './component/for-each-report-details/for-each-report-details.component';
 import { AssertReportDetailsComponent } from './component/assert-report-details/assert-report-details.component';
+import { WhileInlineComponent } from './component/while-inline/while-inline.component';
+import { WhileReportDetailsComponent } from './component/while-report-details/while-report-details.component';
 
 @NgModule({
   declarations: [
@@ -119,6 +121,8 @@ import { AssertReportDetailsComponent } from './component/assert-report-details/
     ForComponent,
     ForInlineComponent,
     WhileComponent,
+    WhileInlineComponent,
+    WhileReportDetailsComponent,
     SessionComponent,
     SessionInlineComponent,
     SessionReportDetailsComponent,
@@ -192,6 +196,8 @@ import { AssertReportDetailsComponent } from './component/assert-report-details/
     ForComponent,
     ForInlineComponent,
     WhileComponent,
+    WhileInlineComponent,
+    WhileReportDetailsComponent,
     SessionComponent,
     SessionInlineComponent,
     SessionReportDetailsComponent,
@@ -277,6 +283,8 @@ export class ArtefactsModule {
     this._artefactService.register('While', {
       icon: 'rotate-cw',
       component: WhileComponent,
+      inlineComponent: WhileInlineComponent,
+      reportDetailsComponent: WhileReportDetailsComponent,
       description: 'Iterates over the node content until the given condition is not met',
     });
     this._artefactService.register('DataSet', {
