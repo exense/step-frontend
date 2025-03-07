@@ -16,7 +16,9 @@ type PossibleValue = string | number | boolean | DynamicValue | undefined;
 
 export interface ArtefactInlineItemConfig {
   itemLabel?: PossibleValue;
+  itemLabelTooltip?: string;
   itemValue?: PossibleValue;
+  itemValueTooltip?: string;
   icon?: string;
   iconTooltip?: string;
   itemTimeValueUnit?: TimeUnitDictKey;
@@ -69,12 +71,22 @@ export class ArtefactInlineItemUtilsService {
           ? this.prepareTimeValue(config.itemValue as DynamicValueInteger, config.itemTimeValueUnit)
           : this.prepareDynamicValue(config.itemValue, isResolved);
 
-      const { icon, iconTooltip, isValueFirst, prefix, suffix } = config;
+      const {
+        icon,
+        iconTooltip,
+        isValueFirst,
+        prefix,
+        suffix,
+        itemLabelTooltip: labelTooltip,
+        itemValueTooltip: valueTooltip,
+      } = config;
 
       return {
         label,
+        labelTooltip,
         isLabelResolved,
         value,
+        valueTooltip,
         isValueResolved,
         icon,
         iconTooltip,

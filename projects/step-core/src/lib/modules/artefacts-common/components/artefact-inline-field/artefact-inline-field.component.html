@@ -19,6 +19,8 @@
             resolved: item.isValueResolved && !value.dynamic,
             'dynamic-resolved': item.isValueResolved && value.dynamic
           }"
+          [matTooltip]="item.valueTooltip ?? ''"
+          matTooltipPosition="below"
         >
           {{ itemValue() }}
         </span>
@@ -30,6 +32,8 @@
             resolved: item.isLabelResolved && !label.dynamic,
             'dynamic-resolved': item.isLabelResolved && label.dynamic
           }"
+          [matTooltip]="item.labelTooltip ?? ''"
+          matTooltipPosition="below"
         >
           {{ itemLabel() }}
         </label>
@@ -42,6 +46,8 @@
             resolved: item.isLabelResolved && !label.dynamic,
             'dynamic-resolved': item.isLabelResolved && label.dynamic
           }"
+          [matTooltip]="item.labelTooltip ?? ''"
+          matTooltipPosition="below"
         >
           {{ itemLabel() }}:
         </label>
@@ -53,6 +59,8 @@
             resolved: item.isValueResolved && !value.dynamic,
             'dynamic-resolved': item.isValueResolved && value.dynamic
           }"
+          [matTooltip]="item.valueTooltip ?? ''"
+          matTooltipPosition="below"
         >
           {{ itemValue() }}
         </span>
