@@ -1,6 +1,6 @@
-<step-modal-window [title]="data.description">
+<step-modal-window [title]="_data.description">
   <div step-modal-window-body>
-    <step-table [dataSource]="data.agents">
+    <step-table [dataSource]="_data.agents">
       <ng-container matColumnDef="agent" stepSearchCol>
         <th mat-header-cell *matHeaderCellDef>Agent</th>
         <td mat-cell *matCellDef="let element">{{ element }}</td>
@@ -8,6 +8,6 @@
     </step-table>
   </div>
   <div step-modal-window-buttons>
-    <button type="button" (click)="close()" mat-stroked-button>Close</button>
+    <button type="button" matDialogClose mat-stroked-button>Close</button>
   </div>
 </step-modal-window>

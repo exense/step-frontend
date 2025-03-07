@@ -60,7 +60,7 @@
           </step-popover-content>
         </step-popover>
       }
-      @if (agentsInvolved$ | async; as agentsInvolved) {
+      @if (execution?.agentsInvolved; as agentsInvolved) {
         <button
           type="button"
           mat-icon-button

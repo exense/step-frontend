@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentsModalComponent } from '../execution-agent-modal/execution-agent-modal.component';
 
@@ -7,8 +7,8 @@ import { AgentsModalComponent } from '../execution-agent-modal/execution-agent-m
   templateUrl: './execution-agent-cell.component.html',
 })
 export class AgentsCellComponent {
-  agents = input('');
-  description = input('Agents');
+  readonly agents = input('');
+  readonly description = input('Agents');
 
   protected agentsArray = computed(() =>
     this.agents()
@@ -16,11 +16,11 @@ export class AgentsCellComponent {
       .filter((agent) => agent.trim() !== ''),
   );
 
-  constructor(private dialog: MatDialog) {}
+  private _dialog = inject(MatDialog);
 
-  openModal(event: Event) {
+  protected openModal(event: Event) {
     event.preventDefault();
-    this.dialog.open(AgentsModalComponent, {
+    this._dialog.open(AgentsModalComponent, {
       data: {
         agents: this.agentsArray(),
         description: this.description(),

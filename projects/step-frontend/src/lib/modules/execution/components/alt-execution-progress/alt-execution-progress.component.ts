@@ -217,11 +217,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
   );
-  readonly agentsInvolved$ = this.execution$.pipe(
-    map((execution: Execution) => {
-      return execution.agentsInvolved;
-    }),
-  );
   protected isResolvedParametersVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(

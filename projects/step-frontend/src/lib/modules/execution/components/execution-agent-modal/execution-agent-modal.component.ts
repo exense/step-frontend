@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -6,12 +6,5 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   templateUrl: './execution-agent-modal.component.html',
 })
 export class AgentsModalComponent {
-  constructor(
-    public dialogRef: MatDialogRef<AgentsModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { agents: string[]; description: string },
-  ) {}
-
-  close() {
-    this.dialogRef.close();
-  }
+  protected _data = inject<{ agents: string[]; description: string }>(MAT_DIALOG_DATA);
 }

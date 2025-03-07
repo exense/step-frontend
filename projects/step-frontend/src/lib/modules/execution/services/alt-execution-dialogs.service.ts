@@ -101,7 +101,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   openAgentsModal(involvedAgents: string, description: string) {
     this._matDialog.open(AgentsModalComponent, {
       data: {
-        agents: involvedAgents.split('-').filter((agent) => agent.trim() !== ''),
+        agents: involvedAgents.split(' ').filter((agent) => agent.trim() !== ''),
         description: description,
       },
     });
