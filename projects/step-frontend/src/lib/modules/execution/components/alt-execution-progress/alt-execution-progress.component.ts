@@ -36,6 +36,7 @@ import {
   PopoverMode,
   IncludeTestcases,
   TimeRange,
+  AlertType,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -146,6 +147,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
+  protected readonly AlertType = AlertType;
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),

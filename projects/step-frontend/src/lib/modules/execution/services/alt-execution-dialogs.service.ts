@@ -13,6 +13,8 @@ import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
 import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './report-node-details-query-params.token';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
+import { MatDialog } from '@angular/material/dialog';
+import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -23,6 +25,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _reportNodeDetails = inject(AltReportNodeDetailsStateService);
   private _executionId = inject(EXECUTION_ID);
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+  private _matDialog = inject(MatDialog);
 
   openIterations(
     node: AggregatedTreeNode,
@@ -93,5 +96,14 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     return this._executionsApi
       .getReportNodesByArtefactHash(this._executionId(), artefactHash)
       .pipe(map((response) => response[0]));
+  }
+
+  openAgentsModal(involvedAgents: string, description: string) {
+    this._matDialog.open(AgentsModalComponent, {
+      data: {
+        agents: involvedAgents.split(' ').filter((agent) => agent.trim() !== ''),
+        description: description,
+      },
+    });
   }
 }

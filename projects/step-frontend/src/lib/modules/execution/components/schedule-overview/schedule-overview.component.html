@@ -45,7 +45,7 @@
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (executionsChartSettings) {
-          <step-timeseries-chart [settings]="executionsChartSettings">
+          <step-timeseries-chart [settings]="executionsChartSettings" (zoomChange)="handleMainChartZoom($event)">
             <ng-template tooltipContent let-data>
               <step-executions-chart-tooltip [data]="data" />
             </ng-template>

@@ -174,6 +174,11 @@ export class ScheduleOverviewComponent {
     });
   }
 
+  handleMainChartZoom(timeRange: TimeRange) {
+    timeRange = { from: Math.round(timeRange.from), to: Math.round(timeRange.to) };
+    this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+  }
+
   triggerRefresh() {
     // signal is triggered
     this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
@@ -329,6 +334,7 @@ export class ScheduleOverviewComponent {
       },
       axes: axes,
       bands: this.getDefaultBands(series.length),
+      zoomEnabled: false,
     };
   }
 
@@ -449,6 +455,7 @@ export class ScheduleOverviewComponent {
       },
       axes: axes,
       bands: this.getDefaultBands(series.length),
+      zoomEnabled: false,
     };
   }
 
