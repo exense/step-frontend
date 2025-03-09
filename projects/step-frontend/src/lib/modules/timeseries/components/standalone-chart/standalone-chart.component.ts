@@ -84,7 +84,7 @@ export class StandaloneChartComponent implements OnChanges {
     } else {
       request.numberOfBuckets = 100;
     }
-    return this._timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.createChart(response);
       }),

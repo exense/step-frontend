@@ -304,7 +304,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
       percentiles: this.columnsDefinition.filter((c) => !!c.pclValue).map((c) => c.pclValue!),
     };
     return this._timeSeriesService
-      .getTimeSeries(request)
+      .getMeasurements(request)
       .pipe(map((response) => this.processResponse(response, context)));
   }
 
