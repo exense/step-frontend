@@ -564,6 +564,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   ngOnDestroy(): void {
     this.uplot?.destroy();
+    this.hideTooltip();
   }
 }
 

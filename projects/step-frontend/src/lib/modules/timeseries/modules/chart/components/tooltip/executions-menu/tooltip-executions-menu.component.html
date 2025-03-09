@@ -1,6 +1,6 @@
 <div>
   @if (executions() === null) {
-    <mat-spinner />
+    <mat-spinner [diameter]="20" />
   } @else {
     @for (execution of transformedExecutions(); track execution.id) {
       <div class="link-row" (click)="navigateToExecution(execution.id)">

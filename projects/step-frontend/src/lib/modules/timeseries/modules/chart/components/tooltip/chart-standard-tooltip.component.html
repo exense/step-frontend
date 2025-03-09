@@ -23,7 +23,7 @@
       </div>
       <div class="right" [class.bold]="entry.bold">
         {{ entry.formattedValue || entry.value || 0 }}
-        @if (!entry.isSummary) {
+        @if (!entry.isSummary && settings()?.useExecutionLinks && entry.value) {
           <span matTooltip="See Execution" class="link-icon" [matMenuTriggerFor]="executionsMenu"></span>
           <mat-menu #executionsMenu class="ts-tooltip" panelClass="tooltip-menu">
             <ng-template matMenuContent>

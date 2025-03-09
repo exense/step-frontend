@@ -13,7 +13,7 @@ import {
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../../_common';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipRowEntry } from '../../types/tooltip-row-entry';
-import { Execution, ExecutionsService, MarkerType } from '@exense/step-core';
+import { Execution, ExecutionsService, FetchBucketsRequest, MarkerType, TimeSeriesService } from '@exense/step-core';
 import { SeriesStroke } from '../../../_common/types/time-series/series-stroke';
 import { NgTemplateOutlet } from '@angular/common';
 import { TsTooltipOptions } from '../../types/ts-tooltip-options';
@@ -21,7 +21,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TooltipExecutionsMenuComponent } from './executions-menu/tooltip-executions-menu.component';
-import { Observable, of } from 'rxjs';
+import { defer, Observable, of, switchMap } from 'rxjs';
 
 /**
  * This component represents a visual effect for a loading chart.
@@ -53,11 +53,10 @@ export class ChartStandardTooltipComponent {
   elipsisAfter = false;
   summaryEntry: TooltipRowEntry | undefined;
 
-  activeMenuEntry: any = null;
-
-  constructor() {
-    console.log('CREATED===========');
-  }
+  settings = computed(() => {
+    let tooltipContextData = this.data();
+    return tooltipContextData?.parentRef.settings.tooltipOptions;
+  });
 
   timestamp = computed(() => {
     if (!this.data()) {
@@ -98,6 +97,18 @@ export class ChartStandardTooltipComponent {
             let executionFn: Observable<Execution[]> = of([]);
             if (executionIds?.length > 0) {
               executionFn = this._executionsService.getExecutionsByIds(executionIds);
+            } else if (settings.fetchExecutionsFn) {
+              executionFn = defer(() =>
+                settings.fetchExecutionsFn!(idx, i).pipe(
+                  switchMap((ids) => {
+                    if (ids.length === 0) {
+                      return of([]);
+                    } else {
+                      return this._executionsService.getExecutionsByIds(ids);
+                    }
+                  }),
+                ),
+              );
             }
             yPoints.push({
               value: bucketValue,
