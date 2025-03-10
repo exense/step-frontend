@@ -65,7 +65,7 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
       return result;
     }
     try {
-      const json = JSON.parse(context.input);
+      const json = JSON.parse(context.output);
       if (Object.keys(json).length) {
         result = json;
       }

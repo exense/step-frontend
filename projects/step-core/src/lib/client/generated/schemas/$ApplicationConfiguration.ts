@@ -48,5 +48,8 @@ export const $ApplicationConfiguration = {
     title: {
       type: 'string',
     },
+    forceLegacyReporting: {
+      type: 'boolean',
+    },
   },
 } as const;

@@ -119,6 +119,8 @@ import { ExecutionsChartTooltipComponent } from './components/schedule-overview/
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
+import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
+import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 
 @NgModule({
   declarations: [
@@ -193,6 +195,8 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
     ExecutionsChartTooltipComponent,
     ErrorDetailsMenuComponent,
     AltExecutionErrorsComponent,
+    AgentsCellComponent,
+    AgentsModalComponent,
   ],
   imports: [
     StepCommonModule,
@@ -347,17 +351,22 @@ export class ExecutionModule {
           path: 'open/:id',
           component: ExecutionOpenerComponent,
         },
-        {
-          matcher: (url) => {
-            if (url[0].path === 'list' || url[0].path === 'open') {
-              return null;
-            }
-            return { consumed: url };
+        stepRouteAdditionalConfig(
+          {
+            quickAccessAlias: 'legacyExecutionProgress',
           },
-          canActivate: [legacyExecutionGuard],
-          component: ExecutionProgressComponent,
-          children: [schedulePlanRoute('modal')],
-        },
+          {
+            matcher: (url) => {
+              if (url[0].path === 'list' || url[0].path === 'open') {
+                return null;
+              }
+              return { consumed: url };
+            },
+            canActivate: [legacyExecutionGuard],
+            component: ExecutionProgressComponent,
+            children: [schedulePlanRoute('modal')],
+          },
+        ),
       ],
     });
     this._viewRegistry.registerRoute({
@@ -435,31 +444,36 @@ export class ExecutionModule {
               path: '',
               redirectTo: 'report',
             },
-            {
-              path: 'report',
-              data: {
-                mode: ViewMode.VIEW,
+            stepRouteAdditionalConfig(
+              {
+                quickAccessAlias: 'executionReport',
               },
-              canActivate: [
-                () => {
-                  const ctx = inject(AggregatedReportViewTreeStateContextService);
-                  const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
-                  ctx.setState(treeState);
-                  return true;
+              {
+                path: 'report',
+                data: {
+                  mode: ViewMode.VIEW,
                 },
-              ],
-              children: [
-                {
-                  path: '',
-                  component: AltExecutionReportComponent,
-                },
-                {
-                  path: '',
-                  component: AltExecutionReportControlsComponent,
-                  outlet: 'controls',
-                },
-              ],
-            },
+                canActivate: [
+                  () => {
+                    const ctx = inject(AggregatedReportViewTreeStateContextService);
+                    const treeState = inject(AGGREGATED_TREE_WIDGET_STATE);
+                    ctx.setState(treeState);
+                    return true;
+                  },
+                ],
+                children: [
+                  {
+                    path: '',
+                    component: AltExecutionReportComponent,
+                  },
+                  {
+                    path: '',
+                    component: AltExecutionReportControlsComponent,
+                    outlet: 'controls',
+                  },
+                ],
+              },
+            ),
             {
               path: 'report-print',
               data: {

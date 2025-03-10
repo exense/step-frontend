@@ -13,8 +13,8 @@ export type ApplicationConfiguration = {
   roleManagement?: boolean;
   projectMembershipManagement?: boolean;
   roles?: Array<string>;
-  forceLegacyReporting?: boolean;
   miscParams?: Record<string, string>;
   defaultUrl?: string;
   title?: string;
+  forceLegacyReporting?: boolean;
 };

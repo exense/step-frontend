@@ -8,6 +8,10 @@ step-alt-execution-progress {
   gap: 2rem;
   padding: 0 1.5rem;
 
+  section.no-gap {
+    margin-bottom: -2rem;
+  }
+
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;

@@ -381,16 +381,18 @@ export class PlansService {
    * Returns a new plan instance as template.
    * @param type
    * @param template
+   * @param name
    * @returns Plan default response
    * @throws ApiError
    */
-  public newPlan(type?: string, template?: string): Observable<Plan> {
+  public newPlan(type?: string, template?: string, name?: string): Observable<Plan> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/plans',
       query: {
         type: type,
         template: template,
+        name: name,
       },
     });
   }
@@ -407,6 +409,21 @@ export class PlansService {
       url: '/plans',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns a new plan instance created from the yaml source.
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public newPlanFromYaml(requestBody?: string): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/yaml',
+      body: requestBody,
+      mediaType: 'text/plain',
     });
   }
 

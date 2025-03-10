@@ -10,6 +10,7 @@ import { FilterUtils } from '../types/filter/filter-utils';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
 import { filter, first, map, of } from 'rxjs';
+import { TimeSeriesUtils } from '../types/time-series/time-series-utils';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -69,23 +70,7 @@ export class DashboardUrlParamsService {
   }
 
   private extractTimeRange(params: Params): TimeRangeSelection | undefined {
-    const rangeType = params['rangeType'] as TimeRangeType;
-    switch (rangeType) {
-      case TimeRangeType.ABSOLUTE:
-        const from = parseInt(params['from']);
-        const to = parseInt(params['to']);
-        if (!from || !to) {
-          return undefined;
-        }
-        return { type: rangeType, absoluteSelection: { from: from, to: to } };
-      case TimeRangeType.RELATIVE:
-        const relativeRange = parseInt(params['relativeRange']);
-        return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
-      case TimeRangeType.FULL:
-        return { type: 'FULL' };
-      default:
-        return undefined;
-    }
+    return TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
   }
 
   private decodeUrlFilters(params: Params): UrlFilterAttribute[] {
@@ -148,8 +133,11 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(timeRange: TimeRangePickerSelection) {
+  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number) {
     let params = this.convertTimeRange(timeRange);
+    if (refresh !== undefined) {
+      params['refreshInterval'] = refresh;
+    }
     this.prefixAndPushUrlParams(params);
   }
 
