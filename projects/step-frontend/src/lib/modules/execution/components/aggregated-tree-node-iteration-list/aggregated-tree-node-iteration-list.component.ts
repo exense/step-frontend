@@ -16,8 +16,14 @@ import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import {
   arrayToRegex,
   AugmentedExecutionsService,
+  DateRange,
+  DateUtilsService,
+  FilterConditionFactoryService,
   ItemsPerPageService,
   ReportNode,
+  SearchValue,
+  StepDataSource,
+  TableRemoteDataSourceFactoryService,
   TableSearch,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -44,7 +50,9 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _renderer = inject(Renderer2);
   private _executionState = inject(AltExecutionStateService);
-  private _augmentedExecutionService = inject(AugmentedExecutionsService);
+  private _filterConditionFactory = inject(FilterConditionFactoryService);
+  private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
+  private _dateUtils = inject(DateUtilsService);
 
   readonly statuses = REPORT_NODE_STATUS;
 
@@ -77,10 +85,15 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   private artefactHash = computed(() => this.node().artefactHash);
 
+  private dateRage = toSignal(
+    this._executionState.timeRange$.pipe(map((timeRange) => this._dateUtils.timeRange2DateRange(timeRange))),
+  );
+
   protected readonly dataSource = computed(() => {
     const artefactHash = this.artefactHash();
     const resolvedPartialPath = this.resolvedPartialPath();
-    return this._augmentedExecutionService.getReportNodeDataSource(artefactHash, resolvedPartialPath);
+    const dateRange = this.dateRage();
+    return this.getReportNodeDataSource(artefactHash, resolvedPartialPath, dateRange);
   });
 
   protected readonly keywordParameters = toSignal(
@@ -150,5 +163,34 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const isFilteredByNonPassed = this.isFilteredByNonPassed();
     const statuses = !isFilteredByNonPassed ? this.statuses.filter((status) => status !== Status.PASSED) : [];
     this.statusesCtrl.setValue(statuses);
+  }
+
+  private getReportNodeDataSource(
+    artefactHash?: string,
+    resolvedPartialPath?: string,
+    dateRange?: DateRange,
+  ): StepDataSource<ReportNode> {
+    let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
+    if (artefactHash) {
+      filters = filters ?? {};
+      filters['artefactHash'] = artefactHash;
+    }
+    if (resolvedPartialPath) {
+      filters = filters ?? {};
+      filters['path'] = { value: `^${resolvedPartialPath}`, regex: true };
+    }
+    if (dateRange) {
+      filters = filters ?? {};
+      filters['executionTime'] = this._filterConditionFactory.dateRangeFilterCondition(dateRange);
+    }
+    return this._dataSourceFactory.createDataSource(
+      AugmentedExecutionsService.REPORTS_TABLE_ID,
+      {
+        name: 'name',
+        status: 'status',
+        executionTime: 'executionTime',
+      },
+      filters,
+    );
   }
 }
