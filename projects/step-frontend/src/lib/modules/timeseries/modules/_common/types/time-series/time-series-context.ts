@@ -300,7 +300,7 @@ export class TimeSeriesContext {
           ? filteringSettings.oql!.replace('attributes.', '')
           : filteringSettings.oql!
         : FilterUtils.filtersToOQL(
-            filteringSettings.filterItems,
+            [...filteringSettings.filterItems, ...(filteringSettings.hiddenFilters || [])],
             undefined,
             TimeSeriesUtils.ATTRIBUTES_REMOVAL_FUNCTION,
           );

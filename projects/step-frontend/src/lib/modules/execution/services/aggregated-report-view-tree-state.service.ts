@@ -38,6 +38,11 @@ export class AggregatedReportViewTreeStateContextService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cleanup();
+  }
+
+  cleanup(): boolean {
     this.state = undefined;
+    return true;
   }
 }

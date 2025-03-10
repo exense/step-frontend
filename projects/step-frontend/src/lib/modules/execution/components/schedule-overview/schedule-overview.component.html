@@ -12,13 +12,20 @@
       }
     </div>
   }
-  <div class="range-picker">
+  <div class="action-buttons">
+    <step-autorefresh-toggle
+      [interval]="refreshInterval()"
+      (refresh)="triggerRefresh()"
+      (intervalChange)="handleRefreshIntervalChange($event)"
+    />
     @if (activeTimeRangeSelection()) {
-      <step-time-range-picker
-        (selectionChange)="handleTimeRangeChange($event)"
-        [selectOptions]="timeRangeOptions"
-        [activeSelection]="activeTimeRangeSelection()!"
-      />
+      <div class="range-picker">
+        <step-time-range-picker
+          (selectionChange)="handleTimeRangeChange($event)"
+          [selectOptions]="timeRangeOptions"
+          [activeSelection]="activeTimeRangeSelection()!"
+        />
+      </div>
     }
   </div>
 </section>
@@ -38,7 +45,7 @@
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (executionsChartSettings) {
-          <step-timeseries-chart [settings]="executionsChartSettings">
+          <step-timeseries-chart [settings]="executionsChartSettings" (zoomChange)="handleMainChartZoom($event)">
             <ng-template tooltipContent let-data>
               <step-executions-chart-tooltip [data]="data" />
             </ng-template>

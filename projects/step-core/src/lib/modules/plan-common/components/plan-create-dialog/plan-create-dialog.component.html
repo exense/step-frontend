@@ -1,44 +1,49 @@
 <step-modal-window title="New Plan">
   <div step-modal-window-body>
-    <step-custom-forms [(stModel)]="plan" stScreen="plan" />
-    <step-form-field>
-      <step-label>Editor</step-label>
-      <mat-select [(ngModel)]="planType">
-        <mat-option>
-          <ngx-mat-select-search
-            [formControl]="filterMultiControl"
-            name="filterMultiControl"
-            ngDefaultControl
-            placeholderLabel="Search..."
-            noEntriesFoundLabel="No matching entries found"
-          >
-            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-          </ngx-mat-select-search>
-        </mat-option>
-        @for (item of dropdownItemsFiltered; track item.type) {
-          <mat-option [value]="item.type">{{ item.label }}</mat-option>
-        }
-      </mat-select>
-    </step-form-field>
-    <step-form-field>
-      <step-label>Plan type</step-label>
-      <mat-select [(ngModel)]="template">
-        <mat-option>
-          <ngx-mat-select-search
-            [formControl]="filterMultiTypeControl"
-            name="filterMultiTypeControl"
-            ngDefaultControl
-            placeholderLabel="Search..."
-            noEntriesFoundLabel="No matching entries found"
-          >
-            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-          </ngx-mat-select-search>
-        </mat-option>
-        @for (item of dropdownItemsTypeFiltered$ | async; track item) {
-          <mat-option [value]="item">{{ item }}</mat-option>
-        }
-      </mat-select>
-    </step-form-field>
+    <step-tabs [tabs]="_availableTabs" [(activeTabId)]="selectedTab" [compactTabs]="true"> </step-tabs>
+    @if (selectedTab === 'general') {
+      <step-custom-forms [(stModel)]="plan" stScreen="plan" />
+      <step-form-field>
+        <step-label>Editor</step-label>
+        <mat-select [(ngModel)]="planType">
+          <mat-option>
+            <ngx-mat-select-search
+              [formControl]="filterMultiControl"
+              name="filterMultiControl"
+              ngDefaultControl
+              placeholderLabel="Search..."
+              noEntriesFoundLabel="No matching entries found"
+            >
+              <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+            </ngx-mat-select-search>
+          </mat-option>
+          @for (item of dropdownItemsFiltered; track item.type) {
+            <mat-option [value]="item.type">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </step-form-field>
+      <step-form-field>
+        <step-label>Plan type</step-label>
+        <mat-select [(ngModel)]="template">
+          <mat-option>
+            <ngx-mat-select-search
+              [formControl]="filterMultiTypeControl"
+              name="filterMultiTypeControl"
+              ngDefaultControl
+              placeholderLabel="Search..."
+              noEntriesFoundLabel="No matching entries found"
+            >
+              <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
+            </ngx-mat-select-search>
+          </mat-option>
+          @for (item of dropdownItemsTypeFiltered$ | async; track item) {
+            <mat-option [value]="item">{{ item }}</mat-option>
+          }
+        </mat-select>
+      </step-form-field>
+    } @else {
+      <step-rich-editor [syntaxMode]="AceMode.YAML" name="yaml" [(ngModel)]="yamlPlan" />
+    }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>

@@ -14,6 +14,7 @@ import {
   Observable,
   skip,
   take,
+  debounceTime,
 } from 'rxjs';
 import {
   ArtefactFilter,
@@ -35,6 +36,7 @@ import {
   PopoverMode,
   IncludeTestcases,
   TimeRange,
+  AlertType,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -140,12 +142,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  private _viewAllService = inject(AltExecutionViewAllService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
+  protected readonly AlertType = AlertType;
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -172,8 +174,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.updateTimeRangeSelection({ type: 'FULL' });
   }
 
-  readonly executionId$ = this._activeExecutionContext.executionId$;
-  readonly activeExecution$ = this._activeExecutionContext.activeExecution$;
+  readonly executionId$ = this._activeExecutionContext.executionId$.pipe(shareReplay(1), takeUntilDestroyed());
+
+  readonly activeExecution$ = this._activeExecutionContext.activeExecution$.pipe(shareReplay(1), takeUntilDestroyed());
+
   readonly execution$ = this.activeExecution$.pipe(
     switchMap((active) => active.execution$),
     shareReplay(1),
@@ -192,7 +196,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     });
 
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(skip(1))),
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(300))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -395,8 +399,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           this.isTreeInitialized = false;
           return;
         }
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath });
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath });
+        // expand all items in tree, due first initialization
+        const expandAllByDefault = !this.isTreeInitialized;
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
   }
