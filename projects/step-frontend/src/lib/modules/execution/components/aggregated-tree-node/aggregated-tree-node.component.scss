@@ -8,6 +8,11 @@
   cursor: pointer;
   padding: 0.2rem 0.6rem;
   border-radius: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: wrap;
 }
 
 .aggregated-info {

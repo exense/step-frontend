@@ -53,7 +53,7 @@
               [iconMode]="true"
               (click)="openNodeDetails(element)"
             />
-            {{ element.name }}
+            <span class="name-value">{{ element.name }}</span>
           </div>
           <step-artefact-inline-details [reportInfo]="element" />
         </div>
