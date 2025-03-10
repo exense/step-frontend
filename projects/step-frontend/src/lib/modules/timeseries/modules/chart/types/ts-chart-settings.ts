@@ -2,6 +2,7 @@ import { Axis, Band, Cursor, Hooks, Scale, Scales } from 'uplot';
 import { TsTooltipOptions } from './ts-tooltip-options';
 import { TSChartSeries } from './ts-chart-series';
 import uPlot from '../../_common/types/uPlot';
+import { FetchBucketsRequest } from '@exense/step-core';
 
 export interface TSChartSettings {
   title: string;
@@ -19,6 +20,7 @@ export interface TSChartSettings {
   truncated?: boolean;
   showCursor?: boolean;
   zoomEnabled?: boolean;
+  dataRequest?: FetchBucketsRequest;
 }
 
 export interface XAxesSettings {

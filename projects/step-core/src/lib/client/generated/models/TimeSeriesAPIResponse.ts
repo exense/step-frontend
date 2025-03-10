@@ -13,6 +13,7 @@ export type TimeSeriesAPIResponse = {
   matrixKeys: Array<BucketAttributes>;
   truncated: boolean;
   collectionResolution: number;
+  collectionIgnoredAttributes: string[];
   higherResolutionUsed: boolean;
   ttlCovered: boolean;
 };

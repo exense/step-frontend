@@ -25,7 +25,7 @@ export class FilterUtils {
       .map((key) => {
         const processedAttribute = attributeProcessFn ? attributeProcessFn(key) : key;
         const attribute = attributesPrefix ? `${attributesPrefix}.${processedAttribute}` : processedAttribute;
-        return `${attribute} = ${object[key]}`;
+        return `${attribute} = "${object[key]}"`;
       })
       .join(' and ');
     return `(${clause})`;
