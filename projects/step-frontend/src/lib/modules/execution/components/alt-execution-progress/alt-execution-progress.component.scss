@@ -64,8 +64,12 @@ step-alt-execution-progress {
         div {
           text-overflow: ellipsis;
           overflow: hidden;
-          white-space: nowrap;
           max-width: 90%;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          white-space: wrap;
+          word-break: break-all;
         }
       }
 

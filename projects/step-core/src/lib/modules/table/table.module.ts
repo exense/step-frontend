@@ -194,4 +194,6 @@ export * from './services/table-highlight-item-container.service';
 export * from './services/table-columns-config.provider';
 export * from './services/table-columns.service';
 export * from './services/items-per-page.service';
+export * from './services/table-persistence-state.service';
+export * from './services/table-persistence-url-state.service';
 export * from './types/row-info.interface';

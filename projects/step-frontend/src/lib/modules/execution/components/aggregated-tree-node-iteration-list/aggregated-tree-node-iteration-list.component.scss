@@ -15,6 +15,13 @@ step-table {
   padding-left: 0;
 }
 
+.name-value {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .details-trigger {
   cursor: pointer;
   display: flex;
