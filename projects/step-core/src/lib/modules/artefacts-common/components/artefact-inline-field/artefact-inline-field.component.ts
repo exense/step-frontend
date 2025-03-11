@@ -25,17 +25,11 @@ export class ArtefactInlineFieldComponent {
 
   protected readonly itemLabel = computed(() => {
     const item = this.item();
-    if (!item.isLabelResolved) {
-      return '[unresolved]';
-    }
     return this._artefactsService.convertDynamicValue(item.label);
   });
 
   protected readonly itemValue = computed(() => {
     const item = this.item();
-    if (!item.isValueResolved) {
-      return '[unresolved]';
-    }
     return this._artefactsService.convertDynamicValue(item.value);
   });
 

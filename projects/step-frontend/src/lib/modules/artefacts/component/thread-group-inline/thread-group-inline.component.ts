@@ -33,9 +33,9 @@ export class ThreadGroupInlineComponent extends BaseInlineArtefactComponent<
       const source: ArtefactInlineItemSource = [
         ['threads', artefact.users],
         {
-          itemLabel: 'pacing',
-          itemValue: artefact.pacing,
-          itemTimeValueUnit: 'ms',
+          label: 'pacing',
+          value: artefact.pacing,
+          timeValueUnit: 'ms',
         },
       ];
 
@@ -45,9 +45,9 @@ export class ThreadGroupInlineComponent extends BaseInlineArtefactComponent<
 
       if (artefact.maxDuration.expression || artefact.maxDuration.value) {
         source.push({
-          itemLabel: 'max duration',
-          itemValue: artefact.maxDuration,
-          itemTimeValueUnit: 'ms',
+          label: 'max duration',
+          value: artefact.maxDuration,
+          timeValueUnit: 'ms',
         });
       }
 

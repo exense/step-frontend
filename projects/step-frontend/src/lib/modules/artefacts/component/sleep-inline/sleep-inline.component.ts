@@ -31,8 +31,8 @@ export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtef
       const { duration, unit, releaseTokens } = artefact;
 
       items.push({
-        itemValue: duration,
-        itemTimeValueUnit: unit.value as TimeUnitDictKey,
+        value: duration,
+        timeValueUnit: unit.value as TimeUnitDictKey,
       });
 
       if (releaseTokens.dynamic) {

@@ -31,13 +31,13 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
       const artefact = reportNode.resolvedArtefact!;
       const source: ArtefactInlineItemSource = [
         {
-          itemLabel: 'tries',
-          itemValue: reportNode.tries,
+          label: 'tries',
+          value: reportNode.tries,
           isValueFirst: true,
         },
         {
-          itemLabel: 'max',
-          itemValue: artefact.maxRetries,
+          label: 'max',
+          value: artefact.maxRetries,
           isValueFirst: true,
           prefix: '(',
           suffix: ')',
@@ -53,8 +53,8 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
       }
       const source: ArtefactInlineItemSource = [
         {
-          itemLabel: 'max tries',
-          itemValue: artefact.maxRetries,
+          label: 'max tries',
+          value: artefact.maxRetries,
         },
       ];
       source.push(...this.timeFields(artefact));
@@ -67,16 +67,16 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
     const result: ArtefactInlineItemSource = [];
     if (artefact.gracePeriod.value || artefact.gracePeriod.expression) {
       result.push({
-        itemLabel: 'grace period',
-        itemValue: artefact.gracePeriod,
-        itemTimeValueUnit: 'ms',
+        label: 'grace period',
+        value: artefact.gracePeriod,
+        timeValueUnit: 'ms',
       });
     }
     if (artefact.timeout.value || artefact.timeout.expression) {
       result.push({
-        itemLabel: 'timeout',
-        itemValue: artefact.timeout,
-        itemTimeValueUnit: 'ms',
+        label: 'timeout',
+        value: artefact.timeout,
+        timeValueUnit: 'ms',
       });
     }
     return result;

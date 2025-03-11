@@ -32,9 +32,9 @@ export class AssertPerformanceReportDetailsComponent extends BaseReportDetailsCo
       ['filter', filter, 'log-in'],
       ['comparator', comparator, 'log-in'],
       {
-        itemLabel: 'expected value',
-        itemValue: expectedValue,
-        itemTimeValueUnit: 'ms',
+        label: 'expected value',
+        value: expectedValue,
+        timeValueUnit: 'ms',
         icon: 'log-in',
       },
     ]);

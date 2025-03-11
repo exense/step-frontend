@@ -34,9 +34,9 @@ export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponen
         [
           [`${aggregator} of`, filter],
           {
-            itemLabel: comparator,
-            itemValue: expectedValue,
-            itemTimeValueUnit: 'ms',
+            label: comparator,
+            value: expectedValue,
+            timeValueUnit: 'ms',
           },
         ],
         isResolved,

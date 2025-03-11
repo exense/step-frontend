@@ -30,9 +30,9 @@ export class SleepReportDetailsComponent extends BaseReportDetailsComponent<Repo
 
     return this._artefactInlineService.convert([
       {
-        itemLabel: 'sleep',
-        itemValue: duration,
-        itemTimeValueUnit: unit.value as TimeUnitDictKey,
+        label: 'sleep',
+        value: duration,
+        timeValueUnit: unit.value as TimeUnitDictKey,
         icon: 'log-in',
       },
       ['releaseToken', releaseTokens, 'log-in'],

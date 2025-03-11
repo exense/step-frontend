@@ -31,15 +31,15 @@ export class RetryIfFailsReportDetailsComponent extends BaseReportDetailsCompone
       source.push(
         ['max tries', artefact.maxRetries, icon],
         {
-          itemLabel: 'grace period',
-          itemValue: artefact.gracePeriod,
-          itemTimeValueUnit: 'ms',
+          label: 'grace period',
+          value: artefact.gracePeriod,
+          timeValueUnit: 'ms',
           icon,
         },
         {
-          itemLabel: 'timeout',
-          itemValue: artefact.timeout,
-          itemTimeValueUnit: 'ms',
+          label: 'timeout',
+          value: artefact.timeout,
+          timeValueUnit: 'ms',
           icon,
         },
         ['release token', artefact.releaseTokens, icon],

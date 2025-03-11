@@ -15,9 +15,7 @@
       @if (item.value; as value) {
         <span
           [ngClass]="{
-            unresolved: !item.isValueResolved,
-            resolved: item.isValueResolved && !value.dynamic,
-            'dynamic-resolved': item.isValueResolved && value.dynamic
+            'dynamic-value': value.dynamic
           }"
           [matTooltip]="item.valueTooltip ?? ''"
           matTooltipPosition="below"
@@ -28,9 +26,7 @@
       @if (item.label; as label) {
         <label
           [ngClass]="{
-            unresolved: !item.isLabelResolved,
-            resolved: item.isLabelResolved && !label.dynamic,
-            'dynamic-resolved': item.isLabelResolved && label.dynamic
+            'dynamic-value': label.dynamic
           }"
           [matTooltip]="item.labelTooltip ?? ''"
           matTooltipPosition="below"
@@ -42,9 +38,7 @@
       @if (item.label; as label) {
         <label
           [ngClass]="{
-            unresolved: !item.isLabelResolved,
-            resolved: item.isLabelResolved && !label.dynamic,
-            'dynamic-resolved': item.isLabelResolved && label.dynamic
+            'dynamic-value': label.dynamic
           }"
           [matTooltip]="item.labelTooltip ?? ''"
           matTooltipPosition="below"
@@ -55,9 +49,7 @@
       @if (item.value; as value) {
         <span
           [ngClass]="{
-            unresolved: !item.isValueResolved,
-            resolved: item.isValueResolved && !value.dynamic,
-            'dynamic-resolved': item.isValueResolved && value.dynamic
+            'dynamic-value': value.dynamic
           }"
           [matTooltip]="item.valueTooltip ?? ''"
           matTooltipPosition="below"

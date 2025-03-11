@@ -15,13 +15,13 @@ type DynamicValue = DynamicValueString | DynamicValueInteger | DynamicValueBoole
 type PossibleValue = string | number | boolean | DynamicValue | undefined;
 
 export interface ArtefactInlineItemConfig {
-  itemLabel?: PossibleValue;
-  itemLabelTooltip?: string;
-  itemValue?: PossibleValue;
-  itemValueTooltip?: string;
+  label?: PossibleValue;
+  labelTooltip?: string;
+  value?: PossibleValue;
+  valueTooltip?: string;
   icon?: string;
   iconTooltip?: string;
-  itemTimeValueUnit?: TimeUnitDictKey;
+  timeValueUnit?: TimeUnitDictKey;
   isValueFirst?: boolean;
   prefix?: string;
   suffix?: string;
@@ -59,35 +59,25 @@ export class ArtefactInlineItemUtilsService {
     return items.map((itemConfig) => {
       let config: ArtefactInlineItemConfig;
       if (itemConfig instanceof Array) {
-        const [itemLabel, itemValue, icon, iconTooltip] = itemConfig;
-        config = { itemLabel, itemValue, icon, iconTooltip };
+        const [label, value, icon, iconTooltip] = itemConfig;
+        config = { label, value, icon, iconTooltip };
       } else {
         config = itemConfig;
       }
 
-      const { value: label, isResolved: isLabelResolved } = this.prepareDynamicValue(config.itemLabel, isResolved);
-      const { value, isResolved: isValueResolved } =
-        !!config.itemTimeValueUnit && this._artefactService.isDynamicValue(config.itemValue)
-          ? this.prepareTimeValue(config.itemValue as DynamicValueInteger, config.itemTimeValueUnit)
-          : this.prepareDynamicValue(config.itemValue, isResolved);
+      const label = this.prepareDynamicValue(config.label);
+      const value =
+        !!config.timeValueUnit && this._artefactService.isDynamicValue(config.value)
+          ? this.prepareTimeValue(config.value as DynamicValueInteger, config.timeValueUnit)
+          : this.prepareDynamicValue(config.value);
 
-      const {
-        icon,
-        iconTooltip,
-        isValueFirst,
-        prefix,
-        suffix,
-        itemLabelTooltip: labelTooltip,
-        itemValueTooltip: valueTooltip,
-      } = config;
+      const { icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip } = config;
 
       return {
         label,
         labelTooltip,
-        isLabelResolved,
         value,
         valueTooltip,
-        isValueResolved,
         icon,
         iconTooltip,
         isValueFirst,
@@ -97,52 +87,37 @@ export class ArtefactInlineItemUtilsService {
     });
   }
 
-  private prepareDynamicValue(
-    value: PossibleValue,
-    isResolved?: boolean,
-  ): { value: DynamicValue | undefined; isResolved?: boolean } {
+  private prepareDynamicValue(value: PossibleValue): DynamicValue | undefined {
     if (value === null || value === undefined) {
-      return { value: value as undefined, isResolved: true };
+      return undefined;
     }
     const isDynamic = this._artefactService.isDynamicValue(value);
     if (isDynamic) {
-      return { value: value as DynamicValue, isResolved: true };
+      return value as DynamicValue;
     }
     if (typeof value === 'object') {
       value = JSON.stringify(value);
     }
     return {
-      value: {
-        value: value as string | number | boolean,
-        dynamic: false,
-      },
-      isResolved: true,
+      value: value as string | number | boolean,
+      dynamic: false,
     };
   }
 
-  private prepareTimeValue(
-    time: DynamicValueInteger,
-    initialUnit?: TimeUnitDictKey,
-  ): { value: DynamicValue | undefined; isResolved?: boolean } {
+  private prepareTimeValue(time: DynamicValueInteger, initialUnit?: TimeUnitDictKey): DynamicValue | undefined {
     if (!time) {
-      return { value: undefined, isResolved: true };
+      return { value: undefined };
     }
     const { value, unit } = this._artefactService.convertTimeDynamicValue(time, initialUnit);
     if (time.dynamic) {
       return {
-        value: {
-          expression: `${value} ${unit}`,
-          dynamic: true,
-        },
-        isResolved: true,
+        expression: `${value} ${unit}`,
+        dynamic: true,
       };
     }
     return {
-      value: {
-        value: `${value}${unit}`,
-        dynamic: false,
-      },
-      isResolved: true,
+      value: `${value}${unit}`,
+      dynamic: false,
     };
   }
 }
