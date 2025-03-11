@@ -399,8 +399,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           this.isTreeInitialized = false;
           return;
         }
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath });
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath });
+        // expand all items in tree, due first initialization
+        const expandAllByDefault = !this.isTreeInitialized;
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
   }
@@ -462,8 +464,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.execution$.pipe(take(1)).subscribe((execution) => {
       if (selection.type === 'RELATIVE') {
         let time = selection.relativeSelection!.timeInMs;
-        let end = execution.endTime || new Date().getTime() - 5000;
-        selection!.absoluteSelection = { from: end - time, to: end };
+        let now = new Date().getTime();
+        let end = execution.endTime || now - 5000;
+        let from = end - time;
+        if (from > end) {
+          // remove the 5 sec buffer
+          end = now;
+        }
+        selection!.absoluteSelection = { from: from, to: end };
         if (!selection.relativeSelection!.label) {
           let foundRelativeOption = this.timeRangeOptions.find(
             (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
