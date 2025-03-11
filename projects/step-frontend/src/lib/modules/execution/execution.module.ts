@@ -28,6 +28,7 @@ import {
   ViewRegistryService,
   DialogParentService,
   TreeStateService,
+  InfoBannerService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -249,12 +250,14 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
+    private _infoBanner: InfoBannerService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     _bulkOperationsRegistry.register();
     this.registerEntities();
     this.registerDashlets();
     this.registerRoutes();
+    this.registerInfoBanners();
   }
 
   private registerEntities(): void {
@@ -670,6 +673,8 @@ export class ExecutionModule {
       ],
     });
   }
+
+  private registerInfoBanners(): void {}
 }
 
 export { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from './shared/type-leaf-report-nodes-table-params';
