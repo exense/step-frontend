@@ -264,15 +264,7 @@ export class ArtefactTreeNodeUtilsService
 
     let children: ArtefactTreeNode[] = [];
 
-    if (forceDisplay && !originalArtefact?.children?.length) {
-      const items = this.createPseudoContainer(
-        ArtefactNodeSource.MAIN,
-        originalArtefact,
-        forceDisplay,
-        isVisuallySkipped,
-      );
-      children.push(items!);
-    } else {
+    if (!forceDisplay || originalArtefact?.children?.length) {
       children = (originalArtefact?.children || []).map((child) =>
         this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
       );
@@ -312,6 +304,17 @@ export class ArtefactTreeNodeUtilsService
       }
     }
 
+    const main = this.createPseudoContainer(
+      ArtefactNodeSource.MAIN,
+      originalArtefact,
+      forceDisplay,
+      isVisuallySkipped,
+      true,
+    );
+    if (main) {
+      children.push(main);
+    }
+
     const after = this.createPseudoContainer(
       ArtefactNodeSource.AFTER,
       originalArtefact,
@@ -330,6 +333,7 @@ export class ArtefactTreeNodeUtilsService
     originalArtefact: AbstractArtefact,
     forceDisplay?: boolean,
     isParentVisuallySkipped?: boolean,
+    hideChildren?: boolean,
   ): ArtefactTreeNode | undefined {
     const parentId = originalArtefact.id;
     const isThreadGroup = originalArtefact._class === THREAD_GROUP;
@@ -342,7 +346,7 @@ export class ArtefactTreeNodeUtilsService
     let childArtefacts: AbstractArtefact[] | undefined = undefined;
     switch (nodeType) {
       case ArtefactNodeSource.AFTER:
-        name = 'After';
+        name = 'After (cleanup)';
         icon = 'chevron-right';
         childContainer = originalArtefact.after;
         break;
@@ -354,7 +358,7 @@ export class ArtefactTreeNodeUtilsService
         }
         break;
       case ArtefactNodeSource.BEFORE:
-        name = 'Before';
+        name = 'Before (init)';
         icon = 'chevron-left';
         childContainer = originalArtefact.before;
         break;
@@ -366,9 +370,11 @@ export class ArtefactTreeNodeUtilsService
         }
         break;
       default:
-        name = 'Steps';
+        name = 'add Step';
         icon = 'circle';
-        childArtefacts = originalArtefact.children;
+        if (!hideChildren) {
+          childArtefacts = originalArtefact.children;
+        }
         break;
     }
     if (childContainer) {
