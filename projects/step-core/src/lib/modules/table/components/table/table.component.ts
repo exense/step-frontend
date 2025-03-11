@@ -382,7 +382,12 @@ export class TableComponent<T>
     if (statePage) {
       this.page.pageSize.set(statePage.pageSize);
       this.page.pageIndex.set(statePage.pageIndex);
-      this.page.length.set(statePage.length);
+      this.page.length.update((current) => {
+        if (!!current && !statePage.length) {
+          return current;
+        }
+        return statePage.length;
+      });
       initialPage = statePage;
     } else {
       this.page.firstPage();

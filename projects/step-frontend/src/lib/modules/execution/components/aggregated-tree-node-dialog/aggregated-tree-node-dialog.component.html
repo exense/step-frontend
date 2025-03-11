@@ -15,7 +15,7 @@
       @if (reportNodeIcon(); as icon) {
         <step-icon class="artefact-icon" [name]="icon" />
       }
-      <span class="node-name">{{ reportNode.name }}</span>
+      <span>{{ reportNode.name }}</span>
       <step-alt-execution-time
         [startTime]="reportNode.executionTime"
         [duration]="reportNode.duration"

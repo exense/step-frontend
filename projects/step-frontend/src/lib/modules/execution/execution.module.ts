@@ -121,6 +121,7 @@ import { ErrorDetailsMenuComponent } from './components/error-details-menu/error
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
+import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
 
 @NgModule({
   declarations: [
@@ -158,6 +159,7 @@ import { AgentsModalComponent } from './components/execution-agent-modal/executi
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
+    AltExecutionResolvedParametersComponent,
     AltExecutionReportComponent,
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,

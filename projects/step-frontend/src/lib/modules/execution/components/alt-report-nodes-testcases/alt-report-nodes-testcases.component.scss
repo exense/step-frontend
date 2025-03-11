@@ -22,23 +22,16 @@ step-table {
 }
 
 .operations {
-  width: 50%;
+  width: 100%;
 }
 
 .name {
   white-space: nowrap;
-  width: 50%;
 }
 
 .test-case-name {
   cursor: pointer;
   user-select: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: wrap;
-  word-break: break-all;
   &.is-selected {
     font-weight: bold;
   }
