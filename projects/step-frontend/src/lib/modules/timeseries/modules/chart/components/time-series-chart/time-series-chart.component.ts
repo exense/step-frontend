@@ -116,11 +116,8 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       this.tooltipInstance = componentRef.instance;
     }
 
-    this.tooltipInstance?.update(template, data);
-    // this.tooltipInstance!.template = template;
-    // this.tooltipInstance!.data = data;
-
     // Update data every time cursor moves
+    this.tooltipInstance?.update(template, data);
 
     const positionStrategy = this.overlay
       .position()
