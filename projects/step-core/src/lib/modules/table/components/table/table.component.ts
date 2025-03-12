@@ -271,6 +271,7 @@ export class TableComponent<T>
   private tableParams$ = toObservable(this.tableParams);
 
   readonly hasFilter$ = this.search$.pipe(
+    map((value) => value.search),
     map((search) => {
       const values = Object.values(search);
       if (values.length === 0) {
