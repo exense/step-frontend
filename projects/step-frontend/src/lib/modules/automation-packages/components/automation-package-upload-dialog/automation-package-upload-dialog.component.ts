@@ -30,8 +30,6 @@ export class AutomationPackageUploadDialogComponent {
     : `Upload new file for "${this._package.attributes?.['name'] ?? this._package.id}"`;
 
   file?: File;
-  version?: string;
-  activationExpr?: string;
   progress$?: Observable<number>;
 
   openFileChooseDialog(): void {
@@ -84,18 +82,18 @@ export class AutomationPackageUploadDialogComponent {
           this._package?.activationExpression?.script,
           this._package?.version,
         )
-        .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
+        .subscribe(() => this._dialogRef.close({ isSuccess: true }));
     }
   }
 
-  updateVersion(version: string) {
+  setVersion(version: string) {
     if (!this._package) {
       this._package = {};
     }
     this._package.version = version;
   }
 
-  updateActivationExpression(script: string) {
+  setActivationExpression(script: string) {
     if (!this._package) {
       this._package = {};
     }

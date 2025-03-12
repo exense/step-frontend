@@ -25,7 +25,7 @@
             autofocus
             name="version"
             [ngModel]="_package?.version"
-            (ngModelChange)="updateVersion($event)"
+            (ngModelChange)="setVersion($event)"
             title="Version"
           />
         </step-form-field>
@@ -36,7 +36,7 @@
             name="activationExpression"
             autofocus
             [ngModel]="_package?.activationExpression?.script"
-            (ngModelChange)="updateActivationExpression($event)"
+            (ngModelChange)="setActivationExpression($event)"
             title="Activation Expression"
           />
         </step-form-field>
