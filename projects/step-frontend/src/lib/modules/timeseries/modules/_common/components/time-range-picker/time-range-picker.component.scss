@@ -82,7 +82,10 @@
   &.compact-btn {
     height: 40px;
     padding: 0 4px;
-    min-width: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
