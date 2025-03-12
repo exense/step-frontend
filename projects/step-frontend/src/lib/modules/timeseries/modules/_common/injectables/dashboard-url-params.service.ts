@@ -193,7 +193,7 @@ export class DashboardUrlParamsService {
       }
     });
     Object.keys(params).forEach((key) => {
-      let prefixedParam = TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key;
+      const prefixedParam = TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key;
       updatedParams[prefixedParam] = params[key];
     });
 
