@@ -1,30 +1,13 @@
 //@ts-ignore
 import uPlot = require('uplot');
 import { Options } from 'uplot';
-import { TooltipAnchor } from '../types/tooltip-anchor';
 import { inject, Injectable } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
-import { TooltipPlacementFunction } from './tooltip-placement-function';
-import { TooltipParentContainer } from '../types/tooltip-parent-container';
 import { TooltipContextData } from './tooltip-context-data';
 import { TSChartSeries } from '../types/ts-chart-series';
 import { TimeSeriesChartComponent } from '../components/time-series-chart/time-series-chart.component';
 
 @Injectable()
 export class CustomTooltipPlugin {
-  private _doc = inject(DOCUMENT);
-  private win = this._doc.defaultView!;
-
-  public static SERIES_NOT_EMPTY_CONDITION_FN = (contextData: TooltipContextData) => {
-    for (let i = 0; i < contextData.series.length; i++) {
-      let value = contextData.series[i].data[contextData.idx!];
-      if (value && value > 0) {
-        return true;
-      }
-    }
-    return false;
-  };
-
   /**
    * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
    */
@@ -80,7 +63,6 @@ export class CustomTooltipPlugin {
         setSize: (u: uPlot) => {},
         // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
-          //@ts-ignore
           // this is called for all linked charts
           if (chartIsLocked()) {
             return;
@@ -101,8 +83,7 @@ export class CustomTooltipPlugin {
             series: ySeries,
             idx: idx,
             idY: idY,
-            //@ts-ignore
-            xValues: u.data[0],
+            xValues: u.data[0] as number[],
             chartRef: u,
             parentRef: ref,
           };
@@ -110,7 +91,6 @@ export class CustomTooltipPlugin {
           // Emit event to parent, which will handle positioning using cdkOverlay
           const boundingClientRect = over.getBoundingClientRect();
 
-          //@ts-ignore
           ref.tooltipEvents.emit({
             type: 'POSITION_CHANGED',
             payload: {

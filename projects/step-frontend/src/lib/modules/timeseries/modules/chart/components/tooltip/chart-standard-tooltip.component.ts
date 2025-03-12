@@ -43,8 +43,7 @@ import { defer, Observable, of, switchMap } from 'rxjs';
   ],
 })
 export class ChartStandardTooltipComponent {
-  //@ts-ignore
-  data = input<TooltipContextData>(null);
+  data = input<TooltipContextData | null>(null);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   private _executionsService = inject(ExecutionsService);
@@ -62,9 +61,9 @@ export class ChartStandardTooltipComponent {
     if (!this.data()) {
       return;
     }
-    let idx = this.data().idx;
+    let idx = this.data()?.idx;
     if (idx !== undefined) {
-      let timestamp = this.data().xValues[idx];
+      let timestamp = this.data()!.xValues[idx];
       return new Date(timestamp).toLocaleString();
     } else {
       return '';
@@ -113,8 +112,7 @@ export class ChartStandardTooltipComponent {
               value: bucketValue,
               formattedValue: this.formatValue(bucketValue, settings.yAxisUnit),
               name: series.label || '',
-              // @ts-ignore
-              stroke: series.strokeConfig,
+              stroke: series.strokeConfig!,
               executions: executionIds,
               executionsFn: executionFn,
               markerClassName: this.getMarkerClass(series.strokeConfig!),

@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ContentChild,
   ElementRef,
@@ -14,11 +13,9 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
   ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
-import { TooltipPlugin } from '../../injectables/tooltip-plugin';
 import { MarkerType, TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, TimeSeriesConfig, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
@@ -31,8 +28,6 @@ import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipContentDirective } from './tooltip-content.directive';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TooltipAnchor } from '../../types/tooltip-anchor';
-import { ChartStandardTooltipComponent } from '../tooltip/chart-standard-tooltip.component';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { TooltipEvent } from '../tooltip/tooltip-event';
 import { TooltipContainerComponent } from '../tooltip/container/tooltip-container.component';
@@ -53,14 +48,13 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
-  providers: [TooltipPlugin, CustomTooltipPlugin],
+  providers: [CustomTooltipPlugin],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, TooltipParentContainer {
   private _element = inject(ElementRef);
-  private _tooltipPlugin = inject(TooltipPlugin);
   private _customTooltipPlugin = inject(CustomTooltipPlugin);
 
   private readonly HEADER_HEIGHT = 27;
@@ -305,7 +299,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       scales: {
         x: {
           time: settings.xAxesSettings.time ?? true,
-          // @ts-ignore
           range: (uPlot, min, max) => {
             return [min - 1, max + 1];
           }, // Add padding to x-axis range
@@ -450,7 +443,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     const index = this.seriesIndexesByIds[seriesId];
     if (index === undefined || !label) return;
     const series = this.uplot.series[index];
-    // @ts-ignore
+    // @ts-ignore labelItems is not exposed on the uPlot model
     const labelItems = series.labelItems;
     labelItems[labelIndex] = label;
     const finalLabel = this.mergeLabelItems(labelItems);
