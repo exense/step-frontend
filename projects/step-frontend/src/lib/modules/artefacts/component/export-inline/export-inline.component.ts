@@ -20,7 +20,7 @@ export class ExportInlineComponent extends BaseInlineArtefactComponent<ExportArt
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<ExportArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -37,7 +37,7 @@ export class ExportInlineComponent extends BaseInlineArtefactComponent<ExportArt
         itemsSource.push(['Filter', artefact.filter]);
       }
 
-      return this._artefactInlineItemUtils.convert(itemsSource, isResolved);
+      return this._artefactInlineItemUtils.convert(itemsSource);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

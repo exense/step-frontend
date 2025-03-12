@@ -19,11 +19,11 @@ export class TestSetInlineComponent extends BaseInlineArtefactComponent<TestSetA
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<TestSetArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert([['threads', artefact.threads]], isResolved);
+      return this._artefactInlineItemUtils.convert([['threads', artefact.threads]]);
     });
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));
 }

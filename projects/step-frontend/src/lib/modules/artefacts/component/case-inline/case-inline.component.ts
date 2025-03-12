@@ -19,11 +19,11 @@ export class CaseInlineComponent extends BaseInlineArtefactComponent<CaseArtefac
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<CaseArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineUtils.convert([[undefined, artefact.value]], isResolved);
+      return this._artefactInlineUtils.convert([[undefined, artefact.value]]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

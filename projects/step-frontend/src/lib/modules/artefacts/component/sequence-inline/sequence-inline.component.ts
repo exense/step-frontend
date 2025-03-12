@@ -20,7 +20,7 @@ export class SequenceInlineComponent extends BaseInlineArtefactComponent<Sequenc
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SequenceArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -40,7 +40,7 @@ export class SequenceInlineComponent extends BaseInlineArtefactComponent<Sequenc
       if (!itemsSource) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert(itemsSource, isResolved);
+      return this._artefactInlineItemUtils.convert(itemsSource);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

@@ -25,14 +25,14 @@ export class DataSetInlineComponent extends BaseInlineArtefactComponent<DataSetA
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .asyncBuilder<DataSetArtefact>()
-    .extractArtefactItemsAsync((artefact, isResolved) => {
+    .extractArtefactItemsAsync((artefact) => {
       if (!artefact?.dataSourceType || !artefact?.dataSource) {
         return of(undefined);
       }
 
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource).pipe(
         map((items) => [...items, ['for write', artefact?.dataSource?.forWrite]] as ArtefactInlineItemSource),
-        map((items) => this._artefactInlineUtils.convert(items, isResolved)),
+        map((items) => this._artefactInlineUtils.convert(items)),
       );
     });
 

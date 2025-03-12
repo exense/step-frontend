@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
-import { ArtefactService } from '../../injectables/artefact.service';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 
@@ -16,21 +15,58 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
 })
 export class ArtefactInlineFieldComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
-  private _artefactsService = inject(ArtefactService);
 
   readonly item = input.required<ArtefactInlineItem>();
+
+  private label = computed(() => this.item()?.label);
+  private value = computed(() => this.item()?.value);
+
+  protected readonly icon = computed(() => this.item()?.icon);
+  protected readonly iconTooltip = computed(() => this.item()?.iconTooltip ?? '');
 
   protected readonly prefix = computed(() => this.item()?.prefix);
   protected readonly suffix = computed(() => this.item()?.suffix);
 
+  protected readonly hasLabel = computed(() => !!this.item().label);
+  protected readonly hasValue = computed(() => !!this.item().value);
+
+  protected readonly labelExpression = computed(() => this.label()?.expression);
+  protected readonly valueExpression = computed(() => this.value()?.expression);
+
+  protected readonly isLabelResolved = computed(() => !!this.label()?.isResolved);
+  protected readonly isValueResolved = computed(() => !!this.value()?.isResolved);
+
+  protected readonly labelTooltip = computed(() => this.label()?.tooltip ?? '');
+  protected readonly valueTooltip = computed(() => this.value()?.tooltip ?? '');
+
   protected readonly itemLabel = computed(() => {
-    const item = this.item();
-    return this._artefactsService.convertDynamicValue(item.label);
+    const isValueFirst = this.item()?.isValueFirst;
+    const label = this.label();
+    let result = '';
+    if (label?.value !== undefined && label?.value !== null) {
+      if (typeof label.value === 'object') {
+        result = JSON.stringify(label.value);
+      } else {
+        result = label.value.toString();
+      }
+    } else {
+      result = label?.expression ?? '';
+    }
+    if (!isValueFirst) {
+      result = `${result}:`;
+    }
+    return result;
   });
 
   protected readonly itemValue = computed(() => {
-    const item = this.item();
-    return this._artefactsService.convertDynamicValue(item.value);
+    const value = this.value();
+    if (value?.value !== undefined && value?.value !== null) {
+      if (typeof value.value === 'object') {
+        return JSON.stringify(value.value);
+      }
+      return value.value;
+    }
+    return value?.expression;
   });
 
   protected readonly trackOverflowContent = computed(() => {

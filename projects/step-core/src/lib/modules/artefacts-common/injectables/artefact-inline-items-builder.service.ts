@@ -1,8 +1,7 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { AbstractArtefact, ReportNode } from '../../../client/step-client-module';
 import { AggregatedArtefactInfo, InlineArtefactContext, ReportNodeWithArtefact } from '../types/artefact-types';
 import { ArtefactInlineItem } from '../types/artefact-inline-item';
-import { ArtefactInlineItemUtilsService } from './artefact-inline-item-utils.service';
 import { map, Observable, of } from 'rxjs';
 
 type ArtefactInlineItems = ArtefactInlineItem[] | undefined;
@@ -14,17 +13,12 @@ type AggregatedItemsExtractorAsync<A extends AbstractArtefact, R extends ReportN
 ) => Observable<ArtefactInlineItems>;
 type ReportNodeItemsExtractor<A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>> = (
   reportNode?: R,
-  isResolved?: boolean,
 ) => ArtefactInlineItems;
 type ReportNodeItemsExtractorAsync<A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>> = (
   reportNode?: R,
-  isResolved?: boolean,
 ) => Observable<ArtefactInlineItems>;
-type ArtefactItemsExtractor<A extends AbstractArtefact> = (artefact?: A, isResolved?: boolean) => ArtefactInlineItems;
-type ArtefactItemsExtractorAsync<A extends AbstractArtefact> = (
-  artefact?: A,
-  isResolved?: boolean,
-) => Observable<ArtefactInlineItems>;
+type ArtefactItemsExtractor<A extends AbstractArtefact> = (artefact?: A) => ArtefactInlineItems;
+type ArtefactItemsExtractorAsync<A extends AbstractArtefact> = (artefact?: A) => Observable<ArtefactInlineItems>;
 
 export interface ArtefactInlineItemsBuilder<
   A extends AbstractArtefact,
@@ -50,8 +44,6 @@ export interface ArtefactInlineItemsBuilderAsync<
 }
 
 class ArtefactInlineItemsBuilderBase<B, A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>> {
-  constructor(protected readonly _utils: ArtefactInlineItemUtilsService) {}
-
   protected extractorAggregatedItems?: AggregatedItemsExtractor<A, R>;
   protected extractorReportNodeItems?: ReportNodeItemsExtractor<A, R>;
   protected extractorArtefactItems?: ArtefactItemsExtractor<A>;
@@ -95,27 +87,26 @@ class ArtefactInlineItemsBuilderImpl<A extends AbstractArtefact, R extends Repor
       return undefined;
     }
 
-    const isResolved = this._utils.isAggregatedArtefactResolved(info);
     if (info?.singleInstanceReportNode) {
-      return this.extractReportNode(info.singleInstanceReportNode, isResolved);
+      return this.extractReportNode(info.singleInstanceReportNode);
     }
 
-    return this.extractArtefact(info.originalArtefact, isResolved);
+    return this.extractArtefact(info.originalArtefact);
   }
 
-  private extractReportNode(reportNode?: R, isResolved?: boolean): ArtefactInlineItems {
+  private extractReportNode(reportNode?: R): ArtefactInlineItems {
     if (this.extractorReportNodeItems) {
       return this.extractorReportNodeItems(reportNode);
     }
     if (!reportNode?.resolvedArtefact) {
       return undefined;
     }
-    return this.extractArtefact(reportNode.resolvedArtefact as A, isResolved);
+    return this.extractArtefact(reportNode.resolvedArtefact as A);
   }
 
-  private extractArtefact(artefact?: A, isResolved?: boolean): ArtefactInlineItems {
+  private extractArtefact(artefact?: A): ArtefactInlineItems {
     if (this.extractorArtefactItems) {
-      return this.extractorArtefactItems(artefact, isResolved);
+      return this.extractorArtefactItems(artefact);
     }
     throw new Error('Artefact extractor not configured');
   }
@@ -167,15 +158,14 @@ class ArtefactInlineItemsBuilderAsyncImpl<A extends AbstractArtefact, R extends 
       return of(undefined);
     }
 
-    const isResolved = this._utils.isAggregatedArtefactResolved(info);
     if (info?.singleInstanceReportNode) {
-      return this.extractReportNode(info.singleInstanceReportNode, isResolved);
+      return this.extractReportNode(info.singleInstanceReportNode);
     }
 
-    return this.extractArtefact(info.originalArtefact, isResolved);
+    return this.extractArtefact(info.originalArtefact);
   }
 
-  private extractReportNode(reportNode?: R, isResolved?: boolean): Observable<ArtefactInlineItems> {
+  private extractReportNode(reportNode?: R): Observable<ArtefactInlineItems> {
     if (this.extractorReportNodeItemsAsync) {
       return this.extractorReportNodeItemsAsync(reportNode);
     }
@@ -187,16 +177,16 @@ class ArtefactInlineItemsBuilderAsyncImpl<A extends AbstractArtefact, R extends 
     if (!reportNode?.resolvedArtefact) {
       return of(undefined);
     }
-    return this.extractArtefact(reportNode.resolvedArtefact as A, isResolved);
+    return this.extractArtefact(reportNode.resolvedArtefact as A);
   }
 
-  private extractArtefact(artefact?: A, isResolved?: boolean): Observable<ArtefactInlineItems> {
+  private extractArtefact(artefact?: A): Observable<ArtefactInlineItems> {
     if (this.extractorArtefactItemsAsync) {
-      return this.extractorArtefactItemsAsync(artefact, isResolved);
+      return this.extractorArtefactItemsAsync(artefact);
     }
 
     if (this.extractorArtefactItems) {
-      return of(this.extractorArtefactItems(artefact, isResolved));
+      return of(this.extractorArtefactItems(artefact));
     }
     throw new Error('Artefact extractor not configured');
   }
@@ -206,19 +196,17 @@ class ArtefactInlineItemsBuilderAsyncImpl<A extends AbstractArtefact, R extends 
   providedIn: 'root',
 })
 export class ArtefactInlineItemsBuilderService {
-  private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
-
   builder<A extends AbstractArtefact, R extends ReportNode = ReportNodeWithArtefact<A>>(): ArtefactInlineItemsBuilder<
     A,
     R
   > {
-    return new ArtefactInlineItemsBuilderImpl(this._artefactInlineItemUtils);
+    return new ArtefactInlineItemsBuilderImpl();
   }
 
   asyncBuilder<
     A extends AbstractArtefact,
     R extends ReportNode = ReportNodeWithArtefact<A>,
   >(): ArtefactInlineItemsBuilderAsync<A, R> {
-    return new ArtefactInlineItemsBuilderAsyncImpl(this._artefactInlineItemUtils);
+    return new ArtefactInlineItemsBuilderAsyncImpl();
   }
 }

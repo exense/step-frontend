@@ -1,62 +1,37 @@
+<ng-template #tplLabel>
+  @if (hasLabel()) {
+    @if (labelExpression(); as labelExpression) {
+      <step-icon class="dynamic" name="zap" [matTooltip]="labelExpression" matTooltipPosition="below" />
+    }
+    <label [class.not-resolved]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
+      {{ itemLabel() }}
+    </label>
+  }
+</ng-template>
+<ng-template #tplValue>
+  @if (hasValue()) {
+    @if (valueExpression(); as valueExpression) {
+      <step-icon class="dynamic" name="zap" [matTooltip]="valueExpression" matTooltipPosition="below" />
+    }
+    <span [class.not-resolved]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
+      {{ itemValue() }}
+    </span>
+  }
+</ng-template>
 @if (item(); as item) {
   @if (prefix(); as prefix) {
     <span>{{ prefix }}</span>
   }
   <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
-    @if (item.icon) {
-      <step-icon
-        class="field-icon"
-        [name]="item.icon"
-        [matTooltip]="item.iconTooltip ?? ''"
-        matTooltipPosition="below"
-      />
+    @if (icon(); as icon) {
+      <step-icon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
     }
     @if (item.isValueFirst) {
-      @if (item.value; as value) {
-        <span
-          [ngClass]="{
-            'dynamic-value': value.dynamic
-          }"
-          [matTooltip]="item.valueTooltip ?? ''"
-          matTooltipPosition="below"
-        >
-          {{ itemValue() }}
-        </span>
-      }
-      @if (item.label; as label) {
-        <label
-          [ngClass]="{
-            'dynamic-value': label.dynamic
-          }"
-          [matTooltip]="item.labelTooltip ?? ''"
-          matTooltipPosition="below"
-        >
-          {{ itemLabel() }}
-        </label>
-      }
+      <ng-container *ngTemplateOutlet="tplValue" />
+      <ng-container *ngTemplateOutlet="tplLabel" />
     } @else {
-      @if (item.label; as label) {
-        <label
-          [ngClass]="{
-            'dynamic-value': label.dynamic
-          }"
-          [matTooltip]="item.labelTooltip ?? ''"
-          matTooltipPosition="below"
-        >
-          {{ itemLabel() }}:
-        </label>
-      }
-      @if (item.value; as value) {
-        <span
-          [ngClass]="{
-            'dynamic-value': value.dynamic
-          }"
-          [matTooltip]="item.valueTooltip ?? ''"
-          matTooltipPosition="below"
-        >
-          {{ itemValue() }}
-        </span>
-      }
+      <ng-container *ngTemplateOutlet="tplLabel" />
+      <ng-container *ngTemplateOutlet="tplValue" />
     }
   </section>
   <div class="ellipsis">...</div>

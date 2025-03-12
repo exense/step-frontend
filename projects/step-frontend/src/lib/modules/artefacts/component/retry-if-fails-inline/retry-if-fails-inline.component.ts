@@ -24,7 +24,7 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<RetryIfFailsArtefact, RetryIfFailsReportNode>()
-    .extractReportNodeItems((reportNode, isResolved) => {
+    .extractReportNodeItems((reportNode) => {
       if (!reportNode) {
         return undefined;
       }
@@ -45,9 +45,9 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
         ['skipped', reportNode.skipped],
       ];
       source.push(...this.timeFields(artefact));
-      return this._artefactInlineItemUtils.convert(source, isResolved);
+      return this._artefactInlineItemUtils.convert(source);
     })
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -58,7 +58,7 @@ export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
         },
       ];
       source.push(...this.timeFields(artefact));
-      return this._artefactInlineItemUtils.convert(source, isResolved);
+      return this._artefactInlineItemUtils.convert(source);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

@@ -20,7 +20,7 @@ export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact,
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<ForArtefact, ForReportNode>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }

@@ -19,7 +19,16 @@ export class EchoReportDetailsComponent extends BaseReportDetailsComponent<EchoR
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
 
   protected items = computed(() => {
-    const echo = this.node()?.echo;
-    return this._artefactInlineUtils.convert([['text', echo, 'log-in']]);
+    const node = this.node();
+    const echo = node?.echo;
+    const echoExpression = node?.resolvedArtefact?.text?.expression;
+    return this._artefactInlineUtils.convert([
+      {
+        label: 'text',
+        value: echo,
+        valueExplicitExpression: echoExpression,
+        icon: 'log-in',
+      },
+    ]);
   });
 }

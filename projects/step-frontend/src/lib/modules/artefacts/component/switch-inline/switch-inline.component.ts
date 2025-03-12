@@ -20,11 +20,11 @@ export class SwitchInlineComponent extends BaseInlineArtefactComponent<SwitchArt
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SwitchArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineUtilsService.convert([[undefined, artefact.expression]], isResolved);
+      return this._artefactInlineUtilsService.convert([[undefined, artefact.expression]]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

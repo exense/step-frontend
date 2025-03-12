@@ -22,7 +22,7 @@ export class SessionInlineComponent extends BaseInlineArtefactComponent<SessionA
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SessionArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       const token = artefact?.token;
       if (!token) {
         return undefined;
@@ -36,7 +36,7 @@ export class SessionInlineComponent extends BaseInlineArtefactComponent<SessionA
         return undefined;
       }
       const itemsSource: ArtefactInlineItemSource = Object.entries(tokenItems).map(([label, value]) => [label, value]);
-      return this._artefactInlineUtils.convert(itemsSource, isResolved);
+      return this._artefactInlineUtils.convert(itemsSource);
     });
 
   protected items = computed(() => this._itemsBuilder.build(this.currentContext()));

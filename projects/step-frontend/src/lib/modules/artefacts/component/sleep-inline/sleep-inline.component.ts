@@ -21,7 +21,7 @@ export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtef
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SleepArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -41,7 +41,7 @@ export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtef
         items.push([undefined, 'release token']);
       }
 
-      return this._artefactInlineUtils.convert(items, isResolved);
+      return this._artefactInlineUtils.convert(items);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

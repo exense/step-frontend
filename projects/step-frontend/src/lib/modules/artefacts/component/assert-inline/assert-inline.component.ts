@@ -22,13 +22,13 @@ export class AssertInlineComponent extends BaseInlineArtefactComponent<AssertArt
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<AssertArtefact, AssertReportNode>()
-    .extractReportNodeItems((reportNode, isResolved) => {
+    .extractReportNodeItems((reportNode) => {
       if (reportNode?.error) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert([[undefined, reportNode?.message ?? '']], isResolved);
+      return this._artefactInlineItemUtils.convert([[undefined, reportNode?.message ?? '']]);
     })
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -40,7 +40,7 @@ export class AssertInlineComponent extends BaseInlineArtefactComponent<AssertArt
       if (artefact.doNegate.expression || artefact.doNegate.value) {
         source.unshift(['negated', artefact.doNegate]);
       }
-      return this._artefactInlineItemUtils.convert(source, isResolved);
+      return this._artefactInlineItemUtils.convert(source);
     });
 
   protected items = computed(() => this._itemsBuilder.build(this.currentContext()));

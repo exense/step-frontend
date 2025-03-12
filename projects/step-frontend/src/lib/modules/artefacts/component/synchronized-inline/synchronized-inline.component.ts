@@ -20,7 +20,7 @@ export class SynchronizedInlineComponent extends BaseInlineArtefactComponent<Syn
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<Synchronized>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -36,7 +36,7 @@ export class SynchronizedInlineComponent extends BaseInlineArtefactComponent<Syn
       if (!itemsSource.length) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert(itemsSource, isResolved);
+      return this._artefactInlineItemUtils.convert(itemsSource);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

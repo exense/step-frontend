@@ -20,11 +20,11 @@ export class IfInlineComponent extends BaseInlineArtefactComponent<IfArtefact> {
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<IfArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineUtilsService.convert([[undefined, artefact.condition]], isResolved);
+      return this._artefactInlineUtilsService.convert([[undefined, artefact.condition]]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

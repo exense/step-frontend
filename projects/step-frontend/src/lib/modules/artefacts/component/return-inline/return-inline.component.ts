@@ -22,7 +22,7 @@ export class ReturnInlineComponent extends BaseInlineArtefactComponent<ReturnArt
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<ReturnArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       const output = artefact?.output;
       if (!output) {
         return undefined;
@@ -43,7 +43,7 @@ export class ReturnInlineComponent extends BaseInlineArtefactComponent<ReturnArt
         'Output',
       ]);
 
-      return this._artefactInlineUtils.convert(outputs, isResolved);
+      return this._artefactInlineUtils.convert(outputs);
     });
 
   protected items = computed(() => this._itemsBuilder.build(this.currentContext()));

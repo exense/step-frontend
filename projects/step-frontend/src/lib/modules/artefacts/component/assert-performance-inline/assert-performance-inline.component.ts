@@ -22,7 +22,7 @@ export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponen
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<AssertPerformanceArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -30,17 +30,14 @@ export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponen
       const filter = artefact.filters![0]!.filter;
       const comparator = this._lists.operatorTypeTexts[artefact.comparator];
       const expectedValue = artefact.expectedValue;
-      return this._artefactInlineUtilsService.convert(
-        [
-          [`${aggregator} of`, filter],
-          {
-            label: comparator,
-            value: expectedValue,
-            timeValueUnit: 'ms',
-          },
-        ],
-        isResolved,
-      );
+      return this._artefactInlineUtilsService.convert([
+        [`${aggregator} of`, filter],
+        {
+          label: comparator,
+          value: expectedValue,
+          timeValueUnit: 'ms',
+        },
+      ]);
     });
 
   protected items = computed(() => this._itemsBuilder.build(this.currentContext()));

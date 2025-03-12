@@ -20,19 +20,19 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<SetArtefact, SetReportNode>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
       const { key, value } = artefact;
-      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']], isResolved);
+      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']]);
     })
-    .extractReportNodeItems((reportNode, isResolved) => {
+    .extractReportNodeItems((reportNode) => {
       if (!reportNode) {
         return undefined;
       }
       const { key, value } = reportNode;
-      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']], isResolved);
+      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

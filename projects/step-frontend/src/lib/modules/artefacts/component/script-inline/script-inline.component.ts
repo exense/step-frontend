@@ -20,11 +20,11 @@ export class ScriptInlineComponent extends BaseInlineArtefactComponent<ScriptArt
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<ScriptArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert([[undefined, artefact.script]], isResolved);
+      return this._artefactInlineItemUtils.convert([[undefined, artefact.script]]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

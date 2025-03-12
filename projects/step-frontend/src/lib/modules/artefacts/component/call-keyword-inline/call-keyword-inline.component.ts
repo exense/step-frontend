@@ -25,28 +25,20 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
 
   private inputItemsBuilder = this._itemsBuilderService
     .builder<KeywordArtefact, KeywordReportNode>()
-    .extractReportNodeItems((reportNode, isResolved) => this.getReportNodeInputs(reportNode, isResolved))
-    .extractArtefactItems((artefact, isResolved) => this.getArtefactInputs(artefact, isResolved));
+    .extractReportNodeItems((reportNode) => this.getReportNodeInputs(reportNode))
+    .extractArtefactItems((artefact) => this.getArtefactInputs(artefact));
 
   private outputItemsBuilder = this._itemsBuilderService
     .builder<KeywordArtefact, KeywordReportNode>()
-    .extractReportNodeItems((reportNode, isResolved) => this.getReportNodeOutputs(reportNode, isResolved))
+    .extractReportNodeItems((reportNode) => this.getReportNodeOutputs(reportNode))
     .extractArtefactItems(() => undefined);
 
   protected readonly inputItems = computed(() => this.inputItemsBuilder.build(this.currentContext()));
 
   protected readonly outputItems = computed(() => this.outputItemsBuilder.build(this.currentContext()));
 
-  private getArtefactInputs(artefact?: KeywordArtefact, isResolved?: boolean): ArtefactInlineItem[] | undefined {
-    if (!artefact?.argument) {
-      return undefined;
-    }
-    const keywordArgument = artefact.argument;
-    let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
-
-    try {
-      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : {};
-    } catch (err) {}
+  private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {
+    const keywordInputs = this.parseParams<DynamicValueString>(artefact?.argument?.value);
     if (!keywordInputs) {
       return undefined;
     }
@@ -57,42 +49,33 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       'Input',
     ]);
 
-    return this._artefactInlineUtils.convert(inputs, isResolved);
+    return this._artefactInlineUtils.convert(inputs);
   }
 
-  private getReportNodeInputs(reportNode?: KeywordReportNode, isResolved?: boolean): ArtefactInlineItem[] | undefined {
-    if (!reportNode?.input) {
+  private getReportNodeInputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+    const artefactInputs = this.parseParams<DynamicValueString>(reportNode?.resolvedArtefact?.argument?.value);
+    const resolvedInputs = this.parseParams(reportNode?.input);
+    if (!resolvedInputs) {
       return undefined;
     }
-    let inputParams: Record<string, string> | undefined;
-    try {
-      inputParams = reportNode?.input ? JSON.parse(reportNode.input) : undefined;
-    } catch {
-      inputParams = undefined;
-    }
-    if (!inputParams) {
-      return undefined;
-    }
-    const inputValues: ArtefactInlineItemSource = Object.entries(inputParams).map(([key, value]) => [
-      key,
-      value,
-      'log-in',
-      'Input',
-    ]);
+    const icon = 'log-in';
+    const iconTooltip = 'Input';
+    const inputValues: ArtefactInlineItemSource = Object.entries(resolvedInputs).map(([label, value]) => {
+      const valueExplicitExpression = artefactInputs?.[label]?.expression;
+      return {
+        label,
+        value,
+        valueExplicitExpression,
+        icon,
+        iconTooltip,
+      };
+    });
 
-    return this._artefactInlineUtils.convert(inputValues, isResolved);
+    return this._artefactInlineUtils.convert(inputValues);
   }
 
-  private getReportNodeOutputs(reportNode?: KeywordReportNode, isResolved?: boolean): ArtefactInlineItem[] | undefined {
-    if (!reportNode?.output) {
-      return undefined;
-    }
-    let outputParams: Record<string, string> | undefined;
-    try {
-      outputParams = reportNode?.output ? JSON.parse(reportNode.output) : undefined;
-    } catch {
-      outputParams = undefined;
-    }
+  private getReportNodeOutputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+    const outputParams = this.parseParams(reportNode?.output);
     if (!outputParams) {
       return undefined;
     }
@@ -102,6 +85,19 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       'log-out',
       'Output',
     ]);
-    return this._artefactInlineUtils.convert(outputValues, isResolved);
+    return this._artefactInlineUtils.convert(outputValues);
+  }
+
+  private parseParams<T = string>(params?: string): Record<string, T> | undefined {
+    if (!params) {
+      return undefined;
+    }
+    let result: Record<string, T> | undefined;
+    try {
+      result = JSON.parse(params);
+    } catch {
+      result = undefined;
+    }
+    return result;
   }
 }

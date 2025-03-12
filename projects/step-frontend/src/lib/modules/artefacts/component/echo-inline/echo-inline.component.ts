@@ -22,23 +22,29 @@ export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoArtefac
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<EchoArtefact, EchoReportNode>()
-    .extractReportNodeItems((reportNode, isResolved) => this.getReportNodeItems(reportNode, isResolved))
-    .extractArtefactItems((artefact, isResolved) => this.getArtefactItems(artefact, isResolved));
+    .extractReportNodeItems((reportNode) => this.getReportNodeItems(reportNode))
+    .extractArtefactItems((artefact) => this.getArtefactItems(artefact));
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));
 
-  private getReportNodeItems(reportNode?: EchoReportNode, isResolved?: boolean): ArtefactInlineItem[] | undefined {
+  private getReportNodeItems(reportNode?: EchoReportNode): ArtefactInlineItem[] | undefined {
     const echo = reportNode?.echo;
+    const echoExpression = reportNode?.resolvedArtefact?.text?.expression;
     if (!echo) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([[undefined, echo]], isResolved);
+    return this._artefactInlineUtils.convert([
+      {
+        value: echo,
+        valueExplicitExpression: echoExpression,
+      },
+    ]);
   }
 
-  private getArtefactItems(echo?: EchoArtefact, isResolved: boolean = false): ArtefactInlineItem[] | undefined {
+  private getArtefactItems(echo?: EchoArtefact): ArtefactInlineItem[] | undefined {
     if (!echo) {
       return undefined;
     }
-    return this._artefactInlineUtils.convert([[undefined, echo.text]], isResolved);
+    return this._artefactInlineUtils.convert([[undefined, echo.text]]);
   }
 }

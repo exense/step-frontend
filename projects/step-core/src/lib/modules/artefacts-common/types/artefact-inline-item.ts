@@ -1,12 +1,15 @@
-import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
+export interface ArtefactInlineItemsResolvableField {
+  value?: string | number | boolean | object;
+  expression?: string;
+  tooltip?: string;
+  isResolved?: boolean;
+}
 
 export interface ArtefactInlineItem {
   icon?: string;
   iconTooltip?: string;
-  label?: DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
-  labelTooltip?: string;
-  value?: DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
-  valueTooltip?: string;
+  label?: ArtefactInlineItemsResolvableField;
+  value?: ArtefactInlineItemsResolvableField;
   isValueFirst?: boolean;
   prefix?: string;
   suffix?: string;

@@ -46,7 +46,8 @@ step-artefact-inline-field {
     font-weight: bold;
   }
 
-  .dynamic-value {
+  .dynamic,
+  .not-resolved {
     color: var.$dark-blue;
   }
 }

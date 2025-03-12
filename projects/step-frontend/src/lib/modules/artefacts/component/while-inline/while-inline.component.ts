@@ -21,7 +21,7 @@ export class WhileInlineComponent extends BaseInlineArtefactComponent<WhileArtef
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<WhileArtefact, WhileReportNode>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
@@ -35,7 +35,7 @@ export class WhileInlineComponent extends BaseInlineArtefactComponent<WhileArtef
       if (artefact.timeout?.value || artefact.timeout?.expression) {
         source.push(['timeout', artefact.timeout]);
       }
-      return this._artefactInlineItemUtils.convert(source, isResolved);
+      return this._artefactInlineItemUtils.convert(source);
     });
 
   protected items = computed(() => this._itemsBuilder.build(this.currentContext()));

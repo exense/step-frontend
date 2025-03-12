@@ -19,11 +19,11 @@ export class CheckInlineComponent extends BaseInlineArtefactComponent<CheckArtef
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<CheckArtefact>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert([[undefined, artefact.expression]], isResolved);
+      return this._artefactInlineItemUtils.convert([[undefined, artefact.expression]]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

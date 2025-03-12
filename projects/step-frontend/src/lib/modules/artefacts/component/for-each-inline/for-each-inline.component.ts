@@ -25,14 +25,14 @@ export class ForEachInlineComponent extends BaseInlineArtefactComponent<ForEachA
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .asyncBuilder<ForEachArtefact>()
-    .extractArtefactItemsAsync((artefact, isResolved) => {
+    .extractArtefactItemsAsync((artefact) => {
       if (!artefact?.dataSourceType || !artefact?.dataSource) {
         return of(undefined);
       }
 
       return this._dataSourceFields.createDataSourceFields(artefact.dataSourceType, artefact.dataSource).pipe(
         map((items) => [['threads', artefact.threads], ...items] as ArtefactInlineItemSource),
-        map((items) => this._artefactInlineUtils.convert(items, isResolved)),
+        map((items) => this._artefactInlineUtils.convert(items)),
       );
     });
 

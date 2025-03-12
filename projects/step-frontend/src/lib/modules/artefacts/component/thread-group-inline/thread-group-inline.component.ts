@@ -25,7 +25,7 @@ export class ThreadGroupInlineComponent extends BaseInlineArtefactComponent<
 
   private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
     .builder<ThreadGroupArtefact, ThreadGroupReportNode>()
-    .extractArtefactItems((artefact, isResolved) => {
+    .extractArtefactItems((artefact) => {
       if (!artefact) {
         return undefined;
       }

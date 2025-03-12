@@ -24,11 +24,11 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
 
   private searchCriteriaBuilder = this._artefactInlineItemBuilder
     .builder<CallPlanArtefact>()
-    .extractArtefactItems((artefact, isResolved) => this.getPlanSearchCriteria(artefact, isResolved));
+    .extractArtefactItems((artefact) => this.getPlanSearchCriteria(artefact));
 
   private inputsBuilder = this._artefactInlineItemBuilder
     .builder<CallPlanArtefact>()
-    .extractArtefactItems((artefact, isResolved) => this.getPlanInputs(artefact, isResolved));
+    .extractArtefactItems((artefact) => this.getPlanInputs(artefact));
 
   protected readonly items = computed(() => {
     const ctx = this.currentContext();
@@ -38,7 +38,7 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
     return !result.length ? undefined : result;
   });
 
-  private getPlanInputs(artefact?: CallPlanArtefact, isResolved?: boolean): ArtefactInlineItem[] {
+  private getPlanInputs(artefact?: CallPlanArtefact): ArtefactInlineItem[] {
     if (!artefact?.input) {
       return [];
     }
@@ -55,10 +55,10 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
       'log-in',
       'Input',
     ]);
-    return this._artefactInlineItemUtils.convert(inputs, isResolved);
+    return this._artefactInlineItemUtils.convert(inputs);
   }
 
-  private getPlanSearchCriteria(artefact?: CallPlanArtefact, isResolved?: boolean): ArtefactInlineItem[] {
+  private getPlanSearchCriteria(artefact?: CallPlanArtefact): ArtefactInlineItem[] {
     if (!artefact?.selectionAttributes?.value || artefact?.selectionAttributes?.value === '{}') {
       return [];
     }
@@ -76,6 +76,6 @@ export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPla
       'search',
       'Search criteria',
     ]);
-    return this._artefactInlineItemUtils.convert(searchCriteria, isResolved);
+    return this._artefactInlineItemUtils.convert(searchCriteria);
   }
 }
