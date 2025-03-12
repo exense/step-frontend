@@ -31,8 +31,13 @@ export class SetInlineComponent extends BaseInlineArtefactComponent<SetArtefact,
       if (!reportNode) {
         return undefined;
       }
-      const { key, value } = reportNode;
-      return this._artefactInlineItemUtils.convert([[key, value, 'log-in']]);
+      const { key: label, value } = reportNode;
+      const labelExplicitExpression = reportNode.resolvedArtefact?.key?.expression;
+      const valueExplicitExpression = reportNode.resolvedArtefact?.value?.expression;
+      const icon = 'log-in';
+      return this._artefactInlineItemUtils.convert([
+        { label, value, icon, labelExplicitExpression, valueExplicitExpression },
+      ]);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

@@ -2,14 +2,13 @@
 
 step-artefact-inline-field-list {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
 
   section.list {
     display: flex;
-    gap: 0.5rem;
 
     &.vertical {
+      gap: 0.5rem;
       flex-direction: column;
       width: 100%;
 

@@ -8,7 +8,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   selector: 'step-artefact-inline-field',
   templateUrl: './artefact-inline-field.component.html',
   styleUrl: './artefact-inline-field.component.scss',
-  imports: [NgClass, StepBasicsModule],
+  imports: [StepBasicsModule],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,23 +39,17 @@ export class ArtefactInlineFieldComponent {
   protected readonly labelTooltip = computed(() => this.label()?.tooltip ?? '');
   protected readonly valueTooltip = computed(() => this.value()?.tooltip ?? '');
 
+  protected readonly isValueFirst = computed(() => this.item()?.isValueFirst ?? false);
+
   protected readonly itemLabel = computed(() => {
-    const isValueFirst = this.item()?.isValueFirst;
     const label = this.label();
-    let result = '';
     if (label?.value !== undefined && label?.value !== null) {
       if (typeof label.value === 'object') {
-        result = JSON.stringify(label.value);
-      } else {
-        result = label.value.toString();
+        return JSON.stringify(label.value);
       }
-    } else {
-      result = label?.expression ?? '';
+      return label.value.toString();
     }
-    if (!isValueFirst) {
-      result = `${result}:`;
-    }
-    return result;
+    return label?.expression ?? '';
   });
 
   protected readonly itemValue = computed(() => {
