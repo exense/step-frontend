@@ -216,6 +216,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     map((execution) => {
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
+    tap((params) => console.log('PARAMS LENGTH', params?.length ?? 0)),
   );
   protected isResolvedParametersVisible = signal(false);
 

@@ -20,17 +20,22 @@ import {
   DateUtilsService,
   FilterConditionFactoryService,
   ItemsPerPageService,
-  ReportNode,
   SearchValue,
   StepDataSource,
   TableRemoteDataSourceFactoryService,
   TableSearch,
+  ReportNode,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
+  TablePersistenceStateService,
+  TableStorageService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
+import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
 const PAGE_SIZE = 25;
 
@@ -43,6 +48,12 @@ const PAGE_SIZE = 25;
       provide: ItemsPerPageService,
       useExisting: AggregatedTreeNodeIterationListComponent,
     },
+    {
+      provide: TableStorageService,
+      useClass: TableMemoryStorageService,
+    },
+    TablePersistenceStateService,
+    tablePersistenceConfigProvider('aggregatedIterationList', STORE_ALL),
   ],
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
