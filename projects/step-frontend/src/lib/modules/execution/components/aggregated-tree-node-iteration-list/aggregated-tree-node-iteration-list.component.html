@@ -37,7 +37,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          {{ element.executionTime | date: 'HH:mm:ss' }}
+          <step-alt-execution-time [startTime]="element.executionTime" [duration]="element.duration" />
         </div>
       </td>
     </ng-container>
