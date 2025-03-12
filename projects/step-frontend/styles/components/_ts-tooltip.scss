@@ -3,6 +3,7 @@
     position: absolute;
     z-index: 100;
     display: block;
+    white-space: nowrap;
     margin: 0 2.4rem;
     top: 0; // this is a tricky fix. if top is not set it will make the container overflow
     cursor: default;

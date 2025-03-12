@@ -8,6 +8,7 @@ import { TooltipPlacementFunction } from './tooltip-placement-function';
 import { TooltipParentContainer } from '../types/tooltip-parent-container';
 import { TooltipContextData } from './tooltip-context-data';
 import { TSChartSeries } from '../types/ts-chart-series';
+import { TimeSeriesChartComponent } from '../components/time-series-chart/time-series-chart.component';
 
 @Injectable()
 export class CustomTooltipPlugin {
@@ -27,45 +28,21 @@ export class CustomTooltipPlugin {
   /**
    * Execution link can also be displayed in the tooltip. Settings and metadata have to be configured for these links.
    */
-  createPlugin(
-    ref: TooltipParentContainer,
-    renderContent: (container: any, data: TooltipContextData) => boolean,
-  ): uPlot.Plugin {
+  createPlugin(ref: TimeSeriesChartComponent): uPlot.Plugin {
     let chart: uPlot;
     let over: HTMLDivElement;
-    let bound: Element;
-    let bLeft: number;
-    let bTop: number;
     let cursorIsOnChartArea = false; // will be changed by onmouseleave and onmouseenter events
-
-    function syncBounds(): void {
-      const bbox = over.getBoundingClientRect();
-      bLeft = bbox.left;
-      bTop = bbox.top;
-    }
+    let tooltipActive = false;
 
     const hideTooltip = () => {
-      //@ts-ignore
-      ref.tooltipEvents.emit({ type: 'HIDE' });
-      // tooltip.style.display = 'none';
+      if (tooltipActive) {
+        tooltipActive = false;
+        ref.tooltipEvents.emit({ type: 'HIDE' });
+      }
     };
-
-    const showTooltip = () => {
-      //@ts-ignore
-      ref.tooltipEvents.emit({ type: 'SHOW' });
-    };
-
-    const tooltip = this.createTooltipElement();
-    this._doc.body.appendChild(tooltip);
-
-    let openMenu: Element | undefined;
-
-    tooltip.addEventListener('click', () => {
-      openMenu?.remove();
-    });
 
     const chartIsLocked = () => {
-      //@ts-ignore
+      //@ts-ignore access the lock state directly in the library
       return chart.cursor._lock;
     };
 
@@ -79,21 +56,17 @@ export class CustomTooltipPlugin {
           chart = u;
           over = u.over;
 
-          bound = over;
-
-          // since the charts are synchronized, the events are called in each chart, so it's difficult to know if we're
+          // since the charts are synchronized, the events are called in each chart, so we don't know if we're
           // hovering on one or on the other, so the following events keep track of the active chart.
           over.onclick = () => {
-            // @ts-ignore
+            // @ts-ignore this is how we access the lock state directly in uPlot library
             const lockState = u.cursor._lock;
             ref.lockStateChange.emit(lockState);
           };
 
           over.onmouseenter = () => {
             cursorIsOnChartArea = true;
-            if (chartIsLocked()) {
-              return;
-            }
+            tooltipActive = true;
           };
 
           over.onmouseleave = () => {
@@ -103,27 +76,18 @@ export class CustomTooltipPlugin {
             }
           };
         },
-        destroy: (u: uPlot) => {
-          tooltip?.remove();
-        },
-        setSize: (u: uPlot) => {
-          syncBounds();
-        },
+        destroy: (u: uPlot) => {},
+        setSize: (u: uPlot) => {},
         // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
           //@ts-ignore
           // this is called for all linked charts
           if (chartIsLocked()) {
             return;
-          } else {
-            if (!cursorIsOnChartArea) {
-              // the cursor is moving on another chart
-              hideTooltip();
-            } else {
-              showTooltip();
-            }
           }
           if (!cursorIsOnChartArea) {
+            // cursor moving on another chart
+            hideTooltip();
             return;
           }
           const { left, top, idx } = u.cursor;
@@ -142,17 +106,9 @@ export class CustomTooltipPlugin {
             chartRef: u,
             parentRef: ref,
           };
-          //@ts-ignore
-          const shouldBeVisible = ref.renderCustomTooltipFn(contextData); // You can still check visibility logic here
-          if (!shouldBeVisible) {
-            //@ts-ignore
-            ref.tooltipVisibilityChange.emit(false);
-            return;
-          }
 
           // Emit event to parent, which will handle positioning using cdkOverlay
           const boundingClientRect = over.getBoundingClientRect();
-          const padding = 20;
 
           //@ts-ignore
           ref.tooltipEvents.emit({
@@ -166,37 +122,5 @@ export class CustomTooltipPlugin {
         },
       },
     };
-  }
-
-  private createTooltipElement() {
-    const tooltip = this.createElementWithClass('div', 'ts-tooltip');
-    tooltip.onclick = (e) => e.stopPropagation();
-    tooltip.style.display = 'none';
-    tooltip.style.position = 'absolute';
-    return tooltip;
-  }
-
-  private getAdjustedBoundaries(element: Element) {
-    const rect = element.getBoundingClientRect();
-    let shiftUp = 0; // positive value when need to avoid scroll
-
-    if (rect.bottom > this.win.innerHeight) {
-      shiftUp = rect.bottom - this.win.innerHeight;
-    }
-
-    return {
-      top: rect.top - shiftUp,
-      bottom: rect.bottom - shiftUp,
-      left: 0,
-      right: this.win.innerWidth,
-      width: this.win.innerWidth,
-      height: rect.height,
-    };
-  }
-
-  private createElementWithClass(element: string, className: string): HTMLElement {
-    const dom = this._doc.createElement(element);
-    dom.classList.add(className);
-    return dom;
   }
 }

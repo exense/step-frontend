@@ -9,5 +9,5 @@ export interface TooltipContextData {
   xValues: number[];
   series: TSChartSeries[];
   chartRef: uPlot;
-  parentRef: TooltipParentContainer;
+  parentRef: TimeSeriesChartComponent;
 }

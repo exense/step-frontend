@@ -10,7 +10,13 @@ import {
   Signal,
 } from '@angular/core';
 import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
-import { Execution, SortDirection, TableApiWrapperService, TableRequestData } from '@exense/step-core';
+import {
+  Execution,
+  ExecutionsService,
+  SortDirection,
+  TableApiWrapperService,
+  TableRequestData,
+} from '@exense/step-core';
 import { TSChartSeries } from '../../../../timeseries/modules/chart';
 
 interface TransformedSeries {
@@ -35,8 +41,10 @@ interface ExecutionItem {
 export class ExecutionsChartTooltipComponent {
   private _tableApiWrapper = inject(TableApiWrapperService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _executionService = inject(ExecutionsService);
 
   readonly data = input<TooltipContextData | undefined>(undefined);
+  readonly taskId = input.required<string>();
 
   readonly EXECUTIONS_LIST_LIMIT = 10;
 
@@ -75,26 +83,27 @@ export class ExecutionsChartTooltipComponent {
   }
 
   fetchExecutionsForSelectedItem(item: TransformedSeries) {
-    const request: TableRequestData = {
-      limit: this.EXECUTIONS_LIST_LIMIT,
-      sort: { field: 'startTime', direction: SortDirection.ASCENDING },
-      filters: [
-        { field: 'result', value: item.label },
-        { collectionFilter: { type: 'Gte', field: 'startTime', value: item.timestamp } },
-        { collectionFilter: { type: 'Lte', field: 'startTime', value: item.timestamp + 1000 * 60 * 60 * 24 } },
-      ],
-    };
-    this._tableApiWrapper.requestTable('executions', request).subscribe((response) => {
-      this.executionsListTruncated = response.recordsFiltered > this.EXECUTIONS_LIST_LIMIT;
-      this.selectedSeriesExecutions = (response.data as Execution[]).map((execution) => {
-        return {
-          id: execution.id!,
-          name: execution.description!,
-          timestamp: new Date(execution.startTime!).toLocaleString(),
-        };
+    let data = this.data()!;
+    let chartInterval = data.xValues[1] - data.xValues[0];
+    const limit = 50;
+    this._executionService
+      .getLastExecutionsByTaskId(this.taskId(), limit, item.timestamp, item.timestamp + chartInterval)
+      .subscribe((executions) => {
+        this.selectedSeriesExecutions = executions
+          .filter((ex) => {
+            console.log(ex);
+            return ex.result === item.label;
+          })
+          .map((execution) => {
+            return {
+              id: execution.id!,
+              name: execution.description!,
+              timestamp: new Date(execution.startTime!).toLocaleString(),
+            };
+          });
+        this.executionsListTruncated = executions.length >= limit;
+        this._changeDetectorRef.detectChanges();
       });
-      this._changeDetectorRef.detectChanges();
-    });
   }
 
   jumpToExecution(execution: ExecutionItem) {

@@ -44,7 +44,7 @@ import { defer, Observable, of, switchMap } from 'rxjs';
 })
 export class ChartStandardTooltipComponent {
   //@ts-ignore
-  data = signal<TooltipContextData>(null);
+  data = input<TooltipContextData>(null);
 
   @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   private _executionsService = inject(ExecutionsService);
@@ -76,7 +76,6 @@ export class ChartStandardTooltipComponent {
       return;
     }
     const contextData: TooltipContextData = this.data()!;
-    console.log('data updated');
     const settings: TsTooltipOptions = contextData.parentRef.settings.tooltipOptions;
     const idx: number = contextData.idx!;
     if (idx === undefined || contextData.idY === undefined) {
@@ -168,7 +167,7 @@ export class ChartStandardTooltipComponent {
   }
 
   private getMarkerClass(stroke: SeriesStroke): string {
-    switch (stroke.type) {
+    switch (stroke?.type) {
       case MarkerType.SQUARE:
         return 'step-marker-filled-square';
       case MarkerType.DOTS:

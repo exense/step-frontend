@@ -11,7 +11,7 @@
       [height]="height"
     >
       <ng-template tooltipContent let-data>
-        <step-chart-standard-tooltip />
+        <step-chart-standard-tooltip [data]="data" />
       </ng-template>
     </step-timeseries-chart>
   }
