@@ -5,7 +5,7 @@
   top: 0; // this is a tricky fix. if top is not set it will make the container overflow
   cursor: default;
   background: #fffaf2d9;
-  padding: 8px 12px;
+  padding: 0.8rem 1.2rem;
   box-shadow: 2px 2px 5px 2px #a3a3a3;
 
   .tooltip-row {
@@ -61,12 +61,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   z-index: 9999;
   white-space: nowrap;
-  padding: 4px 0;
+  padding: 0.4rem 0;
   font-size: 14px;
 }
 
 .menu-item {
-  padding: 4px 12px;
+  padding: 0.4rem 1.2rem;
   cursor: pointer;
 }
 
@@ -76,7 +76,7 @@
 
 .link-icon {
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 0.2rem 0.4rem;
   display: inline-block;
 }
 
