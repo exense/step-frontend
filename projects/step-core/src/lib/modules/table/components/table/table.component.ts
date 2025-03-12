@@ -61,6 +61,11 @@ import { RowDirective } from '../../directives/row.directive';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
+interface SearchData {
+  search: Record<string, SearchValue>;
+  resetPagination: boolean;
+}
+
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
@@ -87,9 +92,14 @@ export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Obser
       provide: TableHighlightItemContainer,
       useExisting: forwardRef(() => TableComponent),
     },
+    TablePersistenceUrlStateService,
     {
       provide: TablePersistenceStateService,
-      useClass: TablePersistenceUrlStateService,
+      useFactory: () => {
+        const urlState = inject(TablePersistenceUrlStateService, { self: true });
+        const externalDefinedState = inject(TablePersistenceStateService, { skipSelf: true, optional: true });
+        return externalDefinedState ?? urlState;
+      },
     },
     {
       provide: TableColumnsDictionaryService,
@@ -253,11 +263,15 @@ export class TableComponent<T>
     _columnDefinitions.setup(this.contentColumns, this.customRemoteColumns);
   }
 
-  private search$ = new BehaviorSubject<Record<string, SearchValue>>(this._tableState.getSearch());
+  private search$ = new BehaviorSubject<SearchData>({
+    search: this._tableState.getSearch(),
+    resetPagination: true,
+  });
   private filter$ = toObservable(this.filter);
   private tableParams$ = toObservable(this.tableParams);
 
   readonly hasFilter$ = this.search$.pipe(
+    map((value) => value.search),
     map((search) => {
       const values = Object.values(search);
       if (values.length === 0) {
@@ -317,11 +331,11 @@ export class TableComponent<T>
       searchWithTimeStamp: this.search$.pipe(timestamp()),
     }).pipe(
       map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
-        const search = searchWithTimeStamp.value;
+        const { search, resetPagination } = searchWithTimeStamp.value;
         let page = pageWithTimeStamp.value;
         // Change has been triggered, by search. In that case reset page to first one
         const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
-        if (isRestToFirstPage) {
+        if (resetPagination && isRestToFirstPage) {
           page = this.createPageInitialValue();
           this.page!.firstPage();
         }
@@ -369,7 +383,12 @@ export class TableComponent<T>
     if (statePage) {
       this.page.pageSize.set(statePage.pageSize);
       this.page.pageIndex.set(statePage.pageIndex);
-      this.page.length.set(statePage.length);
+      this.page.length.update((current) => {
+        if (!!current && !statePage.length) {
+          return current;
+        }
+        return statePage.length;
+      });
       initialPage = statePage;
     } else {
       this.page.firstPage();
@@ -437,18 +456,28 @@ export class TableComponent<T>
 
   private setupExternalSearchChangeHandle(): void {
     this._tableState.externalSearchChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((externalSearch) => {
-      this.search$.next(externalSearch);
+      this.search$.next({ search: externalSearch, resetPagination: true });
     });
   }
 
-  onSearch(column: string, searchValue: SearchValue): void;
-  onSearch(column: string, value: string, regex?: boolean): void;
-  onSearch(column: string, searchValue: string | SearchValue, regex: boolean = true): void {
-    const search = { ...this.search$.value };
+  onSearch(column: string, searchValue: SearchValue, resetPagination?: boolean): void;
+  onSearch(column: string, value: string, regex?: boolean, resetPagination?: boolean): void;
+  onSearch(
+    column: string,
+    searchValue: string | SearchValue,
+    regexOrResetPagination: boolean = true,
+    resetPaginationParam: boolean = true,
+  ): void {
+    const search = { ...this.search$.value.search };
     let searchCol: SearchValue;
+    let regex: boolean;
+    let resetPagination: boolean;
     if (typeof searchValue === 'string') {
+      regex = regexOrResetPagination;
+      resetPagination = resetPaginationParam;
       searchCol = regex ? { value: searchValue, regex } : searchValue;
     } else {
+      resetPagination = regexOrResetPagination;
       searchCol = searchValue;
     }
     type RegexSearchValue = { regex?: boolean; value: string };
@@ -458,15 +487,15 @@ export class TableComponent<T>
       }
     }
     search[column] = searchCol;
-    this.search$.next(search);
+    this.search$.next({ search, resetPagination });
   }
 
   getSearchValue$(column: string): Observable<SearchValue | undefined> {
-    return this.search$.pipe(map((value) => value[column]));
+    return this.search$.pipe(map((value) => value.search[column]));
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
-    const [search, filter, params] = [this.search$.value, this.filter(), this.tableParams()];
+    const [search, filter, params] = [this.search$.value.search, this.filter(), this.tableParams()];
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
