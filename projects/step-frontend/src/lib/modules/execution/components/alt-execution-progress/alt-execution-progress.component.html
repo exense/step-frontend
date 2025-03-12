@@ -46,20 +46,20 @@
           <step-popover-content>
             <div class="execution-resolved-params">
               <strong class="resolved-params-header">Resolved parameters</strong>
-              <step-table [dataSource]="resolvedParams">
-                <ng-container matColumnDef="key">
-                  <th mat-header-cell *matHeaderCellDef>Key</th>
-                  <td mat-cell *matCellDef="let element">{{ element.key }}</td>
-                </ng-container>
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>Value</th>
-                  <td mat-cell *matCellDef="let element">{{ element.value }}</td>
-                </ng-container>
-              </step-table>
+              <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
             </div>
           </step-popover-content>
         </step-popover>
       }
+      <button
+        type="button"
+        mat-icon-button
+        color="default"
+        (click)="_dialogs.openAgentsModal(execution?.agentsInvolved || '', execution?.description || 'Unknown plan')"
+        matTooltip="Show agents"
+      >
+        <step-icon name="agent" />
+      </button>
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }

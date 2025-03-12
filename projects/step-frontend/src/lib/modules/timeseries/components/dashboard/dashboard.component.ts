@@ -382,8 +382,13 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private updateRelativeRangeIfNeeded(settings: DashboardTimeRangeSettings): DashboardTimeRangeSettings {
     const wasFullSelection = TimeSeriesUtils.timeRangesEqual(settings.fullRange, settings.selectedRange);
     if (settings.pickerSelection.type === 'RELATIVE') {
-      const now = new Date().getTime() - 5000;
-      const newFullRange = { from: now - settings.pickerSelection.relativeSelection!.timeInMs, to: now };
+      const now = new Date().getTime();
+      let to = now - 5000;
+      let from = to - settings.pickerSelection.relativeSelection!.timeInMs;
+      if (to < from) {
+        to = now;
+      }
+      const newFullRange = { from: from, to: to };
       let newSelection: TimeRange = newFullRange;
       if (!wasFullSelection) {
         newSelection = TimeSeriesUtils.cropInterval(settings.selectedRange, newFullRange) || newFullRange;

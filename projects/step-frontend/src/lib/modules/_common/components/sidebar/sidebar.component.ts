@@ -22,6 +22,7 @@ import {
   BookmarkService,
   MENU_ITEMS,
   BookmarkNavigatorService,
+  AuthService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, first, map, startWith } from 'rxjs';
@@ -46,6 +47,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
+  private _authService = inject(AuthService);
   private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
     startWith([]),
     map(
@@ -185,7 +187,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   showVersionsDialog(): void {
-    this._matDialog.open(VersionsDialogComponent);
+    this._authService
+      .hasRight$('admin-ui-menu')
+      .subscribe((hasRight) => hasRight && this._matDialog.open(VersionsDialogComponent));
   }
 
   handleScroll($event: Event): void {
