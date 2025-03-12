@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 import type { DynamicValueInteger } from './DynamicValueInteger';
+import type { Expression } from './Expression';
 import type { JsonValue } from './JsonValue';
 
 export type Function = {
@@ -13,6 +14,7 @@ export type Function = {
   executeLocally?: boolean;
   tokenSelectionCriteria?: Record<string, string>;
   managed?: boolean;
+  activationExpression?: Expression;
   useCustomTemplate?: boolean;
   htmlTemplate?: string;
   description?: string;

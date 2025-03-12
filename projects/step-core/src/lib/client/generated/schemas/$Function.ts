@@ -36,6 +36,9 @@ export const $Function = {
     managed: {
       type: 'boolean',
     },
+    activationExpression: {
+      type: 'Expression',
+    },
     useCustomTemplate: {
       type: 'boolean',
     },

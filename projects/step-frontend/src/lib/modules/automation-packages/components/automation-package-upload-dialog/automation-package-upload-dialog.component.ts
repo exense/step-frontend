@@ -19,16 +19,19 @@ export class AutomationPackageUploadDialogComponent {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
 
-  private _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
+  protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('formContainer') private formContainer?: NgForm;
 
+  readonly newPackage = !this._package;
   readonly dialogTitle = !this._package
     ? 'Upload New Automation Package'
     : `Upload new file for "${this._package.attributes?.['name'] ?? this._package.id}"`;
 
   file?: File;
+  version?: string;
+  activationExpr?: string;
   progress$?: Observable<number>;
 
   openFileChooseDialog(): void {
@@ -49,25 +52,56 @@ export class AutomationPackageUploadDialogComponent {
       return;
     }
 
-    if (!this.file) {
-      this.formContainer?.form?.markAllAsTouched();
-      return;
+    if (this.file) {
+      const upload = !this._package?.id
+        ? this._api.uploadCreateAutomationPackage(
+            this.file,
+            this._package?.version,
+            this._package?.activationExpression?.script,
+          )
+        : this._api.uploadUpdateAutomationPackage(
+            this._package.id,
+            this.file,
+            this._package?.version,
+            this._package?.activationExpression?.script,
+          );
+
+      this.progress$ = upload.progress$;
+
+      upload.response$
+        .pipe(
+          map(() => true),
+          catchError((err) => {
+            console.error(err);
+            return of(false);
+          }),
+        )
+        .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
+    } else if (this._package?.id) {
+      this._api
+        .updateAutomationPackageMetadata(
+          this._package?.id,
+          this._package?.activationExpression?.script,
+          this._package?.version,
+        )
+        .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
     }
+  }
 
-    const upload = !this._package?.id
-      ? this._api.uploadCreateAutomationPackage(this.file)
-      : this._api.uploadUpdateAutomationPackage(this._package.id, this.file);
+  updateVersion(version: string) {
+    if (!this._package) {
+      this._package = {};
+    }
+    this._package.version = version;
+  }
 
-    this.progress$ = upload.progress$;
-
-    upload.response$
-      .pipe(
-        map(() => true),
-        catchError((err) => {
-          console.error(err);
-          return of(false);
-        }),
-      )
-      .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
+  updateActivationExpression(script: string) {
+    if (!this._package) {
+      this._package = {};
+    }
+    if (!this._package.activationExpression) {
+      this._package.activationExpression = {};
+    }
+    this._package.activationExpression.script = script;
   }
 }

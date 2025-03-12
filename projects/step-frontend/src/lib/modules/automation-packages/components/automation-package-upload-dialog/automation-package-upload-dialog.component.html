@@ -18,12 +18,38 @@
             </step-suffix>
           </step-form-field>
         </step-upload-container>
+        <step-form-field>
+          <step-label>Automation Package Version</step-label>
+          <input
+            placeholder="Version (optional)"
+            autofocus
+            name="version"
+            [ngModel]="_package?.version"
+            (ngModelChange)="updateVersion($event)"
+            title="Version"
+          />
+        </step-form-field>
+        <step-form-field>
+          <step-label>Activation Expression</step-label>
+          <input
+            placeholder="Activation Expression (optional)"
+            name="activationExpression"
+            autofocus
+            [ngModel]="_package?.activationExpression?.script"
+            (ngModelChange)="updateActivationExpression($event)"
+            title="Activation Expression"
+          />
+        </step-form-field>
         <input #fileInput type="file" (input)="selectFile()" />
       </form>
     </ng-template>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
+    @if (!!file || newPackage) {
+      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
+    } @else {
+      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Update</button>
+    }
   </div>
 </step-modal-window>

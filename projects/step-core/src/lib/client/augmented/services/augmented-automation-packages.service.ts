@@ -14,6 +14,7 @@ import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { query } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -83,9 +84,20 @@ export class AugmentedAutomationPackagesService
       );
   }
 
-  uploadCreateAutomationPackage(file: File): ReturnType<typeof uploadWithProgress> {
+  uploadCreateAutomationPackage(
+    file: File,
+    version?: string,
+    activationExpression?: string,
+  ): ReturnType<typeof uploadWithProgress> {
     const body = new FormData();
     body.set('file', file);
+
+    if (version) {
+      body.set('version', version);
+    }
+    if (activationExpression) {
+      body.set('activationExpr', activationExpression);
+    }
 
     const request$ = this._http.request(
       'POST',
@@ -104,9 +116,21 @@ export class AugmentedAutomationPackagesService
     return uploadWithProgress(request$);
   }
 
-  uploadUpdateAutomationPackage(id: string, file: File): ReturnType<typeof uploadWithProgress> {
+  uploadUpdateAutomationPackage(
+    id: string,
+    file: File,
+    version?: string,
+    activationExpression?: string,
+  ): ReturnType<typeof uploadWithProgress> {
     const body = new FormData();
     body.set('file', file);
+
+    if (version) {
+      body.set('version', version);
+    }
+    if (activationExpression) {
+      body.set('activationExpr', activationExpression);
+    }
 
     const request$ = this._http.request(
       'PUT',
