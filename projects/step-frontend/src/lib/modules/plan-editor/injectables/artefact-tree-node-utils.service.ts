@@ -370,7 +370,7 @@ export class ArtefactTreeNodeUtilsService
         }
         break;
       default:
-        name = 'add Step';
+        name = 'Steps';
         icon = 'circle';
         if (!hideChildren) {
           childArtefacts = originalArtefact.children;
