@@ -511,7 +511,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
       request.collectAttributesValuesLimit = 10;
     }
-    return this._timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.collectionResolutionUsed = response.collectionResolution;

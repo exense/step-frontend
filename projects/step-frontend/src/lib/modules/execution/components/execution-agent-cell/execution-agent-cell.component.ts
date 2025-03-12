@@ -10,11 +10,7 @@ export class AgentsCellComponent {
   readonly agents = input('');
   readonly description = input('Agents');
 
-  protected agentsArray = computed(() =>
-    this.agents()
-      .split(' ')
-      .filter((agent) => agent.trim() !== ''),
-  );
+  protected agentsArray = computed(() => (this.agents() ?? '').split(' ').filter((agent) => agent.trim() !== ''));
 
   private _dialog = inject(MatDialog);
 

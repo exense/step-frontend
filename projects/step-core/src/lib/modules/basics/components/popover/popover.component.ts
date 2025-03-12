@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  forwardRef,
   HostListener,
   Input,
   Output,
@@ -17,6 +18,11 @@ export enum PopoverMode {
   CLICK,
 }
 
+export abstract class PopoverService {
+  abstract freezePopover(): void;
+  abstract unfreezePopover(): void;
+}
+
 @Component({
   selector: 'step-popover',
   templateUrl: './popover.component.html',
@@ -24,8 +30,14 @@ export enum PopoverMode {
   changeDetection: ChangeDetectionStrategy.OnPush,
   exportAs: 'StepPopover',
   encapsulation: ViewEncapsulation.None,
+  providers: [
+    {
+      provide: PopoverService,
+      useExisting: forwardRef(() => PopoverComponent),
+    },
+  ],
 })
-export class PopoverComponent {
+export class PopoverComponent implements PopoverService {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
   @Input() noPadding = false;
@@ -38,9 +50,22 @@ export class PopoverComponent {
   private toggled = false;
   private tooltipTimeout?: ReturnType<typeof setTimeout>;
 
+  private isPopoverFrozen = false;
+
   protected isMouseOverPopover = false;
 
+  freezePopover(): void {
+    this.isPopoverFrozen = true;
+  }
+
+  unfreezePopover(): void {
+    this.isPopoverFrozen = false;
+  }
+
   private togglePopover(): void {
+    if (this.isPopoverFrozen) {
+      return;
+    }
     this.toggled = !this.toggled;
     this.toggled ? this.triggerPopoverDirective.openMenu() : this.triggerPopoverDirective.closeMenu();
     this.toggledEvent.emit(this.toggled);

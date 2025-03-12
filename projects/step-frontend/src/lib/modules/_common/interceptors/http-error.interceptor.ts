@@ -111,11 +111,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       return error.error ?? error.text;
     }
 
-    return JSON.stringify(error);
+    return '';
   }
 
   private showError(error: any) {
-    if (typeof error !== 'string') {
+    if (typeof error !== 'string' || error === '') {
       this._errorLogger.log('Error with unknown format', error);
     } else {
       this._snackBar.open(error, 'dismiss');
