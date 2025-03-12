@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  max-width: 70rem;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: break-spaces;
+  word-break: break-all;
+}
