@@ -1,12 +1,17 @@
 <ng-template #tplLabel>
   @if (hasLabel()) {
     @if (labelExpression(); as labelExpression) {
-      <step-icon
-        [class.not-resolved]="!isLabelResolved()"
-        name="zap"
-        [matTooltip]="labelExpression"
-        matTooltipPosition="below"
-      />
+      @if (isLabelResolved()) {
+        <step-icon
+          name="zap"
+          class="resolved"
+          [matTooltip]="labelExpression"
+          matTooltipPosition="below"
+          (click)="displayText($event, labelExpression)"
+        />
+      } @else {
+        <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
+      }
     }
     <label [class.not-resolved]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
       {{ itemLabel() }}
@@ -19,13 +24,17 @@
 <ng-template #tplValue>
   @if (hasValue()) {
     @if (valueExpression(); as valueExpression) {
-      <step-icon
-        [class.not-resolved]="!isValueResolved()"
-        class="dynamic"
-        name="zap"
-        [matTooltip]="valueExpression"
-        matTooltipPosition="below"
-      />
+      @if (isValueResolved()) {
+        <step-icon
+          name="zap"
+          class="resolved"
+          [matTooltip]="valueExpression"
+          matTooltipPosition="below"
+          (click)="displayText($event, valueExpression)"
+        />
+      } @else {
+        <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
+      }
     }
     <span [class.not-resolved]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
       {{ itemValue() }}

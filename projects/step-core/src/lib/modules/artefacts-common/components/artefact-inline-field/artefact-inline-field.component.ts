@@ -71,17 +71,21 @@ export class ArtefactInlineFieldComponent {
   });
 
   protected displayValue($event: MouseEvent): void {
+    const label = this.itemLabel()?.toString() ?? '';
+    const value = this.itemValue()?.toString() ?? '';
+    this.displayText($event, value, label);
+  }
+
+  protected displayText($event: MouseEvent, text: string, title: string = ''): void {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
-    const label = this.itemLabel()?.toString() ?? '';
-    const value = this.itemValue()?.toString() ?? '';
-    if (!value) {
+    if (!text) {
       return;
     }
-    this._richEditorDialog.editText(value, {
+    this._richEditorDialog.editText(text, {
       isReadOnly: true,
-      title: label,
+      title,
       predefinedMode: AceMode.TEXT,
       wrapText: true,
     });
