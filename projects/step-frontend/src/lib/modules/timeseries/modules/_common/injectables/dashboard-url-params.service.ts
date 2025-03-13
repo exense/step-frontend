@@ -186,10 +186,16 @@ export class DashboardUrlParamsService {
   }
 
   private prefixAndPushUrlParams(params: Record<string, any>): void {
-    const prefixedParams = Object.keys(params).reduce((accumulator: any, key: string) => {
-      accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = params[key];
-      return accumulator;
-    }, {});
+    const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
+    Object.keys(updatedParams).forEach((key) => {
+      if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
+        updatedParams[key] = null; // Set to null so we force the cleaning of the param
+      }
+    });
+    Object.keys(params).forEach((key) => {
+      const prefixedParam = TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key;
+      updatedParams[prefixedParam] = params[key];
+    });
 
     // If current navigation is performing, update url parameters after the navigation is completed
     // Otherwise running navigation might be prevented.
@@ -203,7 +209,7 @@ export class DashboardUrlParamsService {
     previousNavigation$.subscribe(() => {
       this._router.navigate([], {
         relativeTo: this._activatedRoute,
-        queryParams: prefixedParams,
+        queryParams: updatedParams,
         queryParamsHandling: 'merge',
       });
     });
