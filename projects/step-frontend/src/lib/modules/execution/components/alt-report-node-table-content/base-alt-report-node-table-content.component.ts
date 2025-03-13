@@ -78,7 +78,11 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((searchValue) => {
-        this.tableSearch()?.onSearch('executionTime', searchValue);
+        if (typeof searchValue === 'string') {
+          this.tableSearch()?.onSearch('executionTime', searchValue, true, false);
+        } else {
+          this.tableSearch()?.onSearch('executionTime', searchValue, false);
+        }
       });
   }
 }

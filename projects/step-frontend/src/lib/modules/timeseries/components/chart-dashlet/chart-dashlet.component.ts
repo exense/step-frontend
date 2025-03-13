@@ -22,6 +22,8 @@ import {
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
+  FilterUtils,
+  OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -29,7 +31,7 @@ import {
   UPlotUtilsService,
 } from '../../modules/_common';
 import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
-import { defaultIfEmpty, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
+import { defaultIfEmpty, forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ChartDashletSettingsComponent } from '../chart-dashlet-settings/chart-dashlet-settings.component';
 import { Axis } from 'uplot';
@@ -43,6 +45,8 @@ import {
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TooltipContentDirective } from '../../modules/chart/components/time-series-chart/tooltip-content.directive';
+import { ChartStandardTooltipComponent } from '../../modules/chart/components/tooltip/chart-standard-tooltip.component';
 
 declare const uPlot: any;
 
@@ -73,6 +77,8 @@ const resolutionLabels: Record<string, string> = {
     TimeSeriesChartComponent,
     TimeseriesAggregatePickerComponent,
     MatTooltip,
+    TooltipContentDirective,
+    ChartStandardTooltipComponent,
   ],
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
@@ -118,6 +124,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
 
   syncGroupSubscription?: Subscription;
+  cachedRequest?: FetchBucketsRequest;
   cachedResponse?: TimeSeriesAPIResponse;
   showHigherResolutionWarning = false;
   collectionResolutionUsed: number = 0;
@@ -215,8 +222,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       secondaryAggregation!.params!['rateUnit'] = unit.unitKey;
     }
 
-    if (this.cachedResponse) {
-      this.createChart(this.cachedResponse);
+    if (this.cachedResponse && this.cachedRequest) {
+      this.createChart(this.cachedResponse, this.cachedRequest);
     } else {
       this.fetchDataAndCreateChart();
     }
@@ -264,7 +271,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
    * When there is no grouping, the key and label will be 'Value'.
    * If there are grouping, all empty elements will be replaced with an empty label
    */
-  private createChart(response: TimeSeriesAPIResponse): void {
+  private createChart(response: TimeSeriesAPIResponse, request: FetchBucketsRequest): void {
     let syncGroup: TimeSeriesSyncGroup | undefined;
     if (this.item.masterChartId) {
       syncGroup = this.context.getSyncGroup(this.item.masterChartId);
@@ -380,6 +387,37 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       });
     }
 
+    const fetchExecutionsFn: (idx: number, seriesIndex: number) => Observable<string[]> = (
+      idx: number,
+      seriesIndex: number,
+    ) => {
+      if (!response.collectionIgnoredAttributes?.includes('eId')) {
+        // if eId is not ignored, the eIds attributes should be received on the response
+        return of([]);
+      }
+      const selectedBucketAttributes = response.matrixKeys[seriesIndex];
+      const bucketOql = FilterUtils.objectToOQL(selectedBucketAttributes, 'attributes');
+      request.groupDimensions?.forEach((dimension) => {
+        if (!selectedBucketAttributes[dimension]) {
+          // force null filtering for missing attributes
+          selectedBucketAttributes[dimension] = null;
+        }
+      });
+      console.log(selectedBucketAttributes, bucketOql);
+      const isolateRequest: FetchBucketsRequest = {
+        start: xLabels[idx],
+        end: xLabels[idx] + response.interval,
+        groupDimensions: ['eId'],
+        oqlFilter: request.oqlFilter,
+        params: selectedBucketAttributes,
+      };
+      return this._timeSeriesService.getTimeSeries(isolateRequest).pipe(
+        map((response) => {
+          return response.matrixKeys.map((attributes) => attributes['eId']);
+        }),
+      );
+    };
+
     this.fetchLegendEntities(series).subscribe((v) => {
       this._internalSettings = {
         title: this.getChartTitle(),
@@ -392,6 +430,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
           zAxisLabel: this.getSecondAxesLabel(),
           yAxisUnit: yAxesUnit,
           useExecutionLinks: this.showExecutionLinks,
+          fetchExecutionsFn: fetchExecutionsFn,
         },
         showLegend: true,
         axes: axes,
@@ -472,12 +511,13 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       request.collectAttributeKeys = [TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE];
       request.collectAttributesValuesLimit = 10;
     }
-    return this._timeSeriesService.getTimeSeries(request).pipe(
+    return this._timeSeriesService.getMeasurements(request).pipe(
       tap((response) => {
         this.showHigherResolutionWarning = response.higherResolutionUsed;
         this.collectionResolutionUsed = response.collectionResolution;
         this.cachedResponse = response;
-        this.createChart(response);
+        this.cachedRequest = request;
+        this.createChart(response, request);
       }),
     );
   }

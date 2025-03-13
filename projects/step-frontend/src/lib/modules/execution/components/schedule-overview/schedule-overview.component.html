@@ -47,7 +47,7 @@
         @if (executionsChartSettings) {
           <step-timeseries-chart [settings]="executionsChartSettings" (zoomChange)="handleMainChartZoom($event)">
             <ng-template tooltipContent let-data>
-              <step-executions-chart-tooltip [data]="data" />
+              <step-executions-chart-tooltip [data]="data" [taskId]="taskId()!" />
             </ng-template>
           </step-timeseries-chart>
         } @else {
@@ -65,7 +65,7 @@
         @if (keywordsChartSettings) {
           <step-timeseries-chart [settings]="keywordsChartSettings">
             <ng-template tooltipContent let-data>
-              <div class="container">
+              <div class="ts-tooltip">
                 <div
                   class="link-item"
                   (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"
@@ -93,7 +93,7 @@
           <step-alt-report-widget-content class="widget-content">
             <step-timeseries-chart [settings]="testCasesChartSettings">
               <ng-template tooltipContent let-data>
-                <div class="container">
+                <div class="ts-tooltip">
                   <div
                     class="link-item"
                     (click)="jumpToExecution(lastKeywordsExecutions[data.idx!].id!)"

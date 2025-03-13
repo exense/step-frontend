@@ -1,0 +1,14 @@
+<step-table [dataSource]="parameters()">
+  <ng-container matColumnDef="key">
+    <th mat-header-cell *matHeaderCellDef>Key</th>
+    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="pointer">
+      <span class="truncate">{{ element.key }}</span>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="value">
+    <th mat-header-cell *matHeaderCellDef>Value</th>
+    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="pointer">
+      <span class="truncate">{{ element.value }}</span>
+    </td>
+  </ng-container>
+</step-table>

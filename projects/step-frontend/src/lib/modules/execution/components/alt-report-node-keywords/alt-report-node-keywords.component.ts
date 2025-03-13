@@ -4,7 +4,11 @@ import {
   ItemsPerPageService,
   ReportNode,
   SelectionCollector,
+  STORE_ALL,
+  tablePersistenceConfigProvider,
+  TablePersistenceStateService,
   TableSearch,
+  TableStorageService,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -14,6 +18,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
+import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -28,6 +33,12 @@ import { catchError } from 'rxjs/operators';
       provide: ItemsPerPageService,
       useExisting: AltReportNodeKeywordsComponent,
     },
+    {
+      provide: TableStorageService,
+      useClass: TableMemoryStorageService,
+    },
+    TablePersistenceStateService,
+    tablePersistenceConfigProvider('keywords', STORE_ALL),
   ],
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
