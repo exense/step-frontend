@@ -47,7 +47,7 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
   protected isReady = false;
 
   private automationPackageFileName?: string;
-  private table = viewChild('table', { read: TableComponent<AutomationPackageListComponent> });
+  private table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
   private effectTableChange = effect(
     () => {
