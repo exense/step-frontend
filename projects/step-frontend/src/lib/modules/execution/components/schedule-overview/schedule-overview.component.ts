@@ -85,7 +85,7 @@ export class ScheduleOverviewComponent {
   protected error = '';
   protected repositoryId?: string;
 
-  private taskId$ = this._activatedRoute.params.pipe(map((params) => params['id'] as string));
+  protected taskId$ = this._activatedRoute.params.pipe(map((params) => params['id'] as string));
 
   private task$ = this.taskId$.pipe(
     switchMap((taskId) => (!taskId ? of(undefined) : this._scheduleApi.getExecutionTaskById(taskId))),

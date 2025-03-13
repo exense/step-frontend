@@ -46,16 +46,7 @@
           <step-popover-content>
             <div class="execution-resolved-params">
               <strong class="resolved-params-header">Resolved parameters</strong>
-              <step-table [dataSource]="resolvedParams">
-                <ng-container matColumnDef="key">
-                  <th mat-header-cell *matHeaderCellDef>Key</th>
-                  <td mat-cell *matCellDef="let element">{{ element.key }}</td>
-                </ng-container>
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>Value</th>
-                  <td mat-cell *matCellDef="let element">{{ element.value }}</td>
-                </ng-container>
-              </step-table>
+              <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
             </div>
           </step-popover-content>
         </step-popover>
