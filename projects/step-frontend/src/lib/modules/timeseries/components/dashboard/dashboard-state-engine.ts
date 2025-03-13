@@ -47,12 +47,11 @@ export class DashboardStateEngine {
     switch (timeRangeSettings.pickerSelection.type) {
       case 'FULL':
         if (timeRangeSettings.defaultFullRange?.from && !timeRangeSettings.defaultFullRange?.to) {
-          timeRangeSettings.fullRange.to = now;
+          // we have a running execution
+          timeRangeSettings.fullRange.to = Math.max(now, timeRangeSettings.fullRange.from + 1); // in case the execution is very short now() will get before the start
         }
-        if (timeRangeSettings.pickerSelection.type === 'FULL') {
-          // force a new instance
-          timeRangeSettings.pickerSelection = { type: 'FULL', absoluteSelection: { ...timeRangeSettings.fullRange } };
-        }
+        // force a new instance
+        timeRangeSettings.pickerSelection = { type: 'FULL', absoluteSelection: { ...timeRangeSettings.fullRange } };
         break;
       case 'ABSOLUTE':
         break;
