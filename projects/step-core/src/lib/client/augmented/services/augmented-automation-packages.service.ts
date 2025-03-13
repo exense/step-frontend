@@ -8,7 +8,7 @@ import {
 } from '../../table/step-table-client.module';
 import { map, Observable, of, OperatorFunction } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
@@ -92,11 +92,13 @@ export class AugmentedAutomationPackagesService
     const body = new FormData();
     body.set('file', file);
 
+    // Construct query parameters if values exist
+    let params = new HttpParams();
     if (version) {
-      body.set('version', version);
+      params = params.set('version', version);
     }
     if (activationExpression) {
-      body.set('activationExpr', activationExpression);
+      params = params.set('activationExpr', activationExpression);
     }
 
     const request$ = this._http.request(
@@ -107,6 +109,7 @@ export class AugmentedAutomationPackagesService
         headers: {
           enctype: 'multipart/form-data',
         },
+        params, // Attach query parameters here
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,
@@ -125,11 +128,13 @@ export class AugmentedAutomationPackagesService
     const body = new FormData();
     body.set('file', file);
 
+    // Construct query parameters if values exist
+    let params = new HttpParams();
     if (version) {
-      body.set('version', version);
+      params = params.set('version', version);
     }
     if (activationExpression) {
-      body.set('activationExpr', activationExpression);
+      params = params.set('activationExpr', activationExpression);
     }
 
     const request$ = this._http.request(
@@ -140,6 +145,7 @@ export class AugmentedAutomationPackagesService
         headers: {
           enctype: 'multipart/form-data',
         },
+        params, // Attach query parameters here
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,
