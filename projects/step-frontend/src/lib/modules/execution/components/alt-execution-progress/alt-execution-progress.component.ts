@@ -37,6 +37,7 @@ import {
   IncludeTestcases,
   TimeRange,
   AlertType,
+  ExecutionCloseHandleService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -63,6 +64,7 @@ import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/ty
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
+import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -126,6 +128,10 @@ interface RefreshParams {
     {
       provide: SchedulerInvokerService,
       useExisting: AltExecutionDialogsService,
+    },
+    {
+      provide: ExecutionCloseHandleService,
+      useClass: AltExecutionCloseHandleService,
     },
   ],
 })
@@ -216,7 +222,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     map((execution) => {
       return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
     }),
-    tap((params) => console.log('PARAMS LENGTH', params?.length ?? 0)),
   );
   protected isResolvedParametersVisible = signal(false);
 

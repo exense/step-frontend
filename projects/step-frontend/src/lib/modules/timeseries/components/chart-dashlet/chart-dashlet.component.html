@@ -10,8 +10,8 @@
       (lockStateChange)="handleLockStateChange($event)"
       [height]="height"
     >
-      <ng-template let-data>
-        <div style="background: red">Salut {{ data?.name }}</div>
+      <ng-template tooltipContent let-data>
+        <step-chart-standard-tooltip [data]="data" />
       </ng-template>
     </step-timeseries-chart>
   }

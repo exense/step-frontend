@@ -1,0 +1,12 @@
+.link-row {
+  padding: 0.5rem;
+  max-width: 40rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
