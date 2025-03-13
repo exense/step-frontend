@@ -5,7 +5,7 @@
         <step-icon
           name="zap"
           class="resolved"
-          [matTooltip]="labelExpression"
+          [matTooltip]="labelExpression | truncateString: 100"
           matTooltipPosition="below"
           (click)="displayText($event, labelExpression)"
         />
@@ -28,7 +28,7 @@
         <step-icon
           name="zap"
           class="resolved"
-          [matTooltip]="valueExpression"
+          [matTooltip]="valueExpression | truncateString: 100"
           matTooltipPosition="below"
           (click)="displayText($event, valueExpression)"
         />
