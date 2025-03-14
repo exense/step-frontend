@@ -1,13 +1,18 @@
 <step-alt-report-widget [title]="title()">
   <step-alt-report-widget-content>
     @if (chartSettings(); as chartSettings) {
-      <step-doughnut-chart [settings]="chartSettings" />
+      <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)" />
     }
 
     @if (legend(); as legend) {
       <section class="summary">
         @for (item of legend; track item.status) {
-          <step-status-count-badge [status]="item.status" [count]="item.value" />
+          <step-status-count-badge
+            [status]="item.status"
+            [count]="item.value"
+            [isDisabled]="item.isDisabled"
+            (click)="toggleStatusFilter(item.status, $event.ctrlKey || $event.shiftKey)"
+          />
         }
       </section>
     }
