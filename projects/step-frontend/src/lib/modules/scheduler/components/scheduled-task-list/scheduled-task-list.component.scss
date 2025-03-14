@@ -9,6 +9,11 @@
   cursor: pointer;
 }
 
+.scheduler-warning {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .status {
   @include core.status-shape();
   cursor: pointer;

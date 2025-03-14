@@ -1,3 +1,15 @@
+@if (isSchedulerDisabled()) {
+  <step-alert class="scheduler-warning" [type]="AlertType.WARNING">
+    <span>Schedule execution is disabled and will not run until reactivated in</span>
+    <span>
+      @if ('admin-ui-menu' | hasRight | async) {
+        <a [routerLink]="settingsUrl">Admin Settings</a>.
+      } @else {
+        Admin Settings.
+      }
+    </span>
+  </step-alert>
+}
 <step-drag-drop-container>
   <step-table
     data-step-testid="schedules-table"
@@ -110,7 +122,7 @@
             status: true,
             'status-on': element.active,
             'status-off': !element.active,
-            'scheduler-disabled': !isSchedulerEnabled
+            'scheduler-disabled': isSchedulerDisabled()
           }"
           (click)="switchActive(element)"
         >
