@@ -4,6 +4,7 @@
 
 import type { AbstractArtefact } from './AbstractArtefact';
 import type { AgentProvisioningConfiguration } from './AgentProvisioningConfiguration';
+import type { Expression } from './Expression';
 import type { Function } from './Function';
 
 export type Plan = {
@@ -14,6 +15,7 @@ export type Plan = {
   subPlans?: Array<Plan>;
   agents?: AgentProvisioningConfiguration;
   visible?: boolean;
+  activationExpression?: Expression;
   categories?: Array<string>;
   id?: string;
   _class: string;

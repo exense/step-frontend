@@ -71,6 +71,9 @@ export const $Execution = {
     resolvedPlanRootNodeId: {
       type: 'string',
     },
+    agentsInvolved: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

@@ -9,7 +9,7 @@ import {
   InfoBannerService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { AutomationPackagesListComponent } from './components/automation-packages-list/automation-packages-list.component';
+import { AutomationPackageListComponent } from './components/automation-package-list/automation-package-list.component';
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
@@ -18,7 +18,7 @@ import { AutomationPackageExecutionDialogComponent } from './components/automati
 
 @NgModule({
   declarations: [
-    AutomationPackagesListComponent,
+    AutomationPackageListComponent,
     AutomationPackageUploadDialogComponent,
     AutomationPackageExecutionDialogComponent,
   ],
@@ -53,7 +53,7 @@ export class AutomationPackagesModule {
           },
           {
             path: 'list',
-            component: AutomationPackagesListComponent,
+            component: AutomationPackageListComponent,
             children: [
               {
                 path: 'upload',

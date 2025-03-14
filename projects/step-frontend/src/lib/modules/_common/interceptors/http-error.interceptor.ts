@@ -107,7 +107,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       return `${error.error}: ${error.text}`;
     }
 
-    if (error.error || error.text) {
+    if ((error.error || error.text) && !error?.error?.isTrusted) {
       return error.error ?? error.text;
     }
 

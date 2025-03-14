@@ -9,7 +9,6 @@ import type { ImportResult } from './ImportResult';
 import type { ReportExport } from './ReportExport';
 
 export type Execution = {
-  agentsInvolved: string;
   customFields?: Record<string, any>;
   attributes?: Record<string, string>;
   startTime?: number;
@@ -46,5 +45,6 @@ export type Execution = {
   executionParameters?: ExecutionParameters;
   executiontTaskParameters?: ExecutiontTaskParameters;
   resolvedPlanRootNodeId?: string;
+  agentsInvolved?: string;
   id?: string;
 };

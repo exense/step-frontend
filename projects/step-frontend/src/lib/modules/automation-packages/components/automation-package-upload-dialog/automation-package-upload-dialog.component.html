@@ -2,15 +2,14 @@
   <div step-modal-window-body>
     <step-progress-bar *ngIf="progress$; else uploadForm" [progress$]="progress$"></step-progress-bar>
     <ng-template #uploadForm>
-      <form #formContainer="ngForm">
+      <form [formGroup]="form" #formContainer="ngForm">
         <step-upload-container (filesChange)="handleDrop($event)">
-          <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
-            <step-label>Automation Package (jar file)</step-label>
+          <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+            <step-label>Automation Package (jar or ZIP file)</step-label>
             <step-label-addon>
-              <step-icon name="help-circle" matTooltip="Drag & Drop or select your automation package jar file">
-              </step-icon>
+              <step-icon name="help-circle" matTooltip="Drag & Drop or select your automation package jar / ZIP file" />
             </step-label-addon>
-            <input type="text" readonly [ngModel]="file?.name" required name="fileName" />
+            <input type="text" readonly formControlName="fileName" required name="fileName" />
             <step-suffix class="button-suffix">
               <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
                 <step-icon name="folder-plus"></step-icon>
@@ -18,12 +17,41 @@
             </step-suffix>
           </step-form-field>
         </step-upload-container>
+        <step-form-field alignLabelAddon="near">
+          <step-label>Automation Package Version</step-label>
+          <step-label-addon>
+            <step-icon
+              name="help-circle"
+              matTooltip="Optionally set the version of this automation package. This allows to deploy and use multiple versions of the same package on Step in combination with an activation expression"
+            />
+          </step-label-addon>
+          <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
+        </step-form-field>
+        <step-form-field alignLabelAddon="near">
+          <step-label>Activation Expression</step-label>
+          <step-label-addon>
+            <step-icon
+              name="help-circle"
+              matTooltip="When deploying multiple versions of the same package (see version), the expression is used to select the proper versions during the execution of plans. Example: env == PROD"
+            />
+          </step-label-addon>
+          <input
+            placeholder="Activation Expression (optional)"
+            name="activationExpression"
+            formControlName="activationExpression"
+            title="Activation Expression"
+          />
+        </step-form-field>
         <input #fileInput type="file" (input)="selectFile()" />
       </form>
     </ng-template>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
+    @if (!!file || isNewPackage) {
+      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
+    } @else {
+      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Update</button>
+    }
   </div>
 </step-modal-window>
