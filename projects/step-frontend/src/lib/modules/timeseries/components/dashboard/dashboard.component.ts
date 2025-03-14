@@ -99,7 +99,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
-  private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
   @Input() storageId?: string;
@@ -158,14 +157,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       this.metricTypes = metrics;
       this.initState(urlParams, dashboard);
     });
-  }
-
-  get activeMainTimeRange() {
-    return this.mainEngine.state.context.timeRangeSettings;
-  }
-
-  get getCompareModeTimeRange() {
-    return this.compareEngine?.state?.context?.timeRangeSettings;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -360,20 +351,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.mainEngine.state.context.updateAttributes(this.collectAllAttributes());
   }
 
-  private getTimeRangeFromTimeSelection(selection: TimeRangeSelection): TimeRange {
-    switch (selection.type) {
-      case 'ABSOLUTE':
-        return { from: selection.absoluteSelection!.from!, to: selection.absoluteSelection!.to! };
-      case 'RELATIVE':
-        let now = new Date().getTime();
-        return { from: now - selection.relativeSelection!.timeInMs!, to: now };
-      case 'FULL':
-        return { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || new Date().getTime() };
-      default:
-        throw new Error('Unsupported time selection type: ' + selection.type);
-    }
-  }
-
   /**
    * If there is a cached context, which has a RELATIVE time settings, the fullRange has to be updated to the current time.
    * @param settings
@@ -421,7 +398,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       // no custom selection in the URL
       const fullRange = {
         from: this.defaultFullTimeRange!.from,
-        to: this.defaultFullTimeRange!.to || now,
+        to: this.defaultFullTimeRange!.to || Math.max(this.defaultFullTimeRange!.from + 1, now),
       };
       return {
         pickerSelection: { type: 'FULL', absoluteSelection: fullRange },
@@ -469,7 +446,10 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       if (!this.defaultFullTimeRange) {
         throw new Error('Default time range must be specified when using a FULL range');
       }
-      const range = { from: this.defaultFullTimeRange!.from!, to: this.defaultFullTimeRange!.to || end };
+      const range = {
+        from: this.defaultFullTimeRange!.from!,
+        to: this.defaultFullTimeRange?.to || Math.max(this.defaultFullTimeRange!.from! + 1, end),
+      };
       return {
         pickerSelection: { type: 'FULL', absoluteSelection: range },
         fullRange: range,

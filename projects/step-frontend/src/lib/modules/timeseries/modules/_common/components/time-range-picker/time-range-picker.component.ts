@@ -87,6 +87,9 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     const selectionChange = changes['activeSelection'];
     const previousValue = selectionChange?.previousValue;
     const currentValue: TimeRangePickerSelection = selectionChange?.currentValue;
+    if (!currentValue) {
+      return;
+    }
     if (selectionChange.firstChange) {
       if (currentValue!.type === 'ABSOLUTE') {
         this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.from));
