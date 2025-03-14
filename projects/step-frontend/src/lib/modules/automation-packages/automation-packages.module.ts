@@ -96,13 +96,5 @@ export class AutomationPackagesModule {
     });
   }
 
-  private registerInfoBanners(): void {
-    this._infoBanner.register(
-      'automation-package',
-      `<div>
-            <strong>Automation Packages</strong>
-            <p>Create automation workflows within your IDE as Automation Packages, a standardized way to deploy and execute automation across the DevOps lifecycle. <a href="https://step.exense.ch/knowledgebase/devops/automation-packages-overview/" target="_blank">read more</a></p>
-          </div>`,
-    );
-  }
+  private registerInfoBanners(): void {}
 }
