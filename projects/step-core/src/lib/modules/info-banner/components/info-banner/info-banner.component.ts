@@ -14,12 +14,12 @@ import { AuthService } from '../../../auth/injectables/auth.service';
 })
 export class InfoBannerComponent {
   private _auth = inject(AuthService);
-  private _infoBannerService = inject(InfoBannerService);
+  private _infoBanner = inject(InfoBannerService);
   private _domSanitizer = inject(DomSanitizer);
 
   protected readonly AlertType = AlertType;
   protected readonly infos = computed(() => {
-    const infos = this._infoBannerService.actualInfos();
+    const infos = this._infoBanner.actualInfos();
     return infos
       .filter(
         (info) =>
@@ -33,6 +33,6 @@ export class InfoBannerComponent {
   });
 
   closeBanner(id: string): void {
-    this._infoBannerService.hideInfoInActualView(id);
+    this._infoBanner.hideInfoInActualView(id);
   }
 }

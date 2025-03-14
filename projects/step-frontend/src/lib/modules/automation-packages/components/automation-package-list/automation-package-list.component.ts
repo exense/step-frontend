@@ -18,9 +18,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 
 @Component({
-  selector: 'step-automation-packages-list',
-  templateUrl: './automation-packages-list.component.html',
-  styleUrls: ['./automation-packages-list.component.scss'],
+  selector: 'step-automation-package-list',
+  templateUrl: './automation-package-list.component.html',
+  styleUrls: ['./automation-package-list.component.scss'],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID,
@@ -29,11 +29,11 @@ import { fromPromise } from 'rxjs/internal/observable/innerFrom';
     selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
     {
       provide: DialogParentService,
-      useExisting: forwardRef(() => AutomationPackagesListComponent),
+      useExisting: forwardRef(() => AutomationPackageListComponent),
     },
   ],
 })
-export class AutomationPackagesListComponent implements OnInit, DialogParentService {
+export class AutomationPackageListComponent implements OnInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
@@ -47,7 +47,7 @@ export class AutomationPackagesListComponent implements OnInit, DialogParentServ
   protected isReady = false;
 
   private automationPackageFileName?: string;
-  private table = viewChild('table', { read: TableComponent<AutomationPackagesListComponent> });
+  private table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
   private effectTableChange = effect(
     () => {

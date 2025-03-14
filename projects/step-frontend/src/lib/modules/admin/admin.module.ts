@@ -201,14 +201,5 @@ export class AdminModule {
     });
   }
 
-  private registerInfoBanners(): void {
-    this._infoBanner.register(
-      'settings',
-      `<div>
-            <strong>The Settings page has been re-structured</strong>
-            <p>To clarify the distinction between personal, project, and admin settings, they have been separated and organized into different sections. This settings page is dedicated to project-specific settings for the currently selected project. Global settings, applicable to all projects, can be found in the <a href='/#/admin/controller/'>Admin Settings</a>, while your personal settings are available in the <a href='/#/user-settings'>User Settings</a>.</p>
-          </div>`,
-      { hasPermission: 'admin-ui-menu' },
-    );
-  }
+  private registerInfoBanners(): void {}
 }

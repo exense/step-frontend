@@ -13,8 +13,17 @@
   font-weight: 500;
 }
 
+div {
+  white-space: nowrap;
+}
+
 div.date {
   background: var.$white;
   border-radius: 1.6rem;
   padding: 0.2rem 0.8rem;
+}
+
+div.duration {
+  flex: 1;
+  text-align: center;
 }
