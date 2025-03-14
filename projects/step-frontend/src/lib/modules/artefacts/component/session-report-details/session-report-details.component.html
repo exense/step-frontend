@@ -1,0 +1,16 @@
+@if (items(); as items) {
+  <section class="json-container">
+    <step-json-view-expanded [data]="items" [limit]="7" labelExpand="Expand" labelCollapse="Collapse" />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyItems()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
+}
+@if (node()?.attachments; as attachments) {
+  @if (attachments.length) {
+    <step-report-details-attachments [attachments]="attachments" />
+  }
+}

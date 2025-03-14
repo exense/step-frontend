@@ -53,6 +53,8 @@ export class AggregatedTreeStatusComponent {
     return undefined;
   });
 
+  protected isEmptyStatus = computed(() => !this.statusItems().length);
+
   protected handleClick(status: Status, event: MouseEvent): void {
     this.statusClick.emit({ status, event });
   }

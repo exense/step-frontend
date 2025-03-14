@@ -22,22 +22,20 @@
         [timeOnly]="true"
       />
       <step-status [status]="reportNode.status" [iconMode]="true" />
-      @if (reportNodeArtefactClass() === 'CallKeyword') {
-        <div class="btn-show-details-container">
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Show plan node details"
-            matTooltipPosition="below"
-            [routerLink]="['.', 'plan-node']"
-            [relativeTo]="_activatedRoute"
-            [queryParams]="{ reportNodeId: reportNode.id }"
-            queryParamsHandling="merge"
-          >
-            <step-icon name="external-link" />
-          </button>
-        </div>
-      }
+      <div class="btn-show-details-container">
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Show plan node details"
+          matTooltipPosition="below"
+          [routerLink]="['.', 'plan-node']"
+          [relativeTo]="_activatedRoute"
+          [queryParams]="{ reportNodeId: reportNode.id }"
+          queryParamsHandling="merge"
+        >
+          <step-icon name="external-link" />
+        </button>
+      </div>
     } @else {
       <span>Iteration list</span>
     }

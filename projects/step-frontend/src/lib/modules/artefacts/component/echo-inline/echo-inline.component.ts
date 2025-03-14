@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
-import { AggregatedArtefactInfo, ArtefactInlineItem, BaseInlineArtefactComponent } from '@exense/step-core';
-import { Observable, of } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import {
+  ArtefactInlineItem,
+  ArtefactInlineItemsBuilderService,
+  ArtefactInlineItemUtilsService,
+  BaseInlineArtefactComponent,
+} from '@exense/step-core';
 import { EchoArtefact } from '../../types/echo.artefact';
 import { EchoReportNode } from '../../types/echo.report-node';
 
@@ -8,33 +12,39 @@ import { EchoReportNode } from '../../types/echo.report-node';
   selector: 'step-echo-inline',
   templateUrl: './echo-inline.component.html',
   styleUrl: './echo-inline.component.scss',
+  host: {
+    class: 'execution-report-node-inline-details',
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class EchoInlineComponent extends BaseInlineArtefactComponent<EchoArtefact, EchoReportNode> {
-  protected getItems(
-    artefact?: EchoArtefact,
-    isVertical?: boolean,
-    isResolved?: boolean,
-  ): ArtefactInlineItem[] | undefined {
-    return undefined;
-  }
+  private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
+  private _itemsBuilder = inject(ArtefactInlineItemsBuilderService)
+    .builder<EchoArtefact, EchoReportNode>()
+    .extractReportNodeItems((reportNode) => this.getReportNodeItems(reportNode))
+    .extractArtefactItems((artefact) => this.getArtefactItems(artefact));
 
-  protected override getReportNodeItems(info?: EchoReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
-    const echo = info?.echo;
+  protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));
+
+  private getReportNodeItems(reportNode?: EchoReportNode): ArtefactInlineItem[] | undefined {
+    const echo = reportNode?.echo;
+    const echoExpression = reportNode?.resolvedArtefact?.text?.expression;
     if (!echo) {
       return undefined;
     }
-    return this.convert([['Text', echo]]);
+    return this._artefactInlineUtils.convert([
+      {
+        value: echo,
+        valueExplicitExpression: echoExpression,
+      },
+    ]);
   }
 
-  protected override getArtefactItems(
-    reportView?: AggregatedArtefactInfo<EchoArtefact, EchoReportNode>,
-    isVertical?: boolean,
-    isResolved: boolean = false,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const echo = reportView?.originalArtefact;
+  private getArtefactItems(echo?: EchoArtefact): ArtefactInlineItem[] | undefined {
     if (!echo) {
-      return of(undefined);
+      return undefined;
     }
-    return of(this.convert([['Text', echo.text]], isResolved));
+    return this._artefactInlineUtils.convert([[undefined, echo.text]]);
   }
 }

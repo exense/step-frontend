@@ -169,6 +169,7 @@ step-alt-execution-progress {
 }
 
 @include common.executions-menu;
+@include common.execution-shared-styles;
 
 .execution-resolved-params {
   display: flex;

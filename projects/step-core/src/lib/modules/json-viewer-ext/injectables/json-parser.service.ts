@@ -62,7 +62,7 @@ export class JsonParserService {
       const isParentIconExist = parentStack[parentStack.length - 1]?.hasIcon;
       const jsonNode: JsonNode = {
         id: result.length + 1,
-        name,
+        name: name.startsWith('_hidden_') ? '' : name,
         icon,
         isParentIconExist,
         iconTooltip: tooltip,

@@ -1,6 +1,7 @@
-import { ReportNode } from '@exense/step-core';
+import { ReportNodeWithArtefact } from '@exense/step-core';
+import { ForArtefact } from './for.artefact';
 
-export interface ForReportNode extends ReportNode {
+export interface ForReportNode extends ReportNodeWithArtefact<ForArtefact> {
   errorCount: number;
   count: number;
 }

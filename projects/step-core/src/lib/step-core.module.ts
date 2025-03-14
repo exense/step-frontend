@@ -45,7 +45,7 @@ import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { CronModule } from './modules/cron/cron.module';
 import { HtmlDescriptionCellComponent } from './components/html-description-cell/html-description-cell.component';
-import { ReportNodeIconComponent } from './components/report-node-icon/report-node-icon.component';
+import { ReportNodeIconComponent } from './modules/artefacts-common/components/report-node-icon/report-node-icon.component';
 import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
@@ -68,12 +68,12 @@ import { ExtractQueryParamsPipe } from './pipes/extract-query-params.pipe';
 import { REPOSITORY_PARAMETERS_INITIALIZER } from './modules/repository-parameters';
 import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
-import { ArtefactInlineDetailsComponent } from './components/artefact-inline-details/artefact-inline-details.component';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 import { SPLIT_EXPORTS } from './modules/split';
 import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
 import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
-import { ReportNodeArtefactDetailsComponent } from './components/report-node-artefact-details/report-node-artefact-details.component';
+import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
+import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 
 @NgModule({
   declarations: [
@@ -81,7 +81,6 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     CapsLockDirective,
     TooltipImmediateCloseDirective,
     ReportNodeStatusComponent,
-    ReportNodeIconComponent,
     AutorefreshToggleComponent,
     SettingButtonComponent,
     IsChartEmptyPipe,
@@ -106,8 +105,6 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
-    ArtefactInlineDetailsComponent,
-    ReportNodeArtefactDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -148,6 +145,8 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     TREE_EXPORTS,
     AUTO_SHRANK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
+    ARTEFACTS_COMMON_EXPORTS,
+    ATTACHMENTS_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -213,10 +212,10 @@ import { ReportNodeArtefactDetailsComponent } from './components/report-node-art
     JSON_VIEWER_EXT_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
+    ARTEFACTS_COMMON_EXPORTS,
+    ATTACHMENTS_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
-    ArtefactInlineDetailsComponent,
-    ReportNodeArtefactDetailsComponent,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -267,7 +266,6 @@ export * from './components/link-button/link-button.component';
 export * from './components/user-settings-button/user-settings-button.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
-export * from './components/artefact-inline-details/artefact-inline-details.component';
 export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
 export { FocusableDirective } from './directives/focusable.directive';
@@ -307,7 +305,7 @@ export * from './modules/is-used-by';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
-export * from './services/artefact-refresh-notification.service';
+export * from './modules/artefacts-common';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
 export * from './services/global-progress-spinner.service';
@@ -316,7 +314,6 @@ export * from './services/invoke-run.service';
 export * from './services/link-processor.service';
 export * from './services/task-by-id-cache.service';
 export * from './services/plugin-info-registry.service';
-export * from './services/artefact.service';
 export * from './modules/plan-common/injectables/artefact-form-change-helper.service';
 export * from './services/function-actions-impl.service';
 export * from './modules/execution-common/services/execution-view-mode.service';
@@ -326,10 +323,8 @@ export * from './modules/editable-labels';
 export * from './modules/custom-forms';
 export * from './modules/scheduler-common';
 export * from './modules/execution-common';
+export * from './modules/attachments';
 export * from './modules/split';
-export * from './components/base-artefact/base-artefact.component';
-export * from './components/base-artefact/base-inline-artefact.component';
-export * from './components/base-artefact/artefact-inline-item';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';
@@ -340,9 +335,8 @@ export * from './modules/entity/pipes/cast-entity-to-execution.pipe';
 export * from './modules/entity/pipes/cast-entity-to-task.pipe';
 export * from './modules/bookmarks';
 export * from './services/auto-refresh-model-factory.service';
-export * from './services/artefacts-factory.service';
 export * from './services/keyword-executor.service';
-export * from './components/report-node-icon/report-node-icon.component';
+export * from './modules/artefacts-common/components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './modules/list-selection';
 export * from './pipes/dashboard-navigation-params.pipe';
@@ -353,4 +347,3 @@ export * from './modules/info-banner';
 export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
-export * from './components/report-node-artefact-details/report-node-artefact-details.component';

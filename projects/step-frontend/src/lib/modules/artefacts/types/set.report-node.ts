@@ -1,6 +1,7 @@
-import { ReportNode } from '@exense/step-core';
+import { ReportNodeWithArtefact } from '@exense/step-core';
+import { SetArtefact } from './set.artefact';
 
-export interface SetReportNode extends ReportNode {
+export interface SetReportNode extends ReportNodeWithArtefact<SetArtefact> {
   key: string;
   value: string;
 }
