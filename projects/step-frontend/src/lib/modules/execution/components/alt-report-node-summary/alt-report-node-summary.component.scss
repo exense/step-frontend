@@ -18,6 +18,10 @@ step-alt-report-node-summary {
     flex-wrap: wrap;
     width: 100%;
   }
+
+  step-status-count-badge {
+    cursor: pointer;
+  }
 }
 @media print {
   step-alt-report-node-summary step-alt-report-widget {

@@ -1,13 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE } from '../../shared/view-mode';
 import { STATUS_COLORS } from '@exense/step-core';
 import {
+  ChartItemClickEvent,
   DoughnutChartItem,
   DoughnutChartSettings,
 } from '../../../timeseries/components/doughnut-chart/doughnut-chart-settings';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged } from 'rxjs';
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-alt-report-node-summary',
@@ -20,22 +22,33 @@ export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
   protected readonly _mode = inject(VIEW_MODE);
 
-  /** @Input() **/
   readonly title = input('');
 
-  /** @Input() **/
   readonly summary = input.required<ReportNodeSummary>();
 
-  protected readonly legend = computed(() => {
+  readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
+
+  private statusFilter = computed(() => new Set(this.statusFilterModel()));
+
+  private availableStatuses = computed(() => {
     const summary = this.summary();
     const keysSet = new Set(Object.keys(summary));
     keysSet.delete('total');
-    keysSet.add('TECHNICAL_ERROR');
-    keysSet.add('FAILED');
+    keysSet.add(Status.TECHNICAL_ERROR);
+    keysSet.add(Status.FAILED);
+    return Array.from(keysSet as Set<Status>);
+  });
 
-    const items = Array.from(keysSet).map((status) => {
+  protected readonly legend = computed(() => {
+    const summary = this.summary();
+    const availableStatuses = this.availableStatuses();
+    const statusFilter = this.statusFilter();
+    const isFilterEmpty = !statusFilter.size;
+
+    const items = availableStatuses.map((status) => {
       const value = summary?.[status] ?? 0;
-      return { status, value };
+      const isDisabled = !isFilterEmpty && !statusFilter.has(status);
+      return { status, value, isDisabled };
     });
 
     return items;
@@ -71,6 +84,8 @@ export class AltReportNodeSummaryComponent {
   protected readonly chartSettings = computed<DoughnutChartSettings | undefined>(() => {
     const dictionary = this.dictionary();
     const total = this.summaryDistinct()?.total ?? 0;
+    const statusFilter = this.statusFilter();
+    const isFilterEmpty = !statusFilter.size;
 
     if (!dictionary) {
       return undefined;
@@ -79,7 +94,8 @@ export class AltReportNodeSummaryComponent {
     const items: DoughnutChartItem[] = Object.entries(this._statusColors)
       .map(([status, color]) => {
         const value = dictionary[status]?.percent ?? 0;
-        return { label: status, background: color, value };
+        const background = isFilterEmpty || statusFilter.has(status as Status) ? color : this._statusColors.UNKNOW;
+        return { label: status, background, value };
       })
       .filter((item) => item.value > 0);
 
@@ -89,6 +105,33 @@ export class AltReportNodeSummaryComponent {
       viewMode: this._mode,
     };
   });
+
+  protected toggleChartItem(event: ChartItemClickEvent) {
+    const status = event.item.label as Status;
+    const preventOtherSelection = !!event.ctrlKey || !!event.shiftKey;
+    this.toggleStatusFilter(status, preventOtherSelection);
+  }
+
+  protected toggleStatusFilter(status: Status, preventOtherSelection: boolean) {
+    this.statusFilterModel.update((value) => {
+      const statusSet = new Set(value);
+      if (!preventOtherSelection) {
+        const hasCurrentStatus = statusSet.has(status);
+        statusSet.clear();
+        if (hasCurrentStatus) {
+          statusSet.add(status);
+        }
+      }
+
+      if (statusSet.has(status)) {
+        statusSet.delete(status);
+      } else {
+        statusSet.add(status);
+      }
+
+      return Array.from(statusSet);
+    });
+  }
 
   private calcPercent(count: number, total: number): number {
     return Math.max(total ? Math.floor((count / total) * 100) : 0, 1);

@@ -83,9 +83,9 @@ export abstract class AltReportNodesStateService implements OnDestroy {
 
   readonly statuses = REPORT_NODE_STATUS;
 
-  readonly statusesCtrl = this._fb.control<Status[]>([]);
+  readonly statusesCtrl = this._fb.nonNullable.control<Status[]>([]);
 
-  private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, { initialValue: this.statusesCtrl.value });
+  readonly statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, { initialValue: this.statusesCtrl.value });
 
   readonly selectedStatuses$ = this.statusesCtrl.valueChanges.pipe(
     startWith(this.statusesCtrl.value),
@@ -111,6 +111,10 @@ export abstract class AltReportNodesStateService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.summaryInProgressInternal$.complete();
+  }
+
+  updateStatusCtrl(statuses: Status[]): void {
+    this.statusesCtrl.setValue(statuses);
   }
 
   toggleFilterNonPassedAndNoRunning(): void {

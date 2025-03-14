@@ -13,14 +13,16 @@ export class StatusCountBadgeComponent {
   private _statusColors = inject(STATUS_COLORS);
   private _bigNumberPipe = inject(BigNumberPipe);
 
-  /** @Input() **/
   readonly status = input<string | undefined>();
-
-  /** @Input() **/
   readonly count = input(0);
+  readonly isDisabled = input(false);
 
   protected readonly color = computed(() => {
     const status = this.status();
+    const isDisabled = this.isDisabled();
+    if (isDisabled) {
+      return this._statusColors.UNKNOW;
+    }
     return (status ? this._statusColors[status as Status] : undefined) ?? this._statusColors['TECHNICAL_ERROR'];
   });
 

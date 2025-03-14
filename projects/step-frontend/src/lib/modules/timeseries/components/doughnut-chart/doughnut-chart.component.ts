@@ -1,20 +1,6 @@
-import {
-  AfterViewInit,
-  Component,
-  effect,
-  ElementRef,
-  input,
-  Input,
-  OnChanges,
-  OnDestroy,
-  signal,
-  SimpleChanges,
-  TemplateRef,
-  viewChild,
-  ViewChild,
-} from '@angular/core';
-import { DoughnutChartSettings } from './doughnut-chart-settings';
-import Chart from 'chart.js/auto';
+import { Component, effect, ElementRef, input, OnDestroy, output, viewChild } from '@angular/core';
+import { ChartItemClickEvent, DoughnutChartSettings } from './doughnut-chart-settings';
+import Chart, { ActiveElement, ChartEvent } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ViewMode } from '../../../execution/shared/view-mode';
 import { StepCommonModule } from '../../../_common/step-common.module';
@@ -27,10 +13,9 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   standalone: true,
 })
 export class DoughnutChartComponent implements OnDestroy {
-  /** @Input() **/
   readonly settings = input.required<DoughnutChartSettings>();
+  readonly chartItemClick = output<ChartItemClickEvent>();
 
-  /** @ViewChild() **/
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
   private chart: Chart | undefined;
@@ -67,6 +52,24 @@ export class DoughnutChartComponent implements OnDestroy {
       options: {
         animation: {
           duration: settings.viewMode === ViewMode.PRINT ? 0 : 500,
+        },
+        onClick: (event: ChartEvent, elements: ActiveElement[], chart: Chart) => {
+          if (!elements.length) {
+            return;
+          }
+          const index = elements[0].index;
+          const label = (chart.data.labels?.[index] ?? '').toString();
+          const value = (chart.data.datasets?.[0]?.data?.[index] ?? 0) as number;
+          const background = (chart.data.datasets?.[0]?.backgroundColor as Record<number, string>)?.[index];
+          this.chartItemClick.emit({
+            item: {
+              label,
+              value,
+              background,
+            },
+            shiftKey: (event.native as MouseEvent)?.shiftKey,
+            ctrlKey: (event.native as MouseEvent)?.ctrlKey,
+          });
         },
         plugins: {
           legend: {

@@ -8,21 +8,25 @@
         (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
       />
     }
-    @if (testCasesSummary$ | async; as testCasesSummary) {
+    @if (_testCasesState.summary$ | async; as testCasesSummary) {
       <step-alt-report-node-summary
         class="widget"
         [style.--colSpan]="1"
         title="Summary: Testcases"
         [summary]="testCasesSummary"
+        [statusFilter]="_testCasesState.statusCtrlValue()"
+        (statusFilterChange)="_testCasesState.updateStatusCtrl($event)"
       />
     }
   }
-  @if (keywordsSummary$ | async; as keywordsSummary) {
+  @if (_keywordsState.summary$ | async; as keywordsSummary) {
     <step-alt-report-node-summary
       class="widget"
       [style.--colSpan]="1"
       title="Summary: Keyword Calls"
       [summary]="keywordsSummary"
+      [statusFilter]="_keywordsState.statusCtrlValue()"
+      (statusFilterChange)="_keywordsState.updateStatusCtrl($event)"
     />
   }
   @if (_mode === ViewMode.VIEW) {

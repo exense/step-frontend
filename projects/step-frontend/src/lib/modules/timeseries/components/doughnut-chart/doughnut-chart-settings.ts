@@ -11,3 +11,9 @@ export interface DoughnutChartItem {
   value: number;
   background: string;
 }
+
+export interface ChartItemClickEvent {
+  item: DoughnutChartItem;
+  shiftKey?: boolean;
+  ctrlKey?: boolean;
+}
