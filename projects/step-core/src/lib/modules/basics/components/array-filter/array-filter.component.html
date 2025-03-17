@@ -1,18 +1,3 @@
-<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
-  <mat-select [multiple]="true" [formControl]="filterControl">
-    <mat-option>
-      <ngx-mat-select-search
-        [formControl]="filterNgxMultiControl"
-        name="filterMultiControl"
-        ngDefaultControl
-        placeholderLabel="Search..."
-        noEntriesFoundLabel="No matching entries found"
-      >
-        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-      </ngx-mat-select-search>
-    </mat-option>
-    @for (item of dropdownItemsFiltered; track trackByKeyValue) {
-      <mat-option [value]="item.key">{{ item.value }}</mat-option>
-    }
-  </mat-select>
+<step-form-field [matTooltip]="invalidFilterMessage()">
+  <step-select [formControl]="filterControl" [multiple]="true" [items]="items()" [extractor]="extractor()" />
 </step-form-field>

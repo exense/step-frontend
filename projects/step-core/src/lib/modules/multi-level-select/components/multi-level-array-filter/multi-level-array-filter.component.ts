@@ -4,6 +4,7 @@ import { MultiLevelSelectComponent } from '../multi-level-select/multi-level-sel
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
 import { MultiLevelItem } from '../../types/multi-level-item';
+import { MultiLevelArrayItemLabelValueExtractor } from '../../types/multi-level-array-item-label-value-extractor';
 
 @Component({
   selector: 'step-multi-level-array-filter',
@@ -22,8 +23,13 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
   string[],
   T[]
 > {
-  /** @Input() **/
-  items = input<MultiLevelItem<T>[]>([]);
+  readonly items = input<MultiLevelItem<T>[]>([]);
+
+  protected readonly extractor: MultiLevelArrayItemLabelValueExtractor<MultiLevelItem<T>, T> = {
+    getValue: (item: MultiLevelItem<T>) => item.key,
+    getLabel: (item: MultiLevelItem<T>) => item.value,
+    getChildren: (item?: MultiLevelItem<T>) => item?.children ?? [],
+  };
 
   protected createControl(fb: FormBuilder): FormControl<T[]> {
     return fb.nonNullable.control([]);

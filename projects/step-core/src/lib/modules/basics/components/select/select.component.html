@@ -23,9 +23,9 @@
       </ngx-mat-select-search>
     </mat-option>
   }
-  @if (useClear()) {
-    <mat-option class="step-select-clear-value" [value]="clearValue()" (click)="clear($event)">{{
-      clearLabel()
+  @if (_selectClear.useClear()) {
+    <mat-option class="step-select-clear-value" [value]="_selectClear.CLEAR_INTERNAL_VALUE" (click)="clear($event)">{{
+      _selectClear.clearLabel()
     }}</mat-option>
   }
   @for (item of extraItems(); track item.key) {

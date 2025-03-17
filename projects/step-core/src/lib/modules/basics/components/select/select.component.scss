@@ -7,20 +7,3 @@ step-select {
     }
   }
 }
-
-.mat-mdc-option.step-select-clear-value {
-  text-decoration: underline;
-  font-style: italic;
-  color: var.$blue-650;
-  min-height: 3rem;
-  font-size: 1.4rem;
-  justify-content: flex-end;
-  mat-pseudo-checkbox {
-    display: none;
-    pointer-events: none;
-  }
-  .mdc-list-item__primary-text {
-    margin-right: 0;
-    pointer-events: none;
-  }
-}
