@@ -31,6 +31,7 @@ import {
   DialogRouteResult,
   ItemInfo,
   CustomFormWrapperComponent,
+  ArrayItemLabelValueExtractor,
 } from '@exense/step-core';
 import { map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -47,7 +48,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     },
   ],
 })
-export class FunctionConfigurationDialogComponent implements OnInit, AfterContentInit, FunctionTypeParentFormService {
+export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);
   private _api = inject(FunctionConfigurationApiService);
   private _matDialogRef = inject<MatDialogRef<FunctionConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
@@ -78,8 +79,10 @@ export class FunctionConfigurationDialogComponent implements OnInit, AfterConten
   private functionTypeChild = viewChild('functionTypeComponent', { read: FunctionTypeComponent });
   private customForm = viewChild(CustomFormWrapperComponent);
 
-  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
-  dropdownItemsFiltered: ItemInfo[] = [];
+  protected readonly itemInfoArrayItemExtractor: ArrayItemLabelValueExtractor<ItemInfo, string> = {
+    getValue: (item: ItemInfo) => item.type,
+    getLabel: (item: ItemInfo) => item.label,
+  };
 
   ngOnInit(): void {
     this.formGroup = functionConfigurationDialogFormCreate(
@@ -102,23 +105,6 @@ export class FunctionConfigurationDialogComponent implements OnInit, AfterConten
     }
 
     this.initStepFunction();
-  }
-
-  ngAfterContentInit(): void {
-    this.dropdownItemsFiltered = [...this.functionTypeItemInfos];
-    this.filterMultiControl.valueChanges
-      .pipe(
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value
-            ? this.functionTypeItemInfos.filter((item) => item.label.toLowerCase().includes(value))
-            : [...this.functionTypeItemInfos],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownItemsFiltered = displayItemsFiltered;
-      });
   }
 
   protected get functionType(): string {
