@@ -493,9 +493,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;
+    const start = this.context.getSelectedTimeRange().from;
+    const end = this.context.getSelectedTimeRange().to;
+    if (start >= end) {
+      throw new Error(`Invalid time range`);
+    }
     const request: FetchBucketsRequest = {
-      start: this.context.getSelectedTimeRange().from,
-      end: this.context.getSelectedTimeRange().to,
+      start: start,
+      end: end,
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),
