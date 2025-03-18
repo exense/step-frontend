@@ -9,15 +9,19 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
 import { KeyValue } from '@angular/common';
 import { SelectExtraOptionsDirective } from '../../directives/select-extra-options.directive';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { SelectClearValueDirective } from '../../directives/select-clear-value.directive';
+import {
+  SelectComponentSearchCtrlContainer,
+  SelectComponentSearchCtrlContainerDefaultImpl,
+} from '../../injectables/select-component-search-ctrl-container.service';
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
@@ -52,10 +56,19 @@ const createDefaultExtractor = <Item, Value>(): ArrayItemLabelValueExtractor<Ite
       useExisting: forwardRef(() => SelectComponent),
       multi: true,
     },
+    SelectComponentSearchCtrlContainerDefaultImpl,
+    {
+      provide: SelectComponentSearchCtrlContainer,
+      useFactory: () => {
+        const parentImpl = inject(SelectComponentSearchCtrlContainer, { skipSelf: true, optional: true });
+        const defaultImpl = inject(SelectComponentSearchCtrlContainerDefaultImpl, { self: true });
+        return parentImpl ?? defaultImpl;
+      },
+    },
   ],
 })
 export class SelectComponent<Item, Value> implements ControlValueAccessor {
-  private _fb = inject(FormBuilder).nonNullable;
+  private _searchCtrlContainer = inject(SelectComponentSearchCtrlContainer);
 
   protected readonly _selectClear = inject(SelectClearValueDirective, { host: true });
 
@@ -81,7 +94,7 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
 
   protected readonly value = signal<ModelValue<Value>>(undefined);
 
-  protected readonly searchCtrl = this._fb.control('');
+  protected readonly searchCtrl = this._searchCtrlContainer.searchControl;
 
   readonly searchValue$ = this.searchCtrl.valueChanges.pipe(startWith(this.searchCtrl.value ?? ''));
 
@@ -126,7 +139,7 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
     }
 
     const selectedItem = displayItems.find((item) => item.key === value);
-    return selectedItem!.value;
+    return selectedItem?.value;
   });
 
   private extraOptions = contentChild<SelectExtraOptionsDirective<Value>>(SelectExtraOptionsDirective);
