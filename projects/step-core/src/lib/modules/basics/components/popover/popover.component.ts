@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  forwardRef,
   HostListener,
   Input,
   Output,
@@ -11,6 +12,17 @@ import {
 import { TriggerPopoverDirective } from '../../directives/trigger-popover.directive';
 import { MatMenu } from '@angular/material/menu';
 
+export enum PopoverMode {
+  BOTH,
+  HOVER,
+  CLICK,
+}
+
+export abstract class PopoverService {
+  abstract freezePopover(): void;
+  abstract unfreezePopover(): void;
+}
+
 @Component({
   selector: 'step-popover',
   templateUrl: './popover.component.html',
@@ -18,12 +30,18 @@ import { MatMenu } from '@angular/material/menu';
   changeDetection: ChangeDetectionStrategy.OnPush,
   exportAs: 'StepPopover',
   encapsulation: ViewEncapsulation.None,
+  providers: [
+    {
+      provide: PopoverService,
+      useExisting: forwardRef(() => PopoverComponent),
+    },
+  ],
 })
-export class PopoverComponent {
+export class PopoverComponent implements PopoverService {
   @Input() xPosition: MatMenu['xPosition'] = 'after';
   @Input() yPosition: MatMenu['yPosition'] = 'above';
   @Input() noPadding = false;
-  @Input() displayByClick = false;
+  @Input() mode = PopoverMode.BOTH;
 
   @Output() toggledEvent = new EventEmitter<boolean>();
 
@@ -32,22 +50,40 @@ export class PopoverComponent {
   private toggled = false;
   private tooltipTimeout?: ReturnType<typeof setTimeout>;
 
+  private isPopoverFrozen = false;
+
   protected isMouseOverPopover = false;
 
-  @HostListener('click', ['$event'])
-  private togglePopover($event?: MouseEvent): void {
-    if ($event) {
-      $event.preventDefault();
-      $event.stopImmediatePropagation();
+  freezePopover(): void {
+    this.isPopoverFrozen = true;
+  }
+
+  unfreezePopover(): void {
+    this.isPopoverFrozen = false;
+  }
+
+  private togglePopover(): void {
+    if (this.isPopoverFrozen) {
+      return;
     }
     this.toggled = !this.toggled;
     this.toggled ? this.triggerPopoverDirective.openMenu() : this.triggerPopoverDirective.closeMenu();
     this.toggledEvent.emit(this.toggled);
   }
 
+  @HostListener('click', ['$event'])
+  private handleClick($event: MouseEvent): void {
+    if (this.mode === PopoverMode.HOVER) {
+      return;
+    }
+    $event.preventDefault();
+    $event.stopImmediatePropagation();
+    this.togglePopover();
+  }
+
   @HostListener('document:click')
   private handleDocumentClick(): void {
-    if (!this.displayByClick || !this.toggled) {
+    if (this.mode !== PopoverMode.CLICK || !this.toggled) {
       return;
     }
     this.togglePopover();
@@ -55,7 +91,7 @@ export class PopoverComponent {
 
   @HostListener('mouseenter')
   protected onPopoverMouseEnter(): void {
-    if (this.displayByClick) {
+    if (this.mode === PopoverMode.CLICK) {
       return;
     }
     this.tooltipTimeout = setTimeout(() => {
@@ -66,7 +102,7 @@ export class PopoverComponent {
 
   @HostListener('mouseleave')
   protected onPopoverMouseLeave(): void {
-    if (this.displayByClick) {
+    if (this.mode === PopoverMode.CLICK) {
       return;
     }
     clearTimeout(this.tooltipTimeout);

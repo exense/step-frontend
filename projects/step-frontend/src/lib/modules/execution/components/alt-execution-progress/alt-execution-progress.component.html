@@ -1,8 +1,21 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
-  <div class="title">
-    @if (execution$ | async; as execution) {
+  @if (execution$ | async; as execution) {
+    <div class="title">
       <h3 data-step-testid>
-        {{ execution?.description }}
+        @if (executionPlan$ | async; as plan) {
+          <entity-icon
+            entityName="plans"
+            [entity]="plan"
+            [matTooltip]="$any(plan).root._class"
+            matTooltipPosition="below"
+          />
+        }
+        <div>{{ execution?.description }}</div>
+        @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
+          @if (repositoryParams.repositoryID !== 'local') {
+            <step-alt-execution-repository [repositoryParams]="repositoryParams" />
+          }
+        }
         @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
           <a
             class="plan-link"
@@ -14,61 +27,148 @@
           </a>
         }
       </h3>
-      <div class="sub-title">
-        <step-alt-execution-time [execution]="execution" />
-        @if (displayStatus$ | async; as status) {
-          <step-status [status]="status" />
-        }
-        <div class="user">{{ execution.executionParameters?.userID }}</div>
-        <step-popover class="details-hint" yPosition="below">
-          <step-icon name="help-circle" />
+    </div>
+    <div class="sub-title">
+      <step-alt-execution-time [startTime]="execution.startTime" [endTime]="execution.endTime" />
+      @if (displayStatus$ | async; as status) {
+        <step-status [status]="status" [iconMode]="true" />
+      }
+      <div class="user">{{ execution.executionParameters?.userID }}</div>
+      @if (resolvedParameters$ | async; as resolvedParams) {
+        <step-popover
+          yPosition="below"
+          [mode]="PopoverMode.CLICK"
+          (toggledEvent)="isResolvedParametersVisible.set($event)"
+        >
+          <button type="button" mat-icon-button [color]="isResolvedParametersVisible() ? 'primary' : 'default'">
+            <step-icon name="sliders" />
+          </button>
           <step-popover-content>
-            <step-execution-details
-              [execution]="execution"
-              [showPlan]="false"
-              [showMode]="false"
-              [showUser]="false"
-              [showExecutionId]="false"
-              [showDates]="false"
-            />
+            <div class="execution-resolved-params">
+              <strong class="resolved-params-header">Resolved parameters</strong>
+              <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
+            </div>
           </step-popover-content>
         </step-popover>
-        @if (execution?.executionParameters?.mode === 'SIMULATION') {
-          <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
-        }
-      </div>
-    }
-  </div>
-  <div class="controls">
-    @if (execution$ | async; as execution) {
-      <step-execution-commands
-        [displayParametersForm]="false"
-        [description]="execution.description"
-        [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
-        [execution]="execution"
-        (refresh)="manualRefresh()"
-        (scheduleTask)="handleTaskSchedule($event)"
-      />
-    }
-    <step-btn-group class="without-borders">
+      }
+      <button
+        type="button"
+        mat-icon-button
+        color="default"
+        (click)="_dialogs.openAgentsModal(execution?.agentsInvolved || '', execution?.description || 'Unknown plan')"
+        matTooltip="Show agents"
+      >
+        <step-icon name="agent" />
+      </button>
+      @if (execution?.executionParameters?.mode === 'SIMULATION') {
+        <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
+      }
+      @if (execution?.executionParameters?.customParameters; as executionParameters) {
+        <step-alt-execution-parameters [executionParameters]="executionParameters" />
+      }
+    </div>
+    <div class="controls">
+      <step-execution-legacy-switcher [execution]="execution" />
+      <step-btn-group class="with-round-borders">
+        <ng-container
+          stepExecutionCommands
+          #commands="StepExecutionCommands"
+          [description]="execution.description"
+          [repositoryObjectRef]="execution.executionParameters!.repositoryObject!"
+          [execution]="execution"
+          [includedTestcases]="testCasesForRelaunch$ | async"
+          (refresh)="manualRefresh()"
+        >
+          <button
+            type="button"
+            mat-icon-button
+            [disabled]="!('plan-execute' | hasRight | async)"
+            [matTooltip]="executionTooltips.execute!"
+            (click)="commands.execute(false)"
+            matTooltipPosition="below"
+          >
+            <step-icon name="repeat" aria-hidden="true" />
+          </button>
+          @if (execution.status; as status) {
+            @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {
+              <button
+                type="button"
+                mat-icon-button
+                aria-label="Left Align"
+                [matTooltip]="executionTooltips.stop!"
+                matTooltipPosition="below"
+                [disabled]="!('plan-execute' | hasRight | async)"
+                (click)="commands.stop()"
+              >
+                <step-icon name="stop-circle" aria-hidden="true" />
+              </button>
+            }
+            @if (status === 'ABORTING') {
+              <button
+                type="button"
+                mat-icon-button
+                class="warning"
+                aria-label="Left Align"
+                [matTooltip]="executionTooltips.forceStop!"
+                matTooltipPosition="below"
+                [disabled]="!('plan-execute' | hasRight | async)"
+                (click)="commands.forceStop()"
+              >
+                <step-icon name="stop-circle" aria-hidden="true" />
+              </button>
+            }
+          }
+        </ng-container>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="relaunchExecution()"
+          matTooltip="Launch execution with parameters"
+          matTooltipPosition="below"
+        >
+          <step-icon name="play-circle" />
+        </button>
+      </step-btn-group>
+
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
-          <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+          <step-btn-group class="without-borders">
+            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+          </step-btn-group>
         }
       }
       <router-outlet name="controls" />
-    </step-btn-group>
-  </div>
-  <div class="range-picker">
-    <router-outlet name="rangePicker" />
-  </div>
+    </div>
+    <div class="range-picker">
+      @if (!(isAnalyticsRoute$ | async)) {
+        <step-time-range-picker
+          [activeSelection]="(timeRangeSelection$ | async)!"
+          [selectOptions]="timeRangeOptions"
+          (selectionChange)="handleTimeRangeChange($event)"
+          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+        />
+      }
+    </div>
+  }
 </section>
-<section class="main">
+
+<section class="no-gap">
   @if (execution$ | async; as execution) {
-    @for (messages of _executionMessages; track messages.id) {
-      <step-dashlet [itemKey]="messages.template" [context]="execution" class="execution-message" />
+    @if (execution.lifecycleErrors; as errors) {
+      @for (error of errors; track error.msg) {
+        <step-alert [type]="AlertType.DANGER">
+          {{ error.msg }}
+        </step-alert>
+      }
+    }
+
+    @for (message of _executionMessages; track message.id) {
+      <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
     }
   }
+</section>
+
+<section class="main">
   <step-alt-execution-tabs />
   @if (execution$ | async; as execution) {
     <step-alt-report-widget class="print-execution-details">
@@ -80,3 +180,4 @@
   <router-outlet />
 </section>
 <router-outlet name="modal" />
+<router-outlet name="nodeDetails" />

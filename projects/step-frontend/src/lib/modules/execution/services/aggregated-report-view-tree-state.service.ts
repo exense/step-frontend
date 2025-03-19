@@ -1,60 +1,48 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { AggregatedReportView, AugmentedExecutionsService, ReportNode, TreeStateService } from '@exense/step-core';
-import { map, Observable } from 'rxjs';
+import { Injectable, InjectionToken, OnDestroy, signal } from '@angular/core';
+import { AggregatedReport, AggregatedReportView, TreeStateInitOptions, TreeStateService } from '@exense/step-core';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
+
+export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
-  private _executionsApi = inject(AugmentedExecutionsService);
+  private resolvedPartialPathInternal = signal<string | undefined>(undefined);
+  readonly resolvedPartialPath = this.resolvedPartialPathInternal.asReadonly();
 
-  loadTree(executionId: string): Observable<boolean> {
-    return this._executionsApi.getFullAggregatedReportView(executionId).pipe(
-      map((root) => {
-        if (!root) {
-          return false;
-        }
-        this.init(root, { expandAllByDefault: false });
-        return true;
-      }),
-    );
+  override init(root: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
+    super.init(root, options);
+    this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
+  }
+}
+
+export const AGGREGATED_TREE_TAB_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
+  'Tree state related to tab',
+);
+export const AGGREGATED_TREE_WIDGET_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(
+  'Tree state related to widget',
+);
+
+@Injectable()
+export class AggregatedReportViewTreeStateContextService implements OnDestroy {
+  private state?: AggregatedReportViewTreeStateService;
+
+  setState(state: AggregatedReportViewTreeStateService): void {
+    this.state = state;
   }
 
-  private displayedAggregatedDetailsNodeInternal = signal<AggregatedTreeNode | undefined>(undefined);
-
-  readonly displayedAggregatedDetailsNode = computed(() => {
-    const selectedNode = this.selectedNode();
-    const displayAggregatedNode = this.displayedAggregatedDetailsNodeInternal();
-    if (selectedNode === displayAggregatedNode) {
-      return selectedNode;
+  getState(): AggregatedReportViewTreeStateService {
+    if (!this.state) {
+      throw new Error(`Three state hasn't been initialized.`);
     }
-    return undefined;
-  });
-
-  private visibleDetailsInternal = signal<Record<string, boolean>>({});
-  readonly visibleDetails = this.visibleDetailsInternal.asReadonly();
-
-  private visibleInfosInternal = signal<Record<string, boolean>>({});
-  readonly visibleInfos = this.visibleInfosInternal.asReadonly();
-
-  toggleDetail(node: ReportNode): void {
-    const isVisible = !!this.visibleDetailsInternal()[node.id!];
-    this.visibleDetailsInternal.update((value) => ({
-      ...value,
-      [node.id!]: !isVisible,
-    }));
+    return this.state;
   }
 
-  toggleInfo(node: AggregatedTreeNode): void {
-    const isVisible = !!this.visibleInfosInternal()[node.id!];
-    this.visibleInfosInternal.update((value) => ({
-      ...value,
-      [node.id!]: !isVisible,
-    }));
+  ngOnDestroy(): void {
+    this.cleanup();
   }
 
-  showAggregatedDetails(nodeOrId: string | AggregatedTreeNode): void {
-    this.selectNode(nodeOrId);
-    const node = typeof nodeOrId === 'string' ? this.findNodeById(nodeOrId) : nodeOrId;
-    this.displayedAggregatedDetailsNodeInternal.set(node);
+  cleanup(): boolean {
+    this.state = undefined;
+    return true;
   }
 }

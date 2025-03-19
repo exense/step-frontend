@@ -1,47 +1,81 @@
-import { Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  AggregatedArtefactInfo,
   ArtefactInlineItem,
+  ArtefactInlineItemsBuilderService,
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
   DynamicValueString,
-  ReportNode,
 } from '@exense/step-core';
 import { CallPlanArtefact } from '../../types/call-plan.artefact';
-import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'step-call-plan-inline',
   templateUrl: './call-plan-inline.component.html',
   styleUrl: './call-plan-inline.component.scss',
+  host: {
+    class: 'execution-report-node-inline-details',
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPlanArtefact> {
-  protected getReportNodeItems = undefined;
+  private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);
+  private _artefactInlineItemBuilder = inject(ArtefactInlineItemsBuilderService);
 
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<CallPlanArtefact>,
-    isVertical?: boolean,
-    isResolved?: boolean,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const originalArtefact = info?.originalArtefact;
-    if (!originalArtefact?.input?.value) {
-      return of(undefined);
+  private searchCriteriaBuilder = this._artefactInlineItemBuilder
+    .builder<CallPlanArtefact>()
+    .extractArtefactItems((artefact) => this.getPlanSearchCriteria(artefact));
+
+  private inputsBuilder = this._artefactInlineItemBuilder
+    .builder<CallPlanArtefact>()
+    .extractArtefactItems((artefact) => this.getPlanInputs(artefact));
+
+  protected readonly items = computed(() => {
+    const ctx = this.currentContext();
+    const searchCriteriaItems = this.searchCriteriaBuilder.build(ctx) ?? [];
+    const inputItems = this.inputsBuilder.build(ctx) ?? [];
+    const result = [...searchCriteriaItems, ...inputItems];
+    return !result.length ? undefined : result;
+  });
+
+  private getPlanInputs(artefact?: CallPlanArtefact): ArtefactInlineItem[] {
+    if (!artefact?.input) {
+      return [];
     }
-
-    let input: Record<string, DynamicValueString> = {};
+    let callPlanInputs: Record<string, DynamicValueString> | undefined = undefined;
     try {
-      input = JSON.parse(originalArtefact?.input?.value);
-    } catch {
-      return of(undefined);
+      callPlanInputs = !!artefact?.input?.value ? JSON.parse(artefact.input.value) : {};
+    } catch (err) {}
+    if (!callPlanInputs) {
+      return [];
+    }
+    const inputs: ArtefactInlineItemSource = Object.entries(callPlanInputs).map(([label, value]) => [
+      label,
+      value,
+      'log-in',
+      'Input',
+    ]);
+    return this._artefactInlineItemUtils.convert(inputs);
+  }
+
+  private getPlanSearchCriteria(artefact?: CallPlanArtefact): ArtefactInlineItem[] {
+    if (!artefact?.selectionAttributes?.value || artefact?.selectionAttributes?.value === '{}') {
+      return [];
     }
 
-    return of(
-      this.convert(
-        [
-          ['Input', undefined],
-          ...(Object.entries(input).map(([key, value]) => [key, value]) as [string, DynamicValueString][]),
-        ],
-        isResolved,
-      ),
-    );
+    let selectionAttributes: Record<string, DynamicValueString> | undefined = undefined;
+    try {
+      selectionAttributes = JSON.parse(artefact.selectionAttributes.value);
+    } catch (e) {}
+    if (!selectionAttributes) {
+      return [];
+    }
+    const searchCriteria: ArtefactInlineItemSource = Object.entries(selectionAttributes).map(([label, value]) => [
+      label,
+      value,
+      'search',
+      'Search criteria',
+    ]);
+    return this._artefactInlineItemUtils.convert(searchCriteria);
   }
 }

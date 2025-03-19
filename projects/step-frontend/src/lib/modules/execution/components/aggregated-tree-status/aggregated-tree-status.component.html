@@ -1,23 +1,21 @@
-<ng-template #statusGroup let-group>
+@if (singleStatus(); as singleStatus) {
+  <step-status [status]="singleStatus.status" [iconMode]="true" (click)="handleClick(singleStatus.status, $event)" />
+} @else if (isEmptyStatus()) {
   <div class="status-group">
-    @for (item of group; track item.status) {
+    <div class="step-node-aggregated-status step-node-aggregated-status-UNKNOWN">0x</div>
+  </div>
+} @else {
+  @for (item of statusItems(); track item.status) {
+    <div class="status-group">
       <div
         class="step-node-aggregated-status"
         [class]="item.className"
         [matTooltip]="item.tooltipMessage"
         matTooltipPosition="below"
+        (click)="handleClick(item.status, $event)"
       >
-        {{ item.count }}x
+        {{ item.count | shortenNumber: 'x' }}
       </div>
-    }
-  </div>
-</ng-template>
-@if (errorStatusGroup(); as group) {
-  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
-}
-@if (successStatusGroup(); as group) {
-  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
-}
-@if (runningStatusGroup(); as group) {
-  <ng-container *ngTemplateOutlet="statusGroup; context: { $implicit: group }" />
+    </div>
+  }
 }

@@ -6,5 +6,14 @@ export const $AggregatedReportViewRequest = {
     range: {
       type: 'Range',
     },
+    resolveSingleInstanceReport: {
+      type: 'boolean',
+    },
+    selectedReportNodeId: {
+      type: 'string',
+    },
+    filterResolvedPlanNodes: {
+      type: 'boolean',
+    },
   },
 } as const;

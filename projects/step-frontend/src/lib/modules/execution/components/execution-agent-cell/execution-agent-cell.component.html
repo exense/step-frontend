@@ -1,0 +1,6 @@
+@if (agentsArray().length > 1) {
+  <span>{{ agentsArray().length }} agents </span>
+  <a href="#" class="more" (click)="openModal($event)"> (show) </a>
+} @else {
+  <span>{{ agents() }}</span>
+}

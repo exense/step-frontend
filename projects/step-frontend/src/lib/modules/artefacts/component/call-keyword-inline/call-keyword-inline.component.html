@@ -1,1 +1,7 @@
-<step-artefact-inline-field-list [items]="items()" [isVertical]="isVertical()" />
+@if (inputItems(); as inputItems) {
+  <step-artefact-inline-field-list [items]="inputItems" hiddenItemsTooltipSuffix="additional input(s)" />
+}
+@if (outputItems(); as outputItems) {
+  <step-artefact-inline-field-list [items]="outputItems" hiddenItemsTooltipSuffix="additional output(s)" />
+}
+<step-artefact-inline-additional-info [context]="currentContext()" />

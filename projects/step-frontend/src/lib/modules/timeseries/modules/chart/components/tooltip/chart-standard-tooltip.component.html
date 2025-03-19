@@ -1,0 +1,37 @@
+<div class="tooltip-container">
+  @if (elipsisBefore) {
+    <div class="dots">...</div>
+  }
+  @for (entry of entries(); track entry.name) {
+    <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: entry }" />
+  }
+  @if (elipsisAfter) {
+    <div class="dots">...</div>
+  }
+  @if (summaryEntry) {
+    <div class="separator"></div>
+    <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: summaryEntry }" />
+  }
+  <div class="separator"></div>
+  <div class="timestamp">{{ timestamp() }}</div>
+
+  <ng-template #tooltipTemplate let-entry="entry">
+    <div class="tooltip-row">
+      <div class="left">
+        <div [class]="entry.markerClassName" [style.--item-color]="entry.stroke.color"></div>
+        <div class="name" [class.bold]="entry.bold">{{ entry.name }}</div>
+      </div>
+      <div class="right" [class.bold]="entry.bold">
+        {{ entry.formattedValue || entry.value || 0 }}
+        @if (!entry.isSummary && settings()?.useExecutionLinks && entry.value) {
+          <span matTooltip="See Execution" class="link-icon" [matMenuTriggerFor]="executionsMenu"></span>
+          <mat-menu #executionsMenu class="ts-tooltip" panelClass="tooltip-menu">
+            <ng-template matMenuContent>
+              <step-tooltip-executions-menu [executions]="entry.executionsFn | async" />
+            </ng-template>
+          </mat-menu>
+        }
+      </div>
+    </div>
+  </ng-template>
+</div>

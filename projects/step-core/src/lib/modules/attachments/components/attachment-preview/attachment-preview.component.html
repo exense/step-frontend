@@ -1,0 +1,13 @@
+<a target="_blank" [href]="attachment() | attachmentUrl: true">
+  @if (attachment() | attachmentIsImage) {
+    <img class="att-thumbnail" [src]="attachment() | attachmentUrl" />
+  }
+  @if (attachment() | attachmentShowLabel) {
+    <div class="att-preview-label">
+      @if (attachment() | attachmentIsText) {
+        <step-icon name="file" />
+      }
+      <span>{{ attachment()?.name }}</span>
+    </div>
+  }
+</a>

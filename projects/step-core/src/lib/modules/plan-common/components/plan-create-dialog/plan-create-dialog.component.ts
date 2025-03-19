@@ -1,5 +1,13 @@
-import { AfterContentInit, Component, DestroyRef, HostListener, inject, viewChild } from '@angular/core';
-import { combineLatest, debounceTime, map, Observable, share, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import {
+  AfterContentInit,
+  Component,
+  DestroyRef,
+  HostListener,
+  inject,
+  InjectionToken,
+  viewChild,
+} from '@angular/core';
+import { combineLatest, map, Observable, share, shareReplay, startWith, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CustomFormComponent } from '../../../custom-forms';
@@ -9,13 +17,29 @@ import { ItemInfo, PlanTypeRegistryService } from '../../../custom-registeries/c
 import { FormControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { Tab, TabsComponent } from '../../../tabs';
+import { AceMode, RichEditorComponent } from '../../../rich-editor';
+
+const TABS = new InjectionToken<Tab<string>[]>('Plan creation tabs', {
+  providedIn: 'root',
+  factory: () => [
+    {
+      id: 'general',
+      label: 'Create new',
+    },
+    {
+      id: 'yaml',
+      label: 'Create from YAML',
+    },
+  ],
+});
 
 @Component({
   selector: 'step-plan-create-dialog',
   templateUrl: './plan-create-dialog.component.html',
   styleUrls: ['./plan-create-dialog.component.scss'],
   standalone: true,
-  imports: [StepBasicsModule, CustomFormComponent, NgxMatSelectSearchModule],
+  imports: [StepBasicsModule, CustomFormComponent, NgxMatSelectSearchModule, TabsComponent, RichEditorComponent],
 })
 export class PlanCreateDialogComponent implements AfterContentInit {
   private _api = inject(AugmentedPlansService);
@@ -30,8 +54,13 @@ export class PlanCreateDialogComponent implements AfterContentInit {
 
   readonly _planTypes = inject(PlanTypeRegistryService).getItemInfos();
   protected planType = this._planTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
+  protected yamlPlan = '';
 
   readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
+
+  protected _availableTabs = inject(TABS);
+  protected selectedTab: string = this._availableTabs[0].id;
+  protected readonly AceMode = AceMode;
 
   filterMultiControl: FormControl<string | null> = new FormControl<string>('');
   filterMultiTypeControl: FormControl<string | null> = new FormControl<string>('');
@@ -69,17 +98,11 @@ export class PlanCreateDialogComponent implements AfterContentInit {
   }
 
   save(editAfterSave?: boolean): void {
-    this.customForm()!
-      .readyToProceed()
+    const createPlan$ = this.selectedTab === 'yaml' ? this.createAsYamlPlan$() : this.createNewPlan$();
+
+    createPlan$
       .pipe(
-        switchMap(() => this._api.newPlan(this.planType, this.template)),
-        tap((createdPlan) => {
-          createdPlan.attributes = this.plan.attributes;
-          if (createdPlan.root) {
-            createdPlan.root.attributes = createdPlan.attributes;
-          }
-        }),
-        switchMap((createdPlan) => this._api.savePlan(createdPlan)),
+        switchMap((createdPlan) => this._api.savePlan(createdPlan)), // Common save logic
       )
       .subscribe((plan) => {
         if (editAfterSave) {
@@ -89,8 +112,53 @@ export class PlanCreateDialogComponent implements AfterContentInit {
       });
   }
 
-  @HostListener('keydown.enter')
-  private handleKeyEnter(): void {
+  private createAsYamlPlan$(): Observable<any> {
+    return this._api.newPlanFromYaml(this.yamlPlan);
+  }
+
+  private createNewPlan$(): Observable<any> {
+    const planAttributes = this.plan.attributes;
+    const planName = this.plan.attributes?.['name'];
+
+    return this.customForm()!
+      .readyToProceed()
+      .pipe(
+        switchMap(() => this._api.newPlan(this.planType, this.template, planName)),
+        tap((createdPlan) => {
+          createdPlan.attributes = planAttributes;
+          if (createdPlan.root) {
+            createdPlan.root.attributes = createdPlan.attributes;
+          }
+        }),
+      );
+  }
+
+  @HostListener('keydown.enter', ['$event'])
+  private handleKeyEnter(event: KeyboardEvent): void {
+    const activeElement = document.activeElement as HTMLElement;
+
+    if (this.isInTextEditor(activeElement)) {
+      return; // Prevents triggering save when inside a text editor
+    }
+
     this.save(true);
+  }
+
+  /**
+   * Checks if the current active element is an input, textarea, or a rich text editor.
+   */
+  private isInTextEditor(element: HTMLElement | null): boolean {
+    if (!element) return false;
+
+    if (element.tagName.toLowerCase() === 'textarea') {
+      return true;
+    }
+
+    // Check if inside a contenteditable or a rich-text editor (Quill, TinyMCE, etc.)
+    if (element.isContentEditable) {
+      return true;
+    }
+
+    return false;
   }
 }

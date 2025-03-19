@@ -42,12 +42,13 @@
       mat-row
       *matRowDef="let row; columns: displayColumns()"
       class="content-row"
+      [stepRow]="row"
       [class.row-highlight]="row === highlightedItem"
     ></tr>
     <tr class="mat-mdc-row" *matNoDataRow>
       <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
         @if ((tableDataSource?.total$ | async) === 0) {
-          No data available in table
+          {{ noResultsPlaceholder() || 'No data available in table' }}
         } @else {
           No matching records found
         }
@@ -60,3 +61,8 @@
   [length]="tableDataSource?.totalFiltered$ | async"
   [pageSizeOptions]="pageSizeOptions"
 />
+@if (rowsExtension(); as rowsExtension) {
+  @if (rowInfos(); as rows) {
+    <ng-container *ngTemplateOutlet="rowsExtension.template; context: { $implicit: rows }" />
+  }
+}

@@ -67,6 +67,9 @@ export const $CallPlan = {
     input: {
       type: 'DynamicValueString',
     },
+    workArtefact: {
+      type: 'boolean',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

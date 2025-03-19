@@ -45,5 +45,6 @@ export type Execution = {
   executionParameters?: ExecutionParameters;
   executiontTaskParameters?: ExecutiontTaskParameters;
   resolvedPlanRootNodeId?: string;
+  agentsInvolved?: string;
   id?: string;
 };

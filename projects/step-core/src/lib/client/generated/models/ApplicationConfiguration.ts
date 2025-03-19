@@ -16,4 +16,5 @@ export type ApplicationConfiguration = {
   miscParams?: Record<string, string>;
   defaultUrl?: string;
   title?: string;
+  forceLegacyReporting?: boolean;
 };

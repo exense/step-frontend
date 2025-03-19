@@ -5,7 +5,6 @@ import {
   ExecutionParameters,
   ExecutionsService,
   FieldFilter,
-  ReportNode,
   TableBulkOperationRequest,
 } from '../../generated';
 import { map, Observable, OperatorFunction } from 'rxjs';
@@ -47,18 +46,6 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       status: 'status',
       result: 'result',
     });
-  }
-
-  getReportNodeDataSource(artefactHash?: string): StepDataSource<ReportNode> {
-    return this._dataSourceFactory.createDataSource(
-      AugmentedExecutionsService.REPORTS_TABLE_ID,
-      {
-        name: 'name',
-        status: 'status',
-        executionTime: 'executionTime',
-      },
-      artefactHash ? { artefactHash: [artefactHash] } : undefined,
-    );
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {

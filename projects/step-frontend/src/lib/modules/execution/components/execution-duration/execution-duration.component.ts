@@ -1,4 +1,4 @@
-import { Component, computed, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { DateFormat, Execution } from '@exense/step-core';
 
 @Component({
@@ -6,6 +6,7 @@ import { DateFormat, Execution } from '@exense/step-core';
   templateUrl: './execution-duration.component.html',
   styleUrl: './execution-duration.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExecutionDurationComponent {
   protected readonly DateFormat = DateFormat;

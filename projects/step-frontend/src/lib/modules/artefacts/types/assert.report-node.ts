@@ -1,6 +1,7 @@
-import { ReportNode } from '@exense/step-core';
+import { ReportNodeWithArtefact } from '@exense/step-core';
+import { AssertArtefact } from './assert.artefact';
 
-export interface AssertReportNode extends ReportNode {
+export interface AssertReportNode extends ReportNodeWithArtefact<AssertArtefact> {
   message: string;
   description: string;
   key: string;

@@ -9,14 +9,19 @@ import {
   InfoBannerService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { AutomationPackagesListComponent } from './components/automation-packages-list/automation-packages-list.component';
+import { AutomationPackageListComponent } from './components/automation-package-list/automation-package-list.component';
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import { AutomationPackageUploadDialogComponent } from './components/automation-package-upload-dialog/automation-package-upload-dialog.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ExecutionModule } from '../execution/execution.module';
+import { AutomationPackageExecutionDialogComponent } from './components/automation-package-execution-dialog/automation-package-execution-dialog.component';
 
 @NgModule({
-  declarations: [AutomationPackagesListComponent, AutomationPackageUploadDialogComponent],
+  declarations: [
+    AutomationPackageListComponent,
+    AutomationPackageUploadDialogComponent,
+    AutomationPackageExecutionDialogComponent,
+  ],
   imports: [StepCommonModule, StepCoreModule, ExecutionModule],
 })
 export class AutomationPackagesModule {
@@ -48,7 +53,7 @@ export class AutomationPackagesModule {
           },
           {
             path: 'list',
-            component: AutomationPackagesListComponent,
+            component: AutomationPackageListComponent,
             children: [
               {
                 path: 'upload',
@@ -68,6 +73,14 @@ export class AutomationPackagesModule {
                   }),
                 ],
               },
+              dialogRoute({
+                path: 'execute/:id',
+                dialogComponent: AutomationPackageExecutionDialogComponent,
+                resolve: {
+                  automationPackage: (route: ActivatedRouteSnapshot) =>
+                    inject(AugmentedAutomationPackagesService).getAutomationPackage(route.params['id']),
+                },
+              }),
             ],
           },
         ],
@@ -83,13 +96,5 @@ export class AutomationPackagesModule {
     });
   }
 
-  private registerInfoBanners(): void {
-    this._infoBanner.register(
-      'automation-package',
-      `<div>
-            <strong>Automation Packages</strong>
-            <p>Create automation workflows within your IDE as Automation Packages, a standardized way to deploy and execute automation across the DevOps lifecycle. <a href="https://step.exense.ch/knowledgebase/devops/automation-packages-overview/" target="_blank">read more</a></p>
-          </div>`,
-    );
-  }
+  private registerInfoBanners(): void {}
 }

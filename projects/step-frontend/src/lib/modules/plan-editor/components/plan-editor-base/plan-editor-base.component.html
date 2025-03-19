@@ -27,7 +27,6 @@
         [hasUndo]="_planEditService.hasUndo$ | async"
         [hasRedo]="_planEditService.hasRedo$ | async"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
-        [description]="planContext?.plan?.attributes?.['name']"
         [repositoryObjectRef]="repositoryObjectRef"
         (discardAll)="_planEditService.discardAll()"
         (undo)="_planEditService.undo()"
@@ -38,7 +37,7 @@
         (reset)="resetInteractive()"
         (stop)="stopInteractive()"
         (showSource)="showPlanSource()"
-        (scheduleTask)="scheduleTask.emit($event)"
+        (runPlan)="runPlan.emit()"
       />
     }
   </div>

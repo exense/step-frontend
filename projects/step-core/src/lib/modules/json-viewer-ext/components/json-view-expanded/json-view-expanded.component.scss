@@ -1,0 +1,80 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  &.collapsable {
+    cursor: pointer;
+  }
+}
+
+.json-node {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+  padding-left: calc(var(--level, 0) * 1.5rem);
+  &.additional-shift {
+    padding-left: calc(var(--level, 0) * 1.5rem + 3rem);
+  }
+  border-radius: 1rem;
+  cursor: pointer;
+  &:hover {
+    border: solid 0.1rem var.$blue-600;
+    margin-left: -0.1rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+}
+
+.name-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.value-container {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: break-spaces;
+  word-break: break-all;
+  padding-top: 0.2rem;
+}
+
+.name {
+  white-space: nowrap;
+  padding: 0.2rem 0;
+  user-select: none;
+}
+
+button.btn-more {
+  position: absolute;
+  width: 100%;
+  top: auto !important;
+  bottom: -0.8rem;
+  height: 3rem;
+  border-color: var.$blue-600 !important;
+  background: var.$white;
+  &:not(.visible) {
+    opacity: 0;
+    &:hover {
+      opacity: 1;
+    }
+    transition: opacity 0.3s;
+  }
+}
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8rem;
+  pointer-events: none;
+  background: linear-gradient(transparent, var.$white);
+}

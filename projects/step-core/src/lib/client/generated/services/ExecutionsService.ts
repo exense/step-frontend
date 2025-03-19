@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-import type { AggregatedReportView } from '../models/AggregatedReportView';
+import type { AggregatedReport } from '../models/AggregatedReport';
 import type { AggregatedReportViewRequest } from '../models/AggregatedReportViewRequest';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { Execution } from '../models/Execution';
@@ -117,10 +117,10 @@ export class ExecutionsService {
   /**
    * Returns the full aggregated report view for the provided execution.
    * @param id
-   * @returns AggregatedReportView default response
+   * @returns AggregatedReport default response
    * @throws ApiError
    */
-  public getFullAggregatedReportView(id: string): Observable<AggregatedReportView> {
+  public getFullAggregatedReportView(id: string): Observable<AggregatedReport> {
     return this.httpRequest.request({
       method: 'GET',
       url: '/executions/{id}/report/aggregated',
@@ -134,13 +134,10 @@ export class ExecutionsService {
    * Returns an aggregated report view for the provided execution and aggregation parameters.
    * @param id
    * @param requestBody
-   * @returns AggregatedReportView default response
+   * @returns AggregatedReport default response
    * @throws ApiError
    */
-  public getAggregatedReportView(
-    id: string,
-    requestBody?: AggregatedReportViewRequest,
-  ): Observable<AggregatedReportView> {
+  public getAggregatedReportView(id: string, requestBody?: AggregatedReportViewRequest): Observable<AggregatedReport> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/{id}/report/aggregated',
@@ -182,6 +179,64 @@ export class ExecutionsService {
       url: '/executions',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the custom report for several executions
+   * @param customReportType
+   * @param ids
+   * @param includeAttachments
+   * @param attachmentsRootFolder
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getCustomMultiReport(
+    customReportType: string,
+    ids?: string,
+    includeAttachments?: boolean,
+    attachmentsRootFolder?: string,
+  ): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/report/multi/{customReportType}',
+      path: {
+        customReportType: customReportType,
+      },
+      query: {
+        ids: ids,
+        includeAttachments: includeAttachments,
+        attachmentsRootFolder: attachmentsRootFolder,
+      },
+    });
+  }
+
+  /**
+   * Returns the custom report for the execution
+   * @param id
+   * @param customReportType
+   * @param includeAttachments
+   * @param attachmentsRootFolder
+   * @returns any default response
+   * @throws ApiError
+   */
+  public getCustomReport(
+    id: string,
+    customReportType: string,
+    includeAttachments?: boolean,
+    attachmentsRootFolder?: string,
+  ): Observable<any> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/{id}/report/{customReportType}',
+      path: {
+        id: id,
+        customReportType: customReportType,
+      },
+      query: {
+        includeAttachments: includeAttachments,
+        attachmentsRootFolder: attachmentsRootFolder,
+      },
     });
   }
 
@@ -244,6 +299,35 @@ export class ExecutionsService {
       url: '/executions/search/names/by/ids',
       body: requestBody,
       mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the last execution triggered by a specific task.
+   * @param taskId
+   * @param limit
+   * @param from
+   * @param to
+   * @returns Execution default response
+   * @throws ApiError
+   */
+  public getLastExecutionsByTaskId(
+    taskId: string,
+    limit?: number,
+    from?: number,
+    to?: number,
+  ): Observable<Array<Execution>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/executions/search/last/by/task-id/{taskId}',
+      path: {
+        taskId: taskId,
+      },
+      query: {
+        limit: limit,
+        from: from,
+        to: to,
+      },
     });
   }
 

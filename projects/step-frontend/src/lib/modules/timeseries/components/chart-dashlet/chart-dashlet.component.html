@@ -9,7 +9,11 @@
       [settings]="_internalSettings!"
       (lockStateChange)="handleLockStateChange($event)"
       [height]="height"
-    />
+    >
+      <ng-template tooltipContent let-data>
+        <step-chart-standard-tooltip [data]="data" />
+      </ng-template>
+    </step-timeseries-chart>
   }
 </div>
 

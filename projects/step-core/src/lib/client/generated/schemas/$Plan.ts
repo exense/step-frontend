@@ -36,6 +36,9 @@ export const $Plan = {
     visible: {
       type: 'boolean',
     },
+    activationExpression: {
+      type: 'Expression',
+    },
     categories: {
       type: 'array',
       contains: {

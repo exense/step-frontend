@@ -37,6 +37,7 @@ export class TabsComponent<T extends string | number> {
   /** @Input() **/
   tabMode = input<'buttons' | 'tabs'>('buttons');
 
+  /** @Input() **/
   userRouteLinks = input(false);
 
   /** @Iput() **/
@@ -47,6 +48,9 @@ export class TabsComponent<T extends string | number> {
 
   /** @Input() **/
   activeTabId = input<T | undefined>();
+
+  /** @Input() **/
+  compactTabs = input<boolean>(false);
 
   /** @Output() **/
   activeTabIdChange = output<T>();

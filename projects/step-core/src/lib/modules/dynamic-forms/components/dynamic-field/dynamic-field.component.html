@@ -54,6 +54,7 @@
           (blur)="handleBlur()"
           (focusin)="forceFocus.set(true)"
           (focusout)="forceFocus.set(false)"
+          [disabled]="isDisabled()"
         >
           <mat-radio-button [value]="true" [tabIndex]="tabIndex()">True</mat-radio-button>
           <mat-radio-button [value]="false" [tabIndex]="tabIndex()">False</mat-radio-button>

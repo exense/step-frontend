@@ -22,19 +22,15 @@ import {
   BookmarkService,
   MENU_ITEMS,
   BookmarkNavigatorService,
+  AuthService,
 } from '@exense/step-core';
 import { VersionsDialogComponent } from '../versions-dialog/versions-dialog.component';
 import { combineLatest, first, map, startWith } from 'rxjs';
 import { SidebarStateService } from '../../injectables/sidebar-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DisplayMenuEntry } from '../../types/display-menu-entry.type';
 
 const MIDDLE_BUTTON = 1;
-
-export type DisplayMenuEntry = Pick<MenuEntry, 'id' | 'title' | 'icon' | 'isCustom'> & {
-  isBookmark?: boolean;
-  hasChildren?: boolean;
-  children?: DisplayMenuEntry[];
-};
 
 const BOOKMARKS_ROOT = 'bookmarks-root';
 
@@ -51,6 +47,7 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   public _viewStateService = inject(ViewStateService);
   private _matDialog = inject(MatDialog);
   private _bookmarkNavigator = inject(BookmarkNavigatorService);
+  private _authService = inject(AuthService);
   private _bookmarkMenuItems$ = inject(BookmarkService).bookmarks$.pipe(
     startWith([]),
     map(
@@ -190,7 +187,9 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   showVersionsDialog(): void {
-    this._matDialog.open(VersionsDialogComponent);
+    this._authService
+      .hasRight$('admin-ui-menu')
+      .subscribe((hasRight) => hasRight && this._matDialog.open(VersionsDialogComponent));
   }
 
   handleScroll($event: Event): void {
@@ -211,12 +210,13 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       return a.weight - b.weight;
     };
 
-    const convert = ({ id, title, icon, isCustom, parentId }: MenuEntry): DisplayMenuEntry => ({
+    const convert = ({ id, title, icon, isCustom, parentId, isActiveFct }: MenuEntry): DisplayMenuEntry => ({
       id,
       title,
       icon,
       isCustom,
       isBookmark: parentId === BOOKMARKS_ROOT,
+      isActiveFct: isActiveFct,
     });
 
     const findChildren = (parent: DisplayMenuEntry) => {

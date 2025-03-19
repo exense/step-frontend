@@ -8,12 +8,13 @@ import {
 } from '../../table/step-table-client.module';
 import { map, Observable, of, OperatorFunction } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { query } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -83,9 +84,22 @@ export class AugmentedAutomationPackagesService
       );
   }
 
-  uploadCreateAutomationPackage(file: File): ReturnType<typeof uploadWithProgress> {
+  uploadCreateAutomationPackage(
+    file: File,
+    version?: string,
+    activationExpression?: string,
+  ): ReturnType<typeof uploadWithProgress> {
     const body = new FormData();
     body.set('file', file);
+
+    // Construct query parameters if values exist
+    let params = new HttpParams();
+    if (version) {
+      params = params.set('version', version);
+    }
+    if (activationExpression) {
+      params = params.set('activationExpr', activationExpression);
+    }
 
     const request$ = this._http.request(
       'POST',
@@ -95,6 +109,7 @@ export class AugmentedAutomationPackagesService
         headers: {
           enctype: 'multipart/form-data',
         },
+        params, // Attach query parameters here
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,
@@ -104,9 +119,23 @@ export class AugmentedAutomationPackagesService
     return uploadWithProgress(request$);
   }
 
-  uploadUpdateAutomationPackage(id: string, file: File): ReturnType<typeof uploadWithProgress> {
+  uploadUpdateAutomationPackage(
+    id: string,
+    file: File,
+    version?: string,
+    activationExpression?: string,
+  ): ReturnType<typeof uploadWithProgress> {
     const body = new FormData();
     body.set('file', file);
+
+    // Construct query parameters if values exist
+    let params = new HttpParams();
+    if (version) {
+      params = params.set('version', version);
+    }
+    if (activationExpression) {
+      params = params.set('activationExpr', activationExpression);
+    }
 
     const request$ = this._http.request(
       'PUT',
@@ -116,6 +145,7 @@ export class AugmentedAutomationPackagesService
         headers: {
           enctype: 'multipart/form-data',
         },
+        params, // Attach query parameters here
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,

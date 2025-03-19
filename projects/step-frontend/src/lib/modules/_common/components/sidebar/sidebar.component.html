@@ -16,12 +16,20 @@
   </div>
   <div id="sidebar-home-and-settings">
     @if (isOpened$ | async) {
-      <span class="visible-when-collapsed sidebar-home-button" (stepSideBarClick)="navigateTo('home', $event)">
+      <span
+        data-step-testid="sidebar-home-button"
+        class="visible-when-collapsed sidebar-home-button"
+        (stepSideBarClick)="navigateTo('home', $event)"
+      >
         <step-icon name="home" />
       </span>
     }
     @if (('settings-ui-menu' | hasRight | async) || ('admin-ui-menu' | hasRight | async)) {
-      <step-settings-button class="sidebar-home-and-settings-icon" matTooltip="Project Settings" />
+      <step-settings-button
+        data-step-testid="sidebar-settings-button"
+        class="sidebar-home-and-settings-icon"
+        matTooltip="Project Settings"
+      />
     }
   </div>
   <div id="sidebar-categories">
@@ -40,6 +48,7 @@
               <label for="collapsable-tab-{{ mainMenuEntry.title }}">
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
                 <span
+                  data-step-testid="sidebar-main-menu-title"
                   class="sidebar-aligned-text main-menu-name"
                   [attr.data-icon]="mainMenuEntry.icon"
                   [attr.data-id]="mainMenuEntry.id"
@@ -51,7 +60,7 @@
             } @else {
               <label
                 class="no-children"
-                [class.active-primary-item]="mainMenuEntry.id | isMenuItemActive | async"
+                [class.active-primary-item]="mainMenuEntry | isMenuItemActive | async"
                 (stepSideBarClick)="navigateTo(mainMenuEntry.id, $event)"
               >
                 <step-icon class="visible-when-collapsed" [name]="mainMenuEntry.icon" />
@@ -69,11 +78,12 @@
                 <section>
                   <div
                     class="sidebar-subtab"
-                    [class.sidebar-highlighted-subtab]="entry.id | isMenuItemActive | async"
+                    [class.sidebar-highlighted-subtab]="entry | isMenuItemActive | async"
                     (stepSideBarClick)="navigateTo(entry.id, $event)"
                   >
                     <step-icon class="visible-when-collapsed" [name]="entry.icon" />
                     <span
+                      data-step-testid="sidebar-sub-menu-title"
                       class="sidebar-aligned-subtext sub-menu-name"
                       [attr.data-icon]="entry.icon"
                       [attr.data-id]="entry.id"
@@ -86,11 +96,13 @@
                       <section>
                         <div
                           class="sidebar-sub-subtab"
-                          [class.sidebar-highlighted-subtab]="subEntry.id | isMenuItemActive | async"
+                          [class.sidebar-highlighted-subtab]="subEntry | isMenuItemActive | async"
                           (mouseup)="navigateTo(subEntry.id, $event, subEntry.isBookmark)"
                         >
-                          <step-icon class="visible-when-collapsed" [name]="subEntry.icon || 'minus'" />
-                          <span class="sidebar-aligned-sub-subtext" [matTooltip]="subEntry.title">
+                          <span
+                            class="sidebar-aligned-sub-subtext visible-when-collapsed"
+                            [matTooltip]="subEntry.title"
+                          >
                             {{ subEntry.title }}
                           </span>
                           @if (subEntry.isCustom) {
@@ -120,7 +132,12 @@
   </div>
 
   <div id="sidebar-bottom">
-    <span class="version" title="{{ '${project.version}' }}" (click)="showVersionsDialog()">
+    <span
+      class="version"
+      title="{{ '${project.version}' }}"
+      [class.disabled]="!('admin-ui-menu' | hasRight | async)"
+      (click)="showVersionsDialog()"
+    >
       {{ '${project.version}' }}
       <span style="display: none" id="frontend-os">{{ '${project.versionFEOS}' }}</span>
       <span style="display: none" id="frontend-ee">{{ '${project.versionFEEE}' }}</span>

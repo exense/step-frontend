@@ -264,15 +264,7 @@ export class ArtefactTreeNodeUtilsService
 
     let children: ArtefactTreeNode[] = [];
 
-    if (forceDisplay && !originalArtefact?.children?.length) {
-      const items = this.createPseudoContainer(
-        ArtefactNodeSource.MAIN,
-        originalArtefact,
-        forceDisplay,
-        isVisuallySkipped,
-      );
-      children.push(items!);
-    } else {
+    if (!forceDisplay || originalArtefact?.children?.length) {
       children = (originalArtefact?.children || []).map((child) =>
         this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
       );
@@ -312,6 +304,17 @@ export class ArtefactTreeNodeUtilsService
       }
     }
 
+    const main = this.createPseudoContainer(
+      ArtefactNodeSource.MAIN,
+      originalArtefact,
+      forceDisplay,
+      isVisuallySkipped,
+      true,
+    );
+    if (main) {
+      children.push(main);
+    }
+
     const after = this.createPseudoContainer(
       ArtefactNodeSource.AFTER,
       originalArtefact,
@@ -330,6 +333,7 @@ export class ArtefactTreeNodeUtilsService
     originalArtefact: AbstractArtefact,
     forceDisplay?: boolean,
     isParentVisuallySkipped?: boolean,
+    hideChildren?: boolean,
   ): ArtefactTreeNode | undefined {
     const parentId = originalArtefact.id;
     const isThreadGroup = originalArtefact._class === THREAD_GROUP;
@@ -337,32 +341,40 @@ export class ArtefactTreeNodeUtilsService
 
     const id = `${nodeType}|${parentId}`;
     let name = '';
+    let icon = '';
     let childContainer: ChildrenBlock | undefined = undefined;
     let childArtefacts: AbstractArtefact[] | undefined = undefined;
     switch (nodeType) {
       case ArtefactNodeSource.AFTER:
-        name = 'After';
+        name = 'After (cleanup)';
+        icon = 'chevron-right';
         childContainer = originalArtefact.after;
         break;
       case ArtefactNodeSource.AFTER_THREAD:
         if (isThreadGroup) {
           name = 'After Thread';
+          icon = 'chevrons-right';
           childContainer = threadGroupArtefact!.afterThread;
         }
         break;
       case ArtefactNodeSource.BEFORE:
-        name = 'Before';
+        name = 'Before (init)';
+        icon = 'chevron-left';
         childContainer = originalArtefact.before;
         break;
       case ArtefactNodeSource.BEFORE_THREAD:
         if (isThreadGroup) {
           name = 'Before Thread';
+          icon = 'chevrons-left';
           childContainer = threadGroupArtefact!.beforeThread;
         }
         break;
       default:
         name = 'Steps';
-        childArtefacts = originalArtefact.children;
+        icon = 'circle';
+        if (!hideChildren) {
+          childArtefacts = originalArtefact.children;
+        }
         break;
     }
     if (childContainer) {
@@ -377,7 +389,6 @@ export class ArtefactTreeNodeUtilsService
     const isDropDisabled = false;
     const isSkipped = false;
     const isVisuallySkipped = isParentVisuallySkipped ?? false;
-    const icon = 'chevron-left';
     const children = (childArtefacts ?? []).map((child) =>
       this.convertItem(child, { parentId: id, isParentVisuallySkipped: isVisuallySkipped }),
     );

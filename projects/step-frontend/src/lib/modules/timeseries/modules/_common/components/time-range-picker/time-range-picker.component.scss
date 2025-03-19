@@ -4,17 +4,13 @@
 .time-selector-container {
   display: flex;
   flex-direction: row;
-  border-bottom: 1px solid #d7d7d7;
+  padding: 2rem;
+  padding-bottom: 0;
+  gap: 2rem;
 
   .left-section {
-    border-right: 1px solid #d7d7d7;
     white-space: nowrap;
-    padding: 1.2rem;
     width: 232px;
-  }
-
-  .title {
-    font-weight: bold;
   }
 
   .right-section {
@@ -31,7 +27,7 @@
       padding: 4px 12px;
 
       &.full-range {
-        border-top: 1px solid var.$gray-200;
+        margin: 1.2rem 0;
       }
 
       &.active {
@@ -46,11 +42,50 @@
 }
 
 .range-btn {
+  @media print {
+    width: unset;
+    max-width: unset;
+
+    .warn {
+      display: none;
+    }
+  }
+
   @include core.button-round;
+
+  display: flex;
+  max-width: 26rem;
+  align-items: center;
+  width: 26rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  justify-content: space-between;
+  height: 3.6rem;
+
+  .text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 8px;
+  }
+
+  .suffix-icon {
+  }
+
+  .warn {
+    color: var.$orange;
+  }
+
   &.compact-btn {
     height: 40px;
     padding: 0 4px;
-    min-width: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

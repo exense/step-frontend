@@ -1,4 +1,4 @@
-<h4 data-step-testid>Performance assertions</h4>
+<h4 data-step-testid="title-assert-performance">Performance assertions</h4>
 <section>With this control you can make performance assertions.</section>
 <section>
   The assertions are based on the measurements generated within and by your Keywords. Each Keyword execution generates
@@ -11,7 +11,7 @@
   <div><b>Assert</b> that</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.aggregator" [disabled]="context.readonly" name="aggregator">
-      @for (item of aggregatorTypes; track item.key) {
+      @for (item of _lists.aggregatorTypes; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>
       }
     </mat-select>
@@ -27,7 +27,7 @@
   <div>are</div>
   <step-form-field>
     <mat-select [(ngModel)]="context.artefact!.comparator" [disabled]="context.readonly" name="comparator">
-      @for (item of operatorTypes; track item.key) {
+      @for (item of _lists.operatorTypes; track item.key) {
         <mat-option [value]="item.key">{{ item.value }}</mat-option>
       }
     </mat-select>

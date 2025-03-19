@@ -1,56 +1,81 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
   filter,
   map,
+  Observable,
   of,
+  pairwise,
   shareReplay,
-  switchMap,
-  combineLatest,
+  skip,
   startWith,
+  switchMap,
   take,
   tap,
-  distinctUntilChanged,
 } from 'rxjs';
 import {
+  AlertType,
+  ArtefactFilter,
   AugmentedControllerService,
   AugmentedExecutionsService,
-  DateRange,
-  DateUtilsService,
-  DEFAULT_RELATIVE_TIME_OPTIONS,
+  AugmentedPlansService,
+  AugmentedTimeSeriesService,
+  AutoDeselectStrategy,
   Execution,
-  ExecutiontTaskParameters,
+  ExecutionCloseHandleService,
+  IncludeTestcases,
   IS_SMALL_SCREEN,
-  RELATIVE_TIME_OPTIONS,
+  PopoverMode,
+  RegistrationStrategy,
   ReportNode,
-  ScheduledTaskTemporaryStorageService,
+  selectionCollectionProvider,
+  SelectionCollector,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  TimeOption,
   TimeRange,
-  TreeNodeUtilsService,
-  TreeStateService,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
-import { FormBuilder } from '@angular/forms';
-import { DateTime } from 'luxon';
-import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import {
+  AGGREGATED_TREE_TAB_STATE,
+  AGGREGATED_TREE_WIDGET_STATE,
+} from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTabsService } from '../../services/alt-execution-tabs.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
-import { AltExecutionStorageService } from '../../services/alt-execution-storage.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
+import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
+import { KeyValue } from '@angular/common';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { EXECUTION_ID } from '../../services/execution-id.token';
+import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
+import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
+import { ActiveExecutionsService } from '../../services/active-executions.service';
+import { Status } from '../../../_common/step-common.module';
+import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 
-const rangeKey = (executionId: string) => `${executionId}_range`;
+enum UpdateSelection {
+  ALL = 'all',
+  ONLY_NEW = 'onlyNew',
+  NONE = 'none',
+}
+
+interface RefreshParams {
+  execution?: Execution;
+  updateSelection?: UpdateSelection;
+}
 
 @Component({
   selector: 'step-alt-execution-progress',
@@ -58,32 +83,18 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [
+    DashboardUrlParamsService,
     AltExecutionTabsService,
+    {
+      provide: EXECUTION_ID,
+      useFactory: () => {
+        const _activatedRoute = inject(ActivatedRoute);
+        return () => _activatedRoute.snapshot.params?.['id'] ?? '';
+      },
+    },
     {
       provide: AltExecutionStateService,
       useExisting: AltExecutionProgressComponent,
-    },
-    {
-      provide: RELATIVE_TIME_OPTIONS,
-      useFactory: () => {
-        const _state = inject(AltExecutionStateService);
-        const _defaultOptions = inject(DEFAULT_RELATIVE_TIME_OPTIONS);
-
-        return _state.executionFulLRange$.pipe(
-          map((value) => ({ value, label: 'Full Range' }) as TimeOption),
-          map((fullRangeOption) => [..._defaultOptions, fullRangeOption]),
-        );
-      },
-    },
-    AggregatedReportViewTreeNodeUtilsService,
-    {
-      provide: TreeNodeUtilsService,
-      useExisting: AggregatedReportViewTreeNodeUtilsService,
-    },
-    AggregatedReportViewTreeStateService,
-    {
-      provide: TreeStateService,
-      useExisting: AggregatedReportViewTreeStateService,
     },
     AltExecutionViewAllService,
     AltKeywordNodesStateService,
@@ -106,110 +117,182 @@ const rangeKey = (executionId: string) => `${executionId}_range`;
       },
     },
     AltExecutionReportPrintService,
+    ...selectionCollectionProvider(
+      {
+        selectionKeyProperty: 'artefactID',
+        registrationStrategy: RegistrationStrategy.MANUAL,
+      },
+      AutoDeselectStrategy.KEEP_SELECTION,
+    ),
+    AltExecutionDialogsService,
+    {
+      provide: SchedulerInvokerService,
+      useExisting: AltExecutionDialogsService,
+    },
+    {
+      provide: ExecutionCloseHandleService,
+      useClass: AltExecutionCloseHandleService,
+    },
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
-  private _activeExecutions = inject(ActiveExecutionsService);
+  private _urlParamsService = inject(DashboardUrlParamsService);
+  private _activeExecutionContext = inject(ActiveExecutionContextService);
+  private _activeExecutionsService = inject(ActiveExecutionsService);
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
-  private _router = inject(Router);
-  private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
+  private _plansApi = inject(AugmentedPlansService);
   private _controllerService = inject(AugmentedControllerService);
   private _systemService = inject(SystemService);
-  private _fb = inject(FormBuilder);
-  private _aggregatedTreeState = inject(AggregatedReportViewTreeStateService);
-  private _dateUtils = inject(DateUtilsService);
-  private _executionStorage = inject(AltExecutionStorageService);
+  private _aggregatedTreeTabState = inject(AGGREGATED_TREE_TAB_STATE);
+  private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  private _viewAllService = inject(AltExecutionViewAllService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
+  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _executionId = inject(EXECUTION_ID);
+  protected readonly _dialogs = inject(AltExecutionDialogsService);
+  private _router = inject(Router);
+  protected readonly AlertType = AlertType;
+
+  protected isAnalyticsRoute$ = this._router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    startWith(null), // Emit an initial value when the component loads
+    map(() => this._router.url.includes('/analytics')),
+  );
+
+  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'FULL' },
+    ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+  ];
+
+  protected readonly executionTooltips: ExecutionActionsTooltips = {
+    simulate: 'Relaunch execution in simulation mode',
+    execute: 'Relaunch execution with same parameters',
+    schedule: 'Schedule for cyclical execution',
+  };
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
 
-  private relativeTime?: number;
-
-  get executionIdSnapshot(): string {
-    const routeSnapshot = this._activatedRoute.snapshot;
-    return routeSnapshot.params?.['id'] ?? '';
-  }
-
-  updateRelativeTime(time?: number) {
-    this.relativeTime = time;
-  }
-
-  readonly dateRangeCtrl = this._fb.control<DateRange | null | undefined>(null);
-
-  private dateRangeChangeSubscription = this.dateRangeCtrl.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe((range) => {
-      // Ignore synchronization in case of view all mode
-      if (this._viewAllService.isViewAll) {
-        return;
-      }
-      this.saveRangeToStorage(range);
-    });
-
-  readonly dateRange$ = this.dateRangeCtrl.valueChanges.pipe(
-    startWith(this.dateRangeCtrl.value),
-    map((range) => range ?? undefined),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  readonly timeRange$ = this.dateRange$.pipe(
-    map((dateRange) => this._dateUtils.dateRange2TimeRange(dateRange)),
-    shareReplay(1),
-    takeUntilDestroyed(),
-  );
-
-  updateRange(timeRange?: TimeRange | null) {
-    this.dateRangeCtrl.setValue(this._dateUtils.timeRange2DateRange(timeRange));
-  }
-
   selectFullRange(): void {
-    this.execution$.pipe(take(1)).subscribe((execution) => {
-      this.applyDefaultRange(execution);
-    });
+    this.updateTimeRangeSelection({ type: 'FULL' });
   }
 
-  readonly executionId$ = this._activatedRoute.params.pipe(
-    map((params) => params?.['id'] as string),
-    filter((id) => !!id),
-  );
+  readonly executionId$ = this._activeExecutionContext.executionId$.pipe(shareReplay(1), takeUntilDestroyed());
 
-  readonly activeExecution$ = this.executionId$.pipe(map((id) => this._activeExecutions.getActiveExecution(id)));
+  readonly activeExecution$ = this._activeExecutionContext.activeExecution$.pipe(shareReplay(1), takeUntilDestroyed());
 
   readonly execution$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution?.execution$ ?? of(undefined)),
+    switchMap((active) => active.execution$),
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
+    .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
+    .subscribe((activeExecution) => {
+      // force trigger time range change
+      const timeRangeSelection = activeExecution.getTimeRangeSelection();
+      setTimeout(() => {
+        this._urlParamsService.updateUrlParams(timeRangeSelection);
+        this.updateTimeRangeSelection({ ...timeRangeSelection });
+      }, 100);
+    });
+
+  readonly timeRangeSelection$ = this.activeExecution$.pipe(
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(300))),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this.updateTimeRangeSelection(selection);
+  }
+
+  readonly executionPlan$ = this.execution$.pipe(
+    map((execution) => execution.planId),
+    switchMap((planId) => (!planId ? of(undefined) : this._plansApi.getPlanByIdCached(planId))),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly resolvedParameters$ = this.execution$.pipe(
+    map((execution) => {
+      return execution.parameters as unknown as Array<KeyValue<string, string>> | undefined;
+    }),
+  );
+  protected isResolvedParametersVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
   );
 
-  readonly executionFulLRange$ = this.execution$.pipe(map((execution) => this.getDefaultRangeForExecution(execution)));
-
-  readonly isFullRangeSelected$ = combineLatest([this.dateRange$, this.executionFulLRange$]).pipe(
-    map(([selectedRange, fullRange]) => {
-      const startEq = this._dateUtils.areDatesEqual(selectedRange?.start, fullRange?.start);
-      const endEq = this._dateUtils.areDatesEqual(selectedRange?.end, fullRange?.end);
-      return startEq && endEq;
+  readonly isFullRangeSelected$ = this.timeRangeSelection$.pipe(
+    map((selection) => {
+      return selection.type === 'FULL';
     }),
   );
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
+  readonly hasTestCasesFilter$ = this._testCasesSelection.selected$.pipe(
+    map((selected) => selected.length > 0 && selected.length < this._testCasesSelection.possibleLength),
+  );
+
+  private previousTestCasesIds: string[] = [];
   readonly testCases$ = this.execution$.pipe(
-    switchMap((execution) =>
-      this._executionsApi.getReportNodesByExecutionId(execution.id!, 'step.artefacts.reports.TestCaseReportNode', 500),
-    ),
+    startWith(undefined),
+    pairwise(),
+    map(([prevExecution, currentExecution]) => {
+      const updateSelection =
+        prevExecution?.id !== currentExecution?.id ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW;
+      return { execution: currentExecution, updateSelection } as RefreshParams;
+    }),
+    switchMap(({ execution, updateSelection }) => {
+      if (!execution?.id) {
+        return of([]);
+      }
+      return this._executionsApi
+        .getReportNodesByExecutionId(execution.id, 'step.artefacts.reports.TestCaseReportNode', 500)
+        .pipe(
+          tap((reportNodes) => {
+            const oldTestCasesIds = new Set(this.previousTestCasesIds);
+            const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.has(testCase.id!));
+            this.previousTestCasesIds = reportNodes.map((testCase) => testCase.id!);
+            this._testCasesSelection.registerPossibleSelectionManually(reportNodes);
+            if (updateSelection !== UpdateSelection.NONE) {
+              this.determineDefaultSelection(
+                updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
+                execution.executionParameters?.artefactFilter,
+              );
+            }
+          }),
+        );
+    }),
     map((testCases) => (!testCases?.length ? undefined : testCases)),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  protected testCasesForRelaunch$ = this.testCases$.pipe(
+    map((testCases) => {
+      const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
+      if (list?.length === testCases?.length) {
+        return undefined;
+      }
+      return list;
+    }),
+    map((list) => {
+      if (!list?.length) {
+        return undefined;
+      }
+      return {
+        list,
+        by: 'id',
+      } as IncludeTestcases;
+    }),
   );
 
   private testCasesDataSource?: TableDataSource<ReportNode>;
@@ -221,12 +304,12 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly keywordParameters$ = combineLatest([this.execution$, this.testCases$]).pipe(
-    map(([execution, testCases]) => {
+  readonly keywordParameters$ = combineLatest([this.execution$, this._testCasesSelection.selected$]).pipe(
+    map(([execution, testCasesSelection]) => {
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
-        testcases: !testCases?.length ? undefined : testCases.map((testCase) => testCase.artefactID!),
+        testcases: !testCasesSelection.length ? undefined : testCasesSelection,
       } as KeywordParameters;
     }),
     shareReplay(1),
@@ -235,6 +318,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
+
+  private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
+  readonly errorsDataSource$ = of(this.errorsDataSource);
+  readonly availableErrorTypes$ = this.errorsDataSource.allData$.pipe(
+    map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+    map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   readonly currentOperations$ = this.execution$.pipe(
     map((execution) => {
@@ -251,74 +343,93 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
 
+  readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
+    map(([execution, rangeSelection]) => {
+      if (execution.id !== this._executionId()) {
+        // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
+        return undefined;
+      }
+      switch (rangeSelection.type) {
+        case 'FULL':
+          const now = new Date().getTime();
+          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
+        case 'ABSOLUTE':
+          return rangeSelection.absoluteSelection!;
+        case 'RELATIVE':
+          const endTime = execution.endTime || new Date().getTime();
+          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
+      }
+    }),
+    filter((range): range is TimeRange => range !== undefined),
+    shareReplay(1),
+  ) as Observable<TimeRange>;
+
+  readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
+
   ngOnInit(): void {
-    const isIgnoreFilter$ = this._viewAllService.isViewAll$;
-    combineLatest([this.execution$, isIgnoreFilter$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, isIgnoreFilter]) => {
-        this.refreshExecutionTree(execution);
-        this.applyDefaultRange(execution, !isIgnoreFilter);
-      });
+    const urlParams = this._urlParamsService.collectUrlParams();
+
+    // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
+    if (urlParams.timeRange) {
+      this.updateTimeRangeSelection(urlParams.timeRange);
+    } else {
+      // force event
+      let activeExecution = this._activeExecutionsService.getActiveExecution(this._executionId());
+      this.updateTimeRangeSelection({ ...activeExecution.getTimeRangeSelection() });
+    }
+
+    this.setupTreeRefresh();
+    this.setupErrorsRefresh();
   }
 
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
+    this.errorsDataSource.destroy();
   }
 
-  private getDefaultRangeForExecution(execution: Execution, useStorage?: boolean): DateRange {
-    let start: DateTime;
-    let end: DateTime;
-
-    if (execution.endTime) {
-      const storedRange = useStorage ? this._executionStorage.getItem(rangeKey(execution.id!)) : undefined;
-      if (storedRange) {
-        const parsed = JSON.parse(storedRange) as { start?: number; end?: number };
-        start = DateTime.fromMillis(parsed.start ?? execution.startTime!);
-        end = DateTime.fromMillis(parsed.end ?? execution.endTime);
-      } else {
-        start = DateTime.fromMillis(execution.startTime!);
-        end = DateTime.fromMillis(execution.endTime);
-      }
-    } else if (this.relativeTime) {
-      end = DateTime.now();
-      start = end.set({ millisecond: end.millisecond - this.relativeTime });
-    } else {
-      start = DateTime.fromMillis(execution.startTime!);
-      end = DateTime.now();
-    }
-
-    return { start, end };
+  private setupTreeRefresh(): void {
+    combineLatest([this.execution$, this.timeRangeSelection$])
+      .pipe(
+        switchMap(([execution, timeSelection]) => {
+          if (timeSelection.type === 'FULL') {
+            return this._executionsApi.getFullAggregatedReportView(execution.id!);
+          }
+          return this._executionsApi.getAggregatedReportView(execution.id!, {
+            range: timeSelection.absoluteSelection!,
+          });
+        }),
+        map((response) => response ?? {}),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
+        if (!aggregatedReportView) {
+          this.isTreeInitialized = false;
+          return;
+        }
+        // expand all items in tree, due first initialization
+        const expandAllByDefault = !this.isTreeInitialized;
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this.isTreeInitialized = true;
+      });
   }
 
-  private saveRangeToStorage(range?: DateRange | null): void {
-    const executionId = this.executionIdSnapshot;
-    if (!range || !executionId) {
-      return;
-    }
-    const start = range.start?.toMillis();
-    const end = range.end?.toMillis();
-    this._executionStorage.setItem(rangeKey(executionId), JSON.stringify({ start, end }));
+  private setupErrorsRefresh(): void {
+    combineLatest([this.execution$, this.timeRange$])
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(([execution, timeRange]) => {
+        const executionId = execution.id!;
+        this.errorsDataSource.reload({ request: { executionId, timeRange } });
+      });
   }
 
-  handleTaskSchedule(task: ExecutiontTaskParameters): void {
-    const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
-    this._router.navigate([{ outlets: { modal: ['schedule', temporaryId] } }], { relativeTo: this._activatedRoute });
+  relaunchExecution(): void {
+    this._router.navigate([{ outlets: { modal: ['launch'] } }], { relativeTo: this._activatedRoute });
   }
 
   manualRefresh(): void {
-    const executionId = this._activatedRoute.snapshot.params['id'];
-    this._activeExecutions.getActiveExecution(executionId)?.manualRefresh();
-  }
-
-  private applyDefaultRange(execution: Execution, useStorage = false): void {
-    this.dateRangeCtrl.setValue(this.getDefaultRangeForExecution(execution, useStorage));
-  }
-
-  private refreshExecutionTree(execution: Execution): void {
-    this._aggregatedTreeState
-      .loadTree(execution.id!)
-      .subscribe((isInitialized) => (this.isTreeInitialized = isInitialized));
+    this._activeExecutionContext.manualRefresh();
   }
 
   private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
@@ -336,5 +447,47 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         })
         .build(),
     );
+  }
+
+  private determineDefaultSelection(testCases: ReportNode[], artefactFilter?: ArtefactFilter): void {
+    const selectedTestCases = testCases.filter((value) => {
+      if (!artefactFilter) {
+        return true;
+      }
+      switch (artefactFilter.class) {
+        case 'step.artefacts.filters.TestCaseFilter':
+          return (artefactFilter as any).includedNames.includes(value.name);
+        case `step.artefacts.filters.TestCaseIdFilter`:
+          return (artefactFilter as any).includedIds.includes(value.artefactID);
+        default:
+          return true;
+      }
+    });
+    this._testCasesSelection.select(...selectedTestCases);
+  }
+
+  protected readonly PopoverMode = PopoverMode;
+
+  updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
+    this.execution$.pipe(take(1)).subscribe((execution) => {
+      if (selection.type === 'RELATIVE') {
+        let time = selection.relativeSelection!.timeInMs;
+        let now = new Date().getTime();
+        let end = execution.endTime || now - 5000;
+        let from = end - time;
+        if (from > end) {
+          // remove the 5 sec buffer
+          end = now;
+        }
+        selection!.absoluteSelection = { from: from, to: end };
+        if (!selection.relativeSelection!.label) {
+          let foundRelativeOption = this.timeRangeOptions.find(
+            (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+          );
+          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+        }
+      }
+      this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
+    });
   }
 }

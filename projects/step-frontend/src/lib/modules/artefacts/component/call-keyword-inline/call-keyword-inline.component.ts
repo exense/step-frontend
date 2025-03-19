@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  AggregatedArtefactInfo,
   ArtefactInlineItem,
+  ArtefactInlineItemsBuilderService,
+  ArtefactInlineItemSource,
+  ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
   DynamicValueString,
 } from '@exense/step-core';
-import { Observable, of } from 'rxjs';
 import { KeywordArtefact } from '../../types/keyword.artefact';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 
@@ -13,64 +14,90 @@ import { KeywordReportNode } from '../../types/keyword.report-node';
   selector: 'step-call-keyword-inline',
   templateUrl: './call-keyword-inline.component.html',
   styleUrl: './call-keyword-inline.component.scss',
+  host: {
+    class: 'execution-report-node-inline-details',
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<KeywordArtefact, KeywordReportNode> {
-  protected getReportNodeItems(info?: KeywordReportNode, isVertical?: boolean): ArtefactInlineItem[] | undefined {
-    let inputParams: Record<string, string> | undefined;
-    let outputParams: Record<string, string> | undefined;
-    try {
-      inputParams = info?.input ? JSON.parse(info.input) : undefined;
-    } catch {
-      inputParams = undefined;
-    }
-    try {
-      outputParams = info?.output ? JSON.parse(info.output) : undefined;
-    } catch {
-      outputParams = undefined;
-    }
+  private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
+  private _itemsBuilderService = inject(ArtefactInlineItemsBuilderService);
 
-    const items: [string, string | undefined][] = [];
+  private inputItemsBuilder = this._itemsBuilderService
+    .builder<KeywordArtefact, KeywordReportNode>()
+    .extractReportNodeItems((reportNode) => this.getReportNodeInputs(reportNode))
+    .extractArtefactItems((artefact) => this.getArtefactInputs(artefact));
 
-    if (inputParams) {
-      if (isVertical) {
-        items.push(['Inputs', undefined]);
-      }
-      const inputs: [string, string | undefined][] = Object.entries(inputParams).map(([key, value]) => [key, value]);
-      items.push(...inputs);
-    }
-    if (outputParams) {
-      if (isVertical) {
-        items.push(['Outputs', undefined]);
-      }
-      const outputs: [string, string | undefined][] = Object.entries(outputParams).map(([key, value]) => [key, value]);
-      items.push(...outputs);
-    }
-    return this.convert(items);
-  }
+  private outputItemsBuilder = this._itemsBuilderService
+    .builder<KeywordArtefact, KeywordReportNode>()
+    .extractReportNodeItems((reportNode) => this.getReportNodeOutputs(reportNode))
+    .extractArtefactItems(() => undefined);
 
-  protected getArtefactItems(
-    info?: AggregatedArtefactInfo<KeywordArtefact>,
-    isVertical: boolean = false,
-    isResolved: boolean = false,
-  ): Observable<ArtefactInlineItem[] | undefined> {
-    const keywordArgument = info?.originalArtefact?.argument;
-    let keywordInputs: Record<string, DynamicValueString> | undefined = undefined;
+  protected readonly inputItems = computed(() => this.inputItemsBuilder.build(this.currentContext()));
 
-    try {
-      keywordInputs = !!keywordArgument?.value ? JSON.parse(keywordArgument.value) : {};
-    } catch (err) {}
+  protected readonly outputItems = computed(() => this.outputItemsBuilder.build(this.currentContext()));
+
+  private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {
+    const keywordInputs = this.parseParams<DynamicValueString>(artefact?.argument?.value);
     if (!keywordInputs) {
-      return of(undefined);
+      return undefined;
     }
-    const inputs: [string, DynamicValueString | undefined][] = Object.entries(keywordInputs).map(([label, value]) => [
+    const inputs: ArtefactInlineItemSource = Object.entries(keywordInputs).map(([label, value]) => [
       label,
       value,
+      'log-in',
+      'Input',
     ]);
 
-    if (isVertical && inputs.length) {
-      inputs.unshift(['Inputs', undefined]);
-    }
+    return this._artefactInlineUtils.convert(inputs);
+  }
 
-    return of(this.convert(inputs, isResolved));
+  private getReportNodeInputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+    const artefactInputs = this.parseParams<DynamicValueString>(reportNode?.resolvedArtefact?.argument?.value);
+    const resolvedInputs = this.parseParams(reportNode?.input);
+    if (!resolvedInputs) {
+      return undefined;
+    }
+    const icon = 'log-in';
+    const iconTooltip = 'Input';
+    const inputValues: ArtefactInlineItemSource = Object.entries(resolvedInputs).map(([label, value]) => {
+      const valueExplicitExpression = artefactInputs?.[label]?.expression;
+      return {
+        label,
+        value,
+        valueExplicitExpression,
+        icon,
+        iconTooltip,
+      };
+    });
+
+    return this._artefactInlineUtils.convert(inputValues);
+  }
+
+  private getReportNodeOutputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
+    const outputParams = this.parseParams(reportNode?.output);
+    if (!outputParams) {
+      return undefined;
+    }
+    const outputValues: ArtefactInlineItemSource = Object.entries(outputParams).map(([key, value]) => [
+      key,
+      value,
+      'log-out',
+      'Output',
+    ]);
+    return this._artefactInlineUtils.convert(outputValues);
+  }
+
+  private parseParams<T = string>(params?: string): Record<string, T> | undefined {
+    if (!params) {
+      return undefined;
+    }
+    let result: Record<string, T> | undefined;
+    try {
+      result = JSON.parse(params);
+    } catch {
+      result = undefined;
+    }
+    return result;
   }
 }

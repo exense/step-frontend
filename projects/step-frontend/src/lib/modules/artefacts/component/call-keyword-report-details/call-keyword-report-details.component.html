@@ -1,0 +1,101 @@
+@if (keywordInputs(); as inputs) {
+  <section class="json-container">
+    <step-json-view-expanded
+      [data]="inputs"
+      [limit]="7"
+      [iconsDictionary]="keywordInputIcons"
+      labelExpand="Expand all inputs"
+      labelCollapse="Collapse inputs"
+    />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyInput()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (keywordOutputs(); as outputs) {
+  <section class="json-container">
+    <step-json-view-expanded
+      [data]="outputs"
+      [limit]="7"
+      [iconsDictionary]="keywordOutputIcons"
+      labelExpand="Expand all outputs"
+      labelCollapse="Collapse outputs"
+    />
+    <button type="button" mat-icon-button matTooltip="Copy JSON to clipboard" (click)="copyOutput()">
+      <step-icon name="copy" />
+    </button>
+  </section>
+}
+@if (failedChildren(); as children) {
+  @if (children.length) {
+    <section class="data-container">
+      <div>
+        @for (child of children; track child.id) {
+          <step-report-node-error [node]="child" />
+        }
+      </div>
+    </section>
+  }
+}
+@if (node()?.error) {
+  <step-report-details-error [node]="node()" />
+}
+@if (node()?.attachments; as attachments) {
+  @if (attachments.length) {
+    <step-report-details-attachments [attachments]="attachments" />
+  }
+}
+@if (measuresDataSource(); as measuresDataSource) {
+  <section class="data-container">
+    <div>
+      <step-table [dataSource]="measuresDataSource" matSort>
+        <ng-container matColumnDef="begin">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Begin</th>
+          <td mat-cell *matCellDef="let measure">
+            {{ measure.begin | date: DateFormat.DATE }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let measure">
+            {{ measure.name }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="duration">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration</th>
+          <td mat-cell *matCellDef="let measure">{{ measure.duration }} ms</td>
+        </ng-container>
+        <ng-container matColumnDef="data">
+          <th mat-header-cell *matHeaderCellDef>Custom data</th>
+          <td mat-cell *matCellDef="let measure">
+            <span *ngFor="let item of measure.data | keyvalue"> {{ item.key }}={{ item.value }} </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let measure">
+            <a (click)="navigateToAnalyticsView(measure); (false)" matTooltip="Search in analytics">
+              <step-icon name="external-link"></step-icon>
+            </a>
+          </td>
+        </ng-container>
+      </step-table>
+    </div>
+  </section>
+}
+@if (node(); as node) {
+  @if (node.tokenId || node.agentUrl) {
+    <section class="data-container tech-details">
+      <div class="tech-details-content">
+        @if (node.agentUrl) {
+          <span>Agent:</span>
+          <a [href]="node.agentUrl" target="_blank">{{ node.agentUrl }}</a>
+        }
+        @if (node.tokenId) {
+          <span>Token ID:</span>
+          <span>{{ node.tokenId }}</span>
+        }
+      </div>
+    </section>
+  }
+}

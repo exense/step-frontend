@@ -1,0 +1,16 @@
+@if (!forceLegacyReporting()) {
+  <step-btn-group class="new-execution-report">
+    <mat-slide-toggle
+      [formControl]="toggleControl"
+      color="primary"
+      name="new-execution-report"
+      [matTooltip]="
+        isDisabled()
+          ? _executionViewModeService.getNewExecutionDeactivatedReason(execution()!)
+          : 'Select if you prefer the legacy or the new execution view. (saved for all executions)'
+      "
+    >
+      Beta&nbsp;
+    </mat-slide-toggle>
+  </step-btn-group>
+}

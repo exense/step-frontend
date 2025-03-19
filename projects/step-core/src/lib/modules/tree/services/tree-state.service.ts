@@ -1,11 +1,11 @@
-import { computed, inject, Injectable, NgZone, OnDestroy, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { map, Observable, of, Subject, tap } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TreeNode } from '../types/tree-node';
 import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeStateInitOptions } from '../types/tree-state-init-options.interface';
 import { TreeFlattenerService } from './tree-flattener.service';
-import { DOCUMENT } from '@angular/common';
+import { TreeFlatNode } from '../types/tree-flat-node';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
@@ -87,6 +87,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     }
   }
 
+  cleanup(): boolean {
+    this.originalRoot = undefined;
+    this.rootNode.set(undefined);
+    return true;
+  }
+
   isMultipleNodesSelected(): boolean {
     return this.selectedNodeIdsInternal().length > 1;
   }
@@ -152,6 +158,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     const selectedNodeIds = new Set(this.selectedNodeIdsInternal());
 
     if (preventIfAlreadySelected && selectedNodeIds.has(nId)) {
+      if (this.selectedInsertionParentId() !== nId) {
+        this.selectedInsertionParentId.set(nId);
+      }
       return;
     }
 
@@ -593,7 +602,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     const path = [nodeId];
     let node = this.findNodeById(nodeId);
-    while (!!node?.parentId) {
+    const visitedNodes: Array<string> = [];
+    while (!!node?.parentId && !visitedNodes.includes(node?.parentId)) {
+      visitedNodes.push(node.parentId);
       path.unshift(node.parentId);
       node = this.findNodeById(node.parentId);
     }
@@ -619,6 +630,39 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
   collapseAll(): void {
     this.expandedNodeIdsInternal.set([]);
+  }
+
+  expandSubTree(subRootNodeId: string): void {
+    const { accessCache } = this.treeData();
+    if (!accessCache.get(subRootNodeId)) {
+      return;
+    }
+
+    const idsToExpand = this.getSubTree(subRootNodeId)
+      .filter((node) => node.hasChild)
+      .map((node) => node.id);
+    idsToExpand.unshift(subRootNodeId);
+
+    this.expandedNodeIdsInternal.update((expanded) => {
+      const unique = new Set([...expanded, ...idsToExpand]);
+      return Array.from(unique);
+    });
+  }
+
+  collapseSubTree(subRootNodeId: string): void {
+    const { accessCache } = this.treeData();
+    if (!accessCache.get(subRootNodeId)) {
+      return;
+    }
+
+    const subTreeIds = this.getSubTree(subRootNodeId)
+      .filter((node) => node.hasChild)
+      .map((node) => node.id);
+    subTreeIds.unshift(subRootNodeId);
+
+    const idsToCollapse = new Set(subTreeIds);
+
+    this.expandedNodeIdsInternal.update((expanded) => expanded.filter((id) => !idsToCollapse.has(id)));
   }
 
   getSelectedNodes(): N[] {
@@ -773,5 +817,26 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
       return res;
     }, [] as string[]);
     this.selectedNodeIdsInternal.set(selectedOrdered);
+  }
+
+  private getSubTree(subTreeRootId: string): TreeFlatNode[] {
+    const { tree } = this.treeData();
+    const subRootIndex = tree.findIndex((node) => node.id === subTreeRootId);
+    if (subRootIndex < 0) {
+      return [];
+    }
+
+    const subRootLevel = tree[subRootIndex].parentPath.length;
+    const result: TreeFlatNode[] = [];
+    for (let i = subRootIndex + 1; i < tree.length; i++) {
+      const node = tree[i];
+      const level = node.parentPath.length;
+      if (level <= subRootLevel) {
+        break;
+      }
+      result.push(node);
+    }
+
+    return result;
   }
 }

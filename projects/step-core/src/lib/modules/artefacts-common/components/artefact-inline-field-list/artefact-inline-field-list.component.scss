@@ -1,0 +1,34 @@
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-artefact-inline-field-list {
+  display: flex;
+  align-items: center;
+
+  section.list {
+    display: flex;
+
+    &.vertical {
+      gap: 0.5rem;
+      flex-direction: column;
+      width: 100%;
+
+      step-artefact-inline-field section {
+        max-width: unset;
+      }
+    }
+
+    &.wrap {
+      flex-wrap: wrap;
+    }
+
+    &:not(.vertical) {
+      step-artefact-inline-field step-icon.field-icon {
+        @include core.step-icon-size(1.6rem);
+      }
+    }
+  }
+
+  step-icon.more-icon {
+    @include core.step-icon-size(1.6rem);
+  }
+}

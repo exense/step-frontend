@@ -1,13 +1,5 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { AttachmentsComponent } from './components/attachments/attachments.component';
-import { AttachmentUrlPipe } from './pipes/attachment-url.pipe';
-import { AssertReportNodeShortComponent } from './components/assert-report-node-short/assert-report-node-short.component';
-import { AttachmentIsImagePipe } from './pipes/attachment-is-image.pipe';
-import { AttachmentIsTextPipe } from './pipes/attachment-is-text.pipe';
-import { AttachmentShowLabelPipe } from './pipes/attachment-show-label.pipe';
-import { AttachmentPreviewComponent } from './components/attachment-preview/attachment-preview.component';
-import { AttachmentsPreviewComponent } from './components/attachments-preview/attachments-preview.component';
 import { ReportNodeShortComponent } from './components/report-node-short/report-node-short.component';
 import { ReportNodeComponent } from './components/report-node/report-node.component';
 import { RetryIfFailComponent } from './components/retry-if-fail/retry-if-fail.component';
@@ -17,14 +9,6 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
 
 @NgModule({
   declarations: [
-    AttachmentsComponent,
-    AttachmentUrlPipe,
-    AssertReportNodeShortComponent,
-    AttachmentIsImagePipe,
-    AttachmentIsTextPipe,
-    AttachmentShowLabelPipe,
-    AttachmentPreviewComponent,
-    AttachmentsPreviewComponent,
     ReportNodeShortComponent,
     ReportNodeComponent,
     RetryIfFailComponent,
@@ -33,12 +17,6 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
     CallFunctionReportNodeExternalLinkPipe,
   ],
   imports: [StepCommonModule],
-  exports: [
-    ReportNodeShortComponent,
-    ReportNodeComponent,
-    AssertReportNodeShortComponent,
-    AttachmentPreviewComponent,
-    AttachmentsPreviewComponent,
-  ],
+  exports: [ReportNodeShortComponent, ReportNodeComponent, CallFunctionReportNodeComponent],
 })
 export class ReportNodesModule {}

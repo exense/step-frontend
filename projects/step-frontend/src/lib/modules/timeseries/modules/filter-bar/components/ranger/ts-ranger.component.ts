@@ -41,7 +41,6 @@ import UPlot from '../../../_common/types/uPlot';
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   private _element = inject(ElementRef);
   private _doc = inject(DOCUMENT);
-  private _utils = inject(UPlotUtilsService);
 
   private readonly CHART_HEIGHT = 104;
 
@@ -204,7 +203,6 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       const _onUp = (e: MouseEvent) => {
         off('mouseup', document, _onUp);
         off('mousemove', document, _onMove);
-
         this.emitSelectionToLinkedCharts();
         this.emitRangeEventIfChanged();
 
@@ -249,6 +247,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       ],
       cursor: {
         y: false,
+        lock: false,
         points: {
           show: false,
         },
@@ -264,13 +263,17 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
           // this is not trigger when dblclick is fired on synced charts, but just on the ranger
           dblclick: (self: uPlot, b, handler: MouseListener) => {
             return (e: MouseEvent) => {
-              let hasSelection = this.uplot.select.width > 0;
               handler(e);
-              if (hasSelection) {
-                // has selection
-                this.zoomReset.emit();
-                // this.resetSelect(true);
-              }
+              this.zoomReset.emit();
+              return null;
+            };
+          },
+          mousedown: (self: uPlot, b, handler: MouseListener) => {
+            return (e: MouseEvent) => {
+              // clicking on the ranger causes a bug in the synced charts. The lock is triggered but no tooltip is displayed.
+              // disabling this event will not trigger the lock event
+              e.stopPropagation();
+              e.stopImmediatePropagation();
               return null;
             };
           },
@@ -323,7 +326,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         setSelect: [
           (uRanger: uPlot) => {
             // this is triggered when the synced charts are zooming
-            // this is triggered many times when clicking on the ranger.
+            // this is triggered many times when clicking on the ranger
             this.emitRangeEventIfChanged();
             // zoom(uRanger.select.left, uRanger.select.width);
           },
@@ -370,7 +373,7 @@ export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // let max = u.data[0][u.valToIdx(u.posToVal(u.select.left + u.select.width, 'x'))];
     const min = u.posToVal(u.select.left, 'x');
     const max = u.posToVal(u.select.left + u.select.width, 'x');
-    if (min > max) {
+    if (min >= max) {
       if (this.previousRange) {
         this.selectRange(this.previousRange!);
       }

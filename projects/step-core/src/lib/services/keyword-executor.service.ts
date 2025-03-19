@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { forkJoin, map, switchMap, tap } from 'rxjs';
-import { ArtefactsFactoryService } from './artefacts-factory.service';
+import { ArtefactsFactoryService } from '../modules/artefacts-common/injectables/artefacts-factory.service';
 import { PlanOpenService } from '../modules/plan-common';
 import { AugmentedPlansService } from '../client/step-client-module';
 

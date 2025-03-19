@@ -1,14 +1,16 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Params, Router } from '@angular/router';
 import { TimeSeriesContext } from '../types/time-series/time-series-context';
-import { TimeRange, TimeRangeSelection, TimeSeriesFilterItem } from '@exense/step-core';
-import { TimeRangeType } from '../types/time-selection/time-range-picker-selection';
+import { TimeRange, TimeRangeSelection } from '@exense/step-core';
+import { TimeRangePickerSelection, TimeRangeType } from '../types/time-selection/time-range-picker-selection';
 import { TsFilteringSettings } from '../types/filter/ts-filtering-settings';
 import { TsFilteringMode } from '../types/filter/ts-filtering-mode.enum';
 import { FilterBarItemType } from '../types/filter/filter-bar-item';
 import { FilterUtils } from '../types/filter/filter-utils';
 import { TimeSeriesConfig } from '../types/time-series/time-series.config';
 import { DashboardTimeRangeSettings } from '../../../components/dashboard/dashboard-time-range-settings';
+import { filter, first, map, of } from 'rxjs';
+import { TimeSeriesUtils } from '../types/time-series/time-series-utils';
 
 const MIN_SUFFIX = '_min';
 const MAX_SUFFIX = '_max';
@@ -68,21 +70,7 @@ export class DashboardUrlParamsService {
   }
 
   private extractTimeRange(params: Params): TimeRangeSelection | undefined {
-    const rangeType = params['rangeType'] as TimeRangeType;
-    switch (rangeType) {
-      case TimeRangeType.ABSOLUTE:
-        const from = parseInt(params['from']);
-        const to = parseInt(params['to']);
-        if (!from || !to) {
-          return undefined;
-        }
-        return { type: rangeType, absoluteSelection: { from: from, to: to } };
-      case TimeRangeType.RELATIVE:
-        const relativeRange = parseInt(params['relativeRange']);
-        return { type: rangeType, relativeSelection: { timeInMs: relativeRange } };
-      default:
-        return undefined;
-    }
+    return TimeSeriesUtils.extractTimeRangeSelectionFromURLParams(params);
   }
 
   private decodeUrlFilters(params: Params): UrlFilterAttribute[] {
@@ -145,37 +133,29 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(context: TimeSeriesContext) {
+  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number) {
+    let params = this.convertTimeRange(timeRange);
+    if (refresh !== undefined) {
+      params['refreshInterval'] = refresh;
+    }
+    this.prefixAndPushUrlParams(params);
+  }
+
+  updateUrlParamsFromContext(context: TimeSeriesContext) {
     const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
     mergedParams['refreshInterval'] = context.getRefreshInterval();
-    const prefixedParams = Object.keys(mergedParams).reduce((accumulator: any, key: string) => {
-      accumulator[TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key] = mergedParams[key];
-      return accumulator;
-    }, {});
-
-    this._router.navigate([], {
-      relativeTo: this._activatedRoute,
-      queryParams: prefixedParams,
-    });
+    this.prefixAndPushUrlParams(mergedParams);
   }
 
   private convertContextToUrlParams(
     context: TimeSeriesContext,
     timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
-    const params: Record<string, any> = {
-      rangeType: timeRangeSettings.type,
-    };
+    const params = this.convertTimeRange(timeRangeSettings.pickerSelection);
     if (context.getGroupDimensions().length > 0) {
       params['grouping'] = context.getGroupDimensions().join(',');
-    }
-    if (timeRangeSettings.type === TimeRangeType.ABSOLUTE) {
-      params['from'] = timeRangeSettings.fullRange.from;
-      params['to'] = timeRangeSettings.fullRange.to;
-    } else if (timeRangeSettings.type === TimeRangeType.RELATIVE) {
-      params['relativeRange'] = timeRangeSettings.relativeSelection!.timeInMs;
     }
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();
@@ -189,5 +169,49 @@ export class DashboardUrlParamsService {
     params['refreshInterval'] = context.getRefreshInterval();
 
     return params;
+  }
+
+  private convertTimeRange(pickerSelection: TimeRangePickerSelection): Record<string, any> {
+    const params: Record<string, any> = {
+      rangeType: pickerSelection.type,
+    };
+    if (pickerSelection.type === TimeRangeType.ABSOLUTE) {
+      const fullRange = pickerSelection.absoluteSelection!;
+      params['from'] = fullRange.from;
+      params['to'] = fullRange.to;
+    } else if (pickerSelection.type === TimeRangeType.RELATIVE) {
+      params['relativeRange'] = pickerSelection.relativeSelection!.timeInMs;
+    }
+    return params;
+  }
+
+  private prefixAndPushUrlParams(params: Record<string, any>): void {
+    const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
+    Object.keys(updatedParams).forEach((key) => {
+      if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
+        updatedParams[key] = null; // Set to null so we force the cleaning of the param
+      }
+    });
+    Object.keys(params).forEach((key) => {
+      const prefixedParam = TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key;
+      updatedParams[prefixedParam] = params[key];
+    });
+
+    // If current navigation is performing, update url parameters after the navigation is completed
+    // Otherwise running navigation might be prevented.
+    const previousNavigation$ = !this._router.getCurrentNavigation()
+      ? of(true)
+      : this._router.events.pipe(
+          first((event) => event instanceof NavigationEnd),
+          map(() => true),
+        );
+
+    previousNavigation$.subscribe(() => {
+      this._router.navigate([], {
+        relativeTo: this._activatedRoute,
+        queryParams: updatedParams,
+        queryParamsHandling: 'merge',
+      });
+    });
   }
 }

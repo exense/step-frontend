@@ -84,7 +84,11 @@ export class ViewRegistryService implements OnDestroy {
     this.registerMenuEntry('Schedules', 'scheduler', 'clock', { weight: 100, parentId: 'automation-root' });
 
     // Sub Menus Execute
-    this.registerMenuEntry('Executions', 'executions', 'rocket', { weight: 10, parentId: 'execute-root' });
+    this.registerMenuEntry('Executions', 'executions', 'rocket', {
+      weight: 10,
+      parentId: 'execute-root',
+      isActiveFct: (url) => url.startsWith('/executions/list'),
+    });
     this.registerMenuEntry('Analytics', 'dashboards', 'bar-chart-square-01', { weight: 20, parentId: 'execute-root' });
     // Sub Menus Status
     this.registerMenuEntry('Current Operations', 'operations', 'airplay', { weight: 10, parentId: 'status-root' });
@@ -282,7 +286,12 @@ export class ViewRegistryService implements OnDestroy {
     title: string,
     id: string,
     icon: string,
-    options?: { weight?: number; parentId?: string; isEnabledFct?: () => boolean },
+    options?: {
+      weight?: number;
+      parentId?: string;
+      isEnabledFct?: () => boolean;
+      isActiveFct?: (url: string) => boolean;
+    },
   ): void {
     if (!id || this.registeredMenuIds.includes(id)) {
       return;
@@ -295,6 +304,7 @@ export class ViewRegistryService implements OnDestroy {
       icon,
       weight: options?.weight,
       isEnabledFct: options?.isEnabledFct ?? (() => true),
+      isActiveFct: options?.isActiveFct,
     });
   }
 

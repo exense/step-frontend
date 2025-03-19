@@ -1,6 +1,8 @@
 import {
   Component,
+  ContentChild,
   ElementRef,
+  EmbeddedViewRef,
   EventEmitter,
   inject,
   Input,
@@ -9,11 +11,11 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  TemplateRef,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
-import { TooltipPlugin } from '../../injectables/tooltip-plugin';
 import { MarkerType, TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, TimeSeriesConfig, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
@@ -22,21 +24,38 @@ import { TooltipParentContainer } from '../../types/tooltip-parent-container';
 //@ts-ignore
 import uPlot = require('uplot');
 import MouseListener = uPlot.Cursor.MouseListener;
+import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
+import { TooltipContextData } from '../../injectables/tooltip-context-data';
+import { TooltipContentDirective } from './tooltip-content.directive';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { TooltipEvent } from '../tooltip/tooltip-event';
+import { TooltipContainerComponent } from '../tooltip/container/tooltip-container.component';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
+
+const DEFAULT_TIMESTAMP_FORMAT_FN: (
+  self: uPlot,
+  rawValue: number,
+  seriesIdx: number,
+  idx: number,
+) => string | number = (self: uPlot, rawValue: number, seriesIdx: number, idx: number): string | number => {
+  let date = new Date(rawValue);
+  return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+};
 
 @Component({
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
-  providers: [TooltipPlugin],
+  providers: [CustomTooltipPlugin],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, TooltipParentContainer {
   private _element = inject(ElementRef);
-  private _tooltipPlugin = inject(TooltipPlugin);
+  private _customTooltipPlugin = inject(CustomTooltipPlugin);
 
   private readonly HEADER_HEIGHT = 27;
   private readonly LEGEND_HEIGHT = 24;
@@ -54,6 +73,85 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
+  @ContentChild(TooltipContentDirective, { read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
+
+  @ViewChild('testTemplate') testTemplate!: TemplateRef<any>;
+
+  private overlayRef?: OverlayRef;
+  private tooltipInstance?: TooltipContainerComponent;
+
+  // uPlot tooltip plugin will send events here
+  tooltipEvents = new EventEmitter<TooltipEvent>();
+
+  constructor(private overlay: Overlay) {
+    this.tooltipEvents.subscribe((event) => {
+      switch (event.type) {
+        case 'SHOW':
+          break;
+        case 'HIDE':
+          this.hideTooltip();
+          break;
+        case 'POSITION_CHANGED':
+          const { x, y, data } = event.payload!;
+          this.showTooltipAt(x, y, this.tooltipTemplate, data);
+          break;
+      }
+    });
+  }
+
+  showTooltipAt(x: number, y: number, template: TemplateRef<any>, data: TooltipContextData) {
+    if (!template) {
+      return;
+    }
+    if (!this.overlayRef) {
+      this.overlayRef = this.overlay.create({
+        hasBackdrop: false,
+        panelClass: 'custom-tooltip-panel',
+        scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      });
+
+      const portal = new ComponentPortal(TooltipContainerComponent);
+      const componentRef = this.overlayRef.attach(portal);
+
+      this.tooltipInstance = componentRef.instance;
+    }
+
+    // Update data every time cursor moves
+    this.tooltipInstance?.update(template, data);
+
+    const positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo({ x, y })
+      .withViewportMargin(4)
+      .withPositions([
+        {
+          originX: 'start',
+          originY: 'top',
+          overlayX: 'start',
+          overlayY: 'top',
+          offsetX: 8, // Horizontal gap (right of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+        {
+          originX: 'end',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'top',
+          offsetX: -8, // Horizontal gap (left of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+      ]);
+
+    this.overlayRef.updatePositionStrategy(positionStrategy);
+  }
+
+  hideTooltip() {
+    if (this.overlayRef) {
+      this.overlayRef.dispose(); // Fully destroys it (portal + container)
+      this.overlayRef = undefined; // Force recreation next time
+    }
+  }
+
   uplot!: uPlot;
 
   seriesIndexesByIds: { [key: string]: number } = {}; // for fast accessing
@@ -64,6 +162,8 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   chartIsUnavailable = false;
 
   legendSettings: LegendSettings = { show: true, items: [], expanded: false };
+
+  tooltipEmbeddedView?: EmbeddedViewRef<any>;
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
@@ -116,6 +216,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     this.chartIsUnavailable = false;
     this.seriesIndexesByIds = {};
     this.chartMetadata = [[]];
+    this.tooltipEmbeddedView = undefined;
 
     const cursorOpts: uPlot.Cursor = {
       show: this.settings.showCursor ?? true,
@@ -177,33 +278,48 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     this.chartIsEmpty = noData;
 
-    const opts: uPlot.Options = {
+    let plugins: uPlot.Plugin[] = [];
+
+    // there is a custom tooltip template specified
+    if (this.settings.tooltipOptions.enabled) {
+      plugins = [this._customTooltipPlugin.createPlugin(this)];
+    }
+
+    let opts: uPlot.Options = {
       title: this.title || settings.title,
       ms: 1, // if not specified it's going to be in seconds
       ...this.getSize(),
-      legend: { show: false },
+      legend: { show: !!settings.showDefaultLegend },
       cursor: cursorOpts,
       // @ts-ignore
       select: { show: settings.zoomEnabled ?? true },
       scales: {
         x: {
-          time: true,
-          // min: this.selection?.from,
-          // max: this.selection?.to,
+          time: settings.xAxesSettings.time ?? true,
+          range: (uPlot, min, max) => {
+            return [min - 1, max + 1];
+          }, // Add padding to x-axis range
         },
+        ...settings.scales,
       },
-      plugins: this.settings.tooltipOptions.enabled ? [this._tooltipPlugin.createPlugin(this)] : [],
-      axes: [{ show: settings.showTimeAxes ?? true }, ...(settings.axes || [])],
+      plugins: plugins,
+      axes: [
+        {
+          show: settings.xAxesSettings.show ?? true,
+          incrs: settings.xAxesSettings.gridDisplayMultipliers,
+          grid: { show: true },
+        },
+        ...(settings.axes || []),
+      ],
       series: [
         {
-          label: 'Timestamp',
-          value: (x: uPlot, timestamp: number) => {
-            let date = new Date(timestamp);
-            return date.toLocaleDateString() + ` ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-          },
+          label:
+            this.settings.xAxesSettings.label || (this.settings.xAxesSettings.time ?? true ? 'Timestamp' : 'Value'),
+          value: this.settings.xAxesSettings.valueFormatFn || DEFAULT_TIMESTAMP_FORMAT_FN,
         },
         ...settings.series, // show flag will show/hide series, but they will still exist in the chart
       ],
+      bands: settings.bands,
       hooks: {
         ...settings.hooks,
         setSelect: [
@@ -222,7 +338,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
         ],
       },
     };
-    let data: AlignedData = [settings.xValues, ...settings.series.map((s) => s.data)];
+    let data: AlignedData = [settings.xAxesSettings.values, ...settings.series.map((s) => s.data)];
     if (this.uplot) {
       this.uplot.destroy();
     }
@@ -324,7 +440,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     const index = this.seriesIndexesByIds[seriesId];
     if (index === undefined || !label) return;
     const series = this.uplot.series[index];
-    // @ts-ignore
+    // @ts-ignore labelItems is not exposed on the uPlot model
     const labelItems = series.labelItems;
     labelItems[labelIndex] = label;
     const finalLabel = this.mergeLabelItems(labelItems);
@@ -394,7 +510,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
    */
   updateFullData(series: TSChartSeries[]): void {
     this.seriesIndexesByIds = {};
-    let data: AlignedData = [this.settings.xValues, ...series.map((s) => s.data)];
+    let data: AlignedData = [this.settings.xAxesSettings.values, ...series.map((s) => s.data)];
     this.uplot.batch(() => {
       this.removeAllSeries();
       this.uplot.addSeries({
@@ -428,6 +544,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   ngOnDestroy(): void {
     this.uplot?.destroy();
+    this.hideTooltip();
   }
 }
 
