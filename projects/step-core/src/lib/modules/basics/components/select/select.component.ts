@@ -23,7 +23,6 @@ import {
   SelectComponentSearchCtrlContainerDefaultImpl,
 } from '../../injectables/select-component-search-ctrl-container.service';
 import _default from 'chart.js/dist/plugins/plugin.tooltip';
-import numbers = _default.defaults.animations.numbers;
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
