@@ -22,15 +22,11 @@ import {
   SelectComponentSearchCtrlContainer,
   SelectComponentSearchCtrlContainerDefaultImpl,
 } from '../../injectables/select-component-search-ctrl-container.service';
+import { ArrayItemLabelValueDefaultExtractorService } from '../../injectables/array-item-label-value-default-extractor.service';
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
 type OnTouch = () => void;
-
-const createDefaultExtractor = <Item, Value>(): ArrayItemLabelValueExtractor<Item, Value> => ({
-  getLabel: (item) => item?.toString() ?? '',
-  getValue: (item) => item as unknown as Value,
-});
 
 @Component({
   selector: 'step-select',
@@ -69,6 +65,7 @@ const createDefaultExtractor = <Item, Value>(): ArrayItemLabelValueExtractor<Ite
 })
 export class SelectComponent<Item, Value> implements ControlValueAccessor {
   private _searchCtrlContainer = inject(SelectComponentSearchCtrlContainer);
+  private _defaultExtractor = inject(ArrayItemLabelValueDefaultExtractorService);
 
   protected readonly _selectClear = inject(SelectClearValueDirective, { host: true });
 
@@ -99,7 +96,7 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
 
   private allDisplayItems = computed<KeyValue<Value, string>[]>(() => {
     const items = this.items() ?? [];
-    const extractor = this.extractor() ?? createDefaultExtractor<Item, Value>();
+    const extractor = this.extractor() ?? this._defaultExtractor;
 
     return items.map((item) => ({
       key: extractor.getValue(item),

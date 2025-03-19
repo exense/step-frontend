@@ -358,6 +358,5 @@ export * from './directives/dynamic-input-width.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';
 export * from './pipes/truncate-string.pipe';
-export * from './injectables/array-string-label-value-extractor.token';
-export * from './injectables/array-key-value-label-value-extractor.token';
+export * from './injectables/array-item-label-value-default-extractor.service';
 export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';

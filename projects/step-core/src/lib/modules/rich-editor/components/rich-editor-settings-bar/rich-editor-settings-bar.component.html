@@ -23,7 +23,6 @@
     [(ngModel)]="selectedMode"
     [disabled]="displayModes().length <= 1"
     [items]="displayModes()"
-    [extractor]="_keyValueExtractor"
     [useClear]="false"
   />
 </step-form-field>

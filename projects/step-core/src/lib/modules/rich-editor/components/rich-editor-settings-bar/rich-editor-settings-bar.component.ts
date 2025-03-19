@@ -1,5 +1,5 @@
-import { Component, computed, effect, inject, input, model, output } from '@angular/core';
-import { ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR, StepBasicsModule } from '../../../basics/step-basics.module';
+import { Component, computed, effect, input, model, output } from '@angular/core';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AceMode } from '../../types/ace-mode.enum';
 import { KeyValue } from '@angular/common';
 
@@ -20,8 +20,6 @@ const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
   styleUrl: './rich-editor-settings-bar.component.scss',
 })
 export class RichEditorSettingsBarComponent {
-  protected readonly _keyValueExtractor = inject(ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR);
-
   readonly allowedModes = input<AceMode[] | undefined>(undefined);
   readonly predefinedMode = input<AceMode | undefined>(undefined);
   readonly showAutoFormatBtn = input(false);

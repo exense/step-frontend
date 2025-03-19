@@ -20,16 +20,11 @@ import { SelectionState } from '../../types/selection-state.enum';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MultiLevelArrayItemLabelValueExtractor } from '../../types/multi-level-array-item-label-value-extractor';
+import { MultiLevelArrayItemLabelValueDefaultExtractorService } from '../../injectables/multi-level-array-item-label-value-default-extractor.service';
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
 type OnTouch = () => void;
-
-const createDefaultExtractor = <T = unknown, V = unknown>(): MultiLevelArrayItemLabelValueExtractor<T, V> => ({
-  getLabel: (item) => item?.toString() ?? '',
-  getValue: (item) => item as unknown as V,
-  getChildren: (item) => (item as { children?: T[] })?.children ?? [],
-});
 
 @Component({
   selector: 'step-multi-level-select',
@@ -62,7 +57,9 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
 {
   private onChange?: OnChange<Value>;
   private onTouch?: OnTouch;
-  private readonly DEFAULT_EXTRACTOR = createDefaultExtractor<Item, Value>();
+  private readonly _defaultExtractor = inject<MultiLevelArrayItemLabelValueExtractor<Item, Value>>(
+    MultiLevelArrayItemLabelValueDefaultExtractorService,
+  );
 
   protected isDisabled = false;
   protected selectedItems?: ModelValue<Value>;
@@ -79,7 +76,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
   readonly tabIndex = input<number | undefined>(undefined);
 
   private itemsData = computed(() => {
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
     const items = this.items() ?? [];
     const itemsToCheck = items.map((item) => ({
       item,
@@ -165,7 +162,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
       return;
     }
 
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
 
     if (!this.multiple()) {
       const visualSelectionState = {} as Record<Value, SelectionState>;
@@ -212,7 +209,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
     if (!parent) {
       return;
     }
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
     const children = extractor.getChildren(this.accessCache().get(parent.value));
     if (!children?.length) {
       return;
@@ -242,7 +239,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
     visualSelectionState: Record<Value, SelectionState>,
     isSelected: boolean,
   ) {
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
     const itemsToProceed = [item];
     while (itemsToProceed.length) {
       const child = itemsToProceed.shift()!;
@@ -258,7 +255,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
   private synchronizeVisualStateWithModel(visualSelectionState: Record<Value, SelectionState>): void {
     const newModel: Value[] = [];
     const itemsToProceed = [...this.items()];
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
     while (itemsToProceed.length) {
       const item = itemsToProceed.shift()!;
       const value = extractor.getValue(item);
@@ -279,7 +276,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
     const visualState = {} as Record<Value, SelectionState>;
     const accessCache = this.accessCache();
     const plainItemAccessCache = this.plainItemsAccessCache();
-    const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;
+    const extractor = this.extractor() ?? this._defaultExtractor;
 
     let itemsToProceed: Value[] = [];
     if (this.selectedItems instanceof Array) {
