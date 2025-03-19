@@ -76,6 +76,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
   readonly items = input<Item[]>([]);
   readonly extractor = input<MultiLevelArrayItemLabelValueExtractor<Item, Value> | undefined>(undefined);
   readonly multiple = input(true);
+  readonly tabIndex = input<number | undefined>(undefined);
 
   private itemsData = computed(() => {
     const extractor = this.extractor() ?? this.DEFAULT_EXTRACTOR;

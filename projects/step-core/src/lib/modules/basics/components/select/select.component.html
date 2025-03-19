@@ -5,6 +5,7 @@
   (blur)="handleBlur()"
   [disabled]="isDisabled()"
   [placeholder]="emptyPlaceholder()"
+  [tabIndex]="tabIndex()"
 >
   <mat-select-trigger>
     @if (selection(); as selection) {

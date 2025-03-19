@@ -22,6 +22,8 @@ import {
   SelectComponentSearchCtrlContainer,
   SelectComponentSearchCtrlContainerDefaultImpl,
 } from '../../injectables/select-component-search-ctrl-container.service';
+import _default from 'chart.js/dist/plugins/plugin.tooltip';
+import numbers = _default.defaults.animations.numbers;
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
@@ -75,20 +77,12 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
   private onChange?: OnChange<Value>;
   private onTouch?: OnTouch;
 
-  /** @Input() **/
   readonly useSearch = input(true);
-
-  /** @Input() **/
   readonly multiple = input(false);
-
-  /** @Input() **/
   readonly items = input<Array<Item> | ReadonlyArray<Item> | undefined>(undefined);
-
-  /** @Input() **/
   readonly emptyPlaceholder = input<string>('');
-
-  /** @Input() **/
   readonly extractor = input<ArrayItemLabelValueExtractor<Item, Value> | undefined>(undefined);
+  readonly tabIndex = input<number | undefined>(undefined);
 
   protected readonly isDisabled = signal(false);
 

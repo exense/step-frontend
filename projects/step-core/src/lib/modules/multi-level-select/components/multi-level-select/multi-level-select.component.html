@@ -1,4 +1,10 @@
-<mat-select [multiple]="multiple()" [ngModel]="selectedItems" (blur)="handleBlur()" [disabled]="isDisabled">
+<mat-select
+  [multiple]="multiple()"
+  [tabIndex]="tabIndex()"
+  [ngModel]="selectedItems"
+  (blur)="handleBlur()"
+  [disabled]="isDisabled"
+>
   <mat-option>
     <ngx-mat-select-search
       [formControl]="filterMultiControl"
