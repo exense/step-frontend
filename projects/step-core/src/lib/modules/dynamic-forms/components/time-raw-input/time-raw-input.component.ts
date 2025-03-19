@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { ArrayItemLabelValueExtractor, TimeInputComponent, TimeUnit } from '../../../basics/step-basics.module';
+import { Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR, TimeInputComponent } from '../../../basics/step-basics.module';
 import { NgControl } from '@angular/forms';
 import { NUMBER_CHARS_POSITIVE_ONLY } from '../../shared/constants';
-import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'step-time-raw-input',
@@ -11,15 +10,12 @@ import { KeyValue } from '@angular/common';
   encapsulation: ViewEncapsulation.None,
 })
 export class TimeRawInputComponent extends TimeInputComponent {
+  protected readonly _timeUnitArrayItemExtractor = inject(ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR);
+
   @Input() parentControl?: NgControl;
   @Input() placeholder?: string;
 
   @Output() toggleDynamicExpression = new EventEmitter<void>();
 
   readonly allowedChars = NUMBER_CHARS_POSITIVE_ONLY;
-
-  protected readonly arrayMeasureItemExtractor: ArrayItemLabelValueExtractor<KeyValue<TimeUnit, string>, TimeUnit> = {
-    getValue: (item) => item.key,
-    getLabel: (item) => item.value,
-  };
 }

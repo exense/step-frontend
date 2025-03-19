@@ -13,11 +13,12 @@
         <input type="number" formControlName="iterations" placeholder="Iterations" />
         <step-suffix>per</step-suffix>
         <step-suffix>
-          <mat-select formControlName="iterationsPerUnit">
-            <mat-option *ngFor="let unit of iterationUnits; trackBy: trackByUnit" [value]="unit.key">
-              {{ unit.value }}
-            </mat-option>
-          </mat-select>
+          <step-select
+            formControlName="iterationsPerUnit"
+            [items]="iterationUnits"
+            [extractor]="_timeUnitArrayItemExtractor"
+            [useClear]="false"
+          />
         </step-suffix>
       </step-form-field>
       <step-form-field [showRequiredMarker]="true">
@@ -31,11 +32,12 @@
         ></step-label>
         <input type="number" formControlName="duration" placeholder="Duration" />
         <step-suffix>
-          <mat-select formControlName="durationUnit">
-            <mat-option *ngFor="let unit of durationUnits; trackBy: trackByUnit" [value]="unit.key">
-              {{ unit.value }}
-            </mat-option>
-          </mat-select>
+          <step-select
+            formControlName="durationUnit"
+            [items]="durationUnits"
+            [extractor]="_timeUnitArrayItemExtractor"
+            [useClear]="false"
+          />
         </step-suffix>
         <step-error *ngIf="(isCalculationValid$ | async) === false">
           The pacing must be higher or equal than max iteration duration. Please change form's value.

@@ -2,7 +2,7 @@ import { Component, HostListener, inject, TrackByFunction } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AbstractArtefact, DynamicValueInteger } from '../../../../client/step-client-module';
 import { KeyValue } from '@angular/common';
-import { TimeUnit } from '../../../basics/step-basics.module';
+import { ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR, TimeUnit } from '../../../basics/step-basics.module';
 import { FormBuilder, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay, startWith } from 'rxjs';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
@@ -52,6 +52,7 @@ export class ThreadDistributionWizardDialogComponent {
   private _fb = inject(FormBuilder);
   private _artefact = inject<AbstractArtefact>(MAT_DIALOG_DATA);
   private _matDialogRef = inject(MatDialogRef);
+  protected readonly _timeUnitArrayItemExtractor = inject(ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR);
 
   readonly iterationUnits: KeyValue<TimeUnit, string>[] = [
     { key: TimeUnit.SECOND, value: 'Second' },
