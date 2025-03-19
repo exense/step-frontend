@@ -12,6 +12,8 @@ import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
 export class ExecutionErrorsComponent implements OnChanges {
   readonly ErrorDistributionStatus = ErrorDistributionStatus;
 
+  protected readonly distributionStatusItems = [ErrorDistributionStatus.MESSAGE, ErrorDistributionStatus.CODE];
+
   @Input() selectedErrorDistributionToggle: ErrorDistributionStatus = ErrorDistributionStatus.MESSAGE;
   @Output() selectedErrorDistributionToggleChange = new EventEmitter<ErrorDistributionStatus>();
 
