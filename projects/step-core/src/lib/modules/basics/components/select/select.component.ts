@@ -102,6 +102,9 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
     initialValue: this.searchCtrl.value ?? '',
   });
 
+  private extraOptions = contentChild<SelectExtraOptionsDirective<Value>>(SelectExtraOptionsDirective);
+  protected readonly extraItems = computed(() => this.extraOptions()?.items() ?? []);
+
   private allDisplayItems = computed<KeyValue<Value, string>[]>(() => {
     const items = this.items() ?? [];
     const extractor = this.extractor() ?? createDefaultExtractor<Item, Value>();
@@ -124,27 +127,26 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
   protected readonly selection = computed(() => {
     const value = this.value();
     const displayItems = this.displayItems();
+    const extraItems = this.extraItems();
     const emptyPlaceholder = this.emptyPlaceholder();
 
     if (!value) {
       return emptyPlaceholder;
     }
 
+    const allItems = [...extraItems, ...displayItems];
+
     if (value instanceof Array) {
       const selected = new Set(value);
-      return displayItems
+      return allItems
         .filter((item) => selected.has(item.key))
         .map((item) => item.value)
         .join(', ');
     }
 
-    const selectedItem = displayItems.find((item) => item.key === value);
+    const selectedItem = allItems.find((item) => item.key === value);
     return selectedItem?.value;
   });
-
-  private extraOptions = contentChild<SelectExtraOptionsDirective<Value>>(SelectExtraOptionsDirective);
-
-  protected readonly extraItems = computed(() => this.extraOptions()?.items() ?? []);
 
   writeValue(value?: ModelValue<Value>): void {
     this.value.set(value);
