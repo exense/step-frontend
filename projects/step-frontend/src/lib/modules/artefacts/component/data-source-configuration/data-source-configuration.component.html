@@ -1,17 +1,14 @@
 <form #form="ngForm">
   <step-form-field>
     <step-label>Source type</step-label>
-    <mat-select
+    <step-select
       [ngModel]="context.artefact!.dataSourceType"
       (ngModelChange)="handleDataSourceTypeChange($event)"
       [ngModelOptions]="{ standalone: true }"
       [disabled]="context.readonly"
-    >
-      <mat-option [value]="undefined"></mat-option>
-      @for (item of dataSourceTypes; track item.key) {
-        <mat-option [value]="item.key">{{ item.value }}</mat-option>
-      }
-    </mat-select>
+      [items]="dataSourceTypes"
+      clearLabel="unset"
+    />
   </step-form-field>
   @if (context.artefact!.dataSource) {
     @switch (context.artefact!.dataSourceType) {
