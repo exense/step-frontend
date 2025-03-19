@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TimeSeriesConfig } from '../../types/time-series/time-series.config';
 
 const EMPTY_DIMENSIONS_LABEL = 'Empty';
 

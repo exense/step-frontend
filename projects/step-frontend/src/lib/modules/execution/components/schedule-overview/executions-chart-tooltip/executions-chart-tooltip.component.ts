@@ -91,7 +91,6 @@ export class ExecutionsChartTooltipComponent {
       .subscribe((executions) => {
         this.selectedSeriesExecutions = executions
           .filter((ex) => {
-            console.log(ex);
             return ex.result === item.label;
           })
           .map((execution) => {

@@ -23,7 +23,6 @@ import {
 import {
   COMMON_IMPORTS,
   FilterUtils,
-  OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -288,7 +287,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
-      let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
+      let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
       if (groupDimensions.length === 0) {
         labelItems = [this.context.getMetric(this.item.metricKey).displayName];
       }
@@ -403,7 +402,6 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
           selectedBucketAttributes[dimension] = null;
         }
       });
-      console.log(selectedBucketAttributes, bucketOql);
       const isolateRequest: FetchBucketsRequest = {
         start: xLabels[idx],
         end: xLabels[idx] + response.interval,
@@ -448,7 +446,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (items.length === 0) {
       return this.item.metricKey;
     }
-    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
+    return items
+      .map((i) => {
+        if (i === '' || i == null) {
+          return TimeSeriesConfig.SERIES_LABEL_EMPTY;
+        } else {
+          return i;
+        }
+      })
+      .join(' | ');
   }
 
   private getSecondAxesLabel(): string | undefined {

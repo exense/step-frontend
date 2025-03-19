@@ -22,7 +22,6 @@ export class DiscoverComponent implements OnInit {
   private _matDialogRef = inject<MatDialogRef<DiscoverComponent>>(MatDialogRef);
   readonly DateFormat = DateFormat;
   pageSize = 50;
-  pageSizeOptions = [20, 50, 100];
   dataSource: MatTableDataSource<Measurement> = new MatTableDataSource();
   skip = 0;
   hasMore = true;

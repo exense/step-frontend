@@ -10,7 +10,5 @@ import { COMMON_IMPORTS } from '../../types/common-imports.constant';
   imports: [COMMON_IMPORTS],
 })
 export class DiscoverAttributeStatsComponent {
-  isLoading = true;
-
   @Input() attributeValues!: AttributeStats[];
 }
