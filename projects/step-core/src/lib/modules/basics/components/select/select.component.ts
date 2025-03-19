@@ -22,7 +22,6 @@ import {
   SelectComponentSearchCtrlContainer,
   SelectComponentSearchCtrlContainerDefaultImpl,
 } from '../../injectables/select-component-search-ctrl-container.service';
-import _default from 'chart.js/dist/plugins/plugin.tooltip';
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;

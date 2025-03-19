@@ -1,5 +1,5 @@
-import { Component, computed, effect, input, model, output } from '@angular/core';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { Component, computed, effect, inject, input, model, output } from '@angular/core';
+import { ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AceMode } from '../../types/ace-mode.enum';
 import { KeyValue } from '@angular/common';
 
@@ -20,29 +20,16 @@ const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
   styleUrl: './rich-editor-settings-bar.component.scss',
 })
 export class RichEditorSettingsBarComponent {
-  /** @Input() **/
-  allowedModes = input<AceMode[] | undefined>(undefined);
+  protected readonly _keyValueExtractor = inject(ARRAY_KEY_VALUE_LABEL_VALUE_EXTRACTOR);
 
-  /** @Input() **/
-  predefinedMode = input<AceMode | undefined>(undefined);
-
-  /** @Input() **/
-  showAutoFormatBtn = input(false);
-
-  /** @Input() **/
-  showSaveBtn = input(false);
-
-  /** @Input() **/
-  saveBtnTooltip = input('Save');
-
-  /** @Output() **/
-  modeChanged = output<AceMode>();
-
-  /** @Output() **/
-  save = output();
-
-  /** @Output() **/
-  autoFormat = output();
+  readonly allowedModes = input<AceMode[] | undefined>(undefined);
+  readonly predefinedMode = input<AceMode | undefined>(undefined);
+  readonly showAutoFormatBtn = input(false);
+  readonly showSaveBtn = input(false);
+  readonly saveBtnTooltip = input('Save');
+  readonly modeChanged = output<AceMode>();
+  readonly save = output();
+  readonly autoFormat = output();
 
   protected displayModes = computed<KeyValue<AceMode, string>[]>(() => {
     const predefinedMode = this.predefinedMode();
