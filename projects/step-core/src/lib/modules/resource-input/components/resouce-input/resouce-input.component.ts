@@ -12,12 +12,14 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subject, filter, takeUntil, forkJoin } from 'rxjs';
+import { Observable, Subject, filter, takeUntil, forkJoin, pipe, of } from 'rxjs';
 import { AugmentedResourcesService, ResourceUploadResponse } from '../../../../client/step-client-module';
 import { ResourceDialogsService } from '../../services/resource-dialogs.service';
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError } from 'rxjs/operators';
+import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 
 const MAX_FILES = 1;
 
@@ -228,17 +230,30 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
     this.initializingResource = true;
     this.initializingResourceChange.emit(this.initializingResource);
 
-    this._augmentedResourcesService.getResource(id).subscribe((resource) => {
-      if (resource) {
-        this.resourceNotExisting = false;
-        this.resourceFilename = resource.resourceName;
-      } else {
-        this.resourceNotExisting = true;
-      }
+    this._augmentedResourcesService
+      .overrideInterceptor(
+        pipe(
+          catchError((error: HttpHeaderResponse) => {
+            if (error.status === HttpStatusCode.NotFound) {
+              const empty = new HttpResponse({ status: HttpStatusCode.NoContent });
+              return of(empty);
+            }
+            throw error;
+          }),
+        ),
+      )
+      .getResource(id)
+      .subscribe((resource) => {
+        if (resource) {
+          this.resourceNotExisting = false;
+          this.resourceFilename = resource.resourceName;
+        } else {
+          this.resourceNotExisting = true;
+        }
 
-      this.initializingResource = false;
-      this.initializingResourceChange.emit(this.initializingResource);
-    });
+        this.initializingResource = false;
+        this.initializingResourceChange.emit(this.initializingResource);
+      });
   }
 
   private setStModel(stModel: string = '') {
