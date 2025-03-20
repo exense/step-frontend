@@ -18,6 +18,12 @@ export const $AutomationPackage = {
     status: {
       type: 'Enum',
     },
+    version: {
+      type: 'string',
+    },
+    activationExpression: {
+      type: 'Expression',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

@@ -1,5 +1,5 @@
 @if (transformedData().length) {
-  <div class="container">
+  <div class="ts-tooltip">
     <div>
       @for (series of transformedData(); track series.label) {
         <div class="row" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
@@ -16,6 +16,9 @@
             <span>{{ exec.name }}</span>
             <span class="link-icon"></span>
           </div>
+        }
+        @if (selectedSeriesExecutions?.length === 0) {
+          <div>No executions found</div>
         }
         @if (executionsListTruncated) {
           <div class="dots">...</div>

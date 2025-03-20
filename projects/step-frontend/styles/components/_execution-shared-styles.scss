@@ -1,0 +1,94 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+@mixin execution-shared-styles {
+  @include execution-report-node-inline-details;
+  @include execution-report-node-details;
+}
+
+@mixin execution-report-node-inline-details {
+  .execution-report-node-inline-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    step-icon {
+      @include core.step-icon-size(1.6rem);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .etc-container {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .error-container {
+      display: flex;
+      gap: 0.5rem;
+
+      step-icon {
+        color: map-get(var.$statuses, 'FAILED');
+      }
+
+      .error-text {
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
+        white-space: break-spaces;
+      }
+    }
+  }
+}
+
+@mixin execution-report-node-details {
+  .execution-report-node-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    font-size: 1.2rem;
+
+    .hidden {
+      display: none;
+    }
+
+    .json-container {
+      position: relative;
+      min-height: 2rem;
+      padding-right: 4rem;
+      width: min-content;
+      min-width: 100%;
+
+      button {
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    }
+
+    .data-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      &.error {
+        flex-direction: row;
+        .error-text {
+          width: min-content;
+          min-width: 95%;
+        }
+        step-icon {
+          color: map-get(var.$statuses, 'FAILED');
+        }
+      }
+
+      .tech-details > .tech-details-content {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+      }
+    }
+  }
+}

@@ -13,6 +13,19 @@
 }
 
 step-status {
+  .status-RUNNING step-icon {
+    animation: rotate-icon 2s linear infinite;
+  }
+
+  @keyframes rotate-icon {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   .status {
     @include core.status-shape();
   }

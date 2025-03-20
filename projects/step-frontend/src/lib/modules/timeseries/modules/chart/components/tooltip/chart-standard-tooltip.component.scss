@@ -1,0 +1,94 @@
+.tooltip-container {
+  z-index: 100;
+  display: block;
+  margin: 0 2.4rem;
+  top: 0; // this is a tricky fix. if top is not set it will make the container overflow
+  cursor: default;
+  background: #fffaf2d9;
+  padding: 0.8rem 1.2rem;
+  box-shadow: 2px 2px 5px 2px #a3a3a3;
+
+  .tooltip-row {
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-direction: row;
+    white-space: nowrap;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+
+    .left {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      margin-right: 2rem;
+    }
+
+    .right {
+      white-space: nowrap;
+      display: flex;
+    }
+
+    .color {
+      width: 2rem;
+      height: 1rem;
+      margin-right: 0.8rem;
+    }
+
+    .name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 40rem;
+    }
+  }
+}
+
+.tooltip-row {
+  .left {
+    gap: 0.8rem;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.inline-menu {
+  position: fixed; /* Absolutely positioned to avoid layout issues */
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  white-space: nowrap;
+  padding: 0.4rem 0;
+  font-size: 14px;
+}
+
+.menu-item {
+  padding: 0.4rem 1.2rem;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #f0f0f0;
+}
+
+.link-icon {
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  display: inline-block;
+}
+
+.custom-tooltip-panel {
+  opacity: 0;
+  transition: opacity 50ms ease-in;
+}
+
+.separator {
+  height: 1px;
+  width: 100%;
+  background: #666666;
+  margin: 0.4rem 0;
+  opacity: 0.2;
+}

@@ -1,10 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import {
   AugmentedControllerService,
-  CustomComponent,
+  BaseReportDetailsComponent,
   DateFormat,
   JsonParserIconDictionaryConfig,
-  JsonViewerFormatterService,
   Measure,
   ReportNode,
   TableLocalDataSource,
@@ -20,13 +19,14 @@ import { AltExecutionStateService } from '../../../execution/services/alt-execut
   selector: 'step-call-keyword-report-details',
   templateUrl: './call-keyword-report-details.component.html',
   styleUrl: './call-keyword-report-details.component.scss',
+  host: {
+    class: 'execution-report-node-details',
+  },
 })
-export class CallKeywordReportDetailsComponent implements CustomComponent {
+export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponent<KeywordReportNode> {
   private _controllerService = inject(AugmentedControllerService);
-  private _formatter = inject(JsonViewerFormatterService);
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
   private _window = inject(DOCUMENT).defaultView!;
-  private clipboard = this._window.navigator.clipboard;
 
   private reportNodesToRender = new Set([
     ReportNodeType.ASSERT_REPORT_NODE,
@@ -39,12 +39,8 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     initialValue: undefined,
   });
 
-  private contextInternal = signal<KeywordReportNode | undefined>(undefined);
-
-  protected node = this.contextInternal.asReadonly();
-
   protected keywordInputs = computed(() => {
-    const context = this.contextInternal();
+    const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.input) {
       return result;
@@ -59,13 +55,13 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
   });
 
   protected keywordOutputs = computed(() => {
-    const context = this.contextInternal();
+    const context = this.node();
     let result: Record<string, unknown> | undefined = undefined;
     if (!context?.output) {
       return result;
     }
     try {
-      const json = JSON.parse(context.input);
+      const json = JSON.parse(context.output);
       if (Object.keys(json).length) {
         result = json;
       }
@@ -80,7 +76,7 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     { key: '*', icon: 'log-out', tooltip: 'Output', levels: 0 },
   ];
 
-  private failedChildren$ = toObservable(this.contextInternal).pipe(
+  private failedChildren$ = toObservable(this.node).pipe(
     switchMap((node) => {
       if (!node || node.status !== 'FAILED') {
         return of(undefined);
@@ -110,11 +106,11 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
   });
 
   protected copyInput(): void {
-    this.copyToClipboard(this.contextInternal()?.input);
+    this.copyToClipboard(this.node()?.input);
   }
 
   protected copyOutput(): void {
-    this.copyToClipboard(this.contextInternal()?.output);
+    this.copyToClipboard(this.node()?.output);
   }
 
   protected navigateToAnalyticsView(measure: Measure): void {
@@ -137,18 +133,6 @@ export class CallKeywordReportDetailsComponent implements CustomComponent {
     const paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;
     this._window.open(url, '_blank');
-  }
-
-  contextChange(previousContext?: KeywordReportNode, currentContext?: KeywordReportNode) {
-    this.contextInternal.set(currentContext);
-  }
-
-  private copyToClipboard(json?: string): void {
-    if (!json) {
-      return;
-    }
-    const formatted = this._formatter.formatToJsonString(json);
-    this.clipboard.writeText(formatted);
   }
 
   protected readonly DateFormat = DateFormat;

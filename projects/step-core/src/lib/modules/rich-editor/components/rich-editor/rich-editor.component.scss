@@ -1,7 +1,7 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
 :host {
-  display: block;
+  display: grid;
   width: 100%;
   min-height: 20rem;
   &.is-disabled > div {

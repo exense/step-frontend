@@ -33,6 +33,13 @@
   }
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 1.4rem;
+  align-items: center;
+}
+
 .piechart-container {
   width: 44rem;
 }
@@ -43,6 +50,7 @@
   flex-direction: row;
   gap: 1rem;
   margin-top: 1rem;
+  white-space: nowrap;
 }
 
 .flex-grow-1 {
@@ -82,6 +90,7 @@
   flex-direction: row;
   gap: 0.6rem;
   padding: 2px 0;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;

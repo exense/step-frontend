@@ -156,7 +156,7 @@
             stepTestId="cross-execution-schedule-btn"
             mat-icon-button
             matTooltip="Cross-execution dashboard"
-            [disabled]="!('task-write' | hasRight | async)"
+            [disabled]="!('execution-read' | hasRight | async)"
             [routerLink]="element | taskCrossExecutionUrl"
           >
             <step-icon name="file-07" />

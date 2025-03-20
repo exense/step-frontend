@@ -71,32 +71,42 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (!selection) {
       return;
     }
-    let range: TimeRange;
     if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
       const range = selection.absoluteSelection;
       if (range) {
         this.mainPickerLabel = TimeSeriesUtils.formatRange(range);
-        if (selection.type === 'FULL') {
-          this.fromDateString = '';
-          this.toDateString = '';
-        }
       } else {
         this.mainPickerLabel = 'Full range';
       }
     } else {
-      // relative selection
-      this.fromDateString = '';
-      this.toDateString = '';
       this.mainPickerLabel = selection.relativeSelection!.label!;
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const selectionChange = changes['activeSelection'];
-    if (selectionChange?.previousValue !== selectionChange?.currentValue) {
-      const selection: TimeRangePickerSelection = selectionChange.currentValue;
-      this.formatSelectionLabel(selection);
+    const previousValue = selectionChange?.previousValue;
+    const currentValue: TimeRangePickerSelection = selectionChange?.currentValue;
+    if (!currentValue) {
+      return;
     }
+    if (selectionChange.firstChange) {
+      if (currentValue!.type === 'ABSOLUTE') {
+        this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.from));
+        this.toDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.to));
+      }
+    }
+    if (previousValue && previousValue !== currentValue) {
+      this.formatSelectionLabel(currentValue);
+      if (currentValue.type !== 'ABSOLUTE' && currentValue.type !== previousValue?.type) {
+        this.cleanupAbsoluteDates();
+      }
+    }
+  }
+
+  cleanupAbsoluteDates() {
+    this.fromDateString = '';
+    this.toDateString = '';
   }
 
   applyAbsoluteInterval() {

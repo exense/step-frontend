@@ -40,26 +40,31 @@
           [mode]="PopoverMode.CLICK"
           (toggledEvent)="isResolvedParametersVisible.set($event)"
         >
-          <button type="button" mat-icon-button [color]="isResolvedParametersVisible() ? 'primary' : 'default'">
+          <button
+            type="button"
+            mat-icon-button
+            [color]="isResolvedParametersVisible() ? 'primary' : 'default'"
+            matTooltip="Show resolved parameters"
+          >
             <step-icon name="sliders" />
           </button>
           <step-popover-content>
             <div class="execution-resolved-params">
               <strong class="resolved-params-header">Resolved parameters</strong>
-              <step-table [dataSource]="resolvedParams">
-                <ng-container matColumnDef="key">
-                  <th mat-header-cell *matHeaderCellDef>Key</th>
-                  <td mat-cell *matCellDef="let element">{{ element.key }}</td>
-                </ng-container>
-                <ng-container matColumnDef="value">
-                  <th mat-header-cell *matHeaderCellDef>Value</th>
-                  <td mat-cell *matCellDef="let element">{{ element.value }}</td>
-                </ng-container>
-              </step-table>
+              <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
             </div>
           </step-popover-content>
         </step-popover>
       }
+      <button
+        type="button"
+        mat-icon-button
+        color="default"
+        (click)="_dialogs.openAgentsModal(execution?.agentsInvolved || '', execution?.description || 'Unknown plan')"
+        matTooltip="Show agents"
+      >
+        <step-icon name="agent" />
+      </button>
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
@@ -151,12 +156,24 @@
     </div>
   }
 </section>
-<section class="main">
+
+<section class="no-gap">
   @if (execution$ | async; as execution) {
-    @for (messages of _executionMessages; track messages.id) {
-      <step-dashlet [itemKey]="messages.template" [context]="execution" class="execution-message" />
+    @if (execution.lifecycleErrors; as errors) {
+      @for (error of errors; track error.msg) {
+        <step-alert [type]="AlertType.DANGER">
+          {{ error.msg }}
+        </step-alert>
+      }
+    }
+
+    @for (message of _executionMessages; track message.id) {
+      <step-dashlet [itemKey]="message.template" [context]="execution" class="execution-message" />
     }
   }
+</section>
+
+<section class="main">
   <step-alt-execution-tabs />
   @if (execution$ | async; as execution) {
     <step-alt-report-widget class="print-execution-details">

@@ -1,0 +1,53 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-artefact-inline-field,
+step-artefact-inline-field > section {
+  display: flex;
+  gap: 0.25rem;
+  white-space: nowrap;
+  align-items: center;
+}
+
+step-artefact-inline-field {
+  border-radius: 1rem;
+  padding: 0.2rem;
+  margin-left: 0.1rem;
+  margin-right: 0.1rem;
+  cursor: pointer;
+
+  &:hover {
+    border: solid 0.1rem var.$blue-600;
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+  }
+
+  .ellipsis {
+    display: none;
+  }
+
+  & > section {
+    overflow: hidden;
+    max-width: 20rem;
+
+    &.step-overflow-indicator-has-overflow + .ellipsis {
+      display: block;
+    }
+  }
+
+  label,
+  span {
+    display: block;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .resolved:hover,
+  .not-resolved {
+    color: var.$dark-blue;
+  }
+}

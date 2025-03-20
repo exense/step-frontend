@@ -602,7 +602,9 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
 
     const path = [nodeId];
     let node = this.findNodeById(nodeId);
-    while (!!node?.parentId) {
+    const visitedNodes: Array<string> = [];
+    while (!!node?.parentId && !visitedNodes.includes(node?.parentId)) {
+      visitedNodes.push(node.parentId);
       path.unshift(node.parentId);
       node = this.findNodeById(node.parentId);
     }

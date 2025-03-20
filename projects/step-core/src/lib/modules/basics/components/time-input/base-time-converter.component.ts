@@ -73,7 +73,12 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
 
   writeValue(value: number): void {
     if (!this.displayMeasure) {
-      this.internalDisplayMeasure = this.autoDetermineDisplayMeasure(value, this.modelMeasure);
+      this.internalDisplayMeasure = this.timeConverter.autoDetermineDisplayMeasure(
+        value,
+        this.modelMeasure,
+        this.allowedMeasures,
+        this.defaultDisplayMeasure,
+      );
     }
     this.modelValue = value;
     this.displayValue = this.timeConverter.calculateDisplayValue(
@@ -184,27 +189,5 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
       this.displayMeasure = allowedMeasures[0];
       this.displayMeasureChange.emit(this.displayMeasure);
     }
-  }
-
-  /*
-   * This calculates the best fitting timeUnit for a given number of milliseconds
-   *
-   * TODO: we should instead save the timeUnit in the BE and remove this. (Lucian: timeseries work only with ms, so this is useful)
-   */
-  private autoDetermineDisplayMeasure(model: number, modelMeasure: TimeUnit): TimeUnit {
-    const baseValue = this.timeConverter.calculateBaseValue(model, modelMeasure);
-    const allowedMeasures = [...this.allowedMeasures].sort((a, b) => b - a);
-    const defaultValue = this.defaultDisplayMeasure ?? allowedMeasures[allowedMeasures.length - 1];
-    if (!baseValue) {
-      return defaultValue;
-    }
-
-    for (const unit of allowedMeasures) {
-      if (baseValue % unit === 0 && baseValue / unit >= 1) {
-        return unit;
-      }
-    }
-
-    return defaultValue;
   }
 }

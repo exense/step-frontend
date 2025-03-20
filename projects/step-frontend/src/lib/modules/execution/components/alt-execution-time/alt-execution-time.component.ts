@@ -29,16 +29,9 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
-  /** @Input() **/
   readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
-
-  /** @Input() **/
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
-
-  /** @Input() **/
   readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
-
-  /** @Input() **/
   readonly timeOnly = input(false);
 
   protected readonly displayDate = computed(() => {

@@ -1,0 +1,16 @@
+@if (singleAttachment(); as singleAttachment) {
+  <a [href]="singleAttachment | attachmentUrl">
+    <step-icon name="paperclip" />
+  </a>
+} @else if (hasAttachments()) {
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <step-icon name="paperclip" />
+  </button>
+  <mat-menu #menu="matMenu">
+    @for (attachment of attachments(); track attachment.id) {
+      <button mat-menu-item (click)="openAttachment(attachment)">
+        {{ attachment!.name }}
+      </button>
+    }
+  </mat-menu>
+}

@@ -1,0 +1,64 @@
+<ng-template #tplLabel>
+  @if (hasLabel()) {
+    @if (labelExpression(); as labelExpression) {
+      @if (isLabelResolved()) {
+        <step-icon
+          name="zap"
+          class="resolved"
+          [matTooltip]="labelExpression | truncateString: 100"
+          matTooltipPosition="below"
+          (click)="displayText($event, labelExpression)"
+        />
+      } @else {
+        <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
+      }
+    }
+    <label [class.not-resolved]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
+      {{ itemLabel() }}
+      @if (!isValueFirst()) {
+        {{ ':' }}
+      }
+    </label>
+  }
+</ng-template>
+<ng-template #tplValue>
+  @if (hasValue()) {
+    @if (valueExpression(); as valueExpression) {
+      @if (isValueResolved()) {
+        <step-icon
+          name="zap"
+          class="resolved"
+          [matTooltip]="valueExpression | truncateString: 100"
+          matTooltipPosition="below"
+          (click)="displayText($event, valueExpression)"
+        />
+      } @else {
+        <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
+      }
+    }
+    <span [class.not-resolved]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
+      {{ itemValue() }}
+    </span>
+  }
+</ng-template>
+@if (item(); as item) {
+  @if (prefix(); as prefix) {
+    <span>{{ prefix }}</span>
+  }
+  <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
+    @if (icon(); as icon) {
+      <step-icon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
+    }
+    @if (isValueFirst()) {
+      <ng-container *ngTemplateOutlet="tplValue" />
+      <ng-container *ngTemplateOutlet="tplLabel" />
+    } @else {
+      <ng-container *ngTemplateOutlet="tplLabel" />
+      <ng-container *ngTemplateOutlet="tplValue" />
+    }
+  </section>
+  <div class="ellipsis">...</div>
+  @if (suffix(); as suffix) {
+    <span>{{ suffix }}</span>
+  }
+}

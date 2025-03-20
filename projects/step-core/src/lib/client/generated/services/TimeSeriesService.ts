@@ -99,10 +99,10 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getReportNodesTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/time-series',
+      url: '/time-series/report-nodes',
       body: requestBody,
       mediaType: 'application/json',
     });
@@ -113,10 +113,10 @@ export class TimeSeriesService {
    * @returns TimeSeriesAPIResponse default response
    * @throws ApiError
    */
-  public getReportNodesTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
+  public getTimeSeries(requestBody: FetchBucketsRequest): Observable<TimeSeriesAPIResponse> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/time-series/report-nodes',
+      url: '/time-series',
       body: requestBody,
       mediaType: 'application/json',
     });

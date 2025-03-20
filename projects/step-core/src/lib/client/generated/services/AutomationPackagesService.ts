@@ -11,6 +11,7 @@ import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
+import { Expression } from '../models/Expression';
 
 @Injectable({ providedIn: 'root' })
 export class AutomationPackagesService {
@@ -18,12 +19,16 @@ export class AutomationPackagesService {
 
   /**
    * @param async
+   * @param version
+   * @param activationExpr
    * @param formData
    * @returns any default response
    * @throws ApiError
    */
   public createOrUpdateAutomationPackage(
     async?: boolean,
+    version?: string,
+    activationExpr?: string,
     formData?: {
       file?: FormDataContentDisposition;
     },
@@ -33,6 +38,8 @@ export class AutomationPackagesService {
       url: '/automation-packages',
       query: {
         async: async,
+        version: version,
+        activationExpr: activationExpr,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -40,14 +47,26 @@ export class AutomationPackagesService {
   }
 
   /**
+   * @param version
+   * @param activationExpr
    * @param formData
    * @returns string default response
    * @throws ApiError
    */
-  public createAutomationPackage(formData?: { file?: FormDataContentDisposition }): Observable<string> {
+  public createAutomationPackage(
+    version?: string,
+    activationExpr?: string,
+    formData?: {
+      file?: FormDataContentDisposition;
+    },
+  ): Observable<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/automation-packages',
+      query: {
+        version: version,
+        activationExpr: activationExpr,
+      },
       formData: formData,
       mediaType: 'multipart/form-data',
     });
@@ -71,13 +90,17 @@ export class AutomationPackagesService {
   /**
    * @param id
    * @param async
+   * @param version
+   * @param activationExpr
    * @param formData
    * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
    */
-  public updateAutomationPackageById(
+  public updateAutomationPackageMetadata1(
     id: string,
     async?: boolean,
+    version?: string,
+    activationExpr?: string,
     formData?: {
       file?: FormDataContentDisposition;
     },
@@ -90,6 +113,8 @@ export class AutomationPackagesService {
       },
       query: {
         async: async,
+        version: version,
+        activationExpr: activationExpr,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -157,6 +182,27 @@ export class AutomationPackagesService {
     return this.httpRequest.request({
       method: 'GET',
       url: '/automation-packages/schema',
+    });
+  }
+
+  /**
+   * @param id
+   * @param activationExpr
+   * @param version
+   * @returns any default response
+   * @throws ApiError
+   */
+  public updateAutomationPackageMetadata(id: string, activationExpr?: string, version?: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/automation-packages/{id}/metadata',
+      path: {
+        id: id,
+      },
+      query: {
+        activationExpr: activationExpr,
+        version: version,
+      },
     });
   }
 }

@@ -2,29 +2,33 @@ import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsula
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
   map,
+  Observable,
   of,
   pairwise,
   shareReplay,
+  skip,
   startWith,
   switchMap,
-  tap,
-  distinctUntilChanged,
-  filter,
-  Observable,
-  skip,
   take,
-  debounceTime,
+  tap,
 } from 'rxjs';
 import {
+  AlertType,
   ArtefactFilter,
   AugmentedControllerService,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
+  AutoDeselectStrategy,
   Execution,
+  ExecutionCloseHandleService,
+  IncludeTestcases,
   IS_SMALL_SCREEN,
+  PopoverMode,
   RegistrationStrategy,
   ReportNode,
   selectionCollectionProvider,
@@ -32,10 +36,8 @@ import {
   SystemService,
   TableDataSource,
   TableLocalDataSource,
-  ViewRegistryService,
-  PopoverMode,
-  IncludeTestcases,
   TimeRange,
+  ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -62,6 +64,7 @@ import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/ty
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
+import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -126,6 +129,10 @@ interface RefreshParams {
       provide: SchedulerInvokerService,
       useExisting: AltExecutionDialogsService,
     },
+    {
+      provide: ExecutionCloseHandleService,
+      useClass: AltExecutionCloseHandleService,
+    },
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
@@ -146,6 +153,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
+  protected readonly AlertType = AlertType;
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -343,7 +351,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       }
       switch (rangeSelection.type) {
         case 'FULL':
-          return { from: execution.startTime!, to: execution.endTime || new Date().getTime() };
+          const now = new Date().getTime();
+          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
         case 'ABSOLUTE':
           return rangeSelection.absoluteSelection!;
         case 'RELATIVE':
@@ -351,7 +360,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
       }
     }),
-    filter((range) => !!range),
+    filter((range): range is TimeRange => range !== undefined),
+    shareReplay(1),
   ) as Observable<TimeRange>;
 
   readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
@@ -397,8 +407,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           this.isTreeInitialized = false;
           return;
         }
-        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath });
-        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath });
+        // expand all items in tree, due first initialization
+        const expandAllByDefault = !this.isTreeInitialized;
+        this._aggregatedTreeTabState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
+        this._aggregatedTreeWidgetState.init(aggregatedReportView, { resolvedPartialPath, expandAllByDefault });
         this.isTreeInitialized = true;
       });
   }
@@ -460,8 +472,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.execution$.pipe(take(1)).subscribe((execution) => {
       if (selection.type === 'RELATIVE') {
         let time = selection.relativeSelection!.timeInMs;
-        let end = execution.endTime || new Date().getTime() - 5000;
-        selection!.absoluteSelection = { from: end - time, to: end };
+        let now = new Date().getTime();
+        let end = execution.endTime || now - 5000;
+        let from = end - time;
+        if (from > end) {
+          // remove the 5 sec buffer
+          end = now;
+        }
+        selection!.absoluteSelection = { from: from, to: end };
         if (!selection.relativeSelection!.label) {
           let foundRelativeOption = this.timeRangeOptions.find(
             (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,

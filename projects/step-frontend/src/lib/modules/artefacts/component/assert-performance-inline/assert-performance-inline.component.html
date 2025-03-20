@@ -1,1 +1,4 @@
-<step-artefact-inline-field-list [items]="items()" [isVertical]="isVertical()" />
+@if (items(); as items) {
+  <step-artefact-inline-field-list [items]="items" />
+}
+<step-artefact-inline-additional-info [context]="currentContext()" />

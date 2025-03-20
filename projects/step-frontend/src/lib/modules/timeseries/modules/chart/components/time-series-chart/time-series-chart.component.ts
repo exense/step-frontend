@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ContentChild,
   ElementRef,
@@ -17,7 +16,6 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { AlignedData } from 'uplot';
-import { TooltipPlugin } from '../../injectables/tooltip-plugin';
 import { MarkerType, TimeRange } from '@exense/step-core';
 import { COMMON_IMPORTS, TimeSeriesConfig, UPlot } from '../../../_common';
 import { TSChartSeries } from '../../types/ts-chart-series';
@@ -29,6 +27,10 @@ import MouseListener = uPlot.Cursor.MouseListener;
 import { CustomTooltipPlugin } from '../../injectables/custom-tooltip-plugin';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipContentDirective } from './tooltip-content.directive';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { TooltipEvent } from '../tooltip/tooltip-event';
+import { TooltipContainerComponent } from '../tooltip/container/tooltip-container.component';
 
 const DEFAULT_STROKE_COLOR = '#cccccc';
 
@@ -46,14 +48,13 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
   selector: 'step-timeseries-chart',
   templateUrl: './time-series-chart.component.html',
   styleUrls: ['./time-series-chart.component.scss'],
-  providers: [TooltipPlugin, CustomTooltipPlugin],
+  providers: [CustomTooltipPlugin],
   encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, TooltipParentContainer {
   private _element = inject(ElementRef);
-  private _tooltipPlugin = inject(TooltipPlugin);
   private _customTooltipPlugin = inject(CustomTooltipPlugin);
 
   private readonly HEADER_HEIGHT = 27;
@@ -72,7 +73,84 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
 
-  @ContentChild(TooltipContentDirective, { static: true, read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
+  @ContentChild(TooltipContentDirective, { read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
+
+  @ViewChild('testTemplate') testTemplate!: TemplateRef<any>;
+
+  private overlayRef?: OverlayRef;
+  private tooltipInstance?: TooltipContainerComponent;
+
+  // uPlot tooltip plugin will send events here
+  tooltipEvents = new EventEmitter<TooltipEvent>();
+
+  constructor(private overlay: Overlay) {
+    this.tooltipEvents.subscribe((event) => {
+      switch (event.type) {
+        case 'SHOW':
+          break;
+        case 'HIDE':
+          this.hideTooltip();
+          break;
+        case 'POSITION_CHANGED':
+          const { x, y, data } = event.payload!;
+          this.showTooltipAt(x, y, this.tooltipTemplate, data);
+          break;
+      }
+    });
+  }
+
+  showTooltipAt(x: number, y: number, template: TemplateRef<any>, data: TooltipContextData) {
+    if (!template) {
+      return;
+    }
+    if (!this.overlayRef) {
+      this.overlayRef = this.overlay.create({
+        hasBackdrop: false,
+        panelClass: 'custom-tooltip-panel',
+        scrollStrategy: this.overlay.scrollStrategies.reposition(),
+      });
+
+      const portal = new ComponentPortal(TooltipContainerComponent);
+      const componentRef = this.overlayRef.attach(portal);
+
+      this.tooltipInstance = componentRef.instance;
+    }
+
+    // Update data every time cursor moves
+    this.tooltipInstance?.update(template, data);
+
+    const positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo({ x, y })
+      .withViewportMargin(4)
+      .withPositions([
+        {
+          originX: 'start',
+          originY: 'top',
+          overlayX: 'start',
+          overlayY: 'top',
+          offsetX: 8, // Horizontal gap (right of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+        {
+          originX: 'end',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'top',
+          offsetX: -8, // Horizontal gap (left of cursor)
+          offsetY: 8, // Vertical gap (below cursor)
+        },
+      ]);
+
+    this.overlayRef.updatePositionStrategy(positionStrategy);
+  }
+
+  hideTooltip() {
+    if (this.overlayRef) {
+      this.overlayRef.dispose(); // Fully destroys it (portal + container)
+      this.overlayRef = undefined; // Force recreation next time
+    }
+  }
 
   uplot!: uPlot;
 
@@ -86,27 +164,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   legendSettings: LegendSettings = { show: true, items: [], expanded: false };
 
   tooltipEmbeddedView?: EmbeddedViewRef<any>;
-
-  // this will be called from the tooltip instance.
-  // returns true if the tooltip should be rendered. false otherwise
-  renderCustomTooltipFn = (container: any, data: TooltipContextData): boolean => {
-    if (this.tooltipEmbeddedView) {
-      this.tooltipEmbeddedView.context.$implicit = data;
-    } else {
-      this.tooltipEmbeddedView = this.tooltipTemplate.createEmbeddedView({ $implicit: data });
-      this.tooltipEmbeddedView.rootNodes.forEach((node) => {
-        container.appendChild(node); // Append each node to the target element
-      });
-    }
-    this.tooltipEmbeddedView.detectChanges();
-    if (!this.tooltipEmbeddedView || this.tooltipEmbeddedView.rootNodes.length === 0) {
-      container.innerHTML = '';
-      this.tooltipEmbeddedView?.destroy();
-      this.tooltipEmbeddedView = undefined;
-      return false;
-    }
-    return true;
-  };
 
   private uplotSyncFunction: UPlot.default.Cursor.Sync.ScaleKeyMatcher = (
     subScaleKey: string | null,
@@ -225,11 +282,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
     // there is a custom tooltip template specified
     if (this.settings.tooltipOptions.enabled) {
-      if (this.tooltipTemplate) {
-        plugins = [this._customTooltipPlugin.createPlugin(this, this.renderCustomTooltipFn)];
-      } else {
-        plugins = [this._tooltipPlugin.createPlugin(this)];
-      }
+      plugins = [this._customTooltipPlugin.createPlugin(this)];
     }
 
     let opts: uPlot.Options = {
@@ -243,12 +296,9 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       scales: {
         x: {
           time: settings.xAxesSettings.time ?? true,
-          // @ts-ignore
           range: (uPlot, min, max) => {
             return [min - 1, max + 1];
           }, // Add padding to x-axis range
-          // min: this.selection?.from,
-          // max: this.selection?.to,
         },
         ...settings.scales,
       },
@@ -292,8 +342,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     if (this.uplot) {
       this.uplot.destroy();
     }
-    //@ts-ignore
-    // opts = UPlotStackedUtils.getStackedOpts('test', settings.series, data, undefined);
     this.uplot = new uPlot(opts, data, this.chartElement.nativeElement);
   }
 
@@ -392,7 +440,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     const index = this.seriesIndexesByIds[seriesId];
     if (index === undefined || !label) return;
     const series = this.uplot.series[index];
-    // @ts-ignore
+    // @ts-ignore labelItems is not exposed on the uPlot model
     const labelItems = series.labelItems;
     labelItems[labelIndex] = label;
     const finalLabel = this.mergeLabelItems(labelItems);
@@ -496,6 +544,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   ngOnDestroy(): void {
     this.uplot?.destroy();
+    this.hideTooltip();
   }
 }
 

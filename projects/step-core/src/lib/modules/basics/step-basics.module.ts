@@ -72,6 +72,7 @@ import { DynamicInputWidthDirective } from './directives/dynamic-input-width.dir
 import { PasswordComponent } from './components/password/password.component';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
+import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 
 @NgModule({
   imports: [
@@ -151,6 +152,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     DynamicInputWidthDirective,
+    TruncateStringPipe,
   ],
   exports: [
     CommonModule,
@@ -226,6 +228,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
     DynamicInputWidthDirective,
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
+    TruncateStringPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -353,3 +356,4 @@ export * from './directives/select-extra-options.directive';
 export * from './directives/dynamic-input-width.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';
+export * from './pipes/truncate-string.pipe';
