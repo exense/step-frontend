@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  computed,
-  inject,
-  input,
-  Input,
-  signal,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../../_common';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipRowEntry } from '../../types/tooltip-row-entry';
@@ -45,7 +34,6 @@ import { defer, Observable, of, switchMap } from 'rxjs';
 export class ChartStandardTooltipComponent {
   data = input<TooltipContextData | null>(null);
 
-  @ViewChild('menuTrigger') menuTrigger!: MatMenuTrigger;
   private _executionsService = inject(ExecutionsService);
 
   elipsisBefore = false;
@@ -82,8 +70,8 @@ export class ChartStandardTooltipComponent {
     }
     const hoveredValue: number = contextData.idY!;
     let yPoints: TooltipRowEntry[] = [];
-    // first series is x axis (time)
     const chartSeries = contextData.series;
+    // x series is not included here
     for (let i = 0; i < chartSeries.length; i++) {
       const series = chartSeries[i];
       const bucketValue = series.data[idx];
@@ -97,7 +85,7 @@ export class ChartStandardTooltipComponent {
               executionFn = this._executionsService.getExecutionsByIds(executionIds);
             } else if (settings.fetchExecutionsFn) {
               executionFn = defer(() =>
-                settings.fetchExecutionsFn!(idx, i).pipe(
+                settings.fetchExecutionsFn!(idx, series.id).pipe(
                   switchMap((ids) => {
                     if (ids.length === 0) {
                       return of([]);
@@ -184,14 +172,23 @@ export class ChartStandardTooltipComponent {
     let curr = arr[0];
     let diff = Math.abs(num - curr.value);
     let index = 0;
-    for (let val = 0; val < arr.length; val++) {
-      let newdiff = Math.abs(num - arr[val].value);
+    for (let i = 0; i < arr.length; i++) {
+      const elementValue = arr[i].value;
+      if (!elementValue) {
+        // ignore empty elements
+        continue;
+      }
+      let newdiff = Math.abs(num - elementValue);
 
       if (newdiff < diff) {
         diff = newdiff;
-        curr = arr[val];
-        index = val;
+        curr = arr[i];
+        index = i;
       }
+    }
+    if (!arr[index].value) {
+      // let's not select an empty value
+      return -1;
     }
     return index;
   }
