@@ -98,7 +98,9 @@ interface SearchData {
       useFactory: () => {
         const urlState = inject(TablePersistenceUrlStateService, { self: true });
         const externalDefinedState = inject(TablePersistenceStateService, { skipSelf: true, optional: true });
-        return externalDefinedState ?? urlState;
+        const result = externalDefinedState ?? urlState;
+        result.initialize();
+        return result;
       },
     },
     {
