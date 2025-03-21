@@ -91,7 +91,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   static formatError(error: any): string {
-    if (!error || typeof error !== 'object') {
+    if (!error || (typeof error !== 'object' && !error.includes('{'))) {
+      /* make sure the error is no object or object parsed to string */
       return String(error);
     }
 

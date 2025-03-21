@@ -83,15 +83,15 @@ $light-primary-text: var.$white;
     ),
   );
 
-  @return mat.define-palette($step-palette, 500);
+  @return mat.m2-define-palette($step-palette, 500);
 }
 
 @function step-default-typography() {
-  $result: mat.define-typography-config(
+  $result: mat.m2-define-typography-config(
     $font-family: 'Roboto',
-    $body-1: mat.define-typography-level(12px, 16px, 400),
-    $body-2: mat.define-typography-level(14px, 20px, 500),
-    $button: mat.define-typography-level(14px, 20px, 500),
+    $body-1: mat.m2-define-typography-level(12px, 16px, 400),
+    $body-2: mat.m2-define-typography-level(14px, 20px, 500),
+    $button: mat.m2-define-typography-level(14px, 20px, 500),
   );
 
   @return $result;
@@ -116,14 +116,14 @@ $light-primary-text: var.$white;
   }
 
   @if not $mat-accent-palette {
-    $mat-accent-palette: mat.define-palette(mat.$pink-palette);
+    $mat-accent-palette: mat.m2-define-palette(mat.$m2-pink-palette);
   }
 
   @if not $mat-warn-palette {
-    $mat-warn-palette: mat.define-palette(mat.$red-palette);
+    $mat-warn-palette: mat.m2-define-palette(mat.$m2-red-palette);
   }
 
-  $mat-theme: mat.define-light-theme(
+  $mat-theme: mat.m2-define-light-theme(
     (
       color: (
         primary: $mat-primary-palette,

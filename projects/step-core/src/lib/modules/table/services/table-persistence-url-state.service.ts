@@ -26,46 +26,50 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
     return !url.includes('?') ? url : url.slice(0, url.indexOf('?'));
   }
 
-  private resetInternalUrlChangeFlag = this.navigationEnd$
-    .pipe(
-      switchMap(() => timer(100)),
-      takeUntilDestroyed(),
-    )
-    .subscribe(() => (this.isInternalUrlChange = false));
+  override initialize(): void {
+    super.initialize();
 
-  private restoreUrlSearch = this.navigationEnd$
-    .pipe(
-      switchMap(() => timer(100)),
-      filter(() => this.isSearchRestoreRequired && this.storagePath === this._router.url),
-      takeUntilDestroyed(),
-    )
-    .subscribe(() => {
-      this.isSearchRestoreRequired = false;
-      if (this.hasSearch()) {
-        const search = super.getSearch();
-        this.setUrlSearch(search);
-      }
-    });
+    this.navigationEnd$
+      .pipe(
+        switchMap(() => timer(100)),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => (this.isInternalUrlChange = false));
 
-  private byUrlChange = this._activatedRoute.queryParams
-    .pipe(
-      filter(() => this.canStoreSearch),
-      filter(() => !this.isInternalUrlChange),
-      filter((params) => this.hasUrlSearch(params)),
-      map((params) => this.getUrlSearch(params)),
-      takeUntilDestroyed(),
-    )
-    .subscribe((urlSearch) => this.triggerExternalSearchChange(urlSearch));
+    this.navigationEnd$
+      .pipe(
+        switchMap(() => timer(100)),
+        filter(() => this.isSearchRestoreRequired && this.storagePath === this._router.url),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this.isSearchRestoreRequired = false;
+        if (this.hasSearch()) {
+          const search = super.getSearch();
+          this.setUrlSearch(search);
+        }
+      });
 
-  private byUrlChangeCleanup = this._activatedRoute.queryParams
-    .pipe(
-      filter(() => this.canStoreSearch),
-      pairwise(),
-      filter(([prevParams, currentParams]) => this.hasUrlSearch(prevParams) && !this.hasUrlSearch(currentParams)),
-      filter(() => !this.isInternalUrlChange),
-      takeUntilDestroyed(),
-    )
-    .subscribe(() => this.triggerExternalSearchChange({}));
+    this._activatedRoute.queryParams
+      .pipe(
+        filter(() => this.canStoreSearch),
+        filter(() => !this.isInternalUrlChange),
+        filter((params) => this.hasUrlSearch(params)),
+        map((params) => this.getUrlSearch(params)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((urlSearch) => this.triggerExternalSearchChange(urlSearch));
+
+    this._activatedRoute.queryParams
+      .pipe(
+        filter(() => this.canStoreSearch),
+        pairwise(),
+        filter(([prevParams, currentParams]) => this.hasUrlSearch(prevParams) && !this.hasUrlSearch(currentParams)),
+        filter(() => !this.isInternalUrlChange),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => this.triggerExternalSearchChange({}));
+  }
 
   protected override triggerExternalSearchChange(search: Record<string, SearchValue>): void {
     if (this.storagePath !== this.currentRouterUrlPath) {
