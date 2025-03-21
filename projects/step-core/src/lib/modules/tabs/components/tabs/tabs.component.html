@@ -5,6 +5,7 @@
         mat-tab-link
         [routerLink]="tab.link!"
         [relativeTo]="_activatedRoute"
+        stepTestId="tab-selector-{{ tab.id }}"
         routerLinkActive
         #rla="routerLinkActive"
         [active]="rla.isActive"
@@ -14,7 +15,12 @@
     }
   } @else {
     @for (tab of tabs(); track tab.id) {
-      <a mat-tab-link [active]="tab.id === activeTabId()" (click)="selectTab(tab); (false)">
+      <a
+        mat-tab-link
+        stepTestId="tab-selector-{{ tab.id }}"
+        [active]="tab.id === activeTabId()"
+        (click)="selectTab(tab); (false)"
+      >
         <ng-container *ngTemplateOutlet="renderTab; context: { $implicit: tab }" />
       </a>
     }
