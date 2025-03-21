@@ -1,7 +1,8 @@
-import { Directive, effect, ElementRef, inject, input, Input, InputSignal, Renderer2 } from '@angular/core';
+import { Directive, effect, ElementRef, inject, input, InputSignal, Renderer2 } from '@angular/core';
 
 @Directive({
   selector: '[stepTestId]',
+  standalone: true,
 })
 export class TestIdDirective {
   stepTestId: InputSignal<string | undefined> = input<string | undefined>();

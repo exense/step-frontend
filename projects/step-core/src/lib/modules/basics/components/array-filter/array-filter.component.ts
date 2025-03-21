@@ -1,12 +1,4 @@
-import {
-  AfterContentInit,
-  Component,
-  forwardRef,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  TrackByFunction,
-} from '@angular/core';
+import { AfterContentInit, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
 import { KeyValue } from '@angular/common';
 import { BaseFilterComponent } from '../base-filter/base-filter.component';
@@ -30,8 +22,6 @@ export class ArrayFilterComponent<T = unknown>
   extends BaseFilterComponent<string, unknown>
   implements OnChanges, AfterContentInit
 {
-  protected trackByKeyValue: TrackByFunction<KeyValue<unknown, string>> = (index, item) => item.key;
-
   protected displayItems: KeyValue<unknown, string>[] = [];
 
   @Input() items: T[] | ReadonlyArray<T> = [];
