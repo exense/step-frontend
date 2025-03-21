@@ -386,16 +386,16 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       });
     }
 
-    const fetchExecutionsFn: (idx: number, seriesIndex: number) => Observable<string[]> = (
+    const fetchExecutionsFn: (idx: number, seriesId: string) => Observable<string[]> = (
       idx: number,
-      seriesIndex: number,
+      seriesId: string,
     ) => {
       if (!response.collectionIgnoredAttributes?.includes('eId')) {
         // if eId is not ignored, the eIds attributes should be received on the response
         return of([]);
       }
-      const selectedBucketAttributes = response.matrixKeys[seriesIndex];
-      const bucketOql = FilterUtils.objectToOQL(selectedBucketAttributes, 'attributes');
+      const selectedSeriesIndex = series.findIndex((s) => s.id === seriesId);
+      const selectedBucketAttributes = response.matrixKeys[selectedSeriesIndex - (hasSecondaryAxes ? 1 : 0)];
       request.groupDimensions?.forEach((dimension) => {
         if (!selectedBucketAttributes[dimension]) {
           // force null filtering for missing attributes
