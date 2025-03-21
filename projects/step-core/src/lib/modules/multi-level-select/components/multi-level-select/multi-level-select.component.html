@@ -1,4 +1,10 @@
-<mat-select [multiple]="true" [ngModel]="selectedItems" (blur)="handleBlur()" [disabled]="isDisabled">
+<mat-select
+  [multiple]="multiple()"
+  [tabIndex]="tabIndex()"
+  [ngModel]="selectedItems"
+  (blur)="handleBlur()"
+  [disabled]="isDisabled"
+>
   <mat-option>
     <ngx-mat-select-search
       [formControl]="filterMultiControl"
@@ -8,14 +14,19 @@
       <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
     </ngx-mat-select-search>
   </mat-option>
-  @for (plainItem of plainItems(); track plainItem.key) {
+  @if (_selectClear.useClear()) {
+    <mat-option class="step-select-clear-value" [value]="_selectClear.CLEAR_INTERNAL_VALUE" (click)="clear($event)">{{
+      _selectClear.clearLabel()
+    }}</mat-option>
+  }
+  @for (plainItem of plainItems(); track plainItem.value) {
     <mat-option
       class="step-multi-level-plain-item"
       [style]="{ '--plain-item-level': plainItem.level }"
-      [value]="plainItem.key"
+      [value]="plainItem.value"
       (onSelectionChange)="handleSelectionChange($event, plainItem)"
     >
-      {{ plainItem.value }}
+      {{ plainItem.label }}
     </mat-option>
   }
 </mat-select>

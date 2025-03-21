@@ -1,22 +1,11 @@
 <step-form-field>
   <step-label>Script language</step-label>
-
-  <mat-select [formControl]="formGroup.controls.scriptLanguage">
-    <mat-option>
-      <ngx-mat-select-search
-        [formControl]="filterMultiControl"
-        name="filterMultiControl"
-        ngDefaultControl
-        placeholderLabel="Search..."
-        noEntriesFoundLabel="No matching entries found"
-      >
-        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-      </ngx-mat-select-search>
-    </mat-option>
-    @for (functionTypeScriptOption of dropdownItemsFiltered; track functionTypeScriptOption) {
-      <mat-option [value]="functionTypeScriptOption.scriptLanguage">{{ functionTypeScriptOption.label }}</mat-option>
-    }
-  </mat-select>
+  <step-select
+    [formControl]="formGroup.controls.scriptLanguage"
+    [items]="_functionTypeScriptOptions"
+    [extractor]="arrayItemExtractor"
+    clearLabel="unset"
+  />
 </step-form-field>
 
 <step-dynamic-resource

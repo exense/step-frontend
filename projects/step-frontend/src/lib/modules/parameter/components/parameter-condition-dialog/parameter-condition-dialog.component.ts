@@ -1,12 +1,16 @@
 import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ArrayItemLabelValueExtractor } from '@exense/step-core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
 import { valueValidator } from '../../validators/value.validator';
-import { PREDICATE } from '../../types/predicate.enum';
+import { Predicate } from '../../types/predicate.enum';
 import { ParameterConditionDialogData } from '../../types/parameter-condition.type';
+import { KeyValue } from '@angular/common';
+
+type PredicateItem = KeyValue<Predicate, string>;
+
+const createPredicateItem = (key: Predicate, value: string): PredicateItem => ({ key, value });
 
 @Component({
   selector: 'step-parameter-condition-dialog',
@@ -17,16 +21,21 @@ export class ParameterConditionDialogComponent implements OnInit {
   private _dialogData = inject<ParameterConditionDialogData>(MAT_DIALOG_DATA);
   private dialogRef = inject(MatDialogRef);
 
-  protected PRED = PREDICATE;
-  protected _predicates: Array<{ key: string; value: string }> = [
-    { key: this.PRED.EQUALS, value: 'equals' },
-    { key: this.PRED.NOT_EQUALS, value: 'does not equal' },
-    { key: this.PRED.MATCHES, value: 'matches regex' },
-    { key: this.PRED.NOT_MATCHES, value: 'does not match regex' },
-    { key: this.PRED.EXISTS, value: 'exists' },
-    { key: this.PRED.NOT_EXISTS, value: 'does not exist' },
+  protected Predicate = Predicate;
+  protected predicates = [
+    createPredicateItem(Predicate.EQUALS, 'equals'),
+    createPredicateItem(Predicate.NOT_EQUALS, 'does not equal'),
+    createPredicateItem(Predicate.MATCHES, 'matches regex'),
+    createPredicateItem(Predicate.NOT_MATCHES, 'does not match regex'),
+    createPredicateItem(Predicate.EXISTS, 'exists'),
+    createPredicateItem(Predicate.NOT_EXISTS, 'does not exist'),
   ];
-  protected _bindingKeys: any[] = ['user'];
+  protected yesNoItems: KeyValue<string, string>[] = [
+    { key: 'true', value: 'TRUE' },
+    { key: 'false', value: 'FALSE' },
+  ];
+
+  protected bindingKeys: string[] = ['user'];
   protected _fb = inject(FormBuilder).nonNullable;
   protected bindingKeyExtractor: ArrayItemLabelValueExtractor<string, string> = {
     getValue: (item: string) => item,
@@ -38,16 +47,9 @@ export class ParameterConditionDialogComponent implements OnInit {
   modalTitle: string = '';
   inputs: any[] = [];
 
-  filterPredicateControl: FormControl<string | null> = new FormControl<string>('');
-  filterKeyControl: FormControl<string | null> = new FormControl<string>('');
-  filterValueControl: FormControl<string | null> = new FormControl<string>('');
-  dropdownItemsFiltered: Array<{ key: string; value: string }> = [];
-  dropdownKeysFiltered: Array<{ key: string; value: string }> = [];
-  dropdownValuesFiltered: Array<{ key: string; value: string }> = [];
-
   ngOnInit(): void {
     this._dialogData.inputs.forEach((input) => {
-      this._bindingKeys.push(input.input.id);
+      this.bindingKeys.push(input.input.id);
       this.inputs.push(input.input);
     });
 
@@ -76,52 +78,6 @@ export class ParameterConditionDialogComponent implements OnInit {
       ?.valueChanges.pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => {
         this.conditionForm.get('value')?.reset();
-      });
-
-    this.dropdownKeysFiltered = [...this._bindingKeys];
-    this.filterKeyControl.valueChanges
-      .pipe(
-        startWith(this.filterKeyControl.value),
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value ? this._bindingKeys.filter((item) => item.toLowerCase().includes(value)) : [...this._bindingKeys],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownKeysFiltered = displayItemsFiltered;
-      });
-
-    this.dropdownItemsFiltered = [...this._predicates];
-    this.filterPredicateControl.valueChanges
-      .pipe(
-        startWith(this.filterPredicateControl.value),
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value ? this._predicates.filter((item) => item.value.toLowerCase().includes(value)) : [...this._predicates],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownItemsFiltered = displayItemsFiltered;
-      });
-
-    const valuesArray = [
-      { key: 'true', value: 'TRUE' },
-      { key: 'false', value: 'FALSE' },
-    ];
-    this.dropdownValuesFiltered = [...valuesArray];
-    this.filterValueControl.valueChanges
-      .pipe(
-        startWith(this.filterValueControl.value),
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value ? valuesArray.filter((item) => item.value.toLowerCase().includes(value)) : [...valuesArray],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownValuesFiltered = displayItemsFiltered;
       });
   }
 

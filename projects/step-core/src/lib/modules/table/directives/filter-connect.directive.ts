@@ -53,7 +53,7 @@ export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, O
       console.warn('[stepFilterConnect] not connected');
       return;
     }
-    this._filter!.filterChange.pipe(
+    this._filter!.filterChange$.pipe(
       map((filterValue) => this.convertToSearchValue(filterValue)),
       takeUntilDestroyed(this._destroyRef),
     ).subscribe((searchValue) => this._searchCol!.search(searchValue));

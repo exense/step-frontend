@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ScheduleOverviewTaskChangeStrategy } from '../types/schedule-overview-task-change-strategy';
-import { ExecutiontTaskParameters } from '../../../step-core.module';
+import { ExecutiontTaskParameters } from '../../../client/step-client-module';
 
 const DEFAULT_STRATEGY: ScheduleOverviewTaskChangeStrategy = {
   taskChanged: (task?: ExecutiontTaskParameters) => {},

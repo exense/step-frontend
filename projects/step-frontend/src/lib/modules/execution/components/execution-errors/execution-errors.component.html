@@ -1,12 +1,12 @@
 <step-form-field>
   <step-label>Group by</step-label>&nbsp;
-  <mat-select
+  <step-select
     [ngModel]="selectedErrorDistributionToggle"
     (ngModelChange)="selectedErrorDistributionToggleChange.emit($event)"
-  >
-    <mat-option [value]="ErrorDistributionStatus.MESSAGE">{{ ErrorDistributionStatus.MESSAGE }}</mat-option>
-    <mat-option [value]="ErrorDistributionStatus.CODE">{{ ErrorDistributionStatus.CODE }}</mat-option>
-  </mat-select>
+    [items]="distributionStatusItems"
+    [useClear]="false"
+    [useSearch]="false"
+  />
 </step-form-field>
 <ng-container *ngIf="selectedErrorDistributionToggle === ErrorDistributionStatus.MESSAGE">
   <step-table [dataSource]="countByErrorMsgDataSource" matSort [matSortDisableClear]="true">

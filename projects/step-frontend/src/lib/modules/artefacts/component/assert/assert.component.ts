@@ -48,8 +48,6 @@ export class AssertComponent extends BaseArtefactComponent<AssertArtefact> imple
     createOperatorTypeEntry(OperatorType.IS_NULL, 'is null'),
   ];
 
-  readonly trackByOperatorType: TrackByFunction<OperatorTypeEntry> = (index, item) => item.key;
-
   override ngAfterViewInit(): void {
     super.ngAfterViewInit();
     this.setupNumberExpectedValue();

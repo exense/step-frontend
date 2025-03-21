@@ -10,6 +10,7 @@
 @use 'step-dialogs';
 @use 'step-buttons';
 @use 'step-menu';
+@use 'step-select';
 @use 'step-datepicker';
 @use 'step-alert';
 @use 'step-tooltip';
@@ -167,6 +168,7 @@ $light-primary-text: var.$white;
   @include step-dialogs.dialogs();
   @include step-buttons.buttons();
   @include step-menu.menu();
+  @include step-select.step-select-clear-value();
   @include step-datepicker.datepicker();
   @include step-alert.step-alert();
   @include step-tooltip.tooltip($text-color);

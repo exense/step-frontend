@@ -10,11 +10,13 @@
 <form #form="ngForm">
   <div><b>Assert</b> that</div>
   <step-form-field>
-    <mat-select [(ngModel)]="context.artefact!.aggregator" [disabled]="context.readonly" name="aggregator">
-      @for (item of _lists.aggregatorTypes; track item.key) {
-        <mat-option [value]="item.key">{{ item.value }}</mat-option>
-      }
-    </mat-select>
+    <step-select
+      [(ngModel)]="context.artefact!.aggregator"
+      [disabled]="context.readonly"
+      name="aggregator"
+      [items]="_lists.aggregatorTypes"
+      [useClear]="false"
+    />
   </step-form-field>
   <div>of measurments matching name</div>
   @if (context.artefact?.filters?.length) {
@@ -26,11 +28,13 @@
   }
   <div>are</div>
   <step-form-field>
-    <mat-select [(ngModel)]="context.artefact!.comparator" [disabled]="context.readonly" name="comparator">
-      @for (item of _lists.operatorTypes; track item.key) {
-        <mat-option [value]="item.key">{{ item.value }}</mat-option>
-      }
-    </mat-select>
+    <step-select
+      [(ngModel)]="context.artefact!.comparator"
+      [disabled]="context.readonly"
+      name="comparator"
+      [items]="_lists.operatorTypes"
+      [useClear]="false"
+    />
   </step-form-field>
   <step-dynamic-time-input
     [(ngModel)]="context.artefact!.expectedValue"

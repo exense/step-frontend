@@ -21,11 +21,7 @@
       </step-form-field>
       <step-form-field>
         <step-label>Type</step-label>
-        <mat-select [(ngModel)]="model.type">
-          <mat-option *ngFor="let opt of ALLOWED_TYPES" [value]="opt">
-            {{ opt }}
-          </mat-option>
-        </mat-select>
+        <step-select [(ngModel)]="model.type" [items]="ALLOWED_TYPES" [useClear]="false" />
       </step-form-field>
       <step-screen-input-dropdown-options *ngIf="model.type === 'DROPDOWN'" [model]="model">
       </step-screen-input-dropdown-options>

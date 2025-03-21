@@ -1,14 +1,12 @@
 <section class="header">
   <step-form-field class="screen-select">
-    <mat-select stepTestId="screen-select" [value]="currentlySelectedScreenChoice">
-      <mat-option
-        *ngFor="let screenChoice of screenChoicesRequest$ | async"
-        [value]="screenChoice"
-        (click)="reloadTableForCurrentChoice(screenChoice)"
-      >
-        {{ screenChoice }}
-      </mat-option>
-    </mat-select>
+    <step-select
+      stepTestId="screen-select"
+      [ngModel]="currentlySelectedScreenChoice"
+      (ngModelChange)="reloadTableForCurrentChoice($event)"
+      [items]="screenChoicesRequest()"
+      [useClear]="false"
+    />
   </step-form-field>
   <step-btn-group>
     <button

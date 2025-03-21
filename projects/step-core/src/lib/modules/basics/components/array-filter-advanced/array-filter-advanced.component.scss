@@ -1,12 +1,13 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-.unset-item {
+.step-array-filter-advanced_unset-item {
   border-bottom: solid 0.1rem;
-}
-
-.unset-content::before {
-  content: '(';
-}
-.unset-content::after {
-  content: ')';
+  & > span {
+    &::before {
+      content: '(';
+    }
+    &::after {
+      content: ')';
+    }
+  }
 }

@@ -9,14 +9,20 @@ import {
   signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { ArrayItemLabelValueExtractor } from '../../injectables/array-item-label-value-extractor';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
 import { KeyValue } from '@angular/common';
 import { SelectExtraOptionsDirective } from '../../directives/select-extra-options.directive';
-
-const CLEAR_INTERNAL_VALUE = Symbol('Clear value');
+import { StepMaterialModule } from '../../../step-material/step-material.module';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { SelectClearValueDirective } from '../../directives/select-clear-value.directive';
+import {
+  SelectComponentSearchCtrlContainer,
+  SelectComponentSearchCtrlContainerDefaultImpl,
+} from '../../injectables/select-component-search-ctrl-container.service';
+import { ArrayItemLabelValueDefaultExtractorService } from '../../injectables/array-item-label-value-default-extractor.service';
 
 type ModelValue<T> = T | T[] | null | undefined;
 type OnChange<T> = (value?: ModelValue<T>) => void;
@@ -28,70 +34,69 @@ type OnTouch = () => void;
   styleUrl: './select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [StepMaterialModule, FormsModule, ReactiveFormsModule, NgxMatSelectSearchModule],
   host: {
     '[class.with-empty-placeholder]': '!!emptyPlaceholder()',
     '[class.is-disabled]': 'isDisabled()',
   },
+  hostDirectives: [
+    {
+      directive: SelectClearValueDirective,
+      inputs: ['useClear', 'clearValue', 'clearLabel'],
+    },
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SelectComponent),
       multi: true,
     },
+    SelectComponentSearchCtrlContainerDefaultImpl,
+    {
+      provide: SelectComponentSearchCtrlContainer,
+      useFactory: () => {
+        const parentImpl = inject(SelectComponentSearchCtrlContainer, { skipSelf: true, optional: true });
+        const defaultImpl = inject(SelectComponentSearchCtrlContainerDefaultImpl, { self: true });
+        return parentImpl ?? defaultImpl;
+      },
+    },
   ],
 })
 export class SelectComponent<Item, Value> implements ControlValueAccessor {
-  private _fb = inject(FormBuilder).nonNullable;
+  private _searchCtrlContainer = inject(SelectComponentSearchCtrlContainer);
+  private _defaultExtractor = inject(ArrayItemLabelValueDefaultExtractorService);
+
+  protected readonly _selectClear = inject(SelectClearValueDirective, { host: true });
 
   private onChange?: OnChange<Value>;
   private onTouch?: OnTouch;
 
-  /** @Input() **/
   readonly useSearch = input(true);
-
-  /** @Input() **/
-  readonly useClear = input(true);
-
-  /** @Input() **/
-  readonly clearLabel = input('clear');
-
-  /** @Input() **/
-  readonly clearValue = input<null | undefined>(undefined);
-
-  protected readonly CLEAR_INTERNAL_VALUE = CLEAR_INTERNAL_VALUE;
-
-  /** @Input() **/
   readonly multiple = input(false);
-
-  /** @Input() **/
   readonly items = input<Array<Item> | ReadonlyArray<Item> | undefined>(undefined);
-
-  /** @Input() **/
   readonly emptyPlaceholder = input<string>('');
-
-  /** @Input() **/
-  readonly extractor = input<ArrayItemLabelValueExtractor<Item, Value>>({
-    getLabel: (item) => item?.toString() ?? '',
-    getValue: (item) => item as unknown as Value,
-  });
+  readonly extractor = input<ArrayItemLabelValueExtractor<Item, Value> | undefined>(undefined);
+  readonly tabIndex = input<number | undefined>(undefined);
 
   protected readonly isDisabled = signal(false);
 
   protected readonly value = signal<ModelValue<Value>>(undefined);
 
-  protected readonly searchCtrl = this._fb.control('');
+  protected readonly searchCtrl = this._searchCtrlContainer.searchControl;
 
-  private searchCtrlValue = toSignal(
-    this.searchCtrl.valueChanges.pipe(
-      map((value) => value?.toLowerCase()?.trim()),
-      takeUntilDestroyed(),
-    ),
-    { initialValue: (this.searchCtrl.value ?? '').trim() },
-  );
+  readonly searchValue$ = this.searchCtrl.valueChanges.pipe(startWith(this.searchCtrl.value ?? ''));
+
+  readonly searchValue = toSignal(this.searchValue$, {
+    initialValue: this.searchCtrl.value ?? '',
+  });
+
+  private extraOptions = contentChild<SelectExtraOptionsDirective<Value>>(SelectExtraOptionsDirective);
+  protected readonly extraItems = computed(() => this.extraOptions()?.items() ?? []);
 
   private allDisplayItems = computed<KeyValue<Value, string>[]>(() => {
     const items = this.items() ?? [];
-    const extractor = this.extractor();
+    const extractor = this.extractor() ?? this._defaultExtractor;
 
     return items.map((item) => ({
       key: extractor.getValue(item),
@@ -101,7 +106,7 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
 
   protected readonly displayItems = computed(() => {
     const allDisplayItems = this.allDisplayItems();
-    const searchCtrlValue = this.searchCtrlValue();
+    const searchCtrlValue = this.searchValue().toLowerCase().trim();
     if (!searchCtrlValue) {
       return allDisplayItems;
     }
@@ -111,27 +116,26 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
   protected readonly selection = computed(() => {
     const value = this.value();
     const displayItems = this.displayItems();
+    const extraItems = this.extraItems();
     const emptyPlaceholder = this.emptyPlaceholder();
 
     if (!value) {
       return emptyPlaceholder;
     }
 
+    const allItems = [...extraItems, ...displayItems];
+
     if (value instanceof Array) {
       const selected = new Set(value);
-      return displayItems
+      return allItems
         .filter((item) => selected.has(item.key))
         .map((item) => item.value)
         .join(', ');
     }
 
-    const selectedItem = displayItems.find((item) => item.key === value);
-    return selectedItem!.value;
+    const selectedItem = allItems.find((item) => item.key === value);
+    return selectedItem?.value;
   });
-
-  private extraOptions = contentChild<SelectExtraOptionsDirective<Value>>(SelectExtraOptionsDirective);
-
-  protected readonly extraItems = computed(() => this.extraOptions()?.items() ?? []);
 
   writeValue(value?: ModelValue<Value>): void {
     this.value.set(value);
@@ -150,7 +154,8 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
   }
 
   protected handleChange(value?: ModelValue<Value>): void {
-    if (value === CLEAR_INTERNAL_VALUE || (value instanceof Array && value.includes(CLEAR_INTERNAL_VALUE as Value))) {
+    const clearInternalValue = this._selectClear.CLEAR_INTERNAL_VALUE;
+    if (value === clearInternalValue || (value instanceof Array && value.includes(clearInternalValue as Value))) {
       return;
     }
     this.value.set(value);
@@ -165,6 +170,6 @@ export class SelectComponent<Item, Value> implements ControlValueAccessor {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    this.handleChange(this.clearValue());
+    this.handleChange(this._selectClear.clearValue());
   }
 }

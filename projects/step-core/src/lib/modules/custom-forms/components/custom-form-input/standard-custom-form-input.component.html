@@ -3,42 +3,25 @@
     @case (InputType.TEXT) {
       <input
         type="text"
-        [required]="required"
+        [required]="required()"
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
       />
     }
     @case (InputType.DROPDOWN) {
-      <mat-select
-        [required]="required"
+      <step-select
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
         (blur)="invokeTouch()"
-      >
-        <mat-option>
-          <ngx-mat-select-search
-            [formControl]="filterMultiControl"
-            name="filterMultiControl"
-            ngDefaultControl
-            placeholderLabel="Search..."
-            noEntriesFoundLabel="No matching entries found"
-          >
-            <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-          </ngx-mat-select-search>
-        </mat-option>
-        @if (!!value) {
-          <mat-option class="unset-item" [value]="null">unset</mat-option>
-        }
-        @for (item of dropdownItemsFiltered(); track item) {
-          <mat-option [value]="item">{{ item }}</mat-option>
-        }
-      </mat-select>
+        [items]="dropdownItems()"
+        clearLabel="unset"
+      />
     }
     @case (InputType.CHECKBOX) {
       <mat-slide-toggle
         color="primary"
-        [required]="required"
+        [required]="required()"
         [ngModel]="value === 'true'"
         (ngModelChange)="onValueChange($event.toString())"
         (blur)="invokeTouch()"
@@ -46,19 +29,19 @@
     }
     @default {}
   }
-  @if (hint) {
+  @if (hint(); as hint) {
     <step-suffix class="icon-suffix">
       <step-icon name="help-circle" [matTooltip]="hint" />
     </step-suffix>
   }
 </ng-template>
-@if (hideLabel) {
-  <step-form-field [showRequiredMarker]="required">
+@if (hideLabel()) {
+  <step-form-field [showRequiredMarker]="required()">
     <ng-container *ngTemplateOutlet="content" />
   </step-form-field>
 } @else {
   <step-form-field
-    [showRequiredMarker]="required"
+    [showRequiredMarker]="required()"
     alignLabelAddon="near"
     [class.checkbox-toggle-input]="input()?.type === InputType.CHECKBOX"
   >

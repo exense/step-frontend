@@ -1,24 +1,16 @@
-import {
-  AfterContentInit,
-  Component,
-  DestroyRef,
-  HostListener,
-  inject,
-  InjectionToken,
-  viewChild,
-} from '@angular/core';
-import { combineLatest, map, Observable, share, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { Component, inject, InjectionToken, viewChild } from '@angular/core';
+import { Observable, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CustomFormComponent } from '../../../custom-forms';
-import { StepBasicsModule, DialogRouteResult } from '../../../basics/step-basics.module';
+import { StepBasicsModule, DialogRouteResult, ArrayItemLabelValueExtractor } from '../../../basics/step-basics.module';
 import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
 import { ItemInfo, PlanTypeRegistryService } from '../../../custom-registeries/custom-registries.module';
-import { FormControl } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { Tab, TabsComponent } from '../../../tabs';
 import { AceMode, RichEditorComponent } from '../../../rich-editor';
+import { DOCUMENT } from '@angular/common';
 
 const TABS = new InjectionToken<Tab<string>[]>('Plan creation tabs', {
   providedIn: 'root',
@@ -40,62 +32,35 @@ const TABS = new InjectionToken<Tab<string>[]>('Plan creation tabs', {
   styleUrls: ['./plan-create-dialog.component.scss'],
   standalone: true,
   imports: [StepBasicsModule, CustomFormComponent, NgxMatSelectSearchModule, TabsComponent, RichEditorComponent],
+  host: {
+    '(keydown.enter)': 'handleKeyEnter()',
+  },
 })
-export class PlanCreateDialogComponent implements AfterContentInit {
+export class PlanCreateDialogComponent {
   private _api = inject(AugmentedPlansService);
   private _matDialogRef = inject<MatDialogRef<PlanCreateDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _router = inject(Router);
-  private _destroyRef = inject(DestroyRef);
+  private _doc = inject(DOCUMENT);
 
   private customForm = viewChild(CustomFormComponent);
 
   protected template: string = 'TestCase';
   protected plan: Partial<Plan> = { attributes: {} };
 
-  readonly _planTypes = inject(PlanTypeRegistryService).getItemInfos();
-  protected planType = this._planTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
+  protected readonly _planEditorTypes = inject(PlanTypeRegistryService).getItemInfos();
+  protected planType = this._planEditorTypes.find((planType) => planType.type === 'step.core.plans.Plan')?.type;
   protected yamlPlan = '';
 
-  readonly artefactTypes$ = this._api.getArtefactTemplates().pipe(shareReplay(1));
+  protected readonly artefactTypes = toSignal(this._api.getArtefactTemplates(), { initialValue: [] });
 
   protected _availableTabs = inject(TABS);
   protected selectedTab: string = this._availableTabs[0].id;
   protected readonly AceMode = AceMode;
 
-  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
-  filterMultiTypeControl: FormControl<string | null> = new FormControl<string>('');
-  dropdownItemsFiltered: ItemInfo[] = [];
-  dropdownItemsTypeFiltered$: Observable<string[]> | undefined;
-
-  ngAfterContentInit(): void {
-    this.dropdownItemsFiltered = [...this._planTypes];
-    this.filterMultiControl.valueChanges
-      .pipe(
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value ? this._planTypes.filter((item) => item.label.toLowerCase().includes(value)) : [...this._planTypes],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.dropdownItemsFiltered = displayItemsFiltered;
-      });
-
-    this.dropdownItemsTypeFiltered$ = combineLatest([
-      this.artefactTypes$,
-      this.filterMultiTypeControl.valueChanges.pipe(startWith(this.filterMultiTypeControl.value)),
-    ]).pipe(
-      takeUntilDestroyed(this._destroyRef),
-      map(([artefactTypes, filterValue]) => {
-        if (filterValue) {
-          return artefactTypes.filter((item) => item.toLowerCase().includes(filterValue.toLowerCase()));
-        } else {
-          return artefactTypes;
-        }
-      }),
-      share(),
-    );
-  }
+  protected readonly planEditorTypeExtractor: ArrayItemLabelValueExtractor<ItemInfo, string> = {
+    getLabel: (item: ItemInfo) => item.label,
+    getValue: (item: ItemInfo) => item.type,
+  };
 
   save(editAfterSave?: boolean): void {
     const createPlan$ = this.selectedTab === 'yaml' ? this.createAsYamlPlan$() : this.createNewPlan$();
@@ -133,9 +98,8 @@ export class PlanCreateDialogComponent implements AfterContentInit {
       );
   }
 
-  @HostListener('keydown.enter', ['$event'])
-  private handleKeyEnter(event: KeyboardEvent): void {
-    const activeElement = document.activeElement as HTMLElement;
+  protected handleKeyEnter(): void {
+    const activeElement = this._doc.activeElement as HTMLElement;
 
     if (this.isInTextEditor(activeElement)) {
       return; // Prevents triggering save when inside a text editor

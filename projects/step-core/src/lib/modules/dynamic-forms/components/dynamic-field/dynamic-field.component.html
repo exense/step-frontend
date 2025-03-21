@@ -30,20 +30,20 @@
   @if (!dynamic()) {
     @switch (fieldType()) {
       @case (DynamicFieldType.ENUM) {
-        <mat-select
+        <step-select
           [disabled]="isDisabled()"
           [ngModel]="value()"
           (ngModelChange)="handleValueChange($event)"
           (blur)="handleBlur()"
           [tabIndex]="tabIndex()"
+          [items]="enumItems()"
         >
-          @if (displayEnumExtraValue()) {
-            <mat-option [value]="value()">{{ value() }}</mat-option>
-          }
-          @for (item of enumItems(); track item) {
-            <mat-option [value]="item">{{ item }}</mat-option>
-          }
-        </mat-select>
+          <step-select-extra-options>
+            @if (displayEnumExtraValue()) {
+              <mat-option [value]="value()">{{ value() }}</mat-option>
+            }
+          </step-select-extra-options>
+        </step-select>
       }
       @case (DynamicFieldType.BOOLEAN) {
         <mat-radio-group
