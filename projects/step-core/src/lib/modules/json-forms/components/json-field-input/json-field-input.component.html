@@ -17,7 +17,7 @@
           (focusout)="forceFocus.set(false)"
         />
       } @else {
-        <span [matTooltip]="label() ?? ''">{{ label() }}</span>
+        <span [matTooltip]="label()">{{ label() }}</span>
       }
       @if (tooltip(); as tooltip) {
         <step-icon name="help-circle" [matTooltip]="tooltip" />
