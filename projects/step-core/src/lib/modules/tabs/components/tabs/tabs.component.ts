@@ -18,12 +18,13 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { CommonModule } from '@angular/common';
 import { TabTemplateDirective } from '../directives/tab-template.directive';
+import { TestIdDirective } from '../../../../directives/test-id.directive';
 
 @Component({
   selector: 'step-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
-  imports: [StepMaterialModule, CommonModule, RouterModule],
+  imports: [StepMaterialModule, CommonModule, RouterModule, TestIdDirective],
   standalone: true,
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,

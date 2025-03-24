@@ -40,7 +40,12 @@
           [mode]="PopoverMode.CLICK"
           (toggledEvent)="isResolvedParametersVisible.set($event)"
         >
-          <button type="button" mat-icon-button [color]="isResolvedParametersVisible() ? 'primary' : 'default'">
+          <button
+            type="button"
+            mat-icon-button
+            [color]="isResolvedParametersVisible() ? 'primary' : 'default'"
+            matTooltip="Show resolved parameters"
+          >
             <step-icon name="sliders" />
           </button>
           <step-popover-content>

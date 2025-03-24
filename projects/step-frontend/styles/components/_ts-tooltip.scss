@@ -69,19 +69,6 @@
       }
     }
 
-    .tooltip-menu {
-      position: absolute;
-      background: #fffbf5;
-      min-width: 10rem;
-      max-width: 40rem;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      top: -0.4rem;
-      border: 1px solid #d1d1d1;
-      padding: 0.6rem;
-      z-index: 1000;
-    }
-
     .separator {
       height: 1px;
       width: 100%;
@@ -144,5 +131,17 @@
       border-top: 2px solid;
       border-right: 2px solid;
     }
+  }
+
+  .tooltip-menu {
+    background: #fffbf5;
+    min-width: 10rem;
+    max-width: 40rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    top: -0.4rem;
+    border: 1px solid #d1d1d1;
+    padding: 0.8rem 1.2rem;
+    z-index: 1000;
   }
 }

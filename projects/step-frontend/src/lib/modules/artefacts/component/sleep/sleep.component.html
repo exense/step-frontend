@@ -6,7 +6,7 @@
       [disabled]="context.readonly"
       name="duration"
     />
-    @if (context.artefact!.duration.dynamic && context.artefact!.unit.value) {
+    @if (context.artefact!.duration.dynamic && context.artefact!.unit?.value) {
       <step-dynamic-textfield label="Unit" [(ngModel)]="context.artefact!.unit" [disabled]="true" name="unit" />
     }
   } @else {
