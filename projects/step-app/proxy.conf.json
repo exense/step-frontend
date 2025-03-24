@@ -8,5 +8,10 @@
     "target": "https://stepos-master.stepcloud-test.ch:443",
     "secure": false,
     "changeOrigin": true
+  },
+  "/doc": {
+    "target": "https://stepos-master.stepcloud-test.ch:443",
+    "secure": false,
+    "changeOrigin": true
   }
 }
