@@ -71,6 +71,9 @@ export class StandaloneChartComponent implements OnChanges {
   }
 
   private fetchDataAndCreateChart(range: TimeRange) {
+    if (range.from >= range.to) {
+      throw new Error(`Invalid time range ${JSON.stringify(range)}`);
+    }
     const groupDimensions = this.grouping;
     const request: FetchBucketsRequest = {
       start: range.from,

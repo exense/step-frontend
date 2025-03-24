@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DATE_FORMATS } from '@angular/material/core';
@@ -102,7 +102,6 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     LockColumnContainerComponent,
     LockColumnComponent,
     DashboardNavigationParamsPipe,
-    TestIdDirective,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -110,7 +109,6 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     StepMaterialModule,
     TableModule,
     StepBasicsModule,
@@ -127,6 +125,7 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     WizardModule,
     CronModule,
     DatePickerModule,
+    TestIdDirective,
     AUTH_EXPORTS,
     EDITABLE_LABELS_EXPORTS,
     CUSTOM_FORMS_EXPORTS,
@@ -152,7 +151,6 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     CapsLockDirective,
     StepMaterialModule,
     JsonViewerModule,
@@ -238,6 +236,7 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
       provide: FunctionActionsService,
       useExisting: FunctionActionsImplService,
     },
+    provideHttpClient(withInterceptorsFromDi()),
   ],
 })
 export class StepCoreModule {

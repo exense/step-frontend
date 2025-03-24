@@ -23,7 +23,6 @@ import {
 import {
   COMMON_IMPORTS,
   FilterUtils,
-  OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -288,7 +287,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const secondaryAxesData: (number | undefined | null)[] = [];
     const series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
       const metadata: any[] = []; // here we can store meta info, like execution links or other attributes
-      let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field]);
+      let labelItems = groupDimensions.map((field) => response.matrixKeys[i]?.[field] || undefined); // convert empty strings to undefined
       if (groupDimensions.length === 0) {
         labelItems = [this.context.getMetric(this.item.metricKey).displayName];
       }
@@ -387,23 +386,22 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       });
     }
 
-    const fetchExecutionsFn: (idx: number, seriesIndex: number) => Observable<string[]> = (
+    const fetchExecutionsFn: (idx: number, seriesId: string) => Observable<string[]> = (
       idx: number,
-      seriesIndex: number,
+      seriesId: string,
     ) => {
       if (!response.collectionIgnoredAttributes?.includes('eId')) {
         // if eId is not ignored, the eIds attributes should be received on the response
         return of([]);
       }
-      const selectedBucketAttributes = response.matrixKeys[seriesIndex];
-      const bucketOql = FilterUtils.objectToOQL(selectedBucketAttributes, 'attributes');
+      const selectedSeriesIndex = series.findIndex((s) => s.id === seriesId);
+      const selectedBucketAttributes = response.matrixKeys[selectedSeriesIndex - (hasSecondaryAxes ? 1 : 0)];
       request.groupDimensions?.forEach((dimension) => {
         if (!selectedBucketAttributes[dimension]) {
           // force null filtering for missing attributes
           selectedBucketAttributes[dimension] = null;
         }
       });
-      console.log(selectedBucketAttributes, bucketOql);
       const isolateRequest: FetchBucketsRequest = {
         start: xLabels[idx],
         end: xLabels[idx] + response.interval,
@@ -448,7 +446,15 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (items.length === 0) {
       return this.item.metricKey;
     }
-    return items.map((i) => i ?? TimeSeriesConfig.SERIES_LABEL_EMPTY).join(' | ');
+    return items
+      .map((i) => {
+        if (i === '' || i == null) {
+          return TimeSeriesConfig.SERIES_LABEL_EMPTY;
+        } else {
+          return i;
+        }
+      })
+      .join(' | ');
   }
 
   private getSecondAxesLabel(): string | undefined {
@@ -493,9 +499,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;
+    const start = this.context.getSelectedTimeRange().from;
+    const end = this.context.getSelectedTimeRange().to;
+    if (start >= end) {
+      throw new Error(`Invalid time range`);
+    }
     const request: FetchBucketsRequest = {
-      start: this.context.getSelectedTimeRange().from,
-      end: this.context.getSelectedTimeRange().to,
+      start: start,
+      end: end,
       groupDimensions: groupDimensions,
       oqlFilter: oqlFilter,
       percentiles: this.getRequiredPercentiles(),

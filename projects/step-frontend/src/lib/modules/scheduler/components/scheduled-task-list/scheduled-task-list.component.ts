@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, OnInit } from '@angular/core';
+import { Component, forwardRef, inject, OnInit, signal } from '@angular/core';
 import {
   AutoDeselectStrategy,
   ExecutiontTaskParameters,
@@ -14,10 +14,12 @@ import {
   DialogRouteResult,
   DialogsService,
   tableColumnsConfigProvider,
+  AlertType,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
-import { map, of, pipe, switchMap, tap } from 'rxjs';
+import { catchError, map, of, pipe, switchMap, tap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type StatusItem = KeyValue<string, string>;
 
@@ -44,7 +46,7 @@ enum ActiveLabels {
     },
   ],
 })
-export class ScheduledTaskListComponent implements OnInit, DialogParentService {
+export class ScheduledTaskListComponent implements DialogParentService {
   private _auth = inject(AuthService);
   private _dialogs = inject(DialogsService);
   private _schedulerService = inject(AugmentedSchedulerService);
@@ -64,7 +66,13 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
   readonly dataSource = this._schedulerService.createSelectionDataSource();
   readonly returnParentUrl = '/scheduler';
 
-  isSchedulerEnabled: boolean = false;
+  protected isSchedulerDisabled = toSignal(
+    this._schedulerService.isSchedulerEnabled().pipe(
+      map((result) => !result),
+      catchError(() => of(false)),
+    ),
+    { initialValue: false },
+  );
 
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
 
@@ -79,12 +87,6 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
     getValue: (item) => item.key,
     getLabel: (item) => item.value,
   };
-
-  ngOnInit(): void {
-    this._schedulerService.isSchedulerEnabled().subscribe((data) => {
-      this.isSchedulerEnabled = data;
-    });
-  }
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
@@ -131,4 +133,6 @@ export class ScheduledTaskListComponent implements OnInit, DialogParentService {
       )
       .subscribe();
   }
+
+  protected readonly AlertType = AlertType;
 }

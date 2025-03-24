@@ -54,6 +54,8 @@ export class TablePersistenceStateService implements OnDestroy {
     this.externalSearchChangeTrigger$.complete();
   }
 
+  initialize(): void {}
+
   saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
     this.saveSearch(search);
     this.savePage(page);
