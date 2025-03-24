@@ -18,6 +18,10 @@ step-form-field {
   cursor: pointer;
 }
 
+.highlight {
+  background-color: var.$yellow-10;
+}
+
 .step-field-container {
   min-width: 5rem;
   width: auto !important;
