@@ -36,9 +36,9 @@ export class AltExecutionReportComponent {
   protected readonly _state = inject(AltExecutionStateService);
 
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
+  protected readonly _keywordsState = inject(AltKeywordNodesStateService);
+  protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
 
-  protected readonly keywordsSummary$ = inject(AltKeywordNodesStateService).summary$;
-  protected readonly testCasesSummary$ = inject(AltTestCasesNodesStateService).summary$;
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
