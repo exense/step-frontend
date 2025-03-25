@@ -6,6 +6,15 @@
         display: none !important;
       }
 
+      .global-indicator-container div.text {
+        font-family: Roboto;
+      }
+
+      .global-indicator-container__timeout-message {
+        margin-top: 2em;
+        max-width: 400px;
+      }
+
       .global-indicator-container {
           display: flex;
           align-items: center;
@@ -190,12 +199,12 @@
     <rect class="spinner_rCw3" x="8.33" y="15.66" width="7.33" height="7.33"/>
     <rect class="spinner_Rszm" x="15.66" y="15.66" width="7.33" height="7.33"/>
   </svg>
-  <div class="global-indicator-container__message">${initialMessage}</div>
-  <div class="global-indicator-container__fallback-message"></div>
+  <div class="text global-indicator-container__message">${initialMessage}</div>
+  <div class="text global-indicator-container__timeout-message"></div>
 </section>
   `;
 
-  const DEFAULT_TIMEOUT = 60 * 1000;
+  const DEFAULT_TIMEOUT = 30 * 1000;
   const DEFAULT_FALLBACK_MESSAGE =
     `The application is taking longer to load then expected. ` +
     `If you're on a slow connection, you may just need to wait a little longer. Otherwise, try reloading the page ` +
@@ -222,6 +231,7 @@
       switch (name) {
         case 'timeout':
           const timeout = parseInt(newValue as string);
+          console.log('timeout', timeout);
           this.timeout = isNaN(timeout) ? DEFAULT_TIMEOUT : timeout;
           if (this.timerId !== undefined) {
             this.showFallbackMessage();
@@ -249,15 +259,18 @@
         clearTimeout(this.timerId);
       }
       this.timerId = undefined;
-      this.printMessageInDivContainer('.global-indicator-container__fallback-message', '');
+      this.printMessageInDivContainer('.global-indicator-container__timeout-message', '');
+      console.log('this.timeout', this.timeout);
       this.timerId = setTimeout(() => {
-        this.printMessageInDivContainer('.global-indicator-container__fallback-message', this.fallbackMessage);
+        console.log('timed out');
+        this.printMessageInDivContainer('.global-indicator-container__timeout-message', this.fallbackMessage);
         this.timerId = undefined;
       }, this.timeout) as unknown as number;
     }
 
     private printMessageInDivContainer(selector: string, message: string): void {
       const container = this.querySelector<HTMLDivElement>(selector);
+      console.log(selector, container);
       if (!container) {
         return;
       }
@@ -276,7 +289,7 @@
     }
 
     setFallbackMessage(fallbackMessage: string): void {
-      this.indicatorElement?.setAttribute?.('fallback-message', fallbackMessage);
+      this.indicatorElement?.setAttribute?.('timeout-message', fallbackMessage);
     }
 
     setFallbackMessageTimeout(timeout: number): void {

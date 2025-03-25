@@ -67,7 +67,7 @@ const registerPlugins = () => {
       registerMicrofrontendPlugins(Array.from(entryPoints), injector),
       registerOsPlugins(injector),
     ]).then(() => {
-      globalIndicator.showMessage('Starting application...');
+      globalIndicator.showMessage('Starting Step...');
     });
   };
 };
