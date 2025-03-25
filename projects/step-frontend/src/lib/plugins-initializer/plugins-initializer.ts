@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector } from '@angular/core';
 import { MicrofrontendPluginDefinition } from './shared/microfrontend-plugin-definition';
 import { registerMicrofrontendPlugins } from './register-microfrontend-plugins';
-import { PluginInfoRegistryService } from '@exense/step-core';
+import { GLOBAL_INDICATOR, PluginInfoRegistryService } from '@exense/step-core';
 import { registerOsPlugins } from './register-os-plugins';
 
 // For testing purposes only
@@ -41,7 +41,9 @@ const fetchDefinitions = async (): Promise<MicrofrontendPluginDefinition[]> => {
 const registerPlugins = () => {
   const injector = inject(Injector);
   const registry = inject(PluginInfoRegistryService);
+  const globalIndicator = inject(GLOBAL_INDICATOR);
 
+  globalIndicator.showMessage('Loading plugins...');
   return async () => {
     const pluginDefinitions = await fetchDefinitions();
     if (pluginDefinitions.length === 0) {
@@ -60,7 +62,12 @@ const registerPlugins = () => {
 
     registry.register(...pluginNames);
 
-    await Promise.all([registerMicrofrontendPlugins(Array.from(entryPoints), injector), registerOsPlugins(injector)]);
+    await Promise.all([
+      registerMicrofrontendPlugins(Array.from(entryPoints), injector),
+      registerOsPlugins(injector),
+    ]).then(() => {
+      globalIndicator.showMessage('Plugins loaded. Starting the application...');
+    });
   };
 };
 

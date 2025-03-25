@@ -59,6 +59,11 @@
                 "glob": "worker-javascript.js",
                 "input": "node_modules/ace-builds/src-min-noconflict",
                 "output": "/"
+              },
+              {
+                "glob": "global-indicator.js",
+                "input": "dist/step-core/assets",
+                "output": "/"
               }
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],

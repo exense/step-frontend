@@ -1,12 +1,18 @@
 (function () {
   const STYLE = `
     <style>
+
+      step-global-indicator ~ * {
+        display: none !important;
+      }
+
       .global-indicator-container {
           display: flex;
           align-items: center;
-          justify-items: center;
+          justify-content: center;
           flex-direction: column;
           gap: 1rem;
+          height: 90vh;
       }
 
       .global-indicator-container__message {
@@ -185,29 +191,100 @@
     <rect class="spinner_Rszm" x="15.66" y="15.66" width="7.33" height="7.33"/>
   </svg>
   <div class="global-indicator-container__message">${initialMessage}</div>
+  <div class="global-indicator-container__fallback-message"></div>
 </section>
   `;
 
-  class GlobalIndicator extends HTMLElement {
+  const DEFAULT_TIMEOUT = 60 * 1000;
+  const DEFAULT_FALLBACK_MESSAGE =
+    `The application is taking longer to load then expected. ` +
+    `If you're on a slow connection, you may just need to wait a little longer. Otherwise, try reloading the page ` +
+    `(press F5 or the reload button)`;
+
+  class GlobalIndicatorElement extends HTMLElement {
+    static get observedAttributes() {
+      return ['message', 'fallback-message', 'timeout'];
+    }
+
+    private timerId?: number;
+    private timeout = DEFAULT_TIMEOUT;
+    private fallbackMessage = DEFAULT_FALLBACK_MESSAGE;
+
     connectedCallback() {
       const initialMessage = this.getAttribute('message') ?? '';
       this.innerHTML = getHtml(initialMessage);
     }
 
     attributeChangedCallback(name: string, oldValue: unknown, newValue: unknown): void {
-      if (name !== 'message') {
+      if (newValue === oldValue) {
         return;
       }
-      const messageDiv = this.querySelector<HTMLDivElement>('.global-indicator-container__message');
-      if (!messageDiv) {
-        return;
+      switch (name) {
+        case 'timeout':
+          const timeout = parseInt(newValue as string);
+          this.timeout = isNaN(timeout) ? DEFAULT_TIMEOUT : timeout;
+          if (this.timerId !== undefined) {
+            this.showFallbackMessage();
+          }
+          break;
+        case 'fallback-message':
+          this.fallbackMessage = (newValue as string) ?? DEFAULT_FALLBACK_MESSAGE;
+          if (this.timerId !== undefined) {
+            this.showFallbackMessage();
+          }
+          break;
+        case 'message':
+          this.showMessage(newValue as string);
+          break;
       }
-      messageDiv.innerHTML = newValue as string;
     }
 
-    static get observedAttributes() {
-      return ['message'];
+    private showMessage(message: string): void {
+      const messageDiv = this.querySelector<HTMLDivElement>('.global-indicator-container__message');
+      if (!!messageDiv) {
+        messageDiv.innerHTML = message;
+      }
+      this.showFallbackMessage();
+    }
+
+    private showFallbackMessage(): void {
+      if (this.timerId !== undefined) {
+        clearTimeout(this.timerId);
+      }
+      this.timerId = undefined;
+      this.timerId = setTimeout(() => {
+        const fallbackMessageDiv = this.querySelector<HTMLDivElement>('.global-indicator-container__fallback-message');
+        if (!fallbackMessageDiv) {
+          return;
+        }
+        fallbackMessageDiv.innerHTML = this.fallbackMessage;
+        this.timerId = undefined;
+      }, this.timeout) as unknown as number;
     }
   }
-  customElements.define('step-global-indicator', GlobalIndicator);
+  customElements.define('step-global-indicator', GlobalIndicatorElement);
+
+  class GlobalIndicatorImpl {
+    removeIndicator(): void {
+      this.indicatorElement?.remove();
+    }
+
+    showMessage(message: string): void {
+      this.indicatorElement?.setAttribute?.('message', message);
+    }
+
+    setFallbackMessage(fallbackMessage: string): void {
+      this.indicatorElement?.setAttribute?.('fallback-message', fallbackMessage);
+    }
+
+    setFallbackMessageTimeout(timeout: number): void {
+      this.indicatorElement?.setAttribute?.('timeout', timeout.toString());
+    }
+
+    private get indicatorElement(): HTMLElement | null {
+      return document.querySelector('step-global-indicator');
+    }
+  }
+
+  (window as any).globalIndicator = new GlobalIndicatorImpl();
 })();
