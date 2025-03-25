@@ -3,7 +3,9 @@
   "version": "0.2.0",
   "schematics": "./schematics/collection.json",
   "scripts": {
-    "build": "tsc -p tsconfig.schematcis.json",
+    "build:assets": "tsc -p tsconfig.assets.json",
+    "build:schematics": "tsc -p tsconfig.schematcis.json",
+    "build": "npm run build:assets && npm run build:schematics",
     "postbuild": "node copy-schematic-files.js",
     "pack": "",
     "push": "npm publish ../../dist/step-core/*.tgz"
