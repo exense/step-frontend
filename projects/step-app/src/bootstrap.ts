@@ -9,8 +9,8 @@ if (environment.production) {
   enableProdMode();
 }
 
-const globalIndicator: GlobalIndicator = (window as any).globalIndicator;
-globalIndicator.showMessage('Application initialization...');
+const globalIndicator: GlobalIndicator | undefined = (window as any).globalIndicator;
+globalIndicator?.showMessage?.('Initializing application...');
 
 platformBrowserDynamic()
   .bootstrapModule(AppModule)

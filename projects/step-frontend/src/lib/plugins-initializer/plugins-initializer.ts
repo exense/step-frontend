@@ -62,11 +62,12 @@ const registerPlugins = () => {
 
     registry.register(...pluginNames);
 
+    globalIndicator.showMessage('Initializing plugins...');
     await Promise.all([
       registerMicrofrontendPlugins(Array.from(entryPoints), injector),
       registerOsPlugins(injector),
     ]).then(() => {
-      globalIndicator.showMessage('Plugins loaded. Starting the application...');
+      globalIndicator.showMessage('Starting application...');
     });
   };
 };

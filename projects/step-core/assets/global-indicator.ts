@@ -240,10 +240,7 @@
     }
 
     private showMessage(message: string): void {
-      const messageDiv = this.querySelector<HTMLDivElement>('.global-indicator-container__message');
-      if (!!messageDiv) {
-        messageDiv.innerHTML = message;
-      }
+      this.printMessageInDivContainer('.global-indicator-container__message', message);
       this.showFallbackMessage();
     }
 
@@ -252,14 +249,19 @@
         clearTimeout(this.timerId);
       }
       this.timerId = undefined;
+      this.printMessageInDivContainer('.global-indicator-container__fallback-message', '');
       this.timerId = setTimeout(() => {
-        const fallbackMessageDiv = this.querySelector<HTMLDivElement>('.global-indicator-container__fallback-message');
-        if (!fallbackMessageDiv) {
-          return;
-        }
-        fallbackMessageDiv.innerHTML = this.fallbackMessage;
+        this.printMessageInDivContainer('.global-indicator-container__fallback-message', this.fallbackMessage);
         this.timerId = undefined;
       }, this.timeout) as unknown as number;
+    }
+
+    private printMessageInDivContainer(selector: string, message: string): void {
+      const container = this.querySelector<HTMLDivElement>(selector);
+      if (!container) {
+        return;
+      }
+      container.innerHTML = message;
     }
   }
   customElements.define('step-global-indicator', GlobalIndicatorElement);
