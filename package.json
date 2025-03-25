@@ -4,8 +4,8 @@
   "scripts": {
     "ng": "ng",
     "build:core:lib": "ng build @exense/step-core",
-    "build:core:schematics": "cd projects/step-core && npm run build",
-    "build:core": "npm run build:core:lib && npm run build:core:schematics",
+    "build:core:resources": "cd projects/step-core && npm run build",
+    "build:core": "npm run build:core:lib && npm run build:core:resources",
     "build:step-frontend:lib": "ng build @exense/step-frontend",
     "build:step-frontend:resources": "cd projects/step-frontend && npm run copyimages",
     "build:step-frontend": "npm run build:step-frontend:lib && npm run build:step-frontend:resources",
