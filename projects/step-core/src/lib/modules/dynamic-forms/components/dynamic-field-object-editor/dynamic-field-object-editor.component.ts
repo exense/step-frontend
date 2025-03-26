@@ -24,7 +24,7 @@ import {
   JsonFieldUtilsService,
   SchemaObjectField,
 } from '../../../json-forms';
-import { DynamicValuesUtilsService, SimpleValue } from '../../../basics/step-basics.module';
+import { DynamicValuesUtilsService } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-field-object-editor',

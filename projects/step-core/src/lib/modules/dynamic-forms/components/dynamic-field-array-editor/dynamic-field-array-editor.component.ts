@@ -6,7 +6,7 @@ import { DynamicFieldArrayValue } from '../../shared/dynamic-field-group-value';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
 import { v4 } from 'uuid';
 import { JsonFieldMetaData, SchemaField, JsonFieldType, JsonFieldUtilsService } from '../../../json-forms';
-import { DynamicValuesUtilsService } from '@exense/step-core';
+import { DynamicValuesUtilsService } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-field-array-editor',
