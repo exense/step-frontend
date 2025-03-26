@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormGroup, NgForm } from '@angular/forms';
-import { AbstractArtefact, DynamicValueString } from '../../../client/step-client-module';
+import { AbstractArtefact, DynamicValue, DynamicValueString } from '../../../client/step-client-module';
 import { CustomComponent } from '../../custom-registeries/custom-registries.module';
 import { ArtefactFormChangeHelperService, ArtefactContext } from '../../plan-common';
 import { Subscription } from 'rxjs';
-import { ArtefactFieldValue, ArtefactService, SimpleValue } from '../injectables/artefact.service';
+import { DynamicValuesUtilsService, SimpleValue } from '../../basics/step-basics.module';
 
 @Component({
   template: '',
@@ -12,7 +12,7 @@ import { ArtefactFieldValue, ArtefactService, SimpleValue } from '../injectables
 export abstract class BaseArtefactComponent<T extends AbstractArtefact>
   implements CustomComponent, AfterViewInit, OnDestroy
 {
-  private _artefactService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
   protected _artefactFormChangeHelper = inject(ArtefactFormChangeHelperService);
 
   protected abstract form: NgForm | FormGroup;
@@ -35,12 +35,9 @@ export abstract class BaseArtefactComponent<T extends AbstractArtefact>
     this._artefactFormChangeHelper.setupFormBehavior(form, () => this.context.save());
   }
 
-  protected determineEmptyGroup(
-    fields: ArtefactFieldValue[],
-    emptyValues: SimpleValue[] = [undefined, null, '', 0, false],
-  ) {
-    const extractValue = (field: ArtefactFieldValue): SimpleValue => {
-      if (!this._artefactService.isDynamicValue(field)) {
+  protected determineEmptyGroup(fields: DynamicValue[], emptyValues: SimpleValue[] = [undefined, null, '', 0, false]) {
+    const extractValue = (field: DynamicValue): SimpleValue => {
+      if (!this._dynamicValueUtils.isDynamicValue(field)) {
         return field as SimpleValue;
       }
       const dynamicField = field as Omit<DynamicValueString, 'value'> & { value: SimpleValue };

@@ -12,10 +12,9 @@ import {
 import { FormBuilder, NonNullableFormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
-import { DynamicValueString } from '../../../../client/generated';
+import { DynamicValue } from '../../../../client/step-client-module';
 import { DynamicFieldObjectValue } from '../../shared/dynamic-field-group-value';
 import { DYNAMIC_FIELD_VALIDATOR } from '../../shared/dynamic-field-validator';
-import { DynamicValue } from '../../../../client/augmented/models/dynamic-value-complex-types';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
 import {
   JsonFieldMetaData,
@@ -25,8 +24,7 @@ import {
   JsonFieldUtilsService,
   SchemaObjectField,
 } from '../../../json-forms';
-
-const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: false };
+import { DynamicValuesUtilsService, SimpleValue } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-field-object-editor',
@@ -36,6 +34,7 @@ const DEFAULT_FIELD_VALUE: DynamicValueString = { value: undefined, dynamic: fal
 export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
   private _fb = inject(FormBuilder);
   private _utils = inject(JsonFieldUtilsService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
   private terminator$?: Subject<void>;
 
   private readonly formBuilder: NonNullableFormBuilder = this._fb.nonNullable;
@@ -216,7 +215,7 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
 
     // assign required inputs
     this.primaryFields.forEach((field) => {
-      const fieldValue = value[field.key] || { ...DEFAULT_FIELD_VALUE };
+      const fieldValue = value[field.key] ?? this._dynamicValueUtils.createEmptyDynamicValue();
       field.control.setValue(fieldValue);
     });
 
@@ -279,11 +278,9 @@ export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
       throw new Error('Invalid schema');
     }
 
-    const fieldValue: DynamicValue = value[field] || {
-      ...DEFAULT_FIELD_VALUE,
-    };
+    const fieldValue: DynamicValue = value[field] ?? this._dynamicValueUtils.createEmptyDynamicValue();
     if (fieldValue.value === undefined && value[field] === undefined) {
-      fieldValue.value = schema?.properties?.[field]?.default;
+      fieldValue.value = this._utils.getDefaultValueForDynamicModel(schema?.properties?.[field]);
     }
 
     const validator = isRequired ? DYNAMIC_FIELD_VALIDATOR : undefined;
