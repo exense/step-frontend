@@ -42,9 +42,13 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
+  fromDate: DateTime | undefined;
+  toDate: DateTime | undefined;
   fromDateString: string | undefined; // used for formatting the date together with time
-  protected mainPickerLabel: string = '';
   toDateString: string | undefined;
+
+  protected mainPickerLabel: string = '';
+
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   hasFullRangeOption = computed(() => {
@@ -88,11 +92,15 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (!currentValue) {
       return;
     }
-    if (selectionChange.firstChange) {
-      if (currentValue!.type === 'ABSOLUTE') {
-        this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.from));
-        this.toDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.to));
-      }
+    if (currentValue!.type === 'ABSOLUTE') {
+      let fromDate = new Date(currentValue.absoluteSelection!.from);
+      let toDate = new Date(currentValue.absoluteSelection!.to);
+      this.fromDate = DateTime.fromJSDate(fromDate);
+      this.toDate = DateTime.fromJSDate(toDate);
+      this.fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
+      this.toDateString = TimeSeriesUtils.formatInputDate(toDate);
+    } else if (currentValue!.type === 'RELATIVE') {
+      this.cleanupAbsoluteDates();
     }
     if (previousValue && previousValue !== currentValue) {
       this.formatSelectionLabel(currentValue);
@@ -105,6 +113,18 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   cleanupAbsoluteDates() {
     this.fromDateString = '';
     this.toDateString = '';
+    this.toDate = undefined;
+    this.fromDate = undefined;
+  }
+
+  onFromInputLeave() {
+    const inputDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
+    this.fromDate = inputDate ? DateTime.fromJSDate(inputDate) : undefined;
+  }
+
+  onToInputLeave() {
+    const inputDate = TimeSeriesUtils.parseFormattedDate(this.toDateString);
+    this.toDate = inputDate ? DateTime.fromJSDate(inputDate) : undefined;
   }
 
   applyAbsoluteInterval() {
