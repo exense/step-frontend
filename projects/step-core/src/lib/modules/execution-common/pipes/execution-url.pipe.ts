@@ -1,7 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { Execution } from '../../../client/generated';
-import { Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { ExecutionViewModeService } from '../services/execution-view-mode.service';
 
 @Pipe({
@@ -11,9 +10,7 @@ import { ExecutionViewModeService } from '../services/execution-view-mode.servic
 export class ExecutionUrlPipe implements PipeTransform {
   private _executionViewMode = inject(ExecutionViewModeService);
 
-  transform(idOrExecution: string | Execution): Observable<string> {
-    return this._executionViewMode
-      .resolveExecution(idOrExecution)
-      .pipe(switchMap((execution: Execution) => this._executionViewMode.determineUrl(execution)));
+  transform(execution: Execution): Observable<string> {
+    return this._executionViewMode.determineUrl(execution);
   }
 }

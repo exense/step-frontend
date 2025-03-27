@@ -29,6 +29,9 @@ import {
   DialogParentService,
   TreeStateService,
   InfoBannerService,
+  sequenceCanActivateGuards,
+  checkEntityGuardFactory,
+  CommonEntitiesUrlsService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -367,7 +370,24 @@ export class ExecutionModule {
               }
               return { consumed: url };
             },
-            canActivate: [legacyExecutionGuard],
+            canActivate: [
+              sequenceCanActivateGuards([
+                checkEntityGuardFactory({
+                  entityType: 'execution',
+                  idExtractor: (route) => route.url[0].path,
+                  getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
+                }),
+                altExecutionGuard,
+              ]),
+              legacyExecutionGuard,
+            ],
+            canDeactivate: [
+              () => {
+                inject(AugmentedExecutionsService).cleanupCache();
+                return true;
+              },
+            ],
             component: ExecutionProgressComponent,
             children: [schedulePlanRoute('modal')],
           },
@@ -408,7 +428,14 @@ export class ExecutionModule {
         {
           path: ':id',
           canActivate: [
-            altExecutionGuard,
+            sequenceCanActivateGuards([
+              checkEntityGuardFactory({
+                entityType: 'execution',
+                getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
+                getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
+              }),
+              altExecutionGuard,
+            ]),
             (route: ActivatedRouteSnapshot) => {
               const id = route.params['id'];
               inject(ActiveExecutionContextService).setupExecutionId(id);
@@ -439,6 +466,10 @@ export class ExecutionModule {
             AggregatedReportViewTreeStateContextService,
           ],
           canDeactivate: [
+            () => {
+              inject(AugmentedExecutionsService).cleanupCache();
+              return true;
+            },
             () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
             () => inject(AGGREGATED_TREE_WIDGET_STATE).cleanup(),
             () => inject(AltReportNodeDetailsStateService).cleanup(),
