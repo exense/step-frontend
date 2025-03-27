@@ -190,6 +190,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
+  // readonly updateFullTimeRangeSelection = this.execution$.subscribe(execution => {
+  //   console.log('execution change', execution);
+  //   this.timeRangeOptions[0] = {type: 'FULL', absoluteSelection: {from: execution.startTime!, to: execution.endTime!}};
+  // });
+
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
     .subscribe((activeExecution) => {
@@ -486,6 +491,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           );
           selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
         }
+      } else if (selection.type === 'FULL') {
+        selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
       }
       this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
     });

@@ -1,5 +1,11 @@
 <div>
-  <div class="range-btn grey-border" [matMenuTriggerFor]="menu" [class.compact-btn]="compact">
+  <div
+    class="range-btn grey-border"
+    [matMenuTriggerFor]="menu"
+    [class.compact-btn]="compact"
+    (menuClosed)="handleMenuClose()"
+    (menuOpened)="handleMenuOpen()"
+  >
     @if (compact) {
       <step-icon name="clock" />
     } @else {
@@ -21,7 +27,7 @@
           <div class="bottom-gap">
             <step-form-field>
               <step-label>From</step-label>
-              <input type="text" [(ngModel)]="fromDateString" (blur)="onFromInputLeave()" />
+              <input type="text" [(ngModel)]="fromDateString" (blur)="onFromInputLeave()" (focus)="lockInputs()" />
               <step-suffix class="icon-suffix">
                 <step-icon name="calendar" (click)="fromPicker.open()"></step-icon>
               </step-suffix>
@@ -37,7 +43,7 @@
           <div class="bottom-gap">
             <step-form-field>
               <step-label>To</step-label>
-              <input type="text" [(ngModel)]="toDateString" (blur)="onToInputLeave()" />
+              <input type="text" [(ngModel)]="toDateString" (blur)="onToInputLeave()" (focus)="lockInputs()" />
               <step-suffix class="icon-suffix">
                 <step-icon name="calendar" (click)="toPicker.open()"></step-icon>
               </step-suffix>

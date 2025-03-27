@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   EventEmitter,
   inject,
   input,
@@ -17,6 +18,7 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
+import { TimeRange } from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -36,11 +38,31 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   @Input() activeSelection!: TimeRangePickerSelection;
   selectOptions = input.required<TimeRangePickerSelection[]>();
+  activeTimeRange = input<TimeRange>(); // represent the time-range that should be displayed in the inputs
   @Input() initialSelectionIndex: number | undefined;
   @Input() compact = false;
   @Input() fullRangeLabel?: string; // used to override the "Full Selection" default label
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
+
+  // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
+  dateTimeInputsLocked = false;
+
+  timeRangeInputsSyncEffect = effect(() => {
+    const timeRange = this.activeTimeRange();
+    if (!this.dateTimeInputsLocked) {
+      this.fillInputs(timeRange);
+    }
+  });
+
+  fillInputs(range?: TimeRange) {
+    if (range) {
+      this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(range.from));
+      this.toDateString = TimeSeriesUtils.formatInputDate(new Date(range.to));
+      this.fromDate = DateTime.fromMillis(range.from);
+      this.toDate = DateTime.fromMillis(range.to);
+    }
+  }
 
   fromDate: DateTime | undefined;
   toDate: DateTime | undefined;
@@ -54,6 +76,19 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   hasFullRangeOption = computed(() => {
     return this.selectOptions().some((option) => option.type === 'FULL');
   });
+
+  handleMenuClose() {
+    this.dateTimeInputsLocked = false;
+  }
+
+  handleMenuOpen() {
+    // make sure fresh data is displayed
+    this.fillInputs(this.activeTimeRange());
+  }
+
+  lockInputs() {
+    this.dateTimeInputsLocked = true;
+  }
 
   ngOnInit(): void {
     if (!this.selectOptions()) {
@@ -92,39 +127,44 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     if (!currentValue) {
       return;
     }
-    if (currentValue!.type === 'ABSOLUTE') {
-      let fromDate = new Date(currentValue.absoluteSelection!.from);
-      let toDate = new Date(currentValue.absoluteSelection!.to);
-      this.fromDate = DateTime.fromJSDate(fromDate);
-      this.toDate = DateTime.fromJSDate(toDate);
-      this.fromDateString = TimeSeriesUtils.formatInputDate(fromDate);
-      this.toDateString = TimeSeriesUtils.formatInputDate(toDate);
-    } else if (currentValue!.type === 'RELATIVE') {
-      this.cleanupAbsoluteDates();
-    }
     if (previousValue && previousValue !== currentValue) {
       this.formatSelectionLabel(currentValue);
-      if (currentValue.type !== 'ABSOLUTE' && currentValue.type !== previousValue?.type) {
-        this.cleanupAbsoluteDates();
-      }
     }
-  }
-
-  cleanupAbsoluteDates() {
-    this.fromDateString = '';
-    this.toDateString = '';
-    this.toDate = undefined;
-    this.fromDate = undefined;
   }
 
   onFromInputLeave() {
     const inputDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
-    this.fromDate = inputDate ? DateTime.fromJSDate(inputDate) : undefined;
+
+    if (inputDate) {
+      this.fromDate = DateTime.fromJSDate(inputDate);
+    } else {
+      // invalid date
+      if (this.activeTimeRange()) {
+        const from: number = this.activeTimeRange()!.from;
+        this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(from));
+        this.fromDate = DateTime.fromMillis(from);
+      } else {
+        this.fromDate = undefined;
+        this.fromDateString = '';
+      }
+    }
   }
 
   onToInputLeave() {
     const inputDate = TimeSeriesUtils.parseFormattedDate(this.toDateString);
-    this.toDate = inputDate ? DateTime.fromJSDate(inputDate) : undefined;
+    if (inputDate) {
+      this.toDate = DateTime.fromJSDate(inputDate);
+    } else {
+      // invalid date
+      if (this.activeTimeRange()) {
+        const to: number = this.activeTimeRange()!.to;
+        this.toDateString = TimeSeriesUtils.formatInputDate(new Date(to));
+        this.toDate = DateTime.fromMillis(to);
+      } else {
+        this.toDate = undefined;
+        this.toDateString = '';
+      }
+    }
   }
 
   applyAbsoluteInterval() {
@@ -178,14 +218,21 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   }
 
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
-    this.fromDateString = undefined;
-    this.toDateString = undefined;
-    if (
-      option.type === 'RELATIVE' &&
-      this.activeSelection.type === 'RELATIVE' &&
-      this.activeSelection.relativeSelection!.timeInMs === option.relativeSelection!.timeInMs
-    ) {
-      return;
+    if (option.type === 'RELATIVE') {
+      if (option.relativeSelection!.timeInMs === this.activeSelection?.relativeSelection?.timeInMs) {
+        return;
+      }
+    } else if (option.type === 'FULL') {
+      const selectionFrom = option.absoluteSelection?.from;
+      const selectionTo = option.absoluteSelection?.to;
+      if (selectionFrom) {
+        // this.fromDate = DateTime.fromMillis(selectionFrom!);
+        // this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(selectionFrom!));
+      }
+      if (selectionTo) {
+        // this.toDate = DateTime.fromMillis(selectionTo!);
+        // this.toDateString = TimeSeriesUtils.formatInputDate(new Date(selectionTo!));
+      }
     }
     this.emitSelectionChange(option);
   }
