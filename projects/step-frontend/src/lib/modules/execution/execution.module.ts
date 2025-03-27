@@ -374,6 +374,7 @@ export class ExecutionModule {
               sequenceCanActivateGuards([
                 checkEntityGuardFactory({
                   entityType: 'execution',
+                  idExtractor: (route) => route.url[0].path,
                   getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
                 }),

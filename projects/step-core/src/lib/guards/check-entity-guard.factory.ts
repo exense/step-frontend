@@ -10,6 +10,7 @@ type EntityEditLink = Parameters<MultipleProjectsService['confirmEntityEditInASe
 export interface CheckProjectGuardConfig {
   entityType: string;
   idParameterName?: string;
+  idExtractor?: (route: ActivatedRouteSnapshot) => string;
   getEditorUrl: (id: string, route: ActivatedRouteSnapshot) => EntityEditLink;
   getEntity: (id: string) => Observable<unknown>;
 }
@@ -23,7 +24,7 @@ export const checkEntityGuardFactory =
     const _injector = inject(Injector);
 
     const idParameterName = config.idParameterName ?? 'id';
-    const id = route.params[idParameterName];
+    const id = config.idExtractor ? config.idExtractor(route) : route.params[idParameterName];
 
     if (!id) {
       return false;
