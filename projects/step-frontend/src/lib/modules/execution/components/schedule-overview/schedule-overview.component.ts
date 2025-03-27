@@ -229,26 +229,22 @@ export class ScheduleOverviewComponent {
     if (executions.length === 0) {
       this.keywordsChartSettings = this.createKeywordsChart([], []);
     } else {
-      const executionsIdsJoined = executions.map((e) => `attributes.eId = ${e.id!}`).join(' or ');
-      let oqlFilter = 'attributes.metricType = response-time and attributes.type = keyword';
-      if (executionsIdsJoined) {
-        oqlFilter += ` and (${executionsIdsJoined})`;
-      }
+      const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
         numberOfBuckets: 1,
-        oqlFilter: oqlFilter,
-        groupDimensions: ['eId', 'rnStatus'],
+        oqlFilter: executionsIdsJoined,
+        groupDimensions: ['executionId', 'status'],
       };
 
-      this._timeSeriesService.getTimeSeries(request).subscribe((timeSeriesResponse) => {
+      this._timeSeriesService.getReportNodesTimeSeries(request).subscribe((timeSeriesResponse) => {
         this.lastKeywordsExecutions = executions;
-        const statusAttribute = 'rnStatus';
+        const statusAttribute = 'status';
         let executionStats: Record<string, EntityWithKeywordsStats> = {};
         const allStatuses = new Set<string>();
         timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-          const executionId = attributes['eId'];
+          const executionId = attributes['executionId'];
           const status = attributes[statusAttribute];
           allStatuses.add(status);
           let executionEntry: EntityWithKeywordsStats = {
