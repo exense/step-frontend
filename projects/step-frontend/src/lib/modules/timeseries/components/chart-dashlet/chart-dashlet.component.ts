@@ -294,6 +294,24 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       const seriesKey = this.mergeLabelItems(labelItems);
       const stroke: SeriesStroke = this.getSeriesStroke(seriesKey, primaryAxes);
 
+      if (removeChartGaps) {
+        let lastBucketValue: BucketResponse | undefined;
+        response.matrix[i].forEach((b: BucketResponse, j: number) => {
+          if (b) {
+            if (b.sum === 0) {
+              lastBucketValue = undefined;
+            } else {
+              lastBucketValue = b;
+            }
+          } else {
+            // empty bucket
+            if (lastBucketValue) {
+              response.matrix[i][j] = lastBucketValue;
+            }
+          }
+        });
+      }
+
       if (hasExecutionLinks || hasSecondaryAxes) {
         response.matrix[i].forEach((b: BucketResponse, j: number) => {
           metadata.push(b?.attributes);
@@ -465,7 +483,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
       case ChartAggregation.PERCENTILE:
         return 'Overall PCL ' + aggregation.params?.['pclValue'];
       default:
-        return 'Overall ' + aggregation;
+        return 'Overall ' + aggregation?.type;
     }
   }
 
