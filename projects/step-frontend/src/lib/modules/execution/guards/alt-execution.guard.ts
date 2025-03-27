@@ -1,10 +1,11 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { map, switchMap, tap } from 'rxjs';
-import { ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
+import { AugmentedExecutionsService, ExecutionViewMode, ExecutionViewModeService } from '@exense/step-core';
 
 export const altExecutionGuard: CanActivateFn = (route, state) => {
   const _router = inject(Router);
+  const _executionService = inject(AugmentedExecutionsService);
   const _executionViewMode = inject(ExecutionViewModeService);
 
   let executionId: string;
@@ -18,7 +19,7 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  return _executionViewMode.resolveExecution(executionId).pipe(
+  return _executionService.getExecutionByIdCached(executionId).pipe(
     switchMap((execution) => _executionViewMode.getExecutionMode(execution)),
     map((mode) => {
       if (mode === ExecutionViewMode.NEW) {
