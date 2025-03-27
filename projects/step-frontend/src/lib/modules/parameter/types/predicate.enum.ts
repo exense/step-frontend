@@ -1,4 +1,4 @@
-export enum PREDICATE {
+export enum Predicate {
   EQUALS = 'equals',
   NOT_EQUALS = 'not_equals',
   MATCHES = 'matches',

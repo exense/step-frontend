@@ -20,29 +20,14 @@ const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
   styleUrl: './rich-editor-settings-bar.component.scss',
 })
 export class RichEditorSettingsBarComponent {
-  /** @Input() **/
-  allowedModes = input<AceMode[] | undefined>(undefined);
-
-  /** @Input() **/
-  predefinedMode = input<AceMode | undefined>(undefined);
-
-  /** @Input() **/
-  showAutoFormatBtn = input(false);
-
-  /** @Input() **/
-  showSaveBtn = input(false);
-
-  /** @Input() **/
-  saveBtnTooltip = input('Save');
-
-  /** @Output() **/
-  modeChanged = output<AceMode>();
-
-  /** @Output() **/
-  save = output();
-
-  /** @Output() **/
-  autoFormat = output();
+  readonly allowedModes = input<AceMode[] | undefined>(undefined);
+  readonly predefinedMode = input<AceMode | undefined>(undefined);
+  readonly showAutoFormatBtn = input(false);
+  readonly showSaveBtn = input(false);
+  readonly saveBtnTooltip = input('Save');
+  readonly modeChanged = output<AceMode>();
+  readonly save = output();
+  readonly autoFormat = output();
 
   protected displayModes = computed<KeyValue<AceMode, string>[]>(() => {
     const predefinedMode = this.predefinedMode();

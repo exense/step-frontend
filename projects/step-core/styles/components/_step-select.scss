@@ -1,0 +1,21 @@
+@use '../core-variables' as var;
+
+@mixin step-select-clear-value {
+  .mat-mdc-option.step-select-clear-value {
+    text-decoration: underline;
+    font-style: italic;
+    min-height: 3rem;
+    font-size: 1.4rem;
+    justify-content: flex-end;
+    mat-pseudo-checkbox {
+      display: none;
+      pointer-events: none;
+    }
+    .mdc-list-item__primary-text {
+      margin-right: 0;
+      pointer-events: none;
+      color: var.$blue-650 !important;
+      padding-right: 0.5rem;
+    }
+  }
+}

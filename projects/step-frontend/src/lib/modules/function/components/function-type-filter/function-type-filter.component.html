@@ -1,18 +1,8 @@
-<step-form-field [matTooltip]="(invalidFilterMessage$ | async)!">
-  <mat-select [formControl]="filterControl" multiple>
-    <mat-option>
-      <ngx-mat-select-search
-        [formControl]="filterMultiControl"
-        placeholderLabel="Search..."
-        noEntriesFoundLabel="No matching entries found"
-      >
-        <step-icon name="trash-2" ngxMatSelectSearchClear></step-icon>
-      </ngx-mat-select-search>
-    </mat-option>
-    @for (item of functionTypesFiltered; track item.type) {
-      <mat-option [value]="item.type">
-        {{ item.label }}
-      </mat-option>
-    }
-  </mat-select>
+<step-form-field [matTooltip]="invalidFilterMessage()">
+  <step-select
+    [formControl]="filterControl"
+    [multiple]="true"
+    [items]="_functionTypes"
+    [extractor]="functionTypeExtractor"
+  />
 </step-form-field>

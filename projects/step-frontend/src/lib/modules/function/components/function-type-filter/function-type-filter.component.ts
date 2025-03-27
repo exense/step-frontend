@@ -1,8 +1,11 @@
-import { AfterViewInit, Component, forwardRef, inject } from '@angular/core';
-import { ArrayFilterComponent, BaseFilterComponent, FunctionTypeRegistryService, ItemInfo } from '@exense/step-core';
-import { FormControl } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { Component, forwardRef, inject } from '@angular/core';
+import {
+  ArrayFilterComponent,
+  ArrayItemLabelValueExtractor,
+  BaseFilterComponent,
+  FunctionTypeRegistryService,
+  ItemInfo,
+} from '@exense/step-core';
 
 @Component({
   selector: 'step-function-type-filter',
@@ -16,27 +19,13 @@ import { map } from 'rxjs';
   ],
 })
 export class FunctionTypeFilterComponent
-  extends ArrayFilterComponent
-  implements AfterViewInit, BaseFilterComponent<string, unknown>
+  extends ArrayFilterComponent<ItemInfo>
+  implements BaseFilterComponent<string, unknown>
 {
-  readonly _functionTypes = inject(FunctionTypeRegistryService).getItemInfos();
-  filterMultiControl: FormControl<string | null> = new FormControl<string>('');
-  functionTypesFiltered: ItemInfo[] = [...this._functionTypes];
+  protected readonly _functionTypes = inject(FunctionTypeRegistryService).getItemInfos();
 
-  ngAfterViewInit(): void {
-    this.functionTypesFiltered = [...this._functionTypes];
-    this.filterMultiControl.valueChanges
-      .pipe(
-        map((value) => value?.toLowerCase()),
-        map((value) =>
-          value
-            ? this._functionTypes.filter((item) => item.label.toLowerCase().includes(value))
-            : [...this._functionTypes],
-        ),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe((displayItemsFiltered) => {
-        this.functionTypesFiltered = displayItemsFiltered;
-      });
-  }
+  protected readonly functionTypeExtractor: ArrayItemLabelValueExtractor<ItemInfo, string> = {
+    getLabel: (item: ItemInfo) => item.label,
+    getValue: (item: ItemInfo) => item.type,
+  };
 }

@@ -85,6 +85,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     ElementResizeDirective,
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
+    SelectComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -148,7 +149,6 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     BigNumberPipe,
     BooleanFilterComponent,
     StatusIconPipe,
-    SelectComponent,
     SelectExtraOptionsDirective,
     ShortenNumberPipe,
     DynamicInputWidthDirective,
@@ -326,6 +326,7 @@ export * from './types/step-route-additional-config';
 export * from './directives/popover-content.directive';
 export * from './directives/trigger-popover.directive';
 export * from './directives/input-model-formatter.directive';
+export * from './directives/select-clear-value.directive';
 export * from './components/popover/popover.component';
 export * from './pipes/safe-html.pipe';
 export * from './pipes/duration.pipe';
@@ -357,3 +358,5 @@ export * from './directives/dynamic-input-width.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';
 export * from './pipes/truncate-string.pipe';
+export * from './injectables/array-item-label-value-default-extractor.service';
+export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';

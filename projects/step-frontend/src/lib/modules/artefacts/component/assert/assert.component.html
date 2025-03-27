@@ -9,11 +9,14 @@
   </step-dynamic-textfield>
   <step-form-field>
     <step-label>Operator</step-label>
-    <mat-select #operator [(ngModel)]="context.artefact!.operator" [disabled]="context.readonly" name="operator">
-      <mat-option *ngFor="let item of operatorTypes; trackBy: trackByOperatorType" [value]="item.key">
-        {{ item.value }}
-      </mat-option>
-    </mat-select>
+    <step-select
+      #operator
+      [(ngModel)]="context.artefact!.operator"
+      [disabled]="context.readonly"
+      name="operator"
+      [items]="operatorTypes"
+      clearLabel="unset"
+    />
   </step-form-field>
   <step-dynamic-textfield
     label="Expected value"

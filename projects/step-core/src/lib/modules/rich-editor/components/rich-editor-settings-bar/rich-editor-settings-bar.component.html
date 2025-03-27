@@ -19,9 +19,10 @@
       </button>
     </step-prefix>
   }
-  <mat-select [(ngModel)]="selectedMode" [disabled]="displayModes().length <= 1">
-    @for (mode of displayModes(); track mode.key) {
-      <mat-option [value]="mode.key">{{ mode.value }}</mat-option>
-    }
-  </mat-select>
+  <step-select
+    [(ngModel)]="selectedMode"
+    [disabled]="displayModes().length <= 1"
+    [items]="displayModes()"
+    [useClear]="false"
+  />
 </step-form-field>

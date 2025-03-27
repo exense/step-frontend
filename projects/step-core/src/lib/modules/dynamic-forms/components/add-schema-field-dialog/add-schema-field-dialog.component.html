@@ -6,12 +6,7 @@
     </step-form-field>
     <step-form-field [showRequiredMarker]="true">
       <step-label>Field type</step-label>
-      <mat-select formControlName="fieldType">
-        <mat-option [value]="undefined"></mat-option>
-        @for (item of typeItems; track item) {
-          <mat-option [value]="item">{{ item }}</mat-option>
-        }
-      </mat-select>
+      <step-select formControlName="fieldType" [items]="typeItems" clearLabel="unset" />
     </step-form-field>
     <step-form-field>
       <step-label>Is required</step-label>

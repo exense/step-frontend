@@ -10,7 +10,7 @@ import {
 import { RenderOptionsPipe } from '../../pipes/render-options.pipe';
 import { filter, map, of, switchMap, take } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-screen-configuration-list',
@@ -32,7 +32,10 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
   private _multipleProjectList = inject(MultipleProjectsService);
   private _router = inject(Router);
 
-  readonly screenChoicesRequest$ = this._activatedRoute.data.pipe(map((data) => data['availableScreens']));
+  protected readonly screenChoicesRequest = toSignal(
+    this._activatedRoute.data.pipe(map((data) => data['availableScreens'] as string[])),
+    { initialValue: [] },
+  );
 
   protected currentlySelectedScreenChoice?: string;
 
