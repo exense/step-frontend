@@ -13,8 +13,9 @@
 }
 
 step-status {
+  .status-PROVISIONING step-icon,
   .status-RUNNING step-icon {
-    animation: rotate-icon 2s linear infinite;
+    animation: rotate-icon 4s linear infinite;
   }
 
   @keyframes rotate-icon {

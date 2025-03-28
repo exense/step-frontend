@@ -59,26 +59,38 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return throwError(() => error);
   }
 
-  private parseHttpError(error: HttpErrorResponse): string {
-    let jsonError: any = error.error || error;
-    if (typeof jsonError === 'string' && error.headers.get('Content-Type')?.includes('application/json')) {
-      try {
-        jsonError = JSON.parse(jsonError);
-      } catch (e) {
-        console.log('Error parsing JSON response', e);
-      }
+  private parseHttpError(error?: HttpErrorResponse | string): string {
+    let jsonError: any;
+
+    if (typeof error === 'string') {
+      jsonError = this.parseJson(error);
+    } else if (error && error.headers.get('Content-Type')?.includes('application/json')) {
+      jsonError = this.parseJson(error.error);
     }
 
     if (jsonError?.errorMessage) {
       return jsonError.errorMessage;
     }
-    if (error.name && error.message) {
+    if (error && error instanceof HttpErrorResponse && error.name && error.message) {
       return `${error.name}: ${error.message}`;
     }
     if (jsonError) {
       return JSON.stringify(jsonError);
     }
+    if (typeof error === 'string') {
+      return error;
+    }
     return 'Unknown HTTP error';
+  }
+
+  private parseJson(jsonString: string): any {
+    let result: any = undefined;
+    try {
+      result = JSON.parse(jsonString);
+    } catch (e) {
+      console.log('Error parsing JSON response', e);
+    }
+    return result;
   }
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {

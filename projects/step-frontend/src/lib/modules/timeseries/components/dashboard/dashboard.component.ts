@@ -54,7 +54,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -186,27 +186,31 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         this.transformTimePickerSelectionIntoDashboardSettings(urlParams.timeRange!, urlParams),
       );
     }
-    const context = existingContext || this.createContext(this.dashboard, urlParams, existingContext);
-    this.resolution = context.getChartsResolution();
-    this.refreshInterval = context.getRefreshInterval();
-    const state: DashboardState = {
-      context: context,
-      getFilterBar: () => this.filterBar!,
-      getDashlets: () => this.dashlets,
-      refreshInProgress: false,
-    };
-    this.mainEngine = new DashboardStateEngine(state);
-    this.mainEngine.subscribeForContextChange();
+    const context$: Observable<TimeSeriesContext> = existingContext
+      ? of(existingContext)
+      : this.createContext(this.dashboard, urlParams, existingContext);
+    context$.subscribe((context) => {
+      this.resolution = context.getChartsResolution();
+      this.refreshInterval = context.getRefreshInterval();
+      const state: DashboardState = {
+        context: context,
+        getFilterBar: () => this.filterBar!,
+        getDashlets: () => this.dashlets,
+        refreshInProgress: false,
+      };
+      this.mainEngine = new DashboardStateEngine(state);
+      this.mainEngine.subscribeForContextChange();
 
-    this.updateUrl();
-    context.stateChange$.subscribe((stateChanged) => {
       this.updateUrl();
+      context.stateChange$.subscribe((stateChanged) => {
+        this.updateUrl();
+      });
+      // notify the outside regarding the time picker selection
+      context.onTimePickerOptionChange().subscribe((selection) => this.timeRangeChange.next(selection));
+      if (urlParams.editMode && this.hasWritePermission && this.editable) {
+        this.enableEditMode();
+      }
     });
-    // notify the outside regarding the time picker selection
-    context.onTimePickerOptionChange().subscribe((selection) => this.timeRangeChange.next(selection));
-    if (urlParams.editMode && this.hasWritePermission && this.editable) {
-      this.enableEditMode();
-    }
   }
 
   public refresh() {
@@ -463,7 +467,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     dashboard: DashboardView,
     urlParams: DashboardUrlParams,
     existingContext?: TimeSeriesContext,
-  ): TimeSeriesContext {
+  ): Observable<TimeSeriesContext> {
     const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
       dashboard,
@@ -479,26 +483,29 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       dashboard.filters,
       this.hiddenFilters,
     );
-    this.fetchFilterEntities(visibleFilters);
-    return this._timeSeriesContextFactory.createContext(
-      {
-        id: dashboard.id!,
-        dashlets: this.dashboard.dashlets,
-        timeRangeSettings: timeRangeSettings,
-        selectedTimeRange: urlParams.selectedTimeRange,
-        attributes: metricAttributes,
-        grouping: urlParams.grouping || dashboard.grouping || [],
-        filteringSettings: {
-          mode: TsFilteringMode.STANDARD,
-          filterItems: visibleFilters,
-          hiddenFilters: this.hiddenFilters,
-        },
-        resolution: this.resolution,
-        metrics: this.metricTypes,
-        refreshInterval:
-          urlParams.refreshInterval !== undefined ? urlParams.refreshInterval : this.dashboard.refreshInterval,
-      },
-      this.storageId,
+    return this.fetchFilterEntities(visibleFilters).pipe(
+      map((empty) => {
+        return this._timeSeriesContextFactory.createContext(
+          {
+            id: dashboard.id!,
+            dashlets: this.dashboard.dashlets,
+            timeRangeSettings: timeRangeSettings,
+            selectedTimeRange: urlParams.selectedTimeRange,
+            attributes: metricAttributes,
+            grouping: urlParams.grouping || dashboard.grouping || [],
+            filteringSettings: {
+              mode: TsFilteringMode.STANDARD,
+              filterItems: visibleFilters,
+              hiddenFilters: this.hiddenFilters,
+            },
+            resolution: this.resolution,
+            metrics: this.metricTypes,
+            refreshInterval:
+              urlParams.refreshInterval !== undefined ? urlParams.refreshInterval : this.dashboard.refreshInterval,
+          },
+          this.storageId,
+        );
+      }),
     );
   }
 
@@ -526,7 +533,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     return visibleFilters;
   }
 
-  private fetchFilterEntities(items: FilterBarItem[]): void {
+  private fetchFilterEntities(items: FilterBarItem[]): Observable<any> {
     const entitiesByAttributes: Record<string, string[]> = {};
     const entityFilterItems = items.filter((item) => item.searchEntities?.length);
     entityFilterItems.forEach((item) => {
@@ -538,16 +545,21 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
     });
-    this.fetchAllEntities(entitiesByAttributes).subscribe((indexedEntities) => {
-      entityFilterItems.forEach((item) => {
-        const entitiesByType = indexedEntities[item.attributeName];
-        item.searchEntities.forEach((entity) => {
-          if (entity.searchValue && !entity.entity) {
-            entity.entity = entitiesByType[entity.searchValue];
-          }
+    if (entityFilterItems.length === 0) {
+      return of(undefined);
+    }
+    return this.fetchAllEntities(entitiesByAttributes).pipe(
+      tap((indexedEntities) => {
+        entityFilterItems.forEach((item) => {
+          const entitiesByType = indexedEntities[item.attributeName];
+          item.searchEntities.forEach((entity) => {
+            if (entity.searchValue && !entity.entity) {
+              entity.entity = entitiesByType[entity.searchValue];
+            }
+          });
         });
-      });
-    });
+      }),
+    );
   }
 
   /**

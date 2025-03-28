@@ -166,12 +166,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
   ];
 
-  protected readonly executionTooltips: ExecutionActionsTooltips = {
-    simulate: 'Relaunch execution in simulation mode',
-    execute: 'Relaunch execution with same parameters',
-    schedule: 'Schedule for cyclical execution',
-  };
-
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
 
   private isTreeInitialized = false;
