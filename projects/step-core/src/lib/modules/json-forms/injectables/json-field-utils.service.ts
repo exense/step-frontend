@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { JsonFieldType } from '../types/json-field-type.enum';
 import { SchemaField, SchemaSimpleField } from '../types/json-field-schema';
+import { DynamicValuesUtilsService } from '../../basics/step-basics.module';
+import { DynamicValue } from '../../../client/augmented/models/dynamic-value-complex-types';
 
 interface FieldMetaParameters {
   fieldSchema?: SchemaField;
@@ -13,6 +15,8 @@ interface FieldMetaParameters {
   providedIn: 'root',
 })
 export class JsonFieldUtilsService {
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
+
   determineFieldMetaParameters(fieldDescription: SchemaField = {}): FieldMetaParameters {
     let fieldSchema: SchemaField | undefined;
     let fieldType: JsonFieldType | undefined;
@@ -102,5 +106,29 @@ export class JsonFieldUtilsService {
       }
     }
     return true;
+  }
+
+  getDefaultValueForDynamicModel(field?: SchemaField): DynamicValue['value'] {
+    if (!field || !field.default) {
+      return undefined;
+    }
+
+    if (field.type === 'array') {
+      const items = field.default as (string | number | boolean)[];
+      return items.map((item) => this._dynamicValueUtils.convertSimpleValueToDynamicValue(item));
+    }
+
+    if (field.type === 'object') {
+      const objContainer = field.default as Record<string, string | number | boolean>;
+      return Object.entries(objContainer).reduce(
+        (res, [key, value]) => {
+          res[key] = this._dynamicValueUtils.convertSimpleValueToDynamicValue(value);
+          return res;
+        },
+        {} as Record<string, DynamicValue>,
+      );
+    }
+
+    return field.default;
   }
 }

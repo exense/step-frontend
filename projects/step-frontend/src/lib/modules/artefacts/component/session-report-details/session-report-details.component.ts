@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactFieldValue,
-  ArtefactService,
   BaseReportDetailsComponent,
   DynamicValueString,
+  DynamicValuesUtilsService,
   ReportNodeWithArtefact,
+  SimpleOrDynamicValue,
 } from '@exense/step-core';
 import { SessionArtefact } from '../../types/session.artefact';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'step-session-report-details',
@@ -19,7 +18,7 @@ import { DOCUMENT } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SessionReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SessionArtefact>> {
-  private _artefactService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
   protected items = computed(() => {
     let result: Record<string, unknown> | undefined = undefined;
@@ -32,8 +31,10 @@ export class SessionReportDetailsComponent extends BaseReportDetailsComponent<Re
       if (Object.keys(json).length) {
         result = Object.entries(json).reduce(
           (res, [key, value]) => {
-            const isDynamic = this._artefactService.isDynamicValue(value as ArtefactFieldValue);
-            res[key] = isDynamic ? this._artefactService.convertDynamicValue(value as DynamicValueString) : value;
+            const isDynamic = this._dynamicValueUtils.isDynamicValue(value as SimpleOrDynamicValue);
+            res[key] = isDynamic
+              ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
+              : value;
             return res;
           },
           {} as Record<string, unknown>,

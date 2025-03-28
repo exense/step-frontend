@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import {
-  ArtefactService,
   BaseReportDetailsComponent,
+  DynamicValuesUtilsService,
   JsonParserIconDictionaryConfig,
   ReportNodeWithArtefact,
 } from '@exense/step-core';
@@ -18,7 +18,7 @@ import { CallPlanArtefact } from '../../types/call-plan.artefact';
 export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<CallPlanArtefact>
 > {
-  private _artefactsService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
   private artefact = computed(() => this.node()?.resolvedArtefact);
 
   protected readonly searchCriteria = computed(() => {
@@ -46,8 +46,8 @@ export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
       const json = JSON.parse(artefact.input.value);
       if (Object.keys(json).length) {
         Object.keys(json).forEach((key) => {
-          if (this._artefactsService.isDynamicValue(json[key])) {
-            json[key] = this._artefactsService.convertDynamicValue(json[key]);
+          if (this._dynamicValueUtils.isDynamicValue(json[key])) {
+            json[key] = this._dynamicValueUtils.convertDynamicValueToSimpleValue(json[key]);
           }
         });
         result = json;

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
-  ArtefactFieldValue,
-  ArtefactService,
   BaseReportDetailsComponent,
   DynamicValueString,
+  DynamicValuesUtilsService,
   JsonParserIconDictionaryConfig,
   ReportNodeWithArtefact,
+  SimpleOrDynamicValue,
 } from '@exense/step-core';
 import { ReturnArtefact } from '../../types/return.artefact';
 
@@ -19,7 +19,7 @@ import { ReturnArtefact } from '../../types/return.artefact';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ReturnArtefact>> {
-  private _artefactService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
   protected outputItems = computed(() => {
     const artefact = this.node()?.resolvedArtefact;
@@ -32,8 +32,10 @@ export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<Rep
       if (Object.keys(json).length) {
         result = Object.entries(json).reduce(
           (res, [key, value]) => {
-            const isDynamic = this._artefactService.isDynamicValue(value as ArtefactFieldValue);
-            res[key] = isDynamic ? this._artefactService.convertDynamicValue(value as DynamicValueString) : value;
+            const isDynamic = this._dynamicValueUtils.isDynamicValue(value as SimpleOrDynamicValue);
+            res[key] = isDynamic
+              ? this._dynamicValueUtils.convertDynamicValueToSimpleValue(value as DynamicValueString)
+              : value;
             return res;
           },
           {} as Record<string, unknown>,
