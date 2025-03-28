@@ -1,8 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { DynamicValueBoolean, DynamicValueInteger, DynamicValueString } from '../../../client/step-client-module';
 import { ArtefactInlineItem, ArtefactInlineItemsResolvableField } from '../types/artefact-inline-item';
-import { ArtefactService } from './artefact.service';
-import { TimeUnitDictKey } from '../../basics/types/time-unit.enum';
+import { TimeUnitDictKey, DynamicValuesUtilsService } from '../../basics/step-basics.module';
 
 type DynamicValue = DynamicValueString | DynamicValueInteger | DynamicValueBoolean;
 type PossibleValue = string | number | boolean | DynamicValue | undefined;
@@ -33,7 +32,7 @@ export type ArtefactInlineItemSource = (
   providedIn: 'root',
 })
 export class ArtefactInlineItemUtilsService {
-  private _artefactService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
   convert(items: ArtefactInlineItemSource): ArtefactInlineItem[] {
     return items.map((itemConfig) => {
@@ -47,7 +46,7 @@ export class ArtefactInlineItemUtilsService {
 
       const label = this.prepareDynamicValue(config.label);
       const value =
-        !!config.timeValueUnit && this._artefactService.isDynamicValue(config.value)
+        !!config.timeValueUnit && this._dynamicValueUtils.isDynamicValue(config.value)
           ? this.prepareTimeValue(config.value as DynamicValueInteger, config.timeValueUnit)
           : this.prepareDynamicValue(config.value);
 
@@ -83,7 +82,7 @@ export class ArtefactInlineItemUtilsService {
     if (value === null || value === undefined) {
       return undefined;
     }
-    const isDynamic = this._artefactService.isDynamicValue(value);
+    const isDynamic = this._dynamicValueUtils.isDynamicValue(value);
     if (isDynamic) {
       const dynamicValue = value as DynamicValue;
       if (dynamicValue.dynamic) {
@@ -111,7 +110,7 @@ export class ArtefactInlineItemUtilsService {
     if (!time) {
       return undefined;
     }
-    const { value, unit } = this._artefactService.convertTimeDynamicValue(time, initialUnit);
+    const { value, unit } = this._dynamicValueUtils.convertTimeDynamicValue(time, initialUnit);
     if (time.dynamic) {
       return {
         expression: `${value} ${unit}`,

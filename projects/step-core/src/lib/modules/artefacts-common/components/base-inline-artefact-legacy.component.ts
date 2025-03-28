@@ -12,7 +12,7 @@ import {
   DynamicValueString,
   ReportNode,
 } from '../../../client/step-client-module';
-import { ArtefactService } from '../injectables/artefact.service';
+import { DynamicValuesUtilsService } from '../../basics/step-basics.module';
 
 @Component({
   template: '',
@@ -22,7 +22,7 @@ export abstract class BaseInlineArtefactLegacyComponent<
   R extends ReportNode = ReportNodeWithArtefact<A>,
 > implements CustomComponent
 {
-  private _artefactService = inject(ArtefactService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
   private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
   protected info = computed(() => this.contextInternal()?.aggregatedInfo);
@@ -115,7 +115,7 @@ export abstract class BaseInlineArtefactLegacyComponent<
     isResolved?: boolean,
   ): ArtefactInlineItem[] {
     return items.map(([label, value]) => {
-      const isDynamic = this._artefactService.isDynamicValue(value);
+      const isDynamic = this._dynamicValueUtils.isDynamicValue(value);
       if (isDynamic) {
         return {
           label: { value: label, dynamic: false },

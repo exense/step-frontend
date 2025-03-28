@@ -1,13 +1,12 @@
 import { Component, effect, inject, input, OnDestroy, output, signal, TemplateRef } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { DynamicValue, DynamicValueArray } from '../../../../client/step-client-module';
+import { DynamicValue } from '../../../../client/step-client-module';
 import { DynamicFieldArrayValue } from '../../shared/dynamic-field-group-value';
 import { ComplexFieldContext } from '../../services/complex-field-context.service';
 import { v4 } from 'uuid';
 import { JsonFieldMetaData, SchemaField, JsonFieldType, JsonFieldUtilsService } from '../../../json-forms';
-
-const DEFAULT_FIELD_VALUE: DynamicValueArray = { value: undefined, dynamic: false };
+import { DynamicValuesUtilsService } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-dynamic-field-array-editor',
@@ -18,6 +17,7 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
   private _fb = inject(FormBuilder);
   private _fbNonNullable = this._fb.nonNullable;
   private _utils = inject(JsonFieldUtilsService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
 
   private terminator$?: Subject<void>;
 
@@ -152,11 +152,9 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
       throw new Error('Invalid schema');
     }
 
-    const fieldValue: DynamicValue = value || {
-      ...DEFAULT_FIELD_VALUE,
-    };
+    const fieldValue: DynamicValue = value ?? this._dynamicValueUtils.createEmptyDynamicValue();
     if (fieldValue.value === undefined && value === undefined) {
-      fieldValue.value = fieldDescription.default;
+      fieldValue.value = this._utils.getDefaultValueForDynamicModel(fieldDescription);
     }
 
     const control = this._fbNonNullable.control<DynamicValue>(fieldValue);

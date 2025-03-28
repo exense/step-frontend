@@ -357,3 +357,4 @@ export * from './directives/dynamic-input-width.directive';
 export * from './directives/overflow-indicator.directive';
 export * from './directives/overflow-tooltip.directive';
 export * from './pipes/truncate-string.pipe';
+export * from './injectables/dynamic-values-utils.service';
