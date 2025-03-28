@@ -33,7 +33,7 @@
       @if (displayStatus$ | async; as status) {
         <step-status [status]="status" [iconMode]="true" />
       }
-      <div class="user">{{ execution.executionParameters?.userID }}</div>
+      <div class="user" matTooltip="User that triggered the execution">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
         <step-popover
           yPosition="below"
@@ -74,6 +74,13 @@
     </div>
     <div class="controls">
       <step-execution-legacy-switcher [execution]="execution" />
+      @if (!(isExecutionCompleted$ | async)) {
+        @if (activeExecution$ | async; as activeExecution) {
+          <step-btn-group class="without-borders">
+            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+          </step-btn-group>
+        }
+      }
       <step-btn-group class="with-round-borders">
         <ng-container
           stepExecutionCommands
@@ -88,7 +95,7 @@
             type="button"
             mat-icon-button
             [disabled]="!('plan-execute' | hasRight | async)"
-            [matTooltip]="executionTooltips.execute!"
+            matTooltip="Relaunch execution with same parameters"
             (click)="commands.execute(false)"
             matTooltipPosition="below"
           >
@@ -100,7 +107,7 @@
                 type="button"
                 mat-icon-button
                 aria-label="Left Align"
-                [matTooltip]="executionTooltips.stop!"
+                matTooltip="Stop execution"
                 matTooltipPosition="below"
                 [disabled]="!('plan-execute' | hasRight | async)"
                 (click)="commands.stop()"
@@ -114,7 +121,7 @@
                 mat-icon-button
                 class="warning"
                 aria-label="Left Align"
-                [matTooltip]="executionTooltips.forceStop!"
+                matTooltip="Force stop execution"
                 matTooltipPosition="below"
                 [disabled]="!('plan-execute' | hasRight | async)"
                 (click)="commands.forceStop()"
@@ -134,14 +141,6 @@
           <step-icon name="play-circle" />
         </button>
       </step-btn-group>
-
-      @if (!(isExecutionCompleted$ | async)) {
-        @if (activeExecution$ | async; as activeExecution) {
-          <step-btn-group class="without-borders">
-            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
-          </step-btn-group>
-        }
-      }
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">

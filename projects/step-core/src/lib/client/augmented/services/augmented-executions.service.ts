@@ -7,7 +7,7 @@ import {
   FieldFilter,
   TableBulkOperationRequest,
 } from '../../generated';
-import { map, Observable, OperatorFunction } from 'rxjs';
+import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import {
   StepDataSource,
@@ -30,6 +30,19 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   private _tableApiWrapper = inject(TableApiWrapperService);
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _requestContextHolder = inject(HttpRequestContextHolderService);
+
+  private cachedExecution?: Execution;
+
+  getExecutionByIdCached(id: string): Observable<Execution> {
+    if (this.cachedExecution && this.cachedExecution.id === id) {
+      return of(this.cachedExecution);
+    }
+    return super.getExecutionById(id).pipe(tap((plan) => (this.cachedExecution = plan)));
+  }
+
+  cleanupCache(): void {
+    this.cachedExecution = undefined;
+  }
 
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);

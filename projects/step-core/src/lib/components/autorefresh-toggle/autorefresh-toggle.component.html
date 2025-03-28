@@ -4,7 +4,7 @@
       mat-icon-button
       [disabled]="disableAutoRefreshButton"
       [matMenuTriggerFor]="menu"
-      [matTooltip]="selectedInterval.label"
+      [matTooltip]="'refresh: ' + (selectedInterval.label || presets[1].label)"
     >
       <ng-container *ngTemplateOutlet="btnContent" />
     </button>
@@ -14,7 +14,7 @@
       mat-stroked-button
       [disabled]="disableAutoRefreshButton"
       [matMenuTriggerFor]="menu"
-      [matTooltip]="selectedInterval.label"
+      [matTooltip]="'refresh: ' + (selectedInterval.label || presets[1].label)"
     >
       <ng-container *ngTemplateOutlet="btnContent" />
     </button>

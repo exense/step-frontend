@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
-import { Mutable } from '../../basics/types/mutable';
-import { Execution, ExecutionsService, UserService } from '../../../client/generated';
-import { LOCAL_STORAGE } from '../../basics/types/storage.token';
+import { map, Observable, of } from 'rxjs';
+import {
+  Mutable,
+  LOCAL_STORAGE,
+  CommonEntitiesUrlsService,
+  AppConfigContainerService,
+} from '../../basics/step-basics.module';
+import { Execution } from '../../../client/step-client-module';
 import { ExecutionViewMode } from '../types/execution-view-mode';
-import { switchMap } from 'rxjs/operators';
-import { CommonEntitiesUrlsService } from '../../basics/injectables/common-entities-urls.service';
-import { AppConfigContainerService } from '../../basics/injectables/app-config-container.service';
 
 type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'forceLegacyReporting'>>;
 
@@ -14,9 +15,7 @@ type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'forceLegacyReportin
   providedIn: 'root',
 })
 export class ExecutionViewModeService {
-  private _userService = inject(UserService);
   private _localStorage = inject(LOCAL_STORAGE);
-  private _executionService = inject(ExecutionsService);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _serviceContext = inject(AppConfigContainerService);
 
@@ -28,21 +27,6 @@ export class ExecutionViewModeService {
       return of(this._serviceContext?.conf?.forceLegacyReporting!);
     }
     return of(false);
-  }
-
-  public resolveExecution(idOrExecution: string | Execution): Observable<Execution> {
-    if (typeof idOrExecution !== 'string') {
-      return of(idOrExecution);
-    }
-
-    return this._executionService.getExecutionById(idOrExecution).pipe(
-      switchMap((execution) => {
-        if (!execution) {
-          throw new Error(`Execution with ID ${idOrExecution} not found`);
-        }
-        return of(execution);
-      }),
-    );
   }
 
   getExecutionMode(execution: Execution): Observable<ExecutionViewMode> {
