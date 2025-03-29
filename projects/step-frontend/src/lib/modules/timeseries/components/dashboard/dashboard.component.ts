@@ -184,7 +184,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
-    console.log(existingContext);
     if (existingContext && urlParams.timeRange) {
       // update the existing context with url params
       existingContext.updateTimeRangeSettings(
@@ -195,7 +194,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       ? of(existingContext)
       : this.createContext(this.dashboard, urlParams, existingContext);
     context$.subscribe((context) => {
-      console.log(urlParams);
       this.initStateFromContext(context, urlParams?.editMode);
     });
   }
