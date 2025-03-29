@@ -1,5 +1,15 @@
-import { Component, computed, effect, inject, OnInit, Signal, signal } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import {
+  ChangeDetectorRef,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  Signal,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute, NavigationStart, Params, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   BucketResponse,
@@ -14,7 +24,7 @@ import {
   SchedulerOverviewTaskChangeService,
   ExecutiontTaskParameters,
 } from '@exense/step-core';
-import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { debounceTime, filter, map, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
@@ -23,8 +33,11 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import {
+  DashboardUrlParams,
+  DashboardUrlParamsService,
+} from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 declare const uPlot: any;
 
@@ -56,7 +69,6 @@ interface EntityWithKeywordsStats {
 })
 export class ScheduleOverviewComponent {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
-  readonly URL_PARAMS_PREFIX = 'dc_';
   private _urlParamService = inject(DashboardUrlParamsService);
   private _scheduleApi = inject(AugmentedSchedulerService);
   private _activatedRoute = inject(ActivatedRoute);
@@ -64,8 +76,6 @@ export class ScheduleOverviewComponent {
   private _executionService = inject(ExecutionsService);
   protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
-  private _scheduleOverviewTaskChange = inject(SchedulerOverviewTaskChangeService);
-  private _router = inject(Router);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last day', timeInMs: TimeUnit.DAY } },
@@ -84,6 +94,7 @@ export class ScheduleOverviewComponent {
   protected plan?: Partial<Plan>;
   protected error = '';
   protected repositoryId?: string;
+  private isInitialized = false;
 
   protected taskId$ = this._activatedRoute.params.pipe(map((params) => params['id'] as string));
 
@@ -94,6 +105,8 @@ export class ScheduleOverviewComponent {
   protected readonly taskId = toSignal(this.taskId$, { initialValue: this._activatedRoute.snapshot.params['id'] });
   protected readonly task = toSignal(this.task$, { initialValue: undefined });
   protected readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
+
+  refresh$: Subject<void> = new Subject<void>();
 
   refreshInterval = signal<number>(0);
 
@@ -110,14 +123,16 @@ export class ScheduleOverviewComponent {
     let timeRange = this.activeTimeRangeSelection();
     let refreshInterval = this.refreshInterval();
     if (timeRange) {
-      this._urlParamService.updateUrlParams(timeRange, refreshInterval);
+      // replace url on the first call
+      this._urlParamService.updateUrlParams(timeRange, refreshInterval, !this.isInitialized);
     }
+    this.isInitialized = true;
   });
 
   refreshEffect = effect(() => {
     let range = this.timeRange();
     if (range) {
-      this.refreshCharts(this._taskId, range);
+      this.refresh$.next();
     }
   });
 
@@ -140,6 +155,14 @@ export class ScheduleOverviewComponent {
 
   constructor() {
     const urlParams = this._urlParamService.collectUrlParams();
+    this.updateTimeAndRefresh(urlParams);
+    this.refresh$.subscribe(() => {
+      this.refreshCharts(this._taskId, this.timeRange()!);
+    });
+    this.subscribeToUrlNavigation();
+  }
+
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
     if (urlParams.refreshInterval !== undefined) {
       this.refreshInterval.set(urlParams.refreshInterval);
     } else {
@@ -154,6 +177,14 @@ export class ScheduleOverviewComponent {
     } else {
       this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
     }
+  }
+
+  private subscribeToUrlNavigation() {
+    // subscribe to back and forward events
+    this._activatedRoute.queryParams.subscribe((params: Params) => {
+      let urlParams = this._urlParamService.collectUrlParams();
+      this.updateTimeAndRefresh(urlParams);
+    });
   }
 
   private findRelativeTimeOption(ms?: number): TimeRangePickerSelection {
@@ -181,7 +212,8 @@ export class ScheduleOverviewComponent {
 
   triggerRefresh() {
     // signal is triggered
-    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+    this.refresh$.next();
+    // this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
   }
 
   handleRefreshIntervalChange(interval: number) {

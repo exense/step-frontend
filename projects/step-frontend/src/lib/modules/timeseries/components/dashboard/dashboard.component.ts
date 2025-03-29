@@ -43,7 +43,7 @@ import {
   TsFilteringSettings,
 } from '../../modules/_common';
 import { TimeRangeRelativeSelection } from '@exense/step-core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -54,7 +54,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { filter, forkJoin, map, Observable, of, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -65,6 +65,8 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-location';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -79,6 +81,7 @@ import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-
     ResolutionPickerComponent,
     TimeRangePickerComponent,
     TableDashletComponent,
+    MatProgressSpinner,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
@@ -99,6 +102,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   private _authService: AuthService = inject(AuthService);
   private _urlParamsService: DashboardUrlParamsService = inject(DashboardUrlParamsService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
 
   @Input('id') dashboardId!: string;
   @Input() storageId?: string;
@@ -180,6 +184,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
+    console.log(existingContext);
     if (existingContext && urlParams.timeRange) {
       // update the existing context with url params
       existingContext.updateTimeRangeSettings(
@@ -190,27 +195,32 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       ? of(existingContext)
       : this.createContext(this.dashboard, urlParams, existingContext);
     context$.subscribe((context) => {
-      this.resolution = context.getChartsResolution();
-      this.refreshInterval = context.getRefreshInterval();
-      const state: DashboardState = {
-        context: context,
-        getFilterBar: () => this.filterBar!,
-        getDashlets: () => this.dashlets,
-        refreshInProgress: false,
-      };
-      this.mainEngine = new DashboardStateEngine(state);
-      this.mainEngine.subscribeForContextChange();
-
-      this.updateUrl();
-      context.stateChange$.subscribe((stateChanged) => {
-        this.updateUrl();
-      });
-      // notify the outside regarding the time picker selection
-      context.onTimePickerOptionChange().subscribe((selection) => this.timeRangeChange.next(selection));
-      if (urlParams.editMode && this.hasWritePermission && this.editable) {
-        this.enableEditMode();
-      }
+      console.log(urlParams);
+      this.initStateFromContext(context, urlParams?.editMode);
     });
+  }
+
+  private initStateFromContext(context: TimeSeriesContext, editMode?: boolean) {
+    this.resolution = context.getChartsResolution();
+    this.refreshInterval = context.getRefreshInterval();
+    const state: DashboardState = {
+      context: context,
+      getFilterBar: () => this.filterBar!,
+      getDashlets: () => this.dashlets,
+      refreshInProgress: false,
+    };
+    this.mainEngine = new DashboardStateEngine(state);
+    this.mainEngine.subscribeForContextChange();
+
+    this.updateUrl(true);
+    context.stateChange$.subscribe((stateChanged) => {
+      this.updateUrl();
+    });
+    // notify the outside regarding the time picker selection
+    context.onTimePickerOptionChange().subscribe((selection) => this.timeRangeChange.next(selection));
+    if (editMode && this.hasWritePermission && this.editable) {
+      this.enableEditMode();
+    }
   }
 
   public refresh() {
@@ -251,8 +261,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     this.compareEngine?.state.context.updateChartsResolution(resolution);
   }
 
-  private updateUrl(): void {
-    this._urlParamsService.updateUrlParamsFromContext(this.mainEngine.state.context);
+  private updateUrl(replaceUrl = false): void {
+    this._urlParamsService.updateUrlParamsFromContext(this.mainEngine.state.context, replaceUrl);
   }
 
   enableEditMode() {
