@@ -9,6 +9,15 @@
   padding: 2rem;
 }
 
+.spinner-container {
+  margin-top: 20rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
 .header-container {
   display: flex;
   justify-content: space-between;

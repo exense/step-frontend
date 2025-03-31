@@ -133,20 +133,20 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number) {
+  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number, replaceUrl = false) {
     let params = this.convertTimeRange(timeRange);
     if (refresh !== undefined) {
       params['refreshInterval'] = refresh;
     }
-    this.prefixAndPushUrlParams(params);
+    this.prefixAndPushUrlParams(params, replaceUrl);
   }
 
-  updateUrlParamsFromContext(context: TimeSeriesContext) {
+  updateUrlParamsFromContext(context: TimeSeriesContext, replaceUrl = false) {
     const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
     mergedParams['refreshInterval'] = context.getRefreshInterval();
-    this.prefixAndPushUrlParams(mergedParams);
+    this.prefixAndPushUrlParams(mergedParams, replaceUrl);
   }
 
   private convertContextToUrlParams(
@@ -154,9 +154,7 @@ export class DashboardUrlParamsService {
     timeRangeSettings: DashboardTimeRangeSettings,
   ): Record<string, any> {
     const params = this.convertTimeRange(timeRangeSettings.pickerSelection);
-    if (context.getGroupDimensions().length > 0) {
-      params['grouping'] = context.getGroupDimensions().join(',');
-    }
+    params['grouping'] = context.getGroupDimensions()?.join(',') || '';
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();
       params['select_from'] = selectedTimeRange.from;
@@ -185,7 +183,7 @@ export class DashboardUrlParamsService {
     return params;
   }
 
-  private prefixAndPushUrlParams(params: Record<string, any>): void {
+  private prefixAndPushUrlParams(params: Record<string, any>, replaceUrl: boolean): void {
     const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
     Object.keys(updatedParams).forEach((key) => {
       if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
@@ -208,6 +206,7 @@ export class DashboardUrlParamsService {
 
     previousNavigation$.subscribe(() => {
       this._router.navigate([], {
+        replaceUrl: replaceUrl,
         relativeTo: this._activatedRoute,
         queryParams: updatedParams,
         queryParamsHandling: 'merge',
