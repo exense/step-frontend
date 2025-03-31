@@ -7,6 +7,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { FilterBarPlanItemComponent } from '../filter-bar-plan-item/filter-bar-plan-item.component';
 import { FilterBarTaskItemComponent } from '../filter-bar-task-item/filter-bar-task-item.component';
 import { FilterBarExecutionItemComponent } from '../filter-bar-execution-execution-item/filter-bar-execution-item.component';
+import { Execution, ExecutiontTaskParameters, Plan } from '@exense/step-core';
 
 @Component({
   selector: 'step-ts-filter-bar-item',
@@ -135,12 +136,32 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
 
   private getFormattedValue(item: FilterBarItem): string | undefined {
     let formattedValue: string | undefined = '';
+    const searchEntitiesCount = this.item.searchEntities?.length;
     switch (item.type) {
       case FilterBarItemType.EXECUTION:
+        if (searchEntitiesCount > 1) {
+          formattedValue = this.getFormattedValueForMultipleValues(searchEntitiesCount);
+        } else {
+          formattedValue =
+            (item.searchEntities[0]?.entity as Execution)?.description || item.searchEntities[0]?.searchValue;
+        }
+        break;
       case FilterBarItemType.PLAN:
+        if (searchEntitiesCount > 1) {
+          formattedValue = this.getFormattedValueForMultipleValues(searchEntitiesCount);
+        } else {
+          formattedValue =
+            (item.searchEntities[0]?.entity as Plan)?.attributes?.['name'] || item.searchEntities[0]?.searchValue;
+        }
+        break;
       case FilterBarItemType.TASK:
-        const count = this.item.searchEntities?.length;
-        formattedValue = count ? (count > 1 ? `${count} items` : `1 item`) : '';
+        if (searchEntitiesCount > 1) {
+          formattedValue = this.getFormattedValueForMultipleValues(searchEntitiesCount);
+        } else {
+          formattedValue =
+            (item.searchEntities[0]?.entity as ExecutiontTaskParameters)?.attributes?.['name'] ||
+            item.searchEntities[0]?.searchValue;
+        }
         break;
       case FilterBarItemType.FREE_TEXT:
         formattedValue = this.item.freeTextValues?.join(', ');
@@ -181,6 +202,10 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
         throw new Error('Filter type not handled: ' + item.type);
     }
     return formattedValue;
+  }
+
+  private getFormattedValueForMultipleValues(count?: number): string {
+    return count ? (count > 1 ? `${count} items` : `1 item`) : '';
   }
 
   addSearchValue(text: string): void {
