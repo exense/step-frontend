@@ -1,4 +1,14 @@
-import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  untracked,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
@@ -7,7 +17,9 @@ import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
-import { TreeStateService } from '@exense/step-core';
+import { PaginatorComponent, TreeStateService } from '@exense/step-core';
+import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -31,6 +43,30 @@ export class AltExecutionTreeTabComponent implements OnInit {
   private _executionDialogs = inject(AltExecutionDialogsService);
 
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
+  protected readonly searchCtrl = this._treeState.searchCtrl;
+
+  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+  private paginator = viewChild('paginator', { read: PaginatorComponent });
+
+  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
+  protected readonly hasOccurrences = computed(() => this.foundItems() > 0);
+
+  private effectSearchChange = effect(
+    () => {
+      const searchResult = this._treeState.searchResult();
+      const paginator = untracked(() => this.paginator());
+      paginator?.firstPage();
+    },
+    { allowSignalWrites: true },
+  );
+
+  protected handleSearchResultPage(page: PageEvent): void {
+    const index = page.pageIndex;
+    const itemId = this._treeState.pickSearchResultItemByIndex(index);
+    if (itemId) {
+      this.tree()?.focusNode(itemId);
+    }
+  }
 
   ngOnInit(): void {
     this._activatedRoute.queryParams

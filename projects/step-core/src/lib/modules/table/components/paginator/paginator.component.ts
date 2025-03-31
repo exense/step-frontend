@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, model, signal, untracked, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, input, model, output, signal, untracked, ViewEncapsulation } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { toObservable } from '@angular/core/rxjs-interop';
 
@@ -9,8 +9,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
   encapsulation: ViewEncapsulation.None,
 })
 export class PaginatorComponent {
-  /** @Input() **/
-  pageSizeOptions = input([], {
+  readonly showPageSizeOptions = input(true);
+
+  readonly pageSizeOptions = input([], {
     transform: (value?: number[] | null) => value ?? [],
   });
 
@@ -26,7 +27,6 @@ export class PaginatorComponent {
     { allowSignalWrites: true },
   );
 
-  /** @Input() **/
   lengthInput = input(0, {
     alias: 'length',
     transform: (value: number | undefined | null) => value ?? 0,
@@ -40,7 +40,6 @@ export class PaginatorComponent {
     { allowSignalWrites: true },
   );
 
-  /** @Input() **/
   isPageDisabled = input(false, {
     alias: 'disabled',
     transform: (value: boolean | undefined | null) => !!value,
@@ -49,6 +48,8 @@ export class PaginatorComponent {
   readonly length = signal(0);
   pageSize = model(0);
   readonly pageIndex = signal(0);
+
+  readonly pageChange = output<PageEvent>();
 
   private pageEvent = computed<PageEvent>(() => {
     const pageIndex = this.pageIndex();
@@ -59,6 +60,11 @@ export class PaginatorComponent {
       pageSize,
       length,
     };
+  });
+
+  private pageEventEffect = effect(() => {
+    const pageEvent = this.pageEvent();
+    this.pageChange.emit(pageEvent);
   });
 
   readonly page$ = toObservable(this.pageEvent);
@@ -93,6 +99,9 @@ export class PaginatorComponent {
 
     const from = pageIndex * pageSize;
     const to = pageIndex < pagesCount - 1 ? from + pageSize : length;
+    if (pageSize === 1) {
+      return `${to} of ${length}`;
+    }
     return `${from + 1} - ${to} of ${length}`;
   });
 
@@ -111,6 +120,7 @@ export class PaginatorComponent {
   }
 
   firstPage(): void {
+    console.log('FIRST PAGE');
     this.pageIndex.set(0);
   }
 }

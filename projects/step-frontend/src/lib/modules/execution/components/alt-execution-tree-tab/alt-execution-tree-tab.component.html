@@ -1,7 +1,23 @@
-<section class="buttons-container">
-  <div class="buttons">
+<section class="controls-container">
+  <div class="controls">
     <button type="button" mat-stroked-button (click)="collapseAll()">Collapse All</button>
     <button type="button" mat-stroked-button (click)="expandAll()">Expand All</button>
+    <step-form-field>
+      <step-prefix class="icon-prefix">
+        <step-icon name="search" />
+      </step-prefix>
+      <input type="text" placeholder="Search" [formControl]="searchCtrl" />
+    </step-form-field>
   </div>
 </section>
-<step-alt-execution-tree />
+<step-alt-execution-tree #tree />
+@if (hasOccurrences()) {
+  <step-paginator
+    #paginator
+    [showPageSizeOptions]="false"
+    [pageSizeOptions]="[1]"
+    [pageSize]="1"
+    [length]="foundItems()"
+    (pageChange)="handleSearchResultPage($event)"
+  />
+}

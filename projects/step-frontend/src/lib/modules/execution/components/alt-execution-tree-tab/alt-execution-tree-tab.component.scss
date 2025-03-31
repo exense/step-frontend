@@ -8,12 +8,11 @@ step-alt-execution-tree-tab {
     max-height: 60vh;
   }
 
-  .buttons-container {
+  .controls-container {
     position: absolute;
     right: 0;
     z-index: 3;
-    width: 21rem;
-    .buttons {
+    .controls {
       display: flex;
       gap: 0.5rem;
       align-items: center;
