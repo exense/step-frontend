@@ -21,7 +21,6 @@ import {
   FilterConditionFactoryService,
   ItemsPerPageService,
   SearchValue,
-  StepDataSource,
   TableRemoteDataSourceFactoryService,
   TableSearch,
   ReportNode,
@@ -29,11 +28,13 @@ import {
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
   TableStorageService,
+  TableDataSource,
+  AlertType,
 } from '@exense/step-core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
-import { debounceTime, map, startWith } from 'rxjs';
+import { debounceTime, map, startWith, switchMap } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
 import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
@@ -79,19 +80,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     mastSort?.sort({ id: 'executionTime', start: sort, disableClear: true });
   });
 
-  /** @Input() **/
   readonly node = input.required<AggregatedTreeNode>();
-
-  /** @Input() **/
   readonly initialStatus = input<Status | undefined>(undefined);
-
-  /** @Input() **/
+  readonly initialStatusCount = input<number | undefined>(undefined);
   readonly resolvedPartialPath = input<string | undefined>(undefined);
-
-  /** @Output() **/
   readonly showDetails = output<ReportNode>();
 
-  /** @Output() **/
   readonly openTreeView = output<ReportNode>();
 
   private artefactHash = computed(() => this.node().artefactHash);
@@ -107,6 +101,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     return this.getReportNodeDataSource(artefactHash, resolvedPartialPath, dateRange);
   });
 
+  private totalItems$ = toObservable(this.dataSource).pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+
+  protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
+
   protected readonly keywordParameters = toSignal(
     this._executionState.keywordParameters$.pipe(
       // omit test case selection in case of tree
@@ -115,6 +113,11 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
   );
 
   protected readonly searchCtrl = this._fb.control('');
+
+  private searchCtrlValue = toSignal(this.searchCtrl.valueChanges, {
+    initialValue: this.searchCtrl.value,
+  });
+
   private searchSubscription = this.searchCtrl.valueChanges
     .pipe(
       startWith(this.searchCtrl.value),
@@ -145,6 +148,18 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
       takeUntilDestroyed(),
     )
     .subscribe((statuses) => this.tableSearch()?.onSearch('status', { value: statuses, regex: true }));
+
+  protected readonly showCountWarning = computed(() => {
+    const initialStatus = this.initialStatus();
+    const initialCount = this.initialStatusCount();
+    const search = this.searchCtrlValue();
+    const status = this.statusCtrlValue();
+    const totalItems = this.totalItems();
+    if (!!search || status?.length !== 1 || status[0] !== initialStatus || totalItems === 0) {
+      return false;
+    }
+    return initialCount !== totalItems;
+  });
 
   ngAfterViewInit(): void {
     const treeNodeName = this._el.nativeElement.closest<HTMLElement>('step-tree-node-name');
@@ -180,7 +195,7 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     artefactHash?: string,
     resolvedPartialPath?: string,
     dateRange?: DateRange,
-  ): StepDataSource<ReportNode> {
+  ): TableDataSource<ReportNode> {
     let filters: Record<string, string | string[] | SearchValue> | undefined = undefined;
     if (artefactHash) {
       filters = filters ?? {};
@@ -204,4 +219,6 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
       filters,
     );
   }
+
+  protected readonly AlertType = AlertType;
 }

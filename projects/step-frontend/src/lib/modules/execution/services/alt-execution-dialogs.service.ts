@@ -29,7 +29,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
 
   openIterations(
     node: AggregatedTreeNode,
-    { nodeStatus, reportNodeId }: { nodeStatus?: Status; reportNodeId?: string } = {},
+    {
+      nodeStatus,
+      nodeStatusCount,
+      reportNodeId,
+    }: { nodeStatus?: Status; nodeStatusCount?: number; reportNodeId?: string } = {},
   ): void {
     const nodeId = node.id;
     if (!!reportNodeId) {
@@ -44,7 +48,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       });
       return;
     }
-    this.navigateToIterationList(nodeId, nodeStatus);
+    this.navigateToIterationList(nodeId, nodeStatus, nodeStatusCount);
   }
 
   openIterationDetails<T extends ReportNode>(reportNode: T): void {
@@ -59,10 +63,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     });
   }
 
-  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status): void {
+  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
     const queryParams: Params = {};
     queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
     queryParams[this._queryParamsNames.searchStatus] = searchStatus;
+    queryParams[this._queryParamsNames.searchStatusCount] = searchStatusCount;
     this.openNodeDetails(queryParams);
   }
 
