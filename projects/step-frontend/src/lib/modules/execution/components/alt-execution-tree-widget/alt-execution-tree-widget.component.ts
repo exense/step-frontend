@@ -1,11 +1,10 @@
-import { Component, computed, effect, inject, untracked, viewChild } from '@angular/core';
-import { PaginatorComponent, TreeStateService } from '@exense/step-core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -28,22 +27,12 @@ export class AltExecutionTreeWidgetComponent {
   protected readonly searchCtrl = this._treeState.searchCtrl;
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
-  private paginator = viewChild('paginator', { read: PaginatorComponent });
 
   protected readonly foundItems = computed(() => this._treeState.searchResult().length);
-  protected readonly hasOccurrences = computed(() => this.foundItems() > 0);
+  protected readonly pageIndex = signal(0);
 
-  private effectSearchChange = effect(
-    () => {
-      const searchResult = this._treeState.searchResult();
-      const paginator = untracked(() => this.paginator());
-      paginator?.firstPage();
-    },
-    { allowSignalWrites: true },
-  );
-
-  protected handleSearchResultPage(page: PageEvent): void {
-    const index = page.pageIndex;
+  protected handleSearchResultPage(index: number): void {
+    this.pageIndex.set(index);
     const itemId = this._treeState.pickSearchResultItemByIndex(index);
     if (itemId) {
       this.focusNode(itemId);

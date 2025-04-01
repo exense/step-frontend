@@ -1,0 +1,29 @@
+<step-form-field>
+  <step-prefix class="icon-prefix">
+    <step-icon name="search" />
+  </step-prefix>
+  <input
+    class="search"
+    type="text"
+    placeholder="Search"
+    [ngModel]="value()"
+    (ngModelChange)="handleValueChange($event)"
+    (blur)="handleBlur()"
+    [disabled]="isDisabled()"
+  />
+  <step-suffix class="button-suffix">
+    <button type="button" mat-stroked-button [disabled]="!areButtonsActive()" (click)="prev()">
+      <step-icon name="chevron-left" />
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button type="button" mat-stroked-button [disabled]="!areButtonsActive()" (click)="next()">
+      <step-icon name="chevron-right" />
+    </button>
+  </step-suffix>
+  @if (searchLabel(); as searchLabel) {
+    <step-suffix>
+      <span>{{ searchLabel }}</span>
+    </step-suffix>
+  }
+</step-form-field>

@@ -16,11 +16,11 @@ step-alt-execution-tree-tab {
       display: flex;
       gap: 0.5rem;
       align-items: center;
+      background: var.$white;
 
       button {
         min-width: 10rem;
         white-space: nowrap;
-        background: var.$white;
       }
     }
   }

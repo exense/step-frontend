@@ -120,7 +120,6 @@ export class PaginatorComponent {
   }
 
   firstPage(): void {
-    console.log('FIRST PAGE');
     this.pageIndex.set(0);
   }
 }

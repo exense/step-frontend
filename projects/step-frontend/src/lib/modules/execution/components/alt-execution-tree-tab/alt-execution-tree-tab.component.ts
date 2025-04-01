@@ -1,14 +1,4 @@
-import {
-  Component,
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  OnInit,
-  untracked,
-  viewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
@@ -17,9 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
-import { PaginatorComponent, TreeStateService } from '@exense/step-core';
+import { TreeStateService } from '@exense/step-core';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
-import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -46,22 +35,11 @@ export class AltExecutionTreeTabComponent implements OnInit {
   protected readonly searchCtrl = this._treeState.searchCtrl;
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
-  private paginator = viewChild('paginator', { read: PaginatorComponent });
 
   protected readonly foundItems = computed(() => this._treeState.searchResult().length);
-  protected readonly hasOccurrences = computed(() => this.foundItems() > 0);
+  protected readonly pageIndex = signal(0);
 
-  private effectSearchChange = effect(
-    () => {
-      const searchResult = this._treeState.searchResult();
-      const paginator = untracked(() => this.paginator());
-      paginator?.firstPage();
-    },
-    { allowSignalWrites: true },
-  );
-
-  protected handleSearchResultPage(page: PageEvent): void {
-    const index = page.pageIndex;
+  protected handleSearchResultPage(index: number): void {
     const itemId = this._treeState.pickSearchResultItemByIndex(index);
     if (itemId) {
       this.tree()?.focusNode(itemId);
