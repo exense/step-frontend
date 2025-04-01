@@ -31,6 +31,9 @@ export class AggregatedTreeNodeComponent {
     if (!node) {
       return;
     }
+    if (!count) {
+      count = Object.values(node.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+    }
     this._treeState.selectNode(node);
     this._executionDialogs.openIterations(node, { nodeStatus: status, nodeStatusCount: count });
   }

@@ -101,7 +101,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     return this.getReportNodeDataSource(artefactHash, resolvedPartialPath, dateRange);
   });
 
-  private totalItems$ = toObservable(this.dataSource).pipe(switchMap((dataSource) => dataSource.totalFiltered$));
+  private dataSource$ = toObservable(this.dataSource);
+  private totalItems$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.totalFiltered$));
 
   protected readonly totalItems = toSignal(this.totalItems$, { initialValue: 0 });
 
@@ -155,7 +156,8 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     const search = this.searchCtrlValue();
     const status = this.statusCtrlValue();
     const totalItems = this.totalItems();
-    if (!!search || status?.length !== 1 || status[0] !== initialStatus || totalItems === 0) {
+
+    if (!!search || (!!initialStatus && (status?.length !== 1 || status[0] !== initialStatus)) || totalItems === 0) {
       return false;
     }
     return initialCount !== totalItems;
