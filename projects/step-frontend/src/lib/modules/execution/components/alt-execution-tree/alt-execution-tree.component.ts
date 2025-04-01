@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 
@@ -28,7 +28,6 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
     this._urlParamsService.updateUrlParams(range);
@@ -57,6 +56,9 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       )
       .subscribe((nodeId) => {
         const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
+        if (nodeElement && this.isElementInView(nodeElement)) {
+          return;
+        }
         nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
   }
@@ -75,5 +77,11 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       default:
         break;
     }
+  }
+
+  private isElementInView(element: HTMLElement): boolean {
+    const parentRect = this._el.nativeElement.parentElement!.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    return elementRect.top >= parentRect.top && elementRect.top <= parentRect.bottom;
   }
 }
