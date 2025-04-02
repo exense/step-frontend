@@ -1,4 +1,4 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -22,10 +22,28 @@ import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-t
   ],
 })
 export class AltExecutionTreeWidgetComponent {
-  private _treeState = inject(TreeStateService);
+  private _treeState = inject(AggregatedReportViewTreeStateService);
 
-  /** @ViewChild **/
+  protected readonly searchCtrl = this._treeState.searchCtrl;
+
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+
+  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
+  protected readonly pageIndex = signal(0);
+
+  private effectFocusNode = effect(() => {
+    const foundItems = this.foundItems();
+    const pageIndex = this.pageIndex();
+    if (!foundItems) {
+      return;
+    }
+    untracked(() => {
+      const itemId = this._treeState.pickSearchResultItemByIndex(pageIndex);
+      if (itemId) {
+        this.focusNode(itemId);
+      }
+    });
+  });
 
   focusNode(nodeId: string): void {
     this.tree()?.focusNode(nodeId);

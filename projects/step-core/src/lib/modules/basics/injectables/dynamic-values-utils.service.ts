@@ -51,6 +51,17 @@ export class DynamicValuesUtilsService {
     return result;
   }
 
+  parseJson<T = string>(value?: string): Record<string, T> | undefined {
+    if (!value) {
+      return undefined;
+    }
+    try {
+      return JSON.parse(value) as Record<string, T>;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
   convertTimeDynamicValue(
     value: DynamicValueInteger,
     unit: TimeUnitDictKey = 'ms',

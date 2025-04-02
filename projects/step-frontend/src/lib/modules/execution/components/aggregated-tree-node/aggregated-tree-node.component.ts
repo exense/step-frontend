@@ -8,6 +8,9 @@ import { Status } from '../../../_common/shared/status.enum';
   selector: 'step-aggregated-tree-node',
   templateUrl: './aggregated-tree-node.component.html',
   styleUrl: './aggregated-tree-node.component.scss',
+  host: {
+    '[class.highlight]': 'isInSearchResult()',
+  },
 })
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
@@ -20,6 +23,12 @@ export class AggregatedTreeNodeComponent {
   protected node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
+  });
+
+  protected isInSearchResult = computed(() => {
+    const nodeId = this.nodeId();
+    const selectedSearchResult = this._treeState.selectedSearchResult();
+    return selectedSearchResult === nodeId;
   });
 
   protected readonly detailsTooltip = 'Open execution details';
