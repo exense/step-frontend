@@ -56,10 +56,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       )
       .subscribe((nodeId) => {
         const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
-        if (nodeElement && this.isElementInView(nodeElement)) {
-          return;
-        }
-        nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
       });
   }
 
@@ -77,11 +74,5 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       default:
         break;
     }
-  }
-
-  private isElementInView(element: HTMLElement): boolean {
-    const parentRect = this._el.nativeElement.parentElement!.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-    return elementRect.top >= parentRect.top && elementRect.top <= parentRect.bottom;
   }
 }

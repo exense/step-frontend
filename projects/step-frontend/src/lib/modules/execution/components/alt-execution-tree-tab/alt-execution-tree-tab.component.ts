@@ -1,4 +1,15 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  untracked,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
@@ -39,12 +50,19 @@ export class AltExecutionTreeTabComponent implements OnInit {
   protected readonly foundItems = computed(() => this._treeState.searchResult().length);
   protected readonly pageIndex = signal(0);
 
-  protected handleSearchResultPage(index: number): void {
-    const itemId = this._treeState.pickSearchResultItemByIndex(index);
-    if (itemId) {
-      this.tree()?.focusNode(itemId);
+  private effectFocusNode = effect(() => {
+    const foundItems = this.foundItems();
+    const pageIndex = this.pageIndex();
+    if (!foundItems) {
+      return;
     }
-  }
+    untracked(() => {
+      const itemId = this._treeState.pickSearchResultItemByIndex(pageIndex);
+      if (itemId) {
+        this.tree()?.focusNode(itemId);
+      }
+    });
+  });
 
   ngOnInit(): void {
     this._activatedRoute.queryParams

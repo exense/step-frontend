@@ -4,12 +4,7 @@
       <button type="button" mat-stroked-button (click)="collapseAll()">Collapse All</button>
       <button type="button" mat-stroked-button (click)="expandAll()">Expand All</button>
     </section>
-    <step-search-field
-      [formControl]="searchCtrl"
-      [searchIndex]="pageIndex()"
-      (searchIndexChange)="handleSearchResultPage($event)"
-      [total]="foundItems()"
-    />
+    <step-search-field [formControl]="searchCtrl" [(searchIndex)]="pageIndex" [total]="foundItems()" />
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <step-alt-execution-tree #tree />
