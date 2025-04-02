@@ -60,11 +60,11 @@ button.details-trigger {
   }
 }
 
-.warning {
-  color: var.$orange;
-}
-
 step-alert {
   margin-bottom: 0;
   padding: 0.5rem;
+  .warning-explanation {
+    color: var.$blue-600;
+    margin-left: 0.5rem;
+  }
 }

@@ -81,20 +81,20 @@
     </ng-container>
     <step-table-paginator-addon>
       @if (totalItems() >= 1000) {
-        <step-icon
-          class="warning"
-          name="alert-triangle"
-          matTooltip="Only the first 1000 iterations are show"
-          matTooltipPosition="below"
-        />
+        <step-alert [type]="AlertType.WARNING">
+          <step-icon name="alert-triangle" />
+          Only the first 1000 iterations are show
+        </step-alert>
       } @else if (showCountWarning()) {
         <step-alert [type]="AlertType.WARNING">
+          <step-icon name="alert-triangle" />
+          The number of shown iterations doesn't match the iteration count of the tree
           <step-icon
-            name="alert-triangle"
+            name="help-circle"
+            class="warning-explanation"
             matTooltip="The count here is exact, based on raw data, while in the tree, the time-series aggregation groups and adjusts counts according to the time resolution."
             matTooltipPosition="below"
           />
-          The number of shown iterations doesn't match the iteration count of the tree
         </step-alert>
       }
     </step-table-paginator-addon>
