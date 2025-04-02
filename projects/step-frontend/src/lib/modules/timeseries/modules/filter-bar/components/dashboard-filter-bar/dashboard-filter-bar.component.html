@@ -6,7 +6,8 @@
     <step-time-range-picker
       (selectionChange)="handleTimeRangeChange($event)"
       [selectOptions]="timeRangeOptions"
-      [activeSelection]="activeTimeRange"
+      [activeTimeRange]="context.timeRangeSettings.fullRange"
+      [activeSelection]="activeTimeRangeSelection"
       [compact]="compactView"
     />
   </div>
