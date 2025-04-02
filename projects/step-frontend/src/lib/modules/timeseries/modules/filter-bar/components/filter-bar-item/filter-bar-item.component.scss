@@ -18,6 +18,14 @@ step-form-field {
   cursor: pointer;
 }
 
+.highlight {
+  border: 1px solid #3a3a3a !important;
+
+  &.step-field-container {
+    border-left: 0 !important;
+  }
+}
+
 .step-field-container {
   min-width: 5rem;
   width: auto !important;

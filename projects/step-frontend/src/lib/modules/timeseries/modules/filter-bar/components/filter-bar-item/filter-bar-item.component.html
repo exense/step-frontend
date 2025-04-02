@@ -7,9 +7,9 @@
   [matTooltip]="formattedValue ?? ''"
   class="cursor-pointer"
 >
-  <step-prefix>{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
+  <step-prefix [class.highlight]="formattedValue">{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
   @if (formattedValue) {
-    <div class="step-field-container">{{ formattedValue }}</div>
+    <div class="step-field-container" [class.highlight]="formattedValue">{{ formattedValue }}</div>
   }
   @if (removable) {
     <step-suffix class="icon-suffix">

@@ -360,3 +360,4 @@ export * from './directives/overflow-tooltip.directive';
 export * from './pipes/truncate-string.pipe';
 export * from './injectables/array-item-label-value-default-extractor.service';
 export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';
+export * from './injectables/dynamic-values-utils.service';
