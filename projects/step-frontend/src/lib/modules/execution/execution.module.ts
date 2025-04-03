@@ -1,4 +1,4 @@
-import { inject, Injectable, NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -126,6 +126,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 
 @NgModule({
   declarations: [
@@ -175,7 +176,6 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
-    AltReportWidgetContentDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
@@ -203,6 +203,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltExecutionErrorsComponent,
     AgentsCellComponent,
     AgentsModalComponent,
+    DurationDescriptionComponent,
   ],
   imports: [
     StepCommonModule,
@@ -214,6 +215,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     TimeSeriesChartComponent,
     TooltipContentDirective,
     TimeRangePickerComponent,
+    AltReportWidgetContentDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -241,6 +243,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
     ExecutionLegacySwitcherComponent,
+    DurationDescriptionComponent,
   ],
   providers: [
     {
