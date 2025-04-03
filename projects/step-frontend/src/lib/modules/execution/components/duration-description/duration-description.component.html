@@ -1,0 +1,10 @@
+<div>Start time:</div>
+<div>{{ startTime() | date: DateFormat.DATE_MS }}</div>
+<div>End time:</div>
+@if (isRunning()) {
+  <div>RUNNING</div>
+} @else {
+  <div>{{ endTime() | date: DateFormat.DATE_MS }}</div>
+}
+<div>Duration:</div>
+<div>{{ endTime() | duration: startTime() : { shortenMs: true, displayFull: true } }}</div>

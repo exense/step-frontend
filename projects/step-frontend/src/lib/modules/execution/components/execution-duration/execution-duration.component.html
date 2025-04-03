@@ -7,18 +7,7 @@
       }}</span>
     </div>
     <step-popover-content>
-      <section class="execution-duration-description">
-        <div>Start time:</div>
-        <div>{{ execution()?.startTime | date: DateFormat.DATE }}</div>
-        <div>End time:</div>
-        @if (isRunning()) {
-          <div>RUNNING</div>
-        } @else {
-          <div>{{ execution()?.endTime | date: DateFormat.DATE }}</div>
-        }
-        <div>Duration:</div>
-        <div>{{ endTime() | duration: execution()?.startTime : { shortenMs: true, displayFull: true } }}</div>
-      </section>
+      <step-duration-description [startTime]="execution()?.startTime" [endTime]="endTime()" [isRunning]="isRunning()" />
     </step-popover-content>
   </step-popover>
 } @else {
