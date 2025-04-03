@@ -1,7 +1,6 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, ElementRef, forwardRef, inject, input, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
@@ -35,6 +34,8 @@ export class AltExecutionTreeComponent implements TreeActionsService {
     this._urlParamsService.updateUrlParams(range);
   });
 
+  readonly allowDialogOpen = input(true);
+
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const disabled = !node.children?.length;
     return of([
@@ -58,7 +59,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       )
       .subscribe((nodeId) => {
         const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
-        nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
   }
 
