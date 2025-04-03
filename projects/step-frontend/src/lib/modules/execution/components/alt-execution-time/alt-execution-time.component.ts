@@ -72,4 +72,10 @@ export class AltExecutionTimeComponent {
 
     return this._durationPipe.transform(endTime, startTime);
   });
+
+  protected hasContent = computed(() => {
+    const displayDate = this.displayDate();
+    const duration = this.duration();
+    return !!displayDate || !!duration;
+  });
 }
