@@ -16,6 +16,7 @@ export class AggregatedTreeNodeComponent {
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
   readonly nodeId = input.required<string>();
+  readonly allowDialogOpen = input(true);
 
   protected node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
@@ -25,6 +26,9 @@ export class AggregatedTreeNodeComponent {
   protected readonly detailsTooltip = 'Open execution details';
 
   protected showIterations(status?: Status, event?: MouseEvent): void {
+    if (!this.allowDialogOpen()) {
+      return;
+    }
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
     const node = this.node();

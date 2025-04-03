@@ -1,4 +1,4 @@
-import { inject, Injectable, NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -126,6 +126,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { AltExecutionTreePartialComponent } from './components/alt-execution-tree-partial/alt-execution-tree-partial.component';
 
 @NgModule({
   declarations: [
@@ -180,6 +181,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreePartialComponent,
     AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
@@ -231,6 +233,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
+    AltExecutionTreePartialTabComponent,
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,

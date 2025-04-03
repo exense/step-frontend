@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ArtefactService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -17,6 +17,7 @@ export interface AggregatedTreeNodeDialogData {
   selector: 'step-aggregated-tree-node-dialog',
   templateUrl: './aggregated-tree-node-dialog.component.html',
   styleUrl: './aggregated-tree-node-dialog.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);

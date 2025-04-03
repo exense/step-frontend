@@ -1,12 +1,31 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
+import {
+  ArtefactService,
+  AugmentedControllerService,
+  ReportNode,
+  TreeNodeUtilsService,
+  TreeStateService,
+} from '@exense/step-core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
+import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
+import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 
 @Component({
   selector: 'step-alt-report-node-details',
   templateUrl: './alt-report-node-details.component.html',
   styleUrl: './alt-report-node-details.component.scss',
+  providers: [
+    {
+      provide: TreeNodeUtilsService,
+      useClass: AggregatedReportViewTreeNodeUtilsService,
+    },
+    AggregatedReportViewTreeStateService,
+    {
+      provide: TreeStateService,
+      useExisting: AggregatedReportViewTreeStateService,
+    },
+  ],
 })
 export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);

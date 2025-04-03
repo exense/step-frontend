@@ -1,45 +1,48 @@
 @if (node(); as node) {
-  @if (detailsComponent(); as detailsComponent) {
-    <step-custom-item-render [component]="detailsComponent" [context]="node" />
-  } @else {
-    <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
-    <!--Assertion errors-->
-    @if (children(); as children) {
-      @if (children.length) {
+  <div>
+    @if (detailsComponent(); as detailsComponent) {
+      <step-custom-item-render [component]="detailsComponent" [context]="node" />
+    } @else {
+      <step-artefact-inline-details [reportInfo]="node" [isVertical]="true" />
+      <!--Assertion errors-->
+      @if (children(); as children) {
+        @if (children.length) {
+          <section>
+            <label>Errors</label>
+            <div>
+              @for (child of children; track child.id) {
+                <step-report-node-error [node]="child" />
+              }
+            </div>
+          </section>
+        }
+      }
+      <!--Error-->
+      @if (node.error; as err) {
         <section>
-          <label>Errors</label>
+          <label>Error</label>
           <div>
-            @for (child of children; track child.id) {
-              <step-report-node-error [node]="child" />
-            }
+            {{ err.msg }}
+            {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
           </div>
         </section>
       }
-    }
-    <!--Error-->
-    @if (node.error; as err) {
+      <!--Attachments-->
+      @if (!!node.attachments?.length) {
+        <section>
+          <step-attachments-preview [attachments]="node.attachments" />
+        </section>
+      }
+      <!--Details-->
       <section>
-        <label>Error</label>
-        <div>
-          {{ err.msg }}
-          {{ !!node.attachments?.length ? '. Check the attachments for more details.' : '' }}
-        </div>
+        <step-report-node [reportNodeId]="node.id" [showArtefact]="showArtefact()" />
+      </section>
+      <hr />
+      <section class="footer">
+        <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
+        <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
       </section>
     }
-    <!--Attachments-->
-    @if (!!node.attachments?.length) {
-      <section>
-        <step-attachments-preview [attachments]="node.attachments" />
-      </section>
-    }
-    <!--Details-->
-    <section>
-      <step-report-node [reportNodeId]="node.id" [showArtefact]="showArtefact()" />
-    </section>
-    <hr />
-    <section class="footer">
-      <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
-      <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
-    </section>
-  }
+  </div>
+  <step-alt-execution-tree-partial [node]="node" [allowDialogOpen]="false" />
 }
