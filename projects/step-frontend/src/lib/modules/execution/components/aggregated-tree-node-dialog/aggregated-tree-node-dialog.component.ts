@@ -10,6 +10,7 @@ export interface AggregatedTreeNodeDialogData {
   resolvedPartialPath?: string;
   reportNode?: ReportNode;
   searchStatus?: Status;
+  searchStatusCount?: number;
   reportNodeChildren: ReportNode[];
 }
 
@@ -29,6 +30,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected readonly aggregatedNode = this._data.aggregatedNode;
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;
+  protected readonly initialSearchStatusCount = this._data.searchStatusCount;
   protected readonly hasData = !!this._data.aggregatedNode || !!this._data.reportNode;
   protected readonly hasBackButton = !this._data.reportNode;
 

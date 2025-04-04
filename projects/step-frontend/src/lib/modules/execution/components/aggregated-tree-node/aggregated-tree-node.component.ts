@@ -24,14 +24,17 @@ export class AggregatedTreeNodeComponent {
 
   protected readonly detailsTooltip = 'Open execution details';
 
-  protected showIterations(status?: Status, event?: MouseEvent): void {
+  protected showIterations(status?: Status, count?: number, event?: MouseEvent): void {
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
     const node = this.node();
     if (!node) {
       return;
     }
+    if (!count) {
+      count = Object.values(node.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+    }
     this._treeState.selectNode(node);
-    this._executionDialogs.openIterations(node, { nodeStatus: status });
+    this._executionDialogs.openIterations(node, { nodeStatus: status, nodeStatusCount: count });
   }
 }

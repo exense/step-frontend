@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 step-table {
   --mat-table-row-item-container-height: 3rem;
@@ -56,5 +57,13 @@ button.details-trigger {
   & > button {
     width: 2rem;
     height: 2rem;
+  }
+}
+
+step-alert {
+  margin-bottom: 0;
+  padding: 0.5rem;
+  .warning-explanation {
+    margin-left: 0.5rem;
   }
 }
