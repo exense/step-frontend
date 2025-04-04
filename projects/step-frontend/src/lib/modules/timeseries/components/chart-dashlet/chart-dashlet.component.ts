@@ -296,12 +296,12 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
       if (removeChartGaps) {
         let lastBucketValue: BucketResponse | undefined;
-        response.matrix[i].forEach((b: BucketResponse, j: number) => {
-          if (b) {
-            if (b.sum === 0) {
+        response.matrix[i].forEach((bucketValue: BucketResponse, j: number) => {
+          if (bucketValue) {
+            if (bucketValue.sum === 0) {
               lastBucketValue = undefined;
             } else {
-              lastBucketValue = b;
+              lastBucketValue = bucketValue;
             }
           } else {
             // empty bucket
