@@ -57,8 +57,10 @@ step-table {
     height: 4.8rem;
   }
 
-  mat-paginator {
-    border-radius: 0 0 16px 16px;
+  .paginator-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   tr {
