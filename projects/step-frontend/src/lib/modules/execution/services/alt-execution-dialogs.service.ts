@@ -16,6 +16,16 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
 
+export interface OpenIterationsParams {
+  artefactId: string;
+  artefactHash?: string;
+  countByStatus?: Record<string, number>;
+  nodeStatus?: Status;
+  reportNodeId?: string;
+}
+
+export type PartialOpenIterationsParams = Pick<OpenIterationsParams, 'nodeStatus' | 'reportNodeId'>;
+
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _executionsApi = inject(AugmentedExecutionsService);
@@ -27,24 +37,34 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
   private _matDialog = inject(MatDialog);
 
+  openIterations(params: OpenIterationsParams): void;
+  openIterations(node: AggregatedTreeNode, restParams: PartialOpenIterationsParams): void;
   openIterations(
-    node: AggregatedTreeNode,
-    { nodeStatus, reportNodeId }: { nodeStatus?: Status; reportNodeId?: string } = {},
+    nodeOrParams: AggregatedTreeNode | OpenIterationsParams,
+    restParams?: PartialOpenIterationsParams,
   ): void {
-    const nodeId = node.id;
-    if (!!reportNodeId) {
-      this.navigateToIterationDetails(reportNodeId, nodeId);
+    if (arguments.length === 2) {
+      const node = nodeOrParams as AggregatedTreeNode;
+      restParams = restParams ?? {};
+      const { id: artefactId, artefactHash, countByStatus } = node;
+      this.openIterations({ artefactId, artefactHash, countByStatus, ...restParams });
       return;
     }
-    const itemsCounts = Object.values(node.countByStatus ?? {});
-    if (itemsCounts.length === 1 && itemsCounts[0] === 1 && node.artefactHash) {
-      this.getSingleRunReportNode(node.artefactHash).subscribe((reportNode) => {
+
+    const { artefactId, artefactHash, countByStatus, reportNodeId, nodeStatus } = nodeOrParams as OpenIterationsParams;
+    if (!!reportNodeId) {
+      this.navigateToIterationDetails(reportNodeId, artefactId);
+      return;
+    }
+    const itemsCounts = Object.values(countByStatus ?? {});
+    if (itemsCounts.length === 1 && itemsCounts[0] === 1 && artefactHash) {
+      this.getSingleRunReportNode(artefactHash).subscribe((reportNode) => {
         this._reportNodeDetails.setReportNode(reportNode);
-        this.navigateToIterationDetails(reportNode.id!, nodeId);
+        this.navigateToIterationDetails(reportNode.id!, artefactId);
       });
       return;
     }
-    this.navigateToIterationList(nodeId, nodeStatus);
+    this.navigateToIterationList(artefactId, nodeStatus);
   }
 
   openIterationDetails<T extends ReportNode>(reportNode: T): void {

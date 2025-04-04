@@ -1,45 +1,50 @@
 <step-alt-report-node-list title="Test Cases" [mode]="_mode">
   <step-table #table [dataSource]="(dataSource$ | async)!" class="paddingless-full no-highlight no-border hide-header">
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
-        <step-status [status]="element.status" [iconMode]="true" class="full-width" />
-      </td>
-    </ng-container>
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
-        <span
-          class="test-case-name"
-          [class.is-selected]="hasTestCasesFilter() && (element.artefactID | isSelected | async)"
-          (click)="reportNodeClick.emit(element)"
-        >
-          {{ element.name }}
-        </span>
+        <section (click)="showIterations(element)">
+          <div class="details-trigger">
+            <div>
+              <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+              <span>
+                {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
+              </span>
+            </div>
+          </div>
+          <step-aggregated-status
+            [countByStatus]="element.countByStatus"
+            (statusClick)="showIterations(element, $event.status, $event.event)"
+          />
+        </section>
       </td>
     </ng-container>
     <ng-container matColumnDef="operations">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="operations" mat-cell *matCellDef="let element">
-        @if (element.status === 'RUNNING') {
-          <step-alt-current-operations [reportNodeId]="element.id" [(showAll)]="showAllOperations" />
+        @if (element?.singleInstanceReportNode; as node) {
+          @if (node.status === 'RUNNING') {
+            <step-alt-current-operations [reportNodeId]="node.id" [(showAll)]="showAllOperations" />
+          }
         }
       </td>
     </ng-container>
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
-        <step-btn-group class="actions">
-          <button
-            type="button"
-            mat-icon-button
-            matTooltip="Show this node in tree view"
-            matTooltipPosition="below"
-            (click)="openTestCaseInTreeView.emit(element)"
-          >
-            <step-icon name="git-pull-request" />
-          </button>
-        </step-btn-group>
+        @if (element?.singleInstanceReportNode; as node) {
+          <step-btn-group class="actions">
+            <button
+              type="button"
+              mat-icon-button
+              matTooltip="Show this node in tree view"
+              matTooltipPosition="below"
+              (click)="openTestCaseInTreeView.emit(node)"
+            >
+              <step-icon name="git-pull-request" />
+            </button>
+          </step-btn-group>
+        }
       </td>
     </ng-container>
   </step-table>
