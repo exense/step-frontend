@@ -72,7 +72,6 @@ import { AltReportWidgetContentDirective } from './directives/alt-report-widget-
 import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
 import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
-import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
@@ -126,6 +125,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
 
 @NgModule({
   declarations: [
@@ -188,7 +188,6 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltExecutionLaunchDialogComponent,
     AltExecutionTreePartialTabComponent,
     ExecutionDetailsComponent,
-    AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
@@ -203,6 +202,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     AltExecutionErrorsComponent,
     AgentsCellComponent,
     AgentsModalComponent,
+    AggregatedStatusComponent,
   ],
   imports: [
     StepCommonModule,
