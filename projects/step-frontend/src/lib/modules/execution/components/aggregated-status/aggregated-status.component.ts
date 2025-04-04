@@ -24,7 +24,7 @@ export class AggregatedStatusComponent {
     },
   );
 
-  readonly statusClick = output<{ status: Status; event: MouseEvent }>();
+  readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
   protected readonly statusItems = computed(() => {
     const countByStatus = this.countByStatus();
@@ -43,8 +43,8 @@ export class AggregatedStatusComponent {
 
   protected readonly isEmptyStatus = computed(() => !this.statusItems().length);
 
-  protected handleClick(status: Status, event: MouseEvent): void {
-    this.statusClick.emit({ status, event });
+  protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
+    this.statusClick.emit({ status, count, event });
   }
 
   private createStatusItem(status?: string | Status, count?: number): StatusItem | undefined {

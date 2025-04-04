@@ -14,7 +14,7 @@
           </div>
           <step-aggregated-status
             [countByStatus]="element.countByStatus"
-            (statusClick)="showIterations(element, $event.status, $event.event)"
+            (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
           />
         </section>
       </td>

@@ -22,9 +22,10 @@ export interface OpenIterationsParams {
   countByStatus?: Record<string, number>;
   nodeStatus?: Status;
   reportNodeId?: string;
+  nodeStatusCount?: number;
 }
 
-export type PartialOpenIterationsParams = Pick<OpenIterationsParams, 'nodeStatus' | 'reportNodeId'>;
+export type PartialOpenIterationsParams = Pick<OpenIterationsParams, 'nodeStatus' | 'reportNodeId' | 'nodeStatusCount'>;
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -51,7 +52,8 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       return;
     }
 
-    const { artefactId, artefactHash, countByStatus, reportNodeId, nodeStatus } = nodeOrParams as OpenIterationsParams;
+    const { artefactId, artefactHash, countByStatus, reportNodeId, nodeStatus, nodeStatusCount } =
+      nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
       this.navigateToIterationDetails(reportNodeId, artefactId);
       return;
@@ -64,7 +66,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       });
       return;
     }
-    this.navigateToIterationList(artefactId, nodeStatus);
+    this.navigateToIterationList(artefactId, nodeStatus, nodeStatusCount);
   }
 
   openIterationDetails<T extends ReportNode>(reportNode: T): void {
@@ -79,10 +81,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     });
   }
 
-  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status): void {
+  private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
     const queryParams: Params = {};
     queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
     queryParams[this._queryParamsNames.searchStatus] = searchStatus;
+    queryParams[this._queryParamsNames.searchStatusCount] = searchStatusCount;
     this.openNodeDetails(queryParams);
   }
 

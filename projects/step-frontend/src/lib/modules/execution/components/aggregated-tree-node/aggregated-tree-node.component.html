@@ -5,7 +5,7 @@
         <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
         <step-aggregated-status
           [countByStatus]="node?.countByStatus"
-          (statusClick)="showIterations($event.status, $event.event)"
+          (statusClick)="showIterations($event.status, $event.count, $event.event)"
         />
         <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
           node?.originalArtefact?.description | treeNodeDescription

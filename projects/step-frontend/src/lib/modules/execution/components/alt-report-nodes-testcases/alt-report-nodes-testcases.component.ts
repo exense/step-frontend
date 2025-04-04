@@ -50,15 +50,19 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
     // Empty implementation
   }
 
-  protected showIterations(item: AggregatedReportView, status?: Status, event?: MouseEvent): void {
+  protected showIterations(item: AggregatedReportView, status?: Status, count?: number, event?: MouseEvent): void {
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
 
+    if (!count) {
+      count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+    }
     this._executionDialogs.openIterations({
       artefactId: item.artefact!.id!,
       artefactHash: item.artefactHash!,
       countByStatus: item.countByStatus,
       nodeStatus: status,
+      nodeStatusCount: count,
     });
   }
 }
