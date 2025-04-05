@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
 import {
   combineLatest,
   debounceTime,
@@ -190,7 +190,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        this._urlParamsService.updateUrlParams(timeRangeSelection);
+        // this._urlParamsService.updateUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
@@ -200,6 +200,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range);
+  });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.updateTimeRangeSelection(selection);
@@ -365,6 +369,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
     if (urlParams.timeRange) {
+      console.log('updating time range', urlParams.timeRange);
       this.updateTimeRangeSelection(urlParams.timeRange);
     } else {
       // force event
@@ -374,6 +379,33 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
+    this.subscribeToUrlNavigation();
+  }
+
+  private subscribeToUrlNavigation() {
+    // subscribe to back and forward events
+    this._router.events
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
+        pairwise(), // Gives us [previousEvent, currentEvent]
+        filter(
+          ([prev, curr]) =>
+            prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
+        ),
+      )
+      .subscribe(() => {
+        let params = this._urlParamsService.collectUrlParams();
+        console.log('Full URL:', window.location.href);
+        console.log(this._activatedRoute.snapshot.queryParams);
+        if (params.timeRange) {
+          this.updateTimeRangeSelection(params.timeRange!);
+        }
+        // const actualDashboardId = this.dashboardIdInternal;
+        // this.dashboardIdInternal = undefined;
+        // this._changeDetectorRef.detectChanges();
+        // this.dashboardIdInternal = actualDashboardId;
+      });
   }
 
   ngOnDestroy(): void {

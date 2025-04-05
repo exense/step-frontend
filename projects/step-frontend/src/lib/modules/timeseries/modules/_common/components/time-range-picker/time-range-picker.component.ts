@@ -94,11 +94,9 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
         this.toDateString = TimeSeriesUtils.formatInputDate(new Date(currentValue.absoluteSelection!.to));
       }
     }
-    if (previousValue && previousValue !== currentValue) {
-      this.formatSelectionLabel(currentValue);
-      if (currentValue.type !== 'ABSOLUTE' && currentValue.type !== previousValue?.type) {
-        this.cleanupAbsoluteDates();
-      }
+    this.formatSelectionLabel(currentValue);
+    if (currentValue.type !== 'ABSOLUTE' && currentValue.type !== previousValue?.type) {
+      this.cleanupAbsoluteDates();
     }
   }
 
