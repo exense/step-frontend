@@ -4,7 +4,6 @@ import {
   DestroyRef,
   EventEmitter,
   inject,
-  input,
   Input,
   OnChanges,
   OnInit,
@@ -40,6 +39,7 @@ import { TimeRangePickerSelection } from '../../modules/_common/types/time-selec
 import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 @Component({
   selector: 'step-execution-page',
@@ -58,8 +58,6 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 })
 export class ExecutionPageComponent implements OnInit, OnChanges {
   @Input() execution!: Execution;
-  initialTimeRange = input<TimeRangePickerSelection | undefined>(undefined);
-
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
@@ -68,7 +66,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   protected _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
-  private _timeSeriesContextFactory = inject(TimeSeriesContextsFactory);
+  private _urlParamsService = inject(DashboardUrlParamsService);
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -124,7 +122,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
-        pairwise(), // Gives us [previousEvent, currentEvent]
+        pairwise(),
         filter(
           ([prev, curr]) =>
             prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
@@ -132,8 +130,11 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
       )
       .subscribe(() => {
         this.isInitialized = false;
-        this._timeSeriesContextFactory.destroyContext(this.execution.id);
+        let timeRange = this._urlParamsService.collectUrlParams().timeRange;
         this._changeDetectorRef.detectChanges();
+        if (timeRange) {
+          this.timeRangePickerChange.next(timeRange!);
+        }
         this.isInitialized = true;
       });
   }

@@ -191,13 +191,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        // this._urlParamsService.updateUrlParams(timeRangeSelection);
+        this._urlParamsService.updateUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
 
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(300))),
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(200))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -374,7 +374,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
     if (urlParams.timeRange) {
-      console.log('updating time range', urlParams.timeRange);
       this.updateTimeRangeSelection(urlParams.timeRange);
     } else {
       // force event
@@ -402,7 +401,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       .subscribe(() => {
         let params = this._urlParamsService.collectUrlParams();
         this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-          console.log('is analytics route:', isAnalyticsRoute);
+          console.log('is analytics route:', isAnalyticsRoute, params);
           if (!isAnalyticsRoute && params.timeRange) {
             // analytics route takes care of updating the url itself
             this.updateTimeRangeSelection(params.timeRange!);

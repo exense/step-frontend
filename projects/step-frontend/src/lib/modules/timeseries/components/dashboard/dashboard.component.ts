@@ -65,7 +65,6 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-location';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
@@ -107,7 +106,6 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   @Input('id') dashboardId!: string;
   @Input() storageId?: string;
   @Input() editable: boolean = true;
-  @Input() initialTimeSelection?: TimeRangePickerSelection;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() defaultFullTimeRange?: Partial<TimeRange>;
   @Input() showExecutionLinks = true;
@@ -149,12 +147,8 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       });
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
-    console.log('INIT COLLECT URL PARAMS', urlParams);
-    if (this.initialTimeSelection) {
-      urlParams.timeRange = this.initialTimeSelection;
-    }
     this.resolution = urlParams.resolution;
-    this.removeOneTimeUrlParams();
+    // this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     const metrics$ = this._timeSeriesService.getMetricTypes();
     const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);
