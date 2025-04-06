@@ -159,6 +159,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads
     map(() => this._router.url.includes('/analytics')),
+    shareReplay(1),
   );
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -202,7 +203,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this._urlParamsService.updateUrlParams(range);
+    this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
+      if (!isAnalyticsRoute) {
+        this._urlParamsService.updateUrlParams(range);
+      }
+    });
   });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -396,15 +401,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       )
       .subscribe(() => {
         let params = this._urlParamsService.collectUrlParams();
-        console.log('Full URL:', window.location.href);
-        console.log(this._activatedRoute.snapshot.queryParams);
-        if (params.timeRange) {
-          this.updateTimeRangeSelection(params.timeRange!);
-        }
-        // const actualDashboardId = this.dashboardIdInternal;
-        // this.dashboardIdInternal = undefined;
-        // this._changeDetectorRef.detectChanges();
-        // this.dashboardIdInternal = actualDashboardId;
+        this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
+          console.log('is analytics route:', isAnalyticsRoute);
+          if (!isAnalyticsRoute && params.timeRange) {
+            // analytics route takes care of updating the url itself
+            this.updateTimeRangeSelection(params.timeRange!);
+          }
+        });
       });
   }
 

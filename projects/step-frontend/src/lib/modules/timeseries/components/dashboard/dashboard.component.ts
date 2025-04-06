@@ -149,6 +149,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
       });
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    console.log('INIT COLLECT URL PARAMS', urlParams);
     if (this.initialTimeSelection) {
       urlParams.timeRange = this.initialTimeSelection;
     }
@@ -260,6 +261,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private updateUrl(replaceUrl = false): void {
+    console.log('updating', replaceUrl);
     this._urlParamsService.updateUrlParamsFromContext(this.mainEngine.state.context, replaceUrl);
   }
 
