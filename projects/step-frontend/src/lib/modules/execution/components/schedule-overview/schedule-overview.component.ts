@@ -213,7 +213,7 @@ export class ScheduleOverviewComponent {
   triggerRefresh() {
     // signal is triggered
     this.refresh$.next();
-    // this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
   }
 
   handleRefreshIntervalChange(interval: number) {
