@@ -49,6 +49,7 @@ import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pi
 import { SettingsInsideActionColDirective } from './directives/settings-inside-action-col.directive';
 import { RowsExtensionDirective } from './directives/rows-extension.directive';
 import { RowDirective } from './directives/row.directive';
+import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
 
 @NgModule({
   imports: [
@@ -68,6 +69,7 @@ import { RowDirective } from './directives/row.directive';
     TableComponent,
     SearchColDirective,
     SearchCellDefDirective,
+    TablePaginatorAddonDirective,
     CustomColumnsComponent,
     ColumnDirective,
     CustomCellComponentsPipe,
@@ -97,6 +99,7 @@ import { RowDirective } from './directives/row.directive';
   exports: [
     TableComponent,
     SearchColDirective,
+    TablePaginatorAddonDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
     ColumnDirective,
@@ -175,6 +178,7 @@ export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
 export * from './directives/highlight-table-row.directive';
 export * from './directives/settings-inside-action-col.directive';
+export * from './directives/table-paginator-addon.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './components/bulk-operations/bulk-operations.component';
