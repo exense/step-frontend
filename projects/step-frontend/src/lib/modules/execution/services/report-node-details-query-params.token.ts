@@ -4,6 +4,7 @@ export interface ReportNodeDetailsQueryParams {
   reportNodeId: string;
   aggregatedNodeId: string;
   searchStatus: string;
+  searchStatusCount: string;
 }
 
 export const REPORT_NODE_DETAILS_QUERY_PARAMS = new InjectionToken<ReportNodeDetailsQueryParams>(
@@ -15,6 +16,7 @@ export const REPORT_NODE_DETAILS_QUERY_PARAMS = new InjectionToken<ReportNodeDet
         reportNodeId: 'reportNodeId',
         aggregatedNodeId: 'aggregatedNodeId',
         searchStatus: 'searchStatus',
+        searchStatusCount: 'searchStatusCount',
       }) as ReportNodeDetailsQueryParams,
   },
 );

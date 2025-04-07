@@ -4,11 +4,11 @@ import {
   AbstractArtefact,
   AugmentedPlansService,
   AugmentedScreenService,
-  DynamicValueString,
+  DynamicValue,
   KeywordsService,
 } from '../../../client/step-client-module';
 import { AuthService } from '../../auth';
-import { JsonFieldsSchema } from '../../json-forms';
+import { JsonFieldsSchema, JsonFieldUtilsService } from '../../json-forms';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +18,7 @@ export class ArtefactsFactoryService {
   private _keywordCallsApi = inject(KeywordsService);
   private _screenTemplates = inject(AugmentedScreenService);
   private _authService = inject(AuthService);
+  private _jsonFieldUtilsService = inject(JsonFieldUtilsService);
 
   createControlArtefact(artefactTypeId: string): Observable<AbstractArtefact> {
     return this._planApi.getArtefactType(artefactTypeId).pipe(
@@ -80,11 +81,11 @@ export class ArtefactsFactoryService {
               return res;
             }
 
-            const value = property.default;
+            const value = this._jsonFieldUtilsService.getDefaultValueForDynamicModel(property);
             res[field] = { value, dynamic: false };
             return res;
           },
-          {} as Record<string, DynamicValueString>,
+          {} as Record<string, DynamicValue>,
         );
 
         (artefact as any)['argument'] = {

@@ -670,6 +670,12 @@ export class ExecutionModule {
                     const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                     return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
                   },
+                  searchStatusCount: (route: ActivatedRouteSnapshot) => {
+                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                    const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
+                    const statusCount = parseInt(statusCountStr);
+                    return isNaN(statusCount) ? undefined : statusCount;
+                  },
                 },
                 dialogComponent: AggregatedTreeNodeDialogComponent,
                 children: [
