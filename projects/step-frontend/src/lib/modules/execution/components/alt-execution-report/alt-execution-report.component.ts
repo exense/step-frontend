@@ -49,9 +49,7 @@ export class AltExecutionReportComponent {
     this._urlParamsService.updateUrlParams(range);
   });
 
-  protected handleOpenNodeInTreePage(keyword: ReportNode): void {
-    const reportNodeId = keyword.id;
-    const artefactId = keyword.artefactID;
+  protected handleOpenNodeInTreePage(artefactId?: string, reportNodeId?: string): void {
     if (!artefactId) {
       return;
     }

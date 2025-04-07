@@ -53,7 +53,10 @@ export class AltExecutionTreeTabComponent implements OnInit {
           return;
         }
         this._treeState.selectNode(node);
-        this._executionDialogs.openIterations(node, { reportNodeId: data!.reportNodeId });
+        if (data?.reportNodeId) {
+          const reportNodeId = data.reportNodeId;
+          this._executionDialogs.openIterations(node, { reportNodeId });
+        }
       });
   }
 

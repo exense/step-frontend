@@ -5,7 +5,7 @@
         class="widget"
         [style.--colSpan]="3"
         (reportNodeClick)="handleOpenNodeInTreeWidget($event)"
-        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event)"
+        (openTestCaseInTreeView)="handleOpenNodeInTreePage($event.artefactID)"
       />
     }
     @if (_testCasesState.summary$ | async; as testCasesSummary) {
@@ -36,7 +36,7 @@
     <step-alt-report-node-keywords
       class="keywords widget"
       [style.--colSpan]="3"
-      (openKeywordInTreeView)="handleOpenNodeInTreePage($event)"
+      (openKeywordInTreeView)="handleOpenNodeInTreePage($event.artefactID, $event.id)"
     />
   }
   @if (_state.executionId$ | async; as executionId) {
