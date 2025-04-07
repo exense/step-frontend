@@ -148,7 +148,7 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
     this.resolution = urlParams.resolution;
-    // this.removeOneTimeUrlParams();
+    this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');
     const metrics$ = this._timeSeriesService.getMetricTypes();
     const dashboard$ = this._dashboardService.getDashboardById(this.dashboardId);

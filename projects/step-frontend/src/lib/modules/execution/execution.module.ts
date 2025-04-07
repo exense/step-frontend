@@ -126,6 +126,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 @NgModule({
   declarations: [
@@ -343,7 +344,7 @@ export class ExecutionModule {
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       component: AltExecutionsComponent,
-      providers: [ActiveExecutionsService],
+      providers: [ActiveExecutionsService, DashboardUrlParamsService],
       children: [
         {
           path: '',

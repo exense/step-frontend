@@ -404,9 +404,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         ),
       )
       .subscribe(() => {
-        let params = this._urlParamsService.collectUrlParams();
         this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-          console.log('is analytics route:', isAnalyticsRoute, params);
+          let params = this._urlParamsService.collectUrlParams();
           if (!isAnalyticsRoute && params.timeRange) {
             // analytics route takes care of updating the url itself
             this.updateTimeRangeSelection(params.timeRange!);
