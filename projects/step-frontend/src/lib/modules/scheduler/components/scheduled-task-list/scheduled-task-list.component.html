@@ -112,6 +112,7 @@
             'status-off': !element.active,
             'scheduler-disabled': !isSchedulerEnabled
           }"
+          [disabled]="!('task-write' | hasRight | async)"
           (click)="switchActive(element)"
         >
           {{ element.active ? ActiveLabels.ACTIVE : ActiveLabels.INACTIVE }}
