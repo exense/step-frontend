@@ -1,3 +1,8 @@
 .search-label {
   white-space: nowrap;
 }
+
+input.search.with-hint {
+  border-right: none !important;
+  padding-right: 0 !important;
+}

@@ -23,6 +23,9 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly searchIndex = model.required<number>();
   readonly total = input.required<number>();
 
+  readonly hint = input('');
+  readonly hintIcon = input('alert-circle');
+
   protected readonly areButtonsActive = computed(() => {
     const isDisabled = this.isDisabled();
     const value = (this.value() ?? '').trim();
@@ -82,12 +85,18 @@ export class SearchFieldComponent implements ControlValueAccessor {
   }
 
   protected next(): void {
+    if (!this.areButtonsActive()) {
+      return;
+    }
     const total = this.total();
     this.searchIndex.update((current) => (current + 1) % total);
     this.onTouch?.();
   }
 
   protected prev(): void {
+    if (!this.areButtonsActive()) {
+      return;
+    }
     const total = this.total();
     this.searchIndex.update((current) => {
       const res = current - 1;

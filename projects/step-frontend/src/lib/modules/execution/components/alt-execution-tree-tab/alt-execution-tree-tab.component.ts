@@ -20,6 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { TreeStateService } from '@exense/step-core';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
+import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -41,6 +42,7 @@ export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   protected readonly searchCtrl = this._treeState.searchCtrl;

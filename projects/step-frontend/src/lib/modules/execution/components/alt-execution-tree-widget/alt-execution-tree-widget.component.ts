@@ -5,6 +5,7 @@ import {
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
+import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -23,6 +24,7 @@ import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-t
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   protected readonly searchCtrl = this._treeState.searchCtrl;
 
