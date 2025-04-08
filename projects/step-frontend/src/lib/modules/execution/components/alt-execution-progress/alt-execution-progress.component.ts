@@ -60,6 +60,7 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
+import { AggregatedReportViewExt } from '../../shared/aggregated-report-view-ext';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -466,7 +467,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     );
   }
 
-  private aggregateReportNodes(reportNodes: ReportNode[]): AggregatedReportView[] {
+  private aggregateReportNodes(reportNodes: ReportNode[]): AggregatedReportViewExt[] {
     const artefactHashes: string[] = [];
     const groupedData = new Map<string, ReportNode[]>();
     reportNodes.forEach((reportNode) => {
@@ -502,11 +503,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         },
         {} as Record<string, number>,
       );
+      let averageDuration = nodes.reduce((res, node) => res + (node?.duration ?? 0), 0);
+      averageDuration /= nodes.length;
       return {
         artefactHash,
         artefact,
         singleInstanceReportNode,
         countByStatus,
+        averageDuration,
       };
     });
   }

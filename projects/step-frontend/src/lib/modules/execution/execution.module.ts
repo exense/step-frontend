@@ -128,6 +128,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
 import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree-node-dialog-hooks.service';
 
 @NgModule({
   declarations: [

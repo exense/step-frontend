@@ -2,5 +2,10 @@
   <div class="date" [matTooltip]="dateTooltip()" matTooltipPosition="below">{{ date }}</div>
 }
 @if (duration(); as duration) {
-  <div class="duration">{{ duration }}</div>
+  <div class="duration">
+    @if (isAverageDuration()) {
+      <span class="average" matTooltip="Average" matTooltipPosition="below">Ø</span>
+    }
+    {{ duration }}
+  </div>
 }
