@@ -6,10 +6,10 @@
         <section (click)="showIterations(element)">
           @if (element?.singleInstanceReportNode; as singleNode) {
             @if (singleNode.duration) {
-              <step-alt-execution-time [startTime]="0" [duration]="singleNode.duration" />
+              <step-alt-execution-duration [duration]="singleNode.duration" />
             }
           } @else if (!!element.averageDuration) {
-            <step-alt-execution-time [startTime]="0" [duration]="element.averageDuration" [isAverageDuration]="true" />
+            <step-alt-execution-duration [duration]="element.averageDuration" [isAverage]="true" />
           }
         </section>
       </td>

@@ -6,9 +6,6 @@
       }
       @if (duration(); as duration) {
         <div class="duration">
-          @if (isAverageDuration()) {
-            <span class="average" matTooltip="Average" matTooltipPosition="below">Ø</span>
-          }
           {{ duration }}
         </div>
       }

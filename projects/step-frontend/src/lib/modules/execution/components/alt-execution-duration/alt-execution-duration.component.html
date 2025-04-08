@@ -1,0 +1,6 @@
+@if (duration() !== undefined) {
+  @if (isAverage()) {
+    <span class="average" matTooltip="Average" matTooltipPosition="below">Ø</span>
+  }
+  {{ duration() | duration }}
+}

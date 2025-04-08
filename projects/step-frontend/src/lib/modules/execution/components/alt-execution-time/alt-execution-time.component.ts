@@ -32,7 +32,6 @@ export class AltExecutionTimeComponent {
   readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
   readonly isRunning = input(false);
   readonly timeOnly = input(false);
-  readonly isAverageDuration = input(false);
 
   protected readonly displayDate = computed(() => {
     const startTime = this.startTimeInput();

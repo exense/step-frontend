@@ -129,7 +129,7 @@ import { AggregatedStatusComponent } from './components/aggregated-status/aggreg
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree-node-dialog-hooks.service';
+import { AltExecutionDurationComponent } from './components/alt-execution-duration/alt-execution-duration.component';
 
 @NgModule({
   declarations: [
@@ -179,7 +179,6 @@ import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
-    AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -209,6 +208,7 @@ import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree
     AgentsModalComponent,
     AggregatedStatusComponent,
     DurationDescriptionComponent,
+    AltExecutionDurationComponent,
   ],
   imports: [
     StepCommonModule,
