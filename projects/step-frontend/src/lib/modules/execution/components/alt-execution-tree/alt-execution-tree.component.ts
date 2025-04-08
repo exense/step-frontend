@@ -1,6 +1,6 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
-import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
+import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 enum TreeNodeAction {
@@ -29,10 +29,9 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
-  private _destroyRef = inject(DestroyRef);
 
-  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this._urlParamsService.updateUrlParams(range);
+  updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
+    this._urlParamsService.updateUrlParams(range, undefined, true);
   });
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
@@ -58,7 +57,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       )
       .subscribe((nodeId) => {
         const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
-        nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
       });
   }
 

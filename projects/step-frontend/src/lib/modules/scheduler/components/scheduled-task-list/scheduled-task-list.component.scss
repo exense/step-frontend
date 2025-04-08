@@ -20,6 +20,10 @@
   min-width: 50px;
   border: none;
 
+  &[disabled] {
+    cursor: default;
+  }
+
   &.scheduler-disabled {
     background-color: grey !important;
   }

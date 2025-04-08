@@ -7,8 +7,9 @@ import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nod
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { first, map, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
+import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -45,9 +46,21 @@ export class AltExecutionReportComponent {
 
   private _urlParamsService = inject(DashboardUrlParamsService);
 
-  updateUrlParamsSubscription = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this._urlParamsService.updateUrlParams(range);
-  });
+  updateUrlParamsSubscription = this._state.timeRangeSelection$
+    .pipe(
+      scan(
+        (acc, range) => {
+          const isFirst = !acc.hasEmitted;
+          return { range, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+      first(),
+    )
+    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+      this._urlParamsService.updateUrlParams(range, undefined, isFirst);
+    });
 
   protected handleOpenNodeInTreePage(artefactId?: string, reportNodeId?: string): void {
     if (!artefactId) {

@@ -12,5 +12,6 @@ export interface AggregatedTreeNode
     AggregatedArtefactInfo<AbstractArtefact> {
   countByStatus?: Record<string, number>;
   nodeType: AggregatedTreeNodeType;
+  artefactId?: string;
   artefactHash?: string;
 }

@@ -6,6 +6,7 @@ import {
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
   DynamicValueString,
+  DynamicValuesUtilsService,
 } from '@exense/step-core';
 import { KeywordArtefact } from '../../types/keyword.artefact';
 import { KeywordReportNode } from '../../types/keyword.report-node';
@@ -21,6 +22,7 @@ import { KeywordReportNode } from '../../types/keyword.report-node';
 })
 export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<KeywordArtefact, KeywordReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
+  private _dynamicValueUtils = inject(DynamicValuesUtilsService);
   private _itemsBuilderService = inject(ArtefactInlineItemsBuilderService);
 
   private inputItemsBuilder = this._itemsBuilderService
@@ -38,7 +40,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   protected readonly outputItems = computed(() => this.outputItemsBuilder.build(this.currentContext()));
 
   private getArtefactInputs(artefact?: KeywordArtefact): ArtefactInlineItem[] | undefined {
-    const keywordInputs = this.parseParams<DynamicValueString>(artefact?.argument?.value);
+    const keywordInputs = this._dynamicValueUtils.parseJson<DynamicValueString>(artefact?.argument?.value);
     if (!keywordInputs) {
       return undefined;
     }
@@ -53,8 +55,10 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   }
 
   private getReportNodeInputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
-    const artefactInputs = this.parseParams<DynamicValueString>(reportNode?.resolvedArtefact?.argument?.value);
-    const resolvedInputs = this.parseParams(reportNode?.input);
+    const artefactInputs = this._dynamicValueUtils.parseJson<DynamicValueString>(
+      reportNode?.resolvedArtefact?.argument?.value,
+    );
+    const resolvedInputs = this._dynamicValueUtils.parseJson(reportNode?.input);
     if (!resolvedInputs) {
       return undefined;
     }
@@ -75,7 +79,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
   }
 
   private getReportNodeOutputs(reportNode?: KeywordReportNode): ArtefactInlineItem[] | undefined {
-    const outputParams = this.parseParams(reportNode?.output);
+    const outputParams = this._dynamicValueUtils.parseJson(reportNode?.output);
     if (!outputParams) {
       return undefined;
     }
@@ -86,18 +90,5 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
       'Output',
     ]);
     return this._artefactInlineUtils.convert(outputValues);
-  }
-
-  private parseParams<T = string>(params?: string): Record<string, T> | undefined {
-    if (!params) {
-      return undefined;
-    }
-    let result: Record<string, T> | undefined;
-    try {
-      result = JSON.parse(params);
-    } catch {
-      result = undefined;
-    }
-    return result;
   }
 }

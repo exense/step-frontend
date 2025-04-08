@@ -1,6 +1,6 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { ArtefactService } from '@exense/step-core';
+import { ArtefactService, DynamicSimpleValue, DynamicValuesUtilsService } from '@exense/step-core';
 import { EchoComponent } from './component/echo/echo.component';
 import { ThreadGroupComponent } from './component/thread-group/thread-group.component';
 import { AssertComponent } from './component/assert/assert.component';
@@ -79,6 +79,36 @@ import { ThreadGroupInlineComponent } from './component/thread-group-inline/thre
 import { ThreadGroupReportDetailsComponent } from './component/thread-group-report-details/thread-group-report-details.component';
 import { RetryIfFailsInlineComponent } from './component/retry-if-fails-inline/retry-if-fails-inline.component';
 import { RetryIfFailsReportDetailsComponent } from './component/retry-if-fails-report-details/retry-if-fails-report-details.component';
+import { TestSetArtefact } from './types/test-set.artefact';
+import { CallPlanArtefact } from './types/call-plan.artefact';
+import { KeywordArtefact } from './types/keyword.artefact';
+import { KeywordReportNode } from './types/keyword.report-node';
+import { ForArtefact } from './types/for.artefact';
+import { DataSourceFieldsService } from './injectables/data-source-fields.service';
+import { ForEachArtefact } from './types/for-each.artefact';
+import { EchoArtefact } from './types/echo.artefact';
+import { EchoReportNode } from './types/echo.report-node';
+import { SleepArtefact } from './types/sleep.artefact';
+import { WhileArtefact } from './types/while.artefact';
+import { DataSetArtefact } from './types/data-set.artefact';
+import { Synchronized } from './types/synchronized.artefact';
+import { SequenceArtefact } from './types/sequence.artefact';
+import { ReturnArtefact } from './types/return.artefact';
+import { IfArtefact } from './types/if.artefact';
+import { SessionArtefact } from './types/session.artefact';
+import { SetArtefact } from './types/set.artefact';
+import { SetReportNode } from './types/set.report-node';
+import { ScriptArtefact } from './types/script.artefact';
+import { ThreadGroupArtefact } from './types/thread-group.artefact';
+import { SwitchArtefact } from './types/switch.artefact';
+import { CaseArtefact } from './types/case.artefact';
+import { RetryIfFailsArtefact } from './types/retry-if-fails.artefact';
+import { RetryIfFailsReportNode } from './types/retry-if-fails.report-node';
+import { CheckArtefact } from './types/check.artefact';
+import { AssertArtefact } from './types/assert.artefact';
+import { AssertReportNode } from './types/assert.report-node';
+import { ExportArtefact } from './types/export.artefact';
+import { AssertPerformanceArtefact } from './types/assert-performance.artefact';
 
 @NgModule({
   declarations: [
@@ -253,6 +283,7 @@ export class ArtefactsModule {
       inlineComponent: TestSetInlineComponent,
       reportDetailsComponent: TestSetReportDetailsComponent,
       description: 'Used to group up TestCase’s as a single unit and executing them in parallel',
+      getArtefactSearchValues: (artefact?: TestSetArtefact) => (artefact?.threads ? [artefact.threads] : undefined),
     });
     this._artefactService.register('TestCase', {
       icon: 'plan-testcase',
@@ -273,6 +304,8 @@ export class ArtefactsModule {
       inlineComponent: CallPlanInlineComponent,
       reportDetailsComponent: CallPlanReportDetailsComponent,
       description: 'Used to invoke a plan from within another plan',
+      getArtefactSearchValues: (artefact?: CallPlanArtefact) =>
+        [artefact?.selectionAttributes, artefact?.input].filter((item) => !!item),
     });
     this._artefactService.register('CallKeyword', {
       icon: 'keyword',
@@ -281,6 +314,15 @@ export class ArtefactsModule {
       reportDetailsComponent: CallKeywordReportDetailsComponent,
       description:
         'Technical node used as part of keyword invocation. Can be used explicitly in order to call a keyword by reflection',
+      getArtefactSearchValues: (artefact?: KeywordArtefact) => (artefact?.argument ? [artefact.argument] : undefined),
+      getReportNodeSearchValues: (reportNode?: KeywordReportNode): DynamicSimpleValue[] => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [
+          reportNode?.resolvedArtefact?.argument,
+          reportNode?.input ? _dynamicValueUtils.convertSimpleValueToDynamicValue(reportNode.input) : undefined,
+          reportNode?.output ? _dynamicValueUtils.convertSimpleValueToDynamicValue(reportNode.output) : undefined,
+        ].filter((item) => !!item) as DynamicSimpleValue[];
+      },
     });
     this._artefactService.register('For', {
       icon: 'cpu',
@@ -288,6 +330,14 @@ export class ArtefactsModule {
       inlineComponent: ForInlineComponent,
       reportDetailsComponent: ForReportDetailsComponent,
       description: 'Creates a For loop at execution time and iterates through its children',
+      getArtefactSearchValues: (artefact?: ForArtefact) =>
+        [
+          artefact?.dataSource?.start,
+          artefact?.dataSource?.end,
+          artefact?.dataSource?.inc,
+          artefact?.threads,
+          artefact?.maxFailedLoops,
+        ].filter((item) => !!item),
     });
     this._artefactService.register('ForEach', {
       icon: 'cpu',
@@ -295,6 +345,16 @@ export class ArtefactsModule {
       inlineComponent: ForEachInlineComponent,
       reportDetailsComponent: ForEachReportDetailsComponent,
       description: 'Creates a ForEach loop based on a collection and iterates through the child nodes',
+      getArtefactSearchValues: (artefact?: ForEachArtefact) => {
+        const _dataSourceFields = inject(DataSourceFieldsService);
+        if (!artefact) {
+          return undefined;
+        }
+        const { dataSource, dataSourceType, threads } = artefact;
+        return [threads, ..._dataSourceFields.extractDataSourceSearchValues(dataSourceType!, dataSource!)].filter(
+          (item) => !!item,
+        );
+      },
     });
     this._artefactService.register('While', {
       icon: 'rotate-cw',
@@ -302,6 +362,12 @@ export class ArtefactsModule {
       inlineComponent: WhileInlineComponent,
       reportDetailsComponent: WhileReportDetailsComponent,
       description: 'Iterates over the node content until the given condition is not met',
+      getArtefactSearchValues: (artefact?: WhileArtefact) => {
+        if (!artefact) {
+          return undefined;
+        }
+        return [artefact.condition, artefact.postCondition, artefact.pacing, artefact.timeout].filter((item) => !!item);
+      },
     });
     this._artefactService.register('DataSet', {
       icon: 'grid',
@@ -309,6 +375,17 @@ export class ArtefactsModule {
       inlineComponent: DataSetInlineComponent,
       reportDetailsComponent: DataSetReportDetailsComponent,
       description: 'Used to iterate over rows of data in a table',
+      getArtefactSearchValues: (artefact?: DataSetArtefact) => {
+        const _dataSourceFields = inject(DataSourceFieldsService);
+        if (!artefact) {
+          return undefined;
+        }
+        const { dataSource, dataSourceType } = artefact;
+        return [
+          ..._dataSourceFields.extractDataSourceSearchValues(dataSourceType!, dataSource!),
+          dataSource?.forWrite,
+        ].filter((item) => !!item);
+      },
     });
     this._artefactService.register('Synchronized', {
       icon: 'align-justify',
@@ -317,6 +394,12 @@ export class ArtefactsModule {
       reportDetailsComponent: SynchronizedReportDetailsComponent,
       description:
         'Guarantee thread safety within a test block by synchronizing all threads on the entire Test Execution',
+      getArtefactSearchValues: (artefact?: Synchronized) => {
+        if (!artefact) {
+          return undefined;
+        }
+        return [artefact.lockName, artefact.globalLock].filter((item) => !!item);
+      },
     });
     this._artefactService.register('Sequence', {
       icon: 'plan-sequence',
@@ -324,6 +407,12 @@ export class ArtefactsModule {
       inlineComponent: SequenceInlineComponent,
       reportDetailsComponent: SequenceReportDetailsComponent,
       description: 'Guarantees the ordering of the child nodes, as displayed in the tree.',
+      getArtefactSearchValues: (artefact?: SequenceArtefact) => {
+        if (!artefact) {
+          return undefined;
+        }
+        return [artefact.continueOnError, artefact.pacing].filter((item) => !!item);
+      },
     });
     this._artefactService.register('BeforeSequence', {
       icon: 'arrow-up',
@@ -339,6 +428,7 @@ export class ArtefactsModule {
       inlineComponent: ReturnInlineComponent,
       reportDetailsComponent: ReturnReportDetailsComponent,
       description: 'Used within a Composite Keyword, set the Composite output to the returned value(s)',
+      getArtefactSearchValues: (artefact?: ReturnArtefact) => (artefact?.output ? [artefact.output] : undefined),
     });
     this._artefactService.register('Echo', {
       icon: 'zoom-in',
@@ -346,6 +436,14 @@ export class ArtefactsModule {
       inlineComponent: EchoInlineComponent,
       reportDetailsComponent: EchoReportDetailsComponent,
       description: 'Used to print data in the report nodes of a plan, mostly for debugging or information purposes',
+      getArtefactSearchValues: (artefact?: EchoArtefact) => (artefact?.text ? [artefact.text] : undefined),
+      getReportNodeSearchValues: (reportNode?: EchoReportNode) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        if (reportNode?.echo) {
+          return [_dynamicValueUtils.convertSimpleValueToDynamicValue(reportNode.echo) as DynamicSimpleValue];
+        }
+        return undefined;
+      },
     });
     this._artefactService.register('If', {
       icon: 'square',
@@ -353,6 +451,7 @@ export class ArtefactsModule {
       inlineComponent: IfInlineComponent,
       reportDetailsComponent: IfReportDetailsComponent,
       description: 'Only executes the child nodes if the condition is met',
+      getArtefactSearchValues: (artefact?: IfArtefact) => (artefact?.condition ? [artefact.condition] : undefined),
     });
     this._artefactService.register('Session', {
       icon: 'briefcase',
@@ -360,6 +459,7 @@ export class ArtefactsModule {
       inlineComponent: SessionInlineComponent,
       reportDetailsComponent: SessionReportDetailsComponent,
       description: 'Guarantees that Keywords are executed within the the same Session i.e. Agent Token',
+      getArtefactSearchValues: (artefact?: SessionArtefact) => (artefact?.token ? [artefact.token] : undefined),
     });
     this._artefactService.register('Set', {
       component: SetComponent,
@@ -367,6 +467,13 @@ export class ArtefactsModule {
       reportDetailsComponent: SetReportDetailsComponent,
       icon: 'download',
       description: 'Sets a value to a variable, which can then be accessed throughout Plans and sub Plans',
+      getArtefactSearchValues: (artefact?: SetArtefact) => [artefact?.key, artefact?.value].filter((item) => !!item),
+      getReportNodeSearchValues: (reportNode?: SetReportNode) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [reportNode?.key, reportNode?.value]
+          .filter((item) => !!item)
+          .map((item) => _dynamicValueUtils.convertSimpleValueToDynamicValue(item!) as DynamicSimpleValue);
+      },
     });
     this._artefactService.register('Sleep', {
       icon: 'coffee',
@@ -374,6 +481,9 @@ export class ArtefactsModule {
       inlineComponent: SleepInlineComponent,
       reportDetailsComponent: SleepReportDetailsComponent,
       description: 'Causes the thread to sleep',
+      getArtefactSearchValues: (artefact?: SleepArtefact) => {
+        return [artefact?.duration, artefact?.unit, artefact?.releaseTokens].filter((item) => !!item);
+      },
     });
     this._artefactService.register('Script', {
       icon: 'align-left',
@@ -382,6 +492,13 @@ export class ArtefactsModule {
       reportDetailsComponent: ScriptReportDetailsComponent,
       description:
         'Executes any arbitrary groovy code. The script context is local, which means that variable used in the script control cannot be accessed externally by other nodes',
+      getArtefactSearchValues: (artefact?: ScriptArtefact) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        if (!artefact?.script) {
+          return undefined;
+        }
+        return [_dynamicValueUtils.convertSimpleValueToDynamicValue(artefact.script) as DynamicSimpleValue];
+      },
     });
     this._artefactService.register('ThreadGroup', {
       icon: 'plan-threadgroup',
@@ -389,6 +506,8 @@ export class ArtefactsModule {
       inlineComponent: ThreadGroupInlineComponent,
       reportDetailsComponent: ThreadGroupReportDetailsComponent,
       description: 'Starts multiple threads which will execute the node content in parallel',
+      getArtefactSearchValues: (artefact?: ThreadGroupArtefact) =>
+        [artefact?.users, artefact?.iterations, artefact?.maxDuration].filter((item) => !!item),
     });
     this._artefactService.register('BeforeThread', {
       icon: 'chevron-left',
@@ -409,6 +528,8 @@ export class ArtefactsModule {
       inlineComponent: SwitchInlineComponent,
       reportDetailsComponent: SwitchReportDetailsComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Case" control',
+      getArtefactSearchValues: (artefact?: SwitchArtefact) =>
+        artefact?.expression ? [artefact.expression] : undefined,
     });
     this._artefactService.register('Case', {
       icon: 'minus',
@@ -416,6 +537,7 @@ export class ArtefactsModule {
       inlineComponent: CaseInlineComponent,
       reportDetailsComponent: CaseReportDetailsComponent,
       description: 'Same as in any programming language, to use in combinaison with the "Switch" control',
+      getArtefactSearchValues: (artefact?: CaseArtefact) => (artefact?.value ? [artefact.value] : undefined),
     });
     this._artefactService.register('RetryIfFails', {
       icon: 'repeat',
@@ -423,6 +545,22 @@ export class ArtefactsModule {
       inlineComponent: RetryIfFailsInlineComponent,
       reportDetailsComponent: RetryIfFailsReportDetailsComponent,
       description: 'Retry mechanism with grace period',
+      getArtefactSearchValues: (artefact?: RetryIfFailsArtefact) =>
+        [artefact?.maxRetries, artefact?.gracePeriod, artefact?.timeout].filter((item) => !!item),
+      getReportNodeSearchValues: (reportNode?: RetryIfFailsReportNode) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [
+          reportNode?.tries
+            ? (_dynamicValueUtils.convertSimpleValueToDynamicValue(reportNode.tries) as DynamicSimpleValue)
+            : undefined,
+          reportNode?.skipped
+            ? (_dynamicValueUtils.convertSimpleValueToDynamicValue(reportNode.skipped) as DynamicSimpleValue)
+            : undefined,
+          reportNode?.resolvedArtefact?.maxRetries,
+          reportNode?.resolvedArtefact?.gracePeriod,
+          reportNode?.resolvedArtefact?.timeout,
+        ].filter((item) => !!item);
+      },
     });
     this._artefactService.register('Check', {
       icon: 'check',
@@ -431,6 +569,7 @@ export class ArtefactsModule {
       reportDetailsComponent: CheckReportDetailsComponent,
       description:
         'Performs a custom assertion using groovy expressions. Useful for validating the output of the parent node. For standard assertions use the Control Assert instead',
+      getArtefactSearchValues: (artefact?: CheckArtefact) => (artefact?.expression ? [artefact.expression] : undefined),
     });
     this._artefactService.register('Assert', {
       icon: 'check',
@@ -438,6 +577,23 @@ export class ArtefactsModule {
       inlineComponent: AssertInlineComponent,
       reportDetailsComponent: AssertReportDetailsComponent,
       description: 'Validates the output of a keyword execution.',
+      getArtefactSearchValues: (artefact?: AssertArtefact) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [
+          artefact?.doNegate,
+          artefact?.actual,
+          artefact?.expected,
+          artefact?.operator
+            ? (_dynamicValueUtils.convertSimpleValueToDynamicValue(artefact.operator) as DynamicSimpleValue)
+            : undefined,
+        ].filter((item) => !!item);
+      },
+      getReportNodeSearchValues: (reportNode?: AssertReportNode) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [reportNode?.message]
+          .filter((item) => !!item)
+          .map((item) => _dynamicValueUtils.convertSimpleValueToDynamicValue(item!) as DynamicSimpleValue);
+      },
     });
     this._artefactService.register('Placeholder', {
       icon: 'square',
@@ -451,6 +607,8 @@ export class ArtefactsModule {
       component: ExportComponent,
       inlineComponent: ExportInlineComponent,
       reportDetailsComponent: ExportReportDetailsComponent,
+      getArtefactSearchValues: (artefact?: ExportArtefact) =>
+        [artefact?.value, artefact?.file, artefact?.prefix, artefact?.filter].filter((item) => !!item),
     });
     this._artefactService.register('Failure', {
       icon: 'x-octagon',
@@ -461,6 +619,19 @@ export class ArtefactsModule {
       component: AssertPerformanceComponent,
       inlineComponent: AssertPerformanceInlineComponent,
       reportDetailsComponent: AssertPerformanceReportDetailsComponent,
+      getArtefactSearchValues: (artefact?: AssertPerformanceArtefact) => {
+        const _dynamicValueUtils = inject(DynamicValuesUtilsService);
+        return [
+          artefact?.aggregator
+            ? (_dynamicValueUtils.convertSimpleValueToDynamicValue(artefact.aggregator) as DynamicSimpleValue)
+            : undefined,
+          artefact?.filters?.[0]?.filter,
+          artefact?.comparator
+            ? (_dynamicValueUtils.convertSimpleValueToDynamicValue(artefact.comparator) as DynamicSimpleValue)
+            : undefined,
+          artefact?.expectedValue,
+        ].filter((item) => !!item);
+      },
     });
 
     /* plan type control only */
