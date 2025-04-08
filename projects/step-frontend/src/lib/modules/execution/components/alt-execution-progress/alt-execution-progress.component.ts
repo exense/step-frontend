@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
 import {
   combineLatest,
   debounceTime,
@@ -159,6 +159,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads
     map(() => this._router.url.includes('/analytics')),
+    shareReplay(1),
   );
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -201,10 +202,18 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     });
 
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
-    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(300))),
+    switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(200))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
+    this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
+      if (!isAnalyticsRoute) {
+        this._urlParamsService.updateUrlParams(range);
+      }
+    });
+  });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.updateTimeRangeSelection(selection);
@@ -379,6 +388,30 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
+    this.subscribeToUrlNavigation();
+  }
+
+  private subscribeToUrlNavigation() {
+    // subscribe to back and forward events
+    this._router.events
+      .pipe(
+        takeUntilDestroyed(this._destroyRef),
+        filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
+        pairwise(), // Gives us [previousEvent, currentEvent]
+        filter(
+          ([prev, curr]) =>
+            prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
+        ),
+      )
+      .subscribe(() => {
+        this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
+          let params = this._urlParamsService.collectUrlParams();
+          if (!isAnalyticsRoute && params.timeRange) {
+            // analytics route takes care of updating the url itself
+            this.updateTimeRangeSelection(params.timeRange!);
+          }
+        });
+      });
   }
 
   ngOnDestroy(): void {
