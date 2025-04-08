@@ -1,6 +1,6 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+section {
   background: var.$light-blue-gray;
   border-radius: 1.6rem;
   display: flex;
@@ -11,6 +11,7 @@
   font-size: 1.2rem;
   line-height: 1.8rem;
   font-weight: 500;
+  cursor: pointer;
 }
 
 div {

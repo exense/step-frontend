@@ -1,0 +1,9 @@
+:host {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem;
+
+  & > div:nth-child(2n - 1) {
+    font-weight: 500;
+  }
+}
