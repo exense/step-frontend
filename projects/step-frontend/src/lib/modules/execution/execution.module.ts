@@ -1,4 +1,4 @@
-import { inject, Injectable, NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -126,6 +126,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
@@ -177,7 +178,6 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
-    AltReportWidgetContentDirective,
     AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
@@ -206,6 +206,7 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     AltExecutionErrorsComponent,
     AgentsCellComponent,
     AgentsModalComponent,
+    DurationDescriptionComponent,
   ],
   imports: [
     StepCommonModule,
@@ -217,6 +218,7 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     TimeSeriesChartComponent,
     TooltipContentDirective,
     TimeRangePickerComponent,
+    AltReportWidgetContentDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -244,6 +246,7 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
     ExecutionLegacySwitcherComponent,
+    DurationDescriptionComponent,
   ],
   providers: [
     {
