@@ -127,6 +127,8 @@ import { AgentsCellComponent } from './components/execution-agent-cell/execution
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
+import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
+import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 @NgModule({
   declarations: [
@@ -176,6 +178,8 @@ import { DurationDescriptionComponent } from './components/duration-description/
     AltReportWidgetComponent,
     AltReportWidgetFilterDirective,
     AltReportWidgetSortDirective,
+    AltReportWidgetContentDirective,
+    AltReportWidgetFooterDirective,
     AltReportNodeKeywordsComponent,
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
@@ -346,7 +350,7 @@ export class ExecutionModule {
         forceActivateViewId: () => inject(NavigatorService).forceActivateView('executions'),
       },
       component: AltExecutionsComponent,
-      providers: [ActiveExecutionsService],
+      providers: [ActiveExecutionsService, DashboardUrlParamsService],
       children: [
         {
           path: '',
@@ -670,6 +674,12 @@ export class ExecutionModule {
                   searchStatus: (route: ActivatedRouteSnapshot) => {
                     const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                     return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
+                  },
+                  searchStatusCount: (route: ActivatedRouteSnapshot) => {
+                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                    const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
+                    const statusCount = parseInt(statusCountStr);
+                    return isNaN(statusCount) ? undefined : statusCount;
                   },
                 },
                 dialogComponent: AggregatedTreeNodeDialogComponent,

@@ -163,6 +163,18 @@
 
 <section class="no-gap">
   @if (execution$ | async; as execution) {
+    @if (execution?.importResult && !execution!.importResult!.successful) {
+      <section>
+        <step-alert [type]="AlertType.DANGER">
+          Error while importing plan:
+          <ul>
+            @for (error of execution?.importResult?.errors; track error) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </step-alert>
+      </section>
+    }
     @if (execution.lifecycleErrors; as errors) {
       @for (error of errors; track error.msg) {
         <step-alert [type]="AlertType.DANGER">

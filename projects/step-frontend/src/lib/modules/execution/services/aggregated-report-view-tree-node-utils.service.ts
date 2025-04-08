@@ -7,6 +7,9 @@ import {
   TreeNodeUtilsService,
 } from '@exense/step-core';
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
+import { v5 } from 'uuid';
+
+const HASH_NAMESPACE = 'e9903ee9-1674-45a6-a044-62702dfe0865';
 
 @Injectable()
 export class AggregatedReportViewTreeNodeUtilsService
@@ -19,16 +22,17 @@ export class AggregatedReportViewTreeNodeUtilsService
     params?: { parentId?: string; isParentVisuallySkipped?: boolean },
   ): AggregatedTreeNode {
     const originalArtefact = item.artefact!;
-    const id = originalArtefact.id!;
+    const artefactId = originalArtefact.id!;
     const { parentId, isParentVisuallySkipped } = params ?? {};
+    const id = this.getUniqueId(artefactId, parentId);
     const name = originalArtefact.attributes?.['name'] ?? '';
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
 
-    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item);
-    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item);
-    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item);
-    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item);
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item, parentId);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item, parentId);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item, parentId);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item, parentId);
 
     const children = (item?.children || [])
       .filter(
@@ -54,6 +58,7 @@ export class AggregatedReportViewTreeNodeUtilsService
 
     return {
       id,
+      artefactId,
       name,
       isSkipped: false,
       isVisuallySkipped: isParentVisuallySkipped ?? false,
@@ -84,30 +89,11 @@ export class AggregatedReportViewTreeNodeUtilsService
     return false;
   }
 
-  private createDetailsNode(item: AggregatedReportView): AggregatedTreeNode {
-    const originalArtefact = item.artefact!;
-    const artefactId = originalArtefact.id!;
-    const id = `details_${artefactId}`;
-    const parentId = artefactId;
-    return {
-      id,
-      parentId,
-      name: '',
-      icon: '',
-      isSkipped: false,
-      isVisuallySkipped: false,
-      expandable: false,
-      nodeType: AggregatedTreeNodeType.DETAILS_NODE,
-      originalArtefact,
-      artefactHash: item.artefactHash,
-    };
-  }
-
   private createPseudoContainer(
     containerType: ArtefactNodeSource,
     parent: AggregatedReportView,
+    parentId?: string,
   ): AggregatedTreeNode | undefined {
-    const parentId = parent?.artefact?.id;
     const childArtefacts = (parent?.children ?? []).filter((child) => child.parentSource === containerType);
     if (!childArtefacts?.length || !parentId) {
       return undefined;
@@ -146,5 +132,10 @@ export class AggregatedReportViewTreeNodeUtilsService
       parentId,
       nodeType: AggregatedTreeNodeType.PSEUDO_CONTAINER,
     };
+  }
+
+  private getUniqueId(artefactId: string, parentId?: string): string {
+    const source = !parentId ? artefactId : `${parentId}.${artefactId}`;
+    return v5(source, HASH_NAMESPACE);
   }
 }

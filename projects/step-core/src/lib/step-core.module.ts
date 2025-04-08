@@ -74,6 +74,7 @@ import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
 import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
 import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
+import { SEARCH_EXPORTS } from './modules/search';
 
 @NgModule({
   declarations: [
@@ -146,6 +147,7 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     JSON_VIEWER_EXT_EXPORTS,
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
+    SEARCH_EXPORTS,
   ],
   exports: [
     CommonModule,
@@ -212,6 +214,7 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
     TREE_EXPORTS,
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
+    SEARCH_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -346,3 +349,4 @@ export * from './modules/info-banner';
 export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
+export * from './modules/search';

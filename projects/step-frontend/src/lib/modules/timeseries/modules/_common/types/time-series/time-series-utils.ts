@@ -108,6 +108,8 @@ export class TimeSeriesUtils {
   public static extractTimeRangeSelectionFromURLParams(params: Params): TimeRangePickerSelection | undefined {
     const rangeType = params['rangeType'] as TimeRangeType;
     switch (rangeType) {
+      case TimeRangeType.FULL:
+        return { type: 'FULL' };
       case TimeRangeType.ABSOLUTE:
         const from = parseInt(params['from']);
         const to = parseInt(params['to']);
