@@ -1,4 +1,4 @@
-import { inject, Injectable, NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ExecutionListComponent } from './components/execution-list/execution-list.component';
 import { Status, StepCommonModule } from '../_common/step-common.module';
 import { StatusComponent } from './components/status/status.component';
@@ -126,6 +126,7 @@ import { AgentsCellComponent } from './components/execution-agent-cell/execution
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
 import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
+import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree-node-dialog-hooks.service';
@@ -207,6 +208,7 @@ import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree
     AgentsCellComponent,
     AgentsModalComponent,
     AggregatedStatusComponent,
+    DurationDescriptionComponent,
   ],
   imports: [
     StepCommonModule,
@@ -218,6 +220,7 @@ import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree
     TimeSeriesChartComponent,
     TooltipContentDirective,
     TimeRangePickerComponent,
+    AltReportWidgetContentDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -245,6 +248,7 @@ import { AggregatedTreeNodeDialogHooksService } from './services/aggregated-tree
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
     ExecutionLegacySwitcherComponent,
+    DurationDescriptionComponent,
   ],
   providers: [
     {

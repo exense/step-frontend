@@ -1,11 +1,20 @@
-@if (displayDate(); as date) {
-  <div class="date" [matTooltip]="dateTooltip()" matTooltipPosition="below">{{ date }}</div>
-}
-@if (duration(); as duration) {
-  <div class="duration">
-    @if (isAverageDuration()) {
-      <span class="average" matTooltip="Average" matTooltipPosition="below">Ø</span>
-    }
-    {{ duration }}
-  </div>
+@if (hasContent()) {
+  <step-popover yPosition="below">
+    <section>
+      @if (displayDate(); as date) {
+        <div class="date">{{ date }}</div>
+      }
+      @if (duration(); as duration) {
+        <div class="duration">
+          @if (isAverageDuration()) {
+            <span class="average" matTooltip="Average" matTooltipPosition="below">Ø</span>
+          }
+          {{ duration }}
+        </div>
+      }
+    </section>
+    <step-popover-content>
+      <step-duration-description [startTime]="startTimeInput()" [endTime]="endTime()" [isRunning]="isRunning()" />
+    </step-popover-content>
+  </step-popover>
 }

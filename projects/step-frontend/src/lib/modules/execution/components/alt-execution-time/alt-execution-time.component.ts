@@ -7,7 +7,6 @@ import {
   STEP_DATE_TIME_FORMAT_PROVIDERS,
 } from '@exense/step-core';
 import { DatePipe } from '@angular/common';
-import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-alt-execution-time',
@@ -25,13 +24,13 @@ import { DateTime } from 'luxon';
 export class AltExecutionTimeComponent {
   private _datePipe = inject(DatePipe);
   private _durationPipe = inject(DurationPipe);
-  private _dateRangeAdapter = inject(DateRangeAdapterService);
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
   readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
   readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
+  readonly isRunning = input(false);
   readonly timeOnly = input(false);
   readonly isAverageDuration = input(false);
 
@@ -48,7 +47,7 @@ export class AltExecutionTimeComponent {
     return date === this.todayDate ? 'Today' : date;
   });
 
-  private endTime = computed(() => {
+  protected readonly endTime = computed(() => {
     const startTime = this.startTimeInput();
     let endTime = this.endTimeInput();
     const duration = this.durationInput();
@@ -75,11 +74,9 @@ export class AltExecutionTimeComponent {
     return this._durationPipe.transform(endTime, startTime);
   });
 
-  protected readonly dateTooltip = computed(() => {
-    const startTime = this.startTimeInput();
-    const endTime = this.endTime();
-    const start = startTime ? DateTime.fromMillis(startTime) : undefined;
-    const end = endTime ? DateTime.fromMillis(endTime) : undefined;
-    return this._dateRangeAdapter.format({ start, end }, true);
+  protected hasContent = computed(() => {
+    const displayDate = this.displayDate();
+    const duration = this.duration();
+    return !!displayDate || !!duration;
   });
 }
