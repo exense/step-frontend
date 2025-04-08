@@ -1,6 +1,6 @@
 import { inject, Injectable, Type } from '@angular/core';
 import { map } from 'rxjs';
-import { PlansService } from '../../../client/step-client-module';
+import { AbstractArtefact, DynamicSimpleValue, PlansService, ReportNode } from '../../../client/step-client-module';
 import {
   CustomRegistryType,
   CustomRegistryService,
@@ -14,6 +14,8 @@ export interface ArtefactType extends CustomRegistryItem {
   isSelectable?: boolean;
   inlineComponent?: Type<CustomComponent>;
   reportDetailsComponent?: Type<CustomComponent>;
+  getArtefactSearchValues?(artefact?: AbstractArtefact): DynamicSimpleValue[] | undefined;
+  getReportNodeSearchValues?(reportNode?: ReportNode): DynamicSimpleValue[] | undefined;
 }
 
 @Injectable({

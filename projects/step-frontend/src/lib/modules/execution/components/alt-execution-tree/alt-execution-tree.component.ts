@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -57,7 +57,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       )
       .subscribe((nodeId) => {
         const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
-        nodeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
       });
   }
 

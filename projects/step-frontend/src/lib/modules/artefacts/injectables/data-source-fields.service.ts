@@ -1,7 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { DataSourceConf } from '../types/data-source-conf';
 import { DataSourceType } from '../types/data-source-type.enum';
-import { ArtefactInlineItemSource, AugmentedResourcesService, DynamicValueString } from '@exense/step-core';
+import {
+  ArtefactInlineItemSource,
+  AugmentedResourcesService,
+  DynamicSimpleValue,
+  DynamicValueString,
+} from '@exense/step-core';
 import { catchError, map, Observable, of, pipe } from 'rxjs';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 
@@ -38,6 +43,29 @@ export class DataSourceFieldsService {
     }
   }
 
+  extractDataSourceSearchValues(dataSourceType: DataSourceType, dataSource: DataSourceConf): DynamicSimpleValue[] {
+    switch (dataSourceType) {
+      case DataSourceType.EXCEL:
+        return this.extractExcelSearchFields(dataSource);
+      case DataSourceType.CSV:
+        return this.extractCsvSearchFields(dataSource);
+      case DataSourceType.SQL:
+        return this.extractSqlSearchFields(dataSource);
+      case DataSourceType.GSHEET:
+        return this.extractGSheetSearchFields(dataSource);
+      case DataSourceType.SEQUENCE:
+        return this.extractSequenceSearchFields(dataSource);
+      case DataSourceType.JSON_ARRAY:
+        return this.extractJsonArraySearchFields(dataSource);
+      case DataSourceType.JSON:
+        return this.extractJsonSearchFields(dataSource);
+      case DataSourceType.FILE:
+        return this.extractFileSearchFields(dataSource);
+      case DataSourceType.FOLDER:
+        return this.extractFolderSearchFields(dataSource);
+    }
+  }
+
   private createExcelFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return this.resolveResource(dataSource.file).pipe(
@@ -54,6 +82,10 @@ export class DataSourceFieldsService {
     );
   }
 
+  private extractExcelSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.file, dataSource.worksheet, dataSource.headers];
+  }
+
   private createCsvFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return this.resolveResource(dataSource.file).pipe(
@@ -62,6 +94,10 @@ export class DataSourceFieldsService {
         ['delimiter', dataSource.delimiter, icon],
       ]),
     );
+  }
+
+  private extractCsvSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.file, dataSource.delimiter];
   }
 
   private createSqlFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
@@ -76,6 +112,17 @@ export class DataSourceFieldsService {
     ]);
   }
 
+  private extractSqlSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [
+      dataSource.connectionString,
+      dataSource.driverClass,
+      dataSource.query,
+      dataSource.user,
+      dataSource.password,
+      dataSource.writePKey,
+    ];
+  }
+
   private createGSheetFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return this.resolveResource(dataSource.serviceAccountKey).pipe(
@@ -87,6 +134,10 @@ export class DataSourceFieldsService {
     );
   }
 
+  private extractGSheetSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.serviceAccountKey, dataSource.fileId, dataSource.tabName];
+  }
+
   private createSequenceFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return of([
@@ -96,9 +147,17 @@ export class DataSourceFieldsService {
     ]);
   }
 
+  private extractSequenceSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.start, dataSource.end, dataSource.inc];
+  }
+
   private createJsonArrayFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return of([['json', dataSource.json, icon]]);
+  }
+
+  private extractJsonArraySearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.json];
   }
 
   private createJsonFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
@@ -106,14 +165,26 @@ export class DataSourceFieldsService {
     return of([['json string', dataSource.json, icon]]);
   }
 
+  private extractJsonSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.json];
+  }
+
   private createFileFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return this.resolveResource(dataSource.file).pipe(map((flatFile) => [['flat file', flatFile, icon]]));
   }
 
+  private extractFileSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.file];
+  }
+
   private createFolderFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {
     const icon = withIcon ? 'log-in' : undefined;
     return of([['directory', dataSource.folder, icon]]);
+  }
+
+  private extractFolderSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
+    return [dataSource.folder];
   }
 
   private resolveResource(value: DynamicValueString): Observable<string | DynamicValueString> {
