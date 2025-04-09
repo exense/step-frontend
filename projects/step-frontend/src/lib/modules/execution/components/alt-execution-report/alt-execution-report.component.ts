@@ -52,17 +52,18 @@ export class AltExecutionReportComponent {
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {
     const reportNodeId = keyword.id;
     const artefactId = keyword.artefactID;
+    const artefactHash = keyword.artefactHash;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], {
-      queryParams: { reportNodeId, artefactId },
+      queryParams: { reportNodeId, artefactId, artefactHash },
       relativeTo: this._activatedRoute,
     });
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
-    this.treeWidget()?.focusNode(node.artefactID!);
+    this.treeWidget()?.focusNodeByReport(node);
   }
 
   handleChartZooming(range: TimeRange) {

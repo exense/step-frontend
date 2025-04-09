@@ -13,6 +13,16 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
   }
+
+  findNodesByArtefactId(artefactId?: string): AggregatedTreeNode[] {
+    if (!artefactId) {
+      return [];
+    }
+    const { tree, accessCache } = this.treeData();
+    return tree
+      .map(({ id }) => accessCache.get(id) as AggregatedTreeNode)
+      .filter((item) => item.artefactId === artefactId);
+  }
 }
 
 export const AGGREGATED_TREE_TAB_STATE = new InjectionToken<AggregatedReportViewTreeStateService>(

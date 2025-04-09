@@ -38,7 +38,8 @@ export class AltExecutionTreeTabComponent implements OnInit {
         map((params) => {
           const artefactId = params['artefactId'];
           const reportNodeId = params['reportNodeId'];
-          return { artefactId, reportNodeId };
+          const artefactHash = params['artefactHash'];
+          return { artefactId, reportNodeId, artefactHash };
         }),
         filter((data) => !!data.artefactId),
         takeUntilDestroyed(this._destroyRef),
@@ -48,7 +49,9 @@ export class AltExecutionTreeTabComponent implements OnInit {
         filter((data) => !!data),
       )
       .subscribe((data) => {
-        const node = this._treeState.findNodeById(data!.artefactId);
+        const node = this._treeState
+          .findNodesByArtefactId(data!.artefactId)
+          .find((item) => item.artefactHash === data!.artefactHash);
         if (!node) {
           return;
         }

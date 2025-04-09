@@ -1,5 +1,5 @@
 import { Component, inject, viewChild } from '@angular/core';
-import { TreeStateService } from '@exense/step-core';
+import { ReportNode, TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
@@ -22,13 +22,23 @@ import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-t
   ],
 })
 export class AltExecutionTreeWidgetComponent {
-  private _treeState = inject(TreeStateService);
+  private _treeState = inject(AggregatedReportViewTreeStateService);
 
   /** @ViewChild **/
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
-  focusNode(nodeId: string): void {
+  focusNodeById(nodeId: string): void {
     this.tree()?.focusNode(nodeId);
+  }
+
+  focusNodeByReport(report: ReportNode): void {
+    const node = this._treeState
+      .findNodesByArtefactId(report.artefactID)
+      .find((item) => item.artefactHash === report.artefactHash);
+    if (!node?.id) {
+      return;
+    }
+    this.focusNodeById(node.id);
   }
 
   protected collapseAll(): void {
