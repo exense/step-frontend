@@ -504,7 +504,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         {} as Record<string, number>,
       );
       let averageDuration = nodes.reduce((res, node) => res + (node?.duration ?? 0), 0);
-      averageDuration /= nodes.length;
+      averageDuration = Math.round(averageDuration / nodes.length);
       return {
         artefactHash,
         artefact,

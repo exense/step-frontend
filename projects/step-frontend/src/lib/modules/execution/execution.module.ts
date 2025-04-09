@@ -129,7 +129,7 @@ import { AggregatedStatusComponent } from './components/aggregated-status/aggreg
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { AltExecutionDurationComponent } from './components/alt-execution-duration/alt-execution-duration.component';
+import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
 
 @NgModule({
   declarations: [
@@ -208,7 +208,7 @@ import { AltExecutionDurationComponent } from './components/alt-execution-durati
     AgentsModalComponent,
     AggregatedStatusComponent,
     DurationDescriptionComponent,
-    AltExecutionDurationComponent,
+    ExecutionDurationSimpleComponent,
   ],
   imports: [
     StepCommonModule,
