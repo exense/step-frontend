@@ -64,7 +64,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     if (typeof error === 'string') {
       jsonError = this.parseJson(error);
-    } else if (error && error.headers && error.headers.get('Content-Type')?.includes('application/json')) {
+    } else if (error?.headers?.get('Content-Type')?.includes('application/json')) {
       jsonError = this.parseJson(error.error);
     }
 
