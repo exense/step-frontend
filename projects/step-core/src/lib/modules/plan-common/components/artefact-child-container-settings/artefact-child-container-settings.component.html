@@ -4,6 +4,23 @@
       <step-icon name="chevron-left" />
       {{ name() }}
     </div>
+    <section>
+      @switch (nodeType()) {
+        @case (ArtefactNodeSource.BEFORE) {
+          All controls in before control are executed once at the beginning of its parent node's execution.
+        }
+        @case (ArtefactNodeSource.BEFORE_THREAD) {
+          All controls in before thread control are executed once at the beginning of its parent node's execution.
+        }
+        @case (ArtefactNodeSource.AFTER_THREAD) {
+          All controls in after thread control are executed once at the end of its parent node's execution.
+        }
+        @case (ArtefactNodeSource.AFTER) {
+          All controls in after control are executed once at the end of its parent node's execution.
+        }
+        @default {}
+      }
+    </section>
     <mat-expansion-panel [(expanded)]="showAttributes">
       <mat-expansion-panel-header>
         <mat-panel-title>Properties</mat-panel-title>
