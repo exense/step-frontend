@@ -7,7 +7,9 @@
     <section>
       @switch (nodeType()) {
         @case (ArtefactNodeSource.BEFORE) {
-          All controls in before control are executed once at the beginning of its parent node's execution.
+          All controls in the before slot are executed once at the beginning of the node's execution. <br>
+          It allows setup or preconditions to be defined before the main execution flow starts. <br>
+Use this slot to initialize state, configure dependencies, or perform prerequisite operations needed for the execution of the node.
         }
         @case (ArtefactNodeSource.BEFORE_THREAD) {
 All controls in the before thread slot are executed once at the beginning of each thread's execution.<br>
