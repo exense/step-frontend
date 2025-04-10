@@ -141,19 +141,16 @@ export class DashboardUrlParamsService {
     this.prefixAndPushUrlParams(params, replaceUrl);
   }
 
-  updateUrlParamsFromContext(context: TimeSeriesContext, replaceUrl = false) {
-    const params = this.convertContextToUrlParams(context, context.getTimeRangeSettings());
+  updateUrlParamsFromContext(context: TimeSeriesContext, timeRange: TimeRangePickerSelection, replaceUrl = false) {
+    let params = { ...this.convertTimeRange(timeRange), ...this.convertContextToUrlParams(context) };
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
-    mergedParams['refreshInterval'] = context.getRefreshInterval();
+    // mergedParams['refreshInterval'] = context.getRefreshInterval();
     this.prefixAndPushUrlParams(mergedParams, replaceUrl);
   }
 
-  private convertContextToUrlParams(
-    context: TimeSeriesContext,
-    timeRangeSettings: DashboardTimeRangeSettings,
-  ): Record<string, any> {
-    const params = this.convertTimeRange(timeRangeSettings.pickerSelection);
+  private convertContextToUrlParams(context: TimeSeriesContext): Record<string, any> {
+    const params: Record<string, any> = {};
     params['grouping'] = context.getGroupDimensions()?.join(',') || '';
     if (!context.isFullRangeSelected()) {
       const selectedTimeRange = context.getSelectedTimeRange();
@@ -164,7 +161,6 @@ export class DashboardUrlParamsService {
     if (customResolution > 0) {
       params['resolution'] = customResolution;
     }
-    params['refreshInterval'] = context.getRefreshInterval();
 
     return params;
   }

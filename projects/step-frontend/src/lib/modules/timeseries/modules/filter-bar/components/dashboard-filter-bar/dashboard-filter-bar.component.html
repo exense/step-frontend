@@ -1,18 +1,3 @@
-<div class="time-container">
-  <div class="ranger-section" [class.compact]="compactView">
-    <step-execution-time-selection [context]="context" />
-  </div>
-  <div>
-    <step-time-range-picker
-      (selectionChange)="handleTimeRangeChange($event)"
-      [selectOptions]="timeRangeOptions"
-      [activeTimeRange]="context.timeRangeSettings.fullRange"
-      [activeSelection]="activeTimeRangeSelection"
-      [compact]="compactView"
-    />
-  </div>
-</div>
-
 <div class="filters-section">
   @if (rawMeasurementsModeActive) {
     <step-alert type="warning" class="warning">

@@ -68,11 +68,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
-  @Input() timeRangeOptions!: TimeRangePickerSelection[];
-  @Input() activeTimeRangeSelection!: TimeRangePickerSelection;
   @Input() editMode = false;
-
-  @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
@@ -196,10 +192,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeChange.next({ selection, triggerRefresh: true });
-  }
-
   disableOqlMode() {
     this.activeMode = TsFilteringMode.STANDARD;
   }
@@ -287,8 +279,9 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
-      this.activeTimeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: newRange };
-      this.timeRangeChange.next({ selection: this.activeTimeRangeSelection, triggerRefresh: true });
+      // this.activeTimeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: newRange };
+      // this.timeRangeChange.next({ selection: this.activeTimeRangeSelection, triggerRefresh: true });
+      // TODO find a way to emit the range change
     }
     this.emitFilterChange$.next();
   }

@@ -113,6 +113,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
+  @Output() zoomReset = new EventEmitter<void>();
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -202,7 +203,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   handleZoomReset() {
     this.context.setChartsLockedState(false);
-    this.context.resetZoom();
+    this.zoomReset.next();
+    // this.context.resetZoom();
   }
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {

@@ -1,0 +1,39 @@
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0.4rem;
+  position: relative;
+  z-index: 101;
+
+  .left-section {
+    display: flex;
+    flex-direction: row;
+    gap: 1.2rem;
+  }
+
+  > div {
+    display: flex;
+  }
+}
+
+.dashboard-title {
+  font-size: 1.8rem;
+  min-width: 10rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-grow: 1;
+
+  .name {
+    max-width: 30rem;
+  }
+
+  .description {
+    font-size: 1.2rem;
+    opacity: 0.7;
+    max-width: 50%;
+    flex-grow: 1;
+  }
+}

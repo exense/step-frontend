@@ -21,69 +21,69 @@
   </mat-menu>
 
   <div class="page-container">
-    @if (settingsButtonPosition === SETTINGS_LOCATION.SHIFTED_TO_TABS) {
-      <div class="floating-settings-btn">
-        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-      </div>
-    }
+    <!--    @if (settingsButtonPosition === SETTINGS_LOCATION.SHIFTED_TO_TABS) {-->
+    <!--      <div class="floating-settings-btn">-->
+    <!--        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />-->
+    <!--      </div>-->
+    <!--    }-->
 
-    @if (settingsButtonPosition === SETTINGS_LOCATION.ABOVE_FILTER_BAR) {
-      <div class="above-filter-bar">
-        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-      </div>
-    }
+    <div>
+      <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+    </div>
 
-    @if (showHeaderBar) {
-      <div class="header-container">
-        <div class="dashboard-title">
-          @if (showDashboardName) {
-            <div class="name">
-              <step-editable-label
-                [ngModel]="dashboard.attributes!['name']"
-                (ngModelChange)="onDashboardNameChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-              />
-            </div>
-            <div class="description">
-              <step-editable-textarea-label
-                [(ngModel)]="dashboard.description"
-                (ngModelChange)="handleDashboardDescriptionChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-                name="description"
-              >
-                <div *stepEditableLabelTemplate>Add description</div>
-              </step-editable-textarea-label>
-            </div>
-          }
-        </div>
-        @if (settingsButtonPosition === SETTINGS_LOCATION.HEADER_BAR) {
-          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-        }
-      </div>
-    }
+    <!--    @if (showHeaderBar) {-->
+    <!--      <div class="header-container">-->
+    <!--        <div class="dashboard-title">-->
+    <!--          @if (showDashboardName) {-->
+    <!--            <div class="name">-->
+    <!--              <step-editable-label-->
+    <!--                [ngModel]="dashboard.attributes!['name']"-->
+    <!--                (ngModelChange)="onDashboardNameChange($event)"-->
+    <!--                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"-->
+    <!--              />-->
+    <!--            </div>-->
+    <!--            <div class="description">-->
+    <!--              <step-editable-textarea-label-->
+    <!--                [(ngModel)]="dashboard.description"-->
+    <!--                (ngModelChange)="handleDashboardDescriptionChange($event)"-->
+    <!--                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"-->
+    <!--                name="description"-->
+    <!--              >-->
+    <!--                <div *stepEditableLabelTemplate>Add description</div>-->
+    <!--              </step-editable-textarea-label>-->
+    <!--            </div>-->
+    <!--          }-->
+    <!--        </div>-->
+    <!--        @if (settingsButtonPosition === SETTINGS_LOCATION.HEADER_BAR) {-->
+    <!--          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />-->
+    <!--        }-->
+    <!--      </div>-->
+    <!--    }-->
 
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
       @if (mainEngine?.state) {
         <div style="flex-grow: 1; flex-basis: 0">
+          <div class="time-container">
+            <div class="ranger-section" [class.compact]="compareModeEnabled">
+              <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
+            </div>
+          </div>
           <step-ts-dashboard-filter-bar
             #filterBar
             [editMode]="editMode"
             [context]="mainEngine.state.context"
-            (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
-            [timeRangeOptions]="timeRangeOptions"
-            [activeTimeRangeSelection]="mainEngine!.state.context.timeRangeSettings.pickerSelection"
             [compactView]="compareModeEnabled"
           />
         </div>
         @if (compareModeEnabled) {
           <div style="flex-grow: 1; flex-basis: 0">
+            <div class="ranger-section" [class.compact]="compareModeEnabled">
+              <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
+            </div>
             <step-ts-dashboard-filter-bar
               #compareFilterBar
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
-              (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
-              [timeRangeOptions]="timeRangeOptions"
-              [activeTimeRangeSelection]="compareEngine!.state.context.timeRangeSettings.pickerSelection"
               [compactView]="compareModeEnabled"
             />
           </div>
@@ -106,6 +106,7 @@
                 (remove)="handleChartDelete(i)"
                 (shiftLeft)="handleChartShiftLeft(i)"
                 (shiftRight)="handleChartShiftRight(i)"
+                (zoomReset)="handleZoomReset()"
               />
             </div>
             @if (compareModeEnabled) {
@@ -177,15 +178,6 @@
       <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu" mat-icon-button>
         <step-icon name="settings" />
       </button>
-      @if (showRefreshOption) {
-        <step-autorefresh-toggle
-          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-          [disableAutoRefreshButton]="compareModeEnabled"
-          [interval]="refreshInterval"
-          (refresh)="mainEngine.triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
-      }
       @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
         @if (editMode) {
           <step-alert class="edit-alert" type="WARNING"
