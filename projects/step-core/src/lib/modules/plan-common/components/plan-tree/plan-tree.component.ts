@@ -8,6 +8,7 @@ import {
   inject,
   Input,
   output,
+  Signal,
   viewChild,
   ViewChild,
   ViewEncapsulation,
@@ -65,9 +66,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  readonly activeNode = this._treeState.selectedNode;
-  readonly activeNodeArtefact = computed(() => this.activeNode()?.originalArtefact);
-  readonly activeNodeChildContainer = computed(() => this.activeNode()?.childContainer);
+  readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
 
   /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();

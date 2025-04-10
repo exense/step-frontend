@@ -61,16 +61,19 @@
     [size]="artefactDetailsSize"
     (sizeChange)="handleArtefactDetailsSizeChange($event)"
   >
-    @if (activeNodeArtefact(); as selectedArtefact) {
-      <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
-    }
-    @if (activeNodeChildContainer(); as childContainer) {
-      <step-artefact-child-container-settings
-        [name]="activeNode()?.name"
-        [childContainer]="childContainer"
-        [isReadonly]="isReadonly"
-        (save)="handlePlanChange()"
-      />
+    @if (activeNode(); as activeNode) {
+      @if (activeNode.originalArtefact; as selectedArtefact) {
+        <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
+      }
+      @if (activeNode.childContainer; as childContainer) {
+        <step-artefact-child-container-settings
+          [name]="activeNode.name"
+          [nodeType]="activeNode.nodeType!"
+          [childContainer]="childContainer"
+          [isReadonly]="isReadonly"
+          (save)="handlePlanChange()"
+        />
+      }
     }
   </step-split-area>
 </step-split>
