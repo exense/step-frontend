@@ -13,6 +13,7 @@ const ICON_COLLAPSED = 'chevron-right';
   host: {
     '[class]': 'containerClasses()',
     '[style.--level]': 'node().parentPath.length',
+    '[attr.data-tree-node-id]': 'node().id',
   },
 })
 export class TreeNodeDirective {
