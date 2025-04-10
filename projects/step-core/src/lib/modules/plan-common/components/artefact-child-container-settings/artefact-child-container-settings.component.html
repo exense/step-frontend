@@ -15,7 +15,8 @@ This allows setup or preconditions to be defined before the thread's execution f
 Use this slot to initialize state, configure dependencies, or perform prerequisite operations required for the thread's execution.
         }
         @case (ArtefactNodeSource.AFTER_THREAD) {
-          All controls in after thread control are executed once at the end of its parent node's execution.
+          All controls in the after thread slot are executed once at the end of each thread's execution. <br>
+This allows finalizing or cleanup to be defined after the thread's execution flow ended.
         }
         @case (ArtefactNodeSource.AFTER) {
           All controls in after control are executed once at the end of its parent node's execution.
