@@ -251,7 +251,13 @@ export class ArtefactTreeNodeUtilsService
       if (item?.id === id) {
         return item;
       }
-      itemsToProceed.push(...(item?.before?.steps ?? []), ...(item?.children ?? []), ...(item?.after?.steps ?? []));
+      itemsToProceed.push(
+        ...(item?.before?.steps ?? []),
+        ...((item as ThreadGroupArtefact)?.beforeThread?.steps ?? []),
+        ...(item?.children ?? []),
+        ...((item as ThreadGroupArtefact)?.afterThread?.steps ?? []),
+        ...(item?.after?.steps ?? []),
+      );
     }
 
     return undefined;
