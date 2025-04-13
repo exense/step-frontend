@@ -21,45 +21,9 @@
   </mat-menu>
 
   <div class="page-container">
-    <!--    @if (settingsButtonPosition === SETTINGS_LOCATION.SHIFTED_TO_TABS) {-->
-    <!--      <div class="floating-settings-btn">-->
-    <!--        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />-->
-    <!--      </div>-->
-    <!--    }-->
-
     <div>
       <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
     </div>
-
-    <!--    @if (showHeaderBar) {-->
-    <!--      <div class="header-container">-->
-    <!--        <div class="dashboard-title">-->
-    <!--          @if (showDashboardName) {-->
-    <!--            <div class="name">-->
-    <!--              <step-editable-label-->
-    <!--                [ngModel]="dashboard.attributes!['name']"-->
-    <!--                (ngModelChange)="onDashboardNameChange($event)"-->
-    <!--                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"-->
-    <!--              />-->
-    <!--            </div>-->
-    <!--            <div class="description">-->
-    <!--              <step-editable-textarea-label-->
-    <!--                [(ngModel)]="dashboard.description"-->
-    <!--                (ngModelChange)="handleDashboardDescriptionChange($event)"-->
-    <!--                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"-->
-    <!--                name="description"-->
-    <!--              >-->
-    <!--                <div *stepEditableLabelTemplate>Add description</div>-->
-    <!--              </step-editable-textarea-label>-->
-    <!--            </div>-->
-    <!--          }-->
-    <!--        </div>-->
-    <!--        @if (settingsButtonPosition === SETTINGS_LOCATION.HEADER_BAR) {-->
-    <!--          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />-->
-    <!--        }-->
-    <!--      </div>-->
-    <!--    }-->
-
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
       @if (mainEngine?.state) {
         <div style="flex-grow: 1; flex-basis: 0">

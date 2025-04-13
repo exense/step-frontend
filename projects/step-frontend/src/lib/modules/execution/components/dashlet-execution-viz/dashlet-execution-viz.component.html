@@ -1,1 +1,12 @@
-<step-execution-page [execution]="_state.execution!" />
+@if (timeRange()) {
+  <div class="header">
+    <step-time-range-picker
+      [activeSelection]="activeTimeRangeSelection()!"
+      (selectionChange)="handleTimeRangeChange($event)"
+      [activeTimeRange]="timeRange()"
+      [selectOptions]="timeRangeOptions"
+    />
+  </div>
+
+  <step-execution-dashboard [execution]="_state.execution!" [timeRange]="timeRange()!" />
+}

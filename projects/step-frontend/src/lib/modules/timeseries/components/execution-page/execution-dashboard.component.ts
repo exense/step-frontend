@@ -4,6 +4,7 @@ import {
   DestroyRef,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
@@ -40,11 +41,12 @@ import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-se
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
+import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
 
 @Component({
-  selector: 'step-execution-page',
-  templateUrl: './execution-page.component.html',
-  styleUrls: ['./execution-page.component.scss'],
+  selector: 'step-execution-dashboard',
+  templateUrl: './execution-dashboard.component.html',
+  styleUrls: ['./execution-dashboard.component.scss'],
   standalone: true,
   imports: [
     COMMON_IMPORTS,
@@ -56,17 +58,15 @@ import { DashboardUrlParamsService } from '../../modules/_common/injectables/das
     DashboardComponent,
   ],
 })
-export class ExecutionPageComponent implements OnInit, OnChanges {
-  @Input() execution!: Execution;
+export class ExecutionDashboardComponent implements OnInit, OnChanges {
+  execution = input.required<Execution>();
+  timeRange = input.required<TimeRange>();
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
-
-  @Output() timeRangePickerChange = new EventEmitter<TimeRangePickerSelection>();
 
   private _authService = inject(AuthService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   protected _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
-  private _urlParamsService = inject(DashboardUrlParamsService);
 
   dashboardId!: string;
   hiddenFilters: FilterBarItem[] = [];
@@ -81,8 +81,6 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
 
   private _destroyRef = inject(DestroyRef);
 
-  readonly SETTINGS_BTN_LOCATION = DashboardViewSettingsBtnLocation;
-
   private _router = inject(Router);
 
   ngOnInit(): void {
@@ -94,6 +92,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
     if (!this.dashboardId) {
       throw new Error('Execution dashboard id is not present on conf');
     }
+    const executionId: string = this.execution().id!;
 
     this.hiddenFilters = [
       {
@@ -102,12 +101,12 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
         isLocked: true,
         exactMatch: true,
         freeTextValues: [],
-        searchEntities: [{ searchValue: this.execution.id!, entity: this.execution }],
+        searchEntities: [{ searchValue: executionId, entity: this.execution() }],
         type: FilterBarItemType.EXECUTION,
       },
     ];
-    this.executionRange = this.getExecutionRange(this.execution);
-    this.timeSeriesService.checkTimeSeries(this.execution!.id!).subscribe((exists) => {
+    this.executionRange = this.getExecutionRange(this.execution());
+    this.timeSeriesService.checkTimeSeries(executionId!).subscribe((exists) => {
       if (exists) {
         this.isInitialized = true;
       } else {
@@ -131,11 +130,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
       )
       .subscribe(() => {
         this.isInitialized = false;
-        let timeRange = this._urlParamsService.collectUrlParams().timeRange;
         this._changeDetectorRef.detectChanges();
-        if (timeRange) {
-          this.timeRangePickerChange.next(timeRange!);
-        }
         this.isInitialized = true;
       });
   }
@@ -147,8 +142,8 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
-      this.executionMode = this._executionViewModeService.getExecutionMode(this.execution);
-      this.executionRange = this.getExecutionRange(this.execution);
+      this.executionMode = this._executionViewModeService.getExecutionMode(this.execution());
+      this.executionRange = this.getExecutionRange(this.execution());
       this.dashboard?.refresh();
     }
   }
@@ -156,7 +151,7 @@ export class ExecutionPageComponent implements OnInit, OnChanges {
   rebuildTimeSeries() {
     this.executionCreationInProgress = true;
     this.timeSeriesService
-      .rebuildTimeSeries({ executionId: this.execution.id })
+      .rebuildTimeSeries({ executionId: this.execution().id })
       .pipe(pollAsyncTask(this._asyncTaskService), takeUntilDestroyed(this._destroyRef))
       .subscribe({
         next: (task) => {

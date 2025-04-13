@@ -155,13 +155,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
 
-  protected isAnalyticsRoute$ = this._router.events.pipe(
-    filter((event) => event instanceof NavigationEnd),
-    startWith(null), // Emit an initial value when the component loads
-    map(() => this._router.url.includes('/analytics')),
-    shareReplay(1),
-  );
-
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
     ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
@@ -208,11 +201,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-      if (!isAnalyticsRoute) {
-        this._urlParamsService.updateUrlParams(range);
-      }
-    });
+    this._urlParamsService.updateUrlParams(range);
   });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -404,13 +393,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         ),
       )
       .subscribe(() => {
-        this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-          let params = this._urlParamsService.collectUrlParams();
-          if (!isAnalyticsRoute && params.timeRange) {
-            // analytics route takes care of updating the url itself
-            this.updateTimeRangeSelection(params.timeRange!);
-          }
-        });
+        let params = this._urlParamsService.collectUrlParams();
+        if (params.timeRange) {
+          // analytics route takes care of updating the url itself
+          this.updateTimeRangeSelection(params.timeRange!);
+        }
       });
   }
 

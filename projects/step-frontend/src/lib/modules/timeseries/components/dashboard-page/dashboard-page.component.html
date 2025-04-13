@@ -20,19 +20,26 @@
       </div>
     }
   </div>
-  <step-time-range-picker
-    [activeSelection]="activeTimeRangeSelection()!"
-    (selectionChange)="handleTimeRangeChange($event)"
-    [selectOptions]="timeRangeOptions"
-  />
+  <div class="right-section">
+    <step-autorefresh-toggle [interval]="refreshInterval()" (refresh)="triggerRefresh()"></step-autorefresh-toggle>
+    @if (activeTimeRangeSelection()) {
+      <step-time-range-picker
+        [activeSelection]="activeTimeRangeSelection()!"
+        (selectionChange)="handleTimeRangeChange($event)"
+        [activeTimeRange]="timeRange()"
+        [selectOptions]="timeRangeOptions"
+      />
+    }
+  </div>
 </div>
 
-@if (dashboardIdInternalSignal()) {
+@if (!isLoading) {
   <step-timeseries-dashboard
     [id]="dashboardIdInternalSignal()!"
-    [timeRange]="timeRange()"
+    [timeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     [showExecutionLinks]="true"
-    [showRefreshOption]="true"
+    (zoomReset)="handleZoomReset()"
+    (zoomChange)="handleZoomChange()"
   />
 }

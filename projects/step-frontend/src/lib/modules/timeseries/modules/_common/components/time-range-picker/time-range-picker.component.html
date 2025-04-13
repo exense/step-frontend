@@ -11,9 +11,9 @@
     } @else {
       <step-icon name="calendar" />
       <div class="text" [matTooltip]="mainPickerLabel">
-        {{ (activeSelection().type === 'FULL' && fullRangeLabel) || mainPickerLabel }}
+        {{ (activeSelection()?.type === 'FULL' && fullRangeLabel) || mainPickerLabel }}
       </div>
-      @if (activeSelection().type === 'ABSOLUTE' && hasFullRangeOption()) {
+      @if (activeSelection()?.type === 'ABSOLUTE' && hasFullRangeOption()) {
         <div class="suffix-icon warn">
           <step-icon name="alert-circle" matTooltip="Not full range is selected"> </step-icon>
         </div>
@@ -65,9 +65,9 @@
               class="time-option"
               [class.full-range]="rangeOption.type === 'FULL'"
               [class.active]="
-                (activeSelection().type === 'FULL' && rangeOption.type === 'FULL') ||
+                (activeSelection()?.type === 'FULL' && rangeOption.type === 'FULL') ||
                 (rangeOption.type === 'RELATIVE' &&
-                  rangeOption.relativeSelection?.timeInMs === activeSelection().relativeSelection?.timeInMs)
+                  rangeOption.relativeSelection?.timeInMs === activeSelection()?.relativeSelection?.timeInMs)
               "
             >
               {{ rangeOption.relativeSelection?.label }}

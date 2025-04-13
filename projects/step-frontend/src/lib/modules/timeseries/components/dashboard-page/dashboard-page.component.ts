@@ -9,6 +9,7 @@ import {
   OnInit,
   Signal,
   signal,
+  untracked,
   WritableSignal,
 } from '@angular/core';
 import {
@@ -21,16 +22,15 @@ import {
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, filter, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, Observable, of, pairwise, shareReplay, switchMap, take } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { transform } from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { AuthService, DashboardsService, DashboardView } from '@exense/step-core';
+import { AuthService, AutorefreshToggleComponent, DashboardsService, DashboardView } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 @Component({
@@ -65,11 +65,11 @@ export class DashboardPageComponent implements OnInit {
 
   dashboardId = input<string>(); // optional, otherwise it will be taken from url
   dashboardIdInternalSignal = signal<string | undefined>(undefined);
+  refreshInterval = signal<number>(0);
 
   dashboardIdEffect = effect(() => {
     let dashboardId = this.dashboardId();
     if (dashboardId) {
-      this.dashboardIdInternal = dashboardId;
       this.dashboardIdInternalSignal.set(dashboardId);
     }
   });
@@ -80,18 +80,14 @@ export class DashboardPageComponent implements OnInit {
 
   dashboard$: Observable<DashboardView> = this.dashboardId$.pipe(
     switchMap((id) => this._dashboardService.getDashboardById(id)),
+    shareReplay(1),
   );
 
   dashboard: Signal<DashboardView | undefined> = toSignal(this.dashboard$);
 
-  dashboardEffect = effect(() => {
-    const dashboard = this.dashboard();
-    if (dashboard && this.activeTimeRangeSelection() === undefined) {
-      this.activeTimeRangeSelection.set(dashboard!.timeRange);
-    }
-  });
-
   hasWritePermission = this._authService.hasRight('dashboard-write');
+
+  isLoading = false;
 
   timeRange = computed(() => {
     const pickerSelection = this.activeTimeRangeSelection();
@@ -102,16 +98,10 @@ export class DashboardPageComponent implements OnInit {
     }
   });
 
-  dashboardIdInternal?: string;
-
   ngOnInit(): void {
-    const urlParams = this._urlParamsService.collectUrlParams();
-    if (urlParams.timeRange) {
-      if (urlParams.timeRange.type === 'RELATIVE') {
-        // find the selection with label
-        urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange.relativeSelection!.timeInMs);
-      }
-      this.activeTimeRangeSelection.set(urlParams.timeRange!);
+    const timeRangeInUrl = this.extractTimeRangeFromUrl();
+    if (timeRangeInUrl) {
+      this.activeTimeRangeSelection.set(timeRangeInUrl!);
     }
     if (!this.dashboardId()) {
       this._route.paramMap.subscribe((params) => {
@@ -119,11 +109,26 @@ export class DashboardPageComponent implements OnInit {
         if (!id) {
           throw new Error('Dashboard id not present');
         }
-        this.dashboardIdInternal = id;
         this.dashboardIdInternalSignal.set(id);
       });
     }
+    this.dashboard$.pipe(take(1)).subscribe((dashboard) => {
+      if (dashboard && this.activeTimeRangeSelection() === undefined) {
+        if (dashboard!.timeRange.type === 'RELATIVE' && !dashboard!.timeRange.relativeSelection?.label) {
+          dashboard.timeRange = this.findRelativeTimeOption(dashboard!.timeRange.relativeSelection!.timeInMs);
+        }
+        this.activeTimeRangeSelection.set(dashboard!.timeRange);
+      }
+    });
     this.subscribeToUrlNavigation();
+  }
+
+  handleZoomChange() {
+    console.log('zoom change');
+  }
+
+  handleZoomReset() {
+    console.log('zoom reset');
   }
 
   private findRelativeTimeOption(relativeMs: number): TimeRangePickerSelection {
@@ -144,19 +149,31 @@ export class DashboardPageComponent implements OnInit {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!);
   }
 
+  triggerRefresh() {
+    let rangeSelection = this.activeTimeRangeSelection()!;
+    this.activeTimeRangeSelection.set({ ...rangeSelection });
+  }
+
   private subscribeToUrlNavigation() {
     // subscribe to back and forward events
     this._router.events
       .pipe(
         takeUntilDestroyed(this._destroyRef),
-        filter((event) => event instanceof NavigationStart),
-        filter((event: NavigationStart) => event.navigationTrigger === 'popstate'),
+        filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
+        pairwise(),
+        filter(
+          ([prev, curr]) =>
+            prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
+        ),
       )
       .subscribe(() => {
-        const actualDashboardId = this.dashboardIdInternal;
-        this.dashboardIdInternal = undefined;
+        this.isLoading = true;
+        const timeRangeInUrl = this.extractTimeRangeFromUrl();
+        if (timeRangeInUrl) {
+          this.activeTimeRangeSelection.set(timeRangeInUrl!);
+        }
         this._changeDetectorRef.detectChanges();
-        this.dashboardIdInternal = actualDashboardId;
+        this.isLoading = false;
       });
   }
 
@@ -175,5 +192,17 @@ export class DashboardPageComponent implements OnInit {
     // const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
     // modifiedDashboard.description = description;
     // this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+  }
+
+  extractTimeRangeFromUrl(): TimeRangePickerSelection | undefined {
+    const urlParams = this._urlParamsService.collectUrlParams();
+    if (urlParams.timeRange) {
+      if (urlParams.timeRange.type === 'RELATIVE') {
+        // find the selection with label
+        urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange.relativeSelection!.timeInMs);
+      }
+      return urlParams.timeRange;
+    }
+    return undefined;
   }
 }

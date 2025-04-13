@@ -112,9 +112,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
-  @Input() showRefreshOption = true;
-  @Input() showDashboardName = true;
-  timeRange = input<TimeRange>();
+  timeRange = input.required<TimeRange>();
 
   timeRangeChangeEffect = effect(() => {
     const timeRange = this.timeRange()!;
@@ -125,7 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   /** @Output **/
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
-  readonly zoomChange = output<void>();
+  readonly zoomChange = output<TimeRange>();
   readonly zoomReset = output<void>();
 
   private exportInProgress = false;
@@ -160,18 +158,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   let fullTimeRangeChange = changes['defaultFullTimeRange'];
-  //   if (
-  //     fullTimeRangeChange &&
-  //     fullTimeRangeChange.previousValue !== fullTimeRangeChange.currentValue &&
-  //     !fullTimeRangeChange.firstChange
-  //   ) {
-  //     this.mainEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
-  //     this.compareEngine?.state.context.updateDefaultFullTimeRange(fullTimeRangeChange.currentValue);
-  //   }
-  // }
-
   /**
    * Parameters of the dashboard are combined from 3 places, in the following order:
    * 1. URL
@@ -196,6 +182,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .pipe(takeUntilDestroyed(this._destroyRef))
         .subscribe(() => this.contextSettingsChanged.emit(context));
       this.contextSettingsChanged.emit(context);
+      context.onTimeSelectionChange().subscribe((range) => this.zoomChange.emit(range));
     });
   }
 

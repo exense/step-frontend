@@ -17,6 +17,7 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
+  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -205,6 +206,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.context.setChartsLockedState(false);
     this.zoomReset.next();
     // this.context.resetZoom();
+  }
+
+  handleZoomChange(range: TimeRange) {
+    console.log('ZOOM CHANGE');
   }
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {

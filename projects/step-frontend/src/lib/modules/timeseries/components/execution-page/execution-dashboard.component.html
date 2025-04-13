@@ -1,11 +1,10 @@
 @if (isInitialized) {
   <step-timeseries-dashboard
     [id]="dashboardId"
+    [timeRange]="timeRange()!"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
     [showExecutionLinks]="false"
-    [showRefreshOption]="false"
-    [showDashboardName]="false"
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

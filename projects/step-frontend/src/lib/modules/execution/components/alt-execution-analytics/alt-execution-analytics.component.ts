@@ -9,8 +9,4 @@ import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/ty
 })
 export class AltExecutionAnalyticsComponent {
   readonly _state = inject(AltExecutionStateService);
-
-  handlePickerTimeRangeChange(selection: TimeRangePickerSelection) {
-    this._state.updateTimeRangeSelection(selection);
-  }
 }
