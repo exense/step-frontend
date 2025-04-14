@@ -1,0 +1,50 @@
+<step-form-field>
+  <step-prefix class="icon-prefix">
+    <step-icon name="search" />
+  </step-prefix>
+  <input
+    class="search"
+    [class.with-hint]="!!hint()"
+    type="text"
+    placeholder="Search"
+    [ngModel]="value()"
+    (ngModelChange)="handleValueChange($event)"
+    (blur)="handleBlur()"
+    (keydown.enter)="next()"
+    [disabled]="isDisabled()"
+  />
+  @if (hint(); as hint) {
+    <step-suffix class="icon-suffix">
+      <step-icon [name]="hintIcon()" [matTooltip]="hint" matTooltipPosition="below" />
+    </step-suffix>
+  }
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!areButtonsActive()"
+      (click)="prev()"
+      matTooltip="previous"
+      matTooltipPosition="below"
+    >
+      <step-icon name="chevron-left" />
+    </button>
+  </step-suffix>
+  <step-suffix class="button-suffix">
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!areButtonsActive()"
+      (click)="next()"
+      matTooltip="next (enter)"
+      matTooltipPosition="below"
+    >
+      <step-icon name="chevron-right" />
+    </button>
+  </step-suffix>
+  @if (searchLabel(); as searchLabel) {
+    <step-suffix>
+      <span class="search-label">{{ searchLabel }}</span>
+    </step-suffix>
+  }
+</step-form-field>

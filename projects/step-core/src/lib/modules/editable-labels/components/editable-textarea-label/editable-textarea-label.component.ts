@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, inject, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, viewChild, ViewEncapsulation } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { EditableComponent, EditableComponentState } from '../editable-component/editable.component';
 import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-common-imports.constant';
@@ -28,7 +28,7 @@ const BORDER_WIDTH = 1;
 export class EditableTextareaLabelComponent extends EditableComponent<string> {
   private _textSerialize = inject(TextSerializeService);
 
-  @ViewChild('textarea') textarea?: ElementRef<HTMLElement>;
+  private textarea = viewChild<ElementRef<HTMLElement>>('textarea');
 
   textareaRows = DEFAULT_TEXTAREA_ROWS;
 
@@ -44,8 +44,8 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
     this.recalculateTextareaRows();
     this.value = this._textSerialize.deserializeValue(this.value);
     super.onLabelClick();
-    this.textarea!.nativeElement.focus();
-    this.focusedElement = this.textarea!.nativeElement;
+    this.textarea()?.nativeElement?.focus?.();
+    this.focusedElement = this.textarea()?.nativeElement;
   }
 
   protected override onEnter(): void {
@@ -71,11 +71,12 @@ export class EditableTextareaLabelComponent extends EditableComponent<string> {
   }
 
   onInput(): void {
-    this.textarea!.nativeElement.style.setProperty('height', `0`);
-    this.textarea!.nativeElement.style.setProperty(
-      'height',
-      `${this.textarea!.nativeElement.scrollHeight + 2 * BORDER_WIDTH}px`,
-    );
+    const nativeElement = this.textarea()?.nativeElement;
+    if (!nativeElement) {
+      return;
+    }
+    nativeElement.style.setProperty('height', `0`);
+    nativeElement.style.setProperty('height', `${nativeElement.scrollHeight + 2 * BORDER_WIDTH}px`);
   }
 
   private recalculateTextareaRows(): void {

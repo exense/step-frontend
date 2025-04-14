@@ -1,5 +1,5 @@
 @if (singleStatus(); as singleStatus) {
-  <step-status [status]="singleStatus.status" [iconMode]="true" (click)="handleClick(singleStatus.status, $event)" />
+  <step-status [status]="singleStatus.status" [iconMode]="true" (click)="handleClick(singleStatus, $event)" />
 } @else if (isEmptyStatus()) {
   <div class="status-group">
     <div class="step-node-aggregated-status step-node-aggregated-status-UNKNOWN">0x</div>
@@ -12,7 +12,7 @@
         [class]="item.className"
         [matTooltip]="item.tooltipMessage"
         matTooltipPosition="below"
-        (click)="handleClick(item.status, $event)"
+        (click)="handleClick(item, $event)"
       >
         {{ item.count | shortenNumber: 'x' }}
       </div>

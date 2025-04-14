@@ -1,7 +1,15 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   width: 100%;
   position: relative;
   font-size: 1.2rem;
+  &.highlight {
+    border: solid 0.2rem var.$dark-blue;
+    .name {
+      font-weight: bold;
+    }
+  }
 }
 
 .name {

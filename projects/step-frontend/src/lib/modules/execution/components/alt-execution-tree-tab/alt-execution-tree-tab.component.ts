@@ -1,4 +1,15 @@
-import { Component, DestroyRef, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  untracked,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
@@ -8,6 +19,8 @@ import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { TreeStateService } from '@exense/step-core';
+import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
+import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -29,8 +42,29 @@ export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
+  protected readonly searchCtrl = this._treeState.searchCtrl;
+
+  private tree = viewChild('tree', { read: AltExecutionTreeComponent });
+
+  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
+  protected readonly pageIndex = signal(0);
+
+  private effectFocusNode = effect(() => {
+    const foundItems = this.foundItems();
+    const pageIndex = this.pageIndex();
+    if (!foundItems) {
+      return;
+    }
+    untracked(() => {
+      const itemId = this._treeState.pickSearchResultItemByIndex(pageIndex);
+      if (itemId) {
+        this.tree()?.focusNode(itemId);
+      }
+    });
+  });
 
   ngOnInit(): void {
     this._activatedRoute.queryParams
