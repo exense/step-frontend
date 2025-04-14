@@ -1,4 +1,4 @@
-import { Component, input, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, input, signal, ViewEncapsulation } from '@angular/core';
 import { ControlValueAccessor, NgControl, NgModel } from '@angular/forms';
 
 type OnChange = (value: Record<string, string>) => void;
@@ -22,12 +22,13 @@ export class SimpleObjectInputComponent implements ControlValueAccessor {
 
   readonly showAddFieldBtn = input(true);
   readonly addFieldLabel = input('');
+  readonly updateOnChange = input(false);
 
   protected isDisabled = signal(false);
   protected fields = signal<ObjectField[]>([]);
-  protected readonly ngModelOptions: NgModel['options'] = {
-    updateOn: 'blur',
-  };
+  protected readonly ngModelOptions = computed<NgModel['options']>(() => ({
+    updateOn: this.updateOnChange() ? 'change' : 'blur',
+  }));
 
   constructor(protected readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
