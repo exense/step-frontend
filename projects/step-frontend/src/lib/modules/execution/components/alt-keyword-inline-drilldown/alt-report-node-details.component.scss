@@ -2,6 +2,10 @@
 
 :host {
   font-size: 1.4rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: auto 1fr;
+  height: 100%;
 }
 
 label {
@@ -21,4 +25,10 @@ section {
 
 step-report-node {
   width: 100%;
+}
+
+step-alt-execution-tree-partial {
+  display: block;
+  width: 100%;
+  overflow: auto;
 }
