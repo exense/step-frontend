@@ -131,6 +131,16 @@
               <step-icon name="tool" />
             </button>
             <button
+              data-step-testid="show-entities-package-btn"
+              type="button"
+              mat-icon-button
+              matTooltip="Show package entities"
+              (click)="showEntities(element)"
+              [disabled]="!(AutomationPackagePermission.READ | hasRight | async)"
+            >
+              <step-icon name="layers" />
+            </button>
+            <button
               data-step-testid="delete-package-btn"
               type="button"
               mat-icon-button

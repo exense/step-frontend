@@ -1,0 +1,31 @@
+<step-modal-window title="Automation Package's entities" [showSpinner]="inProgress()">
+  <div step-modal-window-body>
+    @if (!inProgress()) {
+      <step-tabs
+        [tabs]="tabs()"
+        [shrink]="true"
+        [activeTabId]="selectedTab()"
+        (activeTabIdChange)="selectedTab.set($event)"
+      />
+      <div class="tab-content">
+        @switch (selectedTab()) {
+          @case (AutomationPackageEntityKey.PLANS) {
+            <step-table-plans [dataSource]="dataSources()[AutomationPackageEntityKey.PLANS]" />
+          }
+          @case (AutomationPackageEntityKey.KEYWORDS) {
+            <step-table-keywords [dataSource]="dataSources()[AutomationPackageEntityKey.KEYWORDS]" />
+          }
+          @case (AutomationPackageEntityKey.PARAMETERS) {
+            <step-table-parameters [dataSource]="dataSources()[AutomationPackageEntityKey.PARAMETERS]" />
+          }
+          @case (AutomationPackageEntityKey.SCHEDULES) {
+            <step-table-tasks [dataSource]="dataSources()[AutomationPackageEntityKey.SCHEDULES]" />
+          }
+        }
+      </div>
+    }
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+  </div>
+</step-modal-window>
