@@ -304,6 +304,7 @@ export * from './injectables/app-config-container.service';
 export * from './injectables/file-downloader.service';
 export * from './injectables/popover-overlay.service';
 export * from './injectables/additional-initialization.service';
+export * from './injectables/error-message-handler.service';
 export * from './injectables/common-entities-urls.service';
 export * from './types/link-display-type.enum';
 export * from './injectables/is-used-by-dialog';
