@@ -41,8 +41,17 @@
         </div>
         @if (compareModeEnabled) {
           <div style="flex-grow: 1; flex-basis: 0">
-            <div class="ranger-section" [class.compact]="compareModeEnabled">
-              <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
+            <div style="display: flex; flex: 1">
+              <div class="ranger-section" [class.compact]="compareModeEnabled">
+                <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
+              </div>
+              <step-time-range-picker
+                [compact]="true"
+                [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
+                (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
+                [activeTimeRange]="timeRange()?.range"
+                [selectOptions]="timeRangeOptions"
+              />
             </div>
             <step-ts-dashboard-filter-bar
               #compareFilterBar

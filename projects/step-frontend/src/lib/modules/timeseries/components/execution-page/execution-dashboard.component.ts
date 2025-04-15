@@ -60,7 +60,7 @@ import { AltExecutionStateService } from '../../../execution/services/alt-execut
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();
-  timeRange = input.required<TimeRange>();
+  timeRange = input.required<{ range: TimeRange; resetSelection: boolean }>();
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);

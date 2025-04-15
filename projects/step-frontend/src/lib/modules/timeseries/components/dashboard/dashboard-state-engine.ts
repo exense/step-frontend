@@ -26,11 +26,33 @@ export class DashboardStateEngine {
       context.onFilteringChange(),
       context.onChartsResolutionChange(),
       context.onTimeSelectionChange(),
+      context.onFullRangeChange(),
     )
       .pipe(takeUntil(this.terminator$))
       .subscribe(() => {
         this.refreshAllCharts(false, true);
       });
+  }
+
+  handleTimeRangePickerChange(selection: TimeRangePickerSelection) {
+    let timeRange: TimeRange;
+    switch (selection.type) {
+      case 'ABSOLUTE':
+        timeRange = selection.absoluteSelection!;
+        break;
+      case 'RELATIVE':
+        const now = new Date().getTime();
+        timeRange = { from: now - selection.relativeSelection!.timeInMs, to: now };
+        break;
+      default:
+        throw new Error('Unsupported type ' + selection.type);
+    }
+    const timeRangeSettings: DashboardTimeRangeSettings = {
+      timeRangeSelection: selection,
+      fullRange: timeRange,
+      selectedRange: timeRange,
+    };
+    this.state.context.updateTimeRangeSettings(timeRangeSettings);
   }
 
   triggerRefresh(force: boolean = false) {

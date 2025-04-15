@@ -129,6 +129,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 
 @NgModule({
   declarations: [
@@ -219,6 +220,7 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     TooltipContentDirective,
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
+    DashboardPageComponent,
   ],
   exports: [
     ExecutionListComponent,

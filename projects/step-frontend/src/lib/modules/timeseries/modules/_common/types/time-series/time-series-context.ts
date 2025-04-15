@@ -101,14 +101,15 @@ export class TimeSeriesContext {
     this.timeRangeSettings = settings;
     this.stateChangeInternal$.next();
     this.timeRangeSettingsChange.next(settings);
-    // this.fullTimeRangeChange$.next(settings.fullRange);
+    this.fullTimeRangeChange$.next(settings.fullRange);
   }
 
-  updateFullTimeRange(range: TimeRange) {
+  updateFullTimeRange(range: TimeRange, resetSelection = false) {
     const isFullRangeSelected = this.isFullRangeSelected();
+    console.log(isFullRangeSelected, resetSelection);
     const previousSelection = this.timeRangeSettings.selectedRange;
     this.timeRangeSettings.fullRange = range;
-    if (isFullRangeSelected) {
+    if (isFullRangeSelected || resetSelection) {
       this.timeRangeSettings.selectedRange = range;
     } else {
       this.timeRangeSettings.selectedRange = TimeSeriesUtils.cropInterval(previousSelection, range) || range;

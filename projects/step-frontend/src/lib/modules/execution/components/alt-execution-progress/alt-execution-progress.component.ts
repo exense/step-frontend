@@ -343,7 +343,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
     map(([execution, rangeSelection]) => {
       if (execution.id !== this._executionId()) {
-        // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
+        // when the execution changes, the activeExecution is triggered and the time-range will be updated and re-trigger this
         return undefined;
       }
       switch (rangeSelection.type) {

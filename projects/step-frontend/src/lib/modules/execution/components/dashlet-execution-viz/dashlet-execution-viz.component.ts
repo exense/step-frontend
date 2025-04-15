@@ -38,7 +38,9 @@ export class DashletExecutionVizComponent implements CustomComponent, OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
-  activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
+  activeTimeRangeSelection: WritableSignal<
+    { selection: TimeRangePickerSelection; resetSelection: boolean } | undefined
+  > = signal(undefined);
 
   refreshInterval = signal<number>(0);
 
@@ -50,7 +52,8 @@ export class DashletExecutionVizComponent implements CustomComponent, OnInit {
   timeRange = computed(() => {
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
-      return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection, this._state.execution?.endTime);
+      let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection.selection);
+      return { range: timeRange, resetSelection: pickerSelection.resetSelection };
     } else {
       return undefined;
     }
@@ -71,16 +74,34 @@ export class DashletExecutionVizComponent implements CustomComponent, OnInit {
           // find the selection with label
           urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange.relativeSelection!.timeInMs);
         }
-        this.activeTimeRangeSelection.set(urlParams.timeRange!);
+        this.activeTimeRangeSelection.set({ selection: urlParams.timeRange!, resetSelection: false });
       } else {
         if (this.dashboard.timeRange.type === 'RELATIVE') {
           this.dashboard.timeRange = this.findRelativeTimeOption(this.dashboard!.timeRange.relativeSelection!.timeInMs);
         }
-        this.activeTimeRangeSelection.set(this.dashboard.timeRange);
+        this.activeTimeRangeSelection.set({ selection: this.dashboard.timeRange, resetSelection: false });
       }
     });
 
     this.subscribeToUrlNavigation();
+  }
+
+  handleDashboardSettingsChange(context: TimeSeriesContext) {
+    console.log('SETTINGS CHANGED');
+    this._urlParamsService.updateUrlParamsFromContext(
+      context,
+      this.activeTimeRangeSelection()!.selection,
+      this.refreshInterval(),
+    );
+  }
+
+  handleDashboardSettingsInit(context: TimeSeriesContext) {
+    this._urlParamsService.updateUrlParamsFromContext(
+      context,
+      this.activeTimeRangeSelection()!.selection,
+      this.refreshInterval(),
+      true,
+    );
   }
 
   handleZoomChange() {
@@ -101,12 +122,7 @@ export class DashletExecutionVizComponent implements CustomComponent, OnInit {
   }
 
   handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
-    this.activeTimeRangeSelection.set(pickerSelection);
-  }
-
-  handleDashboardSettingsChange(context: TimeSeriesContext) {
-    console.log('SETTINGS CHANGED');
-    this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!);
+    this.activeTimeRangeSelection.set({ selection: pickerSelection, resetSelection: true });
   }
 
   triggerRefresh() {

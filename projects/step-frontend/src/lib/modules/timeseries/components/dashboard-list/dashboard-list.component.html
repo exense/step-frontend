@@ -59,7 +59,7 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <div class="dashlet-container">
-          @for (dashlet of element.dashlets; track dashlet.name) {
+          @for (dashlet of element.dashlets; track $index) {
             <step-icon name="trello" [matTooltip]="dashlet.name" />
           }
         </div>

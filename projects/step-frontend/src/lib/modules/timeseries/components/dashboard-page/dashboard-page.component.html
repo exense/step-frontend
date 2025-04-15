@@ -21,23 +21,28 @@
     }
   </div>
   <div class="right-section">
-    <step-autorefresh-toggle [interval]="refreshInterval()" (refresh)="triggerRefresh()"></step-autorefresh-toggle>
+    <step-autorefresh-toggle
+      (intervalChange)="handleRefreshIntervalChange($event)"
+      [interval]="refreshInterval()"
+      (refresh)="triggerRefresh()"
+    ></step-autorefresh-toggle>
     @if (activeTimeRangeSelection()) {
       <step-time-range-picker
-        [activeSelection]="activeTimeRangeSelection()!"
+        [activeSelection]="activeTimeRangeSelection()!.selection"
         (selectionChange)="handleTimeRangeChange($event)"
-        [activeTimeRange]="timeRange()"
+        [activeTimeRange]="timeRange()?.range"
         [selectOptions]="timeRangeOptions"
       />
     }
   </div>
 </div>
 
-@if (!isLoading) {
+@if (timeRange() && dashboardIdInternalSignal() && !isLoading) {
   <step-timeseries-dashboard
     [id]="dashboardIdInternalSignal()!"
     [timeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
+    (contextSettingsInit)="handleDashboardSettingsInit($event)"
     [showExecutionLinks]="true"
     (zoomReset)="handleZoomReset()"
     (zoomChange)="handleZoomChange()"

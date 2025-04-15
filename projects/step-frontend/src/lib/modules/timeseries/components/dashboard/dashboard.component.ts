@@ -41,6 +41,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
+  TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
 } from '../../modules/_common';
@@ -64,7 +65,6 @@ import { TimeSeriesEntityService } from '../../modules/_common';
 import { DashboardTimeRangeSettings } from './dashboard-time-range-settings';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
-import { DashboardViewSettingsBtnLocation } from './dashboard-view-settings-btn-location';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -112,17 +112,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
-  timeRange = input.required<TimeRange>();
+  timeRange = input.required<{ range: TimeRange; resetSelection: boolean }>();
+
+  timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
   timeRangeChangeEffect = effect(() => {
     const timeRange = this.timeRange()!;
-    this.mainEngine?.state.context.updateFullTimeRange(timeRange);
-    this.compareEngine?.state.context.updateFullTimeRange(timeRange);
+    console.log(timeRange);
+    this.mainEngine?.state.context.updateFullTimeRange(timeRange.range, timeRange.resetSelection);
+    this.compareEngine?.state.context.updateFullTimeRange(timeRange.range, timeRange.resetSelection);
     this.refresh();
   });
 
   /** @Output **/
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
+  readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
   readonly zoomChange = output<TimeRange>();
   readonly zoomReset = output<void>();
 
@@ -146,6 +150,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!dashboardId) {
       throw new Error('Dashboard id input is mandatory');
     }
+    if (!this.timeRange()) {
+      throw new Error('Time range not set');
+    }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
     this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
@@ -167,12 +174,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
-    // if (existingContext && urlParams.timeRange) {
-    //   // update the existing context with url params
-    //   existingContext.updateTimeRangeSettings(
-    //     this.transformTimePickerSelectionIntoDashboardSettings(urlParams.timeRange!, urlParams),
-    //   );
-    // }
     const context$: Observable<TimeSeriesContext> = existingContext
       ? of(existingContext)
       : this.createContext(this.dashboard, urlParams, existingContext);
@@ -181,8 +182,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       context.settingsChange$
         .pipe(takeUntilDestroyed(this._destroyRef))
         .subscribe(() => this.contextSettingsChanged.emit(context));
-      this.contextSettingsChanged.emit(context);
-      context.onTimeSelectionChange().subscribe((range) => this.zoomChange.emit(range));
+      this.contextSettingsInit.emit(context);
+      context.onTimeSelectionChange().subscribe((range) => {
+        this.zoomChange.emit(range);
+      });
     });
   }
 
@@ -332,13 +335,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     existingSettings: DashboardTimeRangeSettings | undefined,
     urlParams: DashboardUrlParams,
   ): DashboardTimeRangeSettings {
-    // priority of time ranges property: 1. URL, 2. existingCustomSelection 3. Default full selection 4. Dashboard
+    // priority of time ranges property: 1. URL, 2. existingCustomSelection 3. Default full selection
     if (existingSettings) {
       return existingSettings!;
     } else {
       return {
-        fullRange: this.timeRange()!,
-        selectedRange: urlParams.selectedTimeRange || this.timeRange()!,
+        fullRange: this.timeRange()!.range,
+        selectedRange: urlParams.selectedTimeRange || this.timeRange()!.range,
       };
     }
   }
@@ -398,7 +401,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ): Observable<TimeSeriesContext> {
     const timeRangeSettings: DashboardTimeRangeSettings = this.computeTimeRangeSettings(
       existingContext?.getTimeRangeSettings(),
-      dashboard,
+      urlParams,
     );
     const metricAttributes: MetricAttribute[] = this.dashboard.dashlets.flatMap((d) => d.attributes || []);
     const urlFilters = FilterUtils.convertUrlKnownFilters(urlParams.filters, metricAttributes).filter(
@@ -602,16 +605,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
     const hiddenFilters = clonedSettings.hiddenFilters || [];
     clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
-    clonedSettings.filterItems.forEach((item) => (item.isHidden = false));
+    clonedSettings.filterItems.forEach((item) => {
+      item.isHidden = false;
+      item.updateTimeSelectionOnFilterChange = true;
+    });
     clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
 
   enableCompareMode() {
     const mainState = this.mainEngine.state;
+    const mainTimeSettings = mainState.context.getTimeRangeSettings();
     const compareModeContext = this._timeSeriesContextFactory.createContext({
       dashlets: JSON.parse(JSON.stringify(this.dashboard.dashlets)), // clone
-      timeRangeSettings: JSON.parse(JSON.stringify(mainState.context.getTimeRangeSettings())),
+      timeRangeSettings: {
+        timeRangeSelection: { type: 'ABSOLUTE', absoluteSelection: mainTimeSettings.fullRange },
+        fullRange: mainTimeSettings.fullRange,
+        selectedRange: mainTimeSettings.selectedRange,
+      },
       id: new Date().getTime().toString(),
       attributes: this.mainEngine.state.context.getAllAttributes(),
       grouping: mainState.context.getGroupDimensions(),

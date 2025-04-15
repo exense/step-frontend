@@ -183,7 +183,6 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
     }
     if (this.syncKey) {
       let syncPubSub = uPlot.sync(this.syncKey);
-      console.log(syncPubSub.pub);
     }
     this.createChart(this.settings);
   }

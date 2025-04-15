@@ -1,12 +1,22 @@
-@if (timeRange()) {
-  <div class="header">
-    <step-time-range-picker
-      [activeSelection]="activeTimeRangeSelection()!"
-      (selectionChange)="handleTimeRangeChange($event)"
-      [activeTimeRange]="timeRange()"
-      [selectOptions]="timeRangeOptions"
-    />
-  </div>
+<!--@if (timeRange()) {-->
+<!--  <div class="header">-->
+<!--    <step-time-range-picker-->
+<!--      [activeSelection]="activeTimeRangeSelection()!"-->
+<!--      (selectionChange)="handleTimeRangeChange($event)"-->
+<!--      [activeTimeRange]="timeRange()?.range"-->
+<!--      [selectOptions]="timeRangeOptions"-->
+<!--    />-->
+<!--  </div>-->
 
-  <step-execution-dashboard [execution]="_state.execution!" [timeRange]="timeRange()!" />
+<!--  <step-execution-dashboard -->
+<!--    [execution]="_state.execution!" -->
+<!--    [timeRange]="timeRange()!"-->
+<!--    (contextSettingsChanged)="handleDashboardSettingsChange($event)"-->
+<!--    (contextSettingsInit)="handleDashboardSettingsInit($event)"-->
+<!--    [showExecutionLinks]="true"-->
+<!--  />-->
+<!--}-->
+
+@if (_state.execution) {
+  <step-dashboard-page [dashboardId]="dashboardId"></step-dashboard-page>
 }

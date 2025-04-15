@@ -5,6 +5,7 @@ import { TimeRangePickerSelection } from '../../modules/_common/types/time-selec
  * This entity will store all the settings for a dashboard regarding time selection.
  */
 export interface DashboardTimeRangeSettings {
+  timeRangeSelection?: TimeRangePickerSelection; // used only in compare mode
   fullRange: TimeRange;
   selectedRange: TimeRange;
 }

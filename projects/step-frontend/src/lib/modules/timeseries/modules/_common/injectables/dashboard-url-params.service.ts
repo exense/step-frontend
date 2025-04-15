@@ -141,11 +141,28 @@ export class DashboardUrlParamsService {
     this.prefixAndPushUrlParams(params, replaceUrl);
   }
 
-  updateUrlParamsFromContext(context: TimeSeriesContext, timeRange: TimeRangePickerSelection, replaceUrl = false) {
+  updateRefreshInterval(rate: number, replaceUrl: boolean) {
+    const newParams = this.prefixParams({ refreshInterval: rate });
+
+    const mergedParams = { ...this._activatedRoute.snapshot.queryParams, ...newParams };
+
+    this._router.navigate([], {
+      relativeTo: this._activatedRoute,
+      replaceUrl: replaceUrl,
+      queryParams: mergedParams,
+    });
+  }
+
+  updateUrlParamsFromContext(
+    context: TimeSeriesContext,
+    timeRange: TimeRangePickerSelection,
+    refreshInterval: number | undefined,
+    replaceUrl = false,
+  ) {
     let params = { ...this.convertTimeRange(timeRange), ...this.convertContextToUrlParams(context) };
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
-    // mergedParams['refreshInterval'] = context.getRefreshInterval();
+    mergedParams['refreshInterval'] = refreshInterval;
     this.prefixAndPushUrlParams(mergedParams, replaceUrl);
   }
 
@@ -166,6 +183,9 @@ export class DashboardUrlParamsService {
   }
 
   private convertTimeRange(pickerSelection: TimeRangePickerSelection): Record<string, any> {
+    if (!pickerSelection) {
+      return {};
+    }
     const params: Record<string, any> = {
       rangeType: pickerSelection.type,
     };
@@ -177,6 +197,15 @@ export class DashboardUrlParamsService {
       params['relativeRange'] = pickerSelection.relativeSelection!.timeInMs;
     }
     return params;
+  }
+
+  private prefixParams(params: Record<string, any>) {
+    const updatedParams: Record<string, any> = {};
+    Object.keys(params).forEach((key) => {
+      const prefixedParam = TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + key;
+      updatedParams[prefixedParam] = params[key];
+    });
+    return updatedParams;
   }
 
   private prefixAndPushUrlParams(params: Record<string, any>, replaceUrl: boolean): void {
