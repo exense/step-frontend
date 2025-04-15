@@ -1,0 +1,28 @@
+<step-modal-window title="Errors">
+  <div step-modal-window-body>
+    <section class="error-container">
+      @for (error of _state.errors(); track error.id) {
+        <step-alert [type]="error.isRead ? AlertType.DEFAULT : AlertType.DANGER">
+          <section class="error-content">
+            <div>{{ error.message }}</div>
+            <step-icon
+              name="x"
+              (click)="_state.dismissError(error.id)"
+              matTooltip="Dismiss"
+              matTooltipPosition="below"
+            />
+          </section>
+        </step-alert>
+      }
+      @if (!_state.count()) {
+        <step-alert [type]="AlertType.SUCCESS">No errors to display</step-alert>
+      }
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    @if (_state.count() > 1) {
+      <button type="button" mat-flat-button color="primary" (click)="dismissAll()">Dismiss All</button>
+    }
+  </div>
+</step-modal-window>

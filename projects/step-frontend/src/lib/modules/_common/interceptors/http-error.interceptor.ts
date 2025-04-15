@@ -9,14 +9,13 @@ import {
 } from '@angular/common/http';
 import { Observable, of, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConnectionError } from '../shared/connection-error';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
-import { NavigatorService } from '@exense/step-core';
+import { ErrorMessageHandlerService, NavigatorService } from '@exense/step-core';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-  private _snackBar = inject(MatSnackBar);
+  private _errorMessageHandler = inject(ErrorMessageHandlerService);
   private _errorLogger = inject(HttpErrorLoggerService);
   private _navigator = inject(NavigatorService);
 
@@ -135,7 +134,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     if (typeof error !== 'string' || error === '') {
       this._errorLogger.log('Error with unknown format', error);
     } else {
-      this._snackBar.open(error, 'dismiss');
+      this._errorMessageHandler.showError(error);
     }
   }
 

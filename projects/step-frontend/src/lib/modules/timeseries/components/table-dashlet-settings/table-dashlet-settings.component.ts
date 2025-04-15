@@ -1,5 +1,12 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { ColumnSelection, DashboardItem, MetricAttribute, MetricType, TimeSeriesService } from '@exense/step-core';
+import {
+  ColumnSelection,
+  DashboardItem,
+  ErrorMessageHandlerService,
+  MetricAttribute,
+  MetricType,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -28,7 +35,7 @@ export class TableDashletSettingsComponent implements OnInit {
   private _inputData: ChartDashletSettingsData = inject<ChartDashletSettingsData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
   private _timeSeriesService = inject(TimeSeriesService);
-  private _snackbar = inject(MatSnackBar);
+  private _errorMessageHandler = inject(ErrorMessageHandlerService);
 
   allAttributes: MetricAttribute[] = [];
   _attributesByKey: Record<string, MetricAttribute> = {};
@@ -105,7 +112,7 @@ export class TableDashletSettingsComponent implements OnInit {
     const existingItems = this.filterItems.filter((i) => i.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
-      this._snackbar.open('Filter not applied', 'dismiss');
+      this._errorMessageHandler.showError('Filter not applied');
       this.filterItems.splice(index, 1);
       return;
     }
