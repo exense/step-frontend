@@ -6,7 +6,7 @@ export type TableRequestFilter = FieldFilter | FulltextFilter | OQLFilter | Tabl
 
 export interface TableRequestData extends TableRequest {
   filters?: TableRequestFilter[];
-  sort?: FieldSort;
+  sort?: FieldSort[];
   skip?: number;
   limit?: number;
   tableParameters?: TableParameters & Record<string, string>;

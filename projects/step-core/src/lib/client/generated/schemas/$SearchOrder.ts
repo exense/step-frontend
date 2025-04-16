@@ -3,12 +3,11 @@
 /* eslint-disable */
 export const $SearchOrder = {
   properties: {
-    attributeName: {
-      type: 'string',
-    },
-    order: {
-      type: 'number',
-      format: 'int32',
+    fieldsSearchOder: {
+      type: 'array',
+      contains: {
+        type: 'FieldSearchOrder',
+      },
     },
   },
 } as const;

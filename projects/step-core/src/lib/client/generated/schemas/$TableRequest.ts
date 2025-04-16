@@ -21,7 +21,10 @@ export const $TableRequest = {
       format: 'int32',
     },
     sort: {
-      type: 'Sort',
+      type: 'array',
+      contains: {
+        type: 'Sort',
+      },
     },
     performEnrichment: {
       type: 'boolean',

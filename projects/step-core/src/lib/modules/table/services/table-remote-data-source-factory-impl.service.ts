@@ -11,7 +11,7 @@ export class TableRemoteDataSourceFactoryImplService implements TableRemoteDataS
 
   createDataSource<T>(
     tableId: string,
-    requestColumnsMap: Record<string, string>,
+    requestColumnsMap: Record<string, string | string[]>,
     filters?: Record<string, string[]>,
   ): TableDataSource<T> {
     return new TableRemoteDataSource(tableId, this._tableRest, requestColumnsMap, filters);
