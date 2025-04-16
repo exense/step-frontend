@@ -56,8 +56,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       startTime: 'startTime',
       endTime: 'endTime',
       user: 'executionParameters.userID',
-      status: 'effectiveStatus',
-      result: 'result',
+      status: ['status', 'result'],
     });
   }
 

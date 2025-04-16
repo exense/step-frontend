@@ -15,14 +15,14 @@ import {
   tap,
 } from 'rxjs';
 import {
-  SortDirection,
-  TableRequestData,
-  TableApiWrapperService,
-  TableResponseGeneric,
-  TableRequestFilter,
   OQLFilter,
-  TableParameters,
+  SortDirection,
   StepDataSourceReloadOptions,
+  TableApiWrapperService,
+  TableParameters,
+  TableRequestData,
+  TableRequestFilter,
+  TableResponseGeneric,
 } from '../../../client/step-client-module';
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
@@ -31,7 +31,7 @@ import { FilterCondition } from './filter-condition';
 export class TableRequestInternal {
   columns: string[];
   searchBy?: { column: string; value: SearchValue }[];
-  orderBy?: { column: string; order: 'asc' | 'desc' };
+  orderBy?: { column: string; order: 'asc' | 'desc' }[];
   start?: number;
   length?: number;
   filter?: string;
@@ -86,15 +86,19 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
     result.filters = filters;
   }
 
-  result.sort = req.orderBy
-    ? {
-        field: req.orderBy.column,
-        direction: req.orderBy.order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
-      }
-    : {
+  if (req.orderBy) {
+    result.sort = req.orderBy.map(({ column, order }) => ({
+      field: column,
+      direction: order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
+    }));
+  } else {
+    result.sort = [
+      {
         field: req.columns[0],
         direction: SortDirection.ASCENDING,
-      };
+      },
+    ];
+  }
 
   if (req.filter) {
     const oql: OQLFilter = { oql: req.filter };
@@ -173,7 +177,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   constructor(
     private _tableId: string,
     private _rest: TableApiWrapperService,
-    private _requestColumnsMap: Record<string, string>,
+    private _requestColumnsMap: Record<string, string | string[]>,
     private _filters?: Record<string, string | string[] | SearchValue>,
   ) {
     if (_filters) {
@@ -220,9 +224,13 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }
 
     const tableRequest: TableRequestInternal = new TableRequestInternal({
-      columns: Object.values(this._requestColumnsMap),
-      searchBy: Object.entries(search || {}).map(([name, value]) => {
-        const column = this._requestColumnsMap[name] ?? name;
+      columns: Object.values(this._requestColumnsMap).reduce((res: string[], value: string | string[]) => {
+        const items: string[] = value instanceof Array ? value : [value];
+        return res.concat(items);
+      }, []) as string[],
+      searchBy: Object.entries(search ?? {}).map(([name, value]) => {
+        const col = this._requestColumnsMap[name] ?? name;
+        const column = col instanceof Array ? col[0] : col;
         return { column, value };
       }),
     });
@@ -258,8 +266,14 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
     const order = sort?.direction;
     if (order) {
-      const column = this._requestColumnsMap[sort!.active];
-      tableRequest.orderBy = column ? { column, order } : undefined;
+      const col = this._requestColumnsMap[sort!.active];
+      if (!col) {
+        tableRequest.orderBy = undefined;
+      } else if (col instanceof Array) {
+        tableRequest.orderBy = col.map((column) => ({ column, order }));
+      } else {
+        tableRequest.orderBy = [{ column: col, order }];
+      }
     }
 
     this.getTableData(tableRequest);

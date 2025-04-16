@@ -11,7 +11,7 @@ export type TableRequest = {
   tableParameters?: TableParameters;
   skip?: number;
   limit?: number;
-  sort?: Sort;
+  sort?: Array<Sort>;
   performEnrichment?: boolean;
   calculateCounts?: boolean;
 };
