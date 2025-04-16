@@ -64,12 +64,16 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     if (typeof error === 'string') {
       jsonError = this.parseJson(error);
-    } else if (error && error.headers.get('Content-Type')?.includes('application/json')) {
+    } else if (error?.headers?.get?.('Content-Type')?.includes?.('application/json')) {
       jsonError = this.parseJson(error.error);
     }
 
-    if (jsonError?.errorMessage) {
-      return jsonError.errorMessage;
+    if (!jsonError) {
+      jsonError = error;
+    }
+
+    if (jsonError?.errorMessage || jsonError?.errorName) {
+      return `${jsonError.errorName || 'Error'}: ${jsonError.errorMessage}`;
     }
     if (error && error instanceof HttpErrorResponse && error.name && error.message) {
       return `${error.name}: ${error.message}`;

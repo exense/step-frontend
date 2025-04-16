@@ -24,7 +24,7 @@
         [disabled]="isDisabled()"
         [ngModel]="field.name"
         (ngModelChange)="changeName(field, $event)"
-        [ngModelOptions]="ngModelOptions"
+        [ngModelOptions]="ngModelOptions()"
       />
     </step-form-field>
     <step-form-field [class.ng-invalid]="_ngControl.invalid" [class.ng-touched]="_ngControl.touched">
@@ -34,7 +34,7 @@
         [disabled]="isDisabled()"
         [ngModel]="field.value"
         (ngModelChange)="changeValue(field, $event)"
-        [ngModelOptions]="ngModelOptions"
+        [ngModelOptions]="ngModelOptions()"
       />
     </step-form-field>
     <step-btn-group>
