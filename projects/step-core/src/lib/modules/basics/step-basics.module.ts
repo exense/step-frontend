@@ -299,7 +299,6 @@ export * from './types/is-used-by-dialog-data';
 export * from './types/is-used-by-search-type';
 export * from './injectables/multiple-projects.service';
 export * from './injectables/generate-api-key.service';
-export * from './injectables/editor-resolver.service';
 export * from './injectables/app-config-container.service';
 export * from './injectables/file-downloader.service';
 export * from './injectables/popover-overlay.service';
