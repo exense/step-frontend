@@ -12,7 +12,7 @@
 }
 
 @mixin aggregatedNodeStatus($status, $color) {
-  .step-node-aggregated-status-#{$status} {
+  .step-aggregated-status-#{$status} {
     color: $color;
     border-color: $color;
   }
@@ -22,7 +22,7 @@
   @include aggregatedNodeStatus($status, $color);
 }
 
-.step-node-aggregated-status {
+.step-aggregated-status {
   display: flex;
   align-items: center;
   justify-content: center;

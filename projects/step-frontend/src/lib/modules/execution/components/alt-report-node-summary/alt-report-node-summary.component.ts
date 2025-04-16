@@ -17,6 +17,9 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './alt-report-node-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[attr.title]': 'null',
+  },
 })
 export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);

@@ -27,13 +27,29 @@ step-table {
 
 .name {
   white-space: nowrap;
+  & > section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+  }
 }
 
 .test-case-name {
   cursor: pointer;
   user-select: none;
-  &.is-selected {
-    font-weight: bold;
+}
+
+.details-trigger {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  max-width: 60rem;
+  & > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 }
 

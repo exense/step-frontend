@@ -75,13 +75,13 @@ export class DurationPipe implements PipeTransform {
   private getParams(params?: boolean | DurationPipeParams): Required<DurationPipeParams> {
     if (!params) {
       return {
-        displayFull: true,
+        displayFull: false,
         shortenMs: false,
       };
     }
     if (typeof params === 'boolean') {
       return {
-        displayFull: !params,
+        displayFull: !!params,
         shortenMs: false,
       };
     }

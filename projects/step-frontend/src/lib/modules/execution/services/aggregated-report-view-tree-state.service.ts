@@ -20,6 +20,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
 
@@ -28,6 +29,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private _injector = inject(Injector);
   private _artefactService = inject(ArtefactService);
   private _fb = inject(FormBuilder);
+  private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
   private searchIndex = new SearchIndex();
 
@@ -72,13 +74,23 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.buildSearchIndex(root);
   }
 
+  findNodesByArtefactId(artefactId?: string): AggregatedTreeNode[] {
+    if (!artefactId) {
+      return [];
+    }
+    const { tree, accessCache } = this.treeData();
+    return tree
+      .map(({ id }) => accessCache.get(id) as AggregatedTreeNode)
+      .filter((item) => item.artefactId === artefactId);
+  }
+
   pickSearchResultItemByIndex(index: number): string {
     const item = this.searchResult()[index];
     this.selectedSearchResultItemInternal.set(item);
     return item;
   }
 
-  private buildSearchIndex(item: AggregatedReportView): void {
+  private buildSearchIndex(item: AggregatedReportView, patentId?: string): void {
     const artefactType = this._artefactService.getArtefactType(item.artefact!._class!);
 
     const items = runInInjectionContext(
@@ -111,9 +123,10 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     searchValues.push(item?.artefact?.attributes?.['name'] ?? '');
 
-    this.searchIndex.register(item.artefact!.id!, searchValues);
+    const nodeId = this._utils.getUniqueId(item.artefact!.id!, patentId);
+    this.searchIndex.register(nodeId, searchValues);
 
-    (item.children ?? []).forEach((child) => this.buildSearchIndex(child));
+    (item.children ?? []).forEach((child) => this.buildSearchIndex(child, nodeId));
   }
 }
 
