@@ -56,7 +56,8 @@ export const checkEntityGuardFactory =
         return _multipleProjects.confirmEntityEditInASeparateProject(entity, entityEditLink, config.entityType);
       }),
       map((result) => {
-        if (!result && _router.url === '/') {
+        const emptyUrls = ['', '/', '/login'];
+        if (!result && emptyUrls.includes(_router.url)) {
           return _router.parseUrl(_defaultPage());
         }
         return result;
