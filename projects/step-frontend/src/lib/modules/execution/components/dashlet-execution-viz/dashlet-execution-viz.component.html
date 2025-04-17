@@ -1,22 +1,3 @@
-<!--@if (timeRange()) {-->
-<!--  <div class="header">-->
-<!--    <step-time-range-picker-->
-<!--      [activeSelection]="activeTimeRangeSelection()!"-->
-<!--      (selectionChange)="handleTimeRangeChange($event)"-->
-<!--      [activeTimeRange]="timeRange()?.range"-->
-<!--      [selectOptions]="timeRangeOptions"-->
-<!--    />-->
-<!--  </div>-->
-
-<!--  <step-execution-dashboard -->
-<!--    [execution]="_state.execution!" -->
-<!--    [timeRange]="timeRange()!"-->
-<!--    (contextSettingsChanged)="handleDashboardSettingsChange($event)"-->
-<!--    (contextSettingsInit)="handleDashboardSettingsInit($event)"-->
-<!--    [showExecutionLinks]="true"-->
-<!--  />-->
-<!--}-->
-
 @if (_state.execution) {
-  <step-dashboard-page [dashboardId]="dashboardId"></step-dashboard-page>
+  <step-legacy-execution-view [execution]="_state.execution!" />
 }

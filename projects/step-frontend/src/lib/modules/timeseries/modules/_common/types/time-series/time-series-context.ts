@@ -104,17 +104,19 @@ export class TimeSeriesContext {
     this.fullTimeRangeChange$.next(settings.fullRange);
   }
 
-  updateFullTimeRange(range: TimeRange, resetSelection = false) {
+  /**
+   * If there is a selection before changing the full range, and it fits inside it, the selection will not be reset. Otherwise it does.
+   * @param range
+   */
+  updateFullTimeRange(range: TimeRange) {
     const isFullRangeSelected = this.isFullRangeSelected();
-    console.log(isFullRangeSelected, resetSelection);
     const previousSelection = this.timeRangeSettings.selectedRange;
-    this.timeRangeSettings.fullRange = range;
-    if (isFullRangeSelected || resetSelection) {
+    if (isFullRangeSelected || !TimeSeriesUtils.intervalIsInside(range, previousSelection)) {
+      // reset it
       this.timeRangeSettings.selectedRange = range;
-    } else {
-      this.timeRangeSettings.selectedRange = TimeSeriesUtils.cropInterval(previousSelection, range) || range;
     }
-    this.fullTimeRangeChange$.next(this.timeRangeSettings.selectedRange);
+    this.timeRangeSettings.fullRange = range;
+    this.fullTimeRangeChange$.next(this.timeRangeSettings.fullRange);
   }
 
   getSyncGroups(): TimeSeriesSyncGroup[] {

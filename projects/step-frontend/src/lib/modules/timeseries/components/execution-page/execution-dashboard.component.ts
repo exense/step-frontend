@@ -8,6 +8,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  output,
   Output,
   SimpleChanges,
   ViewChild,
@@ -18,6 +19,7 @@ import {
   FilterBarItemType,
   ResolutionPickerComponent,
   TimeSeriesConfig,
+  TimeSeriesContext,
   TimeSeriesContextsFactory,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
@@ -60,7 +62,11 @@ import { AltExecutionStateService } from '../../../execution/services/alt-execut
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();
-  timeRange = input.required<{ range: TimeRange; resetSelection: boolean }>();
+  timeRange = input.required<TimeRange>();
+
+  readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
+  readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
+
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);

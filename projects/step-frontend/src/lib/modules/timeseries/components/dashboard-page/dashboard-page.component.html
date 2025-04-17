@@ -21,16 +21,18 @@
     }
   </div>
   <div class="right-section">
-    <step-autorefresh-toggle
-      (intervalChange)="handleRefreshIntervalChange($event)"
-      [interval]="refreshInterval()"
-      (refresh)="triggerRefresh()"
-    ></step-autorefresh-toggle>
+    @if (showRefreshToggle()) {
+      <step-autorefresh-toggle
+        (intervalChange)="handleRefreshIntervalChange($event)"
+        [interval]="refreshInterval()"
+        (refresh)="triggerRefresh()"
+      ></step-autorefresh-toggle>
+    }
     @if (activeTimeRangeSelection()) {
       <step-time-range-picker
-        [activeSelection]="activeTimeRangeSelection()!.selection"
+        [activeSelection]="activeTimeRangeSelection()!"
         (selectionChange)="handleTimeRangeChange($event)"
-        [activeTimeRange]="timeRange()?.range"
+        [activeTimeRange]="timeRange()"
         [selectOptions]="timeRangeOptions"
       />
     }

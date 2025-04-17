@@ -27,16 +27,10 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, filter, Observable, of, pairwise, shareReplay, switchMap, take } from 'rxjs';
+import { filter, Observable, pairwise, shareReplay, switchMap, take } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import {
-  AuthService,
-  AutorefreshToggleComponent,
-  DashboardsService,
-  DashboardView,
-  TimeRange,
-} from '@exense/step-core';
+import { AuthService, DashboardsService, DashboardView, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 interface UrlParams {
@@ -72,11 +66,10 @@ export class DashboardPageComponent implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
-  activeTimeRangeSelection: WritableSignal<
-    { selection: TimeRangePickerSelection; resetSelection: boolean } | undefined
-  > = signal(undefined);
+  activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
   dashboardId = input<string>(); // optional, otherwise it will be taken from url
+  showRefreshToggle = input<boolean>(true);
   dashboardIdInternalSignal = signal<string | undefined>(undefined);
   refreshInterval = signal<number>(0);
 
@@ -104,11 +97,10 @@ export class DashboardPageComponent implements OnInit {
 
   isLoading = false;
 
-  timeRange = computed<{ range: TimeRange; resetSelection: boolean } | undefined>(() => {
+  timeRange = computed<TimeRange | undefined>(() => {
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
-      let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection.selection);
-      return { range: timeRange, resetSelection: pickerSelection.resetSelection };
+      return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
     } else {
       return undefined;
     }
@@ -122,7 +114,7 @@ export class DashboardPageComponent implements OnInit {
     });
     const urlParams = this.extractUrlParams();
     if (urlParams.timeRange) {
-      this.activeTimeRangeSelection.set({ selection: urlParams.timeRange!, resetSelection: false });
+      this.activeTimeRangeSelection.set(urlParams.timeRange);
     }
     console.log(urlParams.refreshInterval);
     this.refreshInterval.set(urlParams.refreshInterval || 0);
@@ -140,7 +132,7 @@ export class DashboardPageComponent implements OnInit {
         if (dashboard!.timeRange.type === 'RELATIVE' && !dashboard!.timeRange.relativeSelection?.label) {
           dashboard.timeRange = this.findRelativeTimeOption(dashboard!.timeRange.relativeSelection!.timeInMs);
         }
-        this.activeTimeRangeSelection.set({ selection: dashboard!.timeRange, resetSelection: false });
+        this.activeTimeRangeSelection.set(dashboard!.timeRange);
       }
     });
     this.subscribeToUrlNavigation();
@@ -168,30 +160,29 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
-    this.activeTimeRangeSelection.set({ selection: pickerSelection, resetSelection: true });
+    this.activeTimeRangeSelection.set(pickerSelection);
   }
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     console.log('SETTINGS CHANGED');
     this._urlParamsService.updateUrlParamsFromContext(
       context,
-      this.activeTimeRangeSelection()!.selection,
-      this.refreshInterval(),
+      this.activeTimeRangeSelection()!,
+      this.showRefreshToggle() ? this.refreshInterval() : undefined,
     );
   }
 
   handleDashboardSettingsInit(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
-      this.activeTimeRangeSelection()!.selection,
-      this.refreshInterval(),
+      this.activeTimeRangeSelection()!,
+      this.showRefreshToggle() ? this.refreshInterval() : undefined,
       true,
     );
   }
 
   triggerRefresh() {
     let rangeSelection = this.activeTimeRangeSelection()!;
-    rangeSelection.resetSelection = false;
     this.activeTimeRangeSelection.set({ ...rangeSelection });
   }
 
@@ -212,7 +203,7 @@ export class DashboardPageComponent implements OnInit {
         const timeRangeInUrl = this.extractTimeRangeFromUrl();
         let refreshInterval = this.extractUrlParams().refreshInterval;
         if (timeRangeInUrl) {
-          this.activeTimeRangeSelection.set({ selection: timeRangeInUrl!, resetSelection: false });
+          this.activeTimeRangeSelection.set(timeRangeInUrl);
         }
         this.refreshInterval.set(refreshInterval || 0);
         this._changeDetectorRef.detectChanges();

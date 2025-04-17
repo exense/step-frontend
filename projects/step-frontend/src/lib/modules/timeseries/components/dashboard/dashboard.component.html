@@ -41,7 +41,7 @@
         </div>
         @if (compareModeEnabled) {
           <div style="flex-grow: 1; flex-basis: 0">
-            <div style="display: flex; flex: 1">
+            <div style="display: flex; flex: 1; gap: 1rem">
               <div class="ranger-section" [class.compact]="compareModeEnabled">
                 <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
               </div>
@@ -49,7 +49,7 @@
                 [compact]="true"
                 [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
                 (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
-                [activeTimeRange]="timeRange()?.range"
+                [activeTimeRange]="timeRange()"
                 [selectOptions]="timeRangeOptions"
               />
             </div>

@@ -1,10 +1,12 @@
-@if (isInitialized) {
+@if (isInitialized && timeRange()) {
   <step-timeseries-dashboard
     [id]="dashboardId"
-    [timeRange]="timeRange()!"
+    [timeRange]="timeRange()"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
     [showExecutionLinks]="false"
+    (contextSettingsInit)="contextSettingsInit.emit($event)"
+    (contextSettingsChanged)="contextSettingsChanged.emit($event)"
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

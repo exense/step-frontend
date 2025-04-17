@@ -130,6 +130,7 @@ import { DurationDescriptionComponent } from './components/duration-description/
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
+import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 
 @NgModule({
   declarations: [
@@ -208,6 +209,7 @@ import { DashboardPageComponent } from '../timeseries/components/dashboard-page/
     AgentsCellComponent,
     AgentsModalComponent,
     DurationDescriptionComponent,
+    LegacyExecutionViewComponent,
   ],
   imports: [
     StepCommonModule,

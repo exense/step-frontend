@@ -112,15 +112,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
-  timeRange = input.required<{ range: TimeRange; resetSelection: boolean }>();
+  timeRange = input.required<TimeRange>();
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
   timeRangeChangeEffect = effect(() => {
     const timeRange = this.timeRange()!;
-    console.log(timeRange);
-    this.mainEngine?.state.context.updateFullTimeRange(timeRange.range, timeRange.resetSelection);
-    this.compareEngine?.state.context.updateFullTimeRange(timeRange.range, timeRange.resetSelection);
+    console.log('time range updated', timeRange);
+    this.mainEngine?.state.context.updateFullTimeRange(timeRange);
+    // this.compareEngine?.state.context.updateFullTimeRange(timeRange);
     this.refresh();
   });
 
@@ -340,59 +340,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return existingSettings!;
     } else {
       return {
-        fullRange: this.timeRange()!.range,
-        selectedRange: urlParams.selectedTimeRange || this.timeRange()!.range,
+        fullRange: this.timeRange()!,
+        selectedRange: urlParams.selectedTimeRange || this.timeRange()!,
       };
     }
   }
-
-  // private transformTimePickerSelectionIntoDashboardSettings(
-  //   timeRangeSelection: TimeRangePickerSelection,
-  //   urlParams: DashboardUrlParams,
-  // ): DashboardTimeRangeSettings {
-  //   const end = this.defaultFullTimeRange?.to || new Date().getTime() - 5000;
-  //   if (timeRangeSelection.type === 'RELATIVE') {
-  //     const timeInMs = timeRangeSelection.relativeSelection!.timeInMs;
-  //     let foundRelativeOption: TimeRangeRelativeSelection = this.timeRangeOptions.find((o) => {
-  //       return timeInMs === o.relativeSelection?.timeInMs;
-  //     })?.relativeSelection || {
-  //       label: timeRangeSelection.relativeSelection!.label || `Last ${timeInMs / 60000} minutes`,
-  //       timeInMs: timeInMs,
-  //     };
-  //     const fullRange = { from: end - foundRelativeOption.timeInMs, to: end };
-  //     return {
-  //       pickerSelection: { type: 'RELATIVE', relativeSelection: foundRelativeOption },
-  //       fullRange: fullRange,
-  //       selectedRange: urlParams.selectedTimeRange
-  //         ? TimeSeriesUtils.cropInterval(urlParams.selectedTimeRange, fullRange) || fullRange
-  //         : fullRange,
-  //       defaultFullRange: this.defaultFullTimeRange,
-  //     };
-  //   } else if (timeRangeSelection.type === 'ABSOLUTE') {
-  //     // absolute
-  //     return {
-  //       pickerSelection: timeRangeSelection,
-  //       fullRange: timeRangeSelection.absoluteSelection!,
-  //       selectedRange: urlParams.selectedTimeRange || timeRangeSelection.absoluteSelection!,
-  //       defaultFullRange: this.defaultFullTimeRange,
-  //     };
-  //   } else {
-  //     // FULL
-  //     if (!this.defaultFullTimeRange) {
-  //       throw new Error('Default time range must be specified when using a FULL range');
-  //     }
-  //     const range = {
-  //       from: this.defaultFullTimeRange!.from!,
-  //       to: this.defaultFullTimeRange?.to || Math.max(this.defaultFullTimeRange!.from! + 1, end),
-  //     };
-  //     return {
-  //       pickerSelection: { type: 'FULL', absoluteSelection: range },
-  //       fullRange: range,
-  //       selectedRange: urlParams.selectedTimeRange || range,
-  //       defaultFullRange: this.defaultFullTimeRange,
-  //     };
-  //   }
-  // }
 
   createContext(
     dashboard: DashboardView,
