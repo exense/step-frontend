@@ -30,6 +30,7 @@
         <step-repository-plan-testcase-list
           #testCases
           [repoRef]="repoRef"
+          [explicitTestCases]="explicitTestCases"
           (includedTestCasesChange)="testcases.set($event)"
         />
       }
