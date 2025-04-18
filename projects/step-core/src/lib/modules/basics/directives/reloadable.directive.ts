@@ -1,6 +1,7 @@
 import { Directive, inject, OnDestroy, OnInit } from '@angular/core';
-import { GlobalReloadService, Reloadable } from '@exense/step-core';
 import { Router } from '@angular/router';
+import { Reloadable } from '../types/reloadable';
+import { GlobalReloadService } from '../injectables/global-reload.service';
 
 @Directive({
   selector: '[stepReloadable]',
