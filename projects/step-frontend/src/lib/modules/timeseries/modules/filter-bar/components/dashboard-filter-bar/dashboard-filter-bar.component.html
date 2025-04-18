@@ -54,13 +54,20 @@
         </step-form-field>
         <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
       } @else {
+        @if (showHiddenFilters()) {
+          @for (item of context.getFilteringSettings().hiddenFilters; track item.attributeName; let i = $index) {
+            @if (showHiddenFilters() || !item.isHidden || true) {
+              <step-ts-filter-bar-item [item]="item" [readonly]="true" [removable]="false" />
+            }
+          }
+        }
         @for (item of _internalFilters; track item.attributeName; let i = $index) {
-          @if (!item.isHidden) {
+          @if (showHiddenFilters() || !item.isHidden || true) {
             <step-ts-filter-bar-item
               #appliedFilter
               [item]="item"
               [highlightRemoveButton]="editMode"
-              [compact]="compactView"
+              [readonly]="!!item.isHidden"
               [removable]="item.removable || editMode"
               (removeItem)="removeFilterItem(i)"
               (filterChange)="handleFilterChange(i, $event)"

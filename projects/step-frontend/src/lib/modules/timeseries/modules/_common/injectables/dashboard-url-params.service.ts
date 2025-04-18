@@ -133,12 +133,12 @@ export class DashboardUrlParamsService {
     return encodedParams;
   }
 
-  updateUrlParams(timeRange: TimeRangePickerSelection, refresh?: number, replaceUrl = false) {
+  patchUrlParams(timeRange: TimeRangePickerSelection, refresh?: number, replaceUrl = false) {
     let params = this.convertTimeRange(timeRange);
     if (refresh !== undefined) {
       params['refreshInterval'] = refresh;
     }
-    this.prefixAndPushUrlParams(params, replaceUrl);
+    this.prefixAndPushUrlParams(params, replaceUrl, true);
   }
 
   updateRefreshInterval(rate: number, replaceUrl: boolean) {
@@ -208,10 +208,11 @@ export class DashboardUrlParamsService {
     return updatedParams;
   }
 
-  private prefixAndPushUrlParams(params: Record<string, any>, replaceUrl: boolean): void {
+  private prefixAndPushUrlParams(params: Record<string, any>, replaceUrl: boolean, patch?: boolean): void {
     const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
+    console.log('previous params', updatedParams);
     Object.keys(updatedParams).forEach((key) => {
-      if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
+      if (!patch && key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
         updatedParams[key] = null; // Set to null so we force the cleaning of the param
       }
     });

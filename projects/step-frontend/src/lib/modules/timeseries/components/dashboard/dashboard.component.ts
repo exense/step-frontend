@@ -154,6 +154,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       throw new Error('Time range not set');
     }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
+    console.log('url params found in url', urlParams);
     this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();
     this.hasWritePermission = this._authService.hasRight('dashboard-write');

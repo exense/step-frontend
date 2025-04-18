@@ -59,7 +59,7 @@ export class AltExecutionReportComponent {
       first(),
     )
     .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
-      this._urlParamsService.updateUrlParams(range, undefined, isFirst);
+      this._urlParamsService.patchUrlParams(range, undefined, isFirst);
     });
 
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {

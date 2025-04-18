@@ -189,7 +189,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        this._urlParamsService.updateUrlParams(timeRangeSelection);
+        this._urlParamsService.patchUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
@@ -201,7 +201,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   );
 
   readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this._urlParamsService.updateUrlParams(range);
+    const refresh = 0; // TODO find a way to get this from the autorefresh model
+    this._urlParamsService.patchUrlParams(range, refresh, true);
   });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {

@@ -48,11 +48,12 @@ export class LegacyExecutionViewComponent implements OnInit {
     console.log('time ranged changed');
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
+      const execution = this.execution();
+      const end = execution.endTime || new Date().getTime();
       if (pickerSelection.type === 'FULL') {
-        let execution = this.execution();
-        return { from: execution.startTime!, to: execution.endTime || new Date().getTime() };
+        return { from: execution.startTime!, to: end };
       } else {
-        return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
+        return TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection, end);
       }
     } else {
       return undefined;

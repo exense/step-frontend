@@ -93,7 +93,6 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     if (!this.execution) {
       throw new Error('Execution input is mandatory');
     }
-    console.log(this._authService.getConf());
     this.dashboardId = this._authService.getConf()!.miscParams![TimeSeriesConfig.PARAM_KEY_EXECUTION_DASHBOARD_ID];
     if (!this.dashboardId) {
       throw new Error('Execution dashboard id is not present on conf');

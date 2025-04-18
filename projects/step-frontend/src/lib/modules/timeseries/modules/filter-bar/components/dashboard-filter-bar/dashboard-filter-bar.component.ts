@@ -5,6 +5,7 @@ import {
   ElementRef,
   EventEmitter,
   inject,
+  input,
   Input,
   OnDestroy,
   OnInit,
@@ -65,6 +66,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() context!: TimeSeriesContext;
+  showHiddenFilters = input<boolean>(false);
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
