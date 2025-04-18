@@ -11,7 +11,6 @@ import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
-import { Expression } from '../models/Expression';
 
 @Injectable({ providedIn: 'root' })
 export class AutomationPackagesService {

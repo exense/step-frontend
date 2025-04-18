@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Plan, PlansService } from '../../generated';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';

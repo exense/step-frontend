@@ -2,7 +2,7 @@ import { HttpClient, HttpEvent } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
-import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table/step-table-client.module';
+import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';

@@ -11,7 +11,7 @@ import {
   TableApiWrapperService,
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
-} from '../../table/step-table-client.module';
+} from '../../table';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 import { map } from 'rxjs';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';

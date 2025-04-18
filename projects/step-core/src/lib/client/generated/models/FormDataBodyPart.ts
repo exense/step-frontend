@@ -22,7 +22,7 @@ export type FormDataBodyPart = {
   value?: string;
   content?: any;
   fileName?: string;
-  simple?: boolean;
   formDataContentDisposition?: FormDataContentDisposition;
+  simple?: boolean;
   parameterizedHeaders?: Record<string, Array<ParameterizedHeader>>;
 };

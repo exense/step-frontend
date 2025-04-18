@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BaseHttpRequest, StepCoreModule, StepHttpRequestService } from '@exense/step-core';
+import { provideStepApi, StepCoreModule } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
@@ -49,15 +49,7 @@ Settings.defaultLocale = 'en';
     RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],
   exports: [RootComponent],
-  providers: [
-    LEGACY_URL_HANDLER,
-    PLUGINS_INITIALIZER,
-    DEFAULT_ROUTE_INITIALIZER,
-    {
-      provide: BaseHttpRequest,
-      useExisting: StepHttpRequestService,
-    },
-  ],
+  providers: [provideStepApi(), LEGACY_URL_HANDLER, PLUGINS_INITIALIZER, DEFAULT_ROUTE_INITIALIZER],
   bootstrap: [RootComponent],
 })
 export class AppModule {}
