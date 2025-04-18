@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
+import { Reloadable } from '../../basics/step-basics.module';
 
-export abstract class TableReload {
-  abstract reload(): void;
-}
+export abstract class TableReload extends Reloadable {}

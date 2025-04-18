@@ -30,6 +30,7 @@ import {
   IS_SMALL_SCREEN,
   PopoverMode,
   RegistrationStrategy,
+  ReloadableDirective,
   ReportNode,
   selectionCollectionProvider,
   SelectionCollector,
@@ -82,6 +83,7 @@ interface RefreshParams {
   templateUrl: './alt-execution-progress.component.html',
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
+  hostDirectives: [ReloadableDirective],
   providers: [
     DashboardUrlParamsService,
     AltExecutionTabsService,

@@ -73,6 +73,7 @@ import { PasswordComponent } from './components/password/password.component';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
+import { ReloadableDirective } from './directives/reloadable.directive';
 
 @NgModule({
   imports: [
@@ -86,6 +87,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
     SelectComponent,
+    ReloadableDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -229,6 +231,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
     TruncateStringPipe,
+    ReloadableDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -360,3 +363,6 @@ export * from './pipes/truncate-string.pipe';
 export * from './injectables/array-item-label-value-default-extractor.service';
 export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';
 export * from './injectables/dynamic-values-utils.service';
+export * from './types/reloadable';
+export * from './injectables/global-reload.service';
+export * from './directives/reloadable.directive';
