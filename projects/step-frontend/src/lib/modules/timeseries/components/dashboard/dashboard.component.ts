@@ -67,6 +67,8 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -83,6 +85,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     TableDashletComponent,
     MatProgressSpinner,
     PerformanceViewTimeSelectionComponent,
+    MatIconButton,
+    MatTooltip,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -164,6 +168,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.metricTypes = metrics;
       this.initState(urlParams, dashboard);
     });
+  }
+
+  public getSelectedTimeRange(): TimeRange {
+    return this.mainEngine.state.context.timeRangeSettings.selectedRange;
   }
 
   /**

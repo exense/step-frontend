@@ -65,6 +65,7 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
+import { AltExecutionAnalyticsComponent } from '../alt-execution-analytics/alt-execution-analytics.component';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -154,6 +155,11 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
+  private analyticsViewReference: AltExecutionAnalyticsComponent | undefined; // reference to the analytics view
+
+  setAnalyticsViewReference(reference: AltExecutionAnalyticsComponent): void {
+    this.analyticsViewReference = reference;
+  }
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -176,6 +182,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     switchMap((active) => active.execution$),
     shareReplay(1),
     takeUntilDestroyed(),
+  );
+
+  protected isAnalyticsRoute$ = this._router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    startWith(null), // Emit an initial value when the component loads
+    map(() => this._router.url.includes('/analytics')),
+    shareReplay(1),
   );
 
   // readonly updateFullTimeRangeSelection = this.execution$.subscribe(execution => {
@@ -521,6 +534,19 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
       }
       this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
+    });
+  }
+
+  updateTimeRangeFromDashboardSelection() {
+    this.timeRange$.pipe(take(1)).subscribe((fullTimeRange) => {
+      let selectionRange = this.analyticsViewReference?.getDashboardSelectionRange();
+      if (!selectionRange) {
+        return;
+      }
+      console.log(fullTimeRange, selectionRange);
+      if (fullTimeRange.from != selectionRange.from || fullTimeRange.to != selectionRange.to) {
+        this.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: selectionRange });
+      }
     });
   }
 }

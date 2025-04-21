@@ -131,6 +131,7 @@ import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-f
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
+import { MatButton } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -223,6 +224,7 @@ import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
     DashboardPageComponent,
+    MatButton,
   ],
   exports: [
     ExecutionListComponent,

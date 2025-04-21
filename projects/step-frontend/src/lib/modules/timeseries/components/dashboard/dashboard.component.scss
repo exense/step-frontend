@@ -129,3 +129,15 @@ step-time-range-picker {
   margin: 0 1rem 0 2rem;
   flex-grow: 1;
 }
+
+.round-disabled-btn {
+  height: 40px;
+  width: 40px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(208, 213, 221);
+  opacity: 0.5;
+  border-radius: 50%;
+}

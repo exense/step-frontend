@@ -11,6 +11,7 @@ import {
   output,
   Output,
   SimpleChanges,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import {
@@ -44,6 +45,7 @@ import { TimeRangePickerComponent } from '../../modules/_common/components/time-
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'step-execution-dashboard',
@@ -119,6 +121,10 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
       }
     });
     this.subscribeToUrlNavigation();
+  }
+
+  public getSelectedTimeRange() {
+    return this.dashboard.getSelectedTimeRange();
   }
 
   private subscribeToUrlNavigation() {

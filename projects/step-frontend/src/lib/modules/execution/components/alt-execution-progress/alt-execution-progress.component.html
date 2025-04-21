@@ -155,6 +155,7 @@
         (selectionChange)="handleTimeRangeChange($event)"
         [fullRangeLabel]="(fullTimeRangeLabel | async)!"
       />
+      <button mat-flat-button (click)="updateTimeRangeFromDashboardSelection()">Update from selection</button>
     </div>
   }
 </section>

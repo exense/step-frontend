@@ -27,10 +27,15 @@
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
       @if (mainEngine?.state) {
         <div style="flex-grow: 1; flex-basis: 0">
-          <div class="time-container">
+          <div style="display: flex; flex: 1; gap: 1rem">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
               <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
             </div>
+            @if (compareModeEnabled) {
+              <div class="round-disabled-btn" mat-icon-button matTooltip="Use the main range picker to adjust">
+                <step-icon name="clock" />
+              </div>
+            }
           </div>
           <step-ts-dashboard-filter-bar
             #filterBar
