@@ -73,6 +73,7 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
 
   private _authService = inject(AuthService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _urlParamsService = inject(DashboardUrlParamsService);
   protected _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
 
@@ -120,7 +121,7 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
         this.executionHasToBeBuilt = true;
       }
     });
-    this.subscribeToUrlNavigation();
+    // this.subscribeToUrlNavigation();
   }
 
   public getSelectedTimeRange() {
@@ -179,6 +180,4 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
         },
       });
   }
-
-  protected readonly ExecutionViewMode = ExecutionViewMode;
 }

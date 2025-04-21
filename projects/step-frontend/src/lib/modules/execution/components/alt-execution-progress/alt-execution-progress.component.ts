@@ -202,7 +202,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        this._urlParamsService.patchUrlParams(timeRangeSelection);
+        // this._urlParamsService.patchUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
@@ -215,7 +215,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
     const refresh = 0; // TODO find a way to get this from the autorefresh model
-    this._urlParamsService.patchUrlParams(range, refresh, true);
+    // this._urlParamsService.patchUrlParams(range, refresh, true);
   });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -391,7 +391,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
-    this.subscribeToUrlNavigation();
+    // this.subscribeToUrlNavigation();
   }
 
   private subscribeToUrlNavigation() {
@@ -410,7 +410,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         let params = this._urlParamsService.collectUrlParams();
         if (params.timeRange) {
           // analytics route takes care of updating the url itself
-          this.updateTimeRangeSelection(params.timeRange!);
+          console.log('BACK CHANGE IN PROGRESS');
+          // this.updateTimeRangeSelection(params.timeRange!);
         }
       });
   }
@@ -543,7 +544,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       if (!selectionRange) {
         return;
       }
-      console.log(fullTimeRange, selectionRange);
       if (fullTimeRange.from != selectionRange.from || fullTimeRange.to != selectionRange.to) {
         this.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: selectionRange });
       }

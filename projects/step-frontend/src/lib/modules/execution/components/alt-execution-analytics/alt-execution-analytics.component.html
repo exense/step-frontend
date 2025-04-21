@@ -1,9 +1,11 @@
 @if (_state.execution$ | async; as execution) {
-  <step-execution-dashboard
-    #dashboard
-    [execution]="execution!"
-    [timeRange]="(_state.timeRange$ | async)!"
-    (contextSettingsChanged)="handleDashboardSettingsChange($event)"
-    (contextSettingsInit)="handleDashboardSettingsInit($event)"
-  />
+  @if (!isLoading) {
+    <step-execution-dashboard
+      #dashboard
+      [execution]="execution!"
+      [timeRange]="(_state.timeRange$ | async)!"
+      (contextSettingsChanged)="handleDashboardSettingsChange($event)"
+      (contextSettingsInit)="handleDashboardSettingsInit($event)"
+    />
+  }
 }

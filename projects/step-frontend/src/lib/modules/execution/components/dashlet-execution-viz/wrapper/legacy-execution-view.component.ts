@@ -12,12 +12,12 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { ExecutionStateService } from '../../../services/execution-state.service';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../../../timeseries/modules/_common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
+import { filter, pairwise } from 'rxjs';
 import { AuthService, DashboardsService, DashboardView, Execution, TimeRange } from '@exense/step-core';
 
 @Component({
@@ -43,6 +43,7 @@ export class LegacyExecutionViewComponent implements OnInit {
 
   dashboardId!: string;
   dashboard!: DashboardView;
+  isLoading = false;
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
     console.log('time ranged changed');
@@ -59,8 +60,6 @@ export class LegacyExecutionViewComponent implements OnInit {
       return undefined;
     }
   });
-
-  dashboardIdInternal?: string;
 
   ngOnInit(): void {
     this.dashboardId = this._authService.getConf()!.miscParams![TimeSeriesConfig.PARAM_KEY_ANALYTICS_DASHBOARD_ID];
@@ -132,14 +131,23 @@ export class LegacyExecutionViewComponent implements OnInit {
     this._router.events
       .pipe(
         takeUntilDestroyed(this._destroyRef),
-        filter((event) => event instanceof NavigationStart),
-        filter((event: NavigationStart) => event.navigationTrigger === 'popstate'),
+        filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
+        pairwise(), // Gives us [previousEvent, currentEvent]
+        filter(
+          ([prev, curr]) =>
+            prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
+        ),
       )
       .subscribe(() => {
-        const actualDashboardId = this.dashboardIdInternal;
-        this.dashboardIdInternal = undefined;
+        this.isLoading = true;
+        let urlParams = this._urlParamsService.collectUrlParams();
         this._changeDetectorRef.detectChanges();
-        this.dashboardIdInternal = actualDashboardId;
+        if (urlParams.timeRange?.type === 'RELATIVE') {
+          // find the selection with label
+          urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange!.relativeSelection!.timeInMs);
+        }
+        this.activeTimeRangeSelection.set(urlParams.timeRange!);
+        this.isLoading = false;
       });
   }
 }

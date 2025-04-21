@@ -162,7 +162,9 @@ export class DashboardUrlParamsService {
     let params = { ...this.convertTimeRange(timeRange), ...this.convertContextToUrlParams(context) };
     const filterParams = this.encodeContextFilters(context.getFilteringSettings());
     const mergedParams = { ...params, ...filterParams };
-    mergedParams['refreshInterval'] = refreshInterval;
+    if (refreshInterval !== undefined) {
+      mergedParams['refreshInterval'] = refreshInterval;
+    }
     this.prefixAndPushUrlParams(mergedParams, replaceUrl);
   }
 
@@ -212,7 +214,8 @@ export class DashboardUrlParamsService {
     const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
     console.log('previous params', updatedParams);
     Object.keys(updatedParams).forEach((key) => {
-      if (!patch && key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX)) {
+      if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX)) {
+        // cleanup the filters that are not present
         updatedParams[key] = null; // Set to null so we force the cleaning of the param
       }
     });

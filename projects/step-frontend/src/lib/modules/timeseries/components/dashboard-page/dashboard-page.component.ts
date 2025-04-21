@@ -212,7 +212,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   onDashboardNameChange(name: string) {
-    let dashboard = this.dashboard()!;
+    const dashboard = this.dashboard()!;
     if (!name) {
       dashboard.attributes!['name'] = 'Unnamed';
       return;

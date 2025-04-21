@@ -155,7 +155,11 @@
         (selectionChange)="handleTimeRangeChange($event)"
         [fullRangeLabel]="(fullTimeRangeLabel | async)!"
       />
-      <button mat-flat-button (click)="updateTimeRangeFromDashboardSelection()">Update from selection</button>
+      @if (isAnalyticsRoute$ | async) {
+        <button style="opacity: 0.8" mat-flat-button (click)="updateTimeRangeFromDashboardSelection()">
+          Update from selection
+        </button>
+      }
     </div>
   }
 </section>
