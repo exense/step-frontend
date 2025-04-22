@@ -8,4 +8,5 @@ export interface MenuEntry {
 
   isEnabledFct(): boolean;
   isActiveFct?(url: string): boolean;
+  isCleanupOnReload?: boolean;
 }
