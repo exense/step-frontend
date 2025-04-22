@@ -44,6 +44,13 @@ export const $TimeSeriesAPIResponse = {
       isRequired: true,
       format: 'int64',
     },
+    collectionIgnoredAttributes: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+      isRequired: true,
+    },
     higherResolutionUsed: {
       type: 'boolean',
       isRequired: true,

@@ -4,18 +4,33 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { AutomationPackage } from '../models/AutomationPackage';
 import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
 import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
 import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
-import { Expression } from '../models/Expression';
 
 @Injectable({ providedIn: 'root' })
 export class AutomationPackagesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public bulkDelete(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
 
   /**
    * @param async
