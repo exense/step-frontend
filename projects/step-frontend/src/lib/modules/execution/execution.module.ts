@@ -32,6 +32,8 @@ import {
   sequenceCanActivateGuards,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  TestRunStatus,
+  ReportNode,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -618,23 +620,31 @@ export class ExecutionModule {
                       );
                     }),
                     catchError(() => of(undefined)),
-                    map((testCases) => {
-                      const list = testCases
+                    map((testCases: ReportNode[] | undefined) => {
+                      const items = testCases?.map?.(
+                        (item) =>
+                          ({
+                            id: item.artefactID,
+                            testplanName: item.name,
+                            status: item.status,
+                          }) as TestRunStatus,
+                      );
+
+                      let list = testCases
                         ?.filter((item) => !!item && item?.status !== 'SKIPPED')
                         ?.map((item) => item?.artefactID!);
                       if (list?.length === testCases?.length) {
-                        return undefined;
+                        list = undefined;
                       }
-                      return list;
-                    }),
-                    map((list) => {
-                      if (!list?.length) {
-                        return undefined;
-                      }
-                      return {
-                        list,
-                        by: 'id',
-                      } as IncludeTestcases;
+
+                      const selection: IncludeTestcases | undefined = !list?.length
+                        ? undefined
+                        : {
+                            list,
+                            by: 'id',
+                          };
+
+                      return { items, selection };
                     }),
                   );
                 },
