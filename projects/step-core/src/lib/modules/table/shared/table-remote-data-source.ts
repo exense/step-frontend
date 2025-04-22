@@ -109,7 +109,7 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
 };
 
 interface RequestContainer extends StepDataSourceReloadOptions {
-  request: TableRequestInternal;
+  request: TableRequestData;
 }
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
@@ -125,8 +125,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }),
     filter((x) => !!x),
     debounceTime(500),
-    map((x) => {
-      const request = convertTableRequest(x!.request);
+    map((x: RequestContainer) => {
+      const request = x!.request;
 
       // Don't show progress bar, when immediateHideProgress flag is passed
       // or hideProgress is passed and there is no in progress current operation
@@ -141,7 +141,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this._inProgress$.next(x.inProgress);
     }),
     exhaustMap((x) =>
-      this._rest.requestTable<T>(this._tableId, x.request).pipe(
+      this._rest.requestTable<T>(this.tableId, x.request).pipe(
         catchError((err) => {
           return of(null);
         }),
@@ -171,7 +171,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private filters: { [key: string]: SearchValue } = {};
 
   constructor(
-    private _tableId: string,
+    readonly tableId: string,
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: Record<string, string>,
     private _filters?: Record<string, string | string[] | SearchValue>,
@@ -242,7 +242,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(req: TableRequestInternal): void;
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
     if (reqOrOptions instanceof TableRequestInternal) {
-      const req = reqOrOptions as TableRequestInternal;
+      const req = convertTableRequest(reqOrOptions as TableRequestInternal);
       this._request$.next({ request: req });
       return;
     }
@@ -270,7 +270,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions) {
-    let val = this._request$.value ?? { request: {} as TableRequestInternal };
+    let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;
     this._request$.next(val);
@@ -293,7 +293,20 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     delete tableRequest.skip;
     delete tableRequest.limit;
 
-    this._rest.exportAsCSV(this._tableId, fields, tableRequest).subscribe();
+    this._rest.exportAsCSV(this.tableId, fields, tableRequest).subscribe();
+  }
+
+  getCurrentRequest(): TableRequestData | undefined {
+    const request = this._request$?.value?.request;
+    if (!request) {
+      return undefined;
+    }
+    return {
+      ...request,
+      filters: request?.filters?.map?.((filter) => ({ ...filter })),
+      sort: !!request.sort ? { ...request.sort } : undefined,
+      tableParameters: !!request.tableParameters ? { ...request.tableParameters } : undefined,
+    };
   }
 
   skipOngoingRequest(): void {
