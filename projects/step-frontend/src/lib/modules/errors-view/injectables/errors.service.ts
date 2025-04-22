@@ -27,7 +27,7 @@ export class ErrorsService implements ErrorMessageHandlerStrategy {
       .open(ErrorViewDialogComponent)
       .afterClosed()
       .subscribe(() => {
-        this._errorState.markAsRead();
+        this._errorState.dismissAll();
         this.isDialogOpened = false;
       });
   }
