@@ -41,10 +41,12 @@ export class AugmentedControllerService extends ControllerService implements Htt
     return this._tableApi
       .requestTable<ReportNode>(this.REPORT_TABLE_ID, {
         skip: 0,
-        sort: {
-          field: 'executionTime',
-          direction: SortDirection.DESCENDING,
-        },
+        sort: [
+          {
+            field: 'executionTime',
+            direction: SortDirection.DESCENDING,
+          },
+        ],
         tableParameters,
       })
       .pipe(map((response) => response.data));
