@@ -18,6 +18,7 @@ export * from './components/attachments/attachments.component';
 export * from './components/attachments-preview/attachments-preview.component';
 export * from './components/alt-attachment-preview/alt-attachment-preview.component';
 export * from './components/alt-attachments-previews/alt-attachments-previews.component';
+export * from './components/attachment-dialog/attachment-dialog.component';
 export * from './injectables/attachment-utils.service';
 
 export const ATTACHMENTS_EXPORTS = [
