@@ -1,13 +1,13 @@
-import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, map, scan } from 'rxjs';
+import { filter, first, map, pairwise, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 
@@ -39,28 +39,14 @@ export class AltExecutionReportComponent {
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
+  protected _cd = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
   private _urlParamsService = inject(DashboardUrlParamsService);
-
-  updateUrlParamsSubscription = this._state.timeRangeSelection$
-    .pipe(
-      scan(
-        (acc, range) => {
-          const isFirst = !acc.hasEmitted;
-          return { range, isFirst, hasEmitted: true };
-        },
-        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
-      ),
-      takeUntilDestroyed(),
-      first(),
-    )
-    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
-      this._urlParamsService.patchUrlParams(range, undefined, isFirst);
-    });
 
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {
     const reportNodeId = keyword.id;

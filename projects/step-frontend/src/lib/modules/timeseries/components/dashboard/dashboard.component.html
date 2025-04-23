@@ -6,10 +6,6 @@
         <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
       </div>
     </mat-menu>
-    <button mat-menu-item (click)="toggleCompareMode()" [disabled]="editMode">
-      <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
-      {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
-    </button>
     <button mat-menu-item (click)="exportRawData()">
       <step-icon name="download" />
       <span>Export Raw Measurements</span>
@@ -22,11 +18,15 @@
 
   <div class="page-container">
     <div>
-      <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+      @if (compareModeEnabled) {
+        <div class="settings-top-bar">
+          <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+        </div>
+      }
     </div>
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
-      @if (mainEngine?.state) {
-        <div style="flex-grow: 1; flex-basis: 0">
+      @if (mainEngine?.state?.context) {
+        <div style="flex-grow: 1; flex-basis: 0; width: 100%; max-width: 100%">
           <div style="display: flex; flex: 1; gap: 1rem">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
               <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
@@ -37,13 +37,19 @@
               </div>
             }
           </div>
-          <step-ts-dashboard-filter-bar
-            #filterBar
-            [editMode]="editMode"
-            [context]="mainEngine.state.context"
-            [compactView]="compareModeEnabled"
-            [showHiddenFilters]="compareModeEnabled"
-          />
+          <div style="display: flex; justify-content: space-between; width: 100%; max-width: 100%; overflow: hidden">
+            <step-ts-dashboard-filter-bar
+              #filterBar
+              [editMode]="editMode"
+              [context]="mainEngine.state.context"
+              [compactView]="compareModeEnabled"
+              [showHiddenFilters]="compareModeEnabled"
+              (fullRangeChange)="handleMainFullRangeChange($event)"
+            />
+            @if (!compareModeEnabled) {
+              <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+            }
+          </div>
         </div>
         @if (compareModeEnabled) {
           <div style="flex-grow: 1; flex-basis: 0">
@@ -64,6 +70,7 @@
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
               [compactView]="compareModeEnabled"
+              (fullRangeChange)="handleCompareFullRangeChange($event)"
             />
           </div>
         }
@@ -154,9 +161,16 @@
 
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
-      <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu" mat-icon-button>
-        <step-icon name="settings" />
-      </button>
+      <step-btn-group class="with-borders" (click)="toggleCompareMode()">
+        <button [class.btn-active]="compareModeEnabled" type="button" mat-stroked-button>
+          <step-icon name="bar-chart-2" />
+        </button>
+      </step-btn-group>
+      <step-btn-group class="with-borders">
+        <button type="button" mat-stroked-button #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu">
+          <step-icon name="more-horizontal" />
+        </button>
+      </step-btn-group>
       @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
         @if (editMode) {
           <step-alert class="edit-alert" type="WARNING"

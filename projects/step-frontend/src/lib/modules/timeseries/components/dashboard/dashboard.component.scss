@@ -141,3 +141,21 @@ step-time-range-picker {
   opacity: 0.5;
   border-radius: 50%;
 }
+
+.settings-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.settings-top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-active {
+  background-color: var.$orange;
+  color: #fff;
+}

@@ -9,6 +9,7 @@ import {
   Observable,
   of,
   pairwise,
+  scan,
   shareReplay,
   skip,
   startWith,
@@ -213,10 +214,25 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    const refresh = 0; // TODO find a way to get this from the autorefresh model
-    // this._urlParamsService.patchUrlParams(range, refresh, true);
-  });
+  updateUrlParamsSubscription = this.timeRangeSelection$
+    .pipe(
+      scan(
+        (acc, range) => {
+          const isFirst = !acc.hasEmitted;
+          return { range, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+    )
+    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+      // analytics tab is handling events itself
+      this.isAnalyticsRoute$.pipe(take(1)).subscribe((analyticsPage) => {
+        if (!analyticsPage) {
+          this._urlParamsService.patchUrlParams(range, undefined, isFirst);
+        }
+      });
+    });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.updateTimeRangeSelection(selection);
@@ -391,7 +407,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
-    // this.subscribeToUrlNavigation();
+    this.subscribeToUrlNavigation();
   }
 
   private subscribeToUrlNavigation() {
@@ -407,12 +423,15 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         ),
       )
       .subscribe(() => {
-        let params = this._urlParamsService.collectUrlParams();
-        if (params.timeRange) {
-          // analytics route takes care of updating the url itself
-          console.log('BACK CHANGE IN PROGRESS');
-          // this.updateTimeRangeSelection(params.timeRange!);
-        }
+        // analytics tab is handling events itself
+        this.isAnalyticsRoute$.pipe(take(1)).subscribe((analyticsRoute) => {
+          if (!analyticsRoute) {
+            let urlParams = this._urlParamsService.collectUrlParams();
+            if (urlParams.timeRange) {
+              this.updateTimeRangeSelection(urlParams.timeRange);
+            }
+          }
+        });
       });
   }
 

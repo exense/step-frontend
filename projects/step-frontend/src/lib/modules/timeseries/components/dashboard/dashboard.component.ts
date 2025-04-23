@@ -44,6 +44,7 @@ import {
   TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
+  TsGroupingComponent,
 } from '../../modules/_common';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { DashboardFilterBarComponent, PerformanceViewTimeSelectionComponent } from '../../modules/filter-bar';
@@ -69,6 +70,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
+import { DashboardSettingsComponent } from '../dashboard-settings/dashboard-settings.component';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -87,6 +89,8 @@ import { MatTooltip } from '@angular/material/tooltip';
     PerformanceViewTimeSelectionComponent,
     MatIconButton,
     MatTooltip,
+    TsGroupingComponent,
+    DashboardSettingsComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -133,6 +137,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
   readonly zoomChange = output<TimeRange>();
   readonly zoomReset = output<void>();
+  readonly fullRangeUpdated = output<TimeRange>();
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -172,6 +177,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   public getSelectedTimeRange(): TimeRange {
     return this.mainEngine.state.context.timeRangeSettings.selectedRange;
+  }
+
+  handleMainFullRangeChange(range: TimeRange) {
+    this.fullRangeUpdated.emit(range);
+  }
+
+  handleCompareFullRangeChange(range: TimeRange) {
+    this.compareEngine?.state.context.updateFullRange(range);
   }
 
   /**

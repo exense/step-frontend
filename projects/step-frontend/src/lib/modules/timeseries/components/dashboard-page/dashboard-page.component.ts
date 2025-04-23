@@ -150,6 +150,10 @@ export class DashboardPageComponent implements OnInit {
     this._urlParamsService.updateRefreshInterval(interval, false);
   }
 
+  handleFullRangeChanged(range: TimeRange) {
+    this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
+  }
+
   private findRelativeTimeOption(relativeMs: number): TimeRangePickerSelection {
     return (
       this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === relativeMs) || {

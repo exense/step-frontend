@@ -14,7 +14,7 @@ import { TimeRangePickerSelection } from '../time-selection/time-range-picker-se
 
 export interface TsCompareModeSettings {
   enabled: boolean;
-  context?: TimeSeriesContext;
+  context?: TimeSeriesContext; // compare context
 }
 
 /**
