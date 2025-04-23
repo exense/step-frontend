@@ -1,0 +1,28 @@
+@switch (attachmentType()) {
+  @case (AttachmentType.IMG) {
+    <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
+  }
+  @case (AttachmentType.TEXT) {
+    <div class="file-info">
+      <step-icon name="file" />
+    </div>
+  }
+  @default {
+    <div class="file-info">
+      <step-icon name="paperclip" />
+    </div>
+  }
+}
+<div
+  class="name"
+  [ngClass]="{
+    overlay: attachmentType() === AttachmentType.IMG
+  }"
+>
+  {{ attachment()?.name }}
+</div>
+<div class="actions">
+  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download()">
+    <step-icon name="download" />
+  </button>
+</div>

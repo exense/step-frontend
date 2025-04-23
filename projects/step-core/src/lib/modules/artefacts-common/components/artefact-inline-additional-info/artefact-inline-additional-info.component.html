@@ -1,7 +1,19 @@
 @if (hasData()) {
   <section class="etc-container">
-    @if (attachmentsCountTooltip(); as tooltip) {
-      <step-icon name="paperclip" [matTooltip]="tooltip" />
+    @if (attachmentMetas(); as attachments) {
+      @if (!!attachments.length) {
+        <div class="attachments-container">
+          <step-icon name="paperclip" matTooltip="Attachments" />
+          @for (att of attachments; track att.id) {
+            <step-popover [noPadding]="true" yPosition="below">
+              <span class="highlight-inline-item" (click)="open(att)">{{ att.name }}</span>
+              <step-popover-content>
+                <step-alt-attachment-preview [attachment]="att" [showDownload]="false" />
+              </step-popover-content>
+            </step-popover>
+          }
+        </div>
+      }
     }
     @if (error(); as error) {
       <div class="error-container">

@@ -15,6 +15,5 @@ import { AttachmentMeta } from '../../../../client/step-client-module';
   imports: [StepBasicsModule, AttachmentUrlPipe, AttachmentIsImagePipe, AttachmentShowLabelPipe, AttachmentIsTextPipe],
 })
 export class AttachmentPreviewComponent {
-  /* @Input() */
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
 }
