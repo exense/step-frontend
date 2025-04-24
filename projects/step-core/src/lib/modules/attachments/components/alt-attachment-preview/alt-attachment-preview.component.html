@@ -22,7 +22,7 @@
   {{ attachment()?.name }}
 </div>
 <div class="actions">
-  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download()">
+  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
     <step-icon name="download" />
   </button>
 </div>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentType } from '../../types/attachment-type.enum';
@@ -16,6 +16,7 @@ import { FormBuilder } from '@angular/forms';
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class AttachmentDialogComponent implements OnInit {
   private _resourceService = inject(AugmentedResourcesService);

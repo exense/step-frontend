@@ -34,7 +34,10 @@ export class AltAttachmentPreviewComponent {
     this._attachmentDialogs.showDetails(this.attachment()!);
   }
 
-  protected download(): void {
+  protected download($event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
     this._attachmentUtils.downloadAttachment(this.attachment());
   }
 }
