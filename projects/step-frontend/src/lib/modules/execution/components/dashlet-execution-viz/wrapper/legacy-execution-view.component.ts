@@ -83,6 +83,10 @@ export class LegacyExecutionViewComponent implements OnInit {
     this.subscribeToUrlNavigation();
   }
 
+  handleFullRangeChangeRequest(range: TimeRange) {
+    this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
+  }
+
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(
       context,

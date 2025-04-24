@@ -4,22 +4,6 @@
   </step-alert>
 }
 
-<!--  @if (compactView) {-->
-<!--    <div class="settings-section">-->
-<!--      <step-tabs-->
-<!--        [tabs]="modes"-->
-<!--        [shrink]="true"-->
-<!--        [activeTabId]="activeMode"-->
-<!--        (activeTabIdChange)="toggleOQLMode($event)"-->
-<!--      />-->
-<!--      <step-timeseries-grouping-->
-<!--        [dimensions]="activeGrouping"-->
-<!--        [groupingOptions]="groupingOptions"-->
-<!--        (groupingChange)="handleGroupingChange($event)"-->
-<!--      />-->
-<!--    </div>-->
-<!--  }-->
-
 <div class="filers-row" [class.oql-mode]="activeMode === TsFilteringMode.OQL" [class.compact-view]="compactView">
   <step-timeseries-grouping
     [dimensions]="activeGrouping"

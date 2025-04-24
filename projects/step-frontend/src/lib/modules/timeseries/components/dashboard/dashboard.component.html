@@ -32,12 +32,31 @@
               <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
             </div>
             @if (compareModeEnabled) {
-              <div class="round-disabled-btn" mat-icon-button matTooltip="Use the main range picker to adjust">
+              <div class="round-btn disabled" mat-icon-button matTooltip="Use the main range picker to adjust">
                 <step-icon name="clock" />
+              </div>
+            } @else {
+              <div
+                (click)="updateTimeRangeFromSelection()"
+                class="round-btn grey-border"
+                [class.disabled]="fullRangeSelected"
+                mat-icon-button
+                matTooltip="Update time range from selection"
+              >
+                <step-icon name="arrow-up-right" />
               </div>
             }
           </div>
-          <div style="display: flex; justify-content: space-between; width: 100%; max-width: 100%; overflow: hidden">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              width: 100%;
+              max-width: 100%;
+              overflow: hidden;
+              gap: 2rem;
+            "
+          >
             <step-ts-dashboard-filter-bar
               #filterBar
               [editMode]="editMode"
@@ -162,12 +181,23 @@
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
       <step-btn-group class="with-borders" (click)="toggleCompareMode()">
-        <button [class.btn-active]="compareModeEnabled" type="button" mat-stroked-button>
+        <button
+          [class.btn-active]="compareModeEnabled"
+          type="button"
+          [matTooltip]="compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode'"
+          mat-stroked-button
+        >
           <step-icon name="bar-chart-2" />
         </button>
       </step-btn-group>
       <step-btn-group class="with-borders">
-        <button type="button" mat-stroked-button #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu">
+        <button
+          type="button"
+          mat-stroked-button
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="settingsMenu"
+          matTooltip="Settings"
+        >
           <step-icon name="more-horizontal" />
         </button>
       </step-btn-group>

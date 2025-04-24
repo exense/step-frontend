@@ -16,6 +16,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ExecutionDashboardComponent } from '../../../timeseries/components/execution-page/execution-dashboard.component';
 import { filter, pairwise } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { TimeRange } from '@exense/step-core';
 
 @Component({
   selector: 'step-alt-execution-analytics',
@@ -50,6 +51,10 @@ export class AltExecutionAnalyticsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._state.setAnalyticsViewReference(this);
     this.subscribeToUrlNavigation();
+  }
+
+  handleFullRangeChangeRequest(range: TimeRange) {
+    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
   private subscribeToUrlNavigation() {

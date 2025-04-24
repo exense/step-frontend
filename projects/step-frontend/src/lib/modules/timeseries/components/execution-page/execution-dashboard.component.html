@@ -7,6 +7,7 @@
     [showExecutionLinks]="false"
     (contextSettingsInit)="contextSettingsInit.emit($event)"
     (contextSettingsChanged)="contextSettingsChanged.emit($event)"
+    (fullRangeUpdateRequest)="fullRangeUpdateRequest.emit($event)"
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

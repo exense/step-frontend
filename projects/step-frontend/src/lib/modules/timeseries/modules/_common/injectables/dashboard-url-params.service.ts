@@ -175,6 +175,9 @@ export class DashboardUrlParamsService {
       const selectedTimeRange = context.getSelectedTimeRange();
       params['select_from'] = selectedTimeRange.from;
       params['select_to'] = selectedTimeRange.to;
+    } else {
+      params['select_from'] = null; // force cleaning
+      params['select_to'] = null; // force cleaning
     }
     const customResolution = context.getChartsResolution();
     if (customResolution > 0) {

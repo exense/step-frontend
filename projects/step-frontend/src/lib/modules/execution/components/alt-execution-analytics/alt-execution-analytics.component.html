@@ -6,6 +6,7 @@
       [timeRange]="(_state.timeRange$ | async)!"
       (contextSettingsChanged)="handleDashboardSettingsChange($event)"
       (contextSettingsInit)="handleDashboardSettingsInit($event)"
+      (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"
     />
   }
 }

@@ -130,7 +130,7 @@ step-time-range-picker {
   flex-grow: 1;
 }
 
-.round-disabled-btn {
+.round-btn {
   height: 40px;
   width: 40px;
   padding: 0 4px;
@@ -138,8 +138,14 @@ step-time-range-picker {
   align-items: center;
   justify-content: center;
   border: 1px solid rgb(208, 213, 221);
-  opacity: 0.5;
+  cursor: pointer;
+
   border-radius: 50%;
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 }
 
 .settings-section {
@@ -153,6 +159,7 @@ step-time-range-picker {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  margin-bottom: 2rem;
 }
 
 .btn-active {

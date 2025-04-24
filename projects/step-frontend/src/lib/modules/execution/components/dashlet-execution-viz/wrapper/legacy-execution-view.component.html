@@ -13,5 +13,6 @@
     [timeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"
+    (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"
   />
 }

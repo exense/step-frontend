@@ -124,6 +124,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
+  fullRangeSelected: boolean = true;
+
   timeRangeChangeEffect = effect(() => {
     const timeRange = this.timeRange()!;
     console.log('time range updated', timeRange);
@@ -137,7 +139,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
   readonly zoomChange = output<TimeRange>();
   readonly zoomReset = output<void>();
-  readonly fullRangeUpdated = output<TimeRange>();
+  readonly fullRangeUpdateRequest = output<TimeRange>();
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -171,8 +173,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const dashboard$ = this._dashboardService.getDashboardById(dashboardId);
     forkJoin([metrics$, dashboard$]).subscribe(([metrics, dashboard]) => {
       this.metricTypes = metrics;
-      this.initState(urlParams, dashboard);
+      this.initState(urlParams, dashboard).subscribe((context) => this.contextSettingsInit.emit(context));
     });
+  }
+
+  updateTimeRangeFromSelection() {
+    if (!this.fullRangeSelected) {
+      this.fullRangeUpdateRequest.emit(this.mainEngine.state.context.getSelectedTimeRange());
+    }
   }
 
   public getSelectedTimeRange(): TimeRange {
@@ -180,7 +188,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleMainFullRangeChange(range: TimeRange) {
-    this.fullRangeUpdated.emit(range);
+    this.fullRangeUpdateRequest.emit(range);
   }
 
   handleCompareFullRangeChange(range: TimeRange) {
@@ -193,22 +201,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * 2. Stored state
    * 3. Dashboard object
    */
-  initState(urlParams: DashboardUrlParams, dashboard: DashboardView): void {
+  initState(urlParams: DashboardUrlParams, dashboard: DashboardView): Observable<TimeSeriesContext> {
     this.dashboard = dashboard;
     const existingContext = this.storageId ? this._timeSeriesContextFactory.getContext(this.storageId) : undefined;
     const context$: Observable<TimeSeriesContext> = existingContext
       ? of(existingContext)
       : this.createContext(this.dashboard, urlParams, existingContext);
-    context$.subscribe((context) => {
-      this.initStateFromContext(context, urlParams?.editMode);
-      context.settingsChange$
-        .pipe(takeUntilDestroyed(this._destroyRef))
-        .subscribe(() => this.contextSettingsChanged.emit(context));
-      this.contextSettingsInit.emit(context);
-      context.onTimeSelectionChange().subscribe((range) => {
-        this.zoomChange.emit(range);
-      });
-    });
+    return context$.pipe(
+      tap((context) => {
+        this.initStateFromContext(context, urlParams?.editMode);
+        context.settingsChange$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(() => {
+          this.contextSettingsChanged.emit(context);
+          this.fullRangeSelected = context.isFullRangeSelected();
+        });
+        this.contextSettingsInit.emit(context);
+        context.onTimeSelectionChange().subscribe((range) => {
+          this.zoomChange.emit(range);
+        });
+      }),
+    );
   }
 
   handleZoomReset() {
@@ -228,11 +239,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mainEngine = new DashboardStateEngine(state);
     this.mainEngine.subscribeForContextChange();
 
-    // this.updateUrl(true);
-    // context.settingsChange$.subscribe((stateChanged) => {
-    //   this.updateUrl();
-    // });
-    // notify the outside regarding the time picker selection
     if (editMode && this.hasWritePermission && this.editable) {
       this.enableEditMode();
     }
@@ -658,7 +664,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this._changeDetectorRef.detectChanges();
 
     this._dashboardService.getDashboardById(this.id()).subscribe((dashboard) => {
-      this.initState({ filters: [] }, dashboard);
+      this.initState({ filters: [] }, dashboard).subscribe((context) => this.contextSettingsChanged.emit(context));
     });
   }
 

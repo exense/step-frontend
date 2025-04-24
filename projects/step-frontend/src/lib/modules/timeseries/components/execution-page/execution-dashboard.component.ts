@@ -65,6 +65,7 @@ import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();
   timeRange = input.required<TimeRange>();
+  readonly fullRangeUpdateRequest = output<TimeRange>();
 
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
