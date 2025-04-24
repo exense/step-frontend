@@ -2,18 +2,24 @@
   @if (hasLabel()) {
     @if (labelExpression(); as labelExpression) {
       @if (isLabelResolved()) {
-        <step-icon
-          name="zap"
-          class="resolved"
-          [matTooltip]="labelExpression | truncateString: 100"
-          matTooltipPosition="below"
-          (click)="displayText($event, labelExpression)"
-        />
+        <step-popover yPosition="below">
+          <step-icon name="zap" class="resolved" (click)="displayText($event, labelExpression)" />
+          <step-popover-content>
+            <div class="step-artefact-inline-field__expression">{{ labelExpression }}</div>
+            <div>{{ itemLabel() }}</div>
+          </step-popover-content>
+        </step-popover>
       } @else {
-        <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
+        <step-popover yPosition="below">
+          <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
+          <step-popover-content>
+            <strong>Unresolved dynamic expression</strong><br />
+            <div class="step-artefact-inline-field__expression">{{ labelExpression }}</div>
+          </step-popover-content>
+        </step-popover>
       }
     }
-    <label [class.not-resolved]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
+    <label [class.not-resolved-text]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
       {{ itemLabel() }}
       @if (!isValueFirst()) {
         {{ ':' }}
@@ -25,18 +31,24 @@
   @if (hasValue()) {
     @if (valueExpression(); as valueExpression) {
       @if (isValueResolved()) {
-        <step-icon
-          name="zap"
-          class="resolved"
-          [matTooltip]="valueExpression | truncateString: 100"
-          matTooltipPosition="below"
-          (click)="displayText($event, valueExpression)"
-        />
+        <step-popover yPosition="below">
+          <step-icon name="zap" class="resolved" (click)="displayText($event, valueExpression)" />
+          <step-popover-content>
+            <div class="step-artefact-inline-field__expression">{{ valueExpression }}</div>
+            <div>{{ itemValue() }}</div>
+          </step-popover-content>
+        </step-popover>
       } @else {
-        <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
+        <step-popover yPosition="below">
+          <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
+          <step-popover-content>
+            <strong>Unresolved dynamic expression</strong><br />
+            <div class="step-artefact-inline-field__expression">{{ valueExpression }}</div>
+          </step-popover-content>
+        </step-popover>
       }
     }
-    <span [class.not-resolved]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
+    <span [class.not-resolved-text]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
       {{ itemValue() }}
     </span>
   }

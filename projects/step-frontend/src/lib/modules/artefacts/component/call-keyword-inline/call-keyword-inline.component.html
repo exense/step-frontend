@@ -1,7 +1,15 @@
 @if (inputItems(); as inputItems) {
-  <step-artefact-inline-field-list [items]="inputItems" hiddenItemsTooltipSuffix="additional input(s)" />
+  <step-artefact-inline-field-list [items]="inputItems" hiddenItemsTooltipSuffix="additional input(s)">
+    <step-artefact-inline-field-list-prefix>
+      <step-icon name="log-in" matTooltip="Input" />
+    </step-artefact-inline-field-list-prefix>
+  </step-artefact-inline-field-list>
 }
 @if (outputItems(); as outputItems) {
-  <step-artefact-inline-field-list [items]="outputItems" hiddenItemsTooltipSuffix="additional output(s)" />
+  <step-artefact-inline-field-list [items]="outputItems" hiddenItemsTooltipSuffix="additional output(s)">
+    <step-artefact-inline-field-list-prefix>
+      <step-icon name="log-out" matTooltip="Output" />
+    </step-artefact-inline-field-list-prefix>
+  </step-artefact-inline-field-list>
 }
 <step-artefact-inline-additional-info [context]="currentContext()" />

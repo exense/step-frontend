@@ -42,12 +42,16 @@ step-artefact-inline-field {
     display: block;
   }
 
-  label {
-    font-weight: bold;
-  }
-
   .resolved:hover,
   .not-resolved {
     color: var.$dark-blue;
   }
+
+  .not-resolved-text {
+    font-family: monospace;
+  }
+}
+
+.step-artefact-inline-field__expression {
+  font-family: monospace;
 }

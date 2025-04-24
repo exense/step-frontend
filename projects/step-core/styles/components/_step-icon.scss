@@ -1,8 +1,15 @@
-@mixin step-icon-size($size) {
-  width: $size;
-  height: $size;
-  min-width: $size;
-  min-height: $size;
+@mixin step-icon-size($size, $with-important: false) {
+  @if $with-important {
+    width: $size !important;
+    height: $size !important;
+    min-width: $size !important;
+    min-height: $size !important;
+  } @else {
+    width: $size;
+    height: $size;
+    min-width: $size;
+    min-height: $size;
+  }
 }
 
 @mixin step-icon($size: 20px, $offset: 6px) {

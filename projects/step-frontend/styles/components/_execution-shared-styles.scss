@@ -5,6 +5,19 @@
 @mixin execution-shared-styles {
   @include execution-report-node-inline-details;
   @include execution-report-node-details;
+
+  .smaller-view {
+    font-size: 1.1rem;
+    step-icon {
+      @include core.step-icon-size(1.5rem, true);
+    }
+  }
+  .larger-view {
+    font-size: 1.3rem;
+    step-icon {
+      @include core.step-icon-size(1.7rem, true);
+    }
+  }
 }
 
 @mixin execution-report-node-inline-details {
@@ -53,6 +66,14 @@
 
     .hidden {
       display: none;
+    }
+
+    .container-title {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .json-container {

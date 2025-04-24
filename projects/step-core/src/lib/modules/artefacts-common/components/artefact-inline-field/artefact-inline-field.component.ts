@@ -76,7 +76,7 @@ export class ArtefactInlineFieldComponent {
     this.displayText($event, value, label);
   }
 
-  protected displayText($event: MouseEvent, text: string, title: string = ''): void {
+  protected displayText($event: MouseEvent, text: string, title: string = 'Dynamic expression'): void {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
