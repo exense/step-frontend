@@ -3,14 +3,12 @@ import { Execution, Operation, ReportNode, TableDataSource, TimeRange, TimeSerie
 import { KeywordParameters } from '../shared/keyword-parameters';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Status } from '../../_common/shared/status.enum';
-import { AltExecutionAnalyticsComponent } from '../components/alt-execution-analytics/alt-execution-analytics.component';
 
 export abstract class AltExecutionStateService {
   abstract readonly timeRangeSelection$: Observable<TimeRangePickerSelection>;
   abstract timeRangeOptions: TimeRangePickerSelection[];
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;
-  abstract readonly isFullRangeSelected$: Observable<boolean>;
   abstract readonly keywordParameters$: Observable<KeywordParameters>;
   abstract readonly keywordsDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly hasTestCasesFilter$: Observable<boolean>;

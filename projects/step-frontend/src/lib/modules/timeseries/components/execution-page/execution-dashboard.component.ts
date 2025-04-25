@@ -36,7 +36,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, Observable, pairwise, take } from 'rxjs';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
-import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 @Component({
   selector: 'step-execution-dashboard',
