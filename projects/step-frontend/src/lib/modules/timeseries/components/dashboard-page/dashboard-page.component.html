@@ -1,18 +1,18 @@
 <div class="header-container">
   <div class="dashboard-title">
-    @if (dashboard()) {
+    @if (dashboard(); as dashboard) {
       <div class="name">
         <step-editable-label
-          [ngModel]="dashboard()!.attributes!['name']"
+          [ngModel]="dashboard!.attributes!['name']"
           (ngModelChange)="onDashboardNameChange($event)"
-          [disabled]="!hasWritePermission || dashboard()!.customFields?.['locked']"
+          [disabled]="!hasWritePermission || dashboard!.customFields?.['locked']"
         />
       </div>
       <div class="description">
         <step-editable-textarea-label
-          [(ngModel)]="dashboard()!.description"
+          [(ngModel)]="dashboard!.description"
           (ngModelChange)="handleDashboardDescriptionChange($event)"
-          [disabled]="!hasWritePermission || dashboard()!.customFields?.['locked']"
+          [disabled]="!hasWritePermission || dashboard!.customFields?.['locked']"
           name="description"
         >
           <div *stepEditableLabelTemplate>Add description</div>
@@ -26,7 +26,7 @@
         (intervalChange)="handleRefreshIntervalChange($event)"
         [interval]="refreshInterval()"
         (refresh)="triggerRefresh()"
-      ></step-autorefresh-toggle>
+      />
     }
     @if (activeTimeRangeSelection()) {
       <step-time-range-picker

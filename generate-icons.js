@@ -62,9 +62,6 @@ const run = async () => {
     const payload = String(markup)
       .trim()
       .match(/^<svg[^>]+?>(.+)<\/svg>$/);
-    if (!payload) {
-      console.log(String(markup));
-    }
 
     if (!payload) {
       console.log('FAILED TO EXTRACT SVG FROM:', `${folder}/${file}`);

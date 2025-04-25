@@ -70,7 +70,6 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
-import { DashboardSettingsComponent } from '../dashboard-settings/dashboard-settings.component';
 
 @Component({
   selector: 'step-timeseries-dashboard',
@@ -90,7 +89,6 @@ import { DashboardSettingsComponent } from '../dashboard-settings/dashboard-sett
     MatIconButton,
     MatTooltip,
     TsGroupingComponent,
-    DashboardSettingsComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {

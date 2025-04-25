@@ -1,19 +1,15 @@
 import {
   ChangeDetectorRef,
   Component,
-  computed,
   DestroyRef,
   ElementRef,
-  EventEmitter,
   inject,
   input,
   Input,
   OnDestroy,
   OnInit,
   output,
-  Output,
   QueryList,
-  Signal,
   ViewChild,
   ViewChildren,
   ViewEncapsulation,
@@ -31,7 +27,6 @@ import {
   OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TsCompareModeSettings,
   TsFilteringMode,
   TsFilteringSettings,
   TsGroupingComponent,
@@ -42,8 +37,6 @@ import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.compo
 import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
-import { TimeRangePickerSelection } from '../../../_common/types/time-selection/time-range-picker-selection';
-import { DashboardSettingsComponent } from '../../../../components/dashboard-settings/dashboard-settings.component';
 import { MatDivider } from '@angular/material/divider';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
@@ -68,7 +61,6 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
     TsGroupingComponent,
     FilterBarItemComponent,
     VisibleFilterBarItemPipe,
-    DashboardSettingsComponent,
     MatDivider,
   ],
 })
