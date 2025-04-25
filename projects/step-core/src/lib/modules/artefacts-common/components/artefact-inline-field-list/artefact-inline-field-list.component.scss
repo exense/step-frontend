@@ -23,6 +23,7 @@ step-artefact-inline-field-list {
     }
 
     &:not(.vertical) {
+      align-items: center;
       step-artefact-inline-field step-icon.field-icon {
         @include core.step-icon-size(1.6rem);
       }

@@ -18,6 +18,10 @@
       @include core.step-icon-size(1.7rem, true);
     }
   }
+
+  step-icon.larger-icon {
+    @include core.step-icon-size(1.7rem, true);
+  }
 }
 
 @mixin execution-report-node-inline-details {
