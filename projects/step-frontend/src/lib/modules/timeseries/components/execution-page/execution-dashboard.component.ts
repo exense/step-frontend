@@ -2,16 +2,12 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
   input,
-  Input,
   OnChanges,
   OnInit,
   output,
-  Output,
   SimpleChanges,
-  viewChild,
   ViewChild,
 } from '@angular/core';
 import {
@@ -21,7 +17,6 @@ import {
   ResolutionPickerComponent,
   TimeSeriesConfig,
   TimeSeriesContext,
-  TimeSeriesContextsFactory,
 } from '../../modules/_common';
 import { DashboardFilterBarComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
@@ -39,13 +34,9 @@ import {
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, Observable, pairwise, take } from 'rxjs';
-import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
-import { AltExecutionStateService } from '../../../execution/services/alt-execution-state.service';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'step-execution-dashboard',
@@ -74,7 +65,6 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
 
   private _authService = inject(AuthService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
-  private _urlParamsService = inject(DashboardUrlParamsService);
   protected _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
 
