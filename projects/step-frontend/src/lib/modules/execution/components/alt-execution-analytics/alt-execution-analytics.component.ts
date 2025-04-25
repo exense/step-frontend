@@ -25,12 +25,10 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {
-    console.log('CONTEXT changed', context);
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, false);
   }
 
   handleDashboardSettingsInit(context: TimeSeriesContext) {
-    console.log('CONTEXT INIT', context);
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, true);
   }
 

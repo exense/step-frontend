@@ -10,6 +10,8 @@
     [groupingOptions]="groupingOptions"
     (groupingChange)="handleGroupingChange($event)"
   />
+  <mat-divider vertical="true" />
+
   <div>
     <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode($event)" />
   </div>

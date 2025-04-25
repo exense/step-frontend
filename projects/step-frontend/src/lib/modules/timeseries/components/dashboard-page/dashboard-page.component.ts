@@ -107,16 +107,10 @@ export class DashboardPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this._router.events.subscribe((event) => {
-      if (event instanceof NavigationStart) {
-        console.log('Navigation started:', event.url);
-      }
-    });
     const urlParams = this.extractUrlParams();
     if (urlParams.timeRange) {
       this.activeTimeRangeSelection.set(urlParams.timeRange);
     }
-    console.log(urlParams.refreshInterval);
     this.refreshInterval.set(urlParams.refreshInterval || 0);
     if (!this.dashboardId()) {
       this._route.paramMap.subscribe((params) => {
@@ -138,15 +132,12 @@ export class DashboardPageComponent implements OnInit {
     this.subscribeToUrlNavigation();
   }
 
-  handleZoomChange() {
-    console.log('zoom change');
-  }
+  handleZoomChange() {}
 
-  handleZoomReset() {
-    console.log('zoom reset');
-  }
+  handleZoomReset() {}
 
   handleRefreshIntervalChange(interval: number) {
+    this.refreshInterval.set(interval);
     this._urlParamsService.updateRefreshInterval(interval, false);
   }
 
@@ -168,7 +159,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {
-    console.log('SETTINGS CHANGED');
     this._urlParamsService.updateUrlParamsFromContext(
       context,
       this.activeTimeRangeSelection()!,
@@ -222,14 +212,13 @@ export class DashboardPageComponent implements OnInit {
       return;
     }
     dashboard.attributes!['name'] = name;
-    // const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
-    // this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+    this._dashboardService.saveDashboard(dashboard).subscribe();
   }
 
   handleDashboardDescriptionChange(description: string) {
-    // const modifiedDashboard = this.editMode ? this.dashboardBackup! : this.dashboard;
-    // modifiedDashboard.description = description;
-    // this._dashboardService.saveDashboard(modifiedDashboard).subscribe();
+    let dashboard = this.dashboard()!;
+    dashboard.description = description;
+    this._dashboardService.saveDashboard(dashboard).subscribe();
   }
 
   extractTimeRangeFromUrl(): TimeRangePickerSelection | undefined {
@@ -246,7 +235,6 @@ export class DashboardPageComponent implements OnInit {
 
   extractUrlParams(): UrlParams {
     const urlParams = this._urlParamsService.collectUrlParams();
-    console.log(urlParams);
     if (urlParams.timeRange && urlParams.timeRange.type === 'RELATIVE') {
       // find the selection with label
       urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange.relativeSelection!.timeInMs);

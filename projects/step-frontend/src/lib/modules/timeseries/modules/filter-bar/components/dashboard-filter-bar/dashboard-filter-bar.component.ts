@@ -44,6 +44,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
 import { TimeRangePickerSelection } from '../../../_common/types/time-selection/time-range-picker-selection';
 import { DashboardSettingsComponent } from '../../../../components/dashboard-settings/dashboard-settings.component';
+import { MatDivider } from '@angular/material/divider';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -68,6 +69,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
     FilterBarItemComponent,
     VisibleFilterBarItemPipe,
     DashboardSettingsComponent,
+    MatDivider,
   ],
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {

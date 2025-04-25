@@ -180,20 +180,21 @@ export class DashboardUrlParamsService {
       params['select_to'] = null; // force cleaning
     }
     const customResolution = context.getChartsResolution();
-    if (customResolution > 0) {
-      params['resolution'] = customResolution;
-    }
+    params['resolution'] = customResolution || null;
 
     return params;
   }
 
   private convertTimeRange(pickerSelection: TimeRangePickerSelection): Record<string, any> {
-    if (!pickerSelection) {
-      return {};
-    }
-    const params: Record<string, any> = {
-      rangeType: pickerSelection.type,
+    let params: Record<string, any> = {
+      rangeType: pickerSelection?.type || null,
+      from: null,
+      to: null,
+      relativeRange: null,
     };
+    if (!pickerSelection) {
+      return params;
+    }
     if (pickerSelection.type === TimeRangeType.ABSOLUTE) {
       const fullRange = pickerSelection.absoluteSelection!;
       params['from'] = fullRange.from;
@@ -215,7 +216,6 @@ export class DashboardUrlParamsService {
 
   private prefixAndPushUrlParams(params: Record<string, any>, replaceUrl: boolean, patch?: boolean): void {
     const updatedParams = { ...this._activatedRoute.snapshot.queryParams };
-    console.log('previous params', updatedParams);
     Object.keys(updatedParams).forEach((key) => {
       if (key.startsWith(TimeSeriesConfig.DASHBOARD_URL_PARAMS_PREFIX + TimeSeriesConfig.DASHBOARD_URL_FILTER_PREFIX)) {
         // cleanup the filters that are not present

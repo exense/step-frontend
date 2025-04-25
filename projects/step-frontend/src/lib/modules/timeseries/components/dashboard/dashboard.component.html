@@ -26,37 +26,32 @@
     </div>
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
       @if (mainEngine?.state?.context) {
-        <div style="flex-grow: 1; flex-basis: 0; width: 100%; max-width: 100%">
-          <div style="display: flex; flex: 1; gap: 1rem">
+        <div class="full-width-grow">
+          <div class="time-section-container">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
               <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
             </div>
             @if (compareModeEnabled) {
-              <div class="round-btn disabled" mat-icon-button matTooltip="Use the main range picker to adjust">
+              <div
+                class="round-btn disabled align-with-ranger"
+                mat-icon-button
+                matTooltip="Use the main range picker to adjust"
+              >
                 <step-icon name="clock" />
               </div>
             } @else {
               <div
                 (click)="updateTimeRangeFromSelection()"
-                class="round-btn grey-border"
+                class="round-btn grey-border align-with-ranger"
                 [class.disabled]="fullRangeSelected"
                 mat-icon-button
-                matTooltip="Update time range from selection"
+                matTooltip="Zoom into selected time range"
               >
-                <step-icon name="arrow-up-right" />
+                <step-icon name="update-time-selection" />
               </div>
             }
           </div>
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              width: 100%;
-              max-width: 100%;
-              overflow: hidden;
-              gap: 2rem;
-            "
-          >
+          <div class="tools-bar">
             <step-ts-dashboard-filter-bar
               #filterBar
               [editMode]="editMode"
@@ -71,12 +66,13 @@
           </div>
         </div>
         @if (compareModeEnabled) {
-          <div style="flex-grow: 1; flex-basis: 0">
-            <div style="display: flex; flex: 1; gap: 1rem">
+          <div class="dual-columns-container">
+            <div class="time-section-container">
               <div class="ranger-section" [class.compact]="compareModeEnabled">
                 <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
               </div>
               <step-time-range-picker
+                class="align-with-ranger"
                 [compact]="true"
                 [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
                 (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
@@ -180,9 +176,45 @@
 
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
-      <step-btn-group class="with-borders" (click)="toggleCompareMode()">
+      @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
+        @if (editMode) {
+          <step-alert class="edit-alert" type="WARNING"
+            >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
+          >
+          <button
+            [disabled]="!dashboard.attributes!['name']"
+            mat-button
+            mat-flat-button
+            color="primary"
+            (click)="saveEditChanges()"
+          >
+            Save
+          </button>
+          <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
+        } @else {
+          <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
+            <step-btn-group class="with-borders">
+              <button
+                type="button"
+                mat-stroked-button
+                #menuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="settingsMenu"
+                [disabled]="!hasWritePermission || compareModeEnabled"
+                (click)="enableEditMode()"
+                matTooltip="Edit"
+              >
+                <step-icon name="edit" />
+              </button>
+            </step-btn-group>
+          </div>
+        }
+      }
+      <step-btn-group
+        class="with-borders"
+        (click)="toggleCompareMode()"
+        [class.compare-btn-active]="compareModeEnabled"
+      >
         <button
-          [class.btn-active]="compareModeEnabled"
           type="button"
           [matTooltip]="compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode'"
           mat-stroked-button
@@ -201,35 +233,6 @@
           <step-icon name="more-horizontal" />
         </button>
       </step-btn-group>
-      @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
-        @if (editMode) {
-          <step-alert class="edit-alert" type="WARNING"
-            >Saving will capture all the current settings, like filters, grouping, and charts settings</step-alert
-          >
-          <button
-            [disabled]="!dashboard.attributes!['name']"
-            mat-button
-            mat-flat-button
-            color="primary"
-            (click)="saveEditChanges()"
-          >
-            Save
-          </button>
-          <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
-        } @else {
-          <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
-            <button
-              mat-button
-              mat-flat-button
-              color="primary"
-              [disabled]="!hasWritePermission || compareModeEnabled"
-              (click)="enableEditMode()"
-            >
-              Edit
-            </button>
-          </div>
-        }
-      }
     </div>
   </ng-template>
 } @else {

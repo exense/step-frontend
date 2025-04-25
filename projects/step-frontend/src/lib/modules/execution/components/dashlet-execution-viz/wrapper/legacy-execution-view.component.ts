@@ -102,14 +102,6 @@ export class LegacyExecutionViewComponent implements OnInit {
     );
   }
 
-  handleZoomChange() {
-    console.log('zoom change');
-  }
-
-  handleZoomReset() {
-    console.log('zoom reset');
-  }
-
   private findRelativeTimeOption(relativeMs: number): TimeRangePickerSelection {
     return (
       this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === relativeMs) || {

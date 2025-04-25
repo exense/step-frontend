@@ -205,12 +205,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   handleZoomReset() {
     this.context.setChartsLockedState(false);
     this.zoomReset.next();
-    // this.context.resetZoom();
   }
 
-  handleZoomChange(range: TimeRange) {
-    console.log('ZOOM CHANGE');
-  }
+  handleZoomChange(range: TimeRange) {}
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;
