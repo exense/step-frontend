@@ -47,10 +47,20 @@ export class TimeRangePickerComponent implements OnInit {
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
 
-  activeSelectionChange = effect(() => {
-    let selection = this.activeSelection();
-    if (selection) {
-      this.formatSelectionLabel(selection);
+  protected mainPickerLabel = computed(() => {
+    const selection = this.activeSelection();
+    if (!selection) {
+      return;
+    }
+    if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
+      const range = selection.absoluteSelection;
+      if (range) {
+        return TimeSeriesUtils.formatRange(range);
+      } else {
+        return 'Full range';
+      }
+    } else {
+      return selection.relativeSelection!.label!;
     }
   });
 
@@ -74,8 +84,6 @@ export class TimeRangePickerComponent implements OnInit {
   toDate: DateTime | undefined;
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
-
-  protected mainPickerLabel: string = '';
 
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -101,34 +109,6 @@ export class TimeRangePickerComponent implements OnInit {
       throw new Error('Options param is mandatory');
     }
   }
-
-  private formatSelectionLabel(selection: TimeRangePickerSelection) {
-    if (!selection) {
-      return;
-    }
-    if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
-      const range = selection.absoluteSelection;
-      if (range) {
-        this.mainPickerLabel = TimeSeriesUtils.formatRange(range);
-      } else {
-        this.mainPickerLabel = 'Full range';
-      }
-    } else {
-      this.mainPickerLabel = selection.relativeSelection!.label!;
-    }
-  }
-
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   const selectionChange = changes['activeSelection'];
-  //   const previousValue = selectionChange?.previousValue;
-  //   const currentValue: TimeRangePickerSelection = selectionChange?.currentValue;
-  //   if (!currentValue) {
-  //     return;
-  //   }
-  //   if (previousValue && previousValue !== currentValue) {
-  //     this.formatSelectionLabel(currentValue);
-  //   }
-  // }
 
   onFromInputLeave() {
     const inputDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);

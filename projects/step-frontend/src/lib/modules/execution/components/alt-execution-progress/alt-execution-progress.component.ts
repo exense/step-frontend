@@ -191,7 +191,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        // this._urlParamsService.patchUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });

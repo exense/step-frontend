@@ -157,12 +157,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const dashboardId = this.id();
-    if (!dashboardId) {
-      throw new Error('Dashboard id input is mandatory');
-    }
-    if (!this.timeRange()) {
-      throw new Error('Time range not set');
-    }
     const urlParams: DashboardUrlParams = this._urlParamsService.collectUrlParams();
     this.resolution = urlParams.resolution;
     this.removeOneTimeUrlParams();

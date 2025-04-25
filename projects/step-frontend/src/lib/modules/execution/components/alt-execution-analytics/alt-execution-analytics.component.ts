@@ -58,7 +58,6 @@ export class AltExecutionAnalyticsComponent implements OnInit {
       )
       .subscribe(() => {
         this.isLoading = true;
-        this._cd.detectChanges();
         let params = this._urlParamsService.collectUrlParams();
         if (params.timeRange) {
           this._state.updateTimeRangeSelection(params.timeRange!);
