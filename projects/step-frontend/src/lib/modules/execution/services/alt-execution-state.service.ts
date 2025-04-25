@@ -22,5 +22,4 @@ export abstract class AltExecutionStateService {
   abstract readonly timeRange$: Observable<TimeRange | undefined>;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
   abstract selectFullRange(): void;
-  abstract setAnalyticsViewReference(view: AltExecutionAnalyticsComponent | undefined): void;
 }

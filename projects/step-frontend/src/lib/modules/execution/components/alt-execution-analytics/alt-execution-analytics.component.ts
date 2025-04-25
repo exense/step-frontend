@@ -1,15 +1,5 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  DestroyRef,
-  ElementRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { TimeSeriesContext } from '../../../timeseries/modules/_common';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -23,7 +13,7 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './alt-execution-analytics.component.html',
   styleUrl: './alt-execution-analytics.component.scss',
 })
-export class AltExecutionAnalyticsComponent implements OnInit, OnDestroy {
+export class AltExecutionAnalyticsComponent implements OnInit {
   readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
@@ -49,7 +39,6 @@ export class AltExecutionAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._state.setAnalyticsViewReference(this);
     this.subscribeToUrlNavigation();
   }
 
@@ -81,9 +70,5 @@ export class AltExecutionAnalyticsComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }, 500);
       });
-  }
-
-  ngOnDestroy(): void {
-    this._state.setAnalyticsViewReference(undefined);
   }
 }

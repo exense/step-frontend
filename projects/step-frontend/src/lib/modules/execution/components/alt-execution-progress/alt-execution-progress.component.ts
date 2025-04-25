@@ -54,7 +54,6 @@ import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-st
 import { AltExecutionReportPrintService } from '../../services/alt-execution-report-print.service';
 import { ALT_EXECUTION_REPORT_IN_PROGRESS } from '../../services/alt-execution-report-in-progress.token';
 import { AltExecutionViewAllService } from '../../services/alt-execution-view-all.service';
-import { ExecutionActionsTooltips } from '../execution-actions/execution-actions.component';
 import { KeyValue } from '@angular/common';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { EXECUTION_ID } from '../../services/execution-id.token';
@@ -66,7 +65,6 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
-import { AltExecutionAnalyticsComponent } from '../alt-execution-analytics/alt-execution-analytics.component';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -156,11 +154,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
-  private analyticsViewReference: AltExecutionAnalyticsComponent | undefined; // reference to the analytics view
-
-  setAnalyticsViewReference(reference: AltExecutionAnalyticsComponent): void {
-    this.analyticsViewReference = reference;
-  }
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
@@ -554,18 +547,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
       }
       this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
-    });
-  }
-
-  updateTimeRangeFromDashboardSelection() {
-    this.timeRange$.pipe(take(1)).subscribe((fullTimeRange) => {
-      let selectionRange = this.analyticsViewReference?.getDashboardSelectionRange();
-      if (!selectionRange) {
-        return;
-      }
-      if (fullTimeRange.from != selectionRange.from || fullTimeRange.to != selectionRange.to) {
-        this.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: selectionRange });
-      }
     });
   }
 }
