@@ -4,6 +4,7 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { DynamicFormsModule } from '../../../dynamic-forms/dynamic-forms.module';
 import { FormsModule } from '@angular/forms';
+import { ArtefactNodeSource } from '../../types/artefact-node-source.enum';
 
 @Component({
   selector: 'step-artefact-child-container-settings',
@@ -13,22 +14,19 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
 })
 export class ArtefactChildContainerSettingsComponent {
-  /** @Input() **/
   readonly name = input<string>();
-
-  /** @Input() **/
   readonly childContainer = input.required<ChildrenBlock>();
-
-  /** @Input() **/
   readonly isReadonly = input(false);
+  readonly nodeType = input.required<ArtefactNodeSource>();
 
   readonly showAttributes = model(true);
 
-  /** @Output() **/
   readonly save = output();
 
   protected handleContinueOnErrorChange(value: DynamicValueBoolean): void {
     this.childContainer().continueOnError = value;
     this.save.emit();
   }
+
+  protected readonly ArtefactNodeSource = ArtefactNodeSource;
 }
