@@ -3,7 +3,7 @@
     @if (labelExpression(); as labelExpression) {
       @if (isLabelResolved()) {
         <step-popover yPosition="below">
-          <step-icon name="zap" class="resolved" (click)="displayText($event, labelExpression)" />
+          <step-icon name="zap" (click)="displayText($event, labelExpression)" />
           <step-popover-content>
             <div class="step-artefact-inline-field__expression">{{ labelExpression }}</div>
             <div>{{ itemLabel() }}</div>
@@ -11,7 +11,7 @@
         </step-popover>
       } @else {
         <step-popover yPosition="below">
-          <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
+          <step-icon name="zap" (click)="displayText($event, labelExpression)" />
           <step-popover-content>
             <strong>Unresolved dynamic expression</strong><br />
             <div class="step-artefact-inline-field__expression">{{ labelExpression }}</div>
@@ -32,7 +32,7 @@
     @if (valueExpression(); as valueExpression) {
       @if (isValueResolved()) {
         <step-popover yPosition="below">
-          <step-icon name="zap" class="resolved" (click)="displayText($event, valueExpression)" />
+          <step-icon name="zap" (click)="displayText($event, valueExpression)" />
           <step-popover-content>
             <div class="step-artefact-inline-field__expression">{{ valueExpression }}</div>
             <div>{{ itemValue() }}</div>
@@ -40,7 +40,7 @@
         </step-popover>
       } @else {
         <step-popover yPosition="below">
-          <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
+          <step-icon name="zap" (click)="displayText($event, valueExpression)" />
           <step-popover-content>
             <strong>Unresolved dynamic expression</strong><br />
             <div class="step-artefact-inline-field__expression">{{ valueExpression }}</div>

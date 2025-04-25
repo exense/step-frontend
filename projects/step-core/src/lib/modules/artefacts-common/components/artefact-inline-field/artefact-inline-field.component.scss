@@ -11,7 +11,7 @@ step-artefact-inline-field > section {
 
 step-artefact-inline-field {
   border-radius: 1rem;
-  padding: 0.2rem;
+  padding: 0.2rem 0.3rem 0.2rem 0.3rem;
   margin-left: 0.1rem;
   margin-right: 0.1rem;
   cursor: pointer;
@@ -20,8 +20,7 @@ step-artefact-inline-field {
     border: solid 0.1rem var.$blue-600;
     margin-left: 0;
     margin-right: 0;
-    padding-top: 0.1rem;
-    padding-bottom: 0.1rem;
+    padding: 0.1rem 0.3rem 0.1rem 0.3rem;
   }
 
   .ellipsis {
@@ -40,11 +39,6 @@ step-artefact-inline-field {
   label,
   span {
     display: block;
-  }
-
-  .resolved:hover,
-  .not-resolved {
-    color: var.$dark-blue;
   }
 
   .not-resolved-text {

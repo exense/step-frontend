@@ -63,6 +63,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       isSkipped: false,
       isVisuallySkipped: isParentVisuallySkipped ?? false,
       icon,
+      iconClassName: 'larger-view',
       expandable,
       children,
       parentId,
