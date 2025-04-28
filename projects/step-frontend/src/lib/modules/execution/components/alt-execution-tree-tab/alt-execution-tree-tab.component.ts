@@ -15,7 +15,7 @@ import {
   AggregatedReportViewTreeStateService,
 } from '../../services/aggregated-report-view-tree-state.service';
 import { ActivatedRoute } from '@angular/router';
-import { filter, map, switchMap } from 'rxjs';
+import { filter, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { TreeStateService } from '@exense/step-core';
@@ -77,12 +77,17 @@ export class AltExecutionTreeTabComponent implements OnInit {
         filter((data) => !!data.artefactId),
         takeUntilDestroyed(this._destroyRef),
         switchMap((data) => {
-          return this._treeState.expandNode(data.artefactId).pipe(map((isExpanded) => (isExpanded ? data : undefined)));
+          const nodeId = this._treeState.getNodeIdsByArtefactId(data.artefactId)[0];
+          if (!nodeId) {
+            return of(undefined);
+          }
+          return this._treeState.expandNode(nodeId).pipe(map((isExpanded) => (isExpanded ? data : undefined)));
         }),
         filter((data) => !!data),
       )
       .subscribe((data) => {
-        const node = this._treeState.findNodeById(data!.artefactId);
+        const nodeId = this._treeState.getNodeIdsByArtefactId(data.artefactId)[0]!;
+        const node = this._treeState.findNodeById(nodeId);
         if (!node) {
           return;
         }

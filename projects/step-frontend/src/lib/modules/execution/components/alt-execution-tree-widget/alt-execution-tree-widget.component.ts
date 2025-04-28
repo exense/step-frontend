@@ -47,8 +47,12 @@ export class AltExecutionTreeWidgetComponent {
     });
   });
 
-  focusNode(nodeId: string): void {
-    this.tree()?.focusNode(nodeId);
+  focusNodeByArtefactId(artefactId: string): void {
+    const nodeId = this._treeState.getNodeIdsByArtefactId(artefactId)[0];
+    if (!nodeId) {
+      return;
+    }
+    this.focusNode(nodeId);
   }
 
   protected collapseAll(): void {
@@ -57,5 +61,9 @@ export class AltExecutionTreeWidgetComponent {
 
   protected expandAll(): void {
     this._treeState.expandAll();
+  }
+
+  private focusNode(nodeId: string): void {
+    this.tree()?.focusNode(nodeId);
   }
 }
