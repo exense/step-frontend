@@ -17,6 +17,9 @@ import { FormBuilder } from '@angular/forms';
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.small]': 'attachmentType === AttachmentType.DEFAULT',
+  },
 })
 export class AttachmentDialogComponent implements OnInit {
   private _resourceService = inject(AugmentedResourcesService);
@@ -39,7 +42,7 @@ export class AttachmentDialogComponent implements OnInit {
 
   private initializeContent(): void {
     this.contentCtrl.disable();
-    if (this.attachmentType === AttachmentType.IMG) {
+    if (this.attachmentType !== AttachmentType.TEXT) {
       return;
     }
     this._resourceService.getResourceContentAsText(this._data.id!).subscribe((content) => {

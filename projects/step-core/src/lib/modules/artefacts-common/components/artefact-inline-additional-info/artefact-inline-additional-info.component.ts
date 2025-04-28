@@ -4,6 +4,7 @@ import { AbstractArtefact, AttachmentMeta } from '../../../../client/step-client
 import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
 import { ATTACHMENTS_EXPORTS } from '../../../attachments';
 import { AttachmentDialogsService } from '../../../attachments/injectables/attachment-dialogs.service';
+import { AttachmentType } from '../../../attachments/types/attachment-type.enum';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
@@ -48,4 +49,5 @@ export class ArtefactInlineAdditionalInfoComponent {
   }
 
   protected readonly PopoverMode = PopoverMode;
+  protected readonly AttachmentType = AttachmentType;
 }

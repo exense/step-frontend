@@ -1,25 +1,40 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
-import { AttachmentIsImagePipe } from '../pipes/attachment-is-image.pipe';
-import { AttachmentIsTextPipe } from '../pipes/attachment-is-text.pipe';
+import { IMAGE_TYPES, ImageType, TEXT_TYPES, TextType, VIDEO_TYPES, VideoType } from '../../basics/step-basics.module';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AttachmentUtilsService {
   private _resourceService = inject(AugmentedResourcesService);
+  private _imageTypes = inject(IMAGE_TYPES);
+  private _textTypes = inject(TEXT_TYPES);
+  private _videoTypes = inject(VIDEO_TYPES);
 
   determineAttachmentType(attachment?: AttachmentMeta): AttachmentType {
     if (!attachment) {
       return AttachmentType.DEFAULT;
     }
-    if (AttachmentIsImagePipe.transform(attachment)) {
+
+    const nameParts = (attachment.name ?? '').split('.');
+    const extension = nameParts[nameParts.length - 1];
+    if (!extension) {
+      return AttachmentType.DEFAULT;
+    }
+
+    if (this._imageTypes.has(extension as ImageType)) {
       return AttachmentType.IMG;
     }
-    if (AttachmentIsTextPipe.transform(attachment)) {
+
+    if (this._videoTypes.has(extension as VideoType)) {
+      return AttachmentType.VIDEO;
+    }
+
+    if (this._textTypes.has(extension as TextType)) {
       return AttachmentType.TEXT;
     }
+
     return AttachmentType.DEFAULT;
   }
 

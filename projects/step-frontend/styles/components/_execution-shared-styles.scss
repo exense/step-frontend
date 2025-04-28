@@ -27,6 +27,17 @@
 }
 
 @mixin execution-report-node-inline-details {
+  .default-attachment-popover-view {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    font-size: 1.2rem;
+    step-icon {
+      @include core.step-icon-size(1.4rem);
+    }
+  }
+
   .execution-report-node-inline-details {
     display: flex;
     flex-direction: column;

@@ -8,6 +8,11 @@ step-alt-attachment-preview {
   position: relative;
   cursor: pointer;
 
+  &.large {
+    width: 30rem;
+    height: 14rem;
+  }
+
   img {
     width: 100%;
     height: 100%;

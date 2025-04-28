@@ -360,3 +360,10 @@ export * from './pipes/truncate-string.pipe';
 export * from './injectables/array-item-label-value-default-extractor.service';
 export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';
 export * from './injectables/dynamic-values-utils.service';
+
+export * from './types/image-type.enum';
+export * from './types/video-type.enum';
+export * from './types/text-type.enum';
+export * from './injectables/image-types.token';
+export * from './injectables/video-types.token';
+export * from './injectables/text-types.token';
