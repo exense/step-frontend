@@ -1,9 +1,14 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .step-popover-menu {
   margin-bottom: 1rem;
   margin-left: 0;
   min-width: unset !important;
   width: unset !important;
   max-width: inherit !important;
+  &.with-border {
+    border: solid 0.1rem var.$gray-150;
+  }
 
   .mat-mdc-menu-item {
     user-select: auto;

@@ -17,6 +17,7 @@ import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.s
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class.with-actions]': 'showDownload()',
+    '[class.with-border]': 'withBorder()',
     '(click)': 'open()',
   },
 })
@@ -26,6 +27,7 @@ export class AltAttachmentPreviewComponent {
 
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
   readonly showDownload = input(true);
+  readonly withBorder = input(true);
 
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;

@@ -5,15 +5,20 @@
         <div class="attachments-container">
           <step-icon name="paperclip" matTooltip="Attachments" />
           @for (att of attachments; track att.id) {
-            <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER">
+            <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER" [withBorder]="true">
               <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
               <step-popover-content>
                 @switch (att | attachmentType) {
                   @case (AttachmentType.IMG) {
-                    <step-alt-attachment-preview class="large" [attachment]="att" [showDownload]="false" />
+                    <step-alt-attachment-preview
+                      class="large"
+                      [attachment]="att"
+                      [showDownload]="false"
+                      [withBorder]="false"
+                    />
                   }
                   @case (AttachmentType.TEXT) {
-                    <step-alt-attachment-preview [attachment]="att" [showDownload]="false" />
+                    <step-alt-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
                   }
                   @default {
                     <div class="default-attachment-popover-view">

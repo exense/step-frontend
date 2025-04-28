@@ -7,16 +7,21 @@ step-alt-attachment-preview {
   height: 7rem;
   position: relative;
   cursor: pointer;
+  overflow: hidden;
 
   &.large {
-    width: 30rem;
-    height: 14rem;
+    width: 60rem;
+    height: 28rem;
+  }
+
+  &.with-border {
+    border: solid 0.1rem var.$gray-150;
+    border-radius: 1rem;
   }
 
   img {
     width: 100%;
     height: 100%;
-    border-radius: 1rem;
   }
 
   .file-info {
@@ -26,8 +31,6 @@ step-alt-attachment-preview {
     justify-content: space-around;
     align-items: flex-start;
     padding-top: 0.5rem;
-    border: solid 0.1rem var.$gray-150;
-    border-radius: 1rem;
 
     step-icon {
       @include core.step-icon-size(4rem);
@@ -40,14 +43,13 @@ step-alt-attachment-preview {
     left: 0;
     right: 0;
     padding-left: 1rem;
-    padding-bottom: 0.2rem;
-    border-bottom-left-radius: 0.1rem;
-    border-bottom-right-radius: 0.1rem;
+    padding-bottom: 0.3rem;
+    padding-top: 0.3rem;
     overflow: hidden;
     text-overflow: ellipsis;
 
     &.overlay {
-      background: rgba(255, 255, 255, 0.5);
+      background: var.$white-transparent;
     }
   }
 
