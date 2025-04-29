@@ -71,6 +71,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     }
 
     if (jsonError?.errorMessage || jsonError?.errorName) {
+      if (jsonError.errorMessage && typeof jsonError.errorMessage !== 'string') {
+        console.error(`Unexpected error type. isJson=${isJson}`, jsonError.errorMessage);
+        try {
+          console.error(JSON.stringify(jsonError.errorMessage));
+        } catch (e) {}
+      }
       return `${jsonError.errorName ?? 'Error'}: ${jsonError.errorMessage}`;
     }
 
