@@ -8,7 +8,7 @@
     [matSortDisableClear]="true"
   >
     <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <step-bulk-selection-di />
+      <step-bulk-selection-di [(selectionType)]="selectionType" />
       @if (hasSelection$ | async) {
         <button mat-icon-button matTooltip="Add selected plans" (click)="addAllPlans()">
           <step-icon name="plus-circle" />
