@@ -5,14 +5,14 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ReportNode, AttachmentMeta, AugmentedResourcesService } from '../../../../client/step-client-module';
 
 @Component({
-  selector: 'step-attachments',
-  templateUrl: './attachments.component.html',
-  styleUrls: ['./attachments.component.scss'],
+  selector: 'step-legacy-attachments',
+  templateUrl: './legacy-attachments.component.html',
+  styleUrls: ['./legacy-attachments.component.scss'],
   standalone: true,
   imports: [StepBasicsModule, AttachmentUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttachmentsComponent {
+export class LegacyAttachmentsComponent {
   private _doc = inject(DOCUMENT);
   protected _resourceService = inject(AugmentedResourcesService);
 

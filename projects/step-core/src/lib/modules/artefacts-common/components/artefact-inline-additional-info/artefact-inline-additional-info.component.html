@@ -10,7 +10,7 @@
               <step-popover-content>
                 @switch (att | attachmentType) {
                   @case (AttachmentType.IMG) {
-                    <step-alt-attachment-preview
+                    <step-attachment-preview
                       class="large"
                       [attachment]="att"
                       [showDownload]="false"
@@ -18,7 +18,7 @@
                     />
                   }
                   @case (AttachmentType.TEXT) {
-                    <step-alt-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
+                    <step-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
                   }
                   @default {
                     <div class="default-attachment-popover-view">

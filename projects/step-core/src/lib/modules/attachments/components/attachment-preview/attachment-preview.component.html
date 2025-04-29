@@ -1,13 +1,33 @@
-<a target="_blank" [href]="attachment() | attachmentUrl: true">
-  @if (attachment() | attachmentIsImage) {
-    <img class="att-thumbnail" [src]="attachment() | attachmentUrl" />
+@switch (attachmentType()) {
+  @case (AttachmentType.IMG) {
+    <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
   }
-  @if (attachment() | attachmentShowLabel) {
-    <div class="att-preview-label">
-      @if (attachment() | attachmentIsText) {
-        <step-icon name="file" />
-      }
-      <span>{{ attachment()?.name }}</span>
+  @case (AttachmentType.TEXT) {
+    <div class="file-info">
+      <step-icon name="file" />
     </div>
   }
-</a>
+  @case (AttachmentType.VIDEO) {
+    <div class="file-info">
+      <step-icon name="film" />
+    </div>
+  }
+  @default {
+    <div class="file-info">
+      <step-icon name="paperclip" />
+    </div>
+  }
+}
+<div
+  class="name"
+  [ngClass]="{
+    overlay: attachmentType() === AttachmentType.IMG
+  }"
+>
+  {{ attachment()?.name }}
+</div>
+<div class="actions">
+  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
+    <step-icon name="download" />
+  </button>
+</div>
