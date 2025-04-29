@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncaps
 import { NgClass } from '@angular/common';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-artefact-inline-field',
@@ -36,10 +36,19 @@ export class ArtefactInlineFieldComponent {
   protected readonly isLabelResolved = computed(() => !!this.label()?.isResolved);
   protected readonly isValueResolved = computed(() => !!this.value()?.isResolved);
 
+  // todo remove
   protected readonly labelTooltip = computed(() => this.label()?.tooltip ?? '');
+
+  // todo remove
   protected readonly valueTooltip = computed(() => this.value()?.tooltip ?? '');
 
   protected readonly isValueFirst = computed(() => this.item()?.isValueFirst ?? false);
+
+  protected readonly hasDynamicExpression = computed(() => {
+    const labelExpression = this.labelExpression();
+    const valueExpression = this.valueExpression();
+    return !!labelExpression || !!valueExpression;
+  });
 
   protected readonly itemLabel = computed(() => {
     const label = this.label();
@@ -90,4 +99,6 @@ export class ArtefactInlineFieldComponent {
       wrapText: true,
     });
   }
+
+  protected readonly PopoverMode = PopoverMode;
 }

@@ -1,6 +1,9 @@
 export interface ArtefactInlineItemsResolvableField {
   value?: string | number | boolean | object;
   expression?: string;
+  /**
+   * @deprecated
+   * **/
   tooltip?: string;
   isResolved?: boolean;
 }

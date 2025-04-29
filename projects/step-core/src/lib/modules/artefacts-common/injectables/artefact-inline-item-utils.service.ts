@@ -8,9 +8,11 @@ type PossibleValue = string | number | boolean | DynamicValue | undefined;
 
 export interface ArtefactInlineItemConfig {
   label?: PossibleValue;
+  /** @deprecated **/
   labelTooltip?: string;
   labelExplicitExpression?: string;
   value?: PossibleValue;
+  /** @deprecated **/
   valueTooltip?: string;
   valueExplicitExpression?: string;
   icon?: string;

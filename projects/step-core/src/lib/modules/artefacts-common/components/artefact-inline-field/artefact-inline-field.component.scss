@@ -2,7 +2,7 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-artefact-inline-field,
-step-artefact-inline-field > section {
+step-artefact-inline-field section.field-content {
   display: flex;
   gap: 0.25rem;
   white-space: nowrap;
@@ -41,11 +41,26 @@ step-artefact-inline-field {
     display: block;
   }
 
+  .expression,
   .not-resolved-text {
     font-family: monospace;
   }
 }
 
-.step-artefact-inline-field__expression {
-  font-family: monospace;
+.step-artefact-inline-field {
+  &__expression-popover {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    & > div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  &__expression {
+    font-family: monospace;
+  }
 }

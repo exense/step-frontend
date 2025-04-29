@@ -53,6 +53,7 @@
 }
 @if (measuresDataSource(); as measuresDataSource) {
   <section class="data-container">
+    <div class="container-title">Measurements</div>
     <div>
       <step-table [dataSource]="measuresDataSource" matSort>
         <ng-container matColumnDef="begin">
