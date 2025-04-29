@@ -70,7 +70,7 @@ export class NavigatorService {
   }
 
   navigateAfterLogin(): void {
-    const emptyUrls = ['', '/'];
+    const emptyUrls = ['', '/', '/login'];
     const url = this._location.path();
     if (emptyUrls.includes(url)) {
       this.navigateToHome();
