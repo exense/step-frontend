@@ -16,10 +16,12 @@ export class BookmarkService implements OnDestroy {
       this._bookmarksApi.getUserBookmarkTable({
         skip: 0,
         limit: 0,
-        sort: {
-          field: 'label',
-          direction: 'ASCENDING',
-        },
+        sort: [
+          {
+            field: 'label',
+            direction: 'ASCENDING',
+          },
+        ],
       }),
     ),
     map((table) => table.data),

@@ -2,7 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { FieldSearchOrder } from './FieldSearchOrder';
+
 export type SearchOrder = {
-  attributeName?: string;
-  order?: number;
+  fieldsSearchOder?: Array<FieldSearchOrder>;
 };
