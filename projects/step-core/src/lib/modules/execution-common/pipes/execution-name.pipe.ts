@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Execution } from '@exense/step-core';
+import { Execution } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'executionName',
