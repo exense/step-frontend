@@ -2,6 +2,7 @@ import { APP_INITIALIZER, FactoryProvider, inject, Injector, runInInjectionConte
 import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
 import {
   AugmentedAutomationPackagesService,
+  AutomationPackageEntityTableRegistryService,
   dialogRoute,
   EntityRegistry,
   InfoBannerService,
@@ -13,6 +14,11 @@ import { AutomationPackageUploadDialogComponent } from './components/automation-
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { AutomationPackageExecutionDialogComponent } from './components/automation-package-execution-dialog/automation-package-execution-dialog.component';
 import { AutomationPackageEntitiesDialogComponent } from './components/automation-package-entities-dialog/automation-package-entities-dialog.component';
+import { AutomationPackageEntityKey } from './types/automation-package-entity-key.enum';
+import { TablePlansComponent } from './components/table-plans/table-plans.component';
+import { TableKeywordsComponent } from './components/table-keywords/table-keywords.component';
+import { TableParametersComponent } from './components/table-parameters/table-parameters.component';
+import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
@@ -94,6 +100,14 @@ const registerInfoBanners = () => {
   const _infoBannerService = inject(InfoBannerService);
 };
 
+const registerEntityTables = () => {
+  const _entityTableRegistry = inject(AutomationPackageEntityTableRegistryService);
+  _entityTableRegistry.register(AutomationPackageEntityKey.PLANS, 'Plans', TablePlansComponent);
+  _entityTableRegistry.register(AutomationPackageEntityKey.KEYWORDS, 'Keywords', TableKeywordsComponent);
+  _entityTableRegistry.register(AutomationPackageEntityKey.PARAMETERS, 'Parameters', TableParametersComponent);
+  _entityTableRegistry.register(AutomationPackageEntityKey.SCHEDULES, 'Tasks', TableTasksComponent);
+};
+
 export const AUTOMATION_PACKAGE_INITIALIZER: FactoryProvider = {
   provide: APP_INITIALIZER,
   useFactory: () => {
@@ -103,6 +117,7 @@ export const AUTOMATION_PACKAGE_INITIALIZER: FactoryProvider = {
       runInInjectionContext(_injector, registerRoutes);
       runInInjectionContext(_injector, registerMenuEntries);
       runInInjectionContext(_injector, registerInfoBanners);
+      runInInjectionContext(_injector, registerEntityTables);
     };
   },
   multi: true,

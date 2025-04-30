@@ -1,0 +1,9 @@
+step-automation-package-entities-dialog {
+  .dialog-content {
+    max-height: unset;
+  }
+  .tab-content {
+    overflow-y: auto;
+    max-height: 64rem;
+  }
+}

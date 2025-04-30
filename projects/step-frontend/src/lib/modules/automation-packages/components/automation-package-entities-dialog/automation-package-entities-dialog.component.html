@@ -8,19 +8,8 @@
         (activeTabIdChange)="selectedTab.set($event)"
       />
       <div class="tab-content">
-        @switch (selectedTab()) {
-          @case (AutomationPackageEntityKey.PLANS) {
-            <step-table-plans [dataSource]="dataSources()[AutomationPackageEntityKey.PLANS]" />
-          }
-          @case (AutomationPackageEntityKey.KEYWORDS) {
-            <step-table-keywords [dataSource]="dataSources()[AutomationPackageEntityKey.KEYWORDS]" />
-          }
-          @case (AutomationPackageEntityKey.PARAMETERS) {
-            <step-table-parameters [dataSource]="dataSources()[AutomationPackageEntityKey.PARAMETERS]" />
-          }
-          @case (AutomationPackageEntityKey.SCHEDULES) {
-            <step-table-tasks [dataSource]="dataSources()[AutomationPackageEntityKey.SCHEDULES]" />
-          }
+        @if (tableContext(); as ctx) {
+          <step-automation-package-entity-table [entityType]="ctx.entity" [dataSource]="ctx.dataSource" />
         }
       </div>
     }

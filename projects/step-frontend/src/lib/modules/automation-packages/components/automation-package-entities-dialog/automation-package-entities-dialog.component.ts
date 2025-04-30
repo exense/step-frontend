@@ -1,8 +1,8 @@
-import { Component, computed, effect, inject, model, signal } from '@angular/core';
+import { Component, computed, effect, inject, model, signal, ViewEncapsulation } from '@angular/core';
 import {
   AbstractOrganizableObject,
   AugmentedAutomationPackagesService,
-  EntityRegistry,
+  AutomationPackageEntityTableRegistryService,
   StepCoreModule,
   Tab,
   TableLocalDataSource,
@@ -11,37 +11,33 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, finalize, Observable, of, switchMap, tap } from 'rxjs';
 import { AutomationPackageEntityKey } from '../../types/automation-package-entity-key.enum';
-import { ENTITIES_DICTIONARY } from '../../injectables/entities-dictionary.token';
-import { TablePlansComponent } from '../table-plans/table-plans.component';
-import { TableKeywordsComponent } from '../table-keywords/table-keywords.component';
-import { TableTasksComponent } from '../table-tasks/table-tasks.component';
-import { TableParametersComponent } from '../table-parameters/table-parameters.component';
+import { AutomationPackageEntityTableComponent } from '../automation-package-entity-table/automation-package-entity-table.component';
 
 interface AutomationPackageEntitiesDialogData {
   readonly automationPackageId: string;
 }
 
-type EntitiesDictionary = Record<AutomationPackageEntityKey, AbstractOrganizableObject[]>;
+type EntitiesDictionary = Record<string, AbstractOrganizableObject[]>;
+
+const MAIN_TABS_ORDER = [
+  AutomationPackageEntityKey.PLANS,
+  AutomationPackageEntityKey.PARAMETERS,
+  AutomationPackageEntityKey.KEYWORDS,
+  AutomationPackageEntityKey.SCHEDULES,
+];
 
 @Component({
   selector: 'step-automation-package-entities-dialog',
   standalone: true,
-  imports: [StepCoreModule, TablePlansComponent, TableKeywordsComponent, TableTasksComponent, TableParametersComponent],
+  imports: [StepCoreModule, AutomationPackageEntityTableComponent],
   templateUrl: './automation-package-entities-dialog.component.html',
   styleUrl: './automation-package-entities-dialog.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutomationPackageEntitiesDialogComponent {
   private _id = inject<AutomationPackageEntitiesDialogData>(MAT_DIALOG_DATA).automationPackageId;
   private _api = inject(AugmentedAutomationPackagesService);
-  protected _entitiesDictionary = inject(ENTITIES_DICTIONARY);
-  private _entities = inject(EntityRegistry);
-
-  private TABS_ORDER = [
-    AutomationPackageEntityKey.PLANS,
-    AutomationPackageEntityKey.PARAMETERS,
-    AutomationPackageEntityKey.KEYWORDS,
-    AutomationPackageEntityKey.SCHEDULES,
-  ];
+  private _entityTablesRegistry = inject(AutomationPackageEntityTableRegistryService);
 
   protected inProgress = signal(false);
 
@@ -58,29 +54,39 @@ export class AutomationPackageEntitiesDialogComponent {
     { initialValue: {} as EntitiesDictionary },
   );
 
-  protected dataSources = computed(() => {
+  private dataSources = computed(() => {
     const entitiesData = this.entitiesData();
     return Object.entries(entitiesData).reduce(
       (res, [key, value]) => {
-        res[key as AutomationPackageEntityKey] = new TableLocalDataSource(value);
+        res[key] = new TableLocalDataSource(value);
         return res;
       },
-      {} as Record<AutomationPackageEntityKey, TableLocalDataSource<AbstractOrganizableObject>>,
+      {} as Record<string, TableLocalDataSource<AbstractOrganizableObject>>,
     );
   });
 
-  protected tabs = computed(() => {
-    const entitiesData = this.entitiesData();
-    return this.TABS_ORDER.filter((key) => !!entitiesData[key]).map((key) => {
-      const entity = this._entities.getEntityByName(this._entitiesDictionary[key]);
-      return {
-        id: key,
-        label: entity.displayName,
-      } as Tab<AutomationPackageEntityKey>;
-    });
+  protected tabs = computed(() => this.createTabs(this.entitiesData()));
+
+  protected selectedTab = model<string | undefined>(undefined);
+
+  protected readonly tableContext = computed(() => {
+    const entity = this.selectedTab();
+    const dataSources = this.dataSources();
+    if (!entity || !dataSources?.[entity]) {
+      return undefined;
+    }
+    const dataSource = dataSources[entity];
+    return {
+      entity,
+      dataSource,
+    };
   });
 
-  protected selectedTab = model<AutomationPackageEntityKey | undefined>(undefined);
+  protected readonly dataSource = computed(() => {
+    const selectedTab = this.selectedTab();
+    const dataSources = this.dataSources();
+    return selectedTab ? dataSources?.[selectedTab] : undefined;
+  });
 
   private effectInitializeTab = effect(
     () => {
@@ -90,5 +96,19 @@ export class AutomationPackageEntitiesDialogComponent {
     { allowSignalWrites: true },
   );
 
-  protected readonly AutomationPackageEntityKey = AutomationPackageEntityKey;
+  private createTabs(entitiesData: EntitiesDictionary): Tab<string>[] {
+    const registeredEntitiesKeys = this._entityTablesRegistry.getItemInfos().map((item) => item.type);
+    const predefinedTabs = MAIN_TABS_ORDER.filter((item) => registeredEntitiesKeys.includes(item)) as string[];
+    const remain = registeredEntitiesKeys.filter((item) => !predefinedTabs.includes(item));
+    const tabsOrder = [...predefinedTabs, ...remain];
+    return tabsOrder
+      .filter((key) => !!entitiesData[key])
+      .map((key) => {
+        const info = this._entityTablesRegistry.getItemInfo(key);
+        return {
+          id: key,
+          label: info?.label ?? key,
+        } as Tab<string>;
+      });
+  }
 }

@@ -21,7 +21,7 @@
         <step-drag-column-caption>Key</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        <step-parameters-key [context]="element" />
+        <step-parameters-key [parameter]="element" [noLink]="true" />
       </td>
     </ng-container>
     <ng-container matColumnDef="value" stepActivityCol="Value" stepSearchCol>

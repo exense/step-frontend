@@ -1,6 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import {
   AbstractOrganizableObject,
+  CustomComponent,
   tableColumnsConfigProvider,
   TableDataSource,
   TablePersistenceStateService,
@@ -23,6 +24,15 @@ import { StepCommonModule } from '../../../_common/step-common.module';
     }),
   ],
 })
-export class TableParametersComponent {
-  readonly dataSource = input.required<TableDataSource<AbstractOrganizableObject>>();
+export class TableParametersComponent implements CustomComponent {
+  protected readonly dataSource = signal<TableDataSource<AbstractOrganizableObject> | undefined>(undefined);
+
+  context?: TableDataSource<AbstractOrganizableObject>;
+
+  contextChange(
+    previousContext?: TableDataSource<AbstractOrganizableObject>,
+    currentContext?: TableDataSource<AbstractOrganizableObject>,
+  ) {
+    this.dataSource.set(currentContext);
+  }
 }
