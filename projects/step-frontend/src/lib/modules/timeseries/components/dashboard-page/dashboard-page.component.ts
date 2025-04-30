@@ -10,6 +10,7 @@ import {
   Signal,
   signal,
   untracked,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import {
@@ -64,6 +65,8 @@ export class DashboardPageComponent implements OnInit {
   private _dashboardService = inject(DashboardsService);
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
+
+  private dashboardComponent = viewChild(DashboardComponent);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
@@ -130,6 +133,16 @@ export class DashboardPageComponent implements OnInit {
       }
     });
     this.subscribeToUrlNavigation();
+  }
+
+  handleDashboardUpdate(dashboard: DashboardView) {
+    // this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
+    const mergedDashboard: DashboardView = {
+      ...dashboard,
+      attributes: this.dashboard!()!.attributes,
+      description: this.dashboard!()!.description,
+    };
+    this._dashboardService.saveDashboard(mergedDashboard).subscribe((response) => {});
   }
 
   handleZoomChange() {}

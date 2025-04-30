@@ -137,6 +137,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly zoomChange = output<TimeRange>();
   readonly zoomReset = output<void>();
   readonly fullRangeUpdateRequest = output<TimeRange>();
+  readonly dashboardUpdate = output<DashboardView>();
 
   private exportInProgress = false;
   dashboard!: DashboardView;
@@ -272,8 +273,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return apiFilter;
       }) || [];
 
-    this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
-    this.mainEngine.refreshAllCharts(false, true);
+    this.dashboardUpdate.emit(this.dashboard);
+    // this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
+    // this.mainEngine.refreshAllCharts(false, true);
   }
 
   addTableDashlet(metric: MetricType) {
