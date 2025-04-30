@@ -1,21 +1,8 @@
 <ng-template #tplLabel>
   @if (hasLabel()) {
-    @if (labelExpression(); as labelExpression) {
-      @if (isLabelResolved()) {
-        <step-icon
-          name="zap"
-          class="resolved"
-          [matTooltip]="labelExpression | truncateString: 100"
-          matTooltipPosition="below"
-          (click)="displayText($event, labelExpression)"
-        />
-      } @else {
-        <step-icon name="zap" class="not-resolved" (click)="displayText($event, labelExpression)" />
-      }
-    }
-    <label [class.not-resolved]="!isLabelResolved()" [matTooltip]="labelTooltip()" matTooltipPosition="below">
+    <label [class.not-resolved-text]="!isLabelResolved()">
       {{ itemLabel() }}
-      @if (!isValueFirst()) {
+      @if (showColon()) {
         {{ ':' }}
       }
     </label>
@@ -23,20 +10,7 @@
 </ng-template>
 <ng-template #tplValue>
   @if (hasValue()) {
-    @if (valueExpression(); as valueExpression) {
-      @if (isValueResolved()) {
-        <step-icon
-          name="zap"
-          class="resolved"
-          [matTooltip]="valueExpression | truncateString: 100"
-          matTooltipPosition="below"
-          (click)="displayText($event, valueExpression)"
-        />
-      } @else {
-        <step-icon name="zap" class="not-resolved" (click)="displayText($event, valueExpression)" />
-      }
-    }
-    <span [class.not-resolved]="!isValueResolved()" [matTooltip]="valueTooltip()" matTooltipPosition="below">
+    <span [class.not-resolved-text]="!isValueResolved()">
       {{ itemValue() }}
     </span>
   }
@@ -45,16 +19,64 @@
   @if (prefix(); as prefix) {
     <span>{{ prefix }}</span>
   }
-  <section [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
+  <section class="field-content" [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
     @if (icon(); as icon) {
       <step-icon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
     }
-    @if (isValueFirst()) {
-      <ng-container *ngTemplateOutlet="tplValue" />
-      <ng-container *ngTemplateOutlet="tplLabel" />
+    @if (hasDynamicExpression()) {
+      <step-popover [mode]="PopoverMode.HOVER" yPosition="below">
+        <section class="field-content">
+          @if (isValueFirst()) {
+            <ng-container *ngTemplateOutlet="tplValue" />
+            <ng-container *ngTemplateOutlet="tplLabel" />
+          } @else {
+            <ng-container *ngTemplateOutlet="tplLabel" />
+            <ng-container *ngTemplateOutlet="tplValue" />
+          }
+        </section>
+        <step-popover-content>
+          <section class="step-artefact-inline-field__expression-popover">
+            @if (labelExpression(); as labelExpression) {
+              <div>
+                <label>label:</label>
+                <step-icon name="zap" />
+                @if (isLabelResolved()) {
+                  <span>{{ itemLabel() }}</span>
+                } @else {
+                  <i>unresolved</i>
+                }
+              </div>
+              <div>
+                <label>label expression:</label>
+                <span class="step-artefact-inline-field__expression">{{ labelExpression }}</span>
+              </div>
+            }
+            @if (valueExpression(); as valueExpression) {
+              <div>
+                <label>value:</label>
+                <step-icon name="zap" />
+                @if (isValueResolved()) {
+                  <span>{{ itemValue() }}</span>
+                } @else {
+                  <i>unresolved</i>
+                }
+              </div>
+              <div>
+                <label>expression:</label>
+                <span class="step-artefact-inline-field__expression">{{ valueExpression }}</span>
+              </div>
+            }
+          </section>
+        </step-popover-content>
+      </step-popover>
     } @else {
-      <ng-container *ngTemplateOutlet="tplLabel" />
-      <ng-container *ngTemplateOutlet="tplValue" />
+      @if (isValueFirst()) {
+        <ng-container *ngTemplateOutlet="tplValue" />
+        <ng-container *ngTemplateOutlet="tplLabel" />
+      } @else {
+        <ng-container *ngTemplateOutlet="tplLabel" />
+        <ng-container *ngTemplateOutlet="tplValue" />
+      }
     }
   </section>
   <div class="ellipsis">...</div>

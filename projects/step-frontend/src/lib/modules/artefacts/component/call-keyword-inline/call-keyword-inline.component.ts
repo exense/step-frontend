@@ -44,12 +44,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     if (!keywordInputs) {
       return undefined;
     }
-    const inputs: ArtefactInlineItemSource = Object.entries(keywordInputs).map(([label, value]) => [
-      label,
-      value,
-      'log-in',
-      'Input',
-    ]);
+    const inputs: ArtefactInlineItemSource = Object.entries(keywordInputs).map(([label, value]) => [label, value]);
 
     return this._artefactInlineUtils.convert(inputs);
   }
@@ -62,16 +57,12 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     if (!resolvedInputs) {
       return undefined;
     }
-    const icon = 'log-in';
-    const iconTooltip = 'Input';
     const inputValues: ArtefactInlineItemSource = Object.entries(resolvedInputs).map(([label, value]) => {
       const valueExplicitExpression = artefactInputs?.[label]?.expression;
       return {
         label,
         value,
         valueExplicitExpression,
-        icon,
-        iconTooltip,
       };
     });
 
@@ -83,12 +74,7 @@ export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<Keyw
     if (!outputParams) {
       return undefined;
     }
-    const outputValues: ArtefactInlineItemSource = Object.entries(outputParams).map(([key, value]) => [
-      key,
-      value,
-      'log-out',
-      'Output',
-    ]);
+    const outputValues: ArtefactInlineItemSource = Object.entries(outputParams).map(([key, value]) => [key, value]);
     return this._artefactInlineUtils.convert(outputValues);
   }
 }

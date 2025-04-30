@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { ArtefactService } from '../../injectables/artefact.service';
 import { AbstractArtefact, ReportNode } from '../../../../client/step-client-module';
 import { AggregatedArtefactInfo } from '../../types/artefact-types';
@@ -13,6 +13,7 @@ import { CustomRegistriesModule } from '../../../custom-registeries/custom-regis
   },
   imports: [CustomRegistriesModule],
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
 })
 export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode> {
   private _artefactService = inject(ArtefactService);

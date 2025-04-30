@@ -5,6 +5,37 @@
 @mixin execution-shared-styles {
   @include execution-report-node-inline-details;
   @include execution-report-node-details;
+
+  /*
+  .smaller-view {
+    font-size: 1.1rem;
+    step-icon {
+      @include core.step-icon-size(1.5rem, true);
+    }
+  }
+  .larger-view {
+    font-size: 1.3rem;
+    step-icon {
+      @include core.step-icon-size(1.7rem, true);
+    }
+  }
+
+  step-icon.larger-icon {
+    @include core.step-icon-size(1.7rem, true);
+  }
+  */
+  .smaller-view {
+  }
+  .larger-view {
+    font-size: 1.4rem;
+    step-icon {
+      @include core.step-icon-size(1.8rem, true);
+    }
+  }
+
+  step-icon.larger-icon {
+    @include core.step-icon-size(1.8rem, true);
+  }
 }
 
 @mixin execution-report-node-inline-details {
@@ -55,6 +86,14 @@
       display: none;
     }
 
+    .container-title {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
     .json-container {
       position: relative;
       min-height: 2rem;
@@ -84,7 +123,7 @@
         }
       }
 
-      .tech-details > .tech-details-content {
+      &.tech-details > .tech-details-content {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 1rem;

@@ -6,6 +6,7 @@ import { ReportDetailsErrorComponent } from './components/report-details-error/r
 import { ReportDetailsAttachmentsComponent } from './components/report-details-attachments/report-details-attachments.component';
 import { ArtefactInlineFieldComponent } from './components/artefact-inline-field/artefact-inline-field.component';
 import { ArtefactInlineFieldListComponent } from './components/artefact-inline-field-list/artefact-inline-field-list.component';
+import { ArtefactInlineFieldListPrefixDirective } from './directives/artefact-inline-field-list-prefix.directive';
 
 export * from './components/base-inline-artefact.component';
 export * from './components/base-inline-artefact-legacy.component';
@@ -26,6 +27,7 @@ export * from './injectables/artefacts-factory.service';
 export * from './injectables/artefact-refresh-notification.service';
 export * from './injectables/artefact-inline-item-utils.service';
 export * from './injectables/artefact-inline-items-builder.service';
+export * from './directives/artefact-inline-field-list-prefix.directive';
 
 export const ARTEFACTS_COMMON_EXPORTS = [
   ArtefactInlineDetailsComponent,
@@ -36,4 +38,5 @@ export const ARTEFACTS_COMMON_EXPORTS = [
   ReportDetailsAttachmentsComponent,
   ArtefactInlineFieldComponent,
   ArtefactInlineFieldListComponent,
+  ArtefactInlineFieldListPrefixDirective,
 ];
