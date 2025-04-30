@@ -1,21 +1,13 @@
-@switch (attachmentType()) {
-  @case (AttachmentType.IMG) {
-    <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
-  }
-  @case (AttachmentType.TEXT) {
-    <div class="file-info">
-      <step-icon name="file" />
-    </div>
-  }
-  @case (AttachmentType.VIDEO) {
-    <div class="file-info">
-      <step-icon name="film" />
-    </div>
-  }
-  @default {
-    <div class="file-info">
-      <step-icon name="paperclip" />
-    </div>
+@if (attachmentType(); as attachmentType) {
+  @switch (attachmentType) {
+    @case (AttachmentType.IMG) {
+      <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
+    }
+    @default {
+      <div class="file-info">
+        <step-icon [name]="attachmentType | attachmentTypeIcon" />
+      </div>
+    }
   }
 }
 <div

@@ -1,4 +1,19 @@
-<step-modal-window [title]="_data.name!">
+<step-modal-window>
+  <div step-modal-window-title>
+    <div>{{ _data.name }}</div>
+    @if (attachmentType === AttachmentType.TEXT) {
+      <button
+        type="button"
+        tabindex="-1"
+        mat-icon-button
+        matTooltip="Copy all"
+        matTooltipPosition="below"
+        (click)="copyTextContentToClipboard()"
+      >
+        <step-icon name="copy" />
+      </button>
+    }
+  </div>
   <div step-modal-window-body>
     @switch (attachmentType) {
       @case (AttachmentType.IMG) {

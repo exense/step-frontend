@@ -38,6 +38,19 @@ export class AttachmentUtilsService {
     return AttachmentType.DEFAULT;
   }
 
+  determineAttachmentTypeIcon(attachmentType: AttachmentType): string {
+    switch (attachmentType) {
+      case AttachmentType.TEXT:
+        return 'file';
+      case AttachmentType.IMG:
+        return 'image';
+      case AttachmentType.VIDEO:
+        return 'film';
+      default:
+        return 'paperclip';
+    }
+  }
+
   downloadAttachment(attachment?: AttachmentMeta): void {
     if (!attachment) {
       return;

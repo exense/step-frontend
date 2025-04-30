@@ -17,19 +17,9 @@
                       [withBorder]="false"
                     />
                   }
-                  @case (AttachmentType.TEXT) {
-                    <step-attachment-preview [attachment]="att" [showDownload]="false" [withBorder]="false" />
-                  }
                   @default {
                     <div class="default-attachment-popover-view">
-                      @switch (att | attachmentType) {
-                        @case (AttachmentType.VIDEO) {
-                          <step-icon name="film" />
-                        }
-                        @default {
-                          <step-icon name="paperclip" />
-                        }
-                      }
+                      <step-icon [name]="att | attachmentType | attachmentTypeIcon" />
                       <span>{{ att.name }}</span>
                     </div>
                   }

@@ -1,5 +1,5 @@
 export enum AttachmentType {
-  DEFAULT,
+  DEFAULT = 1,
   IMG,
   TEXT,
   VIDEO,

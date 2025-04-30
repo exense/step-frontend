@@ -6,11 +6,12 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { NgOptimizedImage } from '@angular/common';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
+import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 
 @Component({
   selector: 'step-attachment-preview',
   standalone: true,
-  imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage],
+  imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage, AttachmentTypeIconPipe],
   templateUrl: './attachment-preview.component.html',
   styleUrl: './attachment-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

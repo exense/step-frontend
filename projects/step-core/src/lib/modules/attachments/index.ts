@@ -9,12 +9,14 @@ import { AttachmentPreviewComponent } from './components/attachment-preview/atta
 import { AttachmentPreviewListComponent } from './components/attachment-preview-list/attachment-preview-list.component';
 import { AttachmentDialogComponent } from './components/attachment-dialog/attachment-dialog.component';
 import { AttachmentTypePipe } from './pipes/attachment-type.pipe';
+import { AttachmentTypeIconPipe } from './pipes/attachment-type-icon.pipe';
 
 export * from './pipes/attachment-is-image.pipe';
 export * from './pipes/attachment-is-text.pipe';
 export * from './pipes/attachment-show-label.pipe';
 export * from './pipes/attachment-url.pipe';
 export * from './pipes/attachment-type.pipe';
+export * from './pipes/attachment-type-icon.pipe';
 export * from './components/legacy-attachment-preview/legacy-attachment-preview.component';
 export * from './components/legacy-attachments/legacy-attachments.component';
 export * from './components/legacy-attachments-preview/legacy-attachments-preview.component';
@@ -35,4 +37,5 @@ export const ATTACHMENTS_EXPORTS = [
   AttachmentPreviewListComponent,
   AttachmentDialogComponent,
   AttachmentTypePipe,
+  AttachmentTypeIconPipe,
 ];
