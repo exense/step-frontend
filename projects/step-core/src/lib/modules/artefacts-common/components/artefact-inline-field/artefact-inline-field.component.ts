@@ -12,6 +12,9 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'highlight-inline-item',
+  },
 })
 export class ArtefactInlineFieldComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
