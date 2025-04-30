@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
 import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
+
+const DEFAULT_MARGIN = '0.5rem';
 
 @Component({
   selector: 'step-artefact-inline-field',
@@ -12,6 +13,9 @@ import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.modul
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[style.--item-margin]': 'margin()',
+  },
 })
 export class ArtefactInlineFieldComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
@@ -36,6 +40,8 @@ export class ArtefactInlineFieldComponent {
   protected readonly isLabelResolved = computed(() => !!this.label()?.isResolved);
   protected readonly isValueResolved = computed(() => !!this.value()?.isResolved);
 
+  protected readonly margin = computed(() => this.item()?.margin ?? DEFAULT_MARGIN);
+
   // todo remove
   protected readonly labelTooltip = computed(() => this.label()?.tooltip ?? '');
 
@@ -43,6 +49,11 @@ export class ArtefactInlineFieldComponent {
   protected readonly valueTooltip = computed(() => this.value()?.tooltip ?? '');
 
   protected readonly isValueFirst = computed(() => this.item()?.isValueFirst ?? false);
+  protected readonly showColon = computed(() => {
+    const isValueFirst = this.isValueFirst();
+    const hideColon = this.item()?.hideColon ?? false;
+    return !isValueFirst && !hideColon;
+  });
 
   protected readonly hasDynamicExpression = computed(() => {
     const labelExpression = this.labelExpression();

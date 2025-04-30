@@ -14,6 +14,8 @@ export interface ArtefactInlineItem {
   label?: ArtefactInlineItemsResolvableField;
   value?: ArtefactInlineItemsResolvableField;
   isValueFirst?: boolean;
+  hideColon?: boolean;
+  margin?: string;
   prefix?: string;
   suffix?: string;
 }

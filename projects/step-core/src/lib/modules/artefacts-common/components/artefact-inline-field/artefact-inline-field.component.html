@@ -2,7 +2,7 @@
   @if (hasLabel()) {
     <label [class.not-resolved-text]="!isLabelResolved()">
       {{ itemLabel() }}
-      @if (!isValueFirst()) {
+      @if (showColon()) {
         {{ ':' }}
       }
     </label>

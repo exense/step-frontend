@@ -6,15 +6,18 @@ step-artefact-inline-field-list {
 
   section.list {
     display: flex;
-    gap: 0.5rem;
 
     &.vertical {
-      gap: 0.5rem;
       flex-direction: column;
       width: 100%;
 
-      step-artefact-inline-field section {
-        max-width: unset;
+      step-artefact-inline-field {
+        &:not(:last-child) {
+          margin-bottom: var(--item-margin, 0);
+        }
+        section {
+          max-width: unset;
+        }
       }
     }
 
@@ -24,8 +27,13 @@ step-artefact-inline-field-list {
 
     &:not(.vertical) {
       align-items: center;
-      step-artefact-inline-field step-icon.field-icon {
-        @include core.step-icon-size(1.6rem);
+      step-artefact-inline-field {
+        &:not(:last-child) {
+          margin-right: var(--item-margin, 0);
+        }
+        step-icon.field-icon {
+          @include core.step-icon-size(1.6rem);
+        }
       }
     }
   }
