@@ -11,6 +11,9 @@ export class ExecutionNamePipe implements PipeTransform {
   }
 
   static transform(execution: Execution): string {
-    return execution.description ?? `unnamed (${execution.id})`;
+    if (!execution.description || execution.description === '') {
+      return `unnamed (${execution.id})`;
+    }
+    return execution.description;
   }
 }
