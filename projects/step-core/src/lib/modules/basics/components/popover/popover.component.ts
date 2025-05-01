@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   forwardRef,
@@ -56,6 +57,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   readonly xPosition = input<MatMenu['xPosition']>('after');
   readonly yPosition = input<MatMenu['yPosition']>('above');
   readonly noPadding = input(false);
+  readonly withBorder = input(false);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
 
   readonly toggledEvent = output<boolean>();
@@ -68,6 +70,11 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   private isPopoverFrozen = false;
 
   protected isMouseOverPopover = false;
+
+  protected readonly popoverClass = computed(() => {
+    const withBorder = this.withBorder();
+    return withBorder ? 'step-popover-menu with-border' : 'step-popover-menu';
+  });
 
   ngAfterViewInit(): void {
     this.setupClosePopoverOnScroll();
@@ -104,7 +111,6 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   }
 
   protected handleClick($event: MouseEvent): void {
-    console.log($event);
     if (this.mode() === PopoverMode.HOVER) {
       return;
     }

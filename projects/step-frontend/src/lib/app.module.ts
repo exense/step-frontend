@@ -23,10 +23,12 @@ import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './modules/automation-packages';
+import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 
 Settings.defaultLocale = 'en';
 
-const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER];
+const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
+
 
 @NgModule({
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
@@ -34,6 +36,7 @@ const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER];
     StepCommonModule,
     BrowserModule,
     StepCoreModule,
+    ...ERRORS_VIEW_IMPORTS,
     AdminModule,
     PlanModule,
     FunctionModule,
