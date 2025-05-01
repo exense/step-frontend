@@ -1,9 +1,8 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { ErrorMessageHandlerService, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DEFAULT_PAGE } from '../modules/routing';
 
 type EntityEditLink = Parameters<MultipleProjectsService['confirmEntityEditInASeparateProject']>[1];
@@ -21,7 +20,7 @@ export const checkEntityGuardFactory =
   (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const _auth = inject(AuthService);
     const _multipleProjects = inject(MultipleProjectsService);
-    const _snackBar = inject(MatSnackBar);
+    const _errorMessageHandler = inject(ErrorMessageHandlerService);
     const _injector = inject(Injector);
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
@@ -40,7 +39,7 @@ export const checkEntityGuardFactory =
     return entity$.pipe(
       switchMap((entity) => {
         if (!entity) {
-          _snackBar.open(`Entity "${config.entityType}" with id "${id}" doesn't exist`, 'dismiss');
+          _errorMessageHandler.showError(`Entity "${config.entityType}" with id "${id}" doesn't exist`);
           return of(false);
         }
 

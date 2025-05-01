@@ -1,0 +1,26 @@
+step-error-view-dialog {
+  max-width: 60rem;
+  display: block !important;
+  .error-container {
+    max-height: 30rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  step-alert {
+    margin-bottom: 0 !important;
+  }
+
+  .error-content {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  div[step-modal-window-body],
+  div[mat-dialog-content] {
+    padding-bottom: 0 !important;
+  }
+}

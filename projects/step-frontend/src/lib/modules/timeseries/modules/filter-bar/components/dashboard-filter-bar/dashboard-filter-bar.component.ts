@@ -16,6 +16,16 @@ import {
 } from '@angular/core';
 import { debounceTime, Observable, Subject, take, takeUntil } from 'rxjs';
 import { Execution, MetricAttribute, OQLVerifyResponse, Tab, TimeRange, TimeSeriesService } from '@exense/step-core';
+import { debounceTime, Observable, Subject } from 'rxjs';
+import {
+  ErrorMessageHandlerService,
+  Execution,
+  MetricAttribute,
+  OQLVerifyResponse,
+  Tab,
+  TimeRange,
+  TimeSeriesService,
+} from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   COMMON_IMPORTS,
@@ -31,9 +41,9 @@ import {
   TsFilteringSettings,
   TsGroupingComponent,
 } from '../../../_common';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
@@ -55,7 +65,6 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   standalone: true,
   imports: [
     COMMON_IMPORTS,
-    DiscoverComponent,
     PerformanceViewTimeSelectionComponent,
     TimeRangePickerComponent,
     TsGroupingComponent,
@@ -116,7 +125,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
-  private _snackbar = inject(MatSnackBar);
+  private _errorMessageHandler = inject(ErrorMessageHandlerService);
 
   ngOnInit(): void {
     const contextInput = this.context();
@@ -282,7 +291,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const existingItems = this._internalFilters.filter((filterItem) => filterItem.attributeName === item.attributeName);
     if (existingItems.length > 1) {
       // the filter is duplicated
-      this._snackbar.open('Filter not applied', 'dismiss');
+      this._errorMessageHandler.showError('Filter not applied');
       this.removeFilterItem(index);
       return;
     }
