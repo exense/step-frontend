@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  output,
   Output,
   SimpleChanges,
   ViewChild,
@@ -111,10 +112,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
 
-  @Output() remove = new EventEmitter();
-  @Output() shiftLeft = new EventEmitter();
-  @Output() shiftRight = new EventEmitter();
-  @Output() zoomReset = new EventEmitter<void>();
+  readonly remove = output();
+  readonly shiftLeft = output();
+  readonly shiftRight = output();
+  readonly zoomReset = output();
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -204,10 +205,8 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   handleZoomReset() {
     this.context.setChartsLockedState(false);
-    this.zoomReset.next();
+    this.zoomReset.emit();
   }
-
-  handleZoomChange(range: TimeRange) {}
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;

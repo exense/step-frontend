@@ -5,7 +5,6 @@
     <step-timeseries-chart
       #chart
       (zoomReset)="handleZoomReset()"
-      (zoomChange)="handleZoomChange($event)"
       [syncKey]="context.id"
       [settings]="_internalSettings!"
       (lockStateChange)="handleLockStateChange($event)"

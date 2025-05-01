@@ -39,14 +39,10 @@ export class AltExecutionReportComponent {
   protected readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
-  protected _cd = inject(ChangeDetectorRef);
-  private _destroyRef = inject(DestroyRef);
 
   protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
-
-  private _urlParamsService = inject(DashboardUrlParamsService);
 
   protected handleOpenNodeInTreePage(keyword: ReportNode): void {
     const reportNodeId = keyword.id;

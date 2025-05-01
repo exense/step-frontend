@@ -1,4 +1,4 @@
-@if (execution() && timeRange() && !isLoading) {
+@if (execution() && timeRange() && !isLoading()) {
   <div class="header">
     <step-time-range-picker
       [activeSelection]="activeTimeRangeSelection()!"

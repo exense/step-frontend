@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ExecutionStateService } from '../../services/execution-state.service';
+import { CustomComponent } from '@exense/step-core';
 
 /**
  * This class is just responsible to pass the execution input to the execution view so it can react its changes.
@@ -9,7 +10,7 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   templateUrl: './dashlet-execution-viz.component.html',
   styleUrls: ['./dashlet-execution-viz.component.scss'],
 })
-export class DashletExecutionVizComponent {
+export class DashletExecutionVizComponent implements CustomComponent {
   _state = inject(ExecutionStateService);
   context?: any;
 }

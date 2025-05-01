@@ -26,7 +26,6 @@ import { AuthService, DashboardsService, DashboardView, Execution, TimeRange } f
 export class LegacyExecutionViewComponent implements OnInit {
   execution = input.required<Execution>();
 
-  private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   private _changeDetectorRef = inject(ChangeDetectorRef);
@@ -41,7 +40,7 @@ export class LegacyExecutionViewComponent implements OnInit {
 
   dashboardId!: string;
   dashboard!: DashboardView;
-  isLoading = false;
+  isLoading = signal<boolean>(false);
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
     console.log('time ranged changed');
@@ -133,7 +132,7 @@ export class LegacyExecutionViewComponent implements OnInit {
         ),
       )
       .subscribe(() => {
-        this.isLoading = true;
+        this.isLoading.set(true);
         let urlParams = this._urlParamsService.collectUrlParams();
         this._changeDetectorRef.detectChanges();
         if (urlParams.timeRange?.type === 'RELATIVE') {
@@ -141,7 +140,7 @@ export class LegacyExecutionViewComponent implements OnInit {
           urlParams.timeRange = this.findRelativeTimeOption(urlParams.timeRange!.relativeSelection!.timeInMs);
         }
         this.activeTimeRangeSelection.set(urlParams.timeRange!);
-        this.isLoading = false;
+        this.isLoading.set(false);
       });
   }
 }

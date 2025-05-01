@@ -40,7 +40,7 @@ import {
   TimeRange,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -185,6 +185,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
   );
 
+  protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
+
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
     .subscribe((activeExecution) => {
@@ -214,11 +216,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     )
     .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
       // analytics tab is handling events itself
-      this.isAnalyticsRoute$.pipe(take(1)).subscribe((analyticsPage) => {
-        if (!analyticsPage) {
-          this._urlParamsService.patchUrlParams(range, undefined, isFirst);
-        }
-      });
+      let analyticsRoute = this.isAnalyticsRoute();
+      if (!analyticsRoute) {
+        this._urlParamsService.patchUrlParams(range, undefined, isFirst);
+      }
     });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
@@ -411,14 +412,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       )
       .subscribe(() => {
         // analytics tab is handling events itself
-        this.isAnalyticsRoute$.pipe(take(1)).subscribe((analyticsRoute) => {
-          if (!analyticsRoute) {
-            let urlParams = this._urlParamsService.collectUrlParams();
-            if (urlParams.timeRange) {
-              this.updateTimeRangeSelection(urlParams.timeRange);
-            }
+        const isAnalytics = this.isAnalyticsRoute();
+        if (!isAnalytics) {
+          let urlParams = this._urlParamsService.collectUrlParams();
+          if (urlParams.timeRange) {
+            this.updateTimeRangeSelection(urlParams.timeRange);
           }
-        });
+        }
       });
   }
 
