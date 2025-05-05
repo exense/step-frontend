@@ -75,7 +75,7 @@ export class AltExecutionReportComponent {
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
-    this.treeWidget()?.focusNode(node.artefactID!);
+    this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
 
   handleChartZooming(range: TimeRange) {
