@@ -37,6 +37,7 @@ enum ActiveLabels {
       entityTableRemoteId: AugmentedSchedulerService.TASKS_TABLE_ID,
       entityScreenId: 'executionParameters',
       entityScreenSubPath: 'executionsParameters.customParameters',
+      allowDefaultVisibilityConfiguration: true,
     }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),

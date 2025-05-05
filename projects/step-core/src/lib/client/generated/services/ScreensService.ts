@@ -172,10 +172,10 @@ export class ScreensService {
 
   /**
    * @param requestBody
-   * @returns any default response
+   * @returns ScreenInput default response
    * @throws ApiError
    */
-  public saveInput(requestBody?: ScreenInput): Observable<any> {
+  public saveInput(requestBody?: ScreenInput): Observable<ScreenInput> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/screens/input',

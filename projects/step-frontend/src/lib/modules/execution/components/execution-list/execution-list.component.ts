@@ -27,6 +27,7 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
       entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
       entityScreenId: 'executionParameters',
       entityScreenSubPath: 'executionParameters.customParameters',
+      allowDefaultVisibilityConfiguration: true,
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),

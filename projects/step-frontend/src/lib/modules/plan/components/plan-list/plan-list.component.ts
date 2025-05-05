@@ -26,6 +26,7 @@ import { Router } from '@angular/router';
       entityTableRemoteId: AugmentedPlansService.PLANS_TABLE_ID,
       entityScreenId: 'plan',
       entityScreenDefaultVisibleFields: ['attributes.name'],
+      allowDefaultVisibilityConfiguration: true,
     }),
     tablePersistenceConfigProvider('planList', STORE_ALL),
     ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),

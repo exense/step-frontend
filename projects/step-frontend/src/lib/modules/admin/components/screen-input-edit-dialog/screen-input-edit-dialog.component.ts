@@ -1,11 +1,16 @@
 import { Component, DestroyRef, HostBinding, inject } from '@angular/core';
-import { AugmentedScreenService, DialogRouteResult, Input as SInput } from '@exense/step-core';
+import {
+  AugmentedScreenService,
+  DialogRouteResult,
+  Input as SInput,
+  TableColumnsDefaultVisibilityService,
+} from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
 import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { of, switchMap } from 'rxjs';
 
 type InputType = SInput['type'];
 type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>;
@@ -21,17 +26,21 @@ export class ScreenInputEditDialogComponent {
   private _dialogData = inject<ScreenInputEditDialogData>(MAT_DIALOG_DATA);
   private _destroyRef = inject(DestroyRef);
   private _route = inject(ActivatedRoute);
+  private _tableColumnsDefaultVisibility = inject(TableColumnsDefaultVisibilityService);
   protected screenInput = this._dialogData.screenInput;
-  readonly modalTitle = `${!!this.screenInput.id ? 'Edit' : 'New'} Input`;
+  private isNew = !this.screenInput?.id;
+  readonly modalTitle = `${this.isNew ? 'New' : 'Edit'} Input`;
   readonly ALLOWED_TYPES: InputType[] = ['DROPDOWN', 'TEXT', 'CHECKBOX'];
 
   protected showAdvanced = false;
+  protected inProgress = false;
 
   readonly customUIComponentsFormatter = CUSTOM_UI_COMPONENTS_FORMATTER;
   readonly activationExpressionFormatter = EXPRESSION_SCRIPT_FORMATTER;
 
   @HostBinding('keydown.enter')
   save(): void {
+    this.inProgress = true;
     this._route.queryParams
       .pipe(
         takeUntilDestroyed(this._destroyRef),
@@ -39,7 +48,16 @@ export class ScreenInputEditDialogComponent {
           this.screenInput.position = data['nextIndex'];
           return this._screenApi.saveInput(this.screenInput);
         }),
+        switchMap((savedInput) => {
+          if (!this.isNew) {
+            return of(undefined);
+          }
+          return this._tableColumnsDefaultVisibility.setupDefaultVisibilityForScreenInputColumn(savedInput);
+        }),
       )
-      .subscribe(() => this._matDialogRef.close({ isSuccess: true }));
+      .subscribe({
+        next: () => this._matDialogRef.close({ isSuccess: true }),
+        complete: () => (this.inProgress = false),
+      });
   }
 }

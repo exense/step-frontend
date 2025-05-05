@@ -4,6 +4,7 @@ import { AlertType } from '../../types/alert-type.enum';
 
 export interface ConfirmationDialogData {
   message: string;
+  alertType?: AlertType;
 }
 
 export type ConfirmationDialogResult = boolean | undefined;
@@ -17,7 +18,7 @@ export class ConfirmationDialogComponent {
   private _dialogRef = inject<MatDialogRef<ConfirmationDialogComponent, ConfirmationDialogResult>>(MatDialogRef);
 
   readonly dialogData = inject<ConfirmationDialogData>(MAT_DIALOG_DATA);
-  readonly AlertType = AlertType;
+  readonly alertType = this.dialogData.alertType ?? AlertType.DANGER;
 
   @HostListener('keydown.enter')
   onSubmit(): void {
