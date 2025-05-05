@@ -1,9 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
-  AbstractOrganizableObject,
+  AugmentedParametersService,
   CustomComponent,
   tableColumnsConfigProvider,
-  TableDataSource,
   TablePersistenceStateService,
 } from '@exense/step-core';
 import { ParameterModule } from '../../../parameter/parameter.module';
@@ -25,14 +24,21 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   ],
 })
 export class TableParametersComponent implements CustomComponent {
-  protected readonly dataSource = signal<TableDataSource<AbstractOrganizableObject> | undefined>(undefined);
+  private _parametersApi = inject(AugmentedParametersService);
 
-  context?: TableDataSource<AbstractOrganizableObject>;
+  private automationPackageId = signal<string | undefined>(undefined);
 
-  contextChange(
-    previousContext?: TableDataSource<AbstractOrganizableObject>,
-    currentContext?: TableDataSource<AbstractOrganizableObject>,
-  ) {
-    this.dataSource.set(currentContext);
+  protected readonly dataSource = computed(() => {
+    const automationPackageId = this.automationPackageId();
+    if (!automationPackageId) {
+      return undefined;
+    }
+    return this._parametersApi.createDataSource(automationPackageId);
+  });
+
+  context?: string;
+
+  contextChange(previousContext?: string, currentContext?: string) {
+    this.automationPackageId.set(currentContext);
   }
 }

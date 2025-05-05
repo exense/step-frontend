@@ -1,9 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
-  AbstractOrganizableObject,
+  AugmentedPlansService,
   CustomComponent,
   tableColumnsConfigProvider,
-  TableDataSource,
   TablePersistenceStateService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../../../_common/step-common.module';
@@ -25,14 +24,21 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   ],
 })
 export class TablePlansComponent implements CustomComponent {
-  protected readonly dataSource = signal<TableDataSource<AbstractOrganizableObject> | undefined>(undefined);
+  private _plansApi = inject(AugmentedPlansService);
 
-  context?: TableDataSource<AbstractOrganizableObject>;
+  private automationPackageId = signal<string | undefined>(undefined);
 
-  contextChange(
-    previousContext?: TableDataSource<AbstractOrganizableObject>,
-    currentContext?: TableDataSource<AbstractOrganizableObject>,
-  ) {
-    this.dataSource.set(currentContext);
+  protected readonly dataSource = computed(() => {
+    const automationPackageId = this.automationPackageId();
+    if (!automationPackageId) {
+      return undefined;
+    }
+    return this._plansApi.getPlansTableDataSource(automationPackageId);
+  });
+
+  context?: string;
+
+  contextChange(previousContext?: string, currentContext?: string) {
+    this.automationPackageId.set(currentContext);
   }
 }

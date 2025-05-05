@@ -1,11 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import {
-  AbstractOrganizableObject,
-  CustomRegistryService,
-  CustomRegistryType,
-  StepCoreModule,
-  TableDataSource,
-} from '@exense/step-core';
+import { CustomRegistryService, CustomRegistryType, StepCoreModule } from '@exense/step-core';
 
 @Component({
   selector: 'step-automation-package-entity-table',
@@ -19,7 +13,7 @@ export class AutomationPackageEntityTableComponent {
   private _customRegistry = inject(CustomRegistryService);
 
   readonly entityType = input.required<string>();
-  readonly dataSource = input.required<TableDataSource<AbstractOrganizableObject>>();
+  readonly automationPackageId = input.required<string>();
 
   protected readonly tableComponent = computed(() => {
     const entityType = this.entityType();

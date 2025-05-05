@@ -1,18 +1,16 @@
-<step-modal-window title="Automation Package's entities" [showSpinner]="inProgress()">
+<step-modal-window title="Automation Package's entities">
   <div step-modal-window-body>
-    @if (!inProgress()) {
-      <step-tabs
-        [tabs]="tabs()"
-        [shrink]="true"
-        [activeTabId]="selectedTab()"
-        (activeTabIdChange)="selectedTab.set($event)"
-      />
-      <div class="tab-content">
-        @if (tableContext(); as ctx) {
-          <step-automation-package-entity-table [entityType]="ctx.entity" [dataSource]="ctx.dataSource" />
-        }
-      </div>
-    }
+    <step-tabs
+      [tabs]="tabs"
+      [shrink]="true"
+      [activeTabId]="selectedTab()"
+      (activeTabIdChange)="selectedTab.set($event)"
+    />
+    <div class="tab-content">
+      @if (selectedTab(); as entity) {
+        <step-automation-package-entity-table [entityType]="entity" [automationPackageId]="_automationPackageId" />
+      }
+    </div>
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
