@@ -2,7 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import {
   AugmentedKeywordsService,
   CustomComponent,
+  STORE_ALL,
   tableColumnsConfigProvider,
+  tablePersistenceConfigProvider,
   TablePersistenceStateService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../../../_common/step-common.module';
@@ -14,6 +16,7 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   templateUrl: './table-keywords.component.html',
   styleUrl: './table-keywords.component.scss',
   providers: [
+    tablePersistenceConfigProvider('automationPackagesKeywordTable', STORE_ALL),
     TablePersistenceStateService,
     tableColumnsConfigProvider({
       entityTableRemoteId: 'automationPackagesKeywordTable',

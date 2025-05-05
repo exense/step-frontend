@@ -2,7 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import {
   AugmentedParametersService,
   CustomComponent,
+  STORE_ALL,
   tableColumnsConfigProvider,
+  tablePersistenceConfigProvider,
   TablePersistenceStateService,
 } from '@exense/step-core';
 import { ParameterModule } from '../../../parameter/parameter.module';
@@ -15,6 +17,7 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   templateUrl: './table-parameters.component.html',
   styleUrl: './table-parameters.component.scss',
   providers: [
+    tablePersistenceConfigProvider('automationPackageParameters', STORE_ALL),
     TablePersistenceStateService,
     tableColumnsConfigProvider({
       entityTableRemoteId: 'automationPackageParameters',

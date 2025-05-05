@@ -1,12 +1,5 @@
 <step-drag-drop-container>
-  <step-table
-    class="paddingless"
-    [dataSource]="dataSource()"
-    matSort
-    matSortActive="name"
-    matSortDirection="asc"
-    [matSortDisableClear]="true"
-  >
+  <step-table class="paddingless" [dataSource]="dataSource()" matSort [matSortDisableClear]="true">
     <step-entity-column-container entityName="functions" />
     <ng-container matColumnDef="actions" stepActionCol>
       <th mat-header-cell *matHeaderCellDef class="cell-actions">

@@ -2,7 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import {
   AugmentedSchedulerService,
   CustomComponent,
+  STORE_ALL,
   tableColumnsConfigProvider,
+  tablePersistenceConfigProvider,
   TablePersistenceStateService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../../../_common/step-common.module';
@@ -14,6 +16,7 @@ import { StepCommonModule } from '../../../_common/step-common.module';
   templateUrl: './table-tasks.component.html',
   styleUrl: './table-tasks.component.scss',
   providers: [
+    tablePersistenceConfigProvider('automationPackagesTasksTable', STORE_ALL),
     TablePersistenceStateService,
     tableColumnsConfigProvider({
       entityTableRemoteId: 'automationPackagesTasksTable',
