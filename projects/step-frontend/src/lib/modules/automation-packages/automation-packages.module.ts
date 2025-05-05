@@ -15,6 +15,7 @@ import { AutomationPackageUploadDialogComponent } from './components/automation-
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ExecutionModule } from '../execution/execution.module';
 import { AutomationPackageExecutionDialogComponent } from './components/automation-package-execution-dialog/automation-package-execution-dialog.component';
+import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
 
 @NgModule({
   declarations: [
@@ -28,8 +29,10 @@ export class AutomationPackagesModule {
   constructor(
     private _entityRegistry: EntityRegistry,
     private _viewRegistry: ViewRegistryService,
+    _automationPackagesBulkOperations: AutomationPackagesBulkOperationsRegisterService,
     private _infoBanner: InfoBannerService,
   ) {
+    _automationPackagesBulkOperations.register();
     this.registerEntities();
     this.registerRoutes();
     this.registerMenuEntries();
