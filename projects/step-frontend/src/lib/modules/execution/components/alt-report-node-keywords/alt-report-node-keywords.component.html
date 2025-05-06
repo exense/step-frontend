@@ -7,9 +7,15 @@
 >
   <step-alt-report-widget-filter>
     @if (hasTestCasesFilter()) {
-      <button type="button" class="clear-test-cases" mat-stroked-button (click)="clearTestCasesFilter()">
+      <button type="button" class="clear-btn-filter" mat-stroked-button (click)="clearTestCasesFilter()">
         <step-icon name="x" />
         <span>Clear test cases filter</span>
+      </button>
+    }
+    @if (hasKeywordFilter()) {
+      <button type="button" class="clear-btn-filter" mat-stroked-button (click)="clearKeywordsFilter()">
+        <step-icon name="x" />
+        <span>Keyword Calls</span>
       </button>
     }
   </step-alt-report-widget-filter>

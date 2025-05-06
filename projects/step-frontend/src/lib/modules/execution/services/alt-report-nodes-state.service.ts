@@ -94,6 +94,16 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     takeUntilDestroyed(),
   );
 
+  readonly reportNodeClassCtrl = this._fb.nonNullable.control<string | undefined>(undefined);
+  readonly reportNodeClassValue = toSignal(this.reportNodeClassCtrl.valueChanges, {
+    initialValue: this.reportNodeClassCtrl.value,
+  });
+  readonly reportNodeClass$ = this.reportNodeClassCtrl.valueChanges.pipe(
+    startWith(this.reportNodeClassCtrl.value),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
   readonly searchCtrl = this._fb.control<string>('');
 
   readonly search$ = this.searchCtrl.valueChanges.pipe(
@@ -113,8 +123,9 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.summaryInProgressInternal$.complete();
   }
 
-  updateStatusCtrl(statuses: Status[]): void {
+  updateStatusCtrl(statuses: Status[], reportNodeClass?: string): void {
     this.statusesCtrl.setValue(statuses);
+    this.reportNodeClassCtrl.setValue(reportNodeClass);
   }
 
   toggleFilterNonPassedAndNoRunning(): void {
@@ -222,6 +233,32 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.statusesCtrl.setValue(statuses);
   }
 
+  private reportNodeClassKey(executionId: string): string {
+    return `${executionId}_${this.storagePrefix}_reportNodeClass`;
+  }
+
+  private saveReportNodeClass(reportNodeClass?: string): void {
+    if (this.isIgnoreFilter) {
+      return;
+    }
+    const executionId = this._executionId();
+    if (executionId && reportNodeClass) {
+      this._executionStorage.setItem(this.reportNodeClassKey(executionId), reportNodeClass);
+    }
+  }
+
+  private restoreReportNodeClass(executionId: string, ignoreFilter?: boolean): void {
+    if (!executionId) {
+      return;
+    }
+    if (ignoreFilter) {
+      this.reportNodeClassCtrl.setValue('');
+      return;
+    }
+    const reportNodeClass = this._executionStorage.getItem(this.reportNodeClassKey(executionId));
+    this.reportNodeClassCtrl.setValue(reportNodeClass ?? '');
+  }
+
   private setupSyncWithStorage(): void {
     const executionId$ = this._executionState.executionId$.pipe(distinctUntilChanged());
     const isIgnoreFilter$ = this._viewAllService.isViewAll$;
@@ -230,11 +267,16 @@ export abstract class AltReportNodesStateService implements OnDestroy {
       .subscribe(([executionId, isIgnoreFilter]) => {
         this.restoreSearch(executionId, isIgnoreFilter);
         this.restoreStatues(executionId, isIgnoreFilter);
+        this.restoreReportNodeClass(executionId, isIgnoreFilter);
       });
 
     this.statusesCtrl.valueChanges
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((statuses) => this.saveStatuses(statuses));
+
+    this.reportNodeClassCtrl.valueChanges
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((reportNodeClass) => this.saveReportNodeClass(reportNodeClass));
 
     this.searchCtrl.valueChanges
       .pipe(debounceTime(200), takeUntilDestroyed(this._destroyRef))

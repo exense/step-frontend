@@ -1,4 +1,4 @@
-import { Component, inject, output, viewChild } from '@angular/core';
+import { Component, computed, inject, output, viewChild } from '@angular/core';
 import {
   AugmentedScreenService,
   ItemsPerPageService,
@@ -19,6 +19,7 @@ import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
+import { ReportNodeType } from '../../../report-nodes/report-nodes.module';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -54,6 +55,11 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected hasTestCasesFilter = toSignal(this._executionState.hasTestCasesFilter$, { initialValue: false });
 
+  protected hasKeywordFilter = computed(() => {
+    const reportNodeClass = this._state.reportNodeClassValue();
+    return reportNodeClass === ReportNodeType.CALL_FUNCTION_REPORT_NODE;
+  });
+
   private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
   /** @Output() **/
@@ -65,6 +71,10 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected clearTestCasesFilter(): void {
     this._selectionCollector.clear();
+  }
+
+  protected clearKeywordsFilter(): void {
+    this._state.reportNodeClassCtrl.setValue(undefined);
   }
 
   override setupSearchFilter(): void {

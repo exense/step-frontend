@@ -15,7 +15,7 @@
         title="Summary: Testcases"
         [summary]="testCasesSummary"
         [statusFilter]="_testCasesState.statusCtrlValue()"
-        (statusFilterChange)="_testCasesState.updateStatusCtrl($event)"
+        (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
       />
     }
   }
@@ -26,7 +26,7 @@
       title="Summary: Keyword Calls"
       [summary]="keywordsSummary"
       [statusFilter]="_keywordsState.statusCtrlValue()"
-      (statusFilterChange)="_keywordsState.updateStatusCtrl($event)"
+      (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
     />
   }
   @if (_mode === ViewMode.VIEW) {
