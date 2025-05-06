@@ -1,19 +1,13 @@
-@if (isInitialized) {
+@if (isInitialized && timeRange()) {
   <step-timeseries-dashboard
     [id]="dashboardId"
+    [timeRange]="timeRange()"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
-    [defaultFullTimeRange]="executionRange"
     [showExecutionLinks]="false"
-    [showRefreshOption]="false"
-    [showDashboardName]="false"
-    [showHeaderBar]="false"
-    (timeRangeChange)="timeRangePickerChange.emit($event)"
-    [settingsButtonPosition]="
-      (executionMode | async) === ExecutionViewMode.NEW
-        ? SETTINGS_BTN_LOCATION.ABOVE_FILTER_BAR
-        : SETTINGS_BTN_LOCATION.SHIFTED_TO_TABS
-    "
+    (contextSettingsInit)="contextSettingsInit.emit($event)"
+    (contextSettingsChanged)="contextSettingsChanged.emit($event)"
+    (fullRangeUpdateRequest)="fullRangeUpdateRequest.emit($event)"
   />
 } @else if (executionHasToBeBuilt) {
   <div class="info-container">

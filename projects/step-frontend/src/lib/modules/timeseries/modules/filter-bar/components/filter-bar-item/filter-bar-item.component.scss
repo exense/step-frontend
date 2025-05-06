@@ -87,3 +87,10 @@ label {
   opacity: 0.8;
   gap: 1.4rem;
 }
+
+.readonly {
+  cursor: default;
+  background-color: var.$gray-100;
+  opacity: 0.6;
+  border-radius: 10px;
+}

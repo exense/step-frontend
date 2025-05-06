@@ -9,7 +9,6 @@ export abstract class AltExecutionStateService {
   abstract timeRangeOptions: TimeRangePickerSelection[];
   abstract readonly executionId$: Observable<string>;
   abstract readonly execution$: Observable<Execution>;
-  abstract readonly isFullRangeSelected$: Observable<boolean>;
   abstract readonly keywordParameters$: Observable<KeywordParameters>;
   abstract readonly keywordsDataSource$: Observable<TableDataSource<ReportNode>>;
   abstract readonly hasTestCasesFilter$: Observable<boolean>;

@@ -124,7 +124,7 @@ export class ScheduleOverviewComponent {
     let refreshInterval = this.refreshInterval();
     if (timeRange) {
       // replace url on the first call
-      this._urlParamService.updateUrlParams(timeRange, refreshInterval, !this.isInitialized);
+      this._urlParamService.patchUrlParams(timeRange, refreshInterval, !this.isInitialized);
     }
     this.isInitialized = true;
   });

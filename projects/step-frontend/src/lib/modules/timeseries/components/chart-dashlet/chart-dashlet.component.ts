@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   OnInit,
+  output,
   Output,
   SimpleChanges,
   ViewChild,
@@ -17,6 +18,7 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
+  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
@@ -110,9 +112,10 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
 
-  @Output() remove = new EventEmitter();
-  @Output() shiftLeft = new EventEmitter();
-  @Output() shiftRight = new EventEmitter();
+  readonly remove = output();
+  readonly shiftLeft = output();
+  readonly shiftRight = output();
+  readonly zoomReset = output();
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -202,7 +205,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   handleZoomReset() {
     this.context.setChartsLockedState(false);
-    this.context.resetZoom();
+    this.zoomReset.emit();
   }
 
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {

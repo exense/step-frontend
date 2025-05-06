@@ -5,13 +5,11 @@ step-ts-dashboard-filter-bar {
   display: flex;
   flex-direction: column;
   padding: 1.6rem 0.1rem;
+  max-width: 100%;
+  flex: 1;
+  min-width: 0;
 
   .grow {
-    flex-grow: 1;
-  }
-
-  .ranger-section {
-    margin: 0 1rem 0 2rem;
     flex-grow: 1;
   }
 
@@ -33,13 +31,6 @@ step-ts-dashboard-filter-bar {
     font-size: 1.2rem;
   }
 
-  .settings-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-  }
-
   .warning {
     font-size: 11px;
     padding: 0.8rem;
@@ -50,6 +41,8 @@ step-ts-dashboard-filter-bar {
     gap: 1.2rem;
     align-items: center;
     min-height: 3.6rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .filers-row {
@@ -70,8 +63,8 @@ step-ts-dashboard-filter-bar {
     }
 
     &::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 0.5rem;
+      height: 0.5rem;
     }
 
     &::-webkit-scrollbar-track {
@@ -79,7 +72,7 @@ step-ts-dashboard-filter-bar {
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: var.$gray-500;
+      background-color: var.$gray-400;
     }
   }
 
@@ -131,4 +124,8 @@ step-ts-dashboard-filter-bar {
 
 button {
   box-shadow: none !important;
+}
+
+mat-divider {
+  margin: 0 0.4rem !important;
 }

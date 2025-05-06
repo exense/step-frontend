@@ -89,7 +89,7 @@ export class TimeSeriesUtils {
     return params;
   }
 
-  static convertSelectionToTimeRange(selection: TimeRangePickerSelection): TimeRange {
+  static convertSelectionToTimeRange(selection: TimeRangePickerSelection, relativeTo?: number): TimeRange {
     let newFullRange: TimeRange;
     switch (selection.type) {
       case 'FULL':
@@ -98,8 +98,8 @@ export class TimeSeriesUtils {
         newFullRange = selection.absoluteSelection!;
         break;
       case 'RELATIVE':
-        let now = new Date().getTime();
-        newFullRange = { from: now - selection.relativeSelection!.timeInMs!, to: now };
+        let end = relativeTo || new Date().getTime();
+        newFullRange = { from: end - selection.relativeSelection!.timeInMs!, to: end };
         break;
     }
     return newFullRange;

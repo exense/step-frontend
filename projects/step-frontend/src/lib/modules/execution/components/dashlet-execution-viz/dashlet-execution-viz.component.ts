@@ -1,7 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { CustomComponent } from '@exense/step-core';
 import { ExecutionStateService } from '../../services/execution-state.service';
+import { CustomComponent } from '@exense/step-core';
 
+/**
+ * This class is just responsible to pass the execution input to the execution view so it can react its changes.
+ */
 @Component({
   selector: 'step-dashlet-execution-viz',
   templateUrl: './dashlet-execution-viz.component.html',

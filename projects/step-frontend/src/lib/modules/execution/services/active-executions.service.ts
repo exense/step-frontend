@@ -16,10 +16,19 @@ export interface ActiveExecution {
   readonly execution$: Observable<Execution>;
   readonly autoRefreshModel: AutoRefreshModel;
   readonly timeRangeSelectionChange$: Observable<TimeRangePickerSelection>;
+  performanceTabSettings: PerformanceTabSettings;
+
   updateTimeRange(timeRangeSelection: TimeRangePickerSelection): void;
   getTimeRangeSelection(): TimeRangePickerSelection;
+  updateChartsResolution(resolution: number): void;
+  updateCompareModeEnabled(enabled: boolean): void;
   destroy(): void;
   manualRefresh(): void;
+}
+
+interface PerformanceTabSettings {
+  resolution: number;
+  compareModeEnabled: boolean;
 }
 
 class ActiveExecutionImpl implements ActiveExecution {
@@ -32,6 +41,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
   timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
   timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
+  performanceTabSettings: PerformanceTabSettings = { resolution: 0, compareModeEnabled: false };
 
   private executionInternal$ = new BehaviorSubject<Execution | undefined>(undefined);
 
@@ -75,6 +85,14 @@ class ActiveExecutionImpl implements ActiveExecution {
 
   manualRefresh(): void {
     this.loadExecution(this.executionId).subscribe((execution) => this.executionInternal$.next(execution));
+  }
+
+  updateChartsResolution(resolution: number): void {
+    this.performanceTabSettings.resolution = resolution;
+  }
+
+  updateCompareModeEnabled(enabled: boolean): void {
+    this.performanceTabSettings.compareModeEnabled = enabled;
   }
 }
 
