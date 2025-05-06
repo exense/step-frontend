@@ -71,6 +71,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   @Input() stDisabled: boolean = false;
   @HostBinding('class.inline') @Input() stInline: boolean = false;
   @Input() stExcludeFields: string[] = [];
+  @Input() stIncludeFieldsOnly?: string[];
   @Input() required: boolean = false;
 
   @Output() stModelChange = new EventEmitter<Record<string, unknown>>();
@@ -186,9 +187,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     this._screensService
       .getScreenInputsByScreenIdWithCache(this.stScreen)
       .pipe(
-        map((screenInputs) =>
-          screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!)),
-        ),
+        map((screenInputs) => this.filterScreenInputs(screenInputs)),
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
         map((screenInputs) => this.determineCustomFormInputSchema(screenInputs)),
       )
@@ -230,9 +229,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           });
         }),
         switchMap(() => this._screensService.getScreenInputsForScreenPost(this.stScreen, this.stModel)),
-        map((screenInputs) =>
-          screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!)),
-        ),
+        map((screenInputs) => this.filterScreenInputs(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
         ),
@@ -256,5 +253,13 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     if (valueHasBeenChanged) {
       this.stModelChange.emit(this.stModel);
     }
+  }
+
+  private filterScreenInputs(screenInputs: ScreenInput[]): ScreenInput[] {
+    let result = screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!));
+    if (this.stIncludeFieldsOnly) {
+      result = result.filter((item) => this.stIncludeFieldsOnly!.includes(item.input!.id!));
+    }
+    return result;
   }
 }
