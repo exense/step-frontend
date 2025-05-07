@@ -1,20 +1,31 @@
-import { NgModule } from '@angular/core';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { makeEnvironmentProviders } from '@angular/core';
 
-import { StepGeneratedClientModule } from './generated/StepGeneratedClientModule';
-import { StepAugmentedClientModule } from './augmented/step-augmented-client.module';
-import { StepTableClientModule } from './table/step-table-client.module';
-
-@NgModule({
-  exports: [StepGeneratedClientModule, StepAugmentedClientModule, StepTableClientModule],
-  imports: [StepGeneratedClientModule, StepAugmentedClientModule, StepTableClientModule],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
-})
-export class StepClientModule {}
+import { StepHttpRequestService } from './augmented';
+import {
+  HttpFeature,
+  HttpFeatureKind,
+  provideHttpClient,
+  withInterceptors,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { BaseHttpRequest } from './generated/core/BaseHttpRequest';
+import { OPEN_API_CONFIG_PROVIDER } from './generated/open-api-config.provider';
+import { lazyLoadedMainInterceptor } from './augmented/interceptros/lazy-loaded.interceptor';
 
 export * from './generated/core/BaseHttpRequest';
 export { ApiError } from './generated/core/ApiError';
 export * from './generated/index';
 export * from './async-task/async-task.module';
-export * from './augmented/step-augmented-client.module';
-export * from './table/step-table-client.module';
+export * from './augmented';
+export { provideLazyLoadedInterceptor, LAZY_LOAD_INTERCEPTORS } from './augmented/interceptros/lazy-loaded.interceptor';
+export * from './table';
+
+export const provideStepApi = (...features: HttpFeature<HttpFeatureKind>[]) =>
+  makeEnvironmentProviders([
+    provideHttpClient(withInterceptorsFromDi(), withInterceptors([lazyLoadedMainInterceptor]), ...features),
+    OPEN_API_CONFIG_PROVIDER,
+    {
+      provide: BaseHttpRequest,
+      useExisting: StepHttpRequestService,
+    },
+  ]);

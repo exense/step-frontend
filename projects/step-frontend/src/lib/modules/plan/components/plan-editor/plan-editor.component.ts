@@ -7,6 +7,7 @@ import {
   PlanEditorService,
   ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
+  ReloadableDirective,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SchedulerInvokerService } from '../../../execution/execution.module';
@@ -15,6 +16,7 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
   selector: 'step-plan-editor',
   templateUrl: './plan-editor.component.html',
   styleUrls: ['./plan-editor.component.scss'],
+  hostDirectives: [ReloadableDirective],
   providers: [
     {
       provide: SchedulerInvokerService,

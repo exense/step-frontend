@@ -1,14 +1,3 @@
-import { NgModule } from '@angular/core';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { StepGeneratedClientModule } from '../generated';
-import { StepTableClientModule } from '../table/step-table-client.module';
-
-@NgModule({
-  imports: [StepGeneratedClientModule, StepTableClientModule],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
-})
-export class StepAugmentedClientModule {}
-
 export type { ExecutionSummaryDto } from './models/execution-summary-dto';
 export type { AugmentedTokenWrapperOwner } from './models/augmented-token-wrapper-owner';
 export type { AugmentedPlan } from './models/augmented-plan';
