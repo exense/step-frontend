@@ -12,12 +12,7 @@
         <span>Clear test cases filter</span>
       </button>
     }
-    @if (hasKeywordFilter()) {
-      <button type="button" class="clear-btn-filter" mat-stroked-button (click)="clearKeywordsFilter()">
-        <step-icon name="x" />
-        <span>Keyword Calls</span>
-      </button>
-    }
+    <step-alt-report-node-keyword-filter />
   </step-alt-report-widget-filter>
   <step-table
     #table

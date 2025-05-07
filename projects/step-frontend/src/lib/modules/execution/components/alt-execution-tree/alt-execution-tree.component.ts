@@ -1,7 +1,6 @@
 import { Component, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
