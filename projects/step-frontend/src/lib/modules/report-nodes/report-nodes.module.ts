@@ -20,3 +20,5 @@ import { CallFunctionReportNodeExternalLinkPipe } from './pipes/call-function-re
   exports: [ReportNodeShortComponent, ReportNodeComponent, CallFunctionReportNodeComponent],
 })
 export class ReportNodesModule {}
+
+export * from './shared/report-node-type.enum';

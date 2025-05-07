@@ -19,15 +19,9 @@ export interface StatusItem {
 export class AggregatedTreeStatusComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
 
-  /**
-   * @Input()
-   * **/
   readonly nodeId = input<string>();
-
-  /**
-   * @Input()
-   * **/
   readonly node = input<AggregatedTreeNode>();
+  readonly statusFilter = input<Status[]>([]);
 
   readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
@@ -40,9 +34,14 @@ export class AggregatedTreeStatusComponent {
 
   protected statusItems = computed(() => {
     const aggregatedStatus = this.status() ?? {};
-    return Object.entries(aggregatedStatus)
+    const statusFilter = this.statusFilter();
+    let result = Object.entries(aggregatedStatus)
       .map(([status, count]) => this.createStatusItem(status, count))
       .filter((item) => !!item) as StatusItem[];
+    if (statusFilter?.length) {
+      result = result.filter((item) => statusFilter.includes(item.status));
+    }
+    return result;
   });
 
   protected singleStatus = computed(() => {
@@ -53,7 +52,11 @@ export class AggregatedTreeStatusComponent {
     return undefined;
   });
 
-  protected isEmptyStatus = computed(() => !this.statusItems().length);
+  protected isEmptyStatus = computed(() => {
+    const items = this.statusItems();
+    const statusFilter = this.statusFilter();
+    return !items.length && !statusFilter.length;
+  });
 
   protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
     this.statusClick.emit({ status, count, event });

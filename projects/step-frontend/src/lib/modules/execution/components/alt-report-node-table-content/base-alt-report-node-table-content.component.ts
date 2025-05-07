@@ -12,7 +12,6 @@ import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, combineLatest } from 'rxjs';
-import { DateTime } from 'luxon';
 
 const VIEW_PAGE_SIZE = 100;
 const PRINT_PAGE_SIZE = 50_000;
@@ -36,6 +35,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   ngAfterViewInit(): void {
     this.setupSearchFilter();
     this.setupStatusesFilter();
+    this.setupReportNodeClassFilter();
     this.setupDateRangeFilter();
   }
 
@@ -46,7 +46,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
 
   protected setupSearchFilter(): void {
     this._state.search$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      this.tableSearch()?.onSearch('name', value);
+      this.tableSearch()?.onSearch?.('name', value);
     });
   }
 
@@ -57,8 +57,14 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((statuses) => {
-        this.tableSearch()?.onSearch('status', { value: statuses, regex: true });
+        this.tableSearch()?.onSearch?.('status', { value: statuses, regex: true });
       });
+  }
+
+  protected setupReportNodeClassFilter(): void {
+    this._state.reportNodeClass$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((reportNodeClass) => {
+      this.tableSearch()?.onSearch?.('_class', reportNodeClass ?? '');
+    });
   }
 
   protected setupDateRangeFilter(): void {
@@ -79,9 +85,9 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
       )
       .subscribe((searchValue) => {
         if (typeof searchValue === 'string') {
-          this.tableSearch()?.onSearch('executionTime', searchValue, true, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, true, false);
         } else {
-          this.tableSearch()?.onSearch('executionTime', searchValue, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, false);
         }
       });
   }

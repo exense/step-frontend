@@ -10,6 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { first, map, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
+import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -78,8 +80,19 @@ export class AltExecutionReportComponent {
     this.treeWidget()?.focusNode(node.artefactID!);
   }
 
-  handleChartZooming(range: TimeRange) {
+  protected handleChartZooming(range: TimeRange) {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
+  }
+
+  protected handleTestCasesSummaryStatusSelection(statuses: Status[]): void {
+    this._testCasesState.updateStatusCtrl(statuses);
+  }
+
+  protected handleKeywordsSummaryStatusSelection(statuses: Status[]): void {
+    this._keywordsState.updateStatusCtrl(
+      statuses,
+      statuses?.length > 0 ? ReportNodeType.CALL_FUNCTION_REPORT_NODE : undefined,
+    );
   }
 
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();

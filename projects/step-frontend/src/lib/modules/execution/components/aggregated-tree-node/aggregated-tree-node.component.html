@@ -4,7 +4,9 @@
       <div class="aggregated-info" (click)="showIterations()">
         <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
         <step-aggregated-tree-status
+          [class.hide-status]="!showStatus()"
           [node]="node"
+          [statusFilter]="statusFilter()"
           (statusClick)="showIterations($event.status, $event.count, $event.event)"
         />
         <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{

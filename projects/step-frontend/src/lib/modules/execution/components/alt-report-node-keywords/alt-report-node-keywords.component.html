@@ -7,11 +7,12 @@
 >
   <step-alt-report-widget-filter>
     @if (hasTestCasesFilter()) {
-      <button type="button" class="clear-test-cases" mat-stroked-button (click)="clearTestCasesFilter()">
+      <button type="button" class="clear-btn-filter" mat-stroked-button (click)="clearTestCasesFilter()">
         <step-icon name="x" />
         <span>Clear test cases filter</span>
       </button>
     }
+    <step-alt-report-node-keyword-filter />
   </step-alt-report-widget-filter>
   <step-table
     #table

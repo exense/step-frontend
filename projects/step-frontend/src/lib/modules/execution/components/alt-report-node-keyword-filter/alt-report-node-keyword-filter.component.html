@@ -1,0 +1,20 @@
+@if (hasKeywordFilter()) {
+  <button
+    type="button"
+    mat-flat-button
+    color="primary"
+    (click)="clearKeywordsFilter()"
+    matTooltip="When enabled filtering to only show keyword calls"
+  >
+    KW
+  </button>
+} @else {
+  <button
+    type="button"
+    mat-stroked-button
+    (click)="setKeywordsFilter()"
+    matTooltip="When enabled filtering to only show keyword calls"
+  >
+    KW
+  </button>
+}
