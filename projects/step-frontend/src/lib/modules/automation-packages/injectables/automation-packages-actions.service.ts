@@ -62,4 +62,8 @@ export class AutomationPackagesActionsService {
         }
       });
   }
+
+  showAutomationPackageEntities(automationPackage: AutomationPackage): void {
+    this._router.navigateByUrl(`${ROOT_URL}/entities/${automationPackage.id}`);
+  }
 }

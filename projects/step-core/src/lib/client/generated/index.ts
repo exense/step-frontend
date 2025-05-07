@@ -4,6 +4,7 @@
 export { StepGeneratedClientModule } from './StepGeneratedClientModule';
 
 export type { AbstractArtefact } from './models/AbstractArtefact';
+export type { AbstractOrganizableObject } from './models/AbstractOrganizableObject';
 export type { AbstractWebPlugin } from './models/AbstractWebPlugin';
 export type { AgentListEntry } from './models/AgentListEntry';
 export type { AgentPoolProvisioningConfiguration } from './models/AgentPoolProvisioningConfiguration';
@@ -163,6 +164,7 @@ export type { Version } from './models/Version';
 export type { ViewModel } from './models/ViewModel';
 
 export { $AbstractArtefact } from './schemas/$AbstractArtefact';
+export { $AbstractOrganizableObject } from './schemas/$AbstractOrganizableObject';
 export { $AbstractWebPlugin } from './schemas/$AbstractWebPlugin';
 export { $AgentListEntry } from './schemas/$AgentListEntry';
 export { $AgentPoolProvisioningConfiguration } from './schemas/$AgentPoolProvisioningConfiguration';

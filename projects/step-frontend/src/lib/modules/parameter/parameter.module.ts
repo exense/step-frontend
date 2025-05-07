@@ -9,7 +9,6 @@ import {
   ExportDialogComponent,
   ImportDialogComponent,
   SimpleOutletComponent,
-  StepCoreModule,
   ViewRegistryService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
@@ -24,14 +23,12 @@ import { ParametersBulkOperationsRegisterService } from './services/parameters-b
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { ParameterUrlPipe } from './pipes/parameter-url.pipe';
 import { ParameterConditionDialogComponent } from './components/parameter-condition-dialog/parameter-condition-dialog.component';
-import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { InputTypePipe } from './pipes/input-type.pipe';
 import { InputOptionsPipe } from './pipes/input-options.pipe';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule, BrowserAnimationsModule, NgxMatSelectSearchModule],
-  exports: [ParameterListComponent, ParameterSelectionComponent],
+  imports: [StepCommonModule],
+  exports: [ParameterListComponent, ParameterSelectionComponent, ParametersKeyComponent, ParameterScopeComponent],
   declarations: [
     ParameterListComponent,
     ParametersKeyComponent,

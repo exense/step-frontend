@@ -5,6 +5,7 @@ import {
   AutomationPackage,
   DialogParentService,
   selectionCollectionProvider,
+  StepCoreModule,
   STORE_ALL,
   tableColumnsConfigProvider,
   TableComponent,
@@ -16,6 +17,7 @@ import { map, Observable, of } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
+import { ExecutionModule } from '../../../execution/execution.module';
 
 @Component({
   selector: 'step-automation-package-list',
@@ -32,6 +34,8 @@ import { fromPromise } from 'rxjs/internal/observable/innerFrom';
       useExisting: forwardRef(() => AutomationPackageListComponent),
     },
   ],
+  standalone: true,
+  imports: [StepCoreModule, ExecutionModule],
 })
 export class AutomationPackageListComponent implements OnInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);
@@ -73,19 +77,23 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
     });
   }
 
-  createPackage(): void {
+  protected createPackage(): void {
     this._actions.createAutomationPackage();
   }
 
-  executePackage(automationPackage: AutomationPackage): void {
+  protected executePackage(automationPackage: AutomationPackage): void {
     this._actions.executeAutomationPackage(automationPackage);
   }
 
-  editPackage(automationPackage: AutomationPackage): void {
+  protected editPackage(automationPackage: AutomationPackage): void {
     this._actions.editAutomationPackage(automationPackage);
   }
 
-  deletePackage(automationPackage: AutomationPackage): void {
+  protected showEntities(automationPackage: AutomationPackage): void {
+    this._actions.showAutomationPackageEntities(automationPackage);
+  }
+
+  protected deletePackage(automationPackage: AutomationPackage): void {
     this._actions.deleteAutomationPackage(automationPackage).subscribe((isSuccess) => {
       if (isSuccess) {
         this._dataSource.reload();
