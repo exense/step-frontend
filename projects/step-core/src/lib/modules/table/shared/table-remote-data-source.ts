@@ -15,14 +15,14 @@ import {
   tap,
 } from 'rxjs';
 import {
-  SortDirection,
-  TableRequestData,
-  TableApiWrapperService,
-  TableResponseGeneric,
-  TableRequestFilter,
   OQLFilter,
-  TableParameters,
+  SortDirection,
   StepDataSourceReloadOptions,
+  TableApiWrapperService,
+  TableParameters,
+  TableRequestData,
+  TableRequestFilter,
+  TableResponseGeneric,
 } from '../../../client/step-client-module';
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
@@ -31,7 +31,7 @@ import { FilterCondition } from './filter-condition';
 export class TableRequestInternal {
   columns: string[];
   searchBy?: { column: string; value: SearchValue }[];
-  orderBy?: { column: string; order: 'asc' | 'desc' };
+  orderBy?: { column: string; order: 'asc' | 'desc' }[];
   start?: number;
   length?: number;
   filter?: string;
@@ -86,15 +86,19 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
     result.filters = filters;
   }
 
-  result.sort = req.orderBy
-    ? {
-        field: req.orderBy.column,
-        direction: req.orderBy.order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
-      }
-    : {
+  if (req.orderBy) {
+    result.sort = req.orderBy.map(({ column, order }) => ({
+      field: column,
+      direction: order === 'asc' ? SortDirection.ASCENDING : SortDirection.DESCENDING,
+    }));
+  } else {
+    result.sort = [
+      {
         field: req.columns[0],
         direction: SortDirection.ASCENDING,
-      };
+      },
+    ];
+  }
 
   if (req.filter) {
     const oql: OQLFilter = { oql: req.filter };
@@ -109,7 +113,7 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
 };
 
 interface RequestContainer extends StepDataSourceReloadOptions {
-  request: TableRequestInternal;
+  request: TableRequestData;
 }
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
@@ -125,8 +129,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }),
     filter((x) => !!x),
     debounceTime(500),
-    map((x) => {
-      const request = convertTableRequest(x!.request);
+    map((x: RequestContainer) => {
+      const request = x!.request;
 
       // Don't show progress bar, when immediateHideProgress flag is passed
       // or hideProgress is passed and there is no in progress current operation
@@ -141,7 +145,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this._inProgress$.next(x.inProgress);
     }),
     exhaustMap((x) =>
-      this._rest.requestTable<T>(this._tableId, x.request).pipe(
+      this._rest.requestTable<T>(this.tableId, x.request).pipe(
         catchError((err) => {
           return of(null);
         }),
@@ -171,9 +175,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private filters: { [key: string]: SearchValue } = {};
 
   constructor(
-    private _tableId: string,
+    readonly tableId: string,
     private _rest: TableApiWrapperService,
-    private _requestColumnsMap: Record<string, string>,
+    private _requestColumnsMap: Record<string, string | string[]>,
     private _filters?: Record<string, string | string[] | SearchValue>,
   ) {
     if (_filters) {
@@ -220,9 +224,13 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }
 
     const tableRequest: TableRequestInternal = new TableRequestInternal({
-      columns: Object.values(this._requestColumnsMap),
-      searchBy: Object.entries(search || {}).map(([name, value]) => {
-        const column = this._requestColumnsMap[name] ?? name;
+      columns: Object.values(this._requestColumnsMap).reduce((res: string[], value: string | string[]) => {
+        const items: string[] = value instanceof Array ? value : [value];
+        return res.concat(items);
+      }, []) as string[],
+      searchBy: Object.entries(search ?? {}).map(([name, value]) => {
+        const col = this._requestColumnsMap[name] ?? name;
+        const column = col instanceof Array ? col[0] : col;
         return { column, value };
       }),
     });
@@ -242,7 +250,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(req: TableRequestInternal): void;
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
     if (reqOrOptions instanceof TableRequestInternal) {
-      const req = reqOrOptions as TableRequestInternal;
+      const req = convertTableRequest(reqOrOptions as TableRequestInternal);
       this._request$.next({ request: req });
       return;
     }
@@ -258,8 +266,14 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
     const order = sort?.direction;
     if (order) {
-      const column = this._requestColumnsMap[sort!.active];
-      tableRequest.orderBy = column ? { column, order } : undefined;
+      const col = this._requestColumnsMap[sort!.active];
+      if (!col) {
+        tableRequest.orderBy = undefined;
+      } else if (col instanceof Array) {
+        tableRequest.orderBy = col.map((column) => ({ column, order }));
+      } else {
+        tableRequest.orderBy = [{ column: col, order }];
+      }
     }
 
     this.getTableData(tableRequest);
@@ -270,7 +284,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions) {
-    let val = this._request$.value ?? { request: {} as TableRequestInternal };
+    let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;
     this._request$.next(val);
@@ -293,7 +307,20 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     delete tableRequest.skip;
     delete tableRequest.limit;
 
-    this._rest.exportAsCSV(this._tableId, fields, tableRequest).subscribe();
+    this._rest.exportAsCSV(this.tableId, fields, tableRequest).subscribe();
+  }
+
+  getCurrentRequest(): TableRequestData | undefined {
+    const request = this._request$?.value?.request;
+    if (!request) {
+      return undefined;
+    }
+    return {
+      ...request,
+      filters: request?.filters?.map?.((filter) => ({ ...filter })),
+      sort: !!request.sort ? { ...request.sort } : undefined,
+      tableParameters: !!request.tableParameters ? { ...request.tableParameters } : undefined,
+    };
   }
 
   skipOngoingRequest(): void {

@@ -4,6 +4,7 @@
 export { StepGeneratedClientModule } from './StepGeneratedClientModule';
 
 export type { AbstractArtefact } from './models/AbstractArtefact';
+export type { AbstractOrganizableObject } from './models/AbstractOrganizableObject';
 export type { AbstractWebPlugin } from './models/AbstractWebPlugin';
 export type { AgentListEntry } from './models/AgentListEntry';
 export type { AgentPoolProvisioningConfiguration } from './models/AgentPoolProvisioningConfiguration';
@@ -56,6 +57,7 @@ export type { Expression } from './models/Expression';
 export type { False } from './models/False';
 export type { FetchBucketsRequest } from './models/FetchBucketsRequest';
 export type { FieldFilter } from './models/FieldFilter';
+export type { FieldSearchOrder } from './models/FieldSearchOrder';
 export type { Filter } from './models/Filter';
 export type { FindByCriteraParam } from './models/FindByCriteraParam';
 export type { FindReferencesRequest } from './models/FindReferencesRequest';
@@ -162,6 +164,7 @@ export type { Version } from './models/Version';
 export type { ViewModel } from './models/ViewModel';
 
 export { $AbstractArtefact } from './schemas/$AbstractArtefact';
+export { $AbstractOrganizableObject } from './schemas/$AbstractOrganizableObject';
 export { $AbstractWebPlugin } from './schemas/$AbstractWebPlugin';
 export { $AgentListEntry } from './schemas/$AgentListEntry';
 export { $AgentPoolProvisioningConfiguration } from './schemas/$AgentPoolProvisioningConfiguration';
@@ -214,6 +217,7 @@ export { $Expression } from './schemas/$Expression';
 export { $False } from './schemas/$False';
 export { $FetchBucketsRequest } from './schemas/$FetchBucketsRequest';
 export { $FieldFilter } from './schemas/$FieldFilter';
+export { $FieldSearchOrder } from './schemas/$FieldSearchOrder';
 export { $Filter } from './schemas/$Filter';
 export { $FindByCriteraParam } from './schemas/$FindByCriteraParam';
 export { $FindReferencesRequest } from './schemas/$FindReferencesRequest';

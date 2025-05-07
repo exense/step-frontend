@@ -1,30 +1,101 @@
-:host {
-  display: inline-block;
-  padding: 5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
-.att-thumbnail {
-  transition: transform 0.2s;
-  transition-delay: 1s;
-  width: 150px;
-  margin-bottom: 2px;
-  &:hover {
-    transform: scale(3);
+step-attachment-preview {
+  display: block;
+  width: 15rem;
+  height: 7rem;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+
+  &.large {
+    width: 45rem;
+    height: 21rem;
   }
-}
 
-.att-preview-label {
-  text-decoration: none;
-  font-size: 85%;
-  color: #5f6368;
-  display: flex;
-  align-items: center;
-}
+  &.with-border {
+    border: solid 0.1rem var.$gray-150;
+    border-radius: 1rem;
+  }
 
-mat-icon {
-  margin-right: 5px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .file-info {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-top: 0.5rem;
+
+    step-icon {
+      @include core.step-icon-size(4rem);
+    }
+  }
+
+  .name {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-left: 1rem;
+    padding-bottom: 0.3rem;
+    padding-top: 0.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.overlay {
+      background: var.$white-transparent;
+    }
+  }
+
+  .actions {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    button {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+
+      .mat-mdc-button-touch-target {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+      }
+
+      step-icon {
+        @include core.step-icon-size(1.5rem);
+      }
+    }
+  }
+
+  &.with-actions {
+    &:hover {
+      img,
+      .file-info {
+        opacity: 0.5;
+      }
+
+      .actions {
+        opacity: 1;
+      }
+    }
+
+    img,
+    .file-info,
+    .actions {
+      transition: opacity 0.5s ease;
+    }
+  }
+
+  &:not(.with-actions) {
+    .actions {
+      display: none;
+    }
+  }
 }

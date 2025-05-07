@@ -16,6 +16,7 @@ import {
   RepositoryObjectReference,
   TableColumnsConfig,
   TablePersistenceConfig,
+  TestRunStatus,
 } from '@exense/step-core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SchedulerInvokerService } from '../../services/scheduler-invoker.service';
@@ -29,7 +30,10 @@ export interface AltExecutionLaunchDialogData {
   title?: string;
   repoRef: RepositoryObjectReference;
   parameters?: Record<string, string>;
-  testCases?: IncludeTestcases;
+  testCases?: {
+    items?: TestRunStatus[];
+    selection?: IncludeTestcases;
+  };
   hideCancel?: boolean;
   isolateExecution?: boolean;
 }
@@ -66,10 +70,10 @@ export class AltExecutionLaunchDialogComponent
 
   protected readonly title = this._data.title ?? 'Launch Execution';
   protected readonly repoRef = this._data.repoRef;
+  protected readonly explicitTestCases = this._data.testCases?.items;
   protected readonly showCancel = !this._data.hideCancel;
   protected readonly executionIsolation = !!this._data.isolateExecution;
 
-  /** @ViewChild **/
   private testCasesComponent = viewChild('testCases', { read: RepositoryPlanTestcaseListComponent });
 
   protected loading = signal(false);
@@ -148,12 +152,13 @@ export class AltExecutionLaunchDialogComponent
     if (!testCases) {
       return;
     }
-    if (!this._data.testCases || this._data.testCases.by === 'all') {
+    const selection = this._data.testCases?.selection;
+    if (!selection || selection.by === 'all') {
       return;
     }
     setTimeout(() => {
       testCases.selectionCollector.clear();
-      testCases.selectionCollector.selectById(...this._data!.testCases!.list!);
+      testCases.selectionCollector.selectById(...selection!.list!);
     }, 500);
   });
 }

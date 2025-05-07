@@ -22,13 +22,23 @@ export class AugmentedPlansService extends PlansService implements HttpOverrideR
     return this;
   }
 
-  getPlansTableDataSource(): StepDataSource<Plan> {
-    return this._dataSourceFactory.createDataSource(AugmentedPlansService.PLANS_TABLE_ID, {
-      name: 'attributes.name',
-      type: 'root._class',
-      automationPackage: 'customFields.automationPackageId',
-      actions: '',
-    });
+  getPlansTableDataSource(automationPackageId?: string): StepDataSource<Plan> {
+    let filters: Parameters<typeof this._dataSourceFactory.createDataSource>[2] = undefined;
+    if (automationPackageId) {
+      filters = filters ?? {};
+      filters['customFields.automationPackageId'] = { value: `^${automationPackageId}$`, regex: true };
+    }
+
+    return this._dataSourceFactory.createDataSource(
+      AugmentedPlansService.PLANS_TABLE_ID,
+      {
+        name: 'attributes.name',
+        type: 'root._class',
+        automationPackage: 'customFields.automationPackageId',
+        actions: '',
+      },
+      filters,
+    );
   }
 
   createSelectionDataSource(): StepDataSource<Plan> {

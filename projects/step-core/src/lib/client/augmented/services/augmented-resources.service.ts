@@ -100,6 +100,18 @@ export class AugmentedResourcesService extends ResourcesService implements HttpO
     return result;
   }
 
+  getResourceContentAsText(id: string): Observable<string> {
+    return this._httpClient.get(
+      `rest/resources/${id}/content`,
+      this._requestContextHolder.decorateRequestOptions({
+        responseType: 'text',
+        params: {
+          inline: true,
+        },
+      }),
+    );
+  }
+
   downloadResource(resourceId: string, fileName: string) {
     const url = this.getDownloadResourceUrl(resourceId);
     fetch(url, { method: 'get' })

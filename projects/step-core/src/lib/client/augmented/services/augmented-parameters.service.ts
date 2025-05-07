@@ -22,17 +22,27 @@ export class AugmentedParametersService extends ParametersService implements Htt
     return this;
   }
 
-  createDataSource(): StepDataSource<Parameter> {
-    return this._dataSourceFactory.createDataSource(AugmentedParametersService.PARAMETERS_TABLE_ID, {
-      scope: 'scope',
-      key: 'key',
-      value: 'value',
-      description: 'description',
-      activationExpressionScript: 'activationExpression.script',
-      lastModificationDate: 'lastModificationDate',
-      priority: 'priority',
-      automationPackage: 'customFields.automationPackageId',
-    });
+  createDataSource(automationPackageId?: string): StepDataSource<Parameter> {
+    let filters: Parameters<typeof this._dataSourceFactory.createDataSource>[2] = undefined;
+    if (automationPackageId) {
+      filters = filters ?? {};
+      filters['customFields.automationPackageId'] = { value: `^${automationPackageId}$`, regex: true };
+    }
+
+    return this._dataSourceFactory.createDataSource(
+      AugmentedParametersService.PARAMETERS_TABLE_ID,
+      {
+        scope: 'scope',
+        key: 'key',
+        value: 'value',
+        description: 'description',
+        activationExpressionScript: 'activationExpression.script',
+        lastModificationDate: 'lastModificationDate',
+        priority: 'priority',
+        automationPackage: 'customFields.automationPackageId',
+      },
+      filters,
+    );
   }
 
   createSelectionDataSource(): StepDataSource<Parameter> {
