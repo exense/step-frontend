@@ -7,7 +7,7 @@
   </section>
   <section class="content">
     <span>
-      <step-attachments [node]="node"> </step-attachments>
+      <step-legacy-attachments [node]="node" />
     </span>
     <step-btn-group>
       <button
@@ -87,7 +87,7 @@
 </div>
 <!-- Attachments -->
 <div>
-  <step-attachments-preview [attachments]="node?.attachments"> </step-attachments-preview>
+  <step-legacy-attachments-preview [attachments]="node?.attachments" />
 </div>
 <!-- Details -->
 <div *ngIf="showDetails">

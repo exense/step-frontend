@@ -5,9 +5,39 @@
 @mixin execution-shared-styles {
   @include execution-report-node-inline-details;
   @include execution-report-node-details;
+  @include highlight-inline-item;
+}
+
+@mixin highlight-inline-item {
+  .highlight-inline-item {
+    border-radius: 1rem;
+    padding: 0.2rem;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    cursor: pointer;
+
+    &:hover {
+      border: solid 0.1rem var.$blue-600;
+      margin-left: 0;
+      margin-right: 0;
+      padding-top: 0.1rem;
+      padding-bottom: 0.1rem;
+    }
+  }
 }
 
 @mixin execution-report-node-inline-details {
+  .default-attachment-popover-view {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    font-size: 1.2rem;
+    step-icon {
+      @include core.step-icon-size(1.4rem);
+    }
+  }
+
   .execution-report-node-inline-details {
     display: flex;
     flex-direction: column;
@@ -24,6 +54,20 @@
     .etc-container {
       display: flex;
       gap: 0.5rem;
+      flex-direction: column;
+    }
+
+    .attachments-container {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      span {
+        display: block;
+        max-width: 15rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .error-container {

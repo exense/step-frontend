@@ -2,18 +2,19 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DOCUMENT } from '@angular/common';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
-import { ReportNode, AttachmentMeta } from '../../../../client/step-client-module';
+import { ReportNode, AttachmentMeta, AugmentedResourcesService } from '../../../../client/step-client-module';
 
 @Component({
-  selector: 'step-attachments',
-  templateUrl: './attachments.component.html',
-  styleUrls: ['./attachments.component.scss'],
+  selector: 'step-legacy-attachments',
+  templateUrl: './legacy-attachments.component.html',
+  styleUrls: ['./legacy-attachments.component.scss'],
   standalone: true,
   imports: [StepBasicsModule, AttachmentUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttachmentsComponent {
+export class LegacyAttachmentsComponent {
   private _doc = inject(DOCUMENT);
+  protected _resourceService = inject(AugmentedResourcesService);
 
   /** @Input() **/
   readonly node = input<ReportNode | undefined>(undefined);
@@ -31,7 +32,7 @@ export class AttachmentsComponent {
   protected readonly hasAttachments = computed(() => this.attachments().length > 0);
 
   protected openAttachment(attachment: AttachmentMeta): void {
-    const url = AttachmentUrlPipe.transform(attachment);
+    const url = this._resourceService.getDownloadResourceUrl(attachment.id!);
     this._doc!.defaultView!.open(url, '_blank');
   }
 }

@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DEFAULT_PAGE } from '@exense/step-core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { DEFAULT_PAGE, ErrorMessageHandlerService } from '@exense/step-core';
 
 @Component({
   selector: 'step-not-found',
@@ -10,12 +9,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class NotFoundComponent implements OnInit {
   private _router = inject(Router);
-  private _snackBar = inject(MatSnackBar);
+  private _errorMessageHandler = inject(ErrorMessageHandlerService);
   private _defaultPage = inject(DEFAULT_PAGE);
 
   ngOnInit(): void {
     const currentUrl = this._router.url;
-    this._snackBar.open(`Page not Found: ${currentUrl}`, 'dismiss');
+    this._errorMessageHandler.showError(`Page not Found: ${currentUrl}`);
     this._router.navigateByUrl(this._defaultPage(true));
   }
 }

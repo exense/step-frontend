@@ -1,0 +1,15 @@
+export enum VideoType {
+  MP4 = 'mp4',
+  MKV = 'mkv',
+  MOV = 'mov',
+  AVI = 'avi',
+  WMV = 'wmv',
+  FLV = 'flv',
+  WEBM = 'webm',
+  MPEG = 'mpeg',
+  MPG = 'mpg',
+  M4V = 'm4v',
+  _3PG = '3pg',
+  _3G2 = '3g2',
+  OGV = 'ogv',
+}

@@ -10,7 +10,7 @@
             matTooltipPosition="below"
           />
         }
-        <div>{{ execution?.description }}</div>
+        <div>{{ execution | executionName }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
           @if (repositoryParams.repositoryID !== 'local') {
             <step-alt-execution-repository [repositoryParams]="repositoryParams" />
