@@ -8,6 +8,9 @@ import { MatSort, SortDirection } from '@angular/material/sort';
   templateUrl: './alt-report-node-list.component.html',
   styleUrl: './alt-report-node-list.component.scss',
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[attr.title]': 'null',
+  },
 })
 export class AltReportNodeListComponent {
   protected _state = inject(AltReportNodesStateService);

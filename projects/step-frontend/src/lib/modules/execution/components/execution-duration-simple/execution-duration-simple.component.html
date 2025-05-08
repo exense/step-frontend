@@ -1,0 +1,17 @@
+@if (duration() !== undefined) {
+  <step-popover yPosition="below">
+    @if (isAverage()) {
+      <span class="average">Ø</span>
+    }
+    {{ duration() | duration }}
+    <step-popover-content>
+      <strong>
+        @if (isAverage()) {
+          Average
+        }
+        Duration:
+      </strong>
+      {{ duration() | duration: 0 : { displayFull: true } }}
+    </step-popover-content>
+  </step-popover>
+}
