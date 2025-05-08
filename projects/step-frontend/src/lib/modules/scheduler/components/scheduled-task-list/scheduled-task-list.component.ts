@@ -63,7 +63,7 @@ export class ScheduledTaskListComponent implements DialogParentService {
 
   readonly ActiveLabels = ActiveLabels;
 
-  readonly dataSource = this._schedulerService.createSelectionDataSource();
+  readonly dataSource = this._schedulerService.createDataSource();
   readonly returnParentUrl = '/scheduler';
 
   protected isSchedulerDisabled = toSignal(
