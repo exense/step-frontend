@@ -183,7 +183,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   handleCompareFullRangeChange(range: TimeRange) {
-    this.compareEngine?.state.context.updateFullRange(range);
+    this.compareEngine?.state.context.updateFullRangeAndSelection(range);
   }
 
   /**

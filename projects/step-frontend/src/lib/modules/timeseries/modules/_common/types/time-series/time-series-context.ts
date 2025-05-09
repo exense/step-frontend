@@ -238,8 +238,9 @@ export class TimeSeriesContext {
     this.chartsLockedState$.next(state);
   }
 
-  updateFullRange(range: TimeRange, emitEvent = true) {
+  updateFullRangeAndSelection(range: TimeRange, emitEvent = true) {
     this.timeRangeSettings.fullRange = range;
+    this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
     } else {
