@@ -15,7 +15,7 @@ const DEFAULT_MARGIN = '0.5rem';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'highlight-inline-item',
-    '[style.--item-margin]': 'margin()',
+    '[style.--style__margin]': 'margin()',
   },
 })
 export class ArtefactInlineFieldComponent {

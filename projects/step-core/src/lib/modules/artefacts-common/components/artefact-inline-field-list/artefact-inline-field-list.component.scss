@@ -13,7 +13,7 @@ step-artefact-inline-field-list {
 
       step-artefact-inline-field {
         &:not(:last-child) {
-          margin-bottom: var(--item-margin, 0);
+          margin-bottom: var(--style__margin, 0rem);
         }
         section {
           max-width: unset;
@@ -29,7 +29,7 @@ step-artefact-inline-field-list {
       align-items: center;
       step-artefact-inline-field {
         &:not(:last-child) {
-          margin-right: var(--item-margin, 0);
+          margin-right: var(--style__margin, 0rem);
         }
         step-icon.field-icon {
           @include core.step-icon-size(1.6rem);
