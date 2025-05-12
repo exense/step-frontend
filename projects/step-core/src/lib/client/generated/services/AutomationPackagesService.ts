@@ -4,6 +4,7 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AbstractOrganizableObject } from '../models/AbstractOrganizableObject';
 import type { AutomationPackage } from '../models/AutomationPackage';
 import type { AutomationPackageExecutionParameters } from '../models/AutomationPackageExecutionParameters';
 import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
@@ -181,6 +182,21 @@ export class AutomationPackagesService {
     return this.httpRequest.request({
       method: 'GET',
       url: '/automation-packages/schema',
+    });
+  }
+
+  /**
+   * @param id
+   * @returns AbstractOrganizableObject default response
+   * @throws ApiError
+   */
+  public listEntities(id: string): Observable<Record<string, Array<AbstractOrganizableObject>>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/{id}/entities',
+      path: {
+        id: id,
+      },
     });
   }
 

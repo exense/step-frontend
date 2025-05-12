@@ -14,6 +14,7 @@ const DEFAULT_MARGIN = '0.5rem';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    class: 'highlight-inline-item',
     '[style.--item-margin]': 'margin()',
   },
 })

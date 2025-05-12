@@ -1,8 +1,10 @@
-@if (noLink$ | async) {
-  {{ context?.key }}
-} @else {
-  <a [routerLink]="context | parameterUrl">{{ context?.key }}</a>
-}
-@if (!(noDescriptionHint$ | async)) {
-  <step-description-hint [description]="context?.description" />
+@if (parameter(); as parameter) {
+  @if (noLink()) {
+    {{ parameter.key }}
+  } @else {
+    <a [routerLink]="parameter | parameterUrl">{{ parameter.key }}</a>
+  }
+  @if (!noDescriptionHint()) {
+    <step-description-hint [description]="parameter?.description" />
+  }
 }
