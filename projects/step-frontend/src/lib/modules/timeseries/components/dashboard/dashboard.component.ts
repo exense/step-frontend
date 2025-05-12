@@ -678,7 +678,12 @@ export class DashboardComponent implements OnInit, OnDestroy, OnChanges {
     );
     const hiddenFilters = clonedSettings.hiddenFilters || [];
     clonedSettings.filterItems = [...hiddenFilters, ...clonedSettings.filterItems]; // make everything visible in compare mode
-    clonedSettings.filterItems.forEach((item) => (item.isHidden = false));
+    clonedSettings.filterItems.forEach((item) => {
+      item.isHidden = false;
+      if (item.attributeName === TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE) {
+        item.menuOpenOnInit = FilterUtils.filterItemIsValid(item); // if there is an execution filter, we open the menu in compare for a faster comparison
+      }
+    });
     clonedSettings.hiddenFilters = [];
     return clonedSettings;
   }
