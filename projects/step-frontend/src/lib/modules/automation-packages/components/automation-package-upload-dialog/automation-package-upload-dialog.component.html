@@ -1,8 +1,9 @@
 <step-modal-window [title]="dialogTitle" [disableCloseByEsc]="!!progress$">
   <div step-modal-window-body>
-    <step-progress-bar *ngIf="progress$; else uploadForm" [progress$]="progress$"></step-progress-bar>
-    <ng-template #uploadForm>
-      <form [formGroup]="form" #formContainer="ngForm">
+    @if (progress$) {
+      <step-progress-bar [progress$]="progress$" />
+    } @else {
+      <form [formGroup]="form">
         <step-upload-container (filesChange)="handleDrop($event)">
           <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
             <step-label>Automation Package (jar or ZIP file)</step-label>
@@ -44,7 +45,7 @@
         </step-form-field>
         <input #fileInput type="file" (input)="selectFile()" />
       </form>
-    </ng-template>
+    }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>

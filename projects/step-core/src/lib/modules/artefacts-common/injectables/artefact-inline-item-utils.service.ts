@@ -8,15 +8,19 @@ type PossibleValue = string | number | boolean | DynamicValue | undefined;
 
 export interface ArtefactInlineItemConfig {
   label?: PossibleValue;
+  /** @deprecated **/
   labelTooltip?: string;
   labelExplicitExpression?: string;
   value?: PossibleValue;
+  /** @deprecated **/
   valueTooltip?: string;
   valueExplicitExpression?: string;
   icon?: string;
   iconTooltip?: string;
   timeValueUnit?: TimeUnitDictKey;
   isValueFirst?: boolean;
+  hideColon?: boolean;
+  margin?: string;
   prefix?: string;
   suffix?: string;
 }
@@ -50,7 +54,7 @@ export class ArtefactInlineItemUtilsService {
           ? this.prepareTimeValue(config.value as DynamicValueInteger, config.timeValueUnit)
           : this.prepareDynamicValue(config.value);
 
-      const { icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip } = config;
+      const { icon, iconTooltip, isValueFirst, prefix, suffix, labelTooltip, valueTooltip, hideColon, margin } = config;
 
       if (label) {
         label.tooltip = labelTooltip;
@@ -74,6 +78,8 @@ export class ArtefactInlineItemUtilsService {
         isValueFirst,
         prefix,
         suffix,
+        hideColon,
+        margin,
       };
     });
   }

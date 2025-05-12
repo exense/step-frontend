@@ -21,5 +21,5 @@ export class SchedulerTaskSelectionComponent extends BaseEntitySelectionTableCom
   @ViewChild('tableRef', { read: TableComponent })
   protected _tableRef?: TableComponent<ExecutiontTaskParameters>;
   protected _selectionCollector = inject<SelectionCollector<string, ExecutiontTaskParameters>>(SelectionCollector);
-  readonly _dataSource = inject(AugmentedSchedulerService).createSelectionDataSource();
+  readonly _dataSource = inject(AugmentedSchedulerService).createDataSource();
 }
