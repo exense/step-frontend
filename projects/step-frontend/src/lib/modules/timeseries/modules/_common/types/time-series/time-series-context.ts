@@ -239,6 +239,7 @@ export class TimeSeriesContext {
   }
 
   updateFullRangeAndSelection(range: TimeRange, emitEvent = true) {
+    this.timeRangeSettings.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: range };
     this.timeRangeSettings.fullRange = range;
     this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
