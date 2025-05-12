@@ -7,7 +7,7 @@
     (menuOpened)="handleMenuOpen()"
   >
     @if (compact) {
-      <step-icon name="clock" />
+      <step-icon name="clock" [matTooltip]="mainPickerLabel()" />
     } @else {
       <step-icon name="calendar" />
       <div class="text" [matTooltip]="mainPickerLabel()">

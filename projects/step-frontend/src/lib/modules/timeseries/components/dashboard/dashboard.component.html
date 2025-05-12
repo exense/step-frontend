@@ -45,7 +45,7 @@
                 class="round-btn grey-border align-with-ranger"
                 [class.disabled]="fullRangeSelected"
                 mat-icon-button
-                matTooltip="Apply selection to global time range"
+                matTooltip="Apply selection to global time range filter"
               >
                 <step-icon name="update-time-selection" />
               </div>
@@ -76,7 +76,7 @@
                 [compact]="true"
                 [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
                 (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
-                [activeTimeRange]="timeRange()"
+                [activeTimeRange]="compareEngine!.state.context.timeRangeSettings.fullRange"
                 [selectOptions]="timeRangeOptions"
               />
             </div>
