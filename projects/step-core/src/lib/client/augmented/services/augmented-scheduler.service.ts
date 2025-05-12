@@ -36,13 +36,23 @@ export class AugmentedSchedulerService extends SchedulerService implements HttpO
     return this;
   }
 
-  createSelectionDataSource(): StepDataSource<ExecutiontTaskParameters> {
-    return this._dataSourceFactory.createDataSource(AugmentedSchedulerService.TASKS_TABLE_ID, {
-      'attributes.name': 'attributes.name',
-      'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
-      cronExpression: 'cronExpression',
-      automationPackage: 'customFields.automationPackageId',
-    });
+  createDataSource(automationPackageId?: string): StepDataSource<ExecutiontTaskParameters> {
+    let filters: Parameters<typeof this._dataSourceFactory.createDataSource>[2] = undefined;
+    if (automationPackageId) {
+      filters = filters ?? {};
+      filters['customFields.automationPackageId'] = { value: `^${automationPackageId}$`, regex: true };
+    }
+
+    return this._dataSourceFactory.createDataSource(
+      AugmentedSchedulerService.TASKS_TABLE_ID,
+      {
+        'attributes.name': 'attributes.name',
+        'executionsParameters.customParameters.env': 'executionsParameters.customParameters.env',
+        cronExpression: 'cronExpression',
+        automationPackage: 'customFields.automationPackageId',
+      },
+      filters,
+    );
   }
 
   /**
