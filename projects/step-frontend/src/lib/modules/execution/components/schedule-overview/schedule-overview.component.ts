@@ -599,15 +599,15 @@ export class ScheduleOverviewComponent {
     };
     this._timeSeriesService.getTimeSeries(request).subscribe((response) => {
       let total = 0;
-      const pairs: { [key: string]: number } = {};
+      const items: { [key: string]: number } = {};
       response.matrixKeys.forEach((keyAttributes, i) => {
         let bucket: BucketResponse = response.matrix[i][0];
-        pairs[keyAttributes['result'] as string] = bucket.count;
+        items[keyAttributes['result'] as string] = bucket.count;
         total += bucket.count;
       });
 
       this.summary = {
-        ...pairs,
+        items,
         total: total,
       };
     });

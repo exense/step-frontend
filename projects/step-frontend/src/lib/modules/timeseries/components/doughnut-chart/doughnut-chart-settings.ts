@@ -2,7 +2,7 @@ import { ViewMode } from '../../../execution/shared/view-mode';
 
 export interface DoughnutChartSettings {
   viewMode?: ViewMode;
-  total?: number;
+  totalValue?: string;
   items: DoughnutChartItem[];
 }
 

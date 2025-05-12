@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE } from '../../shared/view-mode';
-import { STATUS_COLORS } from '@exense/step-core';
+import { BigNumberPipe, STATUS_COLORS } from '@exense/step-core';
 import {
   ChartItemClickEvent,
   DoughnutChartItem,
@@ -17,8 +17,10 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './alt-report-node-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  providers: [BigNumberPipe],
 })
 export class AltReportNodeSummaryComponent {
+  private _bigNumberPipe = inject(BigNumberPipe);
   private _statusColors = inject(STATUS_COLORS);
   protected readonly _mode = inject(VIEW_MODE);
 
@@ -32,8 +34,7 @@ export class AltReportNodeSummaryComponent {
 
   private availableStatuses = computed(() => {
     const summary = this.summary();
-    const keysSet = new Set(Object.keys(summary));
-    keysSet.delete('total');
+    const keysSet = new Set(Object.keys(summary.items));
     keysSet.add(Status.TECHNICAL_ERROR);
     keysSet.add(Status.FAILED);
     return Array.from(keysSet as Set<Status>);
@@ -46,7 +47,7 @@ export class AltReportNodeSummaryComponent {
     const isFilterEmpty = !statusFilter.size;
 
     const items = availableStatuses.map((status) => {
-      const value = summary?.[status] ?? 0;
+      const value = summary?.items?.[status] ?? 0;
       const isDisabled = !isFilterEmpty && !statusFilter.has(status);
       return { status, value, isDisabled };
     });
@@ -63,32 +64,52 @@ export class AltReportNodeSummaryComponent {
   private dictionary = computed(() => {
     const summary = this.summaryDistinct();
 
-    if (!summary?.total) {
+    if (!summary?.total && !summary?.countForecast) {
       return {
         ['EMPTY']: { value: 100, percent: 100 },
       };
     }
-    return Object.keys(this._statusColors).reduce(
+
+    const total = summary.countForecast ?? summary.total;
+
+    const result = Object.keys(this._statusColors).reduce(
       (res, key) => {
-        const value = summary[key];
+        const value = summary.items[key];
         if (value > 0) {
-          const percent = this.calcPercent(value, summary.total);
+          const percent = this.calcPercent(value, total);
           res[key] = { value, percent };
         }
         return res;
       },
       {} as Record<string, { value: number; percent: number }>,
     );
+
+    if (summary.countForecast !== undefined) {
+      const remains = summary.countForecast - summary.total;
+      const percent = this.calcPercent(remains, total);
+      result['EMPTY'] = { value: remains, percent };
+    }
+
+    return result;
   });
 
   protected readonly chartSettings = computed<DoughnutChartSettings | undefined>(() => {
     const dictionary = this.dictionary();
-    const total = this.summaryDistinct()?.total ?? 0;
+    const summaryDistinct = this.summaryDistinct();
+
+    const total = summaryDistinct?.total ?? 0;
+    const countForecast = summaryDistinct?.countForecast;
+
     const statusFilter = this.statusFilter();
     const isFilterEmpty = !statusFilter.size;
 
     if (!dictionary) {
       return undefined;
+    }
+
+    let totalValue: string = `${this._bigNumberPipe.transform(total)}`;
+    if (countForecast !== undefined) {
+      totalValue = `${totalValue} / ${this._bigNumberPipe.transform(countForecast)}`;
     }
 
     const items: DoughnutChartItem[] = Object.entries(this._statusColors)
@@ -101,7 +122,7 @@ export class AltReportNodeSummaryComponent {
 
     return {
       items: items,
-      total,
+      totalValue,
       viewMode: this._mode,
     };
   });
@@ -144,14 +165,22 @@ export class AltReportNodeSummaryComponent {
     if ((!!a && !b) || (!a && !!b)) {
       return false;
     }
-    const keysA = Object.keys(a!);
-    const keysB = Object.keys(b!);
+
+    if (a!.total !== b!.total || a!.countForecast !== b!.countForecast) {
+      return false;
+    }
+
+    const itemsA = a!.items!;
+    const itemsB = b!.items!;
+
+    const keysA = Object.keys(itemsA);
+    const keysB = Object.keys(itemsB);
     if (keysA.length !== keysB.length) {
       return false;
     }
 
     for (const key of keysA) {
-      if (a![key] !== b![key]) {
+      if (itemsA[key] !== itemsB[key]) {
         return false;
       }
     }

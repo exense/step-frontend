@@ -9,6 +9,8 @@ export class AltKeywordNodesStateService extends AltReportNodesStateService {
     super(_executionState.keywordsDataSource$, 'keywords');
   }
 
+  protected readonly statusDistributionViewId = 'statusDistributionForFunctionCalls';
+
   protected override createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest {
     return {
       start: timeRange.from,
