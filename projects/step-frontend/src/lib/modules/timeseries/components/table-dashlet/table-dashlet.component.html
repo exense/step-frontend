@@ -69,10 +69,7 @@
             <span>(ms)</span>
           </div>
         } @else {
-          <button
-            mat-menu-item
-            (click)="column.isVisible = !column.isVisible; updateVisibleColumns(); $event.stopPropagation()"
-          >
+          <button mat-menu-item (click)="$event.stopPropagation()">
             <div class="flex flex-row" style="gap: 12px; align-items: center">
               <mat-checkbox
                 color="primary"

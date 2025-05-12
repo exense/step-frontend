@@ -12,4 +12,5 @@ export enum CustomRegistryType {
   EXECUTION_CUSTOM_PANEL = 'executionCustomPanel',
   ARTEFACT = 'artefact',
   WIZARD_STEP = 'wizardStep',
+  AUTOMATION_PACKAGE_ENTITY_TABLE = 'automationPackageEntityTable',
 }
