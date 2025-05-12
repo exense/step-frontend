@@ -1,12 +1,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $SearchOrder = {
+export const $FlatAggregatedReport = {
   properties: {
-    fieldsSearchOrder: {
+    aggregatedReportViews: {
       type: 'array',
       contains: {
-        type: 'FieldSearchOrder',
+        type: 'AggregatedReportView',
       },
     },
   },

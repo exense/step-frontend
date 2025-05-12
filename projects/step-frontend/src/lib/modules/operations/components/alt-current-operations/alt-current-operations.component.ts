@@ -1,7 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
-import { Operation, StepIconsModule, SystemService } from '@exense/step-core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { of, switchMap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import { Operation, StepIconsModule } from '@exense/step-core';
 import { AltOperationComponent } from '../alt-operation/alt-operation.component';
 import { MatIconButton } from '@angular/material/button';
 
@@ -14,24 +12,8 @@ import { MatIconButton } from '@angular/material/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltCurrentOperationsComponent {
-  private _api = inject(SystemService);
-
-  /** @Input() / @Output() **/
   readonly showAll = model(false);
-
-  /** @Input() **/
-  readonly reportNodeId = input<string | undefined>(undefined);
-
-  private currentOperations$ = toObservable(this.reportNodeId).pipe(
-    switchMap((reportNodeId) => {
-      if (!reportNodeId) {
-        return of([] as Operation[]);
-      }
-      return this._api.getOperationsByReportNodeId(reportNodeId);
-    }),
-  );
-
-  protected readonly currentOperations = toSignal(this.currentOperations$);
+  readonly currentOperations = input<Operation[]>([]);
 
   protected readonly firstOperation = computed(() => this.currentOperations()?.[0]);
 

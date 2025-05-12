@@ -60,7 +60,6 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
-import { AggregatedReportViewExt } from '../../shared/aggregated-report-view-ext';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -256,34 +255,29 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  private testCasesRaw$ = this.execution$.pipe(
-    startWith(undefined),
-    switchMap((execution) => {
-      if (!execution?.id) {
-        return of([]);
+  readonly testCases$ = combineLatest([
+    this.execution$.pipe(
+      startWith(undefined),
+      map((execution) => execution?.id),
+    ),
+    this.timeRange$,
+  ]).pipe(
+    switchMap(([id, range]) => {
+      if (!id) {
+        return of(undefined);
       }
-      return this._executionsApi.getReportNodesByExecutionId(
-        execution.id,
-        'step.artefacts.reports.TestCaseReportNode',
-        500,
-      );
+      return this._executionsApi.getFlatAggregatedReportView(id, {
+        range,
+        filterArtefactClasses: ['TestCase'],
+        fetchCurrentOperations: true,
+      });
     }),
-    map((testCases) => (!testCases?.length ? undefined : testCases)),
+    map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
-    takeUntilDestroyed(),
   );
 
-  readonly testCases$ = combineLatest([this.testCasesRaw$, this.timeRange$]).pipe(
-    map(([testCases, { from, to }]) => {
-      if (!testCases) {
-        return undefined;
-      }
-      return testCases.filter((item) => !!item.executionTime && item.executionTime >= from && item.executionTime <= to);
-    }),
-    map((testCases) => (testCases ? this.aggregateReportNodes(testCases) : undefined)),
-  );
-
-  protected testCasesForRelaunch$ = this.testCasesRaw$.pipe(
+  protected testCasesForRelaunch$ = this.testCases$.pipe(
+    map((testCases) => testCases.map((item) => item.singleInstanceReportNode).filter((item) => !!item)),
     map((testCases) => {
       const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
       if (list?.length === testCases?.length) {
@@ -465,54 +459,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         )
         .build(),
     );
-  }
-
-  private aggregateReportNodes(reportNodes: ReportNode[]): AggregatedReportViewExt[] {
-    const artefactHashes: string[] = [];
-    const groupedData = new Map<string, ReportNode[]>();
-    reportNodes.forEach((reportNode) => {
-      const hash = reportNode.artefactHash;
-      if (!hash) {
-        return;
-      }
-      let list = groupedData.get(hash);
-      if (!list) {
-        list = [] as ReportNode[];
-        groupedData.set(hash, list);
-        artefactHashes.push(hash);
-      }
-      list.push(reportNode);
-    });
-
-    return artefactHashes.map((artefactHash) => {
-      const nodes = groupedData.get(artefactHash)!;
-      const artefact = nodes[0].resolvedArtefact;
-      const singleInstanceReportNode = nodes.length === 1 ? nodes[0] : undefined;
-      const countByStatus = nodes.reduce(
-        (res, node) => {
-          const status = node.status;
-          if (!status) {
-            return res;
-          }
-          if (!res[status]) {
-            res[status] = 1;
-          } else {
-            res[status]++;
-          }
-          return res;
-        },
-        {} as Record<string, number>,
-      );
-      let averageDuration = nodes.reduce((res, node) => res + (node?.duration ?? 0), 0);
-      averageDuration = Math.round(averageDuration / nodes.length);
-      return {
-        artefactHash,
-        artefact,
-        singleInstanceReportNode,
-        countByStatus,
-        averageDuration,
-      };
-    });
   }
 
   protected readonly PopoverMode = PopoverMode;

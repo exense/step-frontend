@@ -7,5 +7,6 @@ export type Operation = {
   start?: string;
   details?: any;
   reportNodeId?: string;
+  artefactHash?: string;
   tid?: number;
 };

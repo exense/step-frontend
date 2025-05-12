@@ -29,10 +29,8 @@
     <ng-container matColumnDef="operations">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="operations" mat-cell *matCellDef="let element">
-        @if (element?.singleInstanceReportNode; as node) {
-          @if (node.status === 'RUNNING') {
-            <step-alt-current-operations [reportNodeId]="node.id" [(showAll)]="showAllOperations" />
-          }
+        @if (element.currentOperations; as operations) {
+          <step-alt-current-operations [currentOperations]="operations" [(showAll)]="showAllOperations" />
         }
       </td>
     </ng-container>
