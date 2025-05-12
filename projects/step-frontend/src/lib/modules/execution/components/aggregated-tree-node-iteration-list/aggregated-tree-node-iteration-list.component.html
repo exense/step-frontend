@@ -49,7 +49,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          <div>
+          <div class="larger-view">
             <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
             <step-status
               class="details-trigger"
@@ -59,7 +59,7 @@
             />
             {{ element.name }}
           </div>
-          <step-artefact-inline-details [reportInfo]="element" />
+          <step-artefact-inline-details class="smaller-view" [reportInfo]="element" />
         </div>
       </td>
     </ng-container>

@@ -3,7 +3,6 @@ import {
   AugmentedControllerService,
   BaseReportDetailsComponent,
   DateFormat,
-  JsonParserIconDictionaryConfig,
   Measure,
   ReportNode,
   TableLocalDataSource,
@@ -68,13 +67,6 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     } catch (e) {}
     return result;
   });
-
-  protected readonly keywordInputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-in', tooltip: 'Input', levels: 0 },
-  ];
-  protected readonly keywordOutputIcons: JsonParserIconDictionaryConfig = [
-    { key: '*', icon: 'log-out', tooltip: 'Output', levels: 0 },
-  ];
 
   private failedChildren$ = toObservable(this.node).pipe(
     switchMap((node) => {
