@@ -62,15 +62,19 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     return this._viewAllService.isViewAll;
   }
 
+  private isFullRangeSelection$ = this._executionState.timeRangeSelection$.pipe(
+    map((rangeSelection) => rangeSelection.type === 'FULL'),
+  );
+
   protected abstract readonly statusDistributionViewId: string;
   protected summaryInProgressInternal$ = new BehaviorSubject(false);
   readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
 
   readonly listInProgress$: Observable<boolean>;
 
-  private forecastSummaryTotal$ = this._executionState.execution$.pipe(
-    switchMap((execution) => {
-      if (execution.status !== 'RUNNING') {
+  private forecastSummaryTotal$ = combineLatest([this._executionState.execution$, this.isFullRangeSelection$]).pipe(
+    switchMap(([execution, isFullRangeSelected]) => {
+      if (execution.status !== 'RUNNING' || !isFullRangeSelected) {
         return of(undefined);
       }
       return this._viewService
