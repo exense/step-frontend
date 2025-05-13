@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE } from '../../shared/view-mode';
-import { BigNumberPipe, STATUS_COLORS } from '@exense/step-core';
+import { STATUS_COLORS } from '@exense/step-core';
 import {
   ChartItemClickEvent,
   DoughnutChartItem,
   DoughnutChartSettings,
-} from '../../../timeseries/components/doughnut-chart/doughnut-chart-settings';
+} from '../../../charts/types/doughnut-chart-settings';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged } from 'rxjs';
 import { Status } from '../../../_common/shared/status.enum';
@@ -17,10 +17,8 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './alt-report-node-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  providers: [BigNumberPipe],
 })
 export class AltReportNodeSummaryComponent {
-  private _bigNumberPipe = inject(BigNumberPipe);
   private _statusColors = inject(STATUS_COLORS);
   protected readonly _mode = inject(VIEW_MODE);
 
@@ -31,6 +29,7 @@ export class AltReportNodeSummaryComponent {
   readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
 
   readonly totalTooltip = input<string | undefined>();
+  readonly totalForecastTooltip = input<string | undefined>();
 
   private statusFilter = computed(() => new Set(this.statusFilterModel()));
 
@@ -109,11 +108,6 @@ export class AltReportNodeSummaryComponent {
       return undefined;
     }
 
-    let totalValue: string = `${this._bigNumberPipe.transform(total)}`;
-    if (countForecast !== undefined) {
-      totalValue = `${totalValue} / ${this._bigNumberPipe.transform(countForecast)}`;
-    }
-
     const items: DoughnutChartItem[] = Object.entries(this._statusColors)
       .map(([status, color]) => {
         const value = dictionary[status]?.percent ?? 0;
@@ -124,10 +118,12 @@ export class AltReportNodeSummaryComponent {
 
     return {
       items: items,
-      totalValue,
       viewMode: this._mode,
     };
   });
+
+  protected readonly total = computed(() => this.summaryDistinct()?.total ?? 0);
+  protected readonly totalForecast = computed(() => this.summaryDistinct()?.countForecast);
 
   protected toggleChartItem(event: ChartItemClickEvent) {
     const status = event.item.label as Status;
