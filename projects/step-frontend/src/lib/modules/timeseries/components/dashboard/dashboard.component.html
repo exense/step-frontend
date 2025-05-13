@@ -6,10 +6,6 @@
         <step-time-input [(ngModel)]="resolution" (ngModelChange)="handleResolutionChange($event)" />
       </div>
     </mat-menu>
-    <button mat-menu-item (click)="toggleCompareMode()" [disabled]="editMode">
-      <step-icon name="bar-chart-2" [class.active]="compareModeEnabled"></step-icon>
-      {{ compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode' }}
-    </button>
     <button mat-menu-item (click)="exportRawData()">
       <step-icon name="download" />
       <span>Export Raw Measurements</span>
@@ -21,70 +17,75 @@
   </mat-menu>
 
   <div class="page-container">
-    @if (settingsButtonPosition === SETTINGS_LOCATION.SHIFTED_TO_TABS) {
-      <div class="floating-settings-btn">
-        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-      </div>
-    }
-
-    @if (settingsButtonPosition === SETTINGS_LOCATION.ABOVE_FILTER_BAR) {
-      <div class="above-filter-bar">
-        <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-      </div>
-    }
-
-    @if (showHeaderBar) {
-      <div class="header-container">
-        <div class="dashboard-title">
-          @if (showDashboardName) {
-            <div class="name">
-              <step-editable-label
-                [ngModel]="dashboard.attributes!['name']"
-                (ngModelChange)="onDashboardNameChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-              />
-            </div>
-            <div class="description">
-              <step-editable-textarea-label
-                [(ngModel)]="dashboard.description"
-                (ngModelChange)="handleDashboardDescriptionChange($event)"
-                [disabled]="!hasWritePermission || dashboard.customFields?.['locked']"
-                name="description"
-              >
-                <div *stepEditableLabelTemplate>Add description</div>
-              </step-editable-textarea-label>
-            </div>
-          }
-        </div>
-        @if (settingsButtonPosition === SETTINGS_LOCATION.HEADER_BAR) {
+    <div>
+      @if (compareModeEnabled) {
+        <div class="settings-top-bar">
           <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
-        }
-      </div>
-    }
-
+        </div>
+      }
+    </div>
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
-      @if (mainEngine?.state) {
-        <div style="flex-grow: 1; flex-basis: 0">
-          <step-ts-dashboard-filter-bar
-            #filterBar
-            [editMode]="editMode"
-            [context]="mainEngine.state.context"
-            (timeRangeChange)="mainEngine.handleTimeRangeChange($event)"
-            [timeRangeOptions]="timeRangeOptions"
-            [activeTimeRangeSelection]="mainEngine!.state.context.timeRangeSettings.pickerSelection"
-            [compactView]="compareModeEnabled"
-          />
+      @if (mainEngine?.state?.context) {
+        <div class="full-width-grow">
+          <div class="time-section-container">
+            <div class="ranger-section" [class.compact]="compareModeEnabled">
+              <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
+            </div>
+            @if (compareModeEnabled) {
+              <div
+                class="round-btn disabled align-with-ranger"
+                mat-icon-button
+                matTooltip="Use the main range picker to adjust"
+              >
+                <step-icon name="clock" />
+              </div>
+            } @else {
+              <div
+                (click)="updateTimeRangeFromSelection()"
+                class="round-btn grey-border align-with-ranger"
+                [class.disabled]="fullRangeSelected"
+                mat-icon-button
+                matTooltip="Apply selection to the time range picker"
+              >
+                <step-icon name="update-time-selection" />
+              </div>
+            }
+          </div>
+          <div class="tools-bar">
+            <step-ts-dashboard-filter-bar
+              #filterBar
+              [editMode]="editMode"
+              [context]="mainEngine.state.context"
+              [compactView]="compareModeEnabled"
+              [showHiddenFilters]="compareModeEnabled"
+              (fullRangeChange)="handleMainFullRangeChange($event)"
+            />
+            @if (!compareModeEnabled) {
+              <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
+            }
+          </div>
         </div>
         @if (compareModeEnabled) {
-          <div style="flex-grow: 1; flex-basis: 0">
+          <div class="dual-columns-container">
+            <div class="time-section-container">
+              <div class="ranger-section" [class.compact]="compareModeEnabled">
+                <step-execution-time-selection #compareTimeSelection [context]="compareEngine!.state.context" />
+              </div>
+              <step-time-range-picker
+                class="align-with-ranger"
+                [compact]="true"
+                [activeSelection]="compareEngine!.state.context.timeRangeSettings.timeRangeSelection!"
+                (selectionChange)="compareEngine!.handleTimeRangePickerChange($event)"
+                [activeTimeRange]="compareEngine!.state.context.timeRangeSettings.fullRange"
+                [selectOptions]="timeRangeOptions"
+              />
+            </div>
             <step-ts-dashboard-filter-bar
               #compareFilterBar
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
-              (timeRangeChange)="compareEngine!.handleTimeRangeChange($event)"
-              [timeRangeOptions]="timeRangeOptions"
-              [activeTimeRangeSelection]="compareEngine!.state.context.timeRangeSettings.pickerSelection"
               [compactView]="compareModeEnabled"
+              (fullRangeChange)="handleCompareFullRangeChange($event)"
             />
           </div>
         }
@@ -106,6 +107,7 @@
                 (remove)="handleChartDelete(i)"
                 (shiftLeft)="handleChartShiftLeft(i)"
                 (shiftRight)="handleChartShiftRight(i)"
+                (zoomReset)="handleZoomReset()"
               />
             </div>
             @if (compareModeEnabled) {
@@ -174,18 +176,6 @@
 
   <ng-template #settingsButtonsTemplate>
     <div class="header-buttons-container">
-      <button class="menu-btn" #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="settingsMenu" mat-icon-button>
-        <step-icon name="settings" />
-      </button>
-      @if (showRefreshOption) {
-        <step-autorefresh-toggle
-          [matTooltip]="compareModeEnabled ? 'Refresh is disabled when compare mode is active' : ''"
-          [disableAutoRefreshButton]="compareModeEnabled"
-          [interval]="refreshInterval"
-          (refresh)="mainEngine.triggerRefresh()"
-          (intervalChange)="handleRefreshIntervalChange($event)"
-        />
-      }
       @if (hasWritePermission && editable && !dashboard.customFields?.['locked']) {
         @if (editMode) {
           <step-alert class="edit-alert" type="WARNING"
@@ -203,18 +193,46 @@
           <button mat-button mat-stroked-button (click)="cancelEditMode()">Cancel</button>
         } @else {
           <div [matTooltip]="compareModeEnabled ? 'Editing is disabled while compare mode is active' : ''">
-            <button
-              mat-button
-              mat-flat-button
-              color="primary"
-              [disabled]="!hasWritePermission || compareModeEnabled"
-              (click)="enableEditMode()"
-            >
-              Edit
-            </button>
+            <step-btn-group class="with-borders">
+              <button
+                type="button"
+                mat-stroked-button
+                #menuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="settingsMenu"
+                [disabled]="!hasWritePermission || compareModeEnabled"
+                (click)="enableEditMode()"
+                matTooltip="Edit"
+              >
+                <step-icon name="edit" />
+              </button>
+            </step-btn-group>
           </div>
         }
       }
+      <step-btn-group
+        class="with-borders"
+        (click)="toggleCompareMode()"
+        [class.compare-btn-active]="compareModeEnabled"
+      >
+        <button
+          type="button"
+          [matTooltip]="compareModeEnabled ? 'Disable Compare Mode' : 'Enable Compare Mode'"
+          mat-stroked-button
+        >
+          <step-icon name="bar-chart-2" />
+        </button>
+      </step-btn-group>
+      <step-btn-group class="with-borders">
+        <button
+          type="button"
+          mat-stroked-button
+          #menuTrigger="matMenuTrigger"
+          [matMenuTriggerFor]="settingsMenu"
+          matTooltip="Settings"
+        >
+          <step-icon name="more-horizontal" />
+        </button>
+      </step-btn-group>
     </div>
   </ng-template>
 } @else {
