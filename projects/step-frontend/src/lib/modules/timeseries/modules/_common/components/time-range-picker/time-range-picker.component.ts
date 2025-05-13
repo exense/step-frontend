@@ -51,10 +51,6 @@ export class TimeRangePickerComponent implements OnInit {
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
 
-  otherOptionSelected = signal<boolean>(false);
-  otherOptionValue = model<number | undefined>(undefined);
-  otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
-
   protected mainPickerLabel = computed(() => {
     console.log('active selection changed');
     const selection = this.activeSelection();
@@ -203,17 +199,7 @@ export class TimeRangePickerComponent implements OnInit {
     }
   }
 
-  applyOtherTimeRange() {
-    let unit: TimeUnit = this.otherOptionUnit()!;
-    let value = this.otherOptionValue();
-    if (!unit || !value) {
-      return;
-    }
-    this.emitSelectionChange({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
-  }
-
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
-    this.otherOptionSelected.set(false);
     if (option.type === 'RELATIVE') {
       if (option.relativeSelection!.timeInMs === this.activeSelection()?.relativeSelection?.timeInMs) {
         return;
