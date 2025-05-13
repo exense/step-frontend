@@ -74,6 +74,23 @@
               {{ rangeOption.type === 'FULL' ? 'Full Range' : '' }}
             </div>
           }
+          <div (click)="$event.stopPropagation()">
+            <div class="time-option" [class.active]="otherOptionSelected()" (click)="otherOptionSelected.set(true)">
+              Other
+            </div>
+            @if (otherOptionSelected()) {
+              <div class="time-option">
+                <span>Last</span>
+                <input [(ngModel)]="otherOptionValue" />
+                <select [(ngModel)]="otherOptionUnit" id="timeUnit" class="time-unit-select">
+                  <option *ngFor="let item of timeUnitOptions" [value]="item[1]">
+                    {{ item[0] }}
+                  </option>
+                </select>
+                <button (click)="applyOtherTimeRange()">Apply</button>
+              </div>
+            }
+          </div>
         </div>
       </div>
       <div class="timezone-container">

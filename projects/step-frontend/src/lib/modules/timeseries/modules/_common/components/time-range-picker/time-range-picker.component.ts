@@ -6,9 +6,11 @@ import {
   inject,
   input,
   Input,
+  model,
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,7 +20,8 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TimeRange } from '@exense/step-core';
+import { TIME_UNIT_DICTIONARY, TimeRange, TimeUnit } from '@exense/step-core';
+import { FormsModule } from '@angular/forms';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -29,9 +32,10 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, FormsModule],
 })
 export class TimeRangePickerComponent implements OnInit, OnChanges {
+  timeUnitOptions = Object.entries(TIME_UNIT_DICTIONARY);
   private _snackBar = inject(MatSnackBar);
 
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
@@ -47,6 +51,10 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
+
+  otherOptionSelected = signal<boolean>(false);
+  otherOptionValue = model<number | undefined>(undefined);
+  otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
 
   timeRangeInputsSyncEffect = effect(() => {
     const timeRange = this.activeTimeRange();
@@ -217,7 +225,17 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     }
   }
 
+  applyOtherTimeRange() {
+    let unit: TimeUnit = this.otherOptionUnit()!;
+    let value = this.otherOptionValue();
+    if (!unit || !value) {
+      return;
+    }
+    this.emitSelectionChange({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
+  }
+
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
+    this.otherOptionSelected.set(false);
     if (option.type === 'RELATIVE') {
       if (option.relativeSelection!.timeInMs === this.activeSelection?.relativeSelection?.timeInMs) {
         return;
