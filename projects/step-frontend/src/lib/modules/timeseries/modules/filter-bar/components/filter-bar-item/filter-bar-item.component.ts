@@ -31,7 +31,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges, AfterViewInit 
   @Input() item!: FilterBarItem; // should not make edits on it
   itemDraft!: FilterBarItem;
   @Input() removable?: boolean;
-  @Input() compact = false;
+  readonly = input<boolean>(false);
   @Input() highlightRemoveButton = false;
   @Input() updateTimeRangeOption = true; // execution filter item provide the 'Update time range' option.
   openOnInit = input<boolean>();

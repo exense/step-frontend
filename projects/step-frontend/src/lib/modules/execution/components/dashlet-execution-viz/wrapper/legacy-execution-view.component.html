@@ -1,0 +1,18 @@
+@if (execution() && timeRange() && !isLoading()) {
+  <div class="header">
+    <step-time-range-picker
+      [activeSelection]="activeTimeRangeSelection()!"
+      (selectionChange)="handleTimeRangeChange($event)"
+      [activeTimeRange]="timeRange()"
+      [selectOptions]="timeRangeOptions"
+    />
+  </div>
+
+  <step-execution-dashboard
+    [execution]="execution()"
+    [timeRange]="timeRange()!"
+    (contextSettingsChanged)="handleDashboardSettingsChange($event)"
+    (contextSettingsInit)="handleDashboardSettingsInit($event)"
+    (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"
+  />
+}
