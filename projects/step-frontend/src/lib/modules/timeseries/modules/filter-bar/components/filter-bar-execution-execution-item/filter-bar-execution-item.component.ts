@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { AfterViewInit, Component, inject, input, Input } from '@angular/core';
 import { DateFormat, EntityDialogsService, Execution } from '@exense/step-core';
 import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
 
@@ -9,11 +9,22 @@ import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
   standalone: true,
   imports: [COMMON_IMPORTS],
 })
-export class FilterBarExecutionItemComponent {
+export class FilterBarExecutionItemComponent implements AfterViewInit {
   readonly DateFormat = DateFormat;
   @Input() values!: EntitySearchValue[];
+  showDialogOnInit = input<boolean | undefined>(false);
 
   private _entityDialogs = inject(EntityDialogsService);
+
+  ngAfterViewInit(): void {
+    if (this.showDialogOnInit()) {
+      setTimeout(() => {
+        this._entityDialogs.selectEntityOfType('executions').subscribe((result) => {
+          this.addSearchExecution(result.item as Execution);
+        });
+      }, 100);
+    }
+  }
 
   showExecutionPicker() {
     this._entityDialogs.selectEntityOfType('executions').subscribe((result) => {
