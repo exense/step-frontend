@@ -132,8 +132,8 @@ import { DurationDescriptionComponent } from './components/duration-description/
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { AltReportNodeStatusFilterComponent } from './components/alt-report-node-status-filter/alt-report-node-status-filter.component';
-import { AltReportNodeKeywordFilterComponent } from './components/alt-report-node-keyword-filter/alt-report-node-keyword-filter.component';
 import { TreeNodeVisualStateDirective } from './directives/tree-node-visual-state.directive';
+import { AltReportNodeArtefactFilterComponent } from './components/alt-report-node-artefact-filter/alt-report-node-artefact-filter.component';
 
 @NgModule({
   declarations: [
@@ -192,7 +192,7 @@ import { TreeNodeVisualStateDirective } from './directives/tree-node-visual-stat
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
     AltReportNodeStatusFilterComponent,
-    AltReportNodeKeywordFilterComponent,
+    AltReportNodeArtefactFilterComponent,
     TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,

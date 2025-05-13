@@ -2,12 +2,11 @@ import { computed, Directive, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../services/aggregated-report-view-tree-state.service';
 import { AltReportNodesStateService } from '../services/alt-report-nodes-state.service';
 import { Status } from '../../_common/shared/status.enum';
-import { ReportNodeType } from '../../report-nodes/shared/report-node-type.enum';
 
 @Directive({
   selector: '[stepTreeNodeVisualState]',
   host: {
-    '[class.not-significant]': `!hasStatuses() || isSkipped() || anotherType()`,
+    '[class.not-significant]': `!hasStatuses() || isSkipped() || anotherClass()`,
   },
 })
 export class TreeNodeVisualStateDirective {
@@ -18,9 +17,6 @@ export class TreeNodeVisualStateDirective {
 
   private node = computed(() => this._treeState.findNodeById(this.nodeId()));
   private statusFilter = computed(() => this._reportNodeState?.statusCtrlValue?.() ?? []);
-  private isKeywordFilter = computed(
-    () => this._reportNodeState?.reportNodeClassValue?.() === ReportNodeType.CALL_FUNCTION_REPORT_NODE,
-  );
 
   private nodeStatuses = computed(() => {
     const node = this.node();
@@ -45,9 +41,12 @@ export class TreeNodeVisualStateDirective {
     return statuses.size === 1 && statuses.has(Status.SKIPPED);
   });
 
-  protected anotherType = computed(() => {
+  protected anotherClass = computed(() => {
     const node = this.node();
-    const isKeywordFilter = this.isKeywordFilter();
-    return isKeywordFilter && node?.originalArtefact?._class !== 'CallKeyword';
+    const artefactClassValue = this._reportNodeState?.artefactClassValue?.();
+    if (artefactClassValue === undefined || artefactClassValue.size === 0) {
+      return false;
+    }
+    return !artefactClassValue.has(node?.originalArtefact?._class ?? '');
   });
 }

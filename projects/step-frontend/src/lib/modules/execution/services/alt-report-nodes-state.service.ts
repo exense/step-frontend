@@ -94,12 +94,18 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     takeUntilDestroyed(),
   );
 
-  readonly reportNodeClassCtrl = this._fb.nonNullable.control<string | undefined>(undefined);
-  readonly reportNodeClassValue = toSignal(this.reportNodeClassCtrl.valueChanges, {
-    initialValue: this.reportNodeClassCtrl.value,
+  readonly artefactClassCtrl = this._fb.nonNullable.control<string[] | undefined>(undefined);
+
+  readonly artefactClassArrayValue = toSignal(this.artefactClassCtrl.valueChanges, {
+    initialValue: this.artefactClassCtrl.value,
   });
-  readonly reportNodeClass$ = this.reportNodeClassCtrl.valueChanges.pipe(
-    startWith(this.reportNodeClassCtrl.value),
+
+  readonly artefactClassValue = computed(() => {
+    const value = this.artefactClassArrayValue();
+    return new Set(value ?? []);
+  });
+  readonly artefactClass$ = this.artefactClassCtrl.valueChanges.pipe(
+    startWith(this.artefactClassCtrl.value),
     shareReplay(1),
     takeUntilDestroyed(),
   );
@@ -123,9 +129,9 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.summaryInProgressInternal$.complete();
   }
 
-  updateStatusCtrl(statuses: Status[], reportNodeClass?: string): void {
+  updateStatusCtrl(statuses: Status[], artefactClass?: string): void {
     this.statusesCtrl.setValue(statuses);
-    this.reportNodeClassCtrl.setValue(reportNodeClass);
+    this.artefactClassCtrl.setValue(artefactClass ? [artefactClass] : []);
   }
 
   toggleFilterNonPassedAndNoRunning(): void {
@@ -233,30 +239,36 @@ export abstract class AltReportNodesStateService implements OnDestroy {
     this.statusesCtrl.setValue(statuses);
   }
 
-  private reportNodeClassKey(executionId: string): string {
-    return `${executionId}_${this.storagePrefix}_reportNodeClass`;
+  private artefactClassKey(executionId: string): string {
+    return `${executionId}_${this.storagePrefix}_artefactClass`;
   }
 
-  private saveReportNodeClass(reportNodeClass?: string): void {
+  private saveArtefactClass(artefactClass?: string[]): void {
     if (this.isIgnoreFilter) {
       return;
     }
     const executionId = this._executionId();
-    if (executionId && reportNodeClass) {
-      this._executionStorage.setItem(this.reportNodeClassKey(executionId), reportNodeClass);
+    if (executionId && artefactClass) {
+      const artefactClassString = artefactClass.join(',');
+      this._executionStorage.setItem(this.artefactClassKey(executionId), artefactClassString);
     }
   }
 
-  private restoreReportNodeClass(executionId: string, ignoreFilter?: boolean): void {
+  private restoreArtefactClass(executionId: string, ignoreFilter?: boolean): void {
     if (!executionId) {
       return;
     }
     if (ignoreFilter) {
-      this.reportNodeClassCtrl.setValue('');
+      this.artefactClassCtrl.setValue([]);
       return;
     }
-    const reportNodeClass = this._executionStorage.getItem(this.reportNodeClassKey(executionId));
-    this.reportNodeClassCtrl.setValue(reportNodeClass ?? '');
+    const artefactClassString = this._executionStorage.getItem(this.artefactClassKey(executionId));
+    if (artefactClassString) {
+      const artefactClass = artefactClassString.split(',');
+      this.artefactClassCtrl.setValue(artefactClass);
+    } else {
+      this.artefactClassCtrl.setValue([]);
+    }
   }
 
   private setupSyncWithStorage(): void {
@@ -267,16 +279,16 @@ export abstract class AltReportNodesStateService implements OnDestroy {
       .subscribe(([executionId, isIgnoreFilter]) => {
         this.restoreSearch(executionId, isIgnoreFilter);
         this.restoreStatues(executionId, isIgnoreFilter);
-        this.restoreReportNodeClass(executionId, isIgnoreFilter);
+        this.restoreArtefactClass(executionId, isIgnoreFilter);
       });
 
     this.statusesCtrl.valueChanges
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((statuses) => this.saveStatuses(statuses));
 
-    this.reportNodeClassCtrl.valueChanges
+    this.artefactClassCtrl.valueChanges
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((reportNodeClass) => this.saveReportNodeClass(reportNodeClass));
+      .subscribe((artefactClass) => this.saveArtefactClass(artefactClass));
 
     this.searchCtrl.valueChanges
       .pipe(debounceTime(200), takeUntilDestroyed(this._destroyRef))

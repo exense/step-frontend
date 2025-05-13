@@ -36,13 +36,11 @@ export class AggregatedTreeNodeComponent {
 
   protected showStatus = computed(() => {
     const node = this.node();
-    const reportNodeType = this._reportNodeState?.reportNodeClassValue?.();
-    if (!reportNodeType) {
+    const artefactClass = this._reportNodeState?.artefactClassValue?.();
+    if (!artefactClass?.size) {
       return true;
     }
-    return (
-      reportNodeType === ReportNodeType.CALL_FUNCTION_REPORT_NODE && node?.originalArtefact?._class === 'CallKeyword'
-    );
+    return artefactClass.has(node?.originalArtefact?._class ?? '');
   });
 
   protected statusFilter = computed(() => this._reportNodeState?.statusCtrlValue?.() ?? []);
