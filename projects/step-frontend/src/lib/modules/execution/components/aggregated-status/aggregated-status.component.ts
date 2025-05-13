@@ -55,4 +55,6 @@ export class AggregatedStatusComponent {
     const tooltipMessage = `${status}: ${count}`;
     return { className, count, status: status as Status, tooltipMessage };
   }
+
+  protected readonly Status = Status;
 }

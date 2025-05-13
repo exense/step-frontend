@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { ArtefactInlineItem } from '../../types/artefact-inline-item';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
+
+const DEFAULT_MARGIN = '0.5rem';
 
 @Component({
   selector: 'step-artefact-inline-field',
@@ -14,6 +15,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'highlight-inline-item',
+    '[style.--style__margin]': 'margin()',
   },
 })
 export class ArtefactInlineFieldComponent {
@@ -39,10 +41,26 @@ export class ArtefactInlineFieldComponent {
   protected readonly isLabelResolved = computed(() => !!this.label()?.isResolved);
   protected readonly isValueResolved = computed(() => !!this.value()?.isResolved);
 
+  protected readonly margin = computed(() => this.item()?.margin ?? DEFAULT_MARGIN);
+
+  // todo remove
   protected readonly labelTooltip = computed(() => this.label()?.tooltip ?? '');
+
+  // todo remove
   protected readonly valueTooltip = computed(() => this.value()?.tooltip ?? '');
 
   protected readonly isValueFirst = computed(() => this.item()?.isValueFirst ?? false);
+  protected readonly showColon = computed(() => {
+    const isValueFirst = this.isValueFirst();
+    const hideColon = this.item()?.hideColon ?? false;
+    return !isValueFirst && !hideColon;
+  });
+
+  protected readonly hasDynamicExpression = computed(() => {
+    const labelExpression = this.labelExpression();
+    const valueExpression = this.valueExpression();
+    return !!labelExpression || !!valueExpression;
+  });
 
   protected readonly itemLabel = computed(() => {
     const label = this.label();
@@ -79,7 +97,7 @@ export class ArtefactInlineFieldComponent {
     this.displayText($event, value, label);
   }
 
-  protected displayText($event: MouseEvent, text: string, title: string = ''): void {
+  protected displayText($event: MouseEvent, text: string, title: string = 'Dynamic expression'): void {
     $event.preventDefault();
     $event.stopPropagation();
     $event.stopImmediatePropagation();
@@ -93,4 +111,6 @@ export class ArtefactInlineFieldComponent {
       wrapText: true,
     });
   }
+
+  protected readonly PopoverMode = PopoverMode;
 }

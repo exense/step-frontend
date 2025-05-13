@@ -14,6 +14,7 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 })
 export class DoughnutChartComponent implements OnDestroy {
   readonly settings = input.required<DoughnutChartSettings>();
+  readonly totalTooltip = input<string | undefined>(undefined);
   readonly chartItemClick = output<ChartItemClickEvent>();
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');

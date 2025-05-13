@@ -29,7 +29,6 @@ Settings.defaultLocale = 'en';
 
 const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
 
-
 @NgModule({
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
   imports: [
