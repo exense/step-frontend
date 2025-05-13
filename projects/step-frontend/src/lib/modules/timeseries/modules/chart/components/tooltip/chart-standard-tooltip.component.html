@@ -5,6 +5,9 @@
   @for (entry of entries(); track entry.name) {
     <ng-container *ngTemplateOutlet="tooltipTemplate; context: { entry: entry }" />
   }
+  @if (entries()?.length === 0) {
+    <div>No data</div>
+  }
   @if (elipsisAfter) {
     <div class="dots">...</div>
   }

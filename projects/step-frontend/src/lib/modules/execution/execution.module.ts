@@ -32,6 +32,8 @@ import {
   sequenceCanActivateGuards,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  TestRunStatus,
+  ReportNode,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -130,6 +132,9 @@ import { AltExecutionTreePartialComponent } from './components/alt-execution-tre
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
+import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
+import { MatButton } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -209,6 +214,7 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     AgentsCellComponent,
     AgentsModalComponent,
     DurationDescriptionComponent,
+    LegacyExecutionViewComponent,
   ],
   imports: [
     StepCommonModule,
@@ -221,6 +227,8 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
     TooltipContentDirective,
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
+    DashboardPageComponent,
+    MatButton,
   ],
   exports: [
     ExecutionListComponent,
@@ -621,23 +629,31 @@ export class ExecutionModule {
                       );
                     }),
                     catchError(() => of(undefined)),
-                    map((testCases) => {
-                      const list = testCases
+                    map((testCases: ReportNode[] | undefined) => {
+                      const items = testCases?.map?.(
+                        (item) =>
+                          ({
+                            id: item.artefactID,
+                            testplanName: item.name,
+                            status: item.status,
+                          }) as TestRunStatus,
+                      );
+
+                      let list = testCases
                         ?.filter((item) => !!item && item?.status !== 'SKIPPED')
                         ?.map((item) => item?.artefactID!);
                       if (list?.length === testCases?.length) {
-                        return undefined;
+                        list = undefined;
                       }
-                      return list;
-                    }),
-                    map((list) => {
-                      if (!list?.length) {
-                        return undefined;
-                      }
-                      return {
-                        list,
-                        by: 'id',
-                      } as IncludeTestcases;
+
+                      const selection: IncludeTestcases | undefined = !list?.length
+                        ? undefined
+                        : {
+                            list,
+                            by: 'id',
+                          };
+
+                      return { items, selection };
                     }),
                   );
                 },

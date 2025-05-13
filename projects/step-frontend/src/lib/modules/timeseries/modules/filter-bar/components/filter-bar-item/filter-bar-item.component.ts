@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  input,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
 import { TimeSeriesUtils, FilterBarItemType, FilterBarItem, COMMON_IMPORTS, FilterUtils } from '../../../_common';
@@ -20,7 +30,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   @Input() item!: FilterBarItem; // should not make edits on it
   itemDraft!: FilterBarItem;
   @Input() removable?: boolean;
-  @Input() compact = false;
+  readonly = input<boolean>(false);
   @Input() highlightRemoveButton = false;
   @Input() updateTimeRangeOption = true; // execution filter item provide the 'Update time range' option.
 

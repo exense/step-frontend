@@ -20,11 +20,14 @@ import { RootComponent } from './components/root/root.component';
 import { StepCommonModule } from './modules/_common/step-common.module';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { APP_ROUTES, DEFAULT_ROUTE_INITIALIZER, LEGACY_URL_HANDLER } from './app.routes';
-import { AutomationPackagesModule } from './modules/automation-packages/automation-packages.module';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
+import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './modules/automation-packages';
+import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 
 Settings.defaultLocale = 'en';
+
+const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
 
 @NgModule({
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
@@ -32,10 +35,11 @@ Settings.defaultLocale = 'en';
     StepCommonModule,
     BrowserModule,
     StepCoreModule,
+    ...ERRORS_VIEW_IMPORTS,
     AdminModule,
     PlanModule,
     FunctionModule,
-    AutomationPackagesModule,
+    ...AUTOMATION_PACKAGE_IMPORTS,
     ExecutionModule,
     BrowserAnimationsModule,
     SchedulerModule,
@@ -51,6 +55,7 @@ Settings.defaultLocale = 'en';
   exports: [RootComponent],
   providers: [
     LEGACY_URL_HANDLER,
+    ...MODULES_INITIALIZERS,
     PLUGINS_INITIALIZER,
     DEFAULT_ROUTE_INITIALIZER,
     {

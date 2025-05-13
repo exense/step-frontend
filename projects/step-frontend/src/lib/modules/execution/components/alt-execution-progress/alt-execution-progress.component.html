@@ -10,7 +10,7 @@
             matTooltipPosition="below"
           />
         }
-        <div>{{ execution?.description }}</div>
+        <div>{{ execution | executionName }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
           @if (repositoryParams.repositoryID !== 'local') {
             <step-alt-execution-repository [repositoryParams]="repositoryParams" />
@@ -148,15 +148,13 @@
       <router-outlet name="controls" />
     </div>
     <div class="range-picker">
-      @if (!(isAnalyticsRoute$ | async)) {
-        <step-time-range-picker
-          [activeSelection]="(timeRangeSelection$ | async)!"
-          [activeTimeRange]="(timeRange$ | async)!"
-          [selectOptions]="timeRangeOptions"
-          (selectionChange)="handleTimeRangeChange($event)"
-          [fullRangeLabel]="(fullTimeRangeLabel | async)!"
-        />
-      }
+      <step-time-range-picker
+        [activeSelection]="(timeRangeSelection$ | async)!"
+        [activeTimeRange]="(timeRange$ | async)!"
+        [selectOptions]="timeRangeOptions"
+        (selectionChange)="handleTimeRangeChange($event)"
+        [fullRangeLabel]="(fullTimeRangeLabel | async)!"
+      />
     </div>
   }
 </section>

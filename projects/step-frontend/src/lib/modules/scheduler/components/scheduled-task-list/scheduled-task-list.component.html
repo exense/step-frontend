@@ -69,7 +69,7 @@
         mat-icon-button
         matTooltip="Configure scheduler"
         matTooltipPosition="below"
-        [disabled]="!('scheduler-manage' | hasRight | async)"
+        [disabled]="!('scheduler-manage' | hasRight | async) || !('admin-ui-menu' | hasRight | async)"
         [routerLink]="settingsUrl"
       >
         <step-icon name="settings" />

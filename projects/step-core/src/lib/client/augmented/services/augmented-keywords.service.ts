@@ -24,7 +24,19 @@ export class AugmentedKeywordsService extends KeywordsService implements HttpOve
     return this;
   }
 
-  createFilteredTableDataSource(filter?: string[]): StepDataSource<Keyword> {
+  createFilteredTableDataSource(filter?: string[], automationPackageId?: string): StepDataSource<Keyword> {
+    let filters: Parameters<typeof this._dataSourceFactory.createDataSource>[2] = undefined;
+
+    if (filter) {
+      filters = filters ?? {};
+      filters['type'] = filter;
+    }
+
+    if (automationPackageId) {
+      filters = filters ?? {};
+      filters['customFields.automationPackageId'] = { value: `^${automationPackageId}$`, regex: true };
+    }
+
     return this._dataSourceFactory.createDataSource(
       AugmentedKeywordsService.FUNCTIONS_TABLE_ID,
       {
@@ -33,7 +45,7 @@ export class AugmentedKeywordsService extends KeywordsService implements HttpOve
         automationPackage: 'customFields.automationPackageId',
         actions: '',
       },
-      filter ? { type: filter } : undefined,
+      filters,
     );
   }
 
