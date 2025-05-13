@@ -117,8 +117,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
   tableIsLoading = true;
 
-  settings!: TableDashletSettings;
-
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];
   attributesByIds: Record<string, MetricAttribute> = {};
@@ -258,9 +256,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   onColumnVisibilityChange(column: TableColumn): void {
-    const newVisible = !column.isVisible;
+    let columnDefinition = this.columnsDefinition.find((c) => c.id === column.id)!;
+    columnDefinition.isVisible = !columnDefinition.isVisible;
+    this.item.tableSettings!.columns.find((c) => c.column === column.id)!.selected = columnDefinition.isVisible;
     // update the chart settings
-    this.settings?.columns.filter((c) => c.column === column.id).forEach((c) => (c.selected = newVisible));
+    this.updateVisibleColumns();
   }
 
   onColumnPclValueChange(column: TableColumn, value: string) {

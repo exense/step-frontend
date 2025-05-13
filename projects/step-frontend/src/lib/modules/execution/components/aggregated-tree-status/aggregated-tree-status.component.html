@@ -6,16 +6,20 @@
   </div>
 } @else {
   @for (item of statusItems(); track item.status) {
-    <div class="status-group">
-      <div
-        class="step-node-aggregated-status"
-        [class]="item.className"
-        [matTooltip]="item.tooltipMessage"
-        matTooltipPosition="below"
-        (click)="handleClick(item, $event)"
-      >
-        {{ item.count | shortenNumber: 'x' }}
+    @if (item.status === Status.RUNNING && item.count === 1) {
+      <step-status [status]="item.status" [iconMode]="true" (click)="handleClick(item, $event)" />
+    } @else {
+      <div class="status-group">
+        <div
+          class="step-node-aggregated-status"
+          [class]="item.className"
+          [matTooltip]="item.tooltipMessage"
+          matTooltipPosition="below"
+          (click)="handleClick(item, $event)"
+        >
+          {{ item.count | shortenNumber: 'x' }}
+        </div>
       </div>
-    </div>
+    }
   }
 }

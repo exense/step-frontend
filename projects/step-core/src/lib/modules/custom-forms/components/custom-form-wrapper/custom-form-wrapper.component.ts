@@ -18,6 +18,7 @@ export class CustomFormWrapperComponent implements ControlValueAccessor {
   @Input() stScreen!: string;
   @Input() stInline: boolean = false;
   @Input() stExcludeFields: string[] = [];
+  @Input() stIncludeFieldsOnly?: string[];
   @Input() showRequiredMarker: boolean = false;
 
   private customForm = viewChild(CustomFormComponent);

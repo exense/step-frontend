@@ -1,4 +1,5 @@
 <section class="list" [class.vertical]="isVertical()" [class.wrap]="wrap()">
+  <ng-content select="step-artefact-inline-field-list-prefix"></ng-content>
   @for (item of displayItems(); track item.label) {
     <step-artefact-inline-field [item]="item" />
   }

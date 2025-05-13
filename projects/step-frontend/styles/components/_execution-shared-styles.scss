@@ -5,9 +5,69 @@
 @mixin execution-shared-styles {
   @include execution-report-node-inline-details;
   @include execution-report-node-details;
+  @include highlight-inline-item;
+
+  /*
+  .smaller-view {
+    font-size: 1.1rem;
+    step-icon {
+      @include core.step-icon-size(1.5rem, true);
+    }
+  }
+  .larger-view {
+    font-size: 1.3rem;
+    step-icon {
+      @include core.step-icon-size(1.7rem, true);
+    }
+  }
+
+  step-icon.larger-icon {
+    @include core.step-icon-size(1.7rem, true);
+  }
+  */
+  .smaller-view {
+  }
+  .larger-view {
+    font-size: 1.4rem;
+    step-icon {
+      @include core.step-icon-size(1.8rem, true);
+    }
+  }
+
+  step-icon.larger-icon {
+    @include core.step-icon-size(1.8rem, true);
+  }
+}
+
+@mixin highlight-inline-item {
+  .highlight-inline-item {
+    border-radius: 1rem;
+    padding: 0.2rem 0.3rem 0.2rem 0.3rem;
+    margin-left: 0.1rem;
+    margin-right: var(--style__margin, 0rem) !important;
+    cursor: pointer;
+
+    &:hover {
+      border: solid 0.1rem var.$blue-600;
+      margin-left: 0;
+      margin-right: calc(var(--style__margin, 0rem) - 0.1rem) !important;
+      padding: 0.1rem 0.3rem 0.1rem 0.3rem;
+    }
+  }
 }
 
 @mixin execution-report-node-inline-details {
+  .default-attachment-popover-view {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    font-size: 1.2rem;
+    step-icon {
+      @include core.step-icon-size(1.4rem);
+    }
+  }
+
   .execution-report-node-inline-details {
     display: flex;
     flex-direction: column;
@@ -24,6 +84,20 @@
     .etc-container {
       display: flex;
       gap: 0.5rem;
+      flex-direction: column;
+    }
+
+    .attachments-container {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+
+      span {
+        display: block;
+        max-width: 15rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     .error-container {
@@ -55,6 +129,14 @@
       display: none;
     }
 
+    .container-title {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
     .json-container {
       position: relative;
       min-height: 2rem;
@@ -84,7 +166,7 @@
         }
       }
 
-      .tech-details > .tech-details-content {
+      &.tech-details > .tech-details-content {
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 1rem;

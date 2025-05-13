@@ -1,0 +1,30 @@
+:host {
+  display: inline-block;
+  padding: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.att-thumbnail {
+  transition: transform 0.2s;
+  transition-delay: 1s;
+  width: 150px;
+  margin-bottom: 2px;
+  &:hover {
+    transform: scale(3);
+  }
+}
+
+.att-preview-label {
+  text-decoration: none;
+  font-size: 85%;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+}
+
+mat-icon {
+  margin-right: 5px;
+}
