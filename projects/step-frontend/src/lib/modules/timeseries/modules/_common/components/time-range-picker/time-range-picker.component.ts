@@ -35,7 +35,6 @@ import { FormsModule } from '@angular/forms';
   imports: [COMMON_IMPORTS, FormsModule],
 })
 export class TimeRangePickerComponent implements OnInit {
-  timeUnitOptions = Object.entries(TIME_UNIT_DICTIONARY);
   private _snackBar = inject(MatSnackBar);
 
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
