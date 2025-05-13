@@ -16,12 +16,8 @@
             [countByStatus]="element.countByStatus"
             (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
           />
-          @if (element?.singleInstanceReportNode; as singleNode) {
-            @if (singleNode.duration) {
-              <step-execution-duration-simple [duration]="singleNode.duration" />
-            }
-          } @else if (!!element.averageDuration) {
-            <step-execution-duration-simple [duration]="element.averageDuration" [isAverage]="true" />
+          @if (element | aggregatedReportViewDurationValue; as duration) {
+            <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
           }
         </section>
       </td>

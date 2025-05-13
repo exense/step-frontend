@@ -132,6 +132,8 @@ import { DurationDescriptionComponent } from './components/duration-description/
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
+import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
+import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 
 @NgModule({
   declarations: [
@@ -211,6 +213,8 @@ import { ExecutionDurationSimpleComponent } from './components/execution-duratio
     AggregatedStatusComponent,
     DurationDescriptionComponent,
     ExecutionDurationSimpleComponent,
+    AggregatedReportViewDurationValuePipe,
+    IsAverageDurationPipe,
   ],
   imports: [
     StepCommonModule,
