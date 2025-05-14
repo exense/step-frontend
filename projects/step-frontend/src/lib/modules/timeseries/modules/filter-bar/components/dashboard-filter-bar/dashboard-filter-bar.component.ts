@@ -3,12 +3,12 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  EventEmitter,
   inject,
+  input,
   Input,
   OnDestroy,
   OnInit,
-  Output,
+  output,
   QueryList,
   ViewChild,
   ViewChildren,
@@ -41,9 +41,10 @@ import {
 } from '../../../_common';
 import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
-import { TimeRangePickerSelection } from '../../../_common/types/time-selection/time-range-picker-selection';
+import { MatDivider } from '@angular/material/divider';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -65,18 +66,21 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
     TimeRangePickerComponent,
     TsGroupingComponent,
     FilterBarItemComponent,
+    VisibleFilterBarItemPipe,
+    MatDivider,
   ],
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
-  @Input() context!: TimeSeriesContext;
+  context = input.required<TimeSeriesContext>();
+  showHiddenFilters = input<boolean>(false);
 
   _internalFilters: FilterBarItem[] = [];
   @Input() compactView = false;
-  @Input() timeRangeOptions!: TimeRangePickerSelection[];
-  @Input() activeTimeRangeSelection!: TimeRangePickerSelection;
   @Input() editMode = false;
 
-  @Output() timeRangeChange = new EventEmitter<{ selection: TimeRangePickerSelection; triggerRefresh: boolean }>();
+  compareModeEnabled = false;
+
+  readonly fullRangeChange = output<TimeRange>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
@@ -121,17 +125,21 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
 
   ngOnInit(): void {
-    if (!this.context) {
+    const contextInput = this.context();
+    if (!contextInput) {
       throw new Error('Context input is mandatory');
     }
-    if (this.context.getGroupDimensions()) {
-      this.activeGrouping = this.context.getGroupDimensions();
+    if (contextInput.getGroupDimensions()) {
+      this.activeGrouping = contextInput.getGroupDimensions();
     }
-    let contextFiltering = this.context.getFilteringSettings();
+    contextInput.compareModeChange$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((settings) => (this.compareModeEnabled = settings.enabled));
+    let contextFiltering = contextInput.getFilteringSettings();
     this.oqlValue = contextFiltering.oql || '';
     this.activeMode = contextFiltering.mode;
     this._internalFilters = contextFiltering.filterItems;
-    this.context
+    contextInput
       .onAttributesChange()
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((attributes: Record<string, MetricAttribute>) => {
@@ -170,8 +178,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private collectUnusedAttributes(): MetricAttribute[] {
-    const hiddenFilters = this.context.getFilteringSettings().hiddenFilters || [];
-    return this.context
+    const hiddenFilters = this.context().getFilteringSettings().hiddenFilters || [];
+    return this.context()
       .getAllAttributes()
       .filter(
         (attr) =>
@@ -198,10 +206,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     } else {
       this.invalidOql = false;
     }
-  }
-
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
   disableOqlMode() {
@@ -236,7 +240,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
       if (!this.rawMeasurementsModeActive) {
-        this.context.updateGrouping(dimensions);
+        this.context().updateGrouping(dimensions);
       } else {
         // wait for the manual apply
       }
@@ -247,15 +251,15 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     const settings: TsFilteringSettings = {
       mode: this.activeMode,
       filterItems: JSON.parse(JSON.stringify(this._internalFilters)),
-      hiddenFilters: this.context.getFilteringSettings().hiddenFilters,
+      hiddenFilters: this.context().getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };
-    this.context.setFilteringSettings(settings);
+    this.context().setFilteringSettings(settings);
   }
 
   manuallyApplyFilters() {
     if (this.haveNewGrouping()) {
-      this.context.updateGrouping(this.activeGrouping);
+      this.context().updateGrouping(this.activeGrouping);
     }
     if (this.activeMode === TsFilteringMode.STANDARD) {
       this.emitFiltersChange();
@@ -291,8 +295,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
-      this.activeTimeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: newRange };
-      this.timeRangeChange.next({ selection: this.activeTimeRangeSelection, triggerRefresh: true });
+      this.fullRangeChange.emit(newRange);
     }
     this.emitFilterChange$.next();
   }
@@ -317,7 +320,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     });
     if (!allExecutionsAreKnown) {
       // don't reduce the interval because we have execution with no info
-      let fullTimeRange = this.context.getFullTimeRange();
+      let fullTimeRange = this.context().getFullTimeRange();
       min = Math.min(fullTimeRange.from!, min);
       max = Math.max(fullTimeRange.to!, max);
     }
@@ -365,7 +368,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private haveNewGrouping() {
-    const contextGrouping = this.context.getGroupDimensions();
+    const contextGrouping = this.context().getGroupDimensions();
     if (contextGrouping.length !== this.activeGrouping.length) {
       return true;
     } else {
@@ -384,12 +387,12 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   }
 
   private createRawMeasurementsFilter() {
-    const filteringSettings = this.context.getFilteringSettings();
+    const filteringSettings = this.context().getFilteringSettings();
     const filtersOql =
       filteringSettings.mode === TsFilteringMode.OQL
         ? filteringSettings.oql!.replace('attributes.', '')
         : FilterUtils.filtersToOQL(this.getValidFilters(), undefined, ATTRIBUTES_REMOVAL_FUNCTION);
-    const selectedTimeRange = this.context.getSelectedTimeRange();
+    const selectedTimeRange = this.context().getSelectedTimeRange();
     return new OQLBuilder()
       .open('and')
       .append(`(begin < ${Math.trunc(selectedTimeRange.to!)} and begin > ${Math.trunc(selectedTimeRange.from!)})`)

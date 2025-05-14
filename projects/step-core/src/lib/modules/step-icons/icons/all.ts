@@ -317,6 +317,7 @@ import { Cloud } from './svg/cloud';
 import { CloudDrizzle } from './svg/cloud-drizzle';
 import { CloudRain } from './svg/cloud-rain';
 import { Columns } from './svg/columns';
+import { UpdateTimeSelection } from './svg/update-time-selection';
 
 export const allIcons = {
   Maximize2,
@@ -638,4 +639,5 @@ export const allIcons = {
   CloudDrizzle,
   CloudRain,
   Columns,
+  UpdateTimeSelection,
 };

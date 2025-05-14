@@ -9,6 +9,7 @@ import {
   Observable,
   of,
   pairwise,
+  scan,
   shareReplay,
   skip,
   startWith,
@@ -35,7 +36,7 @@ import {
   TimeRange,
   ViewRegistryService,
 } from '@exense/step-core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { KeywordParameters } from '../../shared/keyword-parameters';
 import { TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../shared/type-leaf-report-nodes-table-params';
@@ -142,13 +143,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
 
-  protected isAnalyticsRoute$ = this._router.events.pipe(
-    filter((event) => event instanceof NavigationEnd),
-    startWith(null), // Emit an initial value when the component loads
-    map(() => this._router.url.includes('/analytics')),
-    shareReplay(1),
-  );
-
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
     ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
@@ -172,10 +166,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  // readonly updateFullTimeRangeSelection = this.execution$.subscribe(execution => {
-  //   console.log('execution change', execution);
-  //   this.timeRangeOptions[0] = {type: 'FULL', absoluteSelection: {from: execution.startTime!, to: execution.endTime!}};
-  // });
+  protected isAnalyticsRoute$ = this._router.events.pipe(
+    filter((event) => event instanceof NavigationEnd),
+    startWith(null), // Emit an initial value when the component loads
+    map(() => this._router.url.includes('/analytics')),
+    shareReplay(1),
+  );
+
+  protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
@@ -183,7 +181,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       // force trigger time range change
       const timeRangeSelection = activeExecution.getTimeRangeSelection();
       setTimeout(() => {
-        this._urlParamsService.updateUrlParams(timeRangeSelection);
         this.updateTimeRangeSelection({ ...timeRangeSelection });
       }, 100);
     });
@@ -194,13 +191,24 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  readonly updateUrl = this.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
-    this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-      if (!isAnalyticsRoute) {
-        this._urlParamsService.updateUrlParams(range);
+  private updateUrlParamsSubscription = this.timeRangeSelection$
+    .pipe(
+      scan(
+        (acc, range) => {
+          const isFirst = !acc.hasEmitted;
+          return { range, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+    )
+    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+      // analytics tab is handling events itself
+      let analyticsRoute = this.isAnalyticsRoute();
+      if (!analyticsRoute) {
+        this._urlParamsService.patchUrlParams(range, undefined, isFirst);
       }
     });
-  });
 
   protected handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.updateTimeRangeSelection(selection);
@@ -373,13 +381,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         ),
       )
       .subscribe(() => {
-        this.isAnalyticsRoute$.pipe(take(1)).subscribe((isAnalyticsRoute) => {
-          let params = this._urlParamsService.collectUrlParams();
-          if (!isAnalyticsRoute && params.timeRange) {
-            // analytics route takes care of updating the url itself
-            this.updateTimeRangeSelection(params.timeRange!);
+        // analytics tab is handling events itself
+        const isAnalytics = this.isAnalyticsRoute();
+        if (!isAnalytics) {
+          let urlParams = this._urlParamsService.collectUrlParams();
+          if (urlParams.timeRange) {
+            this.updateTimeRangeSelection(urlParams.timeRange);
           }
-        });
+        }
       });
   }
 

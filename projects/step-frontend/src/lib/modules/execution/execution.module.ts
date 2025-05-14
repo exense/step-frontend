@@ -134,6 +134,9 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
 import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
+import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
+import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
+import { MatButton } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -215,6 +218,7 @@ import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
     ExecutionDurationSimpleComponent,
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
+    LegacyExecutionViewComponent,
   ],
   imports: [
     StepCommonModule,
@@ -227,6 +231,8 @@ import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
     TooltipContentDirective,
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
+    DashboardPageComponent,
+    MatButton,
   ],
   exports: [
     ExecutionListComponent,
