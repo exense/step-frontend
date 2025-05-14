@@ -5,5 +5,5 @@
 import type { FieldSearchOrder } from './FieldSearchOrder';
 
 export type SearchOrder = {
-  fieldsSearchOder?: Array<FieldSearchOrder>;
+  fieldsSearchOrder?: Array<FieldSearchOrder>;
 };
