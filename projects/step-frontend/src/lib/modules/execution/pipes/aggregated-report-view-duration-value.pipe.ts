@@ -10,11 +10,11 @@ export class AggregatedReportViewDurationValuePipe implements PipeTransform {
     if (!allBucket) {
       return undefined;
     }
-    const max = allBucket.max ?? 0;
+    const sum = allBucket.sum ?? 0;
     const count = allBucket?.count ?? 0;
-    if (max <= 0 || count <= 0) {
+    if (sum <= 0 || count <= 0) {
       return undefined;
     }
-    return Math.round(max / count);
+    return Math.round(sum / count);
   }
 }
