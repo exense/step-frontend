@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   ArtefactInlineItemsBuilderService,
+  ArtefactInlineItemSource,
   ArtefactInlineItemUtilsService,
   BaseInlineArtefactComponent,
 } from '@exense/step-core';
@@ -24,13 +25,16 @@ export class ForInlineComponent extends BaseInlineArtefactComponent<ForArtefact,
       if (!artefact) {
         return undefined;
       }
-      return this._artefactInlineItemUtils.convert([
-        [undefined, artefact.dataSource!.start],
-        ['to', artefact.dataSource!.end],
-        ['by', artefact.dataSource!.inc],
+      const source: ArtefactInlineItemSource = [
+        { label: undefined, value: artefact.dataSource!.start, hideColon: true, margin: '0rem' },
+        { label: 'to', value: artefact.dataSource!.end, hideColon: true, margin: '0rem' },
+        { label: 'by', value: artefact.dataSource!.inc, hideColon: true, margin: '0rem' },
         ['threads', artefact.threads],
-        ['max failures', artefact.maxFailedLoops],
-      ]);
+      ];
+      if (artefact.maxFailedLoops.value || artefact.maxFailedLoops.expression) {
+        source.push(['max failures', artefact.maxFailedLoops]);
+      }
+      return this._artefactInlineItemUtils.convert(source);
     });
 
   protected readonly items = computed(() => this._itemsBuilder.build(this.currentContext()));

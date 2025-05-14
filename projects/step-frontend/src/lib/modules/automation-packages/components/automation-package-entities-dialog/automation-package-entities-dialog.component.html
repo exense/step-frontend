@@ -1,0 +1,18 @@
+<step-modal-window title="Automation Package's entities">
+  <div step-modal-window-body>
+    <step-tabs
+      [tabs]="tabs"
+      [shrink]="true"
+      [activeTabId]="selectedTab()"
+      (activeTabIdChange)="selectedTab.set($event)"
+    />
+    <div class="tab-content">
+      @if (selectedTab(); as entity) {
+        <step-automation-package-entity-table [entityType]="entity" [automationPackageId]="_automationPackageId" />
+      }
+    </div>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+  </div>
+</step-modal-window>

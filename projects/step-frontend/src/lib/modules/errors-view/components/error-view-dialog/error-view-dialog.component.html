@@ -1,0 +1,19 @@
+<step-modal-window title="Error">
+  <div step-modal-window-body>
+    <section class="error-container">
+      @for (error of _state.errors(); track error.id) {
+        <step-alert [type]="AlertType.DANGER">
+          <section class="error-content">
+            <div>{{ error.message }}</div>
+          </section>
+        </step-alert>
+      }
+      @if (!_state.count()) {
+        <step-alert [type]="AlertType.SUCCESS">No errors to display</step-alert>
+      }
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Close</button>
+  </div>
+</step-modal-window>

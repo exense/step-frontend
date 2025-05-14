@@ -1,0 +1,41 @@
+<step-modal-window>
+  <div step-modal-window-title>
+    <div>{{ _data.name }}</div>
+    @if (attachmentType === AttachmentType.TEXT) {
+      <button
+        type="button"
+        tabindex="-1"
+        mat-icon-button
+        matTooltip="Copy all"
+        matTooltipPosition="below"
+        (click)="copyTextContentToClipboard()"
+      >
+        <step-icon name="copy" />
+      </button>
+    }
+  </div>
+  <div step-modal-window-body>
+    @switch (attachmentType) {
+      @case (AttachmentType.IMG) {
+        <div class="media-container">
+          <img [ngSrc]="(_data | attachmentUrl)!" fill />
+        </div>
+      }
+      @case (AttachmentType.VIDEO) {
+        <div class="media-container">
+          <video controls>
+            <source [src]="_data | attachmentUrl" />
+          </video>
+        </div>
+      }
+      @case (AttachmentType.TEXT) {
+        <step-rich-editor #richEditor [formControl]="contentCtrl" [wrapText]="true" />
+      }
+      @default {}
+    }
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Close</button>
+    <button type="button" mat-flat-button color="primary" (click)="download()">Download</button>
+  </div>
+</step-modal-window>

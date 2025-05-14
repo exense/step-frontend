@@ -1,6 +1,7 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { CustomColumnOptions, CustomComponent, Parameter } from '@exense/step-core';
-import { map, of } from 'rxjs';
+import { of } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-parameters-key',
@@ -9,11 +10,39 @@ import { map, of } from 'rxjs';
 })
 export class ParametersKeyComponent implements CustomComponent {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });
-  private readonly options$ = this._customColumnOptions?.options$ ?? of([]);
+  private readonly options$ = this._customColumnOptions?.options$ ?? of([] as string[]);
 
-  readonly noLink$ = this.options$.pipe(map((options) => options.includes('noEditorLink')));
+  private readonly options = toSignal(this.options$, {
+    initialValue: [],
+  });
 
-  readonly noDescriptionHint$ = this.options$.pipe(map((options) => options.includes('noDescriptionHint')));
+  readonly parameterInput = input<Parameter | undefined>(undefined, { alias: 'parameter' });
+  readonly noLinkInput = input<boolean | undefined>(undefined, { alias: 'noLink' });
+  readonly noDescriptionHintInput = input<boolean | undefined>(undefined, { alias: 'noDescriptionHint' });
 
-  @Input() context?: Parameter;
+  private contextInternal = signal<Parameter | undefined>(undefined);
+
+  protected readonly parameter = computed(() => {
+    const context = this.contextInternal();
+    const parameter = this.parameterInput();
+    return context ?? parameter;
+  });
+
+  protected readonly noLink = computed(() => {
+    const options = this.options();
+    const noLink = this.noLinkInput();
+    return noLink ?? options.includes('noEditorLink');
+  });
+
+  protected readonly noDescriptionHint = computed(() => {
+    const options = this.options();
+    const noDescriptionHint = this.noDescriptionHintInput();
+    return noDescriptionHint ?? options.includes('noDescriptionHint');
+  });
+
+  context?: Parameter;
+
+  contextChange(previousContext?: Parameter, currentContext?: Parameter): void {
+    this.contextInternal.set(currentContext);
+  }
 }

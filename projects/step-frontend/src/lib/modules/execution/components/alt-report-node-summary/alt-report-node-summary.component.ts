@@ -28,6 +28,8 @@ export class AltReportNodeSummaryComponent {
 
   readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
 
+  readonly totalTooltip = input<string | undefined>();
+
   private statusFilter = computed(() => new Set(this.statusFilterModel()));
 
   private availableStatuses = computed(() => {

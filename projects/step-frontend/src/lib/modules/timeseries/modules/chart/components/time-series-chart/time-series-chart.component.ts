@@ -182,7 +182,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
       throw new Error('Missing settings input');
     }
     if (this.syncKey) {
-      uPlot.sync(this.syncKey);
+      let syncPubSub = uPlot.sync(this.syncKey);
     }
     this.createChart(this.settings);
   }

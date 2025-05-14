@@ -1,20 +1,46 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
-import { AttachmentIsImagePipe } from '../../pipes/attachment-is-image.pipe';
-import { AttachmentShowLabelPipe } from '../../pipes/attachment-show-label.pipe';
-import { AttachmentIsTextPipe } from '../../pipes/attachment-is-text.pipe';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentMeta } from '../../../../client/step-client-module';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
+import { NgOptimizedImage } from '@angular/common';
+import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
+import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 
 @Component({
   selector: 'step-attachment-preview',
-  templateUrl: './attachment-preview.component.html',
-  styleUrls: ['./attachment-preview.component.scss'],
   standalone: true,
+  imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage, AttachmentTypeIconPipe],
+  templateUrl: './attachment-preview.component.html',
+  styleUrl: './attachment-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StepBasicsModule, AttachmentUrlPipe, AttachmentIsImagePipe, AttachmentShowLabelPipe, AttachmentIsTextPipe],
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.with-actions]': 'showDownload()',
+    '[class.with-border]': 'withBorder()',
+    '(click)': 'open()',
+  },
 })
 export class AttachmentPreviewComponent {
-  /* @Input() */
+  private _attachmentUtils = inject(AttachmentUtilsService);
+  private _attachmentDialogs = inject(AttachmentDialogsService);
+
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
+  readonly showDownload = input(true);
+  readonly withBorder = input(true);
+
+  protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
+  protected readonly AttachmentType = AttachmentType;
+
+  protected open(): void {
+    this._attachmentDialogs.showDetails(this.attachment()!);
+  }
+
+  protected download($event: MouseEvent): void {
+    $event.preventDefault();
+    $event.stopPropagation();
+    $event.stopImmediatePropagation();
+    this._attachmentUtils.downloadAttachment(this.attachment());
+  }
 }
