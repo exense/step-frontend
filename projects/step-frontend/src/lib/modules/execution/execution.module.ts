@@ -134,6 +134,9 @@ import { DashboardUrlParamsService } from '../timeseries/modules/_common/injecta
 import { AltReportNodeStatusFilterComponent } from './components/alt-report-node-status-filter/alt-report-node-status-filter.component';
 import { TreeNodeVisualStateDirective } from './directives/tree-node-visual-state.directive';
 import { AltReportNodeArtefactFilterComponent } from './components/alt-report-node-artefact-filter/alt-report-node-artefact-filter.component';
+import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
+import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
+import { MatButton } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -215,6 +218,7 @@ import { AltReportNodeArtefactFilterComponent } from './components/alt-report-no
     AgentsCellComponent,
     AgentsModalComponent,
     DurationDescriptionComponent,
+    LegacyExecutionViewComponent,
   ],
   imports: [
     StepCommonModule,
@@ -227,6 +231,8 @@ import { AltReportNodeArtefactFilterComponent } from './components/alt-report-no
     TooltipContentDirective,
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
+    DashboardPageComponent,
+    MatButton,
   ],
   exports: [
     ExecutionListComponent,

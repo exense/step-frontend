@@ -30,7 +30,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   private _urlParamsService = inject(DashboardUrlParamsService);
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
-    this._urlParamsService.updateUrlParams(range, undefined, true);
+    this._urlParamsService.patchUrlParams(range, undefined, true);
   });
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {

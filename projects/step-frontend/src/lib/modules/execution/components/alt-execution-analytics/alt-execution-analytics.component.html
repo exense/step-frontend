@@ -1,3 +1,12 @@
 @if (_state.execution$ | async; as execution) {
-  <step-execution-page [execution]="execution!" (timeRangePickerChange)="handlePickerTimeRangeChange($event)" />
+  @if (!isLoading) {
+    <step-execution-dashboard
+      #dashboard
+      [execution]="execution!"
+      [timeRange]="(_state.timeRange$ | async)!"
+      (contextSettingsChanged)="handleDashboardSettingsChange($event)"
+      (contextSettingsInit)="handleDashboardSettingsInit($event)"
+      (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"
+    />
+  }
 }

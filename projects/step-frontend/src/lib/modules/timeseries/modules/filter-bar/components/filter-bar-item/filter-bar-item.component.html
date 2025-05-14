@@ -1,15 +1,18 @@
 <step-form-field
   [class.active]="active"
+  [class.readonly]="readonly()"
   [class.has-no-value]="!formattedValue"
-  [matMenuTriggerFor]="menu"
+  [matMenuTriggerFor]="readonly() ? null : menu"
   #matTrigger="matMenuTrigger"
   (menuOpened)="onMenuOpen(); focusables.scheduleRefocus()"
   [matTooltip]="formattedValue ?? ''"
   class="cursor-pointer"
 >
-  <step-prefix [class.highlight]="formattedValue">{{ item.label || formattedValue || 'Unspecified' }}</step-prefix>
+  <step-prefix [class.highlight]="formattedValue && !readonly()">{{
+    item.label || formattedValue || 'Unspecified'
+  }}</step-prefix>
   @if (formattedValue) {
-    <div class="step-field-container" [class.highlight]="formattedValue">{{ formattedValue }}</div>
+    <div class="step-field-container" [class.highlight]="formattedValue && !readonly()">{{ formattedValue }}</div>
   }
   @if (removable) {
     <step-suffix class="icon-suffix">
@@ -41,6 +44,7 @@
           *ngFor="let option of item.textValues; let i = index"
           #checkbox
           color="primary"
+          [disabled]="readonly()"
           [name]="option.value"
           [ngModel]="option.isSelected"
           (change)="toggleOption(option, $event.checked)"
@@ -63,7 +67,7 @@
         <input
           type="text"
           autocomplete="off"
-          [readonly]="item.isLocked"
+          [readonly]="item.isLocked || readonly()"
           matInput
           name="attributeName"
           [(ngModel)]="itemDraft.attributeName"
@@ -114,8 +118,11 @@
       <step-ts-filter-bar-execution-item [values]="itemDraft.searchEntities"></step-ts-filter-bar-execution-item>
 
       <div class="apply-checkbox" *ngIf="updateTimeRangeOption">
-        <mat-checkbox [(ngModel)]="itemDraft.updateTimeSelectionOnFilterChange" [ngModelOptions]="{ standalone: true }"
-          >Update time range
+        <mat-checkbox
+          color="primary"
+          [(ngModel)]="itemDraft.updateTimeSelectionOnFilterChange"
+          [ngModelOptions]="{ standalone: true }"
+          >Use selected execution's time range
         </mat-checkbox>
         <step-icon
           matTooltip="Enabling this, the chart time range selection will adjust to cover all your executions"

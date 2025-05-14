@@ -14,7 +14,7 @@ import { TimeRangePickerSelection } from '../time-selection/time-range-picker-se
 
 export interface TsCompareModeSettings {
   enabled: boolean;
-  context?: TimeSeriesContext;
+  context?: TimeSeriesContext; // compare context
 }
 
 /**
@@ -30,7 +30,7 @@ export class TimeSeriesContext {
   /**
    * General observable which emits when any part of the context has been change.
    */
-  readonly stateChange$: Observable<void>;
+  readonly settingsChange$: Observable<void>;
   private stateChangeInternal$ = new Subject<void>();
   inProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -46,7 +46,6 @@ export class TimeSeriesContext {
   private readonly filterSettings$: BehaviorSubject<TsFilteringSettings>;
   private readonly chartsResolution$: BehaviorSubject<number>;
   private readonly chartsLockedState$ = new BehaviorSubject<boolean>(false);
-  private readonly refreshInterval$: BehaviorSubject<number>;
 
   public readonly colorsPool: TimeseriesColorsPool;
 
@@ -74,18 +73,16 @@ export class TimeSeriesContext {
     this.dashboardAttributes$ = new BehaviorSubject<Record<string, MetricAttribute>>(attributes);
     this.colorsPool = params.colorsPool || new TimeseriesColorsPool();
     this.chartsResolution$ = new BehaviorSubject<number>(params.resolution || 0);
-    this.refreshInterval$ = new BehaviorSubject<number>(params.refreshInterval || 0);
     params.metrics?.forEach((m) => (this.indexedMetrics[m.name] = m));
 
     // any specific context change will trigger the main stateChange
-    this.stateChange$ = merge(
+    this.settingsChange$ = merge(
       this.compareModeChange$.pipe(skip(1)),
-      this.inProgress$.pipe(skip(1)),
+      this.inProgress$.pipe(skip(1)), // TODO
       this.activeGroupings$.pipe(skip(1)),
       this.filterSettings$.pipe(skip(1)),
       this.chartsResolution$.pipe(skip(1)),
-      this.chartsLockedState$.pipe(skip(1)),
-      this.refreshInterval$.pipe(skip(1)),
+      this.chartsLockedState$.pipe(skip(1)), // TODO
       this.fullTimeRangeChange$,
       this.selectedTimeRangeChange$,
       this.stateChangeInternal$,
@@ -100,27 +97,26 @@ export class TimeSeriesContext {
     return this.indexedMetrics[key];
   }
 
-  getRefreshInterval(): number {
-    return this.refreshInterval$.getValue();
-  }
-
-  updateRefreshInterval(value: number) {
-    this.refreshInterval$.next(value);
-  }
-
   updateTimeRangeSettings(settings: DashboardTimeRangeSettings) {
     this.timeRangeSettings = settings;
     this.stateChangeInternal$.next();
     this.timeRangeSettingsChange.next(settings);
-    // this.fullTimeRangeChange$.next(settings.fullRange);
+    this.fullTimeRangeChange$.next(settings.fullRange);
   }
 
-  onRefreshIntervalChange(): Observable<number> {
-    return this.refreshInterval$.asObservable();
-  }
-
-  updateDefaultFullTimeRange(range: Partial<TimeRange>) {
-    this.timeRangeSettings.defaultFullRange = range;
+  /**
+   * If there is a selection before changing the full range, and it fits inside it, the selection will not be reset. Otherwise it does.
+   * @param range
+   */
+  updateFullTimeRange(range: TimeRange) {
+    const isFullRangeSelected = this.isFullRangeSelected();
+    const previousSelection = this.timeRangeSettings.selectedRange;
+    if (isFullRangeSelected || !TimeSeriesUtils.intervalIsInside(range, previousSelection)) {
+      // reset it
+      this.timeRangeSettings.selectedRange = range;
+    }
+    this.timeRangeSettings.fullRange = range;
+    this.fullTimeRangeChange$.next(this.timeRangeSettings.fullRange);
   }
 
   getSyncGroups(): TimeSeriesSyncGroup[] {
@@ -142,7 +138,6 @@ export class TimeSeriesContext {
   destroy(): void {
     this.inProgress$.complete();
     this.fullTimeRangeChange$.complete();
-    this.refreshInterval$.complete();
     this.selectedTimeRangeChange$.complete();
     this.activeGroupings$.complete();
     this.filterSettings$.complete();
@@ -243,8 +238,10 @@ export class TimeSeriesContext {
     this.chartsLockedState$.next(state);
   }
 
-  updateFullRange(range: TimeRange, emitEvent = true) {
+  updateFullRangeAndSelection(range: TimeRange, emitEvent = true) {
+    this.timeRangeSettings.timeRangeSelection = { type: 'ABSOLUTE', absoluteSelection: range };
     this.timeRangeSettings.fullRange = range;
+    this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
       this.fullTimeRangeChange$.next(range);
     } else {
@@ -319,10 +316,6 @@ export class TimeSeriesContext {
 
   onGroupingChange(): Observable<string[]> {
     return this.activeGroupings$.asObservable().pipe(skip(1));
-  }
-
-  onTimePickerOptionChange(): Observable<TimeRangePickerSelection> {
-    return this.timeRangeSettingsChange.asObservable().pipe(map((settings) => settings.pickerSelection));
   }
 
   onFilteringChange(): Observable<TsFilteringSettings> {
