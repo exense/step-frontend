@@ -24,7 +24,7 @@
 
     .time-option {
       cursor: pointer;
-      padding: 4px 12px;
+      padding: 0.4rem 1.2rem;
 
       &.full-range {
         margin: 1.2rem 0;
@@ -36,6 +36,44 @@
 
       &:hover {
         background: #f1f1f1;
+      }
+    }
+
+    .custom-time-option {
+      padding: 0.4rem 1.2rem;
+      padding-right: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      input {
+        width: 40px;
+        margin-left: 4px;
+        border: 0;
+        border-bottom: 1px solid grey;
+        -moz-appearance: textfield;
+        padding: 2px;
+
+        &:focus {
+          border-bottom: 1px solid grey;
+          outline: none;
+        }
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+
+      select {
+        margin-left: 4px;
+        border: 0;
+        border-bottom: 1px solid grey;
+      }
+
+      button {
+        background-color: unset;
+        border: 1px solid #d1d1d1;
       }
     }
   }
