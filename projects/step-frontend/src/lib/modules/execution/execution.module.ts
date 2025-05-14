@@ -74,7 +74,6 @@ import { AltReportWidgetContentDirective } from './directives/alt-report-widget-
 import { AltReportNodeKeywordsComponent } from './components/alt-report-node-keywords/alt-report-node-keywords.component';
 import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-testcases/alt-report-nodes-testcases.component';
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
-import { AggregatedTreeStatusComponent } from './components/aggregated-tree-status/aggregated-tree-status.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
 import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
@@ -128,10 +127,14 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
 import { AltExecutionTreePartialComponent } from './components/alt-execution-tree-partial/alt-execution-tree-partial.component';
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
+import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
+import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { MatButton } from '@angular/material/button';
@@ -198,7 +201,6 @@ import { MatButton } from '@angular/material/button';
     AltExecutionLaunchDialogComponent,
     AltExecutionTreePartialTabComponent,
     ExecutionDetailsComponent,
-    AggregatedTreeStatusComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
     TreeNodeDescriptionPipe,
@@ -213,7 +215,11 @@ import { MatButton } from '@angular/material/button';
     AltExecutionErrorsComponent,
     AgentsCellComponent,
     AgentsModalComponent,
+    AggregatedStatusComponent,
     DurationDescriptionComponent,
+    ExecutionDurationSimpleComponent,
+    AggregatedReportViewDurationValuePipe,
+    IsAverageDurationPipe,
     LegacyExecutionViewComponent,
   ],
   imports: [

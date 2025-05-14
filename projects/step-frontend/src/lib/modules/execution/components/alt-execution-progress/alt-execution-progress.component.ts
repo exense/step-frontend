@@ -18,22 +18,18 @@ import {
   tap,
 } from 'rxjs';
 import {
+  AggregatedReportView,
   AlertType,
-  ArtefactFilter,
   AugmentedControllerService,
   AugmentedExecutionsService,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
-  AutoDeselectStrategy,
   Execution,
   ExecutionCloseHandleService,
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
-  RegistrationStrategy,
   ReportNode,
-  selectionCollectionProvider,
-  SelectionCollector,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
@@ -117,13 +113,6 @@ interface RefreshParams {
       },
     },
     AltExecutionReportPrintService,
-    ...selectionCollectionProvider(
-      {
-        selectionKeyProperty: 'artefactID',
-        registrationStrategy: RegistrationStrategy.MANUAL,
-      },
-      AutoDeselectStrategy.KEEP_SELECTION,
-    ),
     AltExecutionDialogsService,
     {
       provide: SchedulerInvokerService,
@@ -149,7 +138,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _aggregatedTreeWidgetState = inject(AGGREGATED_TREE_WIDGET_STATE);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
@@ -203,7 +191,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
-  updateUrlParamsSubscription = this.timeRangeSelection$
+  private updateUrlParamsSubscription = this.timeRangeSelection$
     .pipe(
       scan(
         (acc, range) => {
@@ -250,48 +238,54 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
 
+  readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
+    map(([execution, rangeSelection]) => {
+      if (execution.id !== this._executionId()) {
+        // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
+        return undefined;
+      }
+      switch (rangeSelection.type) {
+        case 'FULL':
+          const now = new Date().getTime();
+          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
+        case 'ABSOLUTE':
+          return rangeSelection.absoluteSelection!;
+        case 'RELATIVE':
+          const endTime = execution.endTime || new Date().getTime();
+          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
+      }
+    }),
+    filter((range): range is TimeRange => range !== undefined),
+    shareReplay(1),
+  ) as Observable<TimeRange>;
+
+  readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
+
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  readonly hasTestCasesFilter$ = this._testCasesSelection.selected$.pipe(
-    map((selected) => selected.length > 0 && selected.length < this._testCasesSelection.possibleLength),
-  );
-
-  private previousTestCasesIds: string[] = [];
-  readonly testCases$ = this.execution$.pipe(
-    startWith(undefined),
-    pairwise(),
-    map(([prevExecution, currentExecution]) => {
-      const updateSelection =
-        prevExecution?.id !== currentExecution?.id ? UpdateSelection.ALL : UpdateSelection.ONLY_NEW;
-      return { execution: currentExecution, updateSelection } as RefreshParams;
-    }),
-    switchMap(({ execution, updateSelection }) => {
-      if (!execution?.id) {
-        return of([]);
+  readonly testCases$ = combineLatest([
+    this.execution$.pipe(
+      startWith(undefined),
+      map((execution) => execution?.id),
+    ),
+    this.timeRange$,
+  ]).pipe(
+    switchMap(([id, range]) => {
+      if (!id) {
+        return of(undefined);
       }
-      return this._executionsApi
-        .getReportNodesByExecutionId(execution.id, 'step.artefacts.reports.TestCaseReportNode', 500)
-        .pipe(
-          tap((reportNodes) => {
-            const oldTestCasesIds = new Set(this.previousTestCasesIds);
-            const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.has(testCase.id!));
-            this.previousTestCasesIds = reportNodes.map((testCase) => testCase.id!);
-            this._testCasesSelection.registerPossibleSelectionManually(reportNodes);
-            if (updateSelection !== UpdateSelection.NONE) {
-              this.determineDefaultSelection(
-                updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
-                execution.executionParameters?.artefactFilter,
-              );
-            }
-          }),
-        );
+      return this._executionsApi.getFlatAggregatedReportView(id, {
+        range,
+        filterArtefactClasses: ['TestCase'],
+        fetchCurrentOperations: true,
+      });
     }),
-    map((testCases) => (!testCases?.length ? undefined : testCases)),
+    map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
-    takeUntilDestroyed(),
   );
 
   protected testCasesForRelaunch$ = this.testCases$.pipe(
+    map((testCases) => testCases.map((item) => item.singleInstanceReportNode).filter((item) => !!item)),
     map((testCases) => {
       const list = testCases?.filter((item) => !!item && item?.status !== 'SKIPPED')?.map((item) => item?.artefactID!);
       if (list?.length === testCases?.length) {
@@ -310,21 +304,20 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
 
-  private testCasesDataSource?: TableDataSource<ReportNode>;
+  private testCasesDataSource?: TableDataSource<AggregatedReportView>;
   readonly testCasesDataSource$ = this.testCases$.pipe(
     tap(() => this.testCasesDataSource?.destroy()),
-    map((nodes) => this.createReportNodesDatasource(nodes ?? []).sharable()),
+    map((nodes) => this.createAggregatedReportViewDatasource(nodes ?? []).sharable()),
     tap((dataSource) => (this.testCasesDataSource = dataSource)),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
-  readonly keywordParameters$ = combineLatest([this.execution$, this._testCasesSelection.selected$]).pipe(
-    map(([execution, testCasesSelection]) => {
+  readonly keywordParameters$ = this.execution$.pipe(
+    map((execution) => {
       return {
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: execution.id,
-        testcases: !testCasesSelection.length ? undefined : testCasesSelection,
       } as KeywordParameters;
     }),
     shareReplay(1),
@@ -357,29 +350,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       return this._systemService.getCurrentOperations(eId);
     }),
   );
-
-  readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
-    map(([execution, rangeSelection]) => {
-      if (execution.id !== this._executionId()) {
-        // when the execution changes, the activeExecution is triggered and the time-range will be updated and re-trigger this
-        return undefined;
-      }
-      switch (rangeSelection.type) {
-        case 'FULL':
-          const now = new Date().getTime();
-          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
-        case 'ABSOLUTE':
-          return rangeSelection.absoluteSelection!;
-        case 'RELATIVE':
-          const endTime = execution.endTime || new Date().getTime();
-          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
-      }
-    }),
-    filter((range): range is TimeRange => range !== undefined),
-    shareReplay(1),
-  ) as Observable<TimeRange>;
-
-  readonly fullTimeRangeLabel = this.timeRange$.pipe(map((range) => TimeSeriesUtils.formatRange(range)));
 
   ngOnInit(): void {
     const urlParams = this._urlParamsService.collectUrlParams();
@@ -483,38 +453,21 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this._activeExecutionContext.manualRefresh();
   }
 
-  private createReportNodesDatasource(nodes: ReportNode[]): TableDataSource<ReportNode> {
+  private createAggregatedReportViewDatasource(items: AggregatedReportView[]): TableDataSource<AggregatedReportView> {
     return new TableLocalDataSource(
-      nodes,
-      TableLocalDataSource.configBuilder<ReportNode>()
-        .addSearchStringPredicate('name', (item) => item.name)
-        .addSearchStringRegexPredicate('status', (item) => item.status)
-        .addCustomSearchPredicate('executionTime', (item, searchValue) => {
-          const [from, to] = searchValue.split('|').map((item) => parseFloat(item));
-          if (!from || !to || isNaN(from) || isNaN(to)) {
-            return true;
-          }
-          return !!item.executionTime && item.executionTime >= from && item.executionTime <= to;
-        })
+      items,
+      TableLocalDataSource.configBuilder<AggregatedReportView>()
+        .addSearchStringPredicate(
+          'name',
+          (item) => item.singleInstanceReportNode?.name ?? item?.artefact?.attributes?.['name'] ?? '',
+        )
+        .addSearchStringRegexPredicate('status', (item) =>
+          Object.keys(item.countByStatus ?? {})
+            .join(' ')
+            .toLowerCase(),
+        )
         .build(),
     );
-  }
-
-  private determineDefaultSelection(testCases: ReportNode[], artefactFilter?: ArtefactFilter): void {
-    const selectedTestCases = testCases.filter((value) => {
-      if (!artefactFilter) {
-        return true;
-      }
-      switch (artefactFilter.class) {
-        case 'step.artefacts.filters.TestCaseFilter':
-          return (artefactFilter as any).includedNames.includes(value.name);
-        case `step.artefacts.filters.TestCaseIdFilter`:
-          return (artefactFilter as any).includedIds.includes(value.artefactID);
-        default:
-          return true;
-      }
-    });
-    this._testCasesSelection.select(...selectedTestCases);
   }
 
   protected readonly PopoverMode = PopoverMode;

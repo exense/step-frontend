@@ -10,4 +10,5 @@ export type GetTokenHandleParameter = {
   createSession?: boolean;
   local?: boolean;
   reservationDescription?: string;
+  skipAutoProvisioning?: boolean;
 };
