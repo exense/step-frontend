@@ -1,9 +1,0 @@
-@use 'projects/step-core/styles/core-variables' as var;
-
-step-select {
-  &.with-empty-placeholder:not(.is-disabled) {
-    mat-select .mat-mdc-select-placeholder {
-      color: var.$blue-700;
-    }
-  }
-}

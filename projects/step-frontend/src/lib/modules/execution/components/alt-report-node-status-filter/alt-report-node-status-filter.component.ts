@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { Status } from '../../../_common/shared/status.enum';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-status-filter',
@@ -8,7 +8,7 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './alt-report-node-status-filter.component.scss',
 })
 export class AltReportNodeStatusFilterComponent {
-  protected readonly _state = inject(AltReportNodesStateService);
+  protected readonly _state = inject(AltReportNodesFilterService);
 
   // Angular doesn't synchronize multiple inputs, if [formControl] is used.
   // To avoid it value is extracted from control and bound with [ngModel].

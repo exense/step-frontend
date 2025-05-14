@@ -21,6 +21,8 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { TreeStateService } from '@exense/step-core';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
+import { AggregatedReportViewTreeFilterService } from '../../services/aggregated-report-view-tree-filter.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -35,6 +37,11 @@ import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.
     {
       provide: AggregatedReportViewTreeStateService,
       useExisting: AGGREGATED_TREE_TAB_STATE,
+    },
+    AggregatedReportViewTreeFilterService,
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AggregatedReportViewTreeFilterService,
     },
   ],
 })

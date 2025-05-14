@@ -15,6 +15,7 @@ import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-nodes-testcases',
@@ -24,6 +25,10 @@ import { TableMemoryStorageService } from '../../services/table-memory-storage.s
     {
       provide: AltReportNodesStateService,
       useExisting: AltTestCasesNodesStateService,
+    },
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AltReportNodesStateService,
     },
     {
       provide: ItemsPerPageService,

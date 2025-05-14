@@ -2,6 +2,7 @@ import { computed, Directive, inject, input } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../services/aggregated-report-view-tree-state.service';
 import { AltReportNodesStateService } from '../services/alt-report-nodes-state.service';
 import { Status } from '../../_common/shared/status.enum';
+import { AltReportNodesFilterService } from '../services/alt-report-nodes-filter.service';
 
 @Directive({
   selector: '[stepTreeNodeVisualState]',
@@ -11,7 +12,7 @@ import { Status } from '../../_common/shared/status.enum';
 })
 export class TreeNodeVisualStateDirective {
   private _treeState = inject(AggregatedReportViewTreeStateService);
-  private _reportNodeState = inject(AltReportNodesStateService, { optional: true });
+  private _reportNodeState = inject(AltReportNodesFilterService, { optional: true });
 
   readonly nodeId = input.required<string>({ alias: 'stepTreeNodeVisualState' });
 

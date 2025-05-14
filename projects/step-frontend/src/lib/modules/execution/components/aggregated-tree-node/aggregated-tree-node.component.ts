@@ -5,6 +5,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { Status } from '../../../_common/shared/status.enum';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -17,7 +18,7 @@ import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.en
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _executionDialogs = inject(AltExecutionDialogsService);
-  private _reportNodeState = inject(AltReportNodesStateService, { optional: true });
+  private _reportNodesFilter = inject(AltReportNodesFilterService, { optional: true });
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
@@ -36,14 +37,14 @@ export class AggregatedTreeNodeComponent {
 
   protected showStatus = computed(() => {
     const node = this.node();
-    const artefactClass = this._reportNodeState?.artefactClassValue?.();
+    const artefactClass = this._reportNodesFilter?.artefactClassValue?.();
     if (!artefactClass?.size) {
       return true;
     }
     return artefactClass.has(node?.originalArtefact?._class ?? '');
   });
 
-  protected statusFilter = computed(() => this._reportNodeState?.statusCtrlValue?.() ?? []);
+  protected statusFilter = computed(() => this._reportNodesFilter?.statusCtrlValue?.() ?? []);
 
   protected readonly detailsTooltip = 'Open execution details';
 

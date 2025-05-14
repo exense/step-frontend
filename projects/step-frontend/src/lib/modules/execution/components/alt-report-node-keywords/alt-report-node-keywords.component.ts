@@ -19,6 +19,7 @@ import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -28,6 +29,10 @@ import { TableMemoryStorageService } from '../../services/table-memory-storage.s
     {
       provide: AltReportNodesStateService,
       useExisting: AltKeywordNodesStateService,
+    },
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AltReportNodesStateService,
     },
     {
       provide: ItemsPerPageService,

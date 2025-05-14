@@ -1,9 +1,21 @@
 <step-alt-report-widget title="Execution tree" [applyOverflow]="true">
   <step-alt-report-widget-filter>
-    <section class="buttons">
-      <button type="button" mat-stroked-button (click)="collapseAll()">Collapse All</button>
-      <button type="button" mat-stroked-button (click)="expandAll()">Expand All</button>
-    </section>
+    <step-btn-group class="with-round-borders">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="collapseAll()"
+        matTooltip="Collapse All"
+        matTooltipPosition="below"
+      >
+        <step-icon name="collapse-all" />
+      </button>
+    </step-btn-group>
+    <step-btn-group class="with-round-borders">
+      <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
+        <step-icon name="expand-all" />
+      </button>
+    </step-btn-group>
     <step-alt-report-node-artefact-filter />
     <step-alt-report-node-status-filter />
     <step-search-field

@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { KeyValue } from '@angular/common';
-import { ArrayItemLabelValueExtractor, ArtefactClass, StepBasicsModule } from '@exense/step-core';
-import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
+import { ArrayItemLabelValueExtractor, ArtefactClass } from '@exense/step-core';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 type Item = KeyValue<ArtefactClass, string>;
 
@@ -13,7 +13,7 @@ const createItem = (key: ArtefactClass, value: string): Item => ({ key, value })
   styleUrl: './alt-report-node-artefact-filter.component.scss',
 })
 export class AltReportNodeArtefactFilterComponent {
-  private _state = inject(AltReportNodesStateService);
+  private _state = inject(AltReportNodesFilterService);
 
   protected readonly items = [
     createItem(ArtefactClass.KEYWORD, 'Keyword'),
