@@ -580,6 +580,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     clonedSettings.filterItems.forEach((item) => {
       item.isHidden = false;
       item.updateTimeSelectionOnFilterChange = true;
+      if (item.attributeName === TimeSeriesConfig.EXECUTION_ID_ATTRIBUTE) {
+        item.menuOpenOnInit = FilterUtils.filterItemIsValid(item); // if there is an execution filter, we open the menu in compare for a faster comparison
+        item.textValues = [];
+        item.searchEntities = [];
+        item.freeTextValues = [];
+      }
     });
     clonedSettings.hiddenFilters = [];
     return clonedSettings;
