@@ -6,9 +6,11 @@ import {
   inject,
   input,
   Input,
+  model,
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,7 +20,8 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TimeRange } from '@exense/step-core';
+import { TIME_UNIT_DICTIONARY, TimeRange, TimeUnit } from '@exense/step-core';
+import { FormsModule } from '@angular/forms';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -29,7 +32,7 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, FormsModule],
 })
 export class TimeRangePickerComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);

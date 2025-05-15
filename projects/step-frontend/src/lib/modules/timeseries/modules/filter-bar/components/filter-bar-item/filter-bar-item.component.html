@@ -115,7 +115,10 @@
       <div class="item-header">
         {{ item.label }}
       </div>
-      <step-ts-filter-bar-execution-item [values]="itemDraft.searchEntities"></step-ts-filter-bar-execution-item>
+      <step-ts-filter-bar-execution-item
+        [showDialogOnInit]="item.menuOpenOnInit"
+        [values]="itemDraft.searchEntities"
+      ></step-ts-filter-bar-execution-item>
 
       <div class="apply-checkbox" *ngIf="updateTimeRangeOption">
         <mat-checkbox
