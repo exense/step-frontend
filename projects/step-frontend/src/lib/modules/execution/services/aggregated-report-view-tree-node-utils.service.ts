@@ -135,7 +135,7 @@ export class AggregatedReportViewTreeNodeUtilsService
     };
   }
 
-  private getUniqueId(artefactId: string, parentId?: string): string {
+  getUniqueId(artefactId: string, parentId?: string): string {
     const source = !parentId ? artefactId : `${parentId}.${artefactId}`;
     return v5(source, HASH_NAMESPACE);
   }

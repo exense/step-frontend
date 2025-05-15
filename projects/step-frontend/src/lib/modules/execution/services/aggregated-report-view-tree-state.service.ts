@@ -20,6 +20,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
 
@@ -28,6 +29,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private _injector = inject(Injector);
   private _artefactService = inject(ArtefactService);
   private _fb = inject(FormBuilder);
+  private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
   private searchIndex = new SearchIndex();
   private artefactsNodeIdIndex = new Map<string, string[]>();
@@ -81,6 +83,16 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
   }
 
+  findNodesByArtefactId(artefactId?: string): AggregatedTreeNode[] {
+    if (!artefactId) {
+      return [];
+    }
+    const { tree, accessCache } = this.treeData();
+    return tree
+      .map(({ id }) => accessCache.get(id) as AggregatedTreeNode)
+      .filter((item) => item.artefactId === artefactId);
+  }
+
   pickSearchResultItemByIndex(index: number): string {
     const item = this.searchResult()[index];
     this.selectedSearchResultItemInternal.set(item);
@@ -104,7 +116,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     (item.children ?? []).forEach((child) => this.buildArtefactsNodeIdIndex(child as AggregatedTreeNode));
   }
 
-  private buildSearchIndex(item: AggregatedTreeNode): void {
+  private buildSearchIndex(item: AggregatedTreeNode, patentId?: string): void {
     const artefact = item.originalArtefact!;
     const artefactType = this._artefactService.getArtefactType(artefact._class!);
 
@@ -135,9 +147,10 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     searchValues.push(artefact?.attributes?.['name'] ?? '');
 
-    this.searchIndex.register(item.id!, searchValues);
+    const nodeId = this._utils.getUniqueId(artefact.id!, patentId);
+    this.searchIndex.register(nodeId, searchValues);
 
-    (item.children ?? []).forEach((child) => this.buildSearchIndex(child as AggregatedTreeNode));
+    (item.children ?? []).forEach((child) => this.buildSearchIndex(child as AggregatedTreeNode, nodeId));
   }
 }
 

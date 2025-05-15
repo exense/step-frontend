@@ -16,6 +16,9 @@ export const $Operation = {
     reportNodeId: {
       type: 'string',
     },
+    artefactHash: {
+      type: 'string',
+    },
     tid: {
       type: 'number',
       format: 'int64',

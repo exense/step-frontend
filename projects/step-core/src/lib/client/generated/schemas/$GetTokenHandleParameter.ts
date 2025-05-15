@@ -24,5 +24,8 @@ export const $GetTokenHandleParameter = {
     reservationDescription: {
       type: 'string',
     },
+    skipAutoProvisioning: {
+      type: 'boolean',
+    },
   },
 } as const;

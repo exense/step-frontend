@@ -1,15 +1,19 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, first, map, pairwise, scan } from 'rxjs';
+import { first, map, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import {
+  AggregatedTreeNodeDialogHooksService,
+  AggregatedTreeNodeDialogHooksStrategy,
+} from '../../services/aggregated-tree-node-dialog-hooks.service';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -26,11 +30,12 @@ import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/ty
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class AltExecutionReportComponent {
+export class AltExecutionReportComponent implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy {
   private _activatedRoute = inject(ActivatedRoute);
   protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
+  private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
 
@@ -44,14 +49,43 @@ export class AltExecutionReportComponent {
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
-  protected handleOpenNodeInTreePage(keyword: ReportNode): void {
-    const reportNodeId = keyword.id;
-    const artefactId = keyword.artefactID;
+  private _urlParamsService = inject(DashboardUrlParamsService);
+
+  private updateUrlParamsSubscription = this._state.timeRangeSelection$
+    .pipe(
+      scan(
+        (acc, range) => {
+          const isFirst = !acc.hasEmitted;
+          return { range, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+      first(),
+    )
+    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+      this._urlParamsService.patchUrlParams(range, undefined, isFirst);
+    });
+
+  ngOnInit(): void {
+    this._hooks.useStrategy(this);
+  }
+
+  ngOnDestroy(): void {
+    this._hooks.cleanupStrategy();
+  }
+
+  reportNodeOpened(reportNode: ReportNode): void {
+    this.treeWidget()?.focusNodeByReport(reportNode);
+  }
+
+  protected handleOpenNodeInTreePage(reportNode: ReportNode): void {
+    const { artefactID: artefactId, artefactHash, id: reportNodeId } = reportNode;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], {
-      queryParams: { reportNodeId, artefactId },
+      queryParams: { reportNodeId, artefactId, artefactHash },
       relativeTo: this._activatedRoute,
     });
   }

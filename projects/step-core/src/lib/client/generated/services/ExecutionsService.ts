@@ -10,6 +10,7 @@ import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTas
 import type { Execution } from '../models/Execution';
 import type { ExecutionParameters } from '../models/ExecutionParameters';
 import type { FindByCriteraParam } from '../models/FindByCriteraParam';
+import type { FlatAggregatedReport } from '../models/FlatAggregatedReport';
 import type { ReportNode } from '../models/ReportNode';
 import type { RepositoryObjectReference } from '../models/RepositoryObjectReference';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
@@ -297,6 +298,28 @@ export class ExecutionsService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/executions/search/names/by/ids',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns an flat aggregated report view for the provided execution and aggregation parameters.
+   * @param id
+   * @param requestBody
+   * @returns FlatAggregatedReport default response
+   * @throws ApiError
+   */
+  public getFlatAggregatedReportView(
+    id: string,
+    requestBody?: AggregatedReportViewRequest,
+  ): Observable<FlatAggregatedReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/executions/{id}/report/aggregated/flat',
+      path: {
+        id: id,
+      },
       body: requestBody,
       mediaType: 'application/json',
     });

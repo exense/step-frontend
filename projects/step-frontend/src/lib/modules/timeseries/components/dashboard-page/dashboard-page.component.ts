@@ -112,6 +112,9 @@ export class DashboardPageComponent implements OnInit {
         if (dashboard!.timeRange.type === 'RELATIVE' && !dashboard!.timeRange.relativeSelection?.label) {
           dashboard.timeRange = this.findRelativeTimeOption(dashboard!.timeRange.relativeSelection!.timeInMs);
         }
+        if (dashboard!.timeRange.type === 'FULL') {
+          dashboard.timeRange = this.timeRangeOptions[0];
+        }
         this.activeTimeRangeSelection.set(dashboard!.timeRange);
       });
     }
