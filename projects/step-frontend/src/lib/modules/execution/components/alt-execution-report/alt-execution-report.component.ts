@@ -90,6 +90,10 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     });
   }
 
+  protected handleOpenNodeInTreeWidget(node: ReportNode): void {
+    this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
+  }
+
   handleChartZooming(range: TimeRange) {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
