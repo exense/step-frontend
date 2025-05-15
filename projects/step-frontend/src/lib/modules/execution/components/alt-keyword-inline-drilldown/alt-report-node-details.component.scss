@@ -4,7 +4,7 @@
   font-size: 1.4rem;
   display: grid;
   gap: 1rem;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(max-content, 1fr);
   height: 100%;
 }
 
@@ -29,6 +29,9 @@ step-report-node {
 
 step-alt-execution-tree-partial {
   display: block;
-  width: 100%;
-  overflow: auto;
+  min-height: 5rem;
+}
+
+.tree-container > .data-container {
+  height: 100%;
 }

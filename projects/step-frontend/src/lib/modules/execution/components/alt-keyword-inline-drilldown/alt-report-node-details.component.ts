@@ -1,7 +1,9 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
+  CLICK_STRATEGY,
+  ClickStrategyType,
   ReportNode,
   TreeNodeUtilsService,
   TreeStateService,
@@ -16,14 +18,19 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
   templateUrl: './alt-report-node-details.component.html',
   styleUrl: './alt-report-node-details.component.scss',
   providers: [
+    AggregatedReportViewTreeNodeUtilsService,
     {
       provide: TreeNodeUtilsService,
-      useClass: AggregatedReportViewTreeNodeUtilsService,
+      useExisting: AggregatedReportViewTreeNodeUtilsService,
     },
     AggregatedReportViewTreeStateService,
     {
       provide: TreeStateService,
       useExisting: AggregatedReportViewTreeStateService,
+    },
+    {
+      provide: CLICK_STRATEGY,
+      useValue: ClickStrategyType.DOUBLE_CLICK,
     },
   ],
 })
@@ -33,6 +40,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
+  readonly openTreeView = output();
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {

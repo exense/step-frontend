@@ -135,6 +135,10 @@
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 1rem;
+
+      .gap {
+        flex: 1;
+      }
     }
 
     .json-container {

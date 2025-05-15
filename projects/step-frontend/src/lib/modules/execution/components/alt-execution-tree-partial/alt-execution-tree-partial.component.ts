@@ -1,27 +1,47 @@
-import { Component, DestroyRef, inject, input, OnInit, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { AggregatedReportViewRequest, AugmentedExecutionsService, ReportNode } from '@exense/step-core';
 import { catchError, combineLatest, finalize, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
+import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
   templateUrl: './alt-execution-tree-partial.component.html',
   styleUrl: './alt-execution-tree-partial.component.scss',
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.no-padding]': 'noPadding()',
+  },
 })
-export class AltExecutionTreePartialComponent implements OnInit {
+export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _executionState = inject(AltExecutionStateService);
   private _destroyRef = inject(DestroyRef);
   private _executionsApi = inject(AugmentedExecutionsService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
+  private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
+  private _executionDialogs = inject(AltExecutionDialogsService);
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   readonly node = input.required<ReportNode>();
-  readonly allowDialogOpen = input(true);
+  readonly noPadding = input(false);
+  readonly autoFocusNode = input(true);
+  readonly showDetailsButton = input(false);
 
   protected showSpinner = signal(false);
 
@@ -29,6 +49,14 @@ export class AltExecutionTreePartialComponent implements OnInit {
 
   ngOnInit(): void {
     this.setupTree();
+  }
+
+  ngOnDestroy(): void {
+    this._treeUtils.cleanupImportantIds();
+  }
+
+  protected openDetails(treeNode: AggregatedTreeNode): void {
+    this._executionDialogs.openIterations(treeNode, {});
   }
 
   private setupTree(): void {
@@ -42,10 +70,10 @@ export class AltExecutionTreePartialComponent implements OnInit {
               if (!response?.aggregatedReportView) {
                 return undefined;
               }
-              const artefactId = reportNode.artefactID;
+
               return {
                 ...response,
-                artefactId,
+                reportNode,
               };
             }),
             catchError(() => of(undefined)),
@@ -58,12 +86,27 @@ export class AltExecutionTreePartialComponent implements OnInit {
         if (!result) {
           return;
         }
-        const { aggregatedReportView, resolvedPartialPath, artefactId } = result;
-        const selectedNodeIds = artefactId ? [artefactId] : [];
-        this._treeState.init(aggregatedReportView!, { selectedNodeIds, resolvedPartialPath });
-        if (artefactId) {
-          this.tree()?.focusNode?.(artefactId);
+        const { aggregatedReportView, resolvedPartialPath, reportNode } = result;
+
+        this._treeState.init(aggregatedReportView!, { resolvedPartialPath });
+
+        const treeNode = this.findTreeNode(reportNode);
+
+        if (treeNode?.id) {
+          this._treeUtils.markIdAsImportant(treeNode.id);
+          this._treeState.selectNode(treeNode);
+          if (this.autoFocusNode()) {
+            this.tree()?.focusNode?.(treeNode.id);
+          }
         }
       });
+  }
+
+  private findTreeNode(reportNode: ReportNode): AggregatedTreeNode | undefined {
+    const nodes = this._treeState.findNodesByArtefactId(reportNode.artefactID);
+
+    const node = nodes.length === 1 ? nodes[0] : nodes.find((item) => item.artefactHash === reportNode.artefactHash);
+
+    return node;
   }
 }

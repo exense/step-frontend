@@ -2,9 +2,14 @@ step-alt-execution-tree-partial {
   position: relative;
 
   step-alt-execution-tree {
-    min-height: 20rem;
-    height: auto;
-    position: absolute;
+    position: relative;
+    step-tree {
+      position: absolute;
+      left: 0;
+      right: 0;
+      overflow: auto;
+      min-height: 5rem;
+    }
   }
 
   .spinner-container {
@@ -14,5 +19,13 @@ step-alt-execution-tree-partial {
     height: 10rem;
     left: calc(50% - 5rem);
     top: calc(50% - 5rem);
+  }
+
+  &.no-padding {
+    step-alt-execution-tree {
+      step-tree {
+        padding-left: 0;
+      }
+    }
   }
 }

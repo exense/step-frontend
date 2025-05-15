@@ -44,5 +44,33 @@
       </section>
     }
   </div>
-  <step-alt-execution-tree-partial [node]="node" [allowDialogOpen]="false" />
+  <div class="tree-container execution-report-node-details">
+    <div class="data-container">
+      <div class="container-title">
+        <step-icon name="tree" />
+        <span>Partial execution tree</span>
+        <step-icon
+          name="alert-circle"
+          matTooltip="The partial execution tree of this node shows the branch leaging to it's direct siblings"
+          matTooltipPosition="below"
+        />
+        <div class="gap"></div>
+        <button
+          type="button"
+          mat-icon-button
+          (click)="openTreeView.emit()"
+          matTooltip="Opens this nodes partial tree view as tab"
+          matTooltipPosition="below"
+        >
+          <step-icon name="git-pull-request" />
+        </button>
+      </div>
+      <step-alt-execution-tree-partial
+        [node]="node"
+        [noPadding]="true"
+        [showDetailsButton]="true"
+        [autoFocusNode]="false"
+      />
+    </div>
+  </div>
 }

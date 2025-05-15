@@ -4,6 +4,10 @@
   (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
 >
   <div *stepTreeNodeNameTemplate="let node" class="node-name">
-    <step-aggregated-tree-node [nodeId]="node.id" [attr.data-node-id]="node.id" [allowDialogOpen]="allowDialogOpen()" />
+    <step-aggregated-tree-node
+      [nodeId]="node.id"
+      [attr.data-node-id]="node.id"
+      [addonTemplate]="treeNodeAddon()?.templateRef"
+    />
   </div>
 </step-tree>
