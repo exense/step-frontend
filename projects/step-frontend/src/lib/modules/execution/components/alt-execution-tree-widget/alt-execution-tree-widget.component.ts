@@ -61,6 +61,14 @@ export class AltExecutionTreeWidgetComponent {
     this.focusNodeById(node.id);
   }
 
+  focusNodeByArtefactId(artefactId: string): void {
+    const nodeId = this._treeState.getNodeIdsByArtefactId(artefactId)[0];
+    if (!nodeId) {
+      return;
+    }
+    this.focusNodeById(nodeId);
+  }
+
   protected collapseAll(): void {
     this._treeState.collapseAll();
   }
