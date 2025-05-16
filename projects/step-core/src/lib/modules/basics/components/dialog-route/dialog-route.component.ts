@@ -50,6 +50,8 @@ export class DialogRouteComponent implements OnInit, OnDestroy {
       ...dialogConfig,
       data,
       viewContainerRef: this._viewContainerRef,
+      // The DialogRouteComponent handles closing by it's own
+      closeOnNavigation: false,
     });
 
     this.modalRef
