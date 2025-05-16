@@ -15,7 +15,6 @@ import {
 import {
   Execution,
   FetchBucketsRequest,
-  ReportNode,
   TableDataSource,
   TimeRange,
   TimeSeriesAPIResponse,
@@ -26,9 +25,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltReportNodesFilterService } from './alt-report-nodes-filter.service';
 
 @Injectable()
-export abstract class AltReportNodesStateService extends AltReportNodesFilterService implements OnDestroy {
+export abstract class AltReportNodesStateService<T> extends AltReportNodesFilterService implements OnDestroy {
   protected constructor(
-    readonly datasource$: Observable<TableDataSource<ReportNode>>,
+    readonly datasource$: Observable<TableDataSource<T>>,
     storagePrefix: string,
   ) {
     super(storagePrefix);

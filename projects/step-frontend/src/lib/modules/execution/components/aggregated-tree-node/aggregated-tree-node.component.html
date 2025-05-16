@@ -3,9 +3,9 @@
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
       <div class="aggregated-info" (click)="showIterations()">
         <span class="name larger-view" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
-        <step-aggregated-tree-status
+        <step-aggregated-status
           [class.hide-status]="!showStatus()"
-          [node]="node"
+          [countByStatus]="node?.countByStatus"
           [statusFilter]="statusFilter()"
           (statusClick)="showIterations($event.status, $event.count, $event.event)"
         />

@@ -42,6 +42,7 @@
         <step-ts-filter-bar-item
           #appliedFilter
           [item]="item"
+          [openOnInit]="item.menuOpenOnInit"
           [highlightRemoveButton]="editMode"
           [readonly]="!!item.isHidden"
           [removable]="item.removable || editMode"

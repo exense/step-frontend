@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { ArtefactService } from '../../injectables/artefact.service';
-import { ReportNode } from '../../../../client/step-client-module';
+import { AggregatedReportView, ReportNode } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+
+type Node = ReportNode | AggregatedReportView;
 
 @Component({
   selector: 'step-report-node-icon',
@@ -18,7 +20,7 @@ export class ReportNodeIconComponent {
   private _artefactTypes = inject(ArtefactService);
 
   /** @Input() **/
-  readonly node = input<ReportNode | undefined>();
+  readonly node = input<Node | undefined>();
 
   /** @Input() **/
   readonly highlightStatus = input(true);
@@ -26,26 +28,31 @@ export class ReportNodeIconComponent {
   /** @Input() **/
   readonly roundBox = input(false);
 
-  protected readonly icon = computed(() => {
+  private artefact = computed(() => {
     const node = this.node();
-    if (!node) {
+    return (node as ReportNode)?.resolvedArtefact ?? (node as AggregatedReportView)?.artefact ?? undefined;
+  });
+
+  protected readonly icon = computed(() => {
+    const artefact = this.artefact();
+    if (!artefact) {
       return undefined;
     }
-    return this._artefactTypes.getArtefactType(node.resolvedArtefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
+    return this._artefactTypes.getArtefactType(artefact?._class)?.icon ?? this._artefactTypes.defaultIcon;
   });
 
   protected readonly artefactClass = computed(() => {
-    const node = this.node();
-    if (!node) {
+    const artefact = this.artefact();
+    if (!artefact) {
       return '';
     }
-    return node.resolvedArtefact?._class ?? '';
+    return artefact?._class ?? '';
   });
 
   protected readonly statusClass = computed(() => {
-    const node = this.node();
+    const node = this.node() as ReportNode;
     const highlightStatus = this.highlightStatus();
-    if (!node || !highlightStatus) {
+    if (!node?.status || !highlightStatus) {
       return undefined;
     }
     return `step-node-status-${node.status}`;
