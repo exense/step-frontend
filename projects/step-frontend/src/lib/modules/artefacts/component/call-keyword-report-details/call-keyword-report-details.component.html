@@ -1,9 +1,12 @@
 @if (keywordInputs(); as inputs) {
   <section class="json-container">
+    <div class="container-title">
+      <step-icon name="log-in" />
+      Inputs
+    </div>
     <step-json-view-expanded
       [data]="inputs"
       [limit]="7"
-      [iconsDictionary]="keywordInputIcons"
       labelExpand="Expand all inputs"
       labelCollapse="Collapse inputs"
     />
@@ -14,10 +17,13 @@
 }
 @if (keywordOutputs(); as outputs) {
   <section class="json-container">
+    <div class="container-title">
+      <step-icon name="log-out" />
+      Outputs
+    </div>
     <step-json-view-expanded
       [data]="outputs"
       [limit]="7"
-      [iconsDictionary]="keywordOutputIcons"
       labelExpand="Expand all outputs"
       labelCollapse="Collapse outputs"
     />
@@ -47,6 +53,10 @@
 }
 @if (measuresDataSource(); as measuresDataSource) {
   <section class="data-container">
+    <div class="container-title">
+      <step-icon name="stopwatch" />
+      Measurements
+    </div>
     <div>
       <step-table [dataSource]="measuresDataSource" matSort>
         <ng-container matColumnDef="begin">
@@ -86,6 +96,10 @@
 @if (node(); as node) {
   @if (node.tokenId || node.agentUrl) {
     <section class="data-container tech-details">
+      <div class="container-title">
+        <step-icon name="routing" />
+        Routing
+      </div>
       <div class="tech-details-content">
         @if (node.agentUrl) {
           <span>Agent:</span>

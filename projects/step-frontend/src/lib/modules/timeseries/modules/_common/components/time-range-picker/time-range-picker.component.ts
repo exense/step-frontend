@@ -6,9 +6,11 @@ import {
   inject,
   input,
   Input,
+  model,
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,7 +20,8 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TimeRange } from '@exense/step-core';
+import { TIME_UNIT_DICTIONARY, TimeRange, TimeUnit } from '@exense/step-core';
+import { FormsModule } from '@angular/forms';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -29,17 +32,16 @@ import { TimeRange } from '@exense/step-core';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, FormsModule],
 })
-export class TimeRangePickerComponent implements OnInit, OnChanges {
+export class TimeRangePickerComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
 
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
-  @Input() activeSelection!: TimeRangePickerSelection;
+  activeSelection = input.required<TimeRangePickerSelection>();
   selectOptions = input.required<TimeRangePickerSelection[]>();
   activeTimeRange = input<TimeRange>(); // represent the time-range that should be displayed in the inputs
-  @Input() initialSelectionIndex: number | undefined;
   @Input() compact = false;
   @Input() fullRangeLabel?: string; // used to override the "Full Selection" default label
 
@@ -47,6 +49,24 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
+
+  protected mainPickerLabel = computed(() => {
+    console.log('active selection changed');
+    const selection = this.activeSelection();
+    if (!selection) {
+      return;
+    }
+    if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
+      const range = selection.absoluteSelection;
+      if (range) {
+        return TimeSeriesUtils.formatRange(range);
+      } else {
+        return 'Full range';
+      }
+    } else {
+      return selection.relativeSelection!.label!;
+    }
+  });
 
   timeRangeInputsSyncEffect = effect(() => {
     const timeRange = this.activeTimeRange();
@@ -68,8 +88,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   toDate: DateTime | undefined;
   fromDateString: string | undefined; // used for formatting the date together with time
   toDateString: string | undefined;
-
-  protected mainPickerLabel: string = '';
 
   readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -93,42 +111,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (!this.selectOptions()) {
       throw new Error('Options param is mandatory');
-    }
-    if (this.initialSelectionIndex != undefined) {
-      this.activeSelection = this.selectOptions()[0];
-    } else {
-      if (!this.activeSelection) {
-        this.activeSelection = this.selectOptions()[0];
-      }
-    }
-    this.formatSelectionLabel(this.activeSelection);
-  }
-
-  private formatSelectionLabel(selection: TimeRangePickerSelection) {
-    if (!selection) {
-      return;
-    }
-    if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
-      const range = selection.absoluteSelection;
-      if (range) {
-        this.mainPickerLabel = TimeSeriesUtils.formatRange(range);
-      } else {
-        this.mainPickerLabel = 'Full range';
-      }
-    } else {
-      this.mainPickerLabel = selection.relativeSelection!.label!;
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const selectionChange = changes['activeSelection'];
-    const previousValue = selectionChange?.previousValue;
-    const currentValue: TimeRangePickerSelection = selectionChange?.currentValue;
-    if (!currentValue) {
-      return;
-    }
-    if (previousValue && previousValue !== currentValue) {
-      this.formatSelectionLabel(currentValue);
     }
   }
 
@@ -199,14 +181,13 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
     }
     // from and to are set here
     if (from < to) {
-      const currentSelection = this.activeSelection.absoluteSelection;
+      const currentSelection = this.activeSelection().absoluteSelection;
       if (currentSelection?.from !== from || currentSelection?.to !== to) {
         // something has changed
         const newSelection: TimeRangePickerSelection = {
           type: 'ABSOLUTE',
           absoluteSelection: { from: from, to: to },
         };
-        this.activeSelection = newSelection;
         this.emitSelectionChange(newSelection);
         this.closeMenu();
       } else {
@@ -219,7 +200,7 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
 
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
     if (option.type === 'RELATIVE') {
-      if (option.relativeSelection!.timeInMs === this.activeSelection?.relativeSelection?.timeInMs) {
+      if (option.relativeSelection!.timeInMs === this.activeSelection()?.relativeSelection?.timeInMs) {
         return;
       }
     } else if (option.type === 'FULL') {
@@ -238,7 +219,6 @@ export class TimeRangePickerComponent implements OnInit, OnChanges {
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {
-    this.activeSelection = selection;
     this.selectionChange.emit(selection);
   }
 

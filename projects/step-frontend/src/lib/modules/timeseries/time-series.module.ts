@@ -18,14 +18,14 @@ import { map } from 'rxjs';
 import { DashboardPageComponent } from './components/dashboard-page/dashboard-page.component';
 import { AnalyticsPageComponent } from './components/analytics-page/analytics-page.component';
 import { DashboardBulkOperationsRegisterService } from './modules/injectables/dashboard-bulk-operations-register.service';
-import { ExecutionPageComponent } from './components/execution-page/execution-page.component';
+import { ExecutionDashboardComponent } from './components/execution-page/execution-dashboard.component';
 import { ChartDashletComponent } from './components/chart-dashlet/chart-dashlet.component';
 import { StandaloneChartComponent } from './components/standalone-chart/standalone-chart.component';
 
 @NgModule({
   imports: [
     AnalyticsPageComponent,
-    ExecutionPageComponent,
+    ExecutionDashboardComponent,
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,
@@ -33,7 +33,7 @@ import { StandaloneChartComponent } from './components/standalone-chart/standalo
   ],
   exports: [
     AnalyticsPageComponent,
-    ExecutionPageComponent,
+    ExecutionDashboardComponent,
     DashboardComponent,
     DashboardListComponent,
     ChartDashletComponent,

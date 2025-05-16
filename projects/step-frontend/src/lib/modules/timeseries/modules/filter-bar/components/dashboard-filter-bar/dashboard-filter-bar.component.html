@@ -1,111 +1,82 @@
-<div class="time-container">
-  <div class="ranger-section" [class.compact]="compactView">
-    <step-execution-time-selection [context]="context" />
-  </div>
+@if (rawMeasurementsModeActive) {
+  <step-alert type="warning" class="warning">
+    You are using custom filters which may slow down the dashboard.
+  </step-alert>
+}
+
+<div class="filers-row" [class.oql-mode]="activeMode === TsFilteringMode.OQL" [class.compact-view]="compactView">
+  <step-timeseries-grouping
+    [dimensions]="activeGrouping"
+    [groupingOptions]="groupingOptions"
+    (groupingChange)="handleGroupingChange($event)"
+  />
+  <mat-divider vertical="true" />
+
   <div>
-    <step-time-range-picker
-      (selectionChange)="handleTimeRangeChange($event)"
-      [selectOptions]="timeRangeOptions"
-      [activeTimeRange]="context.timeRangeSettings.fullRange"
-      [activeSelection]="activeTimeRangeSelection"
-      [compact]="compactView"
-    />
+    <step-tabs [tabs]="modes" [shrink]="true" [activeTabId]="activeMode" (activeTabIdChange)="toggleOQLMode($event)" />
   </div>
-</div>
-
-<div class="filters-section">
-  @if (rawMeasurementsModeActive) {
-    <step-alert type="warning" class="warning">
-      You are using custom filters which may slow down the dashboard.
-    </step-alert>
-  }
-
-  @if (compactView) {
-    <div class="settings-section">
-      <step-tabs
-        [tabs]="modes"
-        [shrink]="true"
-        [activeTabId]="activeMode"
-        (activeTabIdChange)="toggleOQLMode($event)"
-      />
-      <step-timeseries-grouping
-        [dimensions]="activeGrouping"
-        [groupingOptions]="groupingOptions"
-        (groupingChange)="handleGroupingChange($event)"
-      />
-    </div>
-  }
-
-  <div class="filters">
-    <mat-menu #addFilterMenu="matMenu">
-      @for (option of filterOptions; track option.name) {
-        <button mat-menu-item (click)="addFilterItem(option)">
-          <span>{{ option.displayName }}</span>
-        </button>
+  @if (activeMode === TsFilteringMode.OQL) {
+    <step-form-field [matTooltip]="oqlValue" class="ng-touched grow" [class.ng-invalid]="invalidOql">
+      <input type="text" [(ngModel)]="oqlValue" (ngModelChange)="handleOqlChange($event)" />
+      <step-suffix class="icon-suffix">
+        <step-icon
+          name="help-circle"
+          matTooltip="Advanced Filtering with Object Query Language (OQL) lets you define custom, complex filters beyond the predefined options. Using OQL, you can query specific attributes, compare values, or combine conditions to refine your data. Consult our documentation for OQL syntax and usage guidance."
+        />
+      </step-suffix>
+      @if (invalidOql) {
+        <step-error>Invalid OQL</step-error>
       }
-      <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>
-      <button mat-menu-item (click)="openDiscovery()">Discover...</button>
-    </mat-menu>
-
-    <mat-menu #typesMenu="matMenu">
-      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
-      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
-      <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
-    </mat-menu>
-
-    <div class="filers-row" [class.oql-mode]="activeMode === TsFilteringMode.OQL" [class.compact-view]="compactView">
-      @if (activeMode === TsFilteringMode.OQL) {
-        <step-form-field [matTooltip]="oqlValue" class="ng-touched grow" [class.ng-invalid]="invalidOql">
-          <input type="text" [(ngModel)]="oqlValue" (ngModelChange)="handleOqlChange($event)" />
-          <step-suffix class="icon-suffix">
-            <step-icon
-              name="help-circle"
-              matTooltip="Advanced Filtering with Object Query Language (OQL) lets you define custom, complex filters beyond the predefined options. Using OQL, you can query specific attributes, compare values, or combine conditions to refine your data. Consult our documentation for OQL syntax and usage guidance."
-            />
-          </step-suffix>
-          @if (invalidOql) {
-            <step-error>Invalid OQL</step-error>
-          }
-        </step-form-field>
-        <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
-      } @else {
-        @for (item of _internalFilters; track item.attributeName; let i = $index) {
-          @if (!item.isHidden) {
-            <step-ts-filter-bar-item
-              #appliedFilter
-              [item]="item"
-              [highlightRemoveButton]="editMode"
-              [compact]="compactView"
-              [removable]="item.removable || editMode"
-              (removeItem)="removeFilterItem(i)"
-              (filterChange)="handleFilterChange(i, $event)"
-            />
-          }
+    </step-form-field>
+    <button class="apply-btn" mat-button color="primary" (click)="manuallyApplyFilters()">Apply Filters</button>
+  } @else {
+    @if (showHiddenFilters()) {
+      @for (item of context().getFilteringSettings().hiddenFilters; track item.attributeName; let i = $index) {
+        @if (showHiddenFilters() || !item.isHidden || true) {
+          <step-ts-filter-bar-item [item]="item" [readonly]="true" [removable]="false" />
         }
-        <button type="button" class="more-btn" mat-raised-button [matMenuTriggerFor]="addFilterMenu">
-          <step-icon name="plus" />
-          <span>Filters</span>
-        </button>
       }
-      @if (activeMode === TsFilteringMode.STANDARD && rawMeasurementsModeActive) {
-        <button class="apply-btn" color="primary" mat-button (click)="manuallyApplyFilters()">Apply Filters</button>
-      }
-    </div>
-
-    @if (!compactView) {
-      <div class="settings-section">
-        <step-tabs
-          [tabs]="modes"
-          [shrink]="true"
-          [activeTabId]="activeMode"
-          (activeTabIdChange)="toggleOQLMode($event)"
-        />
-        <step-timeseries-grouping
-          [dimensions]="activeGrouping"
-          [groupingOptions]="groupingOptions"
-          (groupingChange)="handleGroupingChange($event)"
-        />
-      </div>
     }
-  </div>
+    @for (item of _internalFilters; track item.attributeName; let i = $index) {
+      @if (showHiddenFilters() || !item.isHidden || true) {
+        <step-ts-filter-bar-item
+          #appliedFilter
+          [item]="item"
+          [openOnInit]="item.menuOpenOnInit"
+          [highlightRemoveButton]="editMode"
+          [readonly]="!!item.isHidden"
+          [removable]="item.removable || editMode"
+          (removeItem)="removeFilterItem(i)"
+          (filterChange)="handleFilterChange(i, $event)"
+        />
+      }
+    }
+    <ng-container *ngTemplateOutlet="addFilterMenu" />
+  }
+  @if (activeMode === TsFilteringMode.STANDARD && rawMeasurementsModeActive) {
+    <button class="apply-btn" color="primary" mat-button (click)="manuallyApplyFilters()">Apply Filters</button>
+  }
 </div>
+
+<ng-template #addFilterMenu>
+  <button type="button" class="more-btn" mat-raised-button [matMenuTriggerFor]="addFilterMenu">
+    <step-icon name="plus" />
+    <span>Filters</span>
+  </button>
+
+  <mat-menu #addFilterMenu="matMenu">
+    @for (option of filterOptions; track option.name) {
+      <button mat-menu-item (click)="addFilterItem(option)">
+        <span>{{ option.displayName }}</span>
+      </button>
+    }
+    <button mat-menu-item [matMenuTriggerFor]="typesMenu">Other</button>
+    <button mat-menu-item (click)="openDiscovery()">Discover...</button>
+  </mat-menu>
+
+  <mat-menu #typesMenu="matMenu">
+    <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.FREE_TEXT)">Text Filter</button>
+    <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.NUMERIC)">Numeric Filter</button>
+    <button mat-menu-item (click)="addCustomFilter(FilterBarItemType.DATE)">Date Filter</button>
+  </mat-menu>
+</ng-template>

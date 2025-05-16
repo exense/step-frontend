@@ -1,4 +1,4 @@
-import { Component, inject, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +10,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { first, map, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import {
+  AggregatedTreeNodeDialogHooksService,
+  AggregatedTreeNodeDialogHooksStrategy,
+} from '../../services/aggregated-tree-node-dialog-hooks.service';
 
 @Component({
   selector: 'step-alt-execution-report',
@@ -26,11 +30,12 @@ import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/ty
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class AltExecutionReportComponent {
+export class AltExecutionReportComponent implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy {
   private _activatedRoute = inject(ActivatedRoute);
   protected readonly _mode = inject(VIEW_MODE);
   private _router = inject(Router);
   private _executionCustomPanelRegistry = inject(ExecutionCustomPanelRegistryService);
+  private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
 
@@ -46,7 +51,7 @@ export class AltExecutionReportComponent {
 
   private _urlParamsService = inject(DashboardUrlParamsService);
 
-  updateUrlParamsSubscription = this._state.timeRangeSelection$
+  private updateUrlParamsSubscription = this._state.timeRangeSelection$
     .pipe(
       scan(
         (acc, range) => {
@@ -59,23 +64,34 @@ export class AltExecutionReportComponent {
       first(),
     )
     .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
-      this._urlParamsService.updateUrlParams(range, undefined, isFirst);
+      this._urlParamsService.patchUrlParams(range, undefined, isFirst);
     });
 
-  protected handleOpenNodeInTreePage(keyword: ReportNode): void {
-    const reportNodeId = keyword.id;
-    const artefactId = keyword.artefactID;
+  ngOnInit(): void {
+    this._hooks.useStrategy(this);
+  }
+
+  ngOnDestroy(): void {
+    this._hooks.cleanupStrategy();
+  }
+
+  reportNodeOpened(reportNode: ReportNode): void {
+    this.treeWidget()?.focusNodeByReport(reportNode);
+  }
+
+  protected handleOpenNodeInTreePage(reportNode: ReportNode): void {
+    const { artefactID: artefactId, artefactHash, id: reportNodeId } = reportNode;
     if (!artefactId) {
       return;
     }
     this._router.navigate(['..', 'tree'], {
-      queryParams: { reportNodeId, artefactId },
+      queryParams: { reportNodeId, artefactId, artefactHash },
       relativeTo: this._activatedRoute,
     });
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
-    this.treeWidget()?.focusNode(node.artefactID!);
+    this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
 
   handleChartZooming(range: TimeRange) {

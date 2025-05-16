@@ -28,6 +28,9 @@ step-alt-execution-tree {
     flex: 1;
     .node-content {
       align-items: flex-start !important;
+      .node-icon {
+        transform: translateX(0.6rem);
+      }
     }
   }
 
@@ -37,6 +40,7 @@ step-alt-execution-tree {
 
   step-tree-node-name {
     width: 100%;
+    min-height: 3.1rem;
     &.not-selectable {
       background: none !important;
     }

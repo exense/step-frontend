@@ -15,5 +15,14 @@ export const $AggregatedReportViewRequest = {
     filterResolvedPlanNodes: {
       type: 'boolean',
     },
+    filterArtefactClasses: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
+    fetchCurrentOperations: {
+      type: 'boolean',
+    },
   },
 } as const;

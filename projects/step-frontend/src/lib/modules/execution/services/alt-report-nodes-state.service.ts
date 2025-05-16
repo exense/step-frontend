@@ -20,7 +20,6 @@ import {
 import {
   Execution,
   FetchBucketsRequest,
-  ReportNode,
   TableDataSource,
   TimeRange,
   TimeSeriesAPIResponse,
@@ -34,9 +33,9 @@ import { AltExecutionViewAllService } from './alt-execution-view-all.service';
 import { EXECUTION_ID } from './execution-id.token';
 
 @Injectable()
-export abstract class AltReportNodesStateService implements OnDestroy {
+export abstract class AltReportNodesStateService<T> implements OnDestroy {
   protected constructor(
-    readonly datasource$: Observable<TableDataSource<ReportNode>>,
+    readonly datasource$: Observable<TableDataSource<T>>,
     private storagePrefix: string,
   ) {
     this.listInProgress$ = datasource$.pipe(

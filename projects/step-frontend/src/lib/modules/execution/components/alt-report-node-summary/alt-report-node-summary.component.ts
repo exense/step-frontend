@@ -17,6 +17,9 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './alt-report-node-summary.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[attr.title]': 'null',
+  },
 })
 export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
@@ -27,6 +30,8 @@ export class AltReportNodeSummaryComponent {
   readonly summary = input.required<ReportNodeSummary>();
 
   readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
+
+  readonly totalTooltip = input<string | undefined>();
 
   private statusFilter = computed(() => new Set(this.statusFilterModel()));
 

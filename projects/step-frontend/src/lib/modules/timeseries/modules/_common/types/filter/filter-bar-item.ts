@@ -10,6 +10,7 @@ export interface FilterBarItem {
   isHidden?: boolean;
   isLocked?: boolean; // the attributeName can't be modified
   removable?: boolean;
+  menuOpenOnInit?: boolean;
 
   min?: number; // for numbers an dates
   max?: number; // for numbers an dates

@@ -1,0 +1,25 @@
+@if (singleStatus(); as singleStatus) {
+  <step-status [status]="singleStatus.status" [iconMode]="true" (click)="handleClick(singleStatus, $event)" />
+} @else if (isEmptyStatus()) {
+  <div class="status-group">
+    <div class="step-aggregated-status step-node-aggregated-status-UNKNOWN">0x</div>
+  </div>
+} @else {
+  @for (item of statusItems(); track item.status) {
+    @if (item.status === Status.RUNNING && item.count === 1) {
+      <step-status [status]="item.status" [iconMode]="true" (click)="handleClick(item, $event)" />
+    } @else {
+      <div class="status-group">
+        <div
+          class="step-aggregated-status"
+          [class]="item.className"
+          [matTooltip]="item.tooltipMessage"
+          matTooltipPosition="below"
+          (click)="handleClick(item, $event)"
+        >
+          {{ item.count | shortenNumber: 'x' }}
+        </div>
+      </div>
+    }
+  }
+}
