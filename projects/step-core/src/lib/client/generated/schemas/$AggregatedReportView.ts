@@ -28,5 +28,17 @@ export const $AggregatedReportView = {
     singleInstanceReportNode: {
       type: 'ReportNode',
     },
+    bucketsByStatus: {
+      type: 'dictionary',
+      contains: {
+        type: 'Bucket',
+      },
+    },
+    currentOperations: {
+      type: 'array',
+      contains: {
+        type: 'Operation',
+      },
+    },
   },
 } as const;

@@ -20,6 +20,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
 
@@ -28,8 +29,20 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private _injector = inject(Injector);
   private _artefactService = inject(ArtefactService);
   private _fb = inject(FormBuilder);
+  private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
   private searchIndex = new SearchIndex();
+  private artefactsNodeIdIndex = new Map<string, string[]>();
+
+  private effectBuildSearchIndex = effect(() => {
+    const rootNode = this.rootNode();
+    this.searchIndex.clear();
+    this.artefactsNodeIdIndex.clear();
+    if (rootNode) {
+      this.buildSearchIndex(rootNode);
+      this.buildArtefactsNodeIdIndex(rootNode);
+    }
+  });
 
   private resolvedPartialPathInternal = signal<string | undefined>(undefined);
   readonly resolvedPartialPath = this.resolvedPartialPathInternal.asReadonly();
@@ -68,8 +81,16 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   override init(root: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
-    this.searchIndex.clear();
-    this.buildSearchIndex(root);
+  }
+
+  findNodesByArtefactId(artefactId?: string): AggregatedTreeNode[] {
+    if (!artefactId) {
+      return [];
+    }
+    const { tree, accessCache } = this.treeData();
+    return tree
+      .map(({ id }) => accessCache.get(id) as AggregatedTreeNode)
+      .filter((item) => item.artefactId === artefactId);
   }
 
   pickSearchResultItemByIndex(index: number): string {
@@ -78,13 +99,28 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     return item;
   }
 
-  private buildSearchIndex(item: AggregatedReportView): void {
-    const artefactType = this._artefactService.getArtefactType(item.artefact!._class!);
+  getNodeIdsByArtefactId(artefactId: string): string[] {
+    return this.artefactsNodeIdIndex.get(artefactId) ?? [];
+  }
 
-    const items = runInInjectionContext(
-      this._injector,
-      () => artefactType?.getArtefactSearchValues?.(item.artefact) ?? [],
-    );
+  private buildArtefactsNodeIdIndex(item: AggregatedTreeNode): void {
+    const artefact = item.originalArtefact;
+    if (artefact) {
+      const nodeId = item.id!;
+      const artefactId = artefact.id!;
+      if (!this.artefactsNodeIdIndex.has(artefactId)) {
+        this.artefactsNodeIdIndex.set(artefactId, []);
+      }
+      this.artefactsNodeIdIndex.get(artefactId)!.push(nodeId);
+    }
+    (item.children ?? []).forEach((child) => this.buildArtefactsNodeIdIndex(child as AggregatedTreeNode));
+  }
+
+  private buildSearchIndex(item: AggregatedTreeNode, patentId?: string): void {
+    const artefact = item.originalArtefact!;
+    const artefactType = this._artefactService.getArtefactType(artefact._class!);
+
+    const items = runInInjectionContext(this._injector, () => artefactType?.getArtefactSearchValues?.(artefact) ?? []);
 
     if (item.singleInstanceReportNode) {
       const resolvedArtefactItems = runInInjectionContext(
@@ -109,11 +145,12 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       searchValues.push(item?.singleInstanceReportNode?.error?.msg);
     }
 
-    searchValues.push(item?.artefact?.attributes?.['name'] ?? '');
+    searchValues.push(artefact?.attributes?.['name'] ?? '');
 
-    this.searchIndex.register(item.artefact!.id!, searchValues);
+    const nodeId = this._utils.getUniqueId(artefact.id!, patentId);
+    this.searchIndex.register(nodeId, searchValues);
 
-    (item.children ?? []).forEach((child) => this.buildSearchIndex(child));
+    (item.children ?? []).forEach((child) => this.buildSearchIndex(child as AggregatedTreeNode, nodeId));
   }
 }
 

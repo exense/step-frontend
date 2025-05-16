@@ -9,4 +9,6 @@ export type AggregatedReportViewRequest = {
   resolveSingleInstanceReport?: boolean;
   selectedReportNodeId?: string;
   filterResolvedPlanNodes?: boolean;
+  filterArtefactClasses?: Array<string>;
+  fetchCurrentOperations?: boolean;
 };

@@ -3,6 +3,8 @@
 /* eslint-disable */
 
 import type { AbstractArtefact } from './AbstractArtefact';
+import type { Bucket } from './Bucket';
+import type { Operation } from './Operation';
 import type { ReportNode } from './ReportNode';
 
 export type AggregatedReportView = {
@@ -12,4 +14,6 @@ export type AggregatedReportView = {
   children?: Array<AggregatedReportView>;
   parentSource?: 'BEFORE' | 'BEFORE_THREAD' | 'MAIN' | 'SUB_PLAN' | 'AFTER_THREAD' | 'AFTER';
   singleInstanceReportNode?: ReportNode;
+  bucketsByStatus?: Record<string, Bucket>;
+  currentOperations?: Array<Operation>;
 };
