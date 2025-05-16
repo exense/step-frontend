@@ -1,6 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { ExecutionCustomPanelRegistryService, IS_SMALL_SCREEN, ReportNode, TimeRange } from '@exense/step-core';
+import {
+  ArtefactClass,
+  ExecutionCustomPanelRegistryService,
+  IS_SMALL_SCREEN,
+  ReportNode,
+  TimeRange,
+} from '@exense/step-core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
@@ -10,6 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { first, map, scan } from 'rxjs';
 import { AltExecutionTreeWidgetComponent } from '../alt-execution-tree-widget/alt-execution-tree-widget.component';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { Status } from '../../../_common/shared/status.enum';
 import {
   AggregatedTreeNodeDialogHooksService,
   AggregatedTreeNodeDialogHooksStrategy,
@@ -94,8 +101,16 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
 
-  handleChartZooming(range: TimeRange) {
+  protected handleChartZooming(range: TimeRange) {
     this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
+  }
+
+  protected handleTestCasesSummaryStatusSelection(statuses: Status[]): void {
+    this._testCasesState.updateStatusCtrl(statuses);
+  }
+
+  protected handleKeywordsSummaryStatusSelection(statuses: Status[]): void {
+    this._keywordsState.updateStatusCtrl(statuses, statuses?.length > 0 ? ArtefactClass.KEYWORD : undefined);
   }
 
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();

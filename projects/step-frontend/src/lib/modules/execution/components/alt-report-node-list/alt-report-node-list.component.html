@@ -7,21 +7,7 @@
   <step-alt-report-widget-filter>
     <ng-content select="step-alt-report-widget-filter" />
     @if (mode() === ViewMode.VIEW) {
-      <step-form-field>
-        <step-select [formControl]="_state.statusesCtrl" [items]="_state.statuses" [multiple]="true" />
-        <step-suffix class="button-suffix">
-          <button
-            type="button"
-            mat-flat-button
-            [color]="_state.isFilteredByNonPassedAndNoRunning() ? 'primary' : undefined"
-            [matTooltip]="_state.isFilteredByNonPassedAndNoRunning() ? 'Clear' : 'Filter for all status except passed'"
-            matTooltipPosition="below"
-            (click)="_state.toggleFilterNonPassedAndNoRunning()"
-          >
-            <step-icon name="alert-circle" />
-          </button>
-        </step-suffix>
-      </step-form-field>
+      <step-alt-report-node-status-filter />
       <step-form-field>
         <step-prefix class="icon-prefix">
           <step-icon name="search" />

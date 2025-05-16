@@ -22,6 +22,7 @@ export * from './components/artefact-inline-field/artefact-inline-field.componen
 export * from './components/artefact-inline-field-list/artefact-inline-field-list.component';
 export * from './types/artefact-types';
 export * from './types/artefact-inline-item';
+export * from './types/artefact-class.enum';
 export * from './injectables/artefact.service';
 export * from './injectables/artefacts-factory.service';
 export * from './injectables/artefact-refresh-notification.service';

@@ -1,7 +1,23 @@
 <section class="controls-container">
   <div class="controls">
-    <button type="button" mat-stroked-button (click)="collapseAll()">Collapse All</button>
-    <button type="button" mat-stroked-button (click)="expandAll()">Expand All</button>
+    <step-btn-group class="with-round-borders">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="collapseAll()"
+        matTooltip="Collapse All"
+        matTooltipPosition="below"
+      >
+        <step-icon name="collapse-all" />
+      </button>
+    </step-btn-group>
+    <step-btn-group class="with-round-borders">
+      <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
+        <step-icon name="expand-all" />
+      </button>
+    </step-btn-group>
+    <step-alt-report-node-artefact-filter />
+    <step-alt-report-node-status-filter />
     <step-search-field
       [formControl]="searchCtrl"
       [total]="foundItems()"

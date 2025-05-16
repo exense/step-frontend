@@ -131,6 +131,9 @@ import { AggregatedStatusComponent } from './components/aggregated-status/aggreg
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { AltReportNodeStatusFilterComponent } from './components/alt-report-node-status-filter/alt-report-node-status-filter.component';
+import { TreeNodeVisualStateDirective } from './directives/tree-node-visual-state.directive';
+import { AltReportNodeArtefactFilterComponent } from './components/alt-report-node-artefact-filter/alt-report-node-artefact-filter.component';
 import { ExecutionDurationSimpleComponent } from './components/execution-duration-simple/execution-duration-simple.component';
 import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report-view-duration-value.pipe';
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
@@ -194,6 +197,9 @@ import { MatButton } from '@angular/material/button';
     AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
     AltKeywordDrilldownComponent,
+    AltReportNodeStatusFilterComponent,
+    AltReportNodeArtefactFilterComponent,
+    TreeNodeVisualStateDirective,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,

@@ -24,7 +24,7 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly total = input.required<number>();
 
   readonly hint = input('');
-  readonly hintIcon = input('alert-circle');
+  readonly hintIcon = input('alert-triangle');
 
   protected readonly areButtonsActive = computed(() => {
     const isDisabled = this.isDisabled();

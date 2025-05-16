@@ -6,6 +6,9 @@ import {
 } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
+import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
+import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -19,6 +22,14 @@ import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.
     {
       provide: AggregatedReportViewTreeStateService,
       useExisting: AGGREGATED_TREE_WIDGET_STATE,
+    },
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AltKeywordNodesStateService,
+    },
+    {
+      provide: AltReportNodesStateService,
+      useExisting: AltKeywordNodesStateService,
     },
   ],
 })
