@@ -32,6 +32,20 @@ step-alt-execution-tree-partial {
   min-height: 5rem;
 }
 
-.tree-container > .data-container {
-  height: 100%;
+.tree-container {
+  margin-top: 4rem;
+  & > .data-container {
+    height: 100%;
+  }
+}
+
+.relative-button {
+  position: relative;
+  width: 4rem;
+  height: 2rem;
+  button {
+    position: absolute;
+    right: 0;
+    margin-top: -1rem;
+  }
 }

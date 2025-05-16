@@ -9,6 +9,12 @@ step-alt-execution-tree-partial {
       right: 0;
       overflow: auto;
       min-height: 5rem;
+
+      .tree-node:hover {
+        .details-button {
+          display: inline-flex !important;
+        }
+      }
     }
   }
 
@@ -26,6 +32,13 @@ step-alt-execution-tree-partial {
       step-tree {
         padding-left: 0;
       }
+    }
+  }
+
+  .details-button {
+    display: none !important;
+    &.selected {
+      display: inline-flex !important;
     }
   }
 }

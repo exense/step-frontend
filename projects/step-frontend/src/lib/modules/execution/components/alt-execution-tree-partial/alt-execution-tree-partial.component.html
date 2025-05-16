@@ -5,10 +5,12 @@
 }
 <step-alt-execution-tree #tree>
   <ng-container *stepAltExecutionTreeNodeAddon="let node; let isSelected = isSelected">
-    @if (showDetailsButton() && isSelected && !(node | isEmptyStatus)) {
+    @if (showDetailsButton() && !(node | isEmptyStatus) && !(node | isCurrentReportDetailsOpened)) {
       <button
         mat-icon-button
         type="button"
+        class="details-button"
+        [class.selected]="isSelected"
         matTooltip="Open details for this node"
         matTooltipPosition="below"
         (click)="openDetails(node)"

@@ -55,15 +55,17 @@
           matTooltipPosition="below"
         />
         <div class="gap"></div>
-        <button
-          type="button"
-          mat-icon-button
-          (click)="openTreeView.emit()"
-          matTooltip="Opens this nodes partial tree view as tab"
-          matTooltipPosition="below"
-        >
-          <step-icon name="git-pull-request" />
-        </button>
+        <div class="relative-button">
+          <button
+            type="button"
+            mat-icon-button
+            (click)="openTreeView.emit()"
+            matTooltip="Opens this nodes partial tree view as tab"
+            matTooltipPosition="below"
+          >
+            <step-icon name="git-pull-request" />
+          </button>
+        </div>
       </div>
       <step-alt-execution-tree-partial
         [node]="node"

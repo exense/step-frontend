@@ -1,13 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
+  AbstractArtefact,
   AugmentedExecutionsService,
   ExecutiontTaskParameters,
   ReportNode,
+  ReportNodeWithArtefact,
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
@@ -20,6 +22,7 @@ export interface OpenIterationsParams {
   aggregatedNodeId: string;
   artefactHash?: string;
   countByStatus?: Record<string, number>;
+  singleInstanceReportNode?: ReportNodeWithArtefact<AbstractArtefact>;
   nodeStatus?: Status;
   reportNodeId?: string;
   nodeStatusCount?: number;
@@ -47,23 +50,37 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     if (arguments.length === 2) {
       const node = nodeOrParams as AggregatedTreeNode;
       restParams = restParams ?? {};
-      const { id: aggregatedNodeId, artefactHash, countByStatus } = node;
-      this.openIterations({ aggregatedNodeId, artefactHash, countByStatus, ...restParams });
+      const { id: aggregatedNodeId, artefactHash, countByStatus, singleInstanceReportNode } = node;
+      this.openIterations({ aggregatedNodeId, artefactHash, countByStatus, singleInstanceReportNode, ...restParams });
       return;
     }
 
-    const { aggregatedNodeId, artefactHash, countByStatus, reportNodeId, nodeStatus, nodeStatusCount } =
-      nodeOrParams as OpenIterationsParams;
+    const {
+      aggregatedNodeId,
+      artefactHash,
+      countByStatus,
+      reportNodeId,
+      nodeStatus,
+      nodeStatusCount,
+      singleInstanceReportNode,
+    } = nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
       this.navigateToIterationDetails(reportNodeId);
       return;
     }
     const itemsCounts = Object.values(countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1 && artefactHash) {
-      this.getSingleRunReportNode(artefactHash).subscribe((reportNode) => {
+      const reportNode$ = singleInstanceReportNode
+        ? of(singleInstanceReportNode)
+        : artefactHash
+          ? this.getSingleRunReportNode(artefactHash)
+          : undefined;
+
+      reportNode$?.subscribe?.((reportNode) => {
         this._reportNodeDetails?.setReportNode?.(reportNode);
         this.navigateToIterationDetails(reportNode.id!);
       });
+
       return;
     }
     this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);

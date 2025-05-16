@@ -140,6 +140,7 @@ import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz
 import { MatButton } from '@angular/material/button';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
+import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 
 @NgModule({
   declarations: [
@@ -224,6 +225,7 @@ import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
     LegacyExecutionViewComponent,
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,
+    IsCurrentReportDetailsOpenedPipe,
   ],
   imports: [
     StepCommonModule,
