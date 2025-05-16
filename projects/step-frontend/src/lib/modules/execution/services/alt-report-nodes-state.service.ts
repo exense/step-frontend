@@ -14,7 +14,9 @@ import {
 } from 'rxjs';
 import {
   Execution,
+  ExecutionSummaryDto,
   FetchBucketsRequest,
+  PrivateViewPluginService,
   TableDataSource,
   TimeRange,
   TimeSeriesAPIResponse,
@@ -39,13 +41,31 @@ export abstract class AltReportNodesStateService<T> extends AltReportNodesFilter
   }
 
   private _timeSeriesService = inject(TimeSeriesService);
+  private _viewService = inject(PrivateViewPluginService);
 
+  private isFullRangeSelection$ = this._executionState.timeRangeSelection$.pipe(
+    map((rangeSelection) => rangeSelection.type === 'FULL'),
+  );
+
+  protected abstract readonly statusDistributionViewId: string;
   protected summaryInProgressInternal$ = new BehaviorSubject(false);
   readonly summaryInProgress$ = this.summaryInProgressInternal$.asObservable();
 
   readonly listInProgress$: Observable<boolean>;
 
-  readonly summary$ = combineLatest([
+  private forecastSummaryTotal$ = combineLatest([this._executionState.execution$, this.isFullRangeSelection$]).pipe(
+    switchMap(([execution, isFullRangeSelected]) => {
+      if (execution.status !== 'RUNNING' || !isFullRangeSelected) {
+        return of(undefined);
+      }
+      return this._viewService
+        .getView(this.statusDistributionViewId, execution.id!)
+        .pipe(map((status) => status as ExecutionSummaryDto));
+    }),
+    map((summary) => summary?.countForecast),
+  );
+
+  private summaryTimeSeries$ = combineLatest([
     this._executionState.execution$,
     this._executionState.timeRange$.pipe(filter((range) => !!range)),
   ]).pipe(
@@ -57,7 +77,10 @@ export abstract class AltReportNodesStateService<T> extends AltReportNodesFilter
         finalize(() => this.summaryInProgressInternal$.next(false)),
       ),
     ),
-    map((response) => this.protectedTimeSeriesResponse(response)),
+  );
+
+  readonly summary$ = combineLatest([this.summaryTimeSeries$, this.forecastSummaryTotal$]).pipe(
+    map(([summaryTimeSeries, countForecast]) => this.protectedTimeSeriesResponse(summaryTimeSeries, countForecast)),
   );
 
   readonly dateRange$ = this._executionState.timeRange$;
@@ -68,20 +91,20 @@ export abstract class AltReportNodesStateService<T> extends AltReportNodesFilter
 
   protected abstract createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest;
 
-  protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse): ReportNodeSummary {
+  protected protectedTimeSeriesResponse(response?: TimeSeriesAPIResponse, countForecast?: number): ReportNodeSummary {
     if (!response) {
-      return { total: 0 } as ReportNodeSummary;
+      return { total: 0, items: {} } as ReportNodeSummary;
     }
 
     return response.matrixKeys.reduce(
       (res: ReportNodeSummary, keyAttributes, i) => {
         const bucket = response.matrix[i][0];
         const status = keyAttributes['status'] as string;
-        res[status] = bucket.count;
+        res.items[status] = bucket.count;
         res.total += bucket.count;
         return res;
       },
-      { total: 0 },
+      { total: 0, countForecast, items: {} },
     ) as ReportNodeSummary;
   }
 }

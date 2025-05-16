@@ -1,4 +1,7 @@
 export interface ReportNodeSummary {
-  [key: string]: number;
+  items: {
+    [key: string]: number;
+  };
   total: number;
+  countForecast?: number;
 }

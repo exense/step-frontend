@@ -19,6 +19,22 @@ step-alt-report-node-summary {
     width: 100%;
   }
 
+  .summary-total {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    div {
+      font-weight: bold;
+      &.total {
+        font-size: 3rem;
+      }
+      &.forecast {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
   step-status-count-badge {
     cursor: pointer;
   }

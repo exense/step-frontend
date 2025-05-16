@@ -9,6 +9,8 @@ export class AltTestCasesNodesStateService extends AltReportNodesStateService<Ag
     super(_executionState.testCasesDataSource$, 'testCases');
   }
 
+  protected readonly statusDistributionViewId = 'statusDistributionForTestcases';
+
   protected override createFetchBucketRequest(execution: Execution, timeRange: TimeRange): FetchBucketsRequest {
     return {
       start: timeRange.from,

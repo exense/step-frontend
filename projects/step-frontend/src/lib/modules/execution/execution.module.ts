@@ -90,7 +90,7 @@ import { AltReportNodeDetailsComponent } from './components/alt-keyword-inline-d
 import { AggregatedTreeNodeIterationListComponent } from './components/aggregated-tree-node-iteration-list/aggregated-tree-node-iteration-list.component';
 import { ArtefactsModule } from '../artefacts/artefacts.module';
 import { AltReportWidgetSortDirective } from './directives/alt-report-widget-sort.directive';
-import { DoughnutChartComponent } from '../timeseries/components/doughnut-chart/doughnut-chart.component';
+import { DOUGHNUT_CHART_IMPORTS } from '../charts';
 import { AltExecutionRepositoryComponent } from './components/alt-execution-repository/alt-execution-repository.component';
 import { ExecutionCommandsDirective } from './directives/execution-commands.directive';
 import { AltExecutionParametersComponent } from './components/alt-execution-parameters/alt-execution-parameters.component';
@@ -232,7 +232,7 @@ import { MatButton } from '@angular/material/button';
     ReportNodesModule,
     TimeSeriesModule,
     ArtefactsModule,
-    DoughnutChartComponent,
+    DOUGHNUT_CHART_IMPORTS,
     TimeSeriesChartComponent,
     TooltipContentDirective,
     TimeRangePickerComponent,
