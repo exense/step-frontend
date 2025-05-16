@@ -1,0 +1,16 @@
+<section class="chart-container">
+  <div class="total-value">
+    @if (totalTemplate(); as totalTemplate) {
+      <ng-container *ngTemplateOutlet="totalTemplate" />
+    } @else {
+      <span [matTooltip]="totalTooltip()" matTooltipPosition="below">
+        @if (settings().totalValue; as total) {
+          {{ total }}
+        } @else {
+          0
+        }
+      </span>
+    }
+  </div>
+  <canvas #canvas></canvas>
+</section>
