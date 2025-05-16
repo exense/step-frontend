@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { BaseHttpRequest, StepCoreModule, StepHttpRequestService } from '@exense/step-core';
+import { provideStepApi, StepCoreModule, BaseHttpRequest, StepHttpRequestService } from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
@@ -54,6 +54,7 @@ const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIA
   ],
   exports: [RootComponent],
   providers: [
+    provideStepApi(),
     LEGACY_URL_HANDLER,
     ...MODULES_INITIALIZERS,
     PLUGINS_INITIALIZER,

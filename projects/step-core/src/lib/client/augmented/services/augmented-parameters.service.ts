@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Parameter, ParametersService } from '../../generated';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';

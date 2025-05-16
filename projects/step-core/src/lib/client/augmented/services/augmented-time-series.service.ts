@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { FetchBucketsRequest, TimeSeriesService } from '../../generated';
 import { map, Observable, of, OperatorFunction, switchMap } from 'rxjs';
-import { TableApiWrapperService } from '../../table/step-table-client.module';
+import { TableApiWrapperService } from '../../table';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';

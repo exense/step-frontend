@@ -1,8 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { ColumnSettings, ScreenInput, ScreenInputColumnSettings, TableSettings } from '../../../client/generated';
+import {
+  ColumnSettings,
+  ScreenInput,
+  ScreenInputColumnSettings,
+  TableSettings,
+  TableApiWrapperService,
+} from '../../../client/step-client-module';
 import { MatColumnDef } from '@angular/material/table';
 import { TableColumnsConfig } from './table-columns-config.provider';
-import { TableApiWrapperService } from '../../../client/table/step-table-client.module';
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
 import { map, Observable, of } from 'rxjs';
 import { ColumnInfo } from '../types/column-info';

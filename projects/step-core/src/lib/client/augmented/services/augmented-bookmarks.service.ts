@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, OperatorFunction } from 'rxjs';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table';
 import { BookmarksService } from '../../generated/services/BookmarksService';
 import { Bookmark } from '../../../modules/bookmarks';
 import { MenuEntry } from '../../../modules/routing';
