@@ -1,16 +1,19 @@
 @if (node(); as node) {
   @switch (node.nodeType) {
     @case (AggregateTreeNodeType.AGGREGATED_INFO) {
-      <div class="aggregated-info" (click)="showIterations()">
+      <div class="aggregated-info" (stepStrategyClick)="showDetails()">
         <span class="name larger-view" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
         <step-aggregated-status
           [countByStatus]="node?.countByStatus"
-          (statusClick)="showIterations($event.status, $event.count, $event.event)"
+          (statusClick)="showDetails($event.status, $event.count, $event.event)"
         />
         <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
           node?.originalArtefact?.description | treeNodeDescription
         }}</span>
         <step-artefact-inline-details class="smaller-view" [aggregatedInfo]="node" />
+        @if (addonTemplate(); as addonTemplate) {
+          <ng-container *ngTemplateOutlet="addonTemplate; context: { $implicit: node, isSelected: isSelected() }" />
+        }
       </div>
     }
     @case (AggregateTreeNodeType.PSEUDO_CONTAINER) {

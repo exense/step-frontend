@@ -34,6 +34,7 @@ import {
   CommonEntitiesUrlsService,
   TestRunStatus,
   ReportNode,
+  SimpleOutletComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -76,7 +77,6 @@ import { AltReportNodesTestcasesComponent } from './components/alt-report-nodes-
 import { ExecutionDetailsComponent } from './components/execution-details/execution-details.component';
 import { AppliedStatusPipe } from './pipes/applied-status.pipe';
 import { AltExecutionTreeTabComponent } from './components/alt-execution-tree-tab/alt-execution-tree-tab.component';
-import { AltKeywordDrilldownComponent } from './components/alt-keyword-drilldown/alt-keyword-drilldown.component';
 import { AltExecutionTabsComponent } from './components/alt-execution-tabs/alt-execution-tabs.component';
 import { AltExecutionReportControlsComponent } from './components/alt-execution-report-controls/alt-execution-report-controls.component';
 import { AggregatedTreeNodeComponent } from './components/aggregated-tree-node/aggregated-tree-node.component';
@@ -98,7 +98,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, filter, first, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -128,6 +128,7 @@ import { AgentsCellComponent } from './components/execution-agent-cell/execution
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
 import { AggregatedStatusComponent } from './components/aggregated-status/aggregated-status.component';
+import { AltExecutionTreePartialComponent } from './components/alt-execution-tree-partial/alt-execution-tree-partial.component';
 import { DurationDescriptionComponent } from './components/duration-description/duration-description.component';
 import { AltReportWidgetFooterDirective } from './directives/alt-report-widget-footer.directive';
 import { DashboardUrlParamsService } from '../timeseries/modules/_common/injectables/dashboard-url-params.service';
@@ -137,6 +138,9 @@ import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
 import { MatButton } from '@angular/material/button';
+import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
+import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
+import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 
 @NgModule({
   declarations: [
@@ -191,9 +195,9 @@ import { MatButton } from '@angular/material/button';
     AltReportNodesTestcasesComponent,
     AltExecutionRepositoryComponent,
     AltExecutionTreeComponent,
+    AltExecutionTreePartialComponent,
     AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
-    AltKeywordDrilldownComponent,
     AltExecutionParametersComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
@@ -219,6 +223,9 @@ import { MatButton } from '@angular/material/button';
     AggregatedReportViewDurationValuePipe,
     IsAverageDurationPipe,
     LegacyExecutionViewComponent,
+    AltExecutionTreeNodeAddonDirective,
+    IsEmptyStatusPipe,
+    IsCurrentReportDetailsOpenedPipe,
   ],
   imports: [
     StepCommonModule,
@@ -250,17 +257,18 @@ import { MatButton } from '@angular/material/button';
     AltExecutionsComponent,
     AltExecutionProgressComponent,
     AltExecutionReportComponent,
+    AltExecutionTreePartialTabComponent,
     AltExecutionReportControlsComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
     AltExecutionTreeTabComponent,
     AltExecutionTreeWidgetComponent,
-    AltKeywordDrilldownComponent,
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltReportWidgetComponent,
     ExecutionLegacySwitcherComponent,
     DurationDescriptionComponent,
+    AltExecutionTreeNodeAddonDirective,
   ],
   providers: [
     {
@@ -588,10 +596,6 @@ export class ExecutionModule {
               path: 'analytics',
               component: AltExecutionAnalyticsComponent,
             },
-            {
-              path: `keyword-drilldown/:keywordId`,
-              component: AltKeywordDrilldownComponent,
-            },
             schedulePlanRoute('modal'),
             dialogRoute({
               path: 'launch',
@@ -662,67 +666,75 @@ export class ExecutionModule {
                 },
               },
             }),
-            dialogRoute(
-              {
-                path: 'node-details',
-                outlet: 'nodeDetails',
-                resolve: {
-                  aggregatedNode: (route: ActivatedRouteSnapshot) => {
-                    const _state = inject(AggregatedReportViewTreeStateContextService).getState();
-                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                    const aggregatedNodeId = route.queryParams[_queryParamNames.aggregatedNodeId];
-                    if (!aggregatedNodeId) {
-                      return undefined;
-                    }
-                    return _state.findNodeById(aggregatedNodeId);
+            {
+              path: 'node-details',
+              outlet: 'nodeDetails',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute(
+                  {
+                    path: ':detailsId',
+                    resolve: {
+                      aggregatedNode: (route: ActivatedRouteSnapshot) => {
+                        const detailsId = route.params['detailsId'];
+                        const _state = inject(AggregatedReportViewTreeStateContextService).getState();
+                        const aggregatedNodeId = detailsId.startsWith('agid_')
+                          ? detailsId.replace('agid_', '')
+                          : undefined;
+                        if (!aggregatedNodeId) {
+                          return undefined;
+                        }
+                        return _state.findNodeById(aggregatedNodeId);
+                      },
+                      resolvedPartialPath: () =>
+                        inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
+                      reportNode: (route: ActivatedRouteSnapshot) => {
+                        const detailsId = route.params['detailsId'];
+                        const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
+                        const _controllerService = inject(AugmentedControllerService);
+                        const reportNodeId = detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
+                        if (!reportNodeId) {
+                          return undefined;
+                        }
+                        const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
+                        if (reportNode) {
+                          return reportNode;
+                        }
+                        return _controllerService.getReportNode(reportNodeId);
+                      },
+                      searchStatus: (route: ActivatedRouteSnapshot) => {
+                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                        return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
+                      },
+                      searchStatusCount: (route: ActivatedRouteSnapshot) => {
+                        const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
+                        const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
+                        const statusCount = parseInt(statusCountStr);
+                        return isNaN(statusCount) ? undefined : statusCount;
+                      },
+                    },
+                    dialogComponent: AggregatedTreeNodeDialogComponent,
+                    children: [
+                      dialogRoute({
+                        path: 'plan-node',
+                        dialogComponent: PlanNodeDetailsDialogComponent,
+                      }),
+                    ],
                   },
-                  resolvedPartialPath: () =>
-                    inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
-                  reportNode: (route: ActivatedRouteSnapshot) => {
-                    const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                    const _controllerService = inject(AugmentedControllerService);
-                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                    const reportNodeId = route.queryParams[_queryParamNames.reportNodeId];
-                    if (!reportNodeId) {
-                      return undefined;
-                    }
-                    const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
-                    if (reportNode) {
-                      return reportNode;
-                    }
-                    return _controllerService.getReportNode(reportNodeId);
+                  {
+                    hasBackdrop: false,
+                    height: '100%',
+                    width: '40%',
+                    panelClass: 'side-dialog',
+                    position: {
+                      right: '0',
+                      top: '0',
+                      bottom: '0',
+                    },
                   },
-                  searchStatus: (route: ActivatedRouteSnapshot) => {
-                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                    return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
-                  },
-                  searchStatusCount: (route: ActivatedRouteSnapshot) => {
-                    const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
-                    const statusCountStr = route.queryParams[_queryParamNames.searchStatusCount];
-                    const statusCount = parseInt(statusCountStr);
-                    return isNaN(statusCount) ? undefined : statusCount;
-                  },
-                },
-                dialogComponent: AggregatedTreeNodeDialogComponent,
-                children: [
-                  dialogRoute({
-                    path: 'plan-node',
-                    dialogComponent: PlanNodeDetailsDialogComponent,
-                  }),
-                ],
-              },
-              {
-                hasBackdrop: false,
-                height: '100%',
-                width: '40%',
-                panelClass: 'side-dialog',
-                position: {
-                  right: '0',
-                  top: '0',
-                  bottom: '0',
-                },
-              },
-            ),
+                ),
+              ],
+            },
             {
               path: 'viz',
               redirectTo: 'analytics',

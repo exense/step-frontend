@@ -1,0 +1,22 @@
+@if (showSpinner()) {
+  <div class="spinner-container">
+    <mat-spinner />
+  </div>
+}
+<step-alt-execution-tree #tree>
+  <ng-container *stepAltExecutionTreeNodeAddon="let node; let isSelected = isSelected">
+    @if (showDetailsButton() && !(node | isEmptyStatus) && !(node | isCurrentReportDetailsOpened)) {
+      <button
+        mat-icon-button
+        type="button"
+        class="details-button"
+        [class.selected]="isSelected"
+        matTooltip="Open details for this node"
+        matTooltipPosition="below"
+        (click)="openDetails(node)"
+      >
+        <step-icon name="microscope" />
+      </button>
+    }
+  </ng-container>
+</step-alt-execution-tree>

@@ -1,0 +1,44 @@
+step-alt-execution-tree-partial {
+  position: relative;
+
+  step-alt-execution-tree {
+    position: relative;
+    step-tree {
+      position: absolute;
+      left: 0;
+      right: 0;
+      overflow: auto;
+      min-height: 5rem;
+
+      .tree-node:hover {
+        .details-button {
+          display: inline-flex !important;
+        }
+      }
+    }
+  }
+
+  .spinner-container {
+    position: absolute;
+    z-index: 2;
+    width: 10rem;
+    height: 10rem;
+    left: calc(50% - 5rem);
+    top: calc(50% - 5rem);
+  }
+
+  &.no-padding {
+    step-alt-execution-tree {
+      step-tree {
+        padding-left: 0;
+      }
+    }
+  }
+
+  .details-button {
+    display: none !important;
+    &.selected {
+      display: inline-flex !important;
+    }
+  }
+}

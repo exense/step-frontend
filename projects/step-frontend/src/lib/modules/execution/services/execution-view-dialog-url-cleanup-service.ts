@@ -9,7 +9,10 @@ export class ExecutionViewDialogUrlCleanupService implements DialogParentService
 
   private readonly PRESERVE_PARAMS_PREFIX = 'dc_';
 
-  navigateBack(result?: DialogRouteResult, relativeTo?: ActivatedRoute) {
+  navigateBack(result?: DialogRouteResult, relativeTo?: ActivatedRoute): void {
+    if (!!result && !result.canNavigateBack) {
+      return;
+    }
     const filteredParams = Object.keys(this._activatedRoute.snapshot.queryParams)
       .filter((key) => key.startsWith(this.PRESERVE_PARAMS_PREFIX))
       .reduce(
@@ -20,6 +23,10 @@ export class ExecutionViewDialogUrlCleanupService implements DialogParentService
         {} as { [key: string]: any },
       );
 
-    this._router.navigate(['..'], { relativeTo: relativeTo!, queryParams: filteredParams });
+    if (this._router.url.includes('node-details')) {
+      this._router.navigate(['..'], { relativeTo: relativeTo!.parent!, queryParams: filteredParams });
+    } else {
+      this._router.navigate(['..'], { relativeTo: relativeTo, queryParams: filteredParams });
+    }
   }
 }

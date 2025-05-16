@@ -2,13 +2,7 @@
   <div class="tree-node-modal-header" step-modal-window-title>
     @if (selectedReportNode(); as reportNode) {
       @if (hasBackButton) {
-        <button
-          type="button"
-          mat-icon-button
-          (click)="selectedReportNode.set(undefined)"
-          matTooltip="Back to iteration's list"
-          matTooltipPosition="below"
-        >
+        <button type="button" mat-icon-button (click)="navigateBack()" matTooltip="Back" matTooltipPosition="below">
           <step-icon name="arrow-left" />
         </button>
       }
@@ -43,14 +37,18 @@
   <div step-modal-window-body>
     @if (hasData) {
       @if (selectedReportNode(); as reportNode) {
-        <step-alt-report-node-details [node]="reportNode" [showArtefact]="true" />
+        <step-alt-report-node-details
+          [node]="reportNode"
+          [showArtefact]="true"
+          (openTreeView)="handleOpenTreeView(reportNode)"
+        />
       } @else {
         <step-aggregated-tree-node-iteration-list
           [node]="aggregatedNode!"
           [resolvedPartialPath]="resolvedPartialPath"
           [initialStatus]="initialSearchStatus"
           [initialStatusCount]="initialSearchStatusCount"
-          (showDetails)="selectedReportNode.set($event)"
+          (showDetails)="handleOpenDetails($event)"
           (openTreeView)="handleOpenTreeView($event)"
         />
       }

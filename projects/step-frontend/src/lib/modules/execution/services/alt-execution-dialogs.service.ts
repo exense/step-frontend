@@ -1,13 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
+  AbstractArtefact,
   AugmentedExecutionsService,
   ExecutiontTaskParameters,
   ReportNode,
+  ReportNodeWithArtefact,
   ScheduledTaskTemporaryStorageService,
 } from '@exense/step-core';
 import { AltReportNodeDetailsStateService } from './alt-report-node-details-state.service';
-import { from, map, Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { EXECUTION_ID } from './execution-id.token';
 import { Status } from '../../_common/shared/status.enum';
 import { SchedulerInvokerService } from './scheduler-invoker.service';
@@ -20,6 +22,7 @@ export interface OpenIterationsParams {
   aggregatedNodeId: string;
   artefactHash?: string;
   countByStatus?: Record<string, number>;
+  singleInstanceReportNode?: ReportNodeWithArtefact<AbstractArtefact>;
   nodeStatus?: Status;
   reportNodeId?: string;
   nodeStatusCount?: number;
@@ -33,7 +36,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
   private _scheduledTaskTemporaryStorage = inject(ScheduledTaskTemporaryStorageService);
-  private _reportNodeDetails = inject(AltReportNodeDetailsStateService);
+  private _reportNodeDetails = inject(AltReportNodeDetailsStateService, { optional: true });
   private _executionId = inject(EXECUTION_ID);
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
   private _matDialog = inject(MatDialog);
@@ -47,30 +50,59 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     if (arguments.length === 2) {
       const node = nodeOrParams as AggregatedTreeNode;
       restParams = restParams ?? {};
-      const { id: aggregatedNodeId, artefactHash, countByStatus } = node;
-      this.openIterations({ aggregatedNodeId, artefactHash, countByStatus, ...restParams });
+      const { id: aggregatedNodeId, artefactHash, countByStatus, singleInstanceReportNode } = node;
+      this.openIterations({ aggregatedNodeId, artefactHash, countByStatus, singleInstanceReportNode, ...restParams });
       return;
     }
 
-    const { aggregatedNodeId, artefactHash, countByStatus, reportNodeId, nodeStatus, nodeStatusCount } =
-      nodeOrParams as OpenIterationsParams;
+    const {
+      aggregatedNodeId,
+      artefactHash,
+      countByStatus,
+      reportNodeId,
+      nodeStatus,
+      nodeStatusCount,
+      singleInstanceReportNode,
+    } = nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
-      this.navigateToIterationDetails(reportNodeId, aggregatedNodeId);
+      this.navigateToIterationDetails(reportNodeId);
       return;
     }
     const itemsCounts = Object.values(countByStatus ?? {});
     if (itemsCounts.length === 1 && itemsCounts[0] === 1 && artefactHash) {
-      this.getSingleRunReportNode(artefactHash).subscribe((reportNode) => {
-        this._reportNodeDetails.setReportNode(reportNode);
-        this.navigateToIterationDetails(reportNode.id!, aggregatedNodeId);
+      const reportNode$ = singleInstanceReportNode
+        ? of(singleInstanceReportNode)
+        : artefactHash
+          ? this.getSingleRunReportNode(artefactHash)
+          : undefined;
+
+      reportNode$?.subscribe?.((reportNode) => {
+        this._reportNodeDetails?.setReportNode?.(reportNode);
+        this.navigateToIterationDetails(reportNode.id!);
       });
+
       return;
     }
     this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);
   }
 
-  openIterationDetails<T extends ReportNode>(reportNode: T): void {
-    this._reportNodeDetails.setReportNode(reportNode);
+  openIterationDetails(artefactHash: string): void;
+  openIterationDetails<T extends ReportNode>(reportNode: T): void;
+  openIterationDetails<T extends ReportNode>(nodeOrHash: T | string): void {
+    if (!nodeOrHash) {
+      return;
+    }
+
+    if (typeof nodeOrHash === 'string') {
+      const artefactHash = nodeOrHash;
+      this.getSingleRunReportNode(artefactHash).subscribe((reportNode) => {
+        this.openIterationDetails(reportNode);
+      });
+      return;
+    }
+
+    const reportNode = nodeOrHash;
+    this._reportNodeDetails?.setReportNode?.(reportNode);
     this.navigateToIterationDetails(reportNode.id!);
   }
 
@@ -83,36 +115,28 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
 
   private navigateToIterationList(aggregatedNodeId: string, searchStatus?: Status, searchStatusCount?: number): void {
     const queryParams: Params = {};
-    queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
     queryParams[this._queryParamsNames.searchStatus] = searchStatus;
     queryParams[this._queryParamsNames.searchStatusCount] = searchStatusCount;
-    this.openNodeDetails(queryParams);
+    this.openNodeDetails(`agid_${aggregatedNodeId}`, queryParams);
   }
 
-  private navigateToIterationDetails(reportNodeId: string, aggregatedNodeId?: string): void {
-    const queryParams: Params = {};
-    queryParams[this._queryParamsNames.reportNodeId] = reportNodeId;
-    queryParams[this._queryParamsNames.aggregatedNodeId] = aggregatedNodeId;
-    this.openNodeDetails(queryParams);
+  private navigateToIterationDetails(reportNodeId: string): void {
+    this.openNodeDetails(`rnid_${reportNodeId}`, {});
   }
 
-  private openNodeDetails(queryParams: Params): void {
-    const isDetailsOpened = this._router.url.includes('node-details');
-    const closePrevious$ = isDetailsOpened ? this.closeNodeDetails() : of(undefined);
-    closePrevious$.subscribe(() => {
-      this._router.navigate([{ outlets: { nodeDetails: ['node-details'] } }], {
-        relativeTo: this._activatedRoute,
-        queryParams,
-        queryParamsHandling: 'merge',
-      });
+  private openNodeDetails(detailsId: string, queryParams: Params): void {
+    let relativeTo: ActivatedRoute;
+    if (this._router.url.includes('node-details')) {
+      relativeTo = this._activatedRoute.parent!.parent!;
+    } else {
+      relativeTo = this._activatedRoute;
+    }
+
+    this._router.navigate([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
+      relativeTo,
+      queryParams,
+      queryParamsHandling: 'merge',
     });
-  }
-
-  private closeNodeDetails(): Observable<unknown> {
-    const closePromise = this._router.navigate([{ outlets: { nodeDetails: null } }], {
-      relativeTo: this._activatedRoute,
-    });
-    return from(closePromise);
   }
 
   private getSingleRunReportNode(artefactHash: string): Observable<ReportNode> {

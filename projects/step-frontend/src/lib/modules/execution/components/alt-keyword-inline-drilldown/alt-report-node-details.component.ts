@@ -1,12 +1,38 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import {
+  ArtefactService,
+  AugmentedControllerService,
+  CLICK_STRATEGY,
+  ClickStrategyType,
+  ReportNode,
+  TreeNodeUtilsService,
+  TreeStateService,
+} from '@exense/step-core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
+import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
+import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 
 @Component({
   selector: 'step-alt-report-node-details',
   templateUrl: './alt-report-node-details.component.html',
   styleUrl: './alt-report-node-details.component.scss',
+  providers: [
+    AggregatedReportViewTreeNodeUtilsService,
+    {
+      provide: TreeNodeUtilsService,
+      useExisting: AggregatedReportViewTreeNodeUtilsService,
+    },
+    AggregatedReportViewTreeStateService,
+    {
+      provide: TreeStateService,
+      useExisting: AggregatedReportViewTreeStateService,
+    },
+    {
+      provide: CLICK_STRATEGY,
+      useValue: ClickStrategyType.DOUBLE_CLICK,
+    },
+  ],
 })
 export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
@@ -14,6 +40,7 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
+  readonly openTreeView = output();
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
