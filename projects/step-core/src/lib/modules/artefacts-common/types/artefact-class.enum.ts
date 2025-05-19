@@ -10,4 +10,7 @@ export enum ArtefactClass {
   SEQUENCE = 'Sequence',
   TEST_SCENARIO = 'TestScenario',
   TEST_SET = 'TestSet',
+  CHECK = 'Check',
+  ASSERT = 'Assert',
+  PERFORMANCE_ASSERT = 'PerformanceAssert',
 }

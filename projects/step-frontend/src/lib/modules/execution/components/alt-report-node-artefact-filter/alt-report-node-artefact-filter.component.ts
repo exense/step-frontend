@@ -27,7 +27,10 @@ export class AltReportNodeArtefactFilterComponent {
     createItem(ArtefactClass.SEQUENCE, 'Sequence'),
     createItem(ArtefactClass.TEST_SCENARIO, 'Test Scenario'),
     createItem(ArtefactClass.TEST_SET, 'Test Set'),
-  ];
+    createItem(ArtefactClass.CHECK, 'Check'),
+    createItem(ArtefactClass.ASSERT, 'Assert'),
+    createItem(ArtefactClass.PERFORMANCE_ASSERT, 'Performance Assert'),
+  ].sort((a, b) => a.value.localeCompare(b.value));
 
   protected readonly itemValueExtractor: ArrayItemLabelValueExtractor<Item, ArtefactClass> = {
     getLabel: (item) => item.value,
