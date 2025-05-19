@@ -28,6 +28,15 @@ step-alt-execution-tree {
     margin-left: 0.8rem;
   }
 
+  step-tree-node.aggregated-important-node .tree-node {
+    step-tree-node-name {
+      color: var.$blue-600 !important;
+    }
+    .node-icon {
+      color: var.$blue-600 !important;
+    }
+  }
+
   .tree-node {
     flex: 1;
     .node-content {

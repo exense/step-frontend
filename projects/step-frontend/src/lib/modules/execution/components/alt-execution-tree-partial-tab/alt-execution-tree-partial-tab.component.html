@@ -1,6 +1,3 @@
-@if (showSpinner()) {
-  <div class="spinner-container">
-    <mat-spinner />
-  </div>
+@if (reportNode$ | async; as reportNode) {
+  <step-alt-execution-tree-partial [node]="reportNode" />
 }
-<step-alt-execution-tree />
