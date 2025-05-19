@@ -1,0 +1,10 @@
+<step-form-field>
+  <step-select
+    [ngModel]="artefactClassValue()"
+    (ngModelChange)="handleArtefactClassValueChange($event)"
+    [items]="items"
+    [extractor]="itemValueExtractor"
+    [multiple]="true"
+    emptyPlaceholder="Type"
+  />
+</step-form-field>

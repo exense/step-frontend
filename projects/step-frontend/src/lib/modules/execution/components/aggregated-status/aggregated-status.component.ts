@@ -26,11 +26,18 @@ export class AggregatedStatusComponent {
 
   readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
+  readonly statusFilter = input<Status[]>([]);
+
   protected readonly statusItems = computed(() => {
     const countByStatus = this.countByStatus();
-    return Object.entries(countByStatus)
+    const statusFilter = this.statusFilter();
+    let result = Object.entries(countByStatus)
       .map(([status, count]) => this.createStatusItem(status, count))
       .filter((item) => !!item) as StatusItem[];
+    if (statusFilter?.length) {
+      result = result.filter((item) => statusFilter.includes(item.status));
+    }
+    return result;
   });
 
   protected readonly singleStatus = computed(() => {
