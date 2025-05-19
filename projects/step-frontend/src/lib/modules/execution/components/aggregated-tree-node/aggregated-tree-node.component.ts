@@ -1,8 +1,9 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AggregatedTreeNode, AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
+import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -19,10 +20,17 @@ export class AggregatedTreeNodeComponent {
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
   readonly nodeId = input.required<string>();
+  readonly addonTemplate = input<TemplateRef<unknown> | undefined>(undefined);
 
   protected node = computed(() => {
     const node = this._treeState.findNodeById(this.nodeId());
     return node;
+  });
+
+  protected isSelected = computed(() => {
+    const nodeId = this.nodeId();
+    const selectedNodes = this._treeState.selectedNodeIds();
+    return selectedNodes.includes(nodeId);
   });
 
   protected isInSearchResult = computed(() => {
@@ -33,11 +41,11 @@ export class AggregatedTreeNodeComponent {
 
   protected readonly detailsTooltip = 'Open execution details';
 
-  protected showIterations(status?: Status, count?: number, event?: MouseEvent): void {
+  protected showDetails(status?: Status, count?: number, event?: MouseEvent): void {
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
     const node = this.node();
-    if (!node) {
+    if (!node || IsEmptyStatusPipe.transform(node)) {
       return;
     }
     if (!count) {
