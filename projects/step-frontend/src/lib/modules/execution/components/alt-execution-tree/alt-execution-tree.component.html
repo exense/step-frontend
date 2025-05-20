@@ -1,8 +1,17 @@
 <step-tree
+  #tree
   [dragDisabled]="true"
   [forceFocus]="true"
   (treeContextAction)="proceedAction($event.actionId, $event.node, $event.multipleNodes)"
 >
+  <ng-container *stepTreeNodeTemplate="let node">
+    <step-tree-node
+      [node]="node"
+      [stepTreeNodeVisualState]="node.id"
+      [class.context-menu-open]="node.id === tree.openedMenuNodeId"
+      (contextMenu)="tree.openContextMenu($event)"
+    />
+  </ng-container>
   <div *stepTreeNodeNameTemplate="let node" class="node-name">
     <step-aggregated-tree-node
       [nodeId]="node.id"

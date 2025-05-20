@@ -4,7 +4,9 @@
       <div class="aggregated-info" (stepStrategyClick)="showDetails()">
         <span class="name larger-view" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
         <step-aggregated-status
+          [class.hide-status]="!showStatus()"
           [countByStatus]="node?.countByStatus"
+          [statusFilter]="statusFilter()"
           (statusClick)="showDetails($event.status, $event.count, $event.event)"
         />
         <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{

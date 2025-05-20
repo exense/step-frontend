@@ -1,9 +1,10 @@
 import { Component, computed, inject, input, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
-import { AggregatedTreeNode, AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
+import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-aggregated-tree-node',
@@ -16,6 +17,7 @@ import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  private _reportNodesFilter = inject(AltReportNodesFilterService, { optional: true });
 
   readonly AggregateTreeNodeType = AggregatedTreeNodeType;
 
@@ -38,6 +40,17 @@ export class AggregatedTreeNodeComponent {
     const selectedSearchResult = this._treeState.selectedSearchResult();
     return selectedSearchResult === nodeId;
   });
+
+  protected showStatus = computed(() => {
+    const node = this.node();
+    const artefactClass = this._reportNodesFilter?.artefactClassValue?.();
+    if (!artefactClass?.size) {
+      return true;
+    }
+    return artefactClass.has(node?.originalArtefact?._class ?? '');
+  });
+
+  protected statusFilter = computed(() => this._reportNodesFilter?.statusCtrlValue?.() ?? []);
 
   protected readonly detailsTooltip = 'Open execution details';
 

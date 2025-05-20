@@ -10,6 +10,10 @@ step-alt-execution-tree {
     background: transparent !important;
   }
 
+  step-tree-node.not-significant {
+    opacity: 0.5;
+  }
+
   .tree-panel {
     overflow: auto !important;
     padding-right: 1rem;

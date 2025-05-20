@@ -10,10 +10,12 @@
     align-items: center;
     justify-content: center;
     z-index: 1;
+    pointer-events: none;
     cursor: default;
     & > span {
       font-size: 2rem;
       font-weight: bold;
+      pointer-events: auto;
     }
   }
 }

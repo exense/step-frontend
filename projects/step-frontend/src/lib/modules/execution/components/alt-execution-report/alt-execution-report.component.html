@@ -16,7 +16,7 @@
         totalForecastTooltip="Forecast number of test cases"
         [summary]="testCasesSummary"
         [statusFilter]="_testCasesState.statusCtrlValue()"
-        (statusFilterChange)="_testCasesState.updateStatusCtrl($event)"
+        (statusFilterChange)="handleTestCasesSummaryStatusSelection($event)"
       />
     }
   }
@@ -29,7 +29,7 @@
       totalForecastTooltip="Forecast number of keyword calls"
       [summary]="keywordsSummary"
       [statusFilter]="_keywordsState.statusCtrlValue()"
-      (statusFilterChange)="_keywordsState.updateStatusCtrl($event)"
+      (statusFilterChange)="handleKeywordsSummaryStatusSelection($event)"
     />
   }
   @if (_mode === ViewMode.VIEW) {
