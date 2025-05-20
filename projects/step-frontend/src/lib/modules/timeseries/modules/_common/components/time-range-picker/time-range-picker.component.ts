@@ -7,12 +7,11 @@ import {
   input,
   Input,
   model,
-  OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
   untracked,
   ViewChild,
+  signal,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeRangePickerSelection } from '../../types/time-selection/time-range-picker-selection';
@@ -20,13 +19,7 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import {
-  TIME_UNIT_DICTIONARY,
-  TIME_UNIT_LABELS,
-  TimeConvertersFactoryService,
-  TimeRange,
-  TimeUnit,
-} from '@exense/step-core';
+import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit } from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -40,10 +33,8 @@ import {
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {
-  timeUnitOptions = Object.values(TimeUnit).filter((k) => !isNaN(Number(k)));
+  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY];
   readonly TIME_UNIT_LABELS: Record<string, string> = {
-    [TimeUnit.MILLISECOND]: 'millis',
-    [TimeUnit.SECOND]: 'sec',
     [TimeUnit.MINUTE]: 'min',
     [TimeUnit.HOUR]: 'hrs',
     [TimeUnit.DAY]: 'days',
@@ -150,6 +141,7 @@ export class TimeRangePickerComponent implements OnInit {
       return;
     }
     this.emitSelectionChange({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
+    this.closeMenu();
   }
 
   timeRangeInputsSyncEffect = effect(() => {
