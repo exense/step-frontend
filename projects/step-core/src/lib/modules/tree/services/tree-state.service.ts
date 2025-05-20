@@ -41,6 +41,14 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return tree.filter((node) => !node.parentPath.some((id) => collapsedNodeIds.includes(id)));
   });
 
+  private flatTreeNodeIndexes = computed(() => {
+    const flatTree = this.flatTree();
+    return flatTree.reduce((res, item, index) => {
+      res.set(item.id, index);
+      return res;
+    }, new Map<string, number>());
+  });
+
   readonly hideRoot = this.hideRootInternal.asReadonly();
   readonly selectedNodeIds = this.selectedNodeIdsInternal.asReadonly();
   readonly expandedNodeIds = this.expandedNodeIdsInternal.asReadonly();
@@ -150,6 +158,12 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     if (isUpdated) {
       this.refresh();
     }
+  }
+
+  indexOf(nodeOrId: N | TreeNode | string): number {
+    const nId = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+    const indexCache = this.flatTreeNodeIndexes();
+    return indexCache.get(nId) ?? -1;
   }
 
   selectNode(nodeOrId: N | TreeNode | string, $event?: MouseEvent, preventIfAlreadySelected: boolean = false): void {

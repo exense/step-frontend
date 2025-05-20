@@ -11,6 +11,7 @@ import {
   input,
   Input,
   Output,
+  TrackByFunction,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -31,6 +32,7 @@ import { TreeNodeComponent } from '../tree-node/tree-node.component';
 import { TreeNodeActionsPipe } from '../../pipes/tree-node-actions.pipe';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { OriginalNodePipe } from '../../pipes/original-node.pipe';
+import { TreeVirtualScrollDirective } from '../../directives/tree-virtual-scroll.directive';
 
 @Component({
   selector: 'step-tree',
@@ -51,6 +53,11 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   private _treeFocusState = inject(TreeFocusStateService, { optional: true });
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _doc = inject(DOCUMENT);
+
+  protected readonly _stepTreeVirtualScroll = inject(TreeVirtualScrollDirective, { optional: true });
+  protected readonly hasVirtualScroll = !!this._stepTreeVirtualScroll;
+
+  protected readonly itemTrackBy: TrackByFunction<N> = (index, item) => item.id;
 
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
@@ -117,6 +124,30 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   handleContextClose(): void {
     this.openedMenuNodeId = undefined;
+  }
+
+  scrollToNode(nodeId?: string): void {
+    if (!nodeId) {
+      return;
+    }
+    if (!this.hasVirtualScroll) {
+      this.nativeScroll(nodeId);
+      return;
+    }
+
+    const index = this._treeState.indexOf(nodeId);
+    if (index < 0) {
+      return;
+    }
+
+    this._stepTreeVirtualScroll!.strategy!.scrollToIndexApproximately(index).subscribe(() => {
+      this.nativeScroll(nodeId);
+    });
+  }
+
+  private nativeScroll(nodeId: string): void {
+    const nodeElement = this._elRef.nativeElement.querySelector<HTMLElement>(`[data-tree-node-id="${nodeId}"]`);
+    nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
   }
 
   private setFocus(isInFocus: boolean) {

@@ -5,6 +5,11 @@ step-tree {
   padding-bottom: 4rem;
   display: block;
 
+  .virtual-scroll-container {
+    width: 100%;
+    height: var(--style__height);
+  }
+
   .node-container {
     // display: flex;
     // position: relative;

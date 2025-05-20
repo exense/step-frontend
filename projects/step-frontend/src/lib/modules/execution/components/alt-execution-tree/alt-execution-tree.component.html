@@ -13,10 +13,6 @@
     />
   </ng-container>
   <div *stepTreeNodeNameTemplate="let node" class="node-name">
-    <step-aggregated-tree-node
-      [nodeId]="node.id"
-      [attr.data-node-id]="node.id"
-      [addonTemplate]="treeNodeAddon()?.templateRef"
-    />
+    <step-aggregated-tree-node [nodeId]="node.id" [addonTemplate]="treeNodeAddon()?.templateRef" />
   </div>
 </step-tree>
