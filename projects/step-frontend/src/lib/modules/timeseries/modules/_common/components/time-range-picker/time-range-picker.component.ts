@@ -41,12 +41,12 @@ import {
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {
-  timeUnitOptions = Object.keys(TimeUnit);
+  timeUnitOptions = Object.values(TimeUnit).filter((k) => !isNaN(Number(k)));
   readonly TIME_UNIT_LABELS: Record<string, string> = {
-    [TimeUnit.MILLISECOND]: 'milliseconds',
-    [TimeUnit.SECOND]: 'seconds',
-    [TimeUnit.MINUTE]: 'minutes',
-    [TimeUnit.HOUR]: 'hours',
+    [TimeUnit.MILLISECOND]: 'millis',
+    [TimeUnit.SECOND]: 'sec',
+    [TimeUnit.MINUTE]: 'min',
+    [TimeUnit.HOUR]: 'hrs',
     [TimeUnit.DAY]: 'days',
   };
   private _snackBar = inject(MatSnackBar);
