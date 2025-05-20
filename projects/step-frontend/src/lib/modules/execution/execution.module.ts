@@ -144,6 +144,9 @@ import { MatButton } from '@angular/material/button';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
+import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
+import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
+import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
 
 @NgModule({
   declarations: [
@@ -232,6 +235,9 @@ import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-deta
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,
     IsCurrentReportDetailsOpenedPipe,
+    SchedulerPageComponent,
+    SchedulerPerformanceViewComponent,
+    SchedulerReportViewComponent,
   ],
   imports: [
     StepCommonModule,
@@ -430,7 +436,21 @@ export class ExecutionModule {
     });
     this._viewRegistry.registerRoute({
       path: 'cross-executions/:id',
-      component: ScheduleOverviewComponent,
+      component: SchedulerPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
+      ],
     });
     this._viewRegistry.registerRoute({
       path: 'executions',
