@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { CustomComponent, StepDataSource } from '@exense/step-core';
-import { FunctionPackageActionsService } from '../../injectables/function-package-actions.service';
+import { Component } from '@angular/core';
+import { CustomComponent } from '@exense/step-core';
 
 @Component({
   selector: 'step-upload-package-btn',
@@ -8,15 +7,5 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
   styleUrls: ['./upload-package-btn.component.scss'],
 })
 export class UploadPackageBtnComponent implements CustomComponent {
-  private _actions = inject(FunctionPackageActionsService);
-
-  context?: StepDataSource<any>;
-
-  addFunctionPackage(): void {
-    this._actions.openAddFunctionPackageDialog().subscribe((result) => {
-      if (result) {
-        this.context?.reload();
-      }
-    });
-  }
+  context?: any;
 }

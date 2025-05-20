@@ -7,6 +7,7 @@ import {
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
+  QuickAccessRouteService,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -19,7 +20,7 @@ import { FunctionPackageSelectionComponent } from './components/function-package
 
 import './components/function-package-selection/function-package-selection.component';
 import { UploadPackageBtnComponent } from './components/upload-package-btn/upload-package-btn.component';
-import { ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { PackageUrlPipe } from './pipes/package-url.pipe';
 
 @NgModule({
@@ -47,6 +48,7 @@ export class FunctionPackagesModule {
     private _entityRegistry: EntityRegistry,
     private _cellsRegistry: CustomCellRegistryService,
     private _viewRegistry: ViewRegistryService,
+    private _quickAccessRoutes: QuickAccessRouteService,
     private _searchCellsRegistry: CustomSearchCellRegistryService,
     private _dashletsRegistry: DashletRegistryService,
   ) {
@@ -72,44 +74,49 @@ export class FunctionPackagesModule {
   }
 
   private registerViews(): void {
+    const functionPackageEditor = (mainPath: string, editorUrl: string): Route => ({
+      path: mainPath,
+      component: SimpleOutletComponent,
+      children: [
+        dialogRoute({
+          path: 'new',
+          dialogComponent: FunctionPackageConfigurationDialogComponent,
+        }),
+        dialogRoute({
+          path: ':id',
+          dialogComponent: FunctionPackageConfigurationDialogComponent,
+          canActivate: [
+            checkEntityGuardFactory({
+              entityType: 'keyword package',
+              getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
+              getEditorUrl: (id) => `${editorUrl}/${id}`,
+            }),
+          ],
+          resolve: {
+            functionPackage: (route: ActivatedRouteSnapshot) => {
+              return inject(AugmentedKeywordPackagesService).getFunctionPackageCached(route.params['id']);
+            },
+          },
+          canDeactivate: [
+            () => {
+              inject(AugmentedKeywordPackagesService).cleanupCache();
+              return true;
+            },
+          ],
+        }),
+      ],
+    });
+
     this._viewRegistry.registerRoute({
       path: 'function-packages',
       component: FunctionPackageListComponent,
-      children: [
-        {
-          path: 'editor',
-          component: SimpleOutletComponent,
-          children: [
-            dialogRoute({
-              path: 'new',
-              dialogComponent: FunctionPackageConfigurationDialogComponent,
-            }),
-            dialogRoute({
-              path: ':id',
-              dialogComponent: FunctionPackageConfigurationDialogComponent,
-              canActivate: [
-                checkEntityGuardFactory({
-                  entityType: 'keyword package',
-                  getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
-                  getEditorUrl: (id) => `/function-packages/editor/${id}`,
-                }),
-              ],
-              resolve: {
-                functionPackage: (route: ActivatedRouteSnapshot) => {
-                  return inject(AugmentedKeywordPackagesService).getFunctionPackageCached(route.params['id']);
-                },
-              },
-              canDeactivate: [
-                () => {
-                  inject(AugmentedKeywordPackagesService).cleanupCache();
-                  return true;
-                },
-              ],
-            }),
-          ],
-        },
-      ],
+      children: [functionPackageEditor('editor', '/function-packages/editor')],
     });
+
+    const keywordsRoute = this._quickAccessRoutes.getRoute('keywords');
+    keywordsRoute?.children?.push?.(
+      functionPackageEditor('function-package-editor', '/functions/function-package-editor'),
+    );
   }
 
   private registerCells(): void {
