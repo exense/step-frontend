@@ -21,6 +21,8 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { TreeStateService } from '@exense/step-core';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
+import { AggregatedReportViewTreeFilterService } from '../../services/aggregated-report-view-tree-filter.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -35,6 +37,11 @@ import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.
     {
       provide: AggregatedReportViewTreeStateService,
       useExisting: AGGREGATED_TREE_TAB_STATE,
+    },
+    AggregatedReportViewTreeFilterService,
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AggregatedReportViewTreeFilterService,
     },
   ],
 })
@@ -71,8 +78,9 @@ export class AltExecutionTreeTabComponent implements OnInit {
       .pipe(
         map((params) => {
           const artefactId = params['artefactId'];
+          const artefactHash = params['artefactHash'];
           const reportNodeId = params['reportNodeId'];
-          return { artefactId, reportNodeId };
+          return { artefactId, artefactHash, reportNodeId };
         }),
         filter((data) => !!data.artefactId),
         takeUntilDestroyed(this._destroyRef),
@@ -82,12 +90,17 @@ export class AltExecutionTreeTabComponent implements OnInit {
         filter((data) => !!data),
       )
       .subscribe((data) => {
-        const node = this._treeState.findNodeById(data!.artefactId);
+        const node = this._treeState
+          .findNodesByArtefactId(data.artefactId)
+          .find((item) => item.artefactHash === data.artefactHash);
         if (!node) {
           return;
         }
         this._treeState.selectNode(node);
-        this._executionDialogs.openIterations(node, { reportNodeId: data!.reportNodeId });
+        if (data?.reportNodeId) {
+          const reportNodeId = data.reportNodeId;
+          this._executionDialogs.openIterations(node, { reportNodeId });
+        }
       });
   }
 

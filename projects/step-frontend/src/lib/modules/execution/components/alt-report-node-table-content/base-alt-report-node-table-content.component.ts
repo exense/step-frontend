@@ -7,15 +7,26 @@ import {
   TableRemoteDataSource,
   TableSearch,
   DateRange,
+  ArtefactClass,
 } from '@exense/step-core';
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, combineLatest } from 'rxjs';
-import { DateTime } from 'luxon';
+import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 
 const VIEW_PAGE_SIZE = 100;
 const PRINT_PAGE_SIZE = 50_000;
+
+const ARTEFACT_REPORT_NODE_MAP: Record<string, string> = {
+  [ArtefactClass.KEYWORD]: ReportNodeType.CALL_FUNCTION_REPORT_NODE,
+  [ArtefactClass.TEST_CASE]: ReportNodeType.TEST_CASE_REPORT_NODE,
+  [ArtefactClass.SLEEP]: ReportNodeType.SLEEP_REPORT_NODE,
+  [ArtefactClass.ECHO]: ReportNodeType.ECHO_REPORT_NODE,
+  [ArtefactClass.WAIT_FOR_EVENT]: ReportNodeType.WAIT_FOR_EVENT_REPORT_NODE,
+  [ArtefactClass.THREAD_GROUP]: ReportNodeType.THREAD_REPORT_NODE,
+  [ArtefactClass.FOR]: ReportNodeType.FOR_REPORT_NODE,
+};
 
 @Component({
   template: '',
@@ -36,6 +47,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
   ngAfterViewInit(): void {
     this.setupSearchFilter();
     this.setupStatusesFilter();
+    this.setupReportNodeClassFilter();
     this.setupDateRangeFilter();
   }
 
@@ -46,7 +58,7 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
 
   protected setupSearchFilter(): void {
     this._state.search$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((value) => {
-      this.tableSearch()?.onSearch('name', value);
+      this.tableSearch()?.onSearch?.('name', value);
     });
   }
 
@@ -57,31 +69,40 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((statuses) => {
-        this.tableSearch()?.onSearch('status', { value: statuses, regex: true });
+        this.tableSearch()?.onSearch?.('status', { value: statuses, regex: true });
       });
+  }
+
+  protected setupReportNodeClassFilter(): void {
+    this._state.artefactClass$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((artefactClass) => {
+      const reportNodeClasses = artefactClass?.map((item) => ARTEFACT_REPORT_NODE_MAP[item])?.filter((item) => !!item);
+
+      this.tableSearch()?.onSearch?.(
+        '_class',
+        !!reportNodeClasses ? this._filterConditionFactory.arrayFilterCondition(reportNodeClasses) : '',
+      );
+    });
   }
 
   protected setupDateRangeFilter(): void {
     combineLatest([this._state.dateRange$, this.isRemoteDataSource$])
       .pipe(
         map(([range, isRemote]) => {
-          const dateRange: DateRange = this._dateUtils.timeRange2DateRange(range)!;
-
           if (isRemote) {
             // Remote dataSource test case
+            const dateRange: DateRange = this._dateUtils.timeRange2DateRange(range)!;
             return this._filterConditionFactory.dateRangeFilterCondition(dateRange);
           }
           // Local dataSource test case
-          const timeRange = this._dateUtils.dateRange2TimeRange(dateRange);
-          return timeRange ? `${timeRange.from}|${timeRange.to}` : '';
+          return range ? `${range.from}|${range.to}` : '';
         }),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((searchValue) => {
         if (typeof searchValue === 'string') {
-          this.tableSearch()?.onSearch('executionTime', searchValue, true, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, true, false);
         } else {
-          this.tableSearch()?.onSearch('executionTime', searchValue, false);
+          this.tableSearch()?.onSearch?.('executionTime', searchValue, false);
         }
       });
   }

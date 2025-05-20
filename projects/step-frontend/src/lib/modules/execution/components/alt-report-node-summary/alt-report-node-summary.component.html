@@ -1,11 +1,16 @@
 <step-alt-report-widget [title]="title()">
   <step-alt-report-widget-content>
     @if (chartSettings(); as chartSettings) {
-      <step-doughnut-chart
-        [totalTooltip]="totalTooltip()"
-        [settings]="chartSettings"
-        (chartItemClick)="toggleChartItem($event)"
-      />
+      <step-doughnut-chart [settings]="chartSettings" (chartItemClick)="toggleChartItem($event)">
+        <section class="summary-total" *stepDoughnutChartTotalTemplate>
+          <div class="total" [matTooltip]="totalTooltip()" matTooltipPosition="below">{{ total() | bigNumber }}</div>
+          @if (totalForecast() !== undefined) {
+            <div class="forecast" [matTooltip]="totalForecastTooltip()" matTooltipPosition="below">
+              / {{ totalForecast() | bigNumber }}
+            </div>
+          }
+        </section>
+      </step-doughnut-chart>
     }
 
     @if (legend(); as legend) {

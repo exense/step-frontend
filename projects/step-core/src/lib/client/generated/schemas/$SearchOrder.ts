@@ -3,7 +3,7 @@
 /* eslint-disable */
 export const $SearchOrder = {
   properties: {
-    fieldsSearchOder: {
+    fieldsSearchOrder: {
       type: 'array',
       contains: {
         type: 'FieldSearchOrder',

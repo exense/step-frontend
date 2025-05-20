@@ -24,7 +24,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   private treeUpdateInternal$ = new Subject<T>();
   readonly treeUpdate$ = this.treeUpdateInternal$.asObservable();
 
-  private rootNode = signal<N | undefined>(undefined);
+  protected rootNode = signal<N | undefined>(undefined);
   private hideRootInternal = signal(false);
   private selectedInsertionParentId = signal<string | undefined>(undefined);
   protected treeData = computed(() => this._treeFlattener.flattenTree(this.rootNode()));

@@ -10,7 +10,6 @@ import {
   OnChanges,
   OnInit,
   Output,
-  signal,
   SimpleChanges,
   untracked,
   ViewChild,

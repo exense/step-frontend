@@ -17,6 +17,8 @@ export class AggregatedReportViewTreeNodeUtilsService
 {
   private _artefactTypes = inject(ArtefactService);
 
+  private importantNodeIds = new Set<string>();
+
   convertItem(
     item: AggregatedReportView,
     params?: { parentId?: string; isParentVisuallySkipped?: boolean },
@@ -135,8 +137,26 @@ export class AggregatedReportViewTreeNodeUtilsService
     };
   }
 
-  private getUniqueId(artefactId: string, parentId?: string): string {
+  getNodeAdditionalClasses(node: AggregatedTreeNode): string[] {
+    const result: string[] = [];
+
+    if (this.importantNodeIds.has(node.id)) {
+      result.push('aggregated-important-node');
+    }
+
+    return result;
+  }
+
+  getUniqueId(artefactId: string, parentId?: string): string {
     const source = !parentId ? artefactId : `${parentId}.${artefactId}`;
     return v5(source, HASH_NAMESPACE);
+  }
+
+  markIdAsImportant(nodeId: string): void {
+    this.importantNodeIds.add(nodeId);
+  }
+
+  cleanupImportantIds(): void {
+    this.importantNodeIds.clear();
   }
 }

@@ -1,17 +1,25 @@
 @if (singleStatus(); as singleStatus) {
-  <step-status [status]="singleStatus.status" [iconMode]="true" (click)="handleClick(singleStatus, $event)" />
+  <step-status
+    [status]="singleStatus.status"
+    [iconMode]="true"
+    (stepStrategyClick)="handleClick(singleStatus, $event)"
+  />
 } @else if (isEmptyStatus()) {
   <div class="status-group">
-    <div class="step-node-aggregated-status step-node-aggregated-status-UNKNOWN">0x</div>
+    <step-icon
+      name="out-of-scope"
+      matTooltip="Not executed - May run later, is unreachable, or not completed in the selected time range"
+      matTooltipPosition="below"
+    />
   </div>
 } @else {
   @for (item of statusItems(); track item.status) {
     @if (item.status === Status.RUNNING && item.count === 1) {
-      <step-status [status]="item.status" [iconMode]="true" (click)="handleClick(item, $event)" />
+      <step-status [status]="item.status" [iconMode]="true" (stepStrategyClick)="handleClick(item, $event)" />
     } @else {
       <div class="status-group">
         <div
-          class="step-node-aggregated-status"
+          class="step-aggregated-status"
           [class]="item.className"
           [matTooltip]="item.tooltipMessage"
           matTooltipPosition="below"

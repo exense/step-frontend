@@ -3,7 +3,6 @@ import {
   AugmentedScreenService,
   ItemsPerPageService,
   ReportNode,
-  SelectionCollector,
   STORE_ALL,
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
@@ -19,6 +18,7 @@ import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
 import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
+import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
   selector: 'step-alt-report-node-keywords',
@@ -28,6 +28,10 @@ import { TableMemoryStorageService } from '../../services/table-memory-storage.s
     {
       provide: AltReportNodesStateService,
       useExisting: AltKeywordNodesStateService,
+    },
+    {
+      provide: AltReportNodesFilterService,
+      useExisting: AltReportNodesStateService,
     },
     {
       provide: ItemsPerPageService,
@@ -43,7 +47,6 @@ import { TableMemoryStorageService } from '../../services/table-memory-storage.s
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _screenApiService = inject(AugmentedScreenService);
-  private _selectionCollector = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
 
   private _executionState = inject(AltExecutionStateService);
   private _dialogs = inject(AltExecutionDialogsService);
@@ -52,8 +55,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected readonly keywordsParameters$ = this._executionState.keywordParameters$;
 
-  protected hasTestCasesFilter = toSignal(this._executionState.hasTestCasesFilter$, { initialValue: false });
-
   private keywordColumnIds = toSignal(this.getKeywordColumnIds(), { initialValue: [] });
 
   /** @Output() **/
@@ -61,10 +62,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
 
   protected openDetails(node: ReportNode): void {
     this._dialogs.openIterationDetails(node);
-  }
-
-  protected clearTestCasesFilter(): void {
-    this._selectionCollector.clear();
   }
 
   override setupSearchFilter(): void {

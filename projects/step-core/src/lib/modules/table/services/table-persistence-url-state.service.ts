@@ -181,6 +181,6 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
       return;
     }
     this.isInternalUrlChange = true;
-    this._router.navigate([], { relativeTo: this._activatedRoute, queryParams });
+    this._router.navigate([], { relativeTo: this._activatedRoute, queryParams, replaceUrl: true });
   }
 }

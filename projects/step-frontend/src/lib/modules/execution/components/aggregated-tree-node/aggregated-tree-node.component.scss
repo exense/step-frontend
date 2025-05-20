@@ -24,11 +24,15 @@
   gap: 0.2rem;
 }
 
-step-aggregated-tree-status {
+step-aggregated-status {
   align-self: flex-start;
 }
 
 step-artefact-inline-details {
   overflow: hidden;
   width: 100%;
+}
+
+.hide-status {
+  display: none;
 }

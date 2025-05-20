@@ -19,6 +19,7 @@ import { TablePlansComponent } from './components/table-plans/table-plans.compon
 import { TableKeywordsComponent } from './components/table-keywords/table-keywords.component';
 import { TableParametersComponent } from './components/table-parameters/table-parameters.component';
 import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
+import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
@@ -108,11 +109,14 @@ const registerEntityTables = () => {
   _entityTableRegistry.register(AutomationPackageEntityKey.SCHEDULES, 'Tasks', TableTasksComponent);
 };
 
+const registerBulkOperations = () => inject(AutomationPackagesBulkOperationsRegisterService).register();
+
 export const AUTOMATION_PACKAGE_INITIALIZER: FactoryProvider = {
   provide: APP_INITIALIZER,
   useFactory: () => {
     const _injector = inject(Injector);
     return () => {
+      runInInjectionContext(_injector, registerBulkOperations);
       runInInjectionContext(_injector, registerEntities);
       runInInjectionContext(_injector, registerRoutes);
       runInInjectionContext(_injector, registerMenuEntries);

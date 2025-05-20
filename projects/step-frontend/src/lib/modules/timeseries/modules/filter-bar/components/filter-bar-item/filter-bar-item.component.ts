@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   input,
@@ -26,19 +27,19 @@ import { Execution, ExecutiontTaskParameters, Plan } from '@exense/step-core';
   standalone: true,
   imports: [COMMON_IMPORTS, FilterBarPlanItemComponent, FilterBarTaskItemComponent, FilterBarExecutionItemComponent],
 })
-export class FilterBarItemComponent implements OnInit, OnChanges {
+export class FilterBarItemComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() item!: FilterBarItem; // should not make edits on it
   itemDraft!: FilterBarItem;
   @Input() removable?: boolean;
   readonly = input<boolean>(false);
   @Input() highlightRemoveButton = false;
   @Input() updateTimeRangeOption = true; // execution filter item provide the 'Update time range' option.
+  openOnInit = input<boolean>();
 
   @Output() removeItem: EventEmitter<void> = new EventEmitter<void>();
   @Output() filterChange: EventEmitter<FilterBarItem> = new EventEmitter<FilterBarItem>();
 
-  @ViewChild('matTrigger') matTrigger!: MatMenuTrigger;
-  @ViewChild(MatMenuTrigger) menuTrigger?: MatMenuTrigger;
+  @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   freeTextValues: string[] = [];
 
@@ -55,6 +56,14 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     if (!this.item) {
       throw new Error('Item input is mandatory');
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.openOnInit()) {
+      setTimeout(() => {
+        this.menuTrigger.openMenu();
+      });
     }
   }
 
@@ -130,7 +139,7 @@ export class FilterBarItemComponent implements OnInit, OnChanges {
     }
     this.filterChange.emit(this.item);
     this.changesApplied = true;
-    this.matTrigger.closeMenu();
+    this.menuTrigger.closeMenu();
     this.formattedValue = this.getFormattedValue(this.item);
   }
 

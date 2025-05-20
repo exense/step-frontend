@@ -1,27 +1,35 @@
-.tree-node-modal-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+step-aggregated-tree-node-dialog {
+  .tree-node-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-  step-status,
-  button {
-    font-size: 1.4rem;
+    step-status,
+    button {
+      font-size: 1.4rem;
+    }
+
+    .artefact-icon {
+      line-height: 2rem;
+    }
+
+    step-status {
+      line-height: 1.6rem;
+    }
+
+    .btn-show-details-container {
+      flex: 1;
+      text-align: right;
+    }
   }
 
-  .artefact-icon {
-    line-height: 2rem;
+  step-modal-window {
+    div[mat-dialog-content] {
+      height: calc(100% - 15rem);
+      div[step-modal-window-body] {
+        font-size: 1.4rem;
+        height: 100%;
+      }
+    }
   }
-
-  step-status {
-    line-height: 1.6rem;
-  }
-
-  .btn-show-details-container {
-    flex: 1;
-    text-align: right;
-  }
-}
-
-div[step-modal-window-body] {
-  font-size: 1.4rem;
 }
