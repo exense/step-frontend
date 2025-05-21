@@ -52,6 +52,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   readonly hideRoot = this.hideRootInternal.asReadonly();
   readonly selectedNodeIds = this.selectedNodeIdsInternal.asReadonly();
   readonly expandedNodeIds = this.expandedNodeIdsInternal.asReadonly();
+  readonly isInitialized = computed(() => !!this.rootNode());
 
   readonly selectedForInsertCandidate = computed(() => {
     const selectedNodeIds = this.selectedNodeIdsInternal();

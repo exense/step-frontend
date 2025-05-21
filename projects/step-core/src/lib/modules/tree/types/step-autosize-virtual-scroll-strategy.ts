@@ -1,7 +1,7 @@
 import { AutoSizeVirtualScrollStrategy, ItemSizeAverager } from '@angular/cdk-experimental/scrolling';
 import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { ListRange } from '@angular/cdk/collections';
-import { map, Observable, of, timer } from 'rxjs';
+import { map, Observable, of, switchMap, timer } from 'rxjs';
 
 export class StepAutosizeVirtualScrollStrategy extends AutoSizeVirtualScrollStrategy implements VirtualScrollStrategy {
   private viewportInternal: CdkVirtualScrollViewport | null = null;
@@ -24,19 +24,29 @@ export class StepAutosizeVirtualScrollStrategy extends AutoSizeVirtualScrollStra
     this.viewportInternal = null;
   }
 
-  scrollToIndexApproximately(index: number): Observable<void> {
+  scrollToIndexApproximately(index: number): void {
     if (!this.viewportInternal) {
-      return of(undefined);
+      return; // of(undefined);
     }
+    const viewport = this.viewportInternal!;
+
+    const currentRange = viewport.getRenderedRange();
+    if (index >= currentRange.start && index < currentRange.end) {
+      return; // of(undefined);
+    }
+
     const itemSize = this.averagerInternal.getAverageItemSize();
-    const viewportSize = Math.ceil(this.viewportInternal.getViewportSize() / itemSize);
+
+    viewport.scrollToOffset(index * itemSize);
+    const viewportSize = Math.ceil(viewport.getViewportSize() / itemSize);
     const range: ListRange = {
       start: index,
       end: index + viewportSize,
     };
-    this.viewportInternal.scrollToOffset(index * itemSize);
-    this.viewportInternal!.setRenderedRange(range);
-    return timer(250).pipe(map(() => {}));
+    viewport.setRenderedRange(range);
+    this.onContentScrolled();
+
+    //return timer(250).pipe(map(() => {}));
   }
 
   override onDataLengthChanged(): void {

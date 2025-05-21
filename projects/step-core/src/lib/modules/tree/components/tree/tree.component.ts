@@ -140,14 +140,16 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
       return;
     }
 
-    this._stepTreeVirtualScroll!.strategy!.scrollToIndexApproximately(index).subscribe(() => {
-      this.nativeScroll(nodeId);
-    });
+    this._stepTreeVirtualScroll!.strategy!.scrollToIndexApproximately(index);
+    this.nativeScroll(nodeId);
+    // sometimes scroll to element doesn't performed correctly after virtual scroll
+    // invoke another autoscroll to correct the position (but without scrolling effect)
+    setTimeout(() => this.nativeScroll(nodeId, 'instant'), 300);
   }
 
-  private nativeScroll(nodeId: string): void {
+  private nativeScroll(nodeId: string, behavior: ScrollBehavior = 'smooth'): void {
     const nodeElement = this._elRef.nativeElement.querySelector<HTMLElement>(`[data-tree-node-id="${nodeId}"]`);
-    nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    nodeElement?.scrollIntoView?.({ behavior, block: 'nearest' });
   }
 
   private setFocus(isInFocus: boolean) {
