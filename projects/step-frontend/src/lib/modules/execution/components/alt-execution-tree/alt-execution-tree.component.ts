@@ -10,15 +10,15 @@ import {
 } from '@angular/core';
 import { TreeAction, TreeActionsService, TreeComponent, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
   COLLAPSE_CHILDREN = 'collapse_children',
 }
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 
 @Component({
   selector: 'step-alt-execution-tree',
