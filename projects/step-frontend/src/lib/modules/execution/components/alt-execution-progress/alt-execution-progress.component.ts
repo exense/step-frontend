@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
@@ -17,6 +17,7 @@ import {
   tap,
 } from 'rxjs';
 import {
+  AggregatedReport,
   AlertType,
   ArtefactFilter,
   AugmentedControllerService,
@@ -65,6 +66,7 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
+import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -133,6 +135,7 @@ interface RefreshParams {
       provide: ExecutionCloseHandleService,
       useClass: AltExecutionCloseHandleService,
     },
+    AggregatedTreeDataLoaderService,
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
@@ -154,6 +157,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
+  private _treeLoader = inject(AggregatedTreeDataLoaderService);
+
+  readonly longRequestWarning = computed(() => {
+    const counter = this._treeLoader.previousRequestCounter();
+    return counter > 0
+      ? 'The request took too long to process. Displayed data may be older than the current refresh interval.'
+      : '';
+  });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -183,11 +194,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
     takeUntilDestroyed(),
   );
-
-  // readonly updateFullTimeRangeSelection = this.execution$.subscribe(execution => {
-  //   console.log('execution change', execution);
-  //   this.timeRangeOptions[0] = {type: 'FULL', absoluteSelection: {from: execution.startTime!, to: execution.endTime!}};
-  // });
 
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
@@ -390,15 +396,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private setupTreeRefresh(): void {
     combineLatest([this.execution$, this.timeRangeSelection$])
       .pipe(
+        debounceTime(300),
         switchMap(([execution, timeSelection]) => {
-          if (timeSelection.type === 'FULL') {
-            return this._executionsApi.getFullAggregatedReportView(execution.id!);
-          }
-          return this._executionsApi.getAggregatedReportView(execution.id!, {
-            range: timeSelection.absoluteSelection!,
-          });
+          return this._treeLoader.load(execution, timeSelection);
         }),
-        map((response) => response ?? {}),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {

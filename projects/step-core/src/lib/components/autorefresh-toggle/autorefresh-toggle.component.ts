@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import { AutoRefreshModelFactoryService } from '../../services/auto-refresh-model-factory.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -22,6 +23,7 @@ interface AutorefreshPreset {
   selector: 'step-autorefresh-toggle',
   templateUrl: './autorefresh-toggle.component.html',
   styleUrls: ['./autorefresh-toggle.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy {
   private terminator$?: Subject<void>;
