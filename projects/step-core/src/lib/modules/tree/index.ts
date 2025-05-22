@@ -7,6 +7,7 @@ import { TreeNodeTemplateDirective } from './directives/tree-node-template.direc
 import { TreeNodeNameTemplateDirective } from './directives/tree-node-name-template.directive';
 import { TreeNodeDetailsTemplateDirective } from './directives/tree-node-details-template.directive';
 import { TreeNodeHasActionsPipe } from './pipes/tree-node-has-actions.pipe';
+import { TreeVirtualScrollDirective } from './directives/tree-virtual-scroll.directive';
 
 export const TREE_EXPORTS = [
   TreeComponent,
@@ -18,6 +19,7 @@ export const TREE_EXPORTS = [
   TreeNodeNameTemplateDirective,
   TreeNodeDetailsTemplateDirective,
   TreeNodeHasActionsPipe,
+  TreeVirtualScrollDirective,
 ];
 
 export * from './components/tree/tree.component';
@@ -29,6 +31,7 @@ export * from './directives/tree-node-template.directive';
 export * from './directives/tree-node-name-template.directive';
 export * from './directives/tree-node-details-template.directive';
 export * from './directives/tree-node.directive';
+export * from './directives/tree-virtual-scroll.directive';
 export * from './services/tree-actions.service';
 export * from './services/tree-node-utils.service';
 export * from './services/tree-state.service';
