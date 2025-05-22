@@ -80,9 +80,10 @@
             <step-autorefresh-toggle
               [model]="activeExecution.autoRefreshModel"
               buttonType="stroke"
-              [class.warning]="!!longRequestWarning()"
-              [matTooltip]="longRequestWarning()"
-              matTooltipPosition="left"
+              requestWarning="The request took too long to process. Displayed data may be older than the current refresh interval."
+              matTooltipPosition="below"
+              #requestWarningRef="StepRequestWarning"
+              [hideTooltip]="requestWarningRef.hasWarning()"
             />
           </step-btn-group>
         }

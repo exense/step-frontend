@@ -1,12 +1,15 @@
 import {
   Component,
+  computed,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -41,7 +44,18 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
     { label: '1 minute', value: 60000 },
     { label: '5 minutes', value: 300000 },
   ];
-  selectedInterval: AutorefreshPreset = this.presets[0];
+
+  readonly hideTooltip = input(false);
+  protected readonly selectedInterval = signal(this.presets[0]);
+  protected readonly tooltipMessage = computed(() => {
+    const hideTooltip = this.hideTooltip();
+    const interval = this.selectedInterval();
+    if (hideTooltip) {
+      return '';
+    }
+    const label = interval.label || this.presets[1].label;
+    return `refresh: ${label}`;
+  });
 
   @Input() autoIncreaseTo?: number;
   @Input() interval: number = 0;
@@ -88,7 +102,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   changeRefreshInterval(newInterval: AutorefreshPreset): void {
-    this.selectedInterval = newInterval;
+    this.selectedInterval.set(newInterval);
     this.model.setInterval(newInterval.value, true);
     this.model.setDisabled(newInterval.value < 0);
   }
@@ -113,17 +127,19 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   private setModel(model: AutoRefreshModel): void {
     this.isExternalModel = true;
     this.setupModelChanges(model);
-    this.selectedInterval = this.presets.find((p) => p.value === model.interval) || {
-      label: '',
-      value: model.interval,
-    };
+    this.selectedInterval.set(
+      this.presets.find((p) => p.value === model.interval) || {
+        label: '',
+        value: model.interval,
+      },
+    );
   }
 
   private setInterval(interval: number): void {
     if (this.isExternalModel) {
       return;
     }
-    this.selectedInterval = this.presets.find((p) => p.value === interval) || { label: '', value: interval };
+    this.selectedInterval.set(this.presets.find((p) => p.value === interval) || { label: '', value: interval });
     this.model.setInterval(interval ?? 0);
   }
 

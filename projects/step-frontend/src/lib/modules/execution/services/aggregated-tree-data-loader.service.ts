@@ -1,10 +1,17 @@
 import { inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { AggregatedReport, AugmentedExecutionsService, Execution, TimeRangeSelection } from '@exense/step-core';
+import {
+  AggregatedReport,
+  AugmentedExecutionsService,
+  DateUtilsService,
+  Execution,
+  TimeRangeSelection,
+} from '@exense/step-core';
 import { map, Observable, shareReplay, Subject, takeUntil, tap } from 'rxjs';
 
 @Injectable()
 export class AggregatedTreeDataLoaderService implements OnDestroy {
   private _executionsApi = inject(AugmentedExecutionsService);
+  private _dateUtils = inject(DateUtilsService);
 
   private terminator$?: Subject<void>;
   private currentExecution?: Execution;
@@ -53,16 +60,7 @@ export class AggregatedTreeDataLoaderService implements OnDestroy {
       return true;
     }
 
-    if (
-      (this.currentTimeRange.type === 'FULL' && timeRange.type === 'FULL') ||
-      (this.currentTimeRange.type === 'ABSOLUTE' &&
-        timeRange.type === 'ABSOLUTE' &&
-        this.currentTimeRange?.absoluteSelection?.from === timeRange?.absoluteSelection?.from &&
-        this.currentTimeRange?.absoluteSelection?.to === timeRange?.absoluteSelection?.to) ||
-      (this.currentTimeRange.type === 'RELATIVE' &&
-        timeRange.type === 'RELATIVE' &&
-        this.currentTimeRange?.relativeSelection?.timeInMs === timeRange?.relativeSelection?.timeInMs)
-    ) {
+    if (this._dateUtils.areTimeRangeSelectionsEquals(this.currentTimeRange, timeRange)) {
       return false;
     }
 

@@ -1,4 +1,14 @@
-import { Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
@@ -25,6 +35,7 @@ import {
   AugmentedPlansService,
   AugmentedTimeSeriesService,
   AutoDeselectStrategy,
+  DateUtilsService,
   Execution,
   ExecutionCloseHandleService,
   IncludeTestcases,
@@ -67,6 +78,7 @@ import { ActiveExecutionsService } from '../../services/active-executions.servic
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
+import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -154,17 +166,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
+  private _dateUtils = inject(DateUtilsService);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
   private _treeLoader = inject(AggregatedTreeDataLoaderService);
 
-  readonly longRequestWarning = computed(() => {
-    const counter = this._treeLoader.previousRequestCounter();
-    return counter > 0
-      ? 'The request took too long to process. Displayed data may be older than the current refresh interval.'
-      : '';
-  });
+  private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -385,6 +393,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
+    this.setupToggleWarningReset();
   }
 
   ngOnDestroy(): void {
@@ -421,6 +430,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       .subscribe(([execution, timeRange]) => {
         const executionId = execution.id!;
         this.errorsDataSource.reload({ request: { executionId, timeRange } });
+      });
+  }
+
+  private setupToggleWarningReset(): void {
+    this.timeRangeSelection$
+      .pipe(
+        distinctUntilChanged((a, b) => this._dateUtils.areTimeRangeSelectionsEquals(a, b)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => {
+        this.toggleRequestWarning()?.resetWarning?.();
       });
   }
 
