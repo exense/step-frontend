@@ -46,6 +46,7 @@
     <td mat-cell *matCellDef="let element">
       <step-execution-link
         *ngIf="element.currentOwner?.executionId"
+        [executionDescription]="element.currentOwner?.executionDescription"
         [executionId]="element.currentOwner!.executionId"
       ></step-execution-link>
       <span *ngIf="element.currentOwner?._class === 'step.functions.services.FunctionServiceTokenWrapperOwner'"

@@ -32,6 +32,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       error.error?.errorMessage === "You're not allowed to access this object from within this context"
     ) {
       this._navigator.navigateToHome({ forceClientUrl: true });
+      this.showError(error.error?.errorMessage);
       return of(false);
     }
 
