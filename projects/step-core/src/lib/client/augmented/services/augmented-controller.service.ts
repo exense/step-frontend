@@ -10,7 +10,7 @@ import {
   StepDataSource,
   TableApiWrapperService,
   TableRemoteDataSourceFactoryService,
-} from '../../table/step-table-client.module';
+} from '../../table';
 import { map, Observable } from 'rxjs';
 
 @Injectable({

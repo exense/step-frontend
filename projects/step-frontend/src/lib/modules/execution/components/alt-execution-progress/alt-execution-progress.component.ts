@@ -29,6 +29,7 @@ import {
   IncludeTestcases,
   IS_SMALL_SCREEN,
   PopoverMode,
+  ReloadableDirective,
   ReportNode,
   SystemService,
   TableDataSource,
@@ -78,6 +79,7 @@ interface RefreshParams {
   templateUrl: './alt-execution-progress.component.html',
   styleUrl: './alt-execution-progress.component.scss',
   encapsulation: ViewEncapsulation.None,
+  hostDirectives: [ReloadableDirective],
   providers: [
     DashboardUrlParamsService,
     AltExecutionTabsService,

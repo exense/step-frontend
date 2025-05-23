@@ -7,6 +7,7 @@ import {
   Keyword,
   KeywordExecutorService,
   KeywordsService,
+  ReloadableDirective,
   RichEditorChangeStatus,
   RichEditorComponent,
   ScriptLanguage,
@@ -19,6 +20,7 @@ import { DeactivateComponentDataInterface } from '../../types/deactivate-compone
   selector: 'step-script-editor',
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
+  hostDirectives: [ReloadableDirective],
 })
 export class ScriptEditorComponent implements AfterViewInit, DeactivateComponentDataInterface {
   private _keywordApi = inject(KeywordsService);
