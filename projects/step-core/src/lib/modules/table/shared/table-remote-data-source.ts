@@ -318,7 +318,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     return {
       ...request,
       filters: request?.filters?.map?.((filter) => ({ ...filter })),
-      sort: !!request.sort ? { ...request.sort } : undefined,
+      sort: !!request.sort ? [...request.sort] : undefined,
       tableParameters: !!request.tableParameters ? { ...request.tableParameters } : undefined,
     };
   }

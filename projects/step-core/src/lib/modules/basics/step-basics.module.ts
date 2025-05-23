@@ -73,6 +73,7 @@ import { PasswordComponent } from './components/password/password.component';
 import { OverflowTooltipDirective } from './directives/overflow-tooltip.directive';
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
+import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ReloadableDirective } from './directives/reloadable.directive';
 
 @NgModule({
@@ -155,6 +156,7 @@ import { ReloadableDirective } from './directives/reloadable.directive';
     ShortenNumberPipe,
     DynamicInputWidthDirective,
     TruncateStringPipe,
+    StrategyClickDirective,
   ],
   exports: [
     CommonModule,
@@ -231,6 +233,7 @@ import { ReloadableDirective } from './directives/reloadable.directive';
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
     TruncateStringPipe,
+    StrategyClickDirective,
     ReloadableDirective,
   ],
 })
@@ -373,3 +376,6 @@ export * from './types/text-type.enum';
 export * from './injectables/image-types.token';
 export * from './injectables/video-types.token';
 export * from './injectables/text-types.token';
+export * from './directives/strategy-click.directive';
+export * from './injectables/click-strategy.token';
+export * from './types/click-strategy.type';

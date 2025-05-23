@@ -32,12 +32,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     ) {
       this.showError(error.error.errorMessage);
       this._navigator.navigateToHome({ forceClientUrl: true });
+      this.showError(error.error?.errorMessage);
       return of(false);
     }
 
     const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(error));
 
-    if (this.isConnectionError(parsedError)) {
+    if (this.isConnectionError(parsedError, error)) {
       return throwError(() => new ConnectionError(error));
     }
 
@@ -134,8 +135,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     }
   }
 
-  private isConnectionError(error: any): boolean {
-    return typeof error === 'string' && error.endsWith(': 0 Unknown Error');
+  private isConnectionError(parsedError: any, error: any): boolean {
+    return (
+      (typeof parsedError === 'string' && parsedError.endsWith(': 0 Unknown Error')) ||
+      error.error instanceof ProgressEvent
+    );
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

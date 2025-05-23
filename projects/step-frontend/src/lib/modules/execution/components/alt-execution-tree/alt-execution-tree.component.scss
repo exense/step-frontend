@@ -10,6 +10,10 @@ step-alt-execution-tree {
     background: transparent !important;
   }
 
+  step-tree-node.not-significant {
+    opacity: 0.5;
+  }
+
   .tree-panel {
     overflow: auto !important;
     padding-right: 1rem;
@@ -22,6 +26,15 @@ step-alt-execution-tree {
   step-report-node-short {
     display: block;
     margin-left: 0.8rem;
+  }
+
+  step-tree-node.aggregated-important-node .tree-node {
+    step-tree-node-name {
+      color: var.$blue-600 !important;
+    }
+    .node-icon {
+      color: var.$blue-600 !important;
+    }
   }
 
   .tree-node {

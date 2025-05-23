@@ -1,9 +1,19 @@
-import { Component, effect, ElementRef, input, OnDestroy, output, viewChild } from '@angular/core';
-import { ChartItemClickEvent, DoughnutChartSettings } from './doughnut-chart-settings';
+import {
+  Component,
+  computed,
+  contentChild,
+  effect,
+  ElementRef,
+  input,
+  OnDestroy,
+  output,
+  viewChild,
+} from '@angular/core';
+import { ChartItemClickEvent, DoughnutChartSettings } from '../../types/doughnut-chart-settings';
 import Chart, { ActiveElement, ChartEvent } from 'chart.js/auto';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { ViewMode } from '../../../execution/shared/view-mode';
 import { StepCommonModule } from '../../../_common/step-common.module';
+import { DoughnutChartTotalTemplateDirective } from '../../directives/doughnut-chart-total-template.directive';
 
 @Component({
   selector: 'step-doughnut-chart',
@@ -16,6 +26,9 @@ export class DoughnutChartComponent implements OnDestroy {
   readonly settings = input.required<DoughnutChartSettings>();
   readonly totalTooltip = input<string | undefined>(undefined);
   readonly chartItemClick = output<ChartItemClickEvent>();
+
+  private readonly totalTemplateDirective = contentChild(DoughnutChartTotalTemplateDirective);
+  protected readonly totalTemplate = computed(() => this.totalTemplateDirective()?.templateRef);
 
   private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
@@ -52,7 +65,7 @@ export class DoughnutChartComponent implements OnDestroy {
       plugins: [ChartDataLabels],
       options: {
         animation: {
-          duration: settings.viewMode === ViewMode.PRINT ? 0 : 500,
+          duration: settings.viewMode === 'print' ? 0 : 500,
         },
         onClick: (event: ChartEvent, elements: ActiveElement[], chart: Chart) => {
           if (!elements.length) {

@@ -17,6 +17,8 @@ export class AggregatedReportViewTreeNodeUtilsService
 {
   private _artefactTypes = inject(ArtefactService);
 
+  private importantNodeIds = new Set<string>();
+
   convertItem(
     item: AggregatedReportView,
     params?: { parentId?: string; isParentVisuallySkipped?: boolean },
@@ -29,10 +31,10 @@ export class AggregatedReportViewTreeNodeUtilsService
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
 
-    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item, parentId);
-    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item, parentId);
-    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item, parentId);
-    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item, parentId);
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item, id);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item, id);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item, id);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item, id);
 
     const children = (item?.children || [])
       .filter(
@@ -135,8 +137,26 @@ export class AggregatedReportViewTreeNodeUtilsService
     };
   }
 
+  getNodeAdditionalClasses(node: AggregatedTreeNode): string[] {
+    const result: string[] = [];
+
+    if (this.importantNodeIds.has(node.id)) {
+      result.push('aggregated-important-node');
+    }
+
+    return result;
+  }
+
   getUniqueId(artefactId: string, parentId?: string): string {
     const source = !parentId ? artefactId : `${parentId}.${artefactId}`;
     return v5(source, HASH_NAMESPACE);
+  }
+
+  markIdAsImportant(nodeId: string): void {
+    this.importantNodeIds.add(nodeId);
+  }
+
+  cleanupImportantIds(): void {
+    this.importantNodeIds.clear();
   }
 }

@@ -20,6 +20,7 @@ import {
   CommonEntitiesUrlsService,
   NavigatorService,
   preloadScreenDataResolver,
+  stepRouteAdditionalConfig,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -65,97 +66,102 @@ export class FunctionModule {
   }
 
   private registerViews(): void {
-    this._viewRegistry.registerRoute({
-      path: 'functions',
-      resolve: {
-        keywordScreenData: preloadScreenDataResolver('keyword'),
-      },
-      component: FunctionListComponent,
-      children: [
+    this._viewRegistry.registerRoute(
+      stepRouteAdditionalConfig(
+        { quickAccessAlias: 'keywords' },
         {
-          path: 'configure',
-          component: SimpleOutletComponent,
+          path: 'functions',
+          resolve: {
+            keywordScreenData: preloadScreenDataResolver('keyword'),
+          },
+          component: FunctionListComponent,
           children: [
-            dialogRoute({
-              path: 'new',
-              resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
-              resolve: {
-                dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
-              },
-            }),
-            dialogRoute({
-              path: ':id',
-              resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
-              canActivate: [
-                checkEntityGuardFactory({
-                  entityType: 'keyword',
-                  getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
-                  getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
+            {
+              path: 'configure',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'new',
+                  resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+                  resolve: {
+                    dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
+                  },
+                }),
+                dialogRoute({
+                  path: ':id',
+                  resolveDialogComponent: () => inject(FunctionConfigurationDialogResolver).getDialogComponent(),
+                  canActivate: [
+                    checkEntityGuardFactory({
+                      entityType: 'keyword',
+                      getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
+                      getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
+                    }),
+                  ],
+                  resolve: {
+                    keyword: (route: ActivatedRouteSnapshot) => {
+                      const id = route.params['id'];
+                      if (!id) return undefined;
+                      return inject(AugmentedKeywordsService).getFunctionByIdCached(id);
+                    },
+                    dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
+                  },
+                  canDeactivate: [
+                    () => {
+                      inject(AugmentedKeywordsService).cleanupCache();
+                      return true;
+                    },
+                  ],
                 }),
               ],
-              resolve: {
-                keyword: (route: ActivatedRouteSnapshot) => {
-                  const id = route.params['id'];
-                  if (!id) return undefined;
-                  return inject(AugmentedKeywordsService).getFunctionByIdCached(id);
-                },
-                dialogConfig: () => inject(FunctionDialogsConfigFactoryService).getDefaultConfig(),
+            },
+            dialogRoute({
+              path: 'import',
+              dialogComponent: ImportDialogComponent,
+              data: {
+                title: 'Keywords import',
+                entity: 'functions',
+                override: false,
+                importAll: false,
               },
-              canDeactivate: [
-                () => {
-                  inject(AugmentedKeywordsService).cleanupCache();
-                  return true;
-                },
+            }),
+            {
+              path: 'export',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'all',
+                  dialogComponent: ExportDialogComponent,
+                  data: {
+                    title: 'Keywords export',
+                    entity: 'functions',
+                    filename: 'allKeywords.sta',
+                  },
+                }),
+                dialogRoute({
+                  path: ':id',
+                  dialogComponent: ExportDialogComponent,
+                  resolve: {
+                    id: (route: ActivatedRouteSnapshot) => route.params['id'],
+                    filename: (route: ActivatedRouteSnapshot) => {
+                      const api = inject(AugmentedKeywordsService);
+                      const id = route.params['id'];
+                      return api.getFunctionById(id).pipe(
+                        map((keyword) => keyword.attributes!['name']),
+                        map((name) => `${name}.sta`),
+                      );
+                    },
+                  },
+                  data: {
+                    title: 'Keywords export',
+                    entity: 'functions',
+                  },
+                }),
               ],
-            }),
+            },
           ],
         },
-        dialogRoute({
-          path: 'import',
-          dialogComponent: ImportDialogComponent,
-          data: {
-            title: 'Keywords import',
-            entity: 'functions',
-            override: false,
-            importAll: false,
-          },
-        }),
-        {
-          path: 'export',
-          component: SimpleOutletComponent,
-          children: [
-            dialogRoute({
-              path: 'all',
-              dialogComponent: ExportDialogComponent,
-              data: {
-                title: 'Keywords export',
-                entity: 'functions',
-                filename: 'allKeywords.sta',
-              },
-            }),
-            dialogRoute({
-              path: ':id',
-              dialogComponent: ExportDialogComponent,
-              resolve: {
-                id: (route: ActivatedRouteSnapshot) => route.params['id'],
-                filename: (route: ActivatedRouteSnapshot) => {
-                  const api = inject(AugmentedKeywordsService);
-                  const id = route.params['id'];
-                  return api.getFunctionById(id).pipe(
-                    map((keyword) => keyword.attributes!['name']),
-                    map((name) => `${name}.sta`),
-                  );
-                },
-              },
-              data: {
-                title: 'Keywords export',
-                entity: 'functions',
-              },
-            }),
-          ],
-        },
-      ],
-    });
+      ),
+    );
     this._viewRegistry.registerRoute({
       path: 'composites',
       resolve: {
