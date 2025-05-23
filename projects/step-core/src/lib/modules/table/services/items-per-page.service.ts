@@ -1,3 +1,6 @@
+import { Observable } from 'rxjs';
+
 export abstract class ItemsPerPageService {
-  abstract getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[];
+  abstract getItemsPerPage(): Observable<number[]>;
+  abstract getDefaultPageSizeItem(): Observable<number>;
 }
