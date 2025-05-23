@@ -8,8 +8,8 @@ import {
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
   TableStorageService,
+  TableMemoryStorageService,
 } from '@exense/step-core';
-import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
 @Component({
   selector: 'step-alt-execution-resolved-parameters',

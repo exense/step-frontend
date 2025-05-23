@@ -59,7 +59,7 @@
 <step-paginator
   [disabled]="pageSizeInputDisabled()"
   [length]="tableDataSource?.totalFiltered$ | async"
-  [pageSizeOptions]="pageSizeOptions"
+  [pageSizeOptions]="pageSizeOptions()"
 />
 @if (rowsExtension(); as rowsExtension) {
   @if (rowInfos(); as rows) {

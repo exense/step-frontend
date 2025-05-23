@@ -8,13 +8,13 @@ import {
   TablePersistenceStateService,
   TableSearch,
   TableStorageService,
+  TableMemoryStorageService,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
 @Component({
   selector: 'step-alt-report-nodes-testcases',

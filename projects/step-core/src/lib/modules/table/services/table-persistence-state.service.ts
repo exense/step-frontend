@@ -7,6 +7,7 @@ import { FilterConditionJson } from '../shared/filter-condition-json.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { Subject } from 'rxjs';
+import { TableLocalStorageService } from './table-local-storage.service';
 
 @Injectable()
 export class TablePersistenceStateService implements OnDestroy {
@@ -15,7 +16,8 @@ export class TablePersistenceStateService implements OnDestroy {
 
   private externalSearchChangeTrigger$ = new Subject<Record<any, SearchValue>>();
 
-  private storage = inject(TableStorageService);
+  private tableStorage = inject(TableStorageService);
+  private tableLocalStorage = inject(TableLocalStorageService);
 
   readonly externalSearchChange$ = this.externalSearchChangeTrigger$.asObservable();
 
@@ -40,6 +42,10 @@ export class TablePersistenceStateService implements OnDestroy {
 
   private get paginationKey(): string {
     return `${this._config!.tableId!}_PAGE`;
+  }
+
+  private get pageSizeKey(): string {
+    return `${this._config!.tableId}_PAGE_SIZE`;
   }
 
   protected triggerExternalSearchChange(search: Record<string, SearchValue>): void {
@@ -68,21 +74,21 @@ export class TablePersistenceStateService implements OnDestroy {
     if (!this.canStoreSearch) {
       return false;
     }
-    return !!this.storage.getItem(this.searchKey);
+    return !!this.tableStorage.getItem(this.searchKey);
   }
 
   saveSearch(search: Record<string, SearchValue>): void {
     if (!this.canStoreSearch) {
       return;
     }
-    this.storage.setItem(this.searchKey, JSON.stringify(search));
+    this.tableStorage.setItem(this.searchKey, JSON.stringify(search));
   }
 
   getSearch(): Record<string, SearchValue> {
     if (!this.canStoreSearch) {
       return {};
     }
-    const jsonString = this.storage.getItem(this.searchKey);
+    const jsonString = this.tableStorage.getItem(this.searchKey);
     if (!jsonString) {
       return {};
     }
@@ -107,35 +113,66 @@ export class TablePersistenceStateService implements OnDestroy {
     if (!this.canStorePagination) {
       return;
     }
-    this.storage.setItem(this.paginationKey, JSON.stringify(page));
+    this.tableStorage.setItem(this.paginationKey, JSON.stringify(page));
+    this.savePageSize(page.pageSize);
   }
 
   getPage(): PageEvent | undefined {
     if (!this.canStorePagination) {
       return undefined;
     }
-    const jsonString = this.storage.getItem(this.paginationKey);
-    if (!jsonString) {
+    const jsonString = this.tableStorage.getItem(this.paginationKey);
+    const pageSize = this.getPageSize();
+    if (!jsonString && pageSize === undefined) {
       return undefined;
     }
-    return JSON.parse(jsonString) as PageEvent;
+    let result: PageEvent;
+    if (jsonString) {
+      result = JSON.parse(jsonString);
+    } else {
+      result = { pageIndex: 0, pageSize: 0, length: 0 };
+    }
+    if (pageSize !== undefined) {
+      result.pageSize = pageSize;
+    }
+
+    return result;
   }
 
   saveSort(sort: Sort): void {
     if (!this.canStoreSort) {
       return;
     }
-    this.storage.setItem(this.sortKey, JSON.stringify(sort));
+    this.tableStorage.setItem(this.sortKey, JSON.stringify(sort));
   }
 
   getSort(): Sort | undefined {
     if (!this.canStoreSort) {
       return undefined;
     }
-    const jsonString = this.storage.getItem(this.sortKey);
+    const jsonString = this.tableStorage.getItem(this.sortKey);
     if (!jsonString) {
       return undefined;
     }
     return JSON.parse(jsonString) as Sort;
+  }
+
+  private savePageSize(pageSize: number): void {
+    if (!this.canStorePagination) {
+      return;
+    }
+    this.tableLocalStorage.setItem(this.pageSizeKey, pageSize.toString());
+  }
+
+  private getPageSize(): number | undefined {
+    if (!this.canStorePagination) {
+      return undefined;
+    }
+    const pageSizeString = this.tableLocalStorage.getItem(this.pageSizeKey) ?? '';
+    const pageSize = parseInt(pageSizeString);
+    if (isNaN(pageSize)) {
+      return undefined;
+    }
+    return pageSize;
   }
 }
