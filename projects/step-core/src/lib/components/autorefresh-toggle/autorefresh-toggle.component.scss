@@ -1,28 +1,30 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-.active {
-  background-color: #eeeeee;
-}
+step-autorefresh-toggle {
+  .active {
+    background-color: #eeeeee;
+  }
 
-.refresh-off {
-  position: absolute;
-  top: 8px;
-  left: 20px;
+  .refresh-off {
+    position: absolute;
+    top: 8px;
+    left: 20px;
 
-  span {
-    padding: 2px 4px;
-    font-size: 8pt;
-    background: var(--main-header-bg-color, #293e50);
-    color: white;
-    border-radius: 6px;
+    span {
+      padding: 2px 4px;
+      font-size: 8pt;
+      background: var(--main-header-bg-color, #293e50);
+      color: white;
+      border-radius: 6px;
 
-    &.disabled {
-      background: var.$gray-400;
+      &.disabled {
+        background: var.$gray-400;
+      }
     }
   }
-}
 
-.refresh-btn {
-  border: 1px solid var.$gray-300;
-  z-index: 1000;
+  .refresh-btn {
+    border: 1px solid var.$gray-300;
+    z-index: 1000;
+  }
 }
