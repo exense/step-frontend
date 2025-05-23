@@ -35,8 +35,8 @@ import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit
 export class TimeRangePickerComponent implements OnInit {
   timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY];
   readonly TIME_UNIT_LABELS: Record<string, string> = {
-    [TimeUnit.MINUTE]: 'min',
-    [TimeUnit.HOUR]: 'hrs',
+    [TimeUnit.MINUTE]: 'minutes',
+    [TimeUnit.HOUR]: 'hours',
     [TimeUnit.DAY]: 'days',
   };
   private _snackBar = inject(MatSnackBar);
