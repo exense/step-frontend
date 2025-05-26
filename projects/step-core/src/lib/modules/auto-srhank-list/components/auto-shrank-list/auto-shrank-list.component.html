@@ -23,13 +23,13 @@
   }
   @if (hasHiddenItems()) {
     <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
-      <button type="button" mat-button [color]="isHiddenVisible() ? 'primary' : 'default'">
+      <button type="button" class="more" mat-button [color]="isHiddenVisible() ? 'primary' : 'default'">
         <div>more</div>
         <step-icon name="chevron-down" />
       </button>
       <step-popover-content>
         @for (item of hiddenItems(); track item.key; let isLast = $last) {
-          <div class="popover-item">
+          <div class="auto-shrank-popover-item">
             <strong>{{ item.key }}</strong>
             <span>{{ item.value }}</span>
           </div>
