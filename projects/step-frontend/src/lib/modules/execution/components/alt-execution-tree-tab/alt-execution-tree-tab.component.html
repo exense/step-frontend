@@ -26,4 +26,9 @@
     />
   </div>
 </section>
-<step-alt-execution-tree #tree stepTreeVirtualScroll="100%" [showSpinnerForEmptyTree]="true" />
+<step-alt-execution-tree
+  #tree
+  stepTreeAutoChooseVirtualScroll="100%"
+  [applyVirtualScrollFrom]="150"
+  [showSpinnerForEmptyTree]="true"
+/>

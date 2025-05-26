@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   contentChild,
   effect,
   ElementRef,
@@ -11,6 +12,7 @@ import {
   input,
   Input,
   Output,
+  signal,
   TrackByFunction,
   ViewChild,
   ViewEncapsulation,
@@ -33,6 +35,7 @@ import { TreeNodeActionsPipe } from '../../pipes/tree-node-actions.pipe';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { OriginalNodePipe } from '../../pipes/original-node.pipe';
 import { TreeVirtualScrollDirective } from '../../directives/tree-virtual-scroll.directive';
+import { TreeAutoChooseVirtualScrollDirective } from '../../directives/tree-auto-choose-virtual-scroll.directive';
 
 @Component({
   selector: 'step-tree',
@@ -55,11 +58,24 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   private _doc = inject(DOCUMENT);
 
   protected readonly _stepTreeVirtualScroll = inject(TreeVirtualScrollDirective, { optional: true });
-  protected readonly hasVirtualScroll = !!this._stepTreeVirtualScroll;
+  protected readonly _strepTreeAutoChooseVirtualScroll = inject(TreeAutoChooseVirtualScrollDirective, {
+    optional: true,
+  });
+  readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
 
   protected readonly itemTrackBy: TrackByFunction<N> = (index, item) => item.id;
 
-  readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
+  private applyVirtualScrollFrom = this._strepTreeAutoChooseVirtualScroll?.applyVirtualScrollFrom ?? signal(undefined);
+  private displayedItems = computed(() => this._treeState.flatTree()?.length ?? 0);
+
+  protected readonly hasVirtualScroll = computed(() => {
+    const applyVirtualScrollFrom = this.applyVirtualScrollFrom();
+    const displayedItems = this.displayedItems();
+    if (typeof applyVirtualScrollFrom === 'number') {
+      return displayedItems >= applyVirtualScrollFrom;
+    }
+    return !!this._stepTreeVirtualScroll;
+  });
 
   readonly contextMenuPosition = { x: 0, y: 0 };
 
