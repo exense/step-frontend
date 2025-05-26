@@ -64,6 +64,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
 
   @Output() disabledChange = new EventEmitter<boolean>();
   @Output() intervalChange = new EventEmitter<number>();
+  @Output() intervalChangeExplicit = new EventEmitter<number>();
   @Output() refresh = new EventEmitter<unknown>();
 
   ngOnInit(): void {
@@ -105,6 +106,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
     this.selectedInterval.set(newInterval);
     this.model.setInterval(newInterval.value, true);
     this.model.setDisabled(newInterval.value < 0);
+    this.intervalChangeExplicit.emit(newInterval.value);
   }
 
   private terminate(): void {

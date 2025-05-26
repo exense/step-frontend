@@ -84,6 +84,7 @@
               matTooltipPosition="below"
               #requestWarningRef="StepRequestWarning"
               [hideTooltip]="requestWarningRef.hasWarning()"
+              (intervalChangeExplicit)="requestWarningRef.resetWarning()"
             />
           </step-btn-group>
         }
