@@ -8,7 +8,7 @@
 </section>
 <section class="visible-items">
   @for (item of visibleItems(); track item.key) {
-    <step-popover yPosition="below" [mode]="PopoverMode.HOVER">
+    <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
       <div class="item">
         <strong>{{ item.key }}</strong>
         <span>{{ item.value }}</span>
