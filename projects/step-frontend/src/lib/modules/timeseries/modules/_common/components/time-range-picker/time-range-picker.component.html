@@ -58,7 +58,7 @@
           </div>
           <div class="timezone-container">{{ timezone }}</div>
         </div>
-        <div class="right-section" (click)="closeMenu()">
+        <div class="right-section">
           @for (rangeOption of selectOptions(); track rangeOption) {
             <div
               (click)="onRelativeOrFullSelectionSelected(rangeOption)"
@@ -66,9 +66,9 @@
               [class.full-range]="rangeOption.type === 'FULL'"
               [class.active]="
                 !otherOptionSelected() &&
-                ((activeSelection()?.type === 'FULL' && rangeOption.type === 'FULL') ||
+                ((draftSelection()?.type === 'FULL' && rangeOption.type === 'FULL') ||
                   (rangeOption.type === 'RELATIVE' &&
-                    rangeOption.relativeSelection?.timeInMs === activeSelection()?.relativeSelection?.timeInMs))
+                    rangeOption.relativeSelection?.timeInMs === draftSelection()?.relativeSelection?.timeInMs))
               "
             >
               {{ rangeOption.relativeSelection?.label }}
@@ -76,17 +76,20 @@
             </div>
           }
           <div (click)="$event.stopPropagation()" style="margin-top: 1rem">
-            <div class="custom-time-option">
-              <div>
-                <span>Last</span>
-                <input [(ngModel)]="otherOptionValue" type="number" />
-                <select [(ngModel)]="otherOptionUnit" id="timeUnit" class="time-unit-select">
-                  <option *ngFor="let item of timeUnitOptions" [value]="item">
-                    {{ TIME_UNIT_LABELS[item] }}
-                  </option>
-                </select>
+            <div class="time-option" [class.active]="otherOptionSelected()" (click)="selectOtherOption()">Other</div>
+            @if (otherOptionSelected()) {
+              <div class="custom-time-option">
+                <div>
+                  <span>Last</span>
+                  <input [(ngModel)]="otherOptionValue" type="number" />
+                  <select [(ngModel)]="otherOptionUnit" id="timeUnit" class="time-unit-select">
+                    <option *ngFor="let item of timeUnitOptions" [value]="item">
+                      {{ TIME_UNIT_LABELS[item] }}
+                    </option>
+                  </select>
+                </div>
               </div>
-            </div>
+            }
           </div>
         </div>
       </div>
@@ -95,7 +98,7 @@
           <button (click)="applyAbsoluteInterval()" mat-stroked-button color="secondary">Apply absolute range</button>
         </div>
         <div class="right-section">
-          <button (click)="applyOtherTimeRange()" mat-stroked-button color="secondary">Apply relative range</button>
+          <button (click)="applyRelativeTimeRange()" mat-stroked-button color="secondary">Apply relative range</button>
         </div>
       </div>
     </div>
