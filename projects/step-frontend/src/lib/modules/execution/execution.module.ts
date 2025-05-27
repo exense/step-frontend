@@ -128,6 +128,7 @@ import { AltExecutionErrorsComponent } from './components/alt-execution-errors/a
 import { AgentsCellComponent } from './components/execution-agent-cell/execution-agent-cell.component';
 import { AgentsModalComponent } from './components/execution-agent-modal/execution-agent-modal.component';
 import { AltExecutionResolvedParametersComponent } from './components/alt-execution-resolved-parameters/alt-execution-resolved-parameters.component';
+import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
 
 @NgModule({
   declarations: [
@@ -216,6 +217,7 @@ import { AltExecutionResolvedParametersComponent } from './components/alt-execut
     TimeSeriesChartComponent,
     TooltipContentDirective,
     TimeRangePickerComponent,
+    ToggleRequestWarningDirective,
   ],
   exports: [
     ExecutionListComponent,

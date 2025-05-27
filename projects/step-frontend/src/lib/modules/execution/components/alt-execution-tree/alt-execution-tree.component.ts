@@ -1,4 +1,13 @@
-import { Component, DestroyRef, ElementRef, forwardRef, inject, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  forwardRef,
+  inject,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -33,6 +42,14 @@ export class AltExecutionTreeComponent implements TreeActionsService {
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed()).subscribe((range) => {
     this._urlParamsService.updateUrlParams(range);
+  });
+
+  readonly showSpinnerForEmptyTree = input(false);
+
+  protected readonly showSpinner = computed(() => {
+    const showSpinnerForEmptyTree = this.showSpinnerForEmptyTree();
+    const isInitialized = this._treeSate.isInitialized();
+    return showSpinnerForEmptyTree && !isInitialized;
   });
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {

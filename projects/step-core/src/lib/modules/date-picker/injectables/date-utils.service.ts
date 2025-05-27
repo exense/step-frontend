@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DateObjectUnits, DateTime } from 'luxon';
 import { DateRange } from '../types/date-range';
-import { TimeRange } from '../../../client/step-client-module';
+import { TimeRange, TimeRangeSelection } from '../../../client/step-client-module';
 
 @Injectable({
   providedIn: 'root',
@@ -47,5 +47,30 @@ export class DateUtilsService {
     const start = DateTime.fromMillis(timeRange.from);
     const end = DateTime.fromMillis(timeRange.to);
     return { start, end };
+  }
+
+  areTimeRangeSelectionsEquals(a?: TimeRangeSelection, b?: TimeRangeSelection): boolean {
+    if (a === b) {
+      return true;
+    }
+
+    if ((!a && !!b) || (!!a && !b)) {
+      return false;
+    }
+
+    if (
+      (a?.type === 'FULL' && b?.type === 'FULL') ||
+      (a?.type === 'ABSOLUTE' &&
+        b?.type === 'ABSOLUTE' &&
+        a?.absoluteSelection?.from === b?.absoluteSelection?.from &&
+        a?.absoluteSelection?.to === b?.absoluteSelection?.to) ||
+      (a?.type === 'RELATIVE' &&
+        b?.type === 'RELATIVE' &&
+        a?.relativeSelection?.timeInMs === b?.relativeSelection?.timeInMs)
+    ) {
+      return true;
+    }
+
+    return false;
   }
 }

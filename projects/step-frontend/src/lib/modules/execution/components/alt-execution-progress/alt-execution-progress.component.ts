@@ -1,4 +1,14 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
@@ -17,6 +27,7 @@ import {
   tap,
 } from 'rxjs';
 import {
+  AggregatedReport,
   AlertType,
   ArtefactFilter,
   AugmentedControllerService,
@@ -24,6 +35,7 @@ import {
   AugmentedPlansService,
   AugmentedTimeSeriesService,
   AutoDeselectStrategy,
+  DateUtilsService,
   Execution,
   ExecutionCloseHandleService,
   IncludeTestcases,
@@ -65,6 +77,8 @@ import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_
 import { ActiveExecutionsService } from '../../services/active-executions.service';
 import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
+import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
+import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -133,6 +147,7 @@ interface RefreshParams {
       provide: ExecutionCloseHandleService,
       useClass: AltExecutionCloseHandleService,
     },
+    AggregatedTreeDataLoaderService,
   ],
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
@@ -151,9 +166,13 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
   private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
   private _executionId = inject(EXECUTION_ID);
+  private _dateUtils = inject(DateUtilsService);
   protected readonly _dialogs = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   protected readonly AlertType = AlertType;
+  private _treeLoader = inject(AggregatedTreeDataLoaderService);
+
+  private toggleRequestWarning = viewChild('requestWarningRef', { read: ToggleRequestWarningDirective });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -183,11 +202,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
     takeUntilDestroyed(),
   );
-
-  // readonly updateFullTimeRangeSelection = this.execution$.subscribe(execution => {
-  //   console.log('execution change', execution);
-  //   this.timeRangeOptions[0] = {type: 'FULL', absoluteSelection: {from: execution.startTime!, to: execution.endTime!}};
-  // });
 
   readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
     .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
@@ -379,6 +393,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
     this.setupTreeRefresh();
     this.setupErrorsRefresh();
+    this.setupToggleWarningReset();
   }
 
   ngOnDestroy(): void {
@@ -390,15 +405,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   private setupTreeRefresh(): void {
     combineLatest([this.execution$, this.timeRangeSelection$])
       .pipe(
+        debounceTime(300),
         switchMap(([execution, timeSelection]) => {
-          if (timeSelection.type === 'FULL') {
-            return this._executionsApi.getFullAggregatedReportView(execution.id!);
-          }
-          return this._executionsApi.getAggregatedReportView(execution.id!, {
-            range: timeSelection.absoluteSelection!,
-          });
+          return this._treeLoader.load(execution, timeSelection);
         }),
-        map((response) => response ?? {}),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
@@ -420,6 +430,17 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       .subscribe(([execution, timeRange]) => {
         const executionId = execution.id!;
         this.errorsDataSource.reload({ request: { executionId, timeRange } });
+      });
+  }
+
+  private setupToggleWarningReset(): void {
+    this.timeRangeSelection$
+      .pipe(
+        distinctUntilChanged((a, b) => this._dateUtils.areTimeRangeSelectionsEquals(a, b)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => {
+        this.toggleRequestWarning()?.resetWarning?.();
       });
   }
 
