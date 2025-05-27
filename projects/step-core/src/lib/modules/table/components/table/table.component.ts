@@ -6,6 +6,7 @@ import {
   contentChildren,
   ContentChildren,
   DestroyRef,
+  effect,
   EventEmitter,
   forwardRef,
   inject,
@@ -54,7 +55,7 @@ import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
-import { isValidRegex } from '../../../basics/step-basics.module';
+import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.module';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
@@ -125,6 +126,7 @@ export class TableComponent<T>
     TableHighlightItemContainer,
     TableColumnsDictionaryService
 {
+  private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
   private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
@@ -164,6 +166,17 @@ export class TableComponent<T>
 
   /** @Input() **/
   noResultsPlaceholder = input<string | undefined>(undefined);
+
+  readonly blockGlobalReload = input(false);
+
+  private effectSetupGlobalReload = effect(() => {
+    const isGlobalBlocked = this.blockGlobalReload();
+    if (isGlobalBlocked) {
+      this._globalReloadService.unRegister(this);
+    } else {
+      this._globalReloadService.register(this);
+    }
+  });
 
   @ViewChild(MatTable) private table?: MatTable<any>;
   @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
@@ -541,6 +554,7 @@ export class TableComponent<T>
   ngOnDestroy(): void {
     this.terminateDatasource();
     this.search$.complete();
+    this._globalReloadService.unRegister(this);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

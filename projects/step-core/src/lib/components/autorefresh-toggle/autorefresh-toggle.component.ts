@@ -1,13 +1,17 @@
 import {
   Component,
+  computed,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import { AutoRefreshModelFactoryService } from '../../services/auto-refresh-model-factory.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -22,6 +26,7 @@ interface AutorefreshPreset {
   selector: 'step-autorefresh-toggle',
   templateUrl: './autorefresh-toggle.component.html',
   styleUrls: ['./autorefresh-toggle.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy {
   private terminator$?: Subject<void>;
@@ -39,7 +44,18 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
     { label: '1 minute', value: 60000 },
     { label: '5 minutes', value: 300000 },
   ];
-  selectedInterval: AutorefreshPreset = this.presets[0];
+
+  readonly hideTooltip = input(false);
+  protected readonly selectedInterval = signal(this.presets[0]);
+  protected readonly tooltipMessage = computed(() => {
+    const hideTooltip = this.hideTooltip();
+    const interval = this.selectedInterval();
+    if (hideTooltip) {
+      return '';
+    }
+    const label = interval.label || this.presets[1].label;
+    return `refresh: ${label}`;
+  });
 
   @Input() autoIncreaseTo?: number;
   @Input() interval: number = 0;
@@ -48,6 +64,7 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
 
   @Output() disabledChange = new EventEmitter<boolean>();
   @Output() intervalChange = new EventEmitter<number>();
+  @Output() intervalChangeExplicit = new EventEmitter<number>();
   @Output() refresh = new EventEmitter<unknown>();
 
   ngOnInit(): void {
@@ -86,9 +103,10 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   changeRefreshInterval(newInterval: AutorefreshPreset): void {
-    this.selectedInterval = newInterval;
+    this.selectedInterval.set(newInterval);
     this.model.setInterval(newInterval.value, true);
     this.model.setDisabled(newInterval.value < 0);
+    this.intervalChangeExplicit.emit(newInterval.value);
   }
 
   private terminate(): void {
@@ -111,17 +129,19 @@ export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy 
   private setModel(model: AutoRefreshModel): void {
     this.isExternalModel = true;
     this.setupModelChanges(model);
-    this.selectedInterval = this.presets.find((p) => p.value === model.interval) || {
-      label: '',
-      value: model.interval,
-    };
+    this.selectedInterval.set(
+      this.presets.find((p) => p.value === model.interval) || {
+        label: '',
+        value: model.interval,
+      },
+    );
   }
 
   private setInterval(interval: number): void {
     if (this.isExternalModel) {
       return;
     }
-    this.selectedInterval = this.presets.find((p) => p.value === interval) || { label: '', value: interval };
+    this.selectedInterval.set(this.presets.find((p) => p.value === interval) || { label: '', value: interval });
     this.model.setInterval(interval ?? 0);
   }
 
