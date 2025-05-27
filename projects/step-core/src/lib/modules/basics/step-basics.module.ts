@@ -74,6 +74,7 @@ import { OverflowTooltipDirective } from './directives/overflow-tooltip.directiv
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
+import { ReloadableDirective } from './directives/reloadable.directive';
 
 @NgModule({
   imports: [
@@ -87,6 +88,7 @@ import { StrategyClickDirective } from './directives/strategy-click.directive';
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
     SelectComponent,
+    ReloadableDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -232,6 +234,7 @@ import { StrategyClickDirective } from './directives/strategy-click.directive';
     OverflowIndicatorDirective,
     TruncateStringPipe,
     StrategyClickDirective,
+    ReloadableDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -364,7 +367,9 @@ export * from './pipes/truncate-string.pipe';
 export * from './injectables/array-item-label-value-default-extractor.service';
 export { SelectComponentSearchCtrlContainer } from './injectables/select-component-search-ctrl-container.service';
 export * from './injectables/dynamic-values-utils.service';
-
+export * from './types/reloadable';
+export * from './injectables/global-reload.service';
+export * from './directives/reloadable.directive';
 export * from './types/image-type.enum';
 export * from './types/video-type.enum';
 export * from './types/text-type.enum';
