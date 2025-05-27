@@ -170,6 +170,12 @@ step-alt-execution-progress {
   button.warning {
     color: var.$red-50;
   }
+
+  step-autorefresh-toggle.warning {
+    step-icon {
+      color: var.$orange;
+    }
+  }
 }
 
 @include common.executions-menu;
