@@ -2,11 +2,7 @@ import { FunctionPackage, KeywordPackagesService } from '../../generated';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {
-  StepDataSource,
-  TableRemoteDataSourceFactoryService,
-  TableApiWrapperService,
-} from '../../table/step-table-client.module';
+import { StepDataSource, TableRemoteDataSourceFactoryService, TableApiWrapperService } from '../../table';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';

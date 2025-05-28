@@ -144,6 +144,7 @@ import { MatButton } from '@angular/material/button';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
+import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
 import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
 import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
@@ -252,6 +253,7 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/rep
     AltReportWidgetContentDirective,
     DashboardPageComponent,
     MatButton,
+    ToggleRequestWarningDirective,
   ],
   exports: [
     ExecutionListComponent,

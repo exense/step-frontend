@@ -5,7 +5,7 @@ import {
   TableApiWrapperService,
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
-} from '../../table/step-table-client.module';
+} from '../../table';
 import { map, Observable, of, OperatorFunction } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';

@@ -1,4 +1,14 @@
-import { Component, contentChild, ElementRef, forwardRef, inject, input, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  contentChild,
+  DestroyRef,
+  ElementRef,
+  forwardRef,
+  inject,
+  input,
+  ViewEncapsulation,
+} from '@angular/core';
 import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
 
@@ -35,6 +45,13 @@ export class AltExecutionTreeComponent implements TreeActionsService {
   });
 
   protected readonly treeNodeAddon = contentChild(AltExecutionTreeNodeAddonDirective);
+  readonly showSpinnerForEmptyTree = input(false);
+
+  protected readonly showSpinner = computed(() => {
+    const showSpinnerForEmptyTree = this.showSpinnerForEmptyTree();
+    const isInitialized = this._treeSate.isInitialized();
+    return showSpinnerForEmptyTree && !isInitialized;
+  });
 
   getActionsForNode(node: TreeNode, multipleNodes?: boolean): Observable<TreeAction[]> {
     const disabled = !node.children?.length;

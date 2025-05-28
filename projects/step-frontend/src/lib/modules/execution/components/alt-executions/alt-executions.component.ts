@@ -64,6 +64,9 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
       .subscribe((executionId) => {
         this._activeExecutionsService.removeActiveExecution(executionId);
         if (executionId === this.activeExecutionId) {
+          if (this._router.getCurrentNavigation()) {
+            return;
+          }
           this._router.navigateByUrl(`/executions/list`);
           this.activeExecutionId = undefined;
         }
@@ -109,7 +112,9 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
           executionUrl = executionUrl.substring(1);
         }
 
-        this._customMenuEntries.add(MENU_ENTRY_ID, executionUrl, ExecutionNamePipe.transform(execution));
+        this._customMenuEntries.add(MENU_ENTRY_ID, executionUrl, ExecutionNamePipe.transform(execution), {
+          isCleanupOnReload: true,
+        });
       });
   }
 }
