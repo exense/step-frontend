@@ -304,7 +304,7 @@ export class ExecutionsService {
   }
 
   /**
-   * Returns an flat aggregated report view for the provided execution and aggregation parameters.
+   * Returns a flat aggregated report view for the provided execution and aggregation parameters.
    * @param id
    * @param requestBody
    * @returns FlatAggregatedReport default response

@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { AggregatedReportView } from './AggregatedReportView';
+import type { FlatAggregatedReportView } from './FlatAggregatedReportView';
 
 export type FlatAggregatedReport = {
-  aggregatedReportViews?: Array<AggregatedReportView>;
+  aggregatedReportViews?: Array<FlatAggregatedReportView>;
 };

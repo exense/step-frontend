@@ -16,7 +16,10 @@ export { AugmentedInteractivePlanExecutionService } from './services/augmented-i
 export { AssignEntityParameters } from './shared/assign-entity-parameters';
 export { AugmentedUserService } from './services/augmented-user.service';
 export { AugmentedQuotaManagerService } from './services/augmented-quota-manager.service';
-export { AugmentedAutomationPackagesService } from './services/augmented-automation-packages.service';
+export {
+  AugmentedAutomationPackagesService,
+  AutomationPackageParams,
+} from './services/augmented-automation-packages.service';
 export { AugmentedBookmarksService } from './services/augmented-bookmarks.service';
 export { AugmentedTimeSeriesService } from './services/augmented-time-series.service';
 export { AugmentedDashboardsService } from './services/augmented-dashboards.service';

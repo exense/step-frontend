@@ -3,21 +3,36 @@
     @if (progress$) {
       <step-progress-bar [progress$]="progress$" />
     } @else {
+      <step-tabs [tabs]="_tabs" [(activeTabId)]="selectedTab" [compactTabs]="true" />
       <form [formGroup]="form">
-        <step-upload-container (filesChange)="handleDrop($event)">
-          <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-            <step-label>Automation Package (jar or ZIP file)</step-label>
-            <step-label-addon>
-              <step-icon name="help-circle" matTooltip="Drag & Drop or select your automation package jar / ZIP file" />
-            </step-label-addon>
-            <input type="text" readonly formControlName="fileName" required name="fileName" />
-            <step-suffix class="button-suffix">
-              <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
-                <step-icon name="folder-plus"></step-icon>
-              </button>
-            </step-suffix>
-          </step-form-field>
-        </step-upload-container>
+        @switch (selectedTab()) {
+          @case (UploadType.UPLOAD) {
+            <step-upload-container (filesChange)="handleDrop($event)">
+              <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+                <step-label>Automation Package (jar or ZIP file)</step-label>
+                <step-label-addon>
+                  <step-icon
+                    name="help-circle"
+                    matTooltip="Drag & Drop or select your automation package jar / ZIP file"
+                  />
+                </step-label-addon>
+                <input type="text" readonly formControlName="fileName" name="fileName" />
+                <step-suffix class="button-suffix">
+                  <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
+                    <step-icon name="folder-plus"></step-icon>
+                  </button>
+                </step-suffix>
+              </step-form-field>
+            </step-upload-container>
+          }
+          @case (UploadType.MAVEN) {
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+              <step-label>Maven Snippet</step-label>
+              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="mavenSnippet" />
+            </step-form-field>
+          }
+          @default {}
+        }
         <step-form-field alignLabelAddon="near">
           <step-label>Automation Package Version</step-label>
           <step-label-addon>
@@ -49,10 +64,20 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
-    @if (!!file || isNewPackage) {
-      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Upload</button>
-    } @else {
-      <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">Update</button>
-    }
+    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">
+      @if (!isNewPackage) {
+        Update
+      } @else {
+        @switch (selectedTab()) {
+          @case (UploadType.UPLOAD) {
+            Upload
+          }
+          @case (UploadType.MAVEN) {
+            Add
+          }
+          @default {}
+        }
+      }
+    </button>
   </div>
 </step-modal-window>

@@ -17,7 +17,9 @@
         <step-select [(ngModel)]="template" [items]="artefactTypes()" [useClear]="false" />
       </step-form-field>
     } @else {
-      <step-rich-editor [syntaxMode]="AceMode.YAML" name="yaml" [(ngModel)]="yamlPlan" />
+      <step-form-field>
+        <step-rich-editor [syntaxMode]="AceMode.YAML" name="yaml" [(ngModel)]="yamlPlan" />
+      </step-form-field>
     }
   </div>
   <div step-modal-window-buttons>
