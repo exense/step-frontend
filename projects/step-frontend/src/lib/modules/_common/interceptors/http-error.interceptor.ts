@@ -9,10 +9,10 @@ import {
 } from '@angular/common/http';
 import { Observable, of, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConnectionError } from '../shared/connection-error';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
 import { NavigatorService } from '@exense/step-core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -32,70 +32,67 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       error.error?.errorMessage === "You're not allowed to access this object from within this context"
     ) {
       this._navigator.navigateToHome({ forceClientUrl: true });
-      this.showError(error.error?.errorMessage);
       return of(false);
     }
 
-    let jsonError: any = error.error;
+    const parsedError = this.parseHttpError(error);
+    const formattedError = HttpErrorInterceptor.formatError(parsedError);
+
+    if (this.isConnectionError(formattedError, error)) {
+      return throwError(() => new ConnectionError(error));
+    }
+
+    this.showError(formattedError);
+
+    return throwError(() => error);
+  }
+
+  private parseHttpError(error: HttpErrorResponse): string {
+    const errorContentType = error.headers.get('Content-Type');
+    const isJson = errorContentType?.includes?.('application/json') ?? false;
+
+    let jsonError: any;
 
     // For some reason internal server errors are encoded as ArrayBuffer so we have to decode them first:
     if (error.error instanceof ArrayBuffer) {
       try {
         const decoder = new TextDecoder('utf-8'); // Ensure UTF-8 decoding
-        const jsonString = decoder.decode(new Uint8Array(error.error));
-        jsonError = JSON.parse(jsonString);
+        const errorString = decoder.decode(new Uint8Array(error.error));
+        if (isJson) {
+          jsonError = JSON.parse(errorString);
+        } else {
+          jsonError = { errorMessage: errorString };
+        }
       } catch (e) {
         jsonError = { errorMessage: 'Failed to decode error response: ' + e };
       }
-    }
-
-    const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(jsonError || error.error || error));
-
-    if (this.isConnectionError(parsedError)) {
-      return throwError(() => new ConnectionError(error));
-    }
-
-    this.showError(parsedError);
-
-    return throwError(() => error);
-  }
-
-  private parseHttpError(error?: HttpErrorResponse | string): string {
-    let jsonError: any;
-
-    if (typeof error === 'string') {
-      jsonError = this.parseJson(error);
-    } else if (error?.headers?.get?.('Content-Type')?.includes?.('application/json')) {
-      jsonError = this.parseJson(error.error);
-    }
-
-    if (!jsonError) {
-      jsonError = error;
+    } else if (isJson && typeof error.error === 'string') {
+      jsonError = JSON.parse(error.error);
+    } else if (isJson) {
+      jsonError = error.error;
+    } else {
+      jsonError = { errorMessage: error.error };
     }
 
     if (jsonError?.errorMessage || jsonError?.errorName) {
-      return `${jsonError.errorName || 'Error'}: ${jsonError.errorMessage}`;
+      if (jsonError.errorMessage && typeof jsonError.errorMessage !== 'string') {
+        console.error(`Unexpected error type. isJson=${isJson}`, jsonError.errorMessage);
+        try {
+          console.error(JSON.stringify(jsonError.errorMessage));
+        } catch (e) {}
+      }
+      return `${jsonError.errorName ?? 'Error'}: ${jsonError.errorMessage}`;
     }
-    if (error && error instanceof HttpErrorResponse && error.name && error.message) {
+
+    if (error instanceof HttpErrorResponse && error.name && error.message) {
       return `${error.name}: ${error.message}`;
     }
+
     if (jsonError) {
       return JSON.stringify(jsonError);
     }
-    if (typeof error === 'string') {
-      return error;
-    }
-    return 'Unknown HTTP error';
-  }
 
-  private parseJson(jsonString: string): any {
-    let result: any = undefined;
-    try {
-      result = JSON.parse(jsonString);
-    } catch (e) {
-      console.log('Error parsing JSON response', e);
-    }
-    return result;
+    return 'Unknown HTTP error';
   }
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
@@ -140,8 +137,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     }
   }
 
-  private isConnectionError(error: any): boolean {
-    return typeof error === 'string' && error.endsWith(': 0 Unknown Error');
+  private isConnectionError(parsedError: any, error: any): boolean {
+    return (
+      (typeof parsedError === 'string' && parsedError.endsWith(': 0 Unknown Error')) ||
+      error.error instanceof ProgressEvent
+    );
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
