@@ -8,13 +8,20 @@ import {
 } from '../../table';
 import { map, Observable, of, OperatorFunction } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
-import { query } from '@angular/animations';
+
+export interface AutomationPackageParams {
+  id?: string;
+  file?: File;
+  mavenSnippet?: string;
+  version?: string;
+  activationExpression?: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -84,16 +91,38 @@ export class AugmentedAutomationPackagesService
       );
   }
 
-  uploadCreateAutomationPackage(
-    file: File,
-    version?: string,
-    activationExpression?: string,
-  ): ReturnType<typeof uploadWithProgress> {
-    const body = new FormData();
-    body.set('file', file);
+  automationPackageCreateOrUpdate({
+    id,
+    file,
+    version,
+    activationExpression,
+    mavenSnippet,
+  }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
+    const method = !!id ? 'PUT' : 'POST';
+    let url = 'rest/automation-packages';
+    if (!!id) {
+      url = `${url}/${id}`;
+    }
+    if (!!mavenSnippet) {
+      url = `${url}/mvn`;
+    }
 
-    // Construct query parameters if values exist
-    let params = new HttpParams();
+    let body: FormData | string;
+    if (mavenSnippet) {
+      body = mavenSnippet;
+    } else {
+      body = new FormData();
+      body.set('file', file!);
+    }
+
+    let headers: HttpHeaders;
+    if (typeof body === 'string') {
+      headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
+    } else {
+      headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+    }
+
+    let params = new HttpParams().set('async', true);
     if (version) {
       params = params.set('version', version);
     }
@@ -102,50 +131,12 @@ export class AugmentedAutomationPackagesService
     }
 
     const request$ = this._http.request(
-      'POST',
-      `rest/automation-packages`,
+      method,
+      url,
       this._requestContextHolder.decorateRequestOptions({
+        headers,
         body,
-        headers: {
-          enctype: 'multipart/form-data',
-        },
-        params, // Attach query parameters here
-        observe: 'events',
-        responseType: 'arraybuffer',
-        reportProgress: true,
-      }),
-    );
-
-    return uploadWithProgress(request$);
-  }
-
-  uploadUpdateAutomationPackage(
-    id: string,
-    file: File,
-    version?: string,
-    activationExpression?: string,
-  ): ReturnType<typeof uploadWithProgress> {
-    const body = new FormData();
-    body.set('file', file);
-
-    // Construct query parameters if values exist
-    let params = new HttpParams();
-    if (version) {
-      params = params.set('version', version);
-    }
-    if (activationExpression) {
-      params = params.set('activationExpr', activationExpression);
-    }
-
-    const request$ = this._http.request(
-      'PUT',
-      `rest/automation-packages/${id}?async=true`,
-      this._requestContextHolder.decorateRequestOptions({
-        body,
-        headers: {
-          enctype: 'multipart/form-data',
-        },
-        params, // Attach query parameters here
+        params,
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,

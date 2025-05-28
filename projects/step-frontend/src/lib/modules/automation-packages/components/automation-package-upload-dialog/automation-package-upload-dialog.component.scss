@@ -2,6 +2,10 @@ input[type='file'] {
   display: none;
 }
 
+input[readonly] {
+  cursor: default;
+}
+
 div[step-modal-window-body] form {
   display: flex;
   flex-direction: column;

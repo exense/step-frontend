@@ -89,6 +89,46 @@ export class AutomationPackagesService {
   }
 
   /**
+   * @param async
+   * @param version
+   * @param activationExpr
+   * @returns AutomationPackageUpdateResult default response
+   * @throws ApiError
+   */
+  public createOrUpdateAutomationPackageFromMaven(
+    async?: boolean,
+    version?: string,
+    activationExpr?: string,
+  ): Observable<AutomationPackageUpdateResult> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/automation-packages/mvn',
+      query: {
+        async: async,
+        version: version,
+        activationExpr: activationExpr,
+      },
+    });
+  }
+
+  /**
+   * @param version
+   * @param activationExpr
+   * @returns string default response
+   * @throws ApiError
+   */
+  public createAutomationPackageFromMaven(version?: string, activationExpr?: string): Observable<string> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/mvn',
+      query: {
+        version: version,
+        activationExpr: activationExpr,
+      },
+    });
+  }
+
+  /**
    * @param id
    * @returns AutomationPackage default response
    * @throws ApiError
@@ -112,7 +152,7 @@ export class AutomationPackagesService {
    * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
    */
-  public updateAutomationPackageMetadata1(
+  public updateAutomationPackage(
     id: string,
     async?: boolean,
     version?: string,
@@ -212,6 +252,34 @@ export class AutomationPackagesService {
       url: '/automation-packages/{id}/entities',
       path: {
         id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @param async
+   * @param version
+   * @param activationExpr
+   * @returns AutomationPackageUpdateResult default response
+   * @throws ApiError
+   */
+  public updateAutomationPackageFromMaven(
+    id: string,
+    async?: boolean,
+    version?: string,
+    activationExpr?: string,
+  ): Observable<AutomationPackageUpdateResult> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/automation-packages/{id}/mvn',
+      path: {
+        id: id,
+      },
+      query: {
+        async: async,
+        version: version,
+        activationExpr: activationExpr,
       },
     });
   }
