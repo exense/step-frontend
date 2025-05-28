@@ -6,7 +6,7 @@ export const $FlatAggregatedReport = {
     aggregatedReportViews: {
       type: 'array',
       contains: {
-        type: 'AggregatedReportView',
+        type: 'FlatAggregatedReportView',
       },
     },
   },

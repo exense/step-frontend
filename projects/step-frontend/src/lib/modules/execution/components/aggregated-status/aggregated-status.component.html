@@ -6,14 +6,10 @@
   />
 } @else if (isEmptyStatus()) {
   <div class="status-group">
-    <step-icon
-      name="out-of-scope"
-      matTooltip="Not executed - May run later, is unreachable, or not completed in the selected time range"
-      matTooltipPosition="below"
-    />
+    <step-icon name="out-of-scope" [matTooltip]="emptyStatusMessage()" matTooltipPosition="below" />
   </div>
 } @else {
-  @for (item of statusItems(); track item.status) {
+  @for (item of filteredStatusItems(); track item.status) {
     @if (item.status === Status.RUNNING && item.count === 1) {
       <step-status [status]="item.status" [iconMode]="true" (stepStrategyClick)="handleClick(item, $event)" />
     } @else {
