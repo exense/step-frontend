@@ -36,13 +36,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       return of(false);
     }
 
-    const parsedError = HttpErrorInterceptor.formatError(this.parseHttpError(error));
+    const parsedError = this.parseHttpError(error);
+    const formattedError = HttpErrorInterceptor.formatError(parsedError);
 
-    if (this.isConnectionError(parsedError, error)) {
+    if (this.isConnectionError(formattedError, error)) {
       return throwError(() => new ConnectionError(error));
     }
 
-    this.showError(parsedError);
+    this.showError(formattedError);
 
     return throwError(() => error);
   }
@@ -66,8 +67,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       } catch (e) {
         jsonError = { errorMessage: 'Failed to decode error response: ' + e };
       }
-    } else if (isJson) {
+    } else if (isJson && typeof error.error === 'string') {
       jsonError = JSON.parse(error.error);
+    } else if (isJson) {
+      jsonError = error.error;
     } else {
       jsonError = { errorMessage: error.error };
     }
