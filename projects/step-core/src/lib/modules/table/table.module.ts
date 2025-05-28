@@ -196,3 +196,5 @@ export * from './services/items-per-page.service';
 export * from './services/table-persistence-state.service';
 export * from './services/table-persistence-url-state.service';
 export * from './types/row-info.interface';
+export * from './services/table-memory-storage.service';
+export * from './services/table-local-storage.service';

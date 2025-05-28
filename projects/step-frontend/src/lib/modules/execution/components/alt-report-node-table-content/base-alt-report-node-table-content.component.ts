@@ -12,7 +12,7 @@ import {
 import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, combineLatest } from 'rxjs';
+import { map, combineLatest, Observable, of } from 'rxjs';
 import { ReportNodeType } from '../../../report-nodes/shared/report-node-type.enum';
 
 const VIEW_PAGE_SIZE = 100;
@@ -51,9 +51,13 @@ export abstract class BaseAltReportNodeTableContentComponent implements ItemsPer
     this.setupDateRangeFilter();
   }
 
-  getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[] {
+  getItemsPerPage(): Observable<number[]> {
     const allowedPageSize = this._mode === ViewMode.PRINT ? PRINT_PAGE_SIZE : VIEW_PAGE_SIZE;
-    return [allowedPageSize];
+    return of([allowedPageSize]);
+  }
+
+  getDefaultPageSizeItem(): Observable<number> {
+    return this.getItemsPerPage().pipe(map((items) => items[0]));
   }
 
   protected setupSearchFilter(): void {
