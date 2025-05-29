@@ -1,6 +1,8 @@
 const fs = require('fs/promises');
 
 const STRING_CAMELIZE_REGEXP = /(-|_|\.|\s)+(.)?/g;
+const PAYLOAD_REGEXP = /^<svg[^>]+?>((.|\n)+)<\/svg>$/;
+const VIEWBOX_REGEXP = /viewBox="(.+?)"/;
 
 const iconsSvgFolders = [
   'node_modules/feather-icons/dist/icons',
@@ -59,9 +61,8 @@ const run = async () => {
     const exportName = upperCamelize(iconName);
 
     const markup = await fs.readFile(`${folder}/${file}`, { encoding: 'utf-8' });
-    const payload = String(markup)
-      .trim()
-      .match(/^<svg[^>]+?>(.+)<\/svg>$/);
+    const markupContent = String(markup).trim();
+    const payload = markupContent.match(PAYLOAD_REGEXP)[1];
 
     if (!payload) {
       console.log('FAILED TO EXTRACT SVG FROM:', `${folder}/${file}`);
@@ -70,10 +71,16 @@ const run = async () => {
       return;
     }
 
+    let viewBox = '0 0 24 24';
+    if (VIEWBOX_REGEXP.test(markupContent)) {
+      viewBox = markupContent.match(VIEWBOX_REGEXP)[1];
+    }
+
     const output = iconTemplate
       .replace(/__EXPORT_NAME__/g, exportName)
       .replace(/__ICON_NAME__/g, iconName)
-      .replace(/__PAYLOAD__/, payload[1]);
+      .replace(/__VIEW_BOX__/g, viewBox)
+      .replace(/__PAYLOAD__/, payload);
 
     await fs.writeFile(`${iconsDestFolder}/${iconName}.ts`, output, { encoding: 'utf-8' });
     await fs.appendFile(indexFile, `export { ${exportName} } from './svg/${iconName}';\n`);

@@ -108,6 +108,18 @@ step-alt-execution-progress {
         margin-right: 0.25rem;
       }
 
+      step-btn-group {
+        .mat-mdc-icon-button.mat-mdc-button-base {
+          margin: 0;
+          &:first-child {
+            margin-left: 0.25rem;
+          }
+          &:last-child {
+            margin-right: 0.25rem;
+          }
+        }
+      }
+
       .controls-marker {
         display: flex;
         align-items: center;
