@@ -1,1 +1,8 @@
-Performance view
+@if (dashboardId) {
+  <step-timeseries-dashboard
+    [id]="dashboardId!"
+    [timeRange]="(_stateService.timeRange$ | async)!"
+    [defaultFiltersValues]="dashboardFilters"
+    [showExecutionLinks]="true"
+  />
+}

@@ -38,6 +38,7 @@ import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { SchedulerPageStateService } from './scheduler-page-state.service';
 
 declare const uPlot: any;
 
@@ -56,16 +57,6 @@ interface EntityWithKeywordsStats {
   selector: 'step-schedule-overview',
   templateUrl: './schedule-overview.component.html',
   styleUrls: ['./schedule-overview.component.scss'],
-  providers: [
-    DashboardUrlParamsService,
-    {
-      provide: VIEW_MODE,
-      useFactory: () => {
-        const _activatedRoute = inject(ActivatedRoute);
-        return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
-      },
-    },
-  ],
 })
 export class ScheduleOverviewComponent {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;
@@ -76,6 +67,7 @@ export class ScheduleOverviewComponent {
   private _executionService = inject(ExecutionsService);
   protected _taskId = inject(ActivatedRoute).snapshot.params['id']! as string;
   private _statusColors = inject(STATUS_COLORS);
+  readonly _stateService = inject(SchedulerPageStateService);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last day', timeInMs: TimeUnit.DAY } },

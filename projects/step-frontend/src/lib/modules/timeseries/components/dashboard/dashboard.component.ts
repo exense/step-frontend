@@ -117,6 +117,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() storageId?: string; // for persistence across views
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
+  @Input({ required: false }) defaultFiltersValues: Partial<FilterBarItem>[] = [];
   @Input() showExecutionLinks = true;
   timeRange = input.required<TimeRange>();
 
@@ -382,6 +383,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const visibleFilters: FilterBarItem[] = this.mergeAndExcludeHiddenFilters(
       urlFilters,
+      this.defaultFiltersValues,
       dashboard.filters,
       this.hiddenFilters,
     );
@@ -413,6 +415,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private mergeAndExcludeHiddenFilters(
     urlFilters: FilterBarItem[],
+    defaultFilters: Partial<FilterBarItem>[],
     dashboardFilters: TimeSeriesFilterItem[],
     hiddenFilters: FilterBarItem[],
   ): FilterBarItem[] {
@@ -431,6 +434,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     hiddenFilters.forEach((f) => {
       f.isHidden = true;
       visibleFilters = visibleFilters.filter((v) => v.attributeName !== f.attributeName);
+    });
+    defaultFilters.forEach((filterValues) => {
+      if (!FilterUtils.filterItemIsValid(filterValues as FilterBarItem)) {
+        console.warn('Invalid filter provided. Ignoring');
+      }
+      let foundFilter = visibleFilters.find((f) => f.attributeName === filterValues.attributeName);
+      if (!foundFilter) {
+        console.warn('Filter item not found');
+      } else {
+        (Object.keys(filterValues) as (keyof FilterBarItem)[]).forEach((key) => {
+          const value = filterValues[key];
+          if (value !== null && value !== undefined) {
+            foundFilter[key] = value as unknown;
+          }
+        });
+      }
     });
     return visibleFilters;
   }

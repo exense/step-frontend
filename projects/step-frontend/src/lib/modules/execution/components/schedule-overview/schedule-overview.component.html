@@ -12,22 +12,6 @@
       }
     </div>
   }
-  <div class="action-buttons">
-    <step-autorefresh-toggle
-      [interval]="refreshInterval()"
-      (refresh)="triggerRefresh()"
-      (intervalChange)="handleRefreshIntervalChange($event)"
-    />
-    @if (activeTimeRangeSelection()) {
-      <div class="range-picker">
-        <step-time-range-picker
-          (selectionChange)="handleTimeRangeChange($event)"
-          [selectOptions]="timeRangeOptions"
-          [activeSelection]="activeTimeRangeSelection()!"
-        />
-      </div>
-    }
-  </div>
 </section>
 <section>
   <div class="row">
