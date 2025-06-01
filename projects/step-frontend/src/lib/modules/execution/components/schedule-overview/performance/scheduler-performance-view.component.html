@@ -1,8 +1,12 @@
 @if (dashboardId) {
-  <step-timeseries-dashboard
-    [id]="dashboardId!"
-    [timeRange]="(_stateService.timeRange$ | async)!"
-    [defaultFiltersValues]="dashboardFilters"
-    [showExecutionLinks]="true"
-  />
+  @if (!isLoading) {
+    <step-timeseries-dashboard
+      [id]="dashboardId!"
+      [timeRange]="(_state.timeRange$ | async)!"
+      [hiddenFilters]="dashboardFilters"
+      [showExecutionLinks]="true"
+      (contextSettingsChanged)="handleDashboardSettingsChange($event)"
+      (contextSettingsInit)="handleDashboardSettingsInit($event)"
+    />
+  }
 }

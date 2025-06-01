@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
@@ -18,8 +18,8 @@ import {
   TimeUnit,
 } from '@exense/step-core';
 import { SCHEDULE_ID } from '../../services/schedule-id.token';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, interval, map, Observable, of, range, shareReplay, switchMap, take } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { count, filter, interval, map, Observable, of, range, scan, shareReplay, switchMap, take } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { SchedulerPageStateService } from './scheduler-page-state.service';
 import { FilterBarItem, FilterBarItemType } from '../../../timeseries/time-series.module';
@@ -66,7 +66,7 @@ interface EntityWithKeywordsStats {
     },
   ],
 })
-export class SchedulerPageComponent extends SchedulerPageStateService {
+export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   readonly _taskIdFn = inject(SCHEDULE_ID);
@@ -95,6 +95,42 @@ export class SchedulerPageComponent extends SchedulerPageStateService {
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
   }
+
+  // private refreshIntervalEffect = effect(() => {
+  //   let refreshInterval = this.refreshInterval();
+  // this._urlParamsService.updateRefreshInterval(refreshInterval, false);
+  // });
+
+  private updateUrlRefreshInterval = toObservable(this.refreshInterval)
+    .pipe(
+      scan(
+        (acc, interval) => {
+          const isFirst = !acc.hasEmitted;
+          return { range: interval, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as number, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+    )
+    .subscribe(({ range, isFirst }: { range: number; isFirst: boolean }) => {
+      this._urlParamsService.updateRefreshInterval(range, isFirst);
+    });
+
+  private updateUrlTimeRange = this.timeRangeSelection$
+    .pipe(
+      scan(
+        (acc, range) => {
+          const isFirst = !acc.hasEmitted;
+          return { range, isFirst, hasEmitted: true };
+        },
+        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
+      ),
+      takeUntilDestroyed(),
+    )
+    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
+      // analytics tab is handling events itself
+      this._urlParamsService.patchUrlParams(range, undefined, isFirst);
+    });
 
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
     map((rangeSelection) => {
@@ -305,6 +341,92 @@ export class SchedulerPageComponent extends SchedulerPageStateService {
     }),
   );
 
+  readonly testCasesChartSettings$ = this.lastExecutionsSorted$.pipe(
+    switchMap((executions) => {
+      console.log('EXECUTIONS', executions);
+      return this.timeRange$.pipe(
+        take(1),
+        switchMap((timeRange) => {
+          if (executions.length === 0) {
+            return of(this.createTestCasesChart([], []));
+          } else {
+            const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
+            let oqlFilter = 'attributes.type = TestCase';
+            if (executionsIdsJoined) {
+              oqlFilter += ` and (${executionsIdsJoined})`;
+            }
+            const request: FetchBucketsRequest = {
+              start: timeRange.from,
+              end: timeRange.to,
+              numberOfBuckets: 1,
+              oqlFilter: oqlFilter,
+              groupDimensions: ['executionId', 'status'],
+            };
+
+            return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              map((timeSeriesResponse) => {
+                let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
+                const allStatuses = new Set<string>();
+                if (timeSeriesResponse.matrixKeys.length === 0) {
+                  // don't display the chart when there are no test cases data
+                  return null;
+                }
+                timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
+                  // const nodeName = attributes['name'];
+                  // let artefactHash = attributes['artefactHash'];
+                  const executionId = attributes['executionId'];
+                  const status = attributes['status'];
+                  // const nodeUniqueId = nodeName + artefactHash;
+
+                  allStatuses.add(status);
+                  let executionEntry: EntityWithKeywordsStats = {
+                    entity: executionId,
+                    statuses: {},
+                    timestamp: 0,
+                  };
+                  if (statsByNodes[executionId]) {
+                    executionEntry = statsByNodes[executionId];
+                  } else {
+                    statsByNodes[executionId] = executionEntry;
+                  }
+                  timeSeriesResponse.matrix[i].forEach((bucket) => {
+                    if (bucket) {
+                      const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+                      executionEntry.statuses[status] = newCount;
+                    }
+                  });
+                });
+                let series = Array.from(allStatuses).map((status) => {
+                  let color = this._statusColors[status as Status];
+                  const fill = color + 'cc';
+                  const s: TSChartSeries = {
+                    id: status,
+                    scale: 'y',
+                    labelItems: [status],
+                    legendName: status,
+                    data: executions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
+                    width: 1,
+                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+                      this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                    stroke: color,
+                    fill: fill,
+                    paths: this.bars,
+                    points: { show: false },
+                    show: true,
+                  };
+                  return s;
+                });
+                this.cumulateSeriesData(series);
+                return this.createTestCasesChart(executions, series);
+              }),
+            );
+          }
+        }),
+        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
+      );
+    }),
+  );
+
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -320,15 +442,19 @@ export class SchedulerPageComponent extends SchedulerPageStateService {
 
   constructor() {
     super();
-    const urlParams = this._urlParamsService.collectUrlParams();
-    this.updateTimeAndRefresh(urlParams);
+    // const urlParams = this._urlParamsService.collectUrlParams();
     // this.refresh$.subscribe(() => {
     //   this.refreshCharts(this._taskId, this.timeRange()!);
     // });
     // this.subscribeToUrlNavigation();
   }
 
-  getDashboardFilters(): Partial<FilterBarItem>[] {
+  ngOnInit(): void {
+    const urlParams = this._urlParamsService.collectUrlParams();
+    this.updateTimeAndRefresh(urlParams);
+  }
+
+  getDashboardFilters(): FilterBarItem[] {
     return [
       { attributeName: 'taskId', type: FilterBarItemType.TASK, searchEntities: [{ searchValue: this._taskIdFn() }] },
     ];
@@ -350,11 +476,11 @@ export class SchedulerPageComponent extends SchedulerPageStateService {
   }
 
   private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
-    if (urlParams.refreshInterval !== undefined) {
-      this.refreshInterval.set(urlParams.refreshInterval);
-    } else {
-      this.refreshInterval.set(5000);
+    console.log('received url params', urlParams);
+    if (urlParams.refreshInterval === undefined) {
+      urlParams.refreshInterval = 5000;
     }
+    this.refreshInterval.set(urlParams.refreshInterval!);
     if (urlParams.timeRange) {
       let urlTimeRange = urlParams.timeRange!;
       // if (urlTimeRange.type === 'RELATIVE') {
@@ -415,6 +541,49 @@ export class SchedulerPageComponent extends SchedulerPageStateService {
       },
     ];
 
+    return {
+      title: '',
+      showLegend: false,
+      showDefaultLegend: true,
+      xAxesSettings: {
+        time: false,
+        label: 'Execution',
+        show: false,
+        values: executions.map((item, i) => i),
+        valueFormatFn: (uPlot, rawValue, seriesIdx, idx) => {
+          return executions[idx].description!;
+        },
+      },
+      cursor: {
+        lock: true,
+      },
+      scales: {
+        y: {
+          range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
+            return [0, initMax];
+          },
+        },
+      },
+      series: series,
+      tooltipOptions: {
+        enabled: true,
+      },
+      axes: axes,
+      bands: this.getDefaultBands(series.length),
+      zoomEnabled: false,
+    };
+  }
+
+  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
+    const axes: Axis[] = [
+      {
+        size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+        scale: 'y',
+        values: (u, vals) => {
+          return vals;
+        },
+      },
+    ];
     return {
       title: '',
       showLegend: false,

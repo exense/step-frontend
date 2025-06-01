@@ -17,7 +17,10 @@ export abstract class SchedulerPageStateService {
   abstract readonly summaryData$: Observable<ReportNodeSummary>;
   abstract readonly executionsChartSettings$: Observable<TSChartSettings>;
   abstract readonly keywordsChartSettings$: Observable<{ chartSettings: TSChartSettings; lastExecutions: Execution[] }>;
-  // abstract readonly testCasesChartSettings$: Observable<TSChartSettings>;
+  abstract readonly testCasesChartSettings$: Observable<{
+    chartSettings: TSChartSettings | null;
+    lastExecutions: Execution[];
+  }>;
 
-  abstract getDashboardFilters(): Partial<FilterBarItem>[];
+  abstract getDashboardFilters(): FilterBarItem[];
 }

@@ -51,8 +51,8 @@ export class TimeRangePickerComponent implements OnInit {
   dateTimeInputsLocked = false;
 
   protected mainPickerLabel = computed(() => {
-    console.log('active selection changed');
     const selection = this.activeSelection();
+    console.log('active selection changed', selection);
     if (!selection) {
       return;
     }
