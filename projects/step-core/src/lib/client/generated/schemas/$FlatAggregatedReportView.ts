@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export const $AggregatedReportView = {
+export const $FlatAggregatedReportView = {
   properties: {
     artefact: {
       type: 'AbstractArtefact',
@@ -15,18 +15,6 @@ export const $AggregatedReportView = {
         type: 'number',
         format: 'int64',
       },
-    },
-    children: {
-      type: 'array',
-      contains: {
-        type: 'AggregatedReportView',
-      },
-    },
-    hasDescendantInvocations: {
-      type: 'boolean',
-    },
-    parentSource: {
-      type: 'Enum',
     },
     singleInstanceReportNode: {
       type: 'ReportNode',

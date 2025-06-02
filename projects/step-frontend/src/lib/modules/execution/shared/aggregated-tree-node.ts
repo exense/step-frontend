@@ -14,4 +14,5 @@ export interface AggregatedTreeNode
   nodeType: AggregatedTreeNodeType;
   artefactId?: string;
   artefactHash?: string;
+  hasDescendantInvocations?: boolean;
 }
