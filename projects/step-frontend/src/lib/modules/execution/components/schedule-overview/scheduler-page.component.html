@@ -5,22 +5,33 @@
         <entity-icon entityName="tasks" [entity]="task"></entity-icon>
 
         <div>{{ task.attributes?.['name'] }}</div>
-        <!--        @if (execution.executionParameters?.repositoryObject; as repositoryParams) {-->
-        <!--          @if (repositoryParams.repositoryID !== 'local') {-->
-        <!--            <step-alt-execution-repository [repositoryParams]="repositoryParams" />-->
-        <!--          }-->
-        <!--        }-->
-        <!--        @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {-->
-        <!--          <a-->
-        <!--            class="plan-link"-->
-        <!--            routerLink="/plans/editor/{{ execution.planId }}"-->
-        <!--            matTooltip="Navigate to plan"-->
-        <!--            matTooltipPosition="right"-->
-        <!--          >-->
-        <!--            <step-icon name="external-link" />-->
-        <!--          </a>-->
-        <!--        }-->
+        @if (lastExecution$ | async; as lastExecution) {
+          <a
+            class="plan-link"
+            routerLink="/plans/editor/{{ lastExecution.planId }}"
+            matTooltip="Navigate to plan"
+            matTooltipPosition="right"
+          >
+            <step-icon name="external-link" />
+          </a>
+        }
       </h3>
+    </div>
+    <div class="sub-title">
+      @if (lastExecution$ | async; as lastExecution) {
+        <step-alt-execution-time
+          [startTime]="lastExecution.startTime"
+          [endTime]="lastExecution.endTime"
+          [isRunning]="lastExecution.status === 'RUNNING'"
+        />
+        <step-status [status]="lastExecution?.result" [iconMode]="false" />
+      }
+      <button type="button" mat-icon-button color="default" [matTooltip]="'Cron expression: ' + task.cronExpression">
+        <step-icon name="clock" />
+      </button>
+      <!--      @if (displayStatus$ | async; as status) {-->
+      <!--        <step-status [status]="status" [iconMode]="true" />-->
+      <!--      }-->
     </div>
     <div class="controls">
       <step-autorefresh-toggle
@@ -41,7 +52,7 @@
   }
 </section>
 
-<section class="main tabs-container">
+<section class="main">
   <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
   <router-outlet />
 </section>

@@ -437,7 +437,7 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'cross-executions/:id',
+      path: 'scheduler/:id',
       component: SchedulerPageComponent,
       children: [
         {
