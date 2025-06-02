@@ -5,7 +5,13 @@ import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMa
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
 import { Router } from '@angular/router';
 import { AdditionalRightRuleService } from './additional-right-rule.service';
-import { AppConfigContainerService, Mutable, SESSION_STORAGE } from '../../basics/step-basics.module';
+import {
+  AppConfigContainerService,
+  GlobalReloadService,
+  Mutable,
+  Reloadable,
+  SESSION_STORAGE,
+} from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
 import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
@@ -19,7 +25,7 @@ const ANONYMOUS = 'anonymous';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
+export class AuthService implements OnDestroy, Reloadable {
   private _router = inject(Router);
   private _document = inject(DOCUMENT);
 
@@ -29,6 +35,7 @@ export class AuthService implements OnDestroy {
   private _credentialsService = inject(CredentialsService);
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
+  private _globalReloadService = inject(GlobalReloadService);
 
   private triggerRightCheckInternal$ = new BehaviorSubject<unknown>(undefined);
 
@@ -55,6 +62,10 @@ export class AuthService implements OnDestroy {
     map(() => this._serviceContext?.conf?.debug || false),
     shareReplay(1),
   );
+
+  constructor() {
+    this._globalReloadService.register(this);
+  }
 
   private setContextFromSession(session: SessionDto): void {
     const context: AuthContext = {
@@ -204,9 +215,14 @@ export class AuthService implements OnDestroy {
     this.triggerRightCheckInternal$.next(undefined);
   }
 
+  reload(): void {
+    this.triggerRightCheck();
+  }
+
   ngOnDestroy(): void {
     this.contextInternal$.complete();
     this.triggerRightCheckInternal$.complete();
+    this._globalReloadService.unRegister(this);
   }
 
   private redirectToOidc(): void {

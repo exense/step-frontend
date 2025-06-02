@@ -10,6 +10,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  ViewEncapsulation,
 } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { ItemWidthRegisterService } from '../../injectables/item-width-register.service';
@@ -29,6 +30,7 @@ import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.modul
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -85,7 +87,8 @@ export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit
     let itemsToDisplay = widthKeys.length;
     for (let [i, widthKey] of widthKeys.entries()) {
       const width = this.itemWidths.get(widthKey) ?? 0;
-      totalWidth += width;
+      const gap = i < widthKeys.length - 1 ? 10 : 0;
+      totalWidth += width + gap;
       if (totalWidth > possibleWidth) {
         itemsToDisplay = i;
         break;

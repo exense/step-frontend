@@ -8,6 +8,7 @@ import {
   TablePersistenceStateService,
   TableSearch,
   TableStorageService,
+  TableMemoryStorageService,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -17,7 +18,6 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
 import { map, Observable, of } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
-import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 
 @Component({
