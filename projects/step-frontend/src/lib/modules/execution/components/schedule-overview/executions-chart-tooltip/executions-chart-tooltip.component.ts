@@ -3,20 +3,13 @@ import {
   ChangeDetectorRef,
   Component,
   computed,
-  effect,
   inject,
   input,
-  OnInit,
   Signal,
+  ViewEncapsulation,
 } from '@angular/core';
 import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
-import {
-  Execution,
-  ExecutionsService,
-  SortDirection,
-  TableApiWrapperService,
-  TableRequestData,
-} from '@exense/step-core';
+import { ExecutionsService, TableApiWrapperService } from '@exense/step-core';
 import { TSChartSeries } from '../../../../timeseries/modules/chart';
 
 interface TransformedSeries {
@@ -37,6 +30,7 @@ interface ExecutionItem {
   templateUrl: './executions-chart-tooltip.component.html',
   styleUrls: ['./executions-chart-tooltip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionsChartTooltipComponent {
   private _tableApiWrapper = inject(TableApiWrapperService);

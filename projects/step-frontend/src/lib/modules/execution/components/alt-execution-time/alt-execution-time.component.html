@@ -9,6 +9,9 @@
       }
     </section>
     <step-popover-content>
+      @if (popoverTitle()) {
+        <div class="popover-title">{{ popoverTitle() }}</div>
+      }
       <step-duration-description [startTime]="startTimeInput()" [endTime]="endTime()" [isRunning]="isRunning()" />
     </step-popover-content>
   </step-popover>

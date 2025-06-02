@@ -21,12 +21,9 @@ import {
   TimeRange,
   TimeUnit,
   AugmentedTimeSeriesService,
-  SchedulerOverviewTaskChangeService,
-  ExecutiontTaskParameters,
 } from '@exense/step-core';
 import { debounceTime, filter, map, Observable, of, shareReplay, Subject, switchMap } from 'rxjs';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
 import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
 import { Status } from '../../../_common/shared/status.enum';
 import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';

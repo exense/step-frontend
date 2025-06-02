@@ -153,11 +153,11 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     shareReplay(1),
   ) as Observable<TimeRange>;
 
-  readonly lastExecution$ = this.taskId$.pipe(
+  readonly lastExecution$: Observable<{ execution: Execution | null }> = this.taskId$.pipe(
     switchMap((taskId) => {
       return this._executionService
         .getLastExecutionsByTaskId(taskId, 1, undefined, undefined)
-        .pipe(map((executions) => executions[0]));
+        .pipe(map((executions) => ({ execution: executions[0] || null })));
     }),
   );
 
@@ -356,7 +356,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly testCasesChartSettings$ = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
-      console.log('EXECUTIONS', executions);
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
@@ -381,8 +380,8 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                 let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
                 if (timeSeriesResponse.matrixKeys.length === 0) {
-                  // don't display the chart when there are no test cases data
-                  return null;
+                  // add a default series when there is no data
+                  allStatuses.add('PASSED');
                 }
                 timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
                   // const nodeName = attributes['name'];
@@ -430,6 +429,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                   return s;
                 });
                 this.cumulateSeriesData(series);
+                console.log(series);
                 return this.createTestCasesChart(executions, series);
               }),
             );
@@ -490,7 +490,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
     console.log('received url params', urlParams);
     if (urlParams.refreshInterval === undefined) {
-      urlParams.refreshInterval = 5000;
+      urlParams.refreshInterval = 0;
     }
     this.refreshInterval.set(urlParams.refreshInterval!);
     if (urlParams.timeRange) {
@@ -615,7 +615,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       scales: {
         y: {
           range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-            return [0, initMax];
+            return [0, initMax || 10];
           },
         },
       },
