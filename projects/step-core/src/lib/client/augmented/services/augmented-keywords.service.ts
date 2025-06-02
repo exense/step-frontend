@@ -2,7 +2,7 @@ import { HttpClient, HttpEvent } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of, OperatorFunction, tap } from 'rxjs';
 import { Execution, KeywordsService } from '../../generated';
-import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table/step-table-client.module';
+import { StepDataSource, TableRemoteDataSourceFactoryService } from '../../table';
 import { Keyword } from '../shared/keyword';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';

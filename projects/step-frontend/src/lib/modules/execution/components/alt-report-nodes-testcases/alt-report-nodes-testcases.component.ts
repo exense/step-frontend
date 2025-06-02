@@ -8,12 +8,11 @@ import {
   TablePersistenceStateService,
   TableSearch,
   TableStorageService,
-  TreeStateService,
+  TableMemoryStorageService,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
 import { BaseAltReportNodeTableContentComponent } from '../alt-report-node-table-content/base-alt-report-node-table-content.component';
-import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';

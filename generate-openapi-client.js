@@ -43,6 +43,30 @@ function provideHttpContextFeatureToRequest() {
   }
 }
 
+function extractOpenApiConfig() {
+  const MODULE = `${GENERATED_CODE_LOCATION}/${CLIENT_MODULE_NAME}.ts`;
+  const PROVIDER = `${GENERATED_CODE_LOCATION}/open-api-config.provider.ts`;
+  const beginStr = shell.grep('-n', 'provide: OpenAPI', MODULE).toString();
+  const endStr = shell.grep('-n', 'as OpenAPIConfig', MODULE).toString();
+  const begin = parseInt(beginStr.split(':')[0]);
+  const end = parseInt(endStr.split(':')[0]);
+
+  const data = shell
+    .head({ '-n': end }, MODULE)
+    .tail({ '-n': end - begin + 1 })
+    .toString();
+
+  const result =
+    `import { Provider } from '@angular/core';\n` +
+    `import type {OpenAPIConfig} from './core/OpenAPI';\n` +
+    `import {OpenAPI} from './core/OpenAPI';\n\n` +
+    `export const OPEN_API_CONFIG_PROVIDER: Provider = {\n` +
+    data +
+    `};\n`;
+
+  shell.echo(result).to(PROVIDER);
+}
+
 async function main() {
   //downloading file before executing openapi to make sure it is already generated in the BE
   await fetchSchema();
@@ -60,6 +84,7 @@ async function main() {
   });
 
   provideHttpContextFeatureToRequest();
+  extractOpenApiConfig();
 
   shell.sed('-i', '.*Service.*', '', `${GENERATED_CODE_LOCATION}/${CLIENT_MODULE_NAME}.ts`);
   shell.sed('-i', '/rest', 'rest', `${GENERATED_CODE_LOCATION}/StepGeneratedClientModule.ts`);

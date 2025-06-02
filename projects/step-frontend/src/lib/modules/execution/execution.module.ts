@@ -143,6 +143,7 @@ import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
+import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
 
 @NgModule({
   declarations: [
@@ -244,6 +245,7 @@ import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-deta
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
     DashboardPageComponent,
+    ToggleRequestWarningDirective,
   ],
   exports: [
     ExecutionListComponent,

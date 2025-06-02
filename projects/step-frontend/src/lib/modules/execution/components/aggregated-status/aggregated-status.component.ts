@@ -26,29 +26,47 @@ export class AggregatedStatusComponent {
 
   readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
+  readonly hasDescendantInvocations = input<boolean | undefined>(false);
   readonly statusFilter = input<Status[]>([]);
 
-  protected readonly statusItems = computed(() => {
+  private allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
-    const statusFilter = this.statusFilter();
-    let result = Object.entries(countByStatus)
+    return Object.entries(countByStatus)
       .map(([status, count]) => this.createStatusItem(status, count))
       .filter((item) => !!item) as StatusItem[];
+  });
+
+  protected readonly filteredStatusItems = computed(() => {
+    const allStatuses = this.allStatusItems();
+    const statusFilter = this.statusFilter();
+
     if (statusFilter?.length) {
-      result = result.filter((item) => statusFilter.includes(item.status));
+      return allStatuses.filter((item) => statusFilter.includes(item.status));
     }
-    return result;
+    return allStatuses;
   });
 
   protected readonly singleStatus = computed(() => {
-    const items = this.statusItems();
+    const items = this.filteredStatusItems();
     if (items.length === 1 && items[0].count === 1) {
       return items[0];
     }
     return undefined;
   });
 
-  protected readonly isEmptyStatus = computed(() => !this.statusItems().length);
+  protected readonly isEmptyStatus = computed(() => !this.filteredStatusItems().length);
+
+  protected readonly emptyStatusMessage = computed(() => {
+    const isEmptyStatus = this.isEmptyStatus();
+    const hasDescendantInvocations = this.hasDescendantInvocations();
+    if (!isEmptyStatus) {
+      return '';
+    }
+
+    return hasDescendantInvocations
+      ? 'Execution incomplete — this node may be excluded due to partial tree selection or active filters.'
+      : 'No execution — this node may run later, be skipped by workflow logic, or be excluded by partial tree selection or filters.';
+  });
 
   protected handleClick({ status, count }: StatusItem, event: MouseEvent): void {
     this.statusClick.emit({ status, count, event });
