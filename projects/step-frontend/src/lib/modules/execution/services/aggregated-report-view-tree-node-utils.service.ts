@@ -74,6 +74,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       artefactHash: item.artefactHash,
       countByStatus: item.countByStatus,
       nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
+      hasDescendantInvocations: item.hasDescendantInvocations,
     };
   }
 
