@@ -53,35 +53,11 @@ export class TimeRangePickerComponent implements OnInit {
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
-  otherOptionSelected = signal<boolean>(false);
   otherOptionValue = model<number | undefined>(undefined);
   otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
 
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
-
-  // private handleSelectionChange = effect(() => {
-  //   // return;
-  //   const selection = this.activeSelection();
-  //   const selectOptions = this.selectOptions();
-  //   if (selection && selection.type === 'RELATIVE') {
-  //     const existingOption = selectOptions.find(
-  //       (opt) => opt.type === 'RELATIVE' && opt.relativeSelection?.timeInMs === selection.relativeSelection?.timeInMs,
-  //     );
-  //     untracked(() => {
-  //       if (!existingOption) {
-  //         // Custom relative selection
-  //
-  //       } else {
-  //         this.otherOptionSelected.set(false);
-  //       }
-  //     });
-  //   }
-  // });
-
-  selectOtherOption() {
-    this.otherOptionSelected.set(true);
-  }
 
   protected mainPickerLabel = computed(() => {
     const selection = this.activeSelection();
@@ -95,11 +71,6 @@ export class TimeRangePickerComponent implements OnInit {
     }
 
     if (selection.type === 'RELATIVE') {
-      const label = selection.relativeSelection?.label;
-      if (label) {
-        return label;
-      }
-
       let convertedValue = this.convertMsValue(selection.relativeSelection!.timeInMs);
 
       return `Last ${convertedValue.value} ${this.TIME_UNIT_LABELS[convertedValue.unit]}`;
@@ -120,14 +91,12 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   applyRelativeTimeRange() {
-    if (this.otherOptionSelected()) {
-      let unit: TimeUnit = this.otherOptionUnit()!;
-      let value = this.otherOptionValue();
-      if (!unit || !value) {
-        return;
-      }
-      this.draftSelection.set({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
+    let unit: TimeUnit = this.otherOptionUnit()!;
+    let value = this.otherOptionValue();
+    if (!unit || !value) {
+      return;
     }
+    this.draftSelection.set({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
     this.emitSelectionChange(this.draftSelection()!);
     this.closeMenu();
   }
@@ -154,17 +123,15 @@ export class TimeRangePickerComponent implements OnInit {
 
   handleMenuClose() {
     this.dateTimeInputsLocked = false;
-    this.otherOptionSelected.set(false);
   }
 
   handleMenuOpen() {
     // make sure fresh data is displayed
     let activeSelection = this.activeSelection();
-    this.draftSelection.set(activeSelection);
-    if (activeSelection.type === 'RELATIVE' && !activeSelection.relativeSelection!.label) {
+    this.draftSelection.set({ ...activeSelection });
+    if (activeSelection.type === 'RELATIVE') {
       // we deal with a custom relative range
       const convertedValue = this.convertMsValue(activeSelection.relativeSelection!.timeInMs);
-      this.otherOptionSelected.set(true);
       this.otherOptionValue.set(convertedValue.value);
       this.otherOptionUnit.set(convertedValue.unit);
     }
@@ -217,7 +184,6 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   applyAbsoluteInterval() {
-    this.otherOptionSelected.set(false);
     let from = 0;
     let to = 0;
     const fromDate = TimeSeriesUtils.parseFormattedDate(this.fromDateString);
@@ -267,24 +233,12 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
-    this.otherOptionSelected.set(false);
-    if (option.type === 'RELATIVE') {
-      if (option.relativeSelection!.timeInMs === this.draftSelection()?.relativeSelection?.timeInMs) {
-        return;
-      }
-    } else if (option.type === 'FULL') {
-      const selectionFrom = option.absoluteSelection?.from;
-      const selectionTo = option.absoluteSelection?.to;
-      if (selectionFrom) {
-        // this.fromDate = DateTime.fromMillis(selectionFrom!);
-        // this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(selectionFrom!));
-      }
-      if (selectionTo) {
-        // this.toDate = DateTime.fromMillis(selectionTo!);
-        // this.toDateString = TimeSeriesUtils.formatInputDate(new Date(selectionTo!));
-      }
-    }
     this.draftSelection.set(option);
+    if (option.type === 'RELATIVE') {
+      const convertedValue = this.convertMsValue(option.relativeSelection!.timeInMs);
+      this.otherOptionUnit.set(convertedValue.unit);
+      this.otherOptionValue.set(convertedValue.value);
+    }
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {
