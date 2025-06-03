@@ -1,21 +1,49 @@
-@for (item of _treeState.flatTree(); track item.id) {
-  <div
-    draggable="false"
-    (mousedown)="_treeState.selectNode(item, $event, true)"
-    (dblclick)="handleDblClick(item, $event)"
+@if (hasVirtualScroll()) {
+  <cdk-virtual-scroll-viewport
+    class="virtual-scroll-container"
+    [style.--style__height]="_stepTreeVirtualScroll!.containerHeight()"
+    orientation="vertical"
   >
-    @if (treeNodeTemplate(); as treeNode) {
-      <ng-container
-        *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
-      />
-    } @else {
-      <step-tree-node
-        [class.context-menu-open]="item.id === openedMenuNodeId"
-        [node]="item"
-        (contextMenu)="openContextMenu($event)"
-      />
-    }
-  </div>
+    <ng-container *cdkVirtualFor="let item of _treeState.flatTree(); trackBy: itemTrackBy">
+      <div
+        draggable="false"
+        (mousedown)="_treeState.selectNode(item, $event, true)"
+        (dblclick)="handleDblClick(item, $event)"
+      >
+        @if (treeNodeTemplate(); as treeNode) {
+          <ng-container
+            *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
+          />
+        } @else {
+          <step-tree-node
+            [class.context-menu-open]="item.id === openedMenuNodeId"
+            [node]="item"
+            (contextMenu)="openContextMenu($event)"
+          />
+        }
+      </div>
+    </ng-container>
+  </cdk-virtual-scroll-viewport>
+} @else {
+  @for (item of _treeState.flatTree(); track item.id) {
+    <div
+      draggable="false"
+      (mousedown)="_treeState.selectNode(item, $event, true)"
+      (dblclick)="handleDblClick(item, $event)"
+    >
+      @if (treeNodeTemplate(); as treeNode) {
+        <ng-container
+          *ngTemplateOutlet="treeNode.templateRef; context: { $implicit: item, originalNode: item | originalNode }"
+        />
+      } @else {
+        <step-tree-node
+          [class.context-menu-open]="item.id === openedMenuNodeId"
+          [node]="item"
+          (contextMenu)="openContextMenu($event)"
+        />
+      }
+    </div>
+  }
 }
 <div
   #nodeContextMenuTrigger

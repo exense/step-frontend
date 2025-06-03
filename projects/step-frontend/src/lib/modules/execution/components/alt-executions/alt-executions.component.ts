@@ -115,7 +115,6 @@ export class AltExecutionsComponent implements OnInit, ExecutionTabManagerServic
         this._customMenuEntries.add(MENU_ENTRY_ID, executionUrl, ExecutionNamePipe.transform(execution), {
           isCleanupOnReload: true,
         });
-
       });
   }
 }
