@@ -37,7 +37,7 @@ import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { ResourceInputModule } from './modules/resource-input/resource-input.module';
-import { FunctionActionsService, KeywordsCommonModule } from './modules/keywords-common/keywords-common.module';
+import { FunctionActionsService } from './modules/keywords-common';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
 import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
@@ -75,6 +75,7 @@ import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
 import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
+import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
 
 @NgModule({
   declarations: [
@@ -121,7 +122,7 @@ import { SEARCH_EXPORTS } from './modules/search';
     DynamicFormsModule,
     JsonViewerModule,
     ResourceInputModule,
-    KeywordsCommonModule,
+    KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     WizardModule,
     CronModule,
@@ -184,7 +185,7 @@ import { SEARCH_EXPORTS } from './modules/search';
     LockColumnContainerComponent,
     WaitingArtefactsAdvancedComponent,
     ResourceInputModule,
-    KeywordsCommonModule,
+    KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
     ResourceInputWrapperComponent,
@@ -294,7 +295,7 @@ export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/json-viewer-ext';
 export * from './modules/resource-input/resource-input.module';
-export * from './modules/keywords-common/keywords-common.module';
+export * from './modules/keywords-common';
 export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
 export * from './modules/cron/cron.module';

@@ -11,7 +11,6 @@ import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-source-dialog.component';
-import { PlanEditorAttributesDirective } from './directives/plan-editor-attributes.directive';
 import { PlanNodesDragPreviewComponent } from './components/plan-nodes-drag-preview/plan-nodes-drag-preview.component';
 import { PlanDropInfoPipe } from './pipes/plan-drop-info.pipe';
 import { KeywordDropInfoPipe } from './pipes/keyword-drop-info.pipe';
@@ -28,7 +27,6 @@ import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
     PlanEditorKeyHandlerDirective,
     PlanAlertsComponent,
     PlanSourceDialogComponent,
-    PlanEditorAttributesDirective,
     PlanNodesDragPreviewComponent,
     ArtefactDropInfoPipe,
     KeywordDropInfoPipe,
@@ -40,7 +38,6 @@ import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
     PlanCommonTreeEditorFormComponent,
     PlanEditorKeyHandlerDirective,
     PlanSourceDialogComponent,
-    PlanEditorAttributesDirective,
   ],
 })
 export class PlanEditorModule {

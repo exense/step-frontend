@@ -7,7 +7,7 @@ import {
   MultipleProjectsService,
   DialogsService,
 } from '../modules/basics/step-basics.module';
-import { FunctionActionsService } from '../modules/keywords-common/keywords-common.module';
+import { FunctionActionsService } from '../modules/keywords-common';
 
 @Injectable({
   providedIn: 'root',

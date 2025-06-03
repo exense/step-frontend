@@ -55,17 +55,26 @@
   th.mat-mdc-header-cell:first-of-type,
   td.mat-mdc-cell:first-of-type,
   td.mat-mdc-footer-cell:first-of-type {
-    padding-left: 0;
+    padding-left: 0 !important;
   }
 
   th.mat-mdc-header-cell:last-of-type,
   td.mat-mdc-cell:last-of-type,
   td.mat-mdc-footer-cell:last-of-type {
-    padding-right: 0;
+    padding-right: 0 !important;
   }
 }
 
-@mixin paddingless-edges {
+@mixin paddingless-cells {
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell,
+  td.mat-mdc-footer-cell {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+  }
+}
+
+@mixin paddingless-top-bottom-edges {
   th.mat-mdc-header-cell,
   td.mat-mdc-cell,
   td.mat-mdc-footer-cell {
@@ -91,25 +100,25 @@ step-table {
   th.mat-mdc-header-cell,
   td.mat-mdc-cell,
   td.mat-mdc-footer-cell {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
     font-size: 1.2rem;
   }
 
-  &:not(.paddingless):not(.paddingless-full) {
+  &:not(.paddingless):not(.paddingless-all-sides):not(.paddingless-cells):not(.paddingless-full) {
     tr > td.mat-mdc-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions),
     tr > th.mat-mdc-header-cell:not(:first-of-type):not(:last-of-type):not(.mat-mdc-column-actions) {
-      padding: 8px;
+      padding: 0.8rem;
     }
 
     tr > td.mat-mdc-cell:first-of-type:not(.mat-mdc-column-actions),
     tr > th.mat-mdc-header-cell:first-of-type:not(.mat-mdc-column-actions) {
-      padding: 8px 8px 8px 24px;
+      padding: 0.8rem 0.8rem 0.8rem 2.4rem;
     }
 
     tr > td.mat-mdc-cell:last-of-type:not(.mat-mdc-column-actions),
     tr > th.mat-mdc-header-cell:last-of-type:not(.mat-mdc-column-actions) {
-      padding: 8px 24px 8px 8px;
+      padding: 0.8rem 2.4rem 0.8rem 0.8rem;
     }
   }
 
@@ -117,9 +126,19 @@ step-table {
     @include paddingless-sides;
   }
 
+  &.paddingless-all-sides {
+    @include paddingless-sides;
+    @include paddingless-top-bottom-edges;
+  }
+
+  &.paddingless-cells {
+    @include paddingless-cells;
+  }
+
   &.paddingless-full {
     @include paddingless-sides;
-    @include paddingless-edges;
+    @include paddingless-cells;
+    @include paddingless-top-bottom-edges;
   }
 
   &.no-border {

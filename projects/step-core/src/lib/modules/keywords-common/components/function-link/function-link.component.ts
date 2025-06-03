@@ -3,11 +3,14 @@ import { Keyword } from '../../../../client/step-client-module';
 import { CustomComponent } from '../../../custom-registeries/shared/custom-component';
 import { BaseFunctionLinkComponent } from './base-function-link.component';
 import { Router } from '@angular/router';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-function-link',
   templateUrl: './function-link.component.html',
   styleUrls: ['./function-link.component.scss'],
+  imports: [StepBasicsModule],
+  standalone: true,
 })
 export class FunctionLinkComponent extends BaseFunctionLinkComponent implements CustomComponent {
   private _router = inject(Router);

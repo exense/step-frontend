@@ -8,6 +8,7 @@ import { ArtefactChildContainerSettingsComponent } from './components/artefact-c
 import { ArtefactDetailsComponent } from './components/artefact-details/artefact-details.component';
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { SourcePlanEditorComponent } from './components/source-plan-editor/source-plan-editor.component';
+import { PlanEditorAttributesDirective } from './directives/plan-editor-attributes.directive';
 
 export * from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/select-plan/select-plan.component';
@@ -17,6 +18,8 @@ export * from './components/artefact-child-container-settings/artefact-child-con
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/plan-tree/plan-tree.component';
 export * from './components/source-plan-editor/source-plan-editor.component';
+
+export * from './directives/plan-editor-attributes.directive';
 
 export * from './injectables/plan-artefact-resolver.service';
 export * from './injectables/plan-by-id-cache.service';
@@ -52,4 +55,5 @@ export const PLAN_COMMON_EXPORTS = [
   ArtefactDetailsComponent,
   PlanTreeComponent,
   SourcePlanEditorComponent,
+  PlanEditorAttributesDirective,
 ];

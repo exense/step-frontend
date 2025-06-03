@@ -1,7 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideStepApi, StepCoreModule, BaseHttpRequest, StepHttpRequestService } from '@exense/step-core';
+import {
+  provideStepApi,
+  StepCoreModule,
+  BaseHttpRequest,
+  StepHttpRequestService,
+  KEYWORDS_COMMON_INITIALIZER,
+} from '@exense/step-core';
 import { AdminModule } from './modules/admin/admin.module';
 import { DefaultThemeModule } from './modules/default-theme/default-theme.module';
 import { ExecutionModule } from './modules/execution/execution.module';
@@ -27,7 +33,7 @@ import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-v
 
 Settings.defaultLocale = 'en';
 
-const MODULES_INITIALIZERS = [AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
+const MODULES_INITIALIZERS = [KEYWORDS_COMMON_INITIALIZER, AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
 
 @NgModule({
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
