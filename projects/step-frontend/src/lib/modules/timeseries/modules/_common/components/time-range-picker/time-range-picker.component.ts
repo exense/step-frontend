@@ -91,6 +91,10 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   applyRelativeTimeRange() {
+    if (this.draftSelection()?.type === 'FULL') {
+      this.emitSelectionChange({ type: 'FULL' });
+      return;
+    }
     let unit: TimeUnit = this.otherOptionUnit()!;
     let value = this.otherOptionValue();
     if (!unit || !value) {
