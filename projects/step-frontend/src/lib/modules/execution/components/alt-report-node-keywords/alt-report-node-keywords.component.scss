@@ -30,6 +30,12 @@ step-table {
 
   td.name {
     width: 100%;
+    step-alt-execution-time {
+      margin-right: 2.5rem;
+    }
+    step-artefact-inline-details {
+      margin-left: 2.5rem;
+    }
   }
 }
 
