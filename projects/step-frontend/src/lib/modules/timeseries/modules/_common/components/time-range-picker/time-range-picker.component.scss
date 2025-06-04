@@ -23,6 +23,13 @@
   }
 }
 
+.active {
+  font-weight: 500;
+  color: var.$blue-600;
+  background: var.$gray-100;
+  border-radius: 2rem;
+}
+
 .time-selector-container {
   display: flex;
   flex-direction: row;
@@ -51,17 +58,6 @@
       &.full-range {
         margin: 1.2rem 0;
       }
-
-      &.active {
-        font-weight: 500;
-        color: var.$blue-600;
-        background: var.$gray-100;
-        border-radius: 2rem;
-      }
-
-      &:hover {
-        background: #f1f1f1;
-      }
     }
 
     .custom-time-option {
@@ -80,6 +76,7 @@
         border-bottom: 1px solid grey;
         -moz-appearance: textfield;
         padding: 0 6px;
+        background: transparent;
 
         &:focus {
           border-bottom: 1px solid #b3b3b3;
@@ -98,6 +95,7 @@
         border: 0;
         border-bottom: 1px solid grey;
         width: 8rem;
+        background: transparent;
 
         &:focus {
           border-bottom: 1px solid grey;

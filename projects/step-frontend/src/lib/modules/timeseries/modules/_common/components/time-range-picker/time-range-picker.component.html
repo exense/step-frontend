@@ -73,8 +73,17 @@
           <div (click)="$event.stopPropagation()" style="margin-top: 1rem">
             <div class="custom-time-option" [class.active]="draftSelection()?.type === 'RELATIVE'">
               <span>Last</span>
-              <input [(ngModel)]="otherOptionValue" type="number" />
-              <select [(ngModel)]="otherOptionUnit" id="timeUnit" class="time-unit-select">
+              <input
+                [(ngModel)]="otherOptionValue"
+                type="number"
+                (focus)="onRelativeOrFullSelectionSelected({ type: 'RELATIVE' })"
+              />
+              <select
+                [(ngModel)]="otherOptionUnit"
+                (focus)="onRelativeOrFullSelectionSelected({ type: 'RELATIVE' })"
+                id="timeUnit"
+                class="time-unit-select"
+              >
                 <option *ngFor="let item of timeUnitOptions" [value]="item">
                   {{ TIME_UNIT_LABELS[item] }}
                 </option>

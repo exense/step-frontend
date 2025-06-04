@@ -53,6 +53,7 @@ export class TimeRangePickerComponent implements OnInit {
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
+  otherOptionSelected = signal<boolean>(false);
   otherOptionValue = model<number | undefined>(undefined);
   otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
 
@@ -93,6 +94,7 @@ export class TimeRangePickerComponent implements OnInit {
   applyRelativeTimeRange() {
     if (this.draftSelection()?.type === 'FULL') {
       this.emitSelectionChange({ type: 'FULL' });
+      this.closeMenu();
       return;
     }
     let unit: TimeUnit = this.otherOptionUnit()!;
