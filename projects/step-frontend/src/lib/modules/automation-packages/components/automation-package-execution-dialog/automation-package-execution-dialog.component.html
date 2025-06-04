@@ -1,5 +1,8 @@
 <step-modal-window [title]="title">
   <div step-modal-window-body>
+    @if (executionParameters(); as params) {
+      <step-custom-forms [stModel]="params" stScreen="executionParameters" />
+    }
     <ng-container [formGroup]="executionConfigForm">
       <step-form-field alignLabelAddon="near">
         <step-label>Wrap into TestSet</step-label>
