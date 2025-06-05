@@ -37,12 +37,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/step-app",
+            "outputPath": {
+              "base": "dist/step-app"
+            },
             "index": "projects/step-app/src/index.html",
-            "main": "projects/step-app/src/main.ts",
-            "polyfills": "projects/step-app/src/polyfills.ts",
+            "polyfills": ["projects/step-app/src/polyfills.ts"],
             "tsConfig": "projects/step-app/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -68,8 +69,8 @@
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
-            "commonChunk": false,
-            "allowedCommonJsDependencies": ["ace-builds", "luxon"]
+            "allowedCommonJsDependencies": ["ace-builds", "luxon"],
+            "browser": "projects/step-app/src/main.ts"
           },
           "configurations": {
             "local": {
@@ -98,9 +99,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -109,7 +108,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "@exense/step-app:build:production"
@@ -151,7 +150,7 @@
       "prefix": "step",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "project": "projects/step-core/ng-package.json"
           },
@@ -180,7 +179,7 @@
       "prefix": "step",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "builder": "@angular/build:ng-packagr",
           "options": {
             "project": "projects/step-frontend/ng-package.json"
           },

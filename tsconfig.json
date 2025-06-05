@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "target": "ES2022",
