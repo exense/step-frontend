@@ -8,6 +8,7 @@ import { ForEachArtefact } from '../../types/for-each.artefact';
   templateUrl: './for-each.component.html',
   styleUrls: ['./for-each.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ForEachComponent extends BaseArtefactComponent<ForEachArtefact> {
   protected showHandles = false;

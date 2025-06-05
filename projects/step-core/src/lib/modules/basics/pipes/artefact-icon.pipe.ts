@@ -3,6 +3,7 @@ import { ArtefactService } from '../../artefacts-common/injectables/artefact.ser
 
 @Pipe({
   name: 'artefactIcon',
+  standalone: false,
 })
 export class ArtefactIconPipe implements PipeTransform {
   private _artefactTypes = inject(ArtefactService);

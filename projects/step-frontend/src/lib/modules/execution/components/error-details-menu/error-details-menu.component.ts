@@ -10,6 +10,7 @@ import { catchError, finalize, map, of, switchMap } from 'rxjs';
   templateUrl: './error-details-menu.component.html',
   styleUrls: ['./error-details-menu.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ErrorDetailsMenuComponent {
   private _doc = inject(DOCUMENT);

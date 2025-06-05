@@ -15,6 +15,7 @@ type DialogRef = MatDialogRef<AddSchemaFieldDialogComponent, JsonFieldSchemaMeta
   selector: 'step-add-schema-field-dialog',
   templateUrl: './add-schema-field-dialog.component.html',
   styleUrls: ['./add-schema-field-dialog.component.scss'],
+  standalone: false,
 })
 export class AddSchemaFieldDialogComponent implements OnInit {
   private _fb = inject(FormBuilder).nonNullable;

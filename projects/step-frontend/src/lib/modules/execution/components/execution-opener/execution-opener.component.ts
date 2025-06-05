@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'step-execution-opener',
   templateUrl: './execution-opener.component.html',
   styleUrls: ['./execution-opener.component.scss'],
+  standalone: false,
 })
 export class ExecutionOpenerComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

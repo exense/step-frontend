@@ -27,6 +27,7 @@ import { BulkOperationType } from '../../../basics/types/bulk-operation-type.enu
   selector: 'step-bulk-operations',
   templateUrl: './bulk-operations.component.html',
   styleUrls: ['./bulk-operations.component.scss'],
+  standalone: false,
 })
 export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
   private _injector = inject(Injector);

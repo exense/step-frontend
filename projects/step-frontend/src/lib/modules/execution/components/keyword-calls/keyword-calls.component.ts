@@ -18,6 +18,7 @@ type FieldsAccessor = Mutable<Pick<KeywordCallsComponent, 'showFooter'>>;
   selector: 'step-keyword-calls',
   templateUrl: './keyword-calls.component.html',
   styleUrls: ['./keyword-calls.component.scss'],
+  standalone: false,
 })
 export class KeywordCallsComponent implements OnInit {
   @Input() execution?: Execution;

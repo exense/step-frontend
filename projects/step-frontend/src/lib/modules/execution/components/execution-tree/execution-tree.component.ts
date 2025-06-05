@@ -28,6 +28,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionTreeComponent implements TreeActionsService {
   private _paging = inject(EXECUTION_TREE_PAGING_SETTINGS);

@@ -14,7 +14,6 @@ type Node = ReportNode | AggregatedReportView;
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class ReportNodeIconComponent {
   private _artefactTypes = inject(ArtefactService);

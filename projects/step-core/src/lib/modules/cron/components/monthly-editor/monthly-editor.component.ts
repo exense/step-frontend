@@ -13,6 +13,7 @@ enum MonthlyType {
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class MonthlyEditorComponent {
   @Output() expressionChange = new EventEmitter<string>();

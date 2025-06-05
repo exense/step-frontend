@@ -5,6 +5,7 @@ import { AceMode, CustomComponent } from '@exense/step-core';
   selector: 'step-yaml-plan-editor',
   templateUrl: './yaml-plan-editor.component.html',
   styleUrl: './yaml-plan-editor.component.scss',
+  standalone: false,
 })
 export class YamlPlanEditorComponent implements CustomComponent {
   context?: unknown;

@@ -39,7 +39,6 @@ declare const uPlot: any;
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
   styleUrls: ['./standalone-chart.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
 })
 export class StandaloneChartComponent implements OnChanges {

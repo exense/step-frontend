@@ -8,6 +8,7 @@ type OnTouch = () => void;
   selector: 'step-resource-input-wrapper',
   templateUrl: './resource-input-wrapper.component.html',
   styleUrls: ['./resource-input-wrapper.component.scss'],
+  standalone: false,
 })
 export class ResourceInputWrapperComponent implements ControlValueAccessor {
   @Input() label?: string;

@@ -9,6 +9,7 @@ const SCHEDULER_EXECUTION_USERNAME = 'scheduler_execution_username';
   selector: 'step-scheduler-configuration',
   templateUrl: './scheduler-configuration.component.html',
   styleUrls: ['./scheduler-configuration.component.scss'],
+  standalone: false,
 })
 export class SchedulerConfigurationComponent implements OnInit {
   private _settingsApi = inject(AugmentedSettingsService);

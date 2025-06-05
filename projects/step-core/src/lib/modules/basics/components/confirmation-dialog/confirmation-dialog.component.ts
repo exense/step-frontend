@@ -12,6 +12,7 @@ export type ConfirmationDialogResult = boolean | undefined;
   selector: 'step-confirmation-dialog',
   templateUrl: './confirmation-dialog.component.html',
   styleUrls: ['./confirmation-dialog.component.scss'],
+  standalone: false,
 })
 export class ConfirmationDialogComponent {
   private _dialogRef = inject<MatDialogRef<ConfirmationDialogComponent, ConfirmationDialogResult>>(MatDialogRef);

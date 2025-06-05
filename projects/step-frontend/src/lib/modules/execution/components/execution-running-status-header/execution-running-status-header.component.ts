@@ -18,6 +18,7 @@ const MAX_DISPLAY_COUNT_IN_BADGE = 9;
   styleUrls: ['./execution-running-status-header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionRunningStatusHeaderComponent implements OnChanges {
   @Input() runningExecutionsCount?: number | null;

@@ -93,7 +93,6 @@ interface ProcessedBucketResponse {
   selector: 'step-table-dashlet',
   templateUrl: './table-dashlet.component.html',
   styleUrls: ['./table-dashlet.component.scss'],
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
 })

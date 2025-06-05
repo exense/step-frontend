@@ -7,6 +7,7 @@ import { CustomComponent } from '../../../custom-registeries/shared/custom-compo
   templateUrl: './column-settings-save-dashlet.component.html',
   styleUrl: './column-settings-save-dashlet.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ColumnSettingsSaveDashletComponent implements CustomComponent {
   context?: any;

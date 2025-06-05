@@ -7,6 +7,7 @@ import { ControlDropInfo } from '../../types/control-drop-info.interface';
   selector: 'step-plan-nodes-drag-preview',
   templateUrl: './plan-nodes-drag-preview.component.html',
   styleUrl: './plan-nodes-drag-preview.component.scss',
+  standalone: false,
 })
 export class PlanNodesDragPreviewComponent {
   private _dragDataService = inject(DragDataService);

@@ -1,6 +1,9 @@
 import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 
-@Directive({ selector: '[stepCapsLock]' })
+@Directive({
+  selector: '[stepCapsLock]',
+  standalone: false,
+})
 export class CapsLockDirective {
   @Output('stepCapsLock') capsLock = new EventEmitter<boolean>();
 

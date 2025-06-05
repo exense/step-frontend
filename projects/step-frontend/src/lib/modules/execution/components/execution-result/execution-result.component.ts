@@ -8,6 +8,7 @@ type Result = Execution['result'];
   selector: 'step-execution-result',
   templateUrl: './execution-result.component.html',
   styleUrls: ['./execution-result.component.scss'],
+  standalone: false,
 })
 export class ExecutionResultComponent implements OnChanges {
   @Input() status?: Status;

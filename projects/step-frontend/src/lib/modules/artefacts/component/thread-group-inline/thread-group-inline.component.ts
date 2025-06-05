@@ -16,6 +16,7 @@ import { ThreadGroupReportNode } from '../../types/thread-group.report-node';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ThreadGroupInlineComponent extends BaseInlineArtefactComponent<
   ThreadGroupArtefact,

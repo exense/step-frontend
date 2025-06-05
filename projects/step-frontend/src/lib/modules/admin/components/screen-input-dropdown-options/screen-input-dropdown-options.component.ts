@@ -7,6 +7,7 @@ import { EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
   selector: 'step-screen-input-dropdown-options',
   templateUrl: './screen-input-dropdown-options.component.html',
   styleUrls: ['./screen-input-dropdown-options.component.scss'],
+  standalone: false,
 })
 export class ScreenInputDropdownOptionsComponent {
   readonly activationExpressionFormatter = EXPRESSION_SCRIPT_FORMATTER;

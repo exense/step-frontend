@@ -16,6 +16,7 @@ import { DynamicValuesUtilsService } from '../../basics/step-basics.module';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseInlineArtefactLegacyComponent<
   A extends AbstractArtefact,

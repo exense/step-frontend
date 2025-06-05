@@ -2,6 +2,7 @@ import { Directive, ElementRef, HostListener, inject, Input, OnInit } from '@ang
 
 @Directive({
   selector: '[dynamicInputWidth]',
+  standalone: false,
 })
 export class DynamicInputWidthDirective implements OnInit {
   private _el = inject<ElementRef<HTMLInputElement>>(ElementRef);

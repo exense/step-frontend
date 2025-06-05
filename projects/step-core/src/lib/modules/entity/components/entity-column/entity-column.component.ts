@@ -9,6 +9,7 @@ export type EntityColumnContext = string | { entityName: string; entityPath: str
   selector: 'step-entity-column',
   templateUrl: './entity-column.component.html',
   styleUrls: ['./entity-column.component.scss'],
+  standalone: false,
 })
 export class EntityColumnComponent implements CustomComponent, AfterViewInit {
   private _entityColumnContainer = inject(ColumnContainer);

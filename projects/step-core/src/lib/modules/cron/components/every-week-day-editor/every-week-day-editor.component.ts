@@ -9,6 +9,7 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class EveryWeekDayEditorComponent extends HoursEditorComponent {
   protected override hour = 0;

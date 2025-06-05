@@ -31,6 +31,7 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
       useExisting: forwardRef(() => ResourcesListComponent),
     },
   ],
+  standalone: false,
 })
 export class ResourcesListComponent implements DialogParentService {
   private _resourceDialogs = inject(ResourceDialogsService);

@@ -14,6 +14,7 @@ import { CallPlanArtefact } from '../../types/call-plan.artefact';
   host: {
     class: 'execution-report-node-details',
   },
+  standalone: false,
 })
 export class CallPlanReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<CallPlanArtefact>

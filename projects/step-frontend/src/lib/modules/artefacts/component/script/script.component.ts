@@ -8,6 +8,7 @@ import { ScriptArtefact } from '../../types/script.artefact';
   templateUrl: './script.component.html',
   styleUrls: ['./script.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ScriptComponent extends BaseArtefactComponent<ScriptArtefact> {
   @ViewChild('form')

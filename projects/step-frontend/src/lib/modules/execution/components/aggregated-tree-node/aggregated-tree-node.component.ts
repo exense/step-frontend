@@ -16,6 +16,7 @@ import { ElementSizeService, TreeNodeData } from '@exense/step-core';
       useExisting: forwardRef(() => AggregatedTreeNodeComponent),
     },
   ],
+  standalone: false,
 })
 export class AggregatedTreeNodeComponent implements ElementSizeService {
   private _treeState = inject(AggregatedReportViewTreeStateService);

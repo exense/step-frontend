@@ -8,6 +8,7 @@ export interface DurationPipeParams {
 
 @Pipe({
   name: 'duration',
+  standalone: false,
 })
 export class DurationPipe implements PipeTransform {
   transform(

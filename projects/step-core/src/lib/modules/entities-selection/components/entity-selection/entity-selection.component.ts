@@ -9,6 +9,7 @@ type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelecte
   selector: 'step-entity-selection',
   templateUrl: './entity-selection.component.html',
   styleUrls: ['./entity-selection.component.scss'],
+  standalone: false,
 })
 export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;

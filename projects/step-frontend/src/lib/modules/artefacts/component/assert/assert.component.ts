@@ -23,6 +23,7 @@ const NUMBER_OPERATORS = [
   templateUrl: './assert.component.html',
   styleUrls: ['./assert.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class AssertComponent extends BaseArtefactComponent<AssertArtefact> implements AfterViewInit {
   private _destroyRef = inject(DestroyRef);

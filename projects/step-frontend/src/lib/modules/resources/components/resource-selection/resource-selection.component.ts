@@ -18,6 +18,7 @@ import {
   standalone: true,
   imports: [StepCoreModule],
   providers: [...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  standalone: false,
 })
 export class ResourceSelectionComponent extends BaseEntitySelectionTableComponent {
   private tableRef = viewChild('tableRef', { read: TableComponent<Resource> });

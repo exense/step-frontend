@@ -8,7 +8,6 @@ import { ReportNode, AttachmentMeta, AugmentedResourcesService } from '../../../
   selector: 'step-legacy-attachments',
   templateUrl: './legacy-attachments.component.html',
   styleUrls: ['./legacy-attachments.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule, AttachmentUrlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

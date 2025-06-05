@@ -8,6 +8,7 @@ import { CommonEntitiesUrlsService, ControllerService, DialogsService, ReportNod
   selector: 'step-plan-node-details-dialog',
   templateUrl: './plan-node-details-dialog.component.html',
   styleUrl: './plan-node-details-dialog.component.scss',
+  standalone: false,
 })
 export class PlanNodeDetailsDialogComponent {
   private _api = inject(ControllerService);

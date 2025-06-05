@@ -5,6 +5,7 @@ import { AlertsService } from '../../injectables/alerts.service';
   selector: 'step-alerts-container',
   templateUrl: './alerts-container.component.html',
   styleUrl: './alerts-container.component.scss',
+  standalone: false,
 })
 export class AlertsContainerComponent {
   readonly _alerts = inject(AlertsService).alerts;

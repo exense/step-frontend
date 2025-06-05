@@ -8,6 +8,7 @@ import { SwitchArtefact } from '../../types/switch.artefact';
   templateUrl: './switch.component.html',
   styleUrls: ['./switch.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SwitchComponent extends BaseArtefactComponent<SwitchArtefact> {
   @ViewChild('form')

@@ -35,7 +35,6 @@ import {
   selector: 'step-time-range-picker',
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {

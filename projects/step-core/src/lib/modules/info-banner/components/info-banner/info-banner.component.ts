@@ -10,7 +10,6 @@ import { AuthService } from '../../../auth/injectables/auth.service';
   templateUrl: './info-banner.component.html',
   styleUrl: './info-banner.component.scss',
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class InfoBannerComponent {
   private _auth = inject(AuthService);

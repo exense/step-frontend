@@ -17,6 +17,7 @@ import { ReturnArtefact } from '../../types/return.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ReturnReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ReturnArtefact>> {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);

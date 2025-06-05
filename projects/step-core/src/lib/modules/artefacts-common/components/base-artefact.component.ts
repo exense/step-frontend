@@ -8,6 +8,7 @@ import { DynamicValuesUtilsService, SimpleValue } from '../../basics/step-basics
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseArtefactComponent<T extends AbstractArtefact>
   implements CustomComponent, AfterViewInit, OnDestroy

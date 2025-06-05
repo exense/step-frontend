@@ -12,7 +12,6 @@ type OnTouch = () => void;
   selector: 'step-select-plan',
   templateUrl: './select-plan.component.html',
   styleUrls: ['./select-plan.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
 })
 export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {

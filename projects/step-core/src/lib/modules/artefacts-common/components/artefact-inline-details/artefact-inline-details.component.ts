@@ -13,7 +13,6 @@ import { ArtefactInlineDetailsHeaderDirective } from '../../directives/artefact-
   host: {
     '[class.overflow]': 'overflowContent()',
   },
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
 })
 export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extends ReportNode = ReportNode> {

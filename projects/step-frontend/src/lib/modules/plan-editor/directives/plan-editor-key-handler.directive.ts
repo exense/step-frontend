@@ -16,6 +16,7 @@ import { DOCUMENT } from '@angular/common';
       useExisting: forwardRef(() => PlanEditorKeyHandlerDirective),
     },
   ],
+  standalone: false,
 })
 export class PlanEditorKeyHandlerDirective implements TreeFocusStateService {
   private _authService = inject(AuthService);

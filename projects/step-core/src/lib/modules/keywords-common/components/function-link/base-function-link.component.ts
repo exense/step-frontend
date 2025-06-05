@@ -7,6 +7,7 @@ import { FunctionActionsService } from '../../injectables/function-actions.servi
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseFunctionLinkComponent implements CustomComponent {
   protected _functionActions = inject(FunctionActionsService, { optional: true });

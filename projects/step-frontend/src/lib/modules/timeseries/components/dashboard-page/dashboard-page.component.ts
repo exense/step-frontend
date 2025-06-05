@@ -43,7 +43,6 @@ interface UrlParams {
   selector: 'step-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
-  standalone: true,
   providers: [DashboardUrlParamsService],
   imports: [
     COMMON_IMPORTS,

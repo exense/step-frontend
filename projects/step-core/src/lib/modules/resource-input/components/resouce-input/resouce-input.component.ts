@@ -27,6 +27,7 @@ const MAX_FILES = 1;
   selector: 'step-resource-input',
   templateUrl: './resouce-input.component.html',
   styleUrls: ['./resouce-input.component.scss'],
+  standalone: false,
 })
 export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   private _augmentedResourcesService = inject(AugmentedResourcesService);

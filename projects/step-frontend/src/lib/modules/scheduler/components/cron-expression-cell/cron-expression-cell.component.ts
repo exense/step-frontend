@@ -5,6 +5,7 @@ import { CronExclusion, ExecutiontTaskParameters } from '@exense/step-core';
   selector: 'step-cron-expression-cell',
   templateUrl: './cron-expression-cell.component.html',
   styleUrls: ['./cron-expression-cell.component.scss'],
+  standalone: false,
 })
 export class CronExpressionCellComponent {
   @Input() task?: ExecutiontTaskParameters;

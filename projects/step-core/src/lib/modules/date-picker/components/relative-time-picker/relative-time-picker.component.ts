@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
   selector: 'step-relative-time-picker',
   templateUrl: './relative-time-picker.component.html',
   styleUrl: './relative-time-picker.component.scss',
+  standalone: false,
 })
 export class RelativeTimePickerComponent {
   /** @Input() **/

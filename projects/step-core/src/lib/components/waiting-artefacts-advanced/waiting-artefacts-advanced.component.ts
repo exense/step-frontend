@@ -13,6 +13,7 @@ export interface WaitingArtefactsAdvancedArtefact extends AbstractArtefact {
   templateUrl: './waiting-artefacts-advanced.component.html',
   styleUrls: ['./waiting-artefacts-advanced.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class WaitingArtefactsAdvancedComponent
   extends BaseArtefactComponent<WaitingArtefactsAdvancedArtefact>

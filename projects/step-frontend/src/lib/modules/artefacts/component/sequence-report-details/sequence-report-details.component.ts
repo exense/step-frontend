@@ -14,6 +14,7 @@ import { SequenceArtefact } from '../../types/sequence.artefact';
   host: {
     class: 'execution-report-node-details',
   },
+  standalone: false,
 })
 export class SequenceReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<SequenceArtefact>

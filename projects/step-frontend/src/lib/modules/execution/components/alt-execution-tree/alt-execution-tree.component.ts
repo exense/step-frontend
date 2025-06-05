@@ -31,6 +31,7 @@ enum TreeNodeAction {
       useExisting: forwardRef(() => AltExecutionTreeComponent),
     },
   ],
+  standalone: false,
 })
 export class AltExecutionTreeComponent implements TreeActionsService {
   private _treeSate = inject(TreeStateService);

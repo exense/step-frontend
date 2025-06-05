@@ -11,7 +11,6 @@ import { ArtefactNodeSource } from '../../types/artefact-node-source.enum';
   templateUrl: './artefact-child-container-settings.component.html',
   styleUrl: './artefact-child-container-settings.component.scss',
   imports: [StepMaterialModule, StepIconsModule, DynamicFormsModule, FormsModule],
-  standalone: true,
 })
 export class ArtefactChildContainerSettingsComponent {
   readonly name = input<string>();

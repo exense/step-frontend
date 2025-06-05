@@ -16,6 +16,7 @@ import {
   providers: [
     ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
+  standalone: false,
 })
 export class FunctionPackageSelectionComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);

@@ -15,6 +15,7 @@ import { SetReportNode } from '../../types/set.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SetReportDetailsComponent extends BaseReportDetailsComponent<SetReportNode> {
   private _artefactInlineService = inject(ArtefactInlineItemUtilsService);

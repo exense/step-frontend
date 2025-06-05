@@ -14,6 +14,7 @@ import { CheckArtefact } from '../../types/check.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CheckInlineComponent extends BaseInlineArtefactComponent<CheckArtefact> {
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);

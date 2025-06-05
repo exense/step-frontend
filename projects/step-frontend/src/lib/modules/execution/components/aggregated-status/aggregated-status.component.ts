@@ -15,6 +15,7 @@ export interface StatusItem {
   templateUrl: './aggregated-status.component.html',
   styleUrl: './aggregated-status.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AggregatedStatusComponent {
   readonly countByStatus = input(

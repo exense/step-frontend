@@ -14,6 +14,7 @@ import { RetryIfFailsReportNode } from '../../types/retry-if-fails.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class RetryIfFailsReportDetailsComponent extends BaseReportDetailsComponent<RetryIfFailsReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);
