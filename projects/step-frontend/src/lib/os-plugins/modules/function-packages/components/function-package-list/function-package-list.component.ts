@@ -26,6 +26,7 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
       useExisting: forwardRef(() => FunctionPackageListComponent),
     },
   ],
+  standalone: false,
 })
 export class FunctionPackageListComponent implements DialogParentService {
   private _augApi = inject(AugmentedKeywordPackagesService);

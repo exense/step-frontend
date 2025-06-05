@@ -20,7 +20,9 @@ import { TimeOption, TimeOptionRelativeValue } from '../types/time-option';
 type OnChange<D> = (date?: D | null) => void;
 type OnTouch = () => void;
 
-@Directive({})
+@Directive({
+  standalone: false,
+})
 export abstract class DatePickerBaseDirective<D> implements DateField<D>, OnChanges, ControlValueAccessor {
   private _elRef = inject<ElementRef<HTMLInputElement>>(ElementRef);
   private _dateAdapter = inject<DateAdapterService<D>>(DateAdapterService);

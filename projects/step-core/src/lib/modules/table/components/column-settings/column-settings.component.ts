@@ -12,6 +12,7 @@ interface Column extends Omit<ColumnInfo, 'canHide'> {
   templateUrl: './column-settings.component.html',
   styleUrl: './column-settings.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ColumnSettingsComponent {
   private _tableColumnsDictionary = inject(TableColumnsDictionaryService);

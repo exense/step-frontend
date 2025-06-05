@@ -8,6 +8,7 @@ import { SetArtefact } from '../../types/set.artefact';
   templateUrl: './set.component.html',
   styleUrls: ['./set.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SetComponent extends BaseArtefactComponent<SetArtefact> {
   @ViewChild('form')

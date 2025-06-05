@@ -9,6 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[stepFilterConnect]',
+  standalone: false,
 })
 export class FilterConnectDirective<T = any, CV = T> implements AfterViewInit, OnDestroy {
   private _destroyRef = inject(DestroyRef);

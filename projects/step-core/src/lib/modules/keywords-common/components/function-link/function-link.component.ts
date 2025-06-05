@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
   selector: 'step-function-link',
   templateUrl: './function-link.component.html',
   styleUrls: ['./function-link.component.scss'],
+  standalone: false,
 })
 export class FunctionLinkComponent extends BaseFunctionLinkComponent implements CustomComponent {
   private _router = inject(Router);

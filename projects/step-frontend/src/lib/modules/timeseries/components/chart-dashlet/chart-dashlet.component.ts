@@ -71,7 +71,6 @@ const resolutionLabels: Record<string, string> = {
   selector: 'step-chart-dashlet',
   templateUrl: './chart-dashlet.component.html',
   styleUrls: ['./chart-dashlet.component.scss'],
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     ChartSkeletonComponent,

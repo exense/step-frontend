@@ -13,6 +13,7 @@ export type EnterTextValueDialogResult = string | undefined;
   selector: 'step-enter-text-value-dialog',
   templateUrl: './enter-text-value-dialog.component.html',
   styleUrls: ['./enter-text-value-dialog.component.scss'],
+  standalone: false,
 })
 export class EnterTextValueDialogComponent implements OnInit {
   private _dialogRef = inject<MatDialogRef<EnterTextValueDialogComponent, EnterTextValueDialogResult>>(MatDialogRef);

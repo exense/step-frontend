@@ -8,6 +8,7 @@ import { Synchronized } from '../../types/synchronized.artefact';
   templateUrl: './synchronized.component.html',
   styleUrls: ['./synchronized.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SynchronizedComponent extends BaseArtefactComponent<Synchronized> {
   @ViewChild('form')

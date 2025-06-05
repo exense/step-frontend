@@ -5,6 +5,7 @@ import { PlanContext, ViewRegistryService } from '@exense/step-core';
   selector: 'step-plan-alerts',
   templateUrl: './plan-alerts.component.html',
   styleUrls: ['./plan-alerts.component.scss'],
+  standalone: false,
 })
 export class PlanAlertsComponent {
   @Input() planContext?: PlanContext | null;

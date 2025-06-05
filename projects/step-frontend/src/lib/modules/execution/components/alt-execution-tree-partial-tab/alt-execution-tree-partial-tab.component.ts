@@ -10,6 +10,7 @@ import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-executi
   templateUrl: './alt-execution-tree-partial-tab.component.html',
   styleUrl: './alt-execution-tree-partial-tab.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltExecutionTreePartialTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

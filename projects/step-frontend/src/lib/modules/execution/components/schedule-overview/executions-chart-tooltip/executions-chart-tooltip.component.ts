@@ -37,6 +37,7 @@ interface ExecutionItem {
   templateUrl: './executions-chart-tooltip.component.html',
   styleUrls: ['./executions-chart-tooltip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ExecutionsChartTooltipComponent {
   private _tableApiWrapper = inject(TableApiWrapperService);

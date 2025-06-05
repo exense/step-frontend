@@ -19,7 +19,6 @@ type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRout
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
-  standalone: true,
   imports: [StepCoreModule],
   host: {
     '(keydown.enter)': 'upload()',

@@ -105,7 +105,7 @@
       gap: 0.5rem;
 
       step-icon {
-        color: map-get(var.$statuses, 'FAILED');
+        color: map.get(var.$statuses, 'FAILED');
       }
 
       .error-text {
@@ -166,7 +166,7 @@
           min-width: 95%;
         }
         step-icon {
-          color: map-get(var.$statuses, 'FAILED');
+          color: map.get(var.$statuses, 'FAILED');
         }
       }
 

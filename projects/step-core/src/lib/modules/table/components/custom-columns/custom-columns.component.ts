@@ -39,6 +39,7 @@ import { ScreenDataMetaService } from '../../../basics/injectables/screen-data-m
       useExisting: forwardRef(() => CustomColumnsComponent),
     },
   ],
+  standalone: false,
 })
 export class CustomColumnsComponent
   implements OnInit, OnChanges, OnDestroy, CustomColumnOptions, CustomColumnsBaseComponent, CustomColumnsScreenInputs

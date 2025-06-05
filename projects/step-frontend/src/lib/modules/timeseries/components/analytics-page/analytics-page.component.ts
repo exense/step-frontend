@@ -24,7 +24,6 @@ import { DashboardPageComponent } from '../dashboard-page/dashboard-page.compone
   selector: 'step-analytics-page',
   templateUrl: './analytics-page.component.html',
   styleUrls: ['./analytics-page.component.scss'],
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     DashboardFilterBarComponent,

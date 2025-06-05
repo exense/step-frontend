@@ -44,6 +44,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useExisting: AggregatedReportViewTreeFilterService,
     },
   ],
+  standalone: false,
 })
 export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

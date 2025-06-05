@@ -35,6 +35,7 @@ type OnTouch = () => void;
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AutocompleteInputComponent<T = unknown> implements ControlValueAccessor {
   private _fb = inject(FormBuilder).nonNullable;

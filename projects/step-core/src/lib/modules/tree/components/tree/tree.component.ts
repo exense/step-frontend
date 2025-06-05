@@ -47,7 +47,6 @@ import { TreeAutoChooseVirtualScrollDirective } from '../../directives/tree-auto
       useExisting: forwardRef(() => TreeComponent),
     },
   ],
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
   imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })

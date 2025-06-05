@@ -38,6 +38,7 @@ import { Router } from '@angular/router';
       useExisting: forwardRef(() => PlanListComponent),
     },
   ],
+  standalone: false,
 })
 export class PlanListComponent implements DialogParentService, SchedulerInvokerService {
   private _router = inject(Router);

@@ -23,6 +23,7 @@ import {
     TablePersistenceStateService,
     tablePersistenceConfigProvider('resolvedParametersList', STORE_ALL),
   ],
+  standalone: false,
 })
 export class AltExecutionResolvedParametersComponent {
   private _richEditorDialog = inject(RichEditorDialogService);

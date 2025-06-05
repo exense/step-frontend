@@ -17,6 +17,7 @@ import {
       useExisting: forwardRef(() => FunctionTypeFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class FunctionTypeFilterComponent
   extends ArrayFilterComponent<ItemInfo>

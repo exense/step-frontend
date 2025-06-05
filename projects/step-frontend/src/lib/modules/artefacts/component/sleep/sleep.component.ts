@@ -17,6 +17,7 @@ import { SleepArtefact } from '../../types/sleep.artefact';
   templateUrl: './sleep.component.html',
   styleUrls: ['./sleep.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SleepComponent extends BaseArtefactComponent<SleepArtefact> implements OnDestroy {
   private _converter = inject(TimeConvertersFactoryService).timeConverter();

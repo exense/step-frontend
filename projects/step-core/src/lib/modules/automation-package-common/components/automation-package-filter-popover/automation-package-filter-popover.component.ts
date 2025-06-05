@@ -20,6 +20,7 @@ import { tablePersistenceConfigProvider, tableColumnsConfigProvider } from '../.
     }),
     ...selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.KEEP_SELECTION),
   ],
+  standalone: false,
 })
 export class AutomationPackageFilterPopoverComponent implements AfterViewInit {
   private _selectionCollector = inject<SelectionCollector<string, AutomationPackage>>(SelectionCollector);

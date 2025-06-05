@@ -21,6 +21,7 @@ import { DeactivateComponentDataInterface } from '../../types/deactivate-compone
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
   hostDirectives: [ReloadableDirective],
+  standalone: false,
 })
 export class ScriptEditorComponent implements AfterViewInit, DeactivateComponentDataInterface {
   private _keywordApi = inject(KeywordsService);

@@ -12,7 +12,6 @@ type FormValue = NewDashboardDialogComponent['form']['value'];
   selector: 'step-new-dashboard-dialog',
   templateUrl: './new-dashboard-dialog.component.html',
   styleUrls: ['./new-dashboard-dialog.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class NewDashboardDialogComponent {

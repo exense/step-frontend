@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseModalWindowComponent<T = any, R = any> implements OnInit, OnDestroy {
   private static dialogsStack: BaseModalWindowComponent[] = [];

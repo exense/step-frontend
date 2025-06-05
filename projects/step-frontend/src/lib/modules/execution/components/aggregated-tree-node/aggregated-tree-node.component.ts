@@ -13,6 +13,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
   host: {
     '[class.highlight]': 'isInSearchResult()',
   },
+  standalone: false,
 })
 export class AggregatedTreeNodeComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);

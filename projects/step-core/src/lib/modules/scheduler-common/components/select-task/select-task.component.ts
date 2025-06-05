@@ -13,7 +13,6 @@ type OnTouch = () => void;
   templateUrl: './select-task.component.html',
   styleUrl: './select-task.component.scss',
   imports: [SCHEDULER_COMMON_IMPORTS],
-  standalone: true,
 })
 export class SelectTaskComponent implements ControlValueAccessor {
   private _entityDialogs = inject(EntityDialogsService);

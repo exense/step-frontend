@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'inputType',
+  standalone: false,
 })
 export class InputTypePipe implements PipeTransform {
   transform(inputId: string, inputs: any[]): string {

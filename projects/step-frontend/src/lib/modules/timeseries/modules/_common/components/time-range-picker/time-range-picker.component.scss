@@ -107,17 +107,6 @@
 }
 
 .range-btn {
-  @media print {
-    width: unset;
-    max-width: unset;
-
-    .warn {
-      display: none;
-    }
-  }
-
-  @include core.button-round;
-
   display: flex;
   max-width: 26rem;
   align-items: center;
@@ -129,6 +118,17 @@
   text-overflow: ellipsis;
   justify-content: space-between;
   height: 3.6rem;
+
+  @media print {
+    width: unset;
+    max-width: unset;
+
+    .warn {
+      display: none;
+    }
+  }
+
+  @include core.button-round;
 
   .text {
     flex: 1;

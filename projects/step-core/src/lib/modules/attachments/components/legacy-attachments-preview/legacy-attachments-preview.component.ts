@@ -6,7 +6,6 @@ import { LegacyAttachmentPreviewComponent } from '../legacy-attachment-preview/l
   selector: 'step-legacy-attachments-preview',
   templateUrl: './legacy-attachments-preview.component.html',
   styleUrls: ['./legacy-attachments-preview.component.scss'],
-  standalone: true,
   imports: [LegacyAttachmentPreviewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

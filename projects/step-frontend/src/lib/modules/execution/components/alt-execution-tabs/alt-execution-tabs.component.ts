@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './alt-execution-tabs.component.html',
   styleUrl: './alt-execution-tabs.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltExecutionTabsComponent {
   private _activatedRoute = inject(ActivatedRoute);

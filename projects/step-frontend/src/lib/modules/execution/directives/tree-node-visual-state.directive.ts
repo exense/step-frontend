@@ -8,6 +8,7 @@ import { AltReportNodesFilterService } from '../services/alt-report-nodes-filter
   host: {
     '[class.not-significant]': `notSignificantByStatus() || isSkipped() || anotherClass()`,
   },
+  standalone: false,
 })
 export class TreeNodeVisualStateDirective {
   private _treeState = inject(AggregatedReportViewTreeStateService);

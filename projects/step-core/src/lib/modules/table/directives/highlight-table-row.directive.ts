@@ -14,6 +14,7 @@ import { TableHighlightItemContainer } from '../services/table-highlight-item-co
       useExisting: forwardRef(() => HighlightTableRowDirective),
     },
   ],
+  standalone: false,
 })
 export class HighlightTableRowDirective implements ItemHoverReceiverService, ItemHoldReceiverService {
   private _tableHighlightItemContainerInjected? = inject(TableHighlightItemContainer, { optional: true });

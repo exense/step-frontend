@@ -7,7 +7,6 @@ import { DialogParentService, DialogRouteResult } from '../../../basics/step-bas
   selector: 'step-schedule-plan',
   templateUrl: './schedule-plan.component.html',
   styleUrl: './schedule-plan.component.scss',
-  standalone: true,
   imports: [SCHEDULER_COMMON_IMPORTS],
   providers: [
     {

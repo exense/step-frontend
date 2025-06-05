@@ -5,6 +5,7 @@ import { RepositoryObjectReference } from '@exense/step-core';
   selector: 'step-alt-execution-repository',
   templateUrl: './alt-execution-repository.component.html',
   styleUrl: './alt-execution-repository.component.scss',
+  standalone: false,
 })
 export class AltExecutionRepositoryComponent {
   readonly repositoryParams = input.required<RepositoryObjectReference>();

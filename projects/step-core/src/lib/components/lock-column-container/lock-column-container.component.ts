@@ -19,5 +19,6 @@ import {
       useExisting: forwardRef(() => LockColumnContainerComponent),
     },
   ],
+  standalone: false,
 })
 export class LockColumnContainerComponent extends BaseColumnContainerComponent {}

@@ -41,7 +41,6 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
   selector: 'step-execution-dashboard',
   templateUrl: './execution-dashboard.component.html',
   styleUrls: ['./execution-dashboard.component.scss'],
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     DashboardFilterBarComponent,

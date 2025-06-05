@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'truncateString',
+  standalone: false,
 })
 export class TruncateStringPipe implements PipeTransform {
   transform(value: string, maxChars: number, overflowSuffix: string = '...'): string {

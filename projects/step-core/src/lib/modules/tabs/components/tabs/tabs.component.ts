@@ -25,7 +25,6 @@ import { TestIdDirective } from '../../../../directives/test-id.directive';
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
   imports: [StepMaterialModule, CommonModule, RouterModule, TestIdDirective],
-  standalone: true,
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
 })

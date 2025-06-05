@@ -12,6 +12,7 @@ import { ArtefactService } from '../../../artefacts-common/injectables/artefact.
   styleUrls: ['./entity-icon.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class EntityIconComponent {
   private _entityTypeResolver = inject(EntityTypeResolver);

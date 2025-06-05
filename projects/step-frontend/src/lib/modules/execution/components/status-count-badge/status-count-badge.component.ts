@@ -8,6 +8,7 @@ import { Status } from '../../../_common/shared/status.enum';
   styleUrl: './status-count-badge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BigNumberPipe],
+  standalone: false,
 })
 export class StatusCountBadgeComponent {
   private _statusColors = inject(STATUS_COLORS);

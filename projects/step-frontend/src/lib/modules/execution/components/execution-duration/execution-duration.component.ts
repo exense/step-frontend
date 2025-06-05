@@ -7,6 +7,7 @@ import { DateFormat, Execution } from '@exense/step-core';
   styleUrl: './execution-duration.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ExecutionDurationComponent {
   protected readonly DateFormat = DateFormat;

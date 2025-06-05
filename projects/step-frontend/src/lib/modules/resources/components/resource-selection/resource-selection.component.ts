@@ -15,6 +15,7 @@ import {
   templateUrl: './resource-selection.component.html',
   styleUrls: ['./resource-selection.component.scss'],
   providers: [...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  standalone: false,
 })
 export class ResourceSelectionComponent extends BaseEntitySelectionTableComponent {
   @ViewChild('tableRef', { read: TableComponent })

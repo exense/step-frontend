@@ -9,6 +9,7 @@ import { Component, input, ViewEncapsulation } from '@angular/core';
     '[attr.title]': 'null',
     '[class.overflow-content]': 'applyOverflow()',
   },
+  standalone: false,
 })
 export class AltReportWidgetComponent {
   /** @Input() **/

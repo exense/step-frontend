@@ -32,6 +32,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useExisting: AltKeywordNodesStateService,
     },
   ],
+  standalone: false,
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);

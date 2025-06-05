@@ -11,6 +11,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
   host: {
     '[attr.title]': 'null',
   },
+  standalone: false,
 })
 export class AltReportNodeListComponent {
   protected _state = inject(AltReportNodesStateService);

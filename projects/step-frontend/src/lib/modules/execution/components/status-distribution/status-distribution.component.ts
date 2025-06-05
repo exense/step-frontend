@@ -5,6 +5,7 @@ import { ExecutionSummaryDto } from '@exense/step-core';
   selector: 'step-status-distribution',
   templateUrl: './status-distribution.component.html',
   styleUrls: ['./status-distribution.component.scss'],
+  standalone: false,
 })
 export class StatusDistributionComponent {
   /*@Input() */

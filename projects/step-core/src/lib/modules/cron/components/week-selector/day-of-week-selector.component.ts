@@ -20,9 +20,10 @@ interface DayInfo extends RangeItem {
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class DayOfWeekSelectorComponent implements ControlValueAccessor {
-  readonly _WEEK_DAYS = inject(RANGE_WEEK_DAY).map((item) => ({ ...item, isSelected: false } as DayInfo));
+  readonly _WEEK_DAYS = inject(RANGE_WEEK_DAY).map((item) => ({ ...item, isSelected: false }) as DayInfo);
 
   readonly trackByDay = trackByRange;
 
