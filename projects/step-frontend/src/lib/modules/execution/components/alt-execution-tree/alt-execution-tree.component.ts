@@ -1,15 +1,24 @@
-import { Component, contentChild, ElementRef, forwardRef, inject, input, ViewEncapsulation } from '@angular/core';
-import { TreeAction, TreeActionsService, TreeNode, TreeStateService } from '@exense/step-core';
+import {
+  Component,
+  computed,
+  contentChild,
+  forwardRef,
+  inject,
+  input,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
+import { TreeAction, TreeActionsService, TreeComponent, TreeNode, TreeStateService } from '@exense/step-core';
 import { filter, first, map, Observable, of, switchMap, tap, timer } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 
 enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
   COLLAPSE_CHILDREN = 'collapse_children',
 }
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-execution-tree-node-addon.directive';
 
 @Component({
   selector: 'step-alt-execution-tree',
@@ -24,14 +33,22 @@ import { AltExecutionTreeNodeAddonDirective } from '../../directives/alt-executi
   ],
 })
 export class AltExecutionTreeComponent implements TreeActionsService {
-  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private _treeSate = inject(TreeStateService);
 
   protected readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
+  private tree = viewChild('tree', { read: TreeComponent });
 
   updateUrlParams = this._state.timeRangeSelection$.pipe(takeUntilDestroyed(), first()).subscribe((range) => {
     this._urlParamsService.patchUrlParams(range, undefined, true);
+  });
+
+  readonly showSpinnerForEmptyTree = input(false);
+
+  protected readonly showSpinner = computed(() => {
+    const showSpinnerForEmptyTree = this.showSpinnerForEmptyTree();
+    const isInitialized = this._treeSate.isInitialized();
+    return showSpinnerForEmptyTree && !isInitialized;
   });
 
   protected readonly treeNodeAddon = contentChild(AltExecutionTreeNodeAddonDirective);
@@ -58,8 +75,7 @@ export class AltExecutionTreeComponent implements TreeActionsService {
         switchMap((nodeId) => timer(500).pipe(map(() => nodeId))),
       )
       .subscribe((nodeId) => {
-        const nodeElement = this._el.nativeElement.querySelector<HTMLElement>(`[data-node-id="${nodeId}"]`);
-        nodeElement?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+        this.tree()?.scrollToNode?.(nodeId);
       });
   }
 

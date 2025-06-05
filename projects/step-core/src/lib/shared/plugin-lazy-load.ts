@@ -1,6 +1,7 @@
 import { PluginOnInit } from './plugin-on-init';
 import { createNgModule, inject, Injector, Type } from '@angular/core';
 import { PluginInfoRegistryService } from '../services/plugin-info-registry.service';
+import { LAZY_LOAD_INTERCEPTORS } from '../client/step-client-module';
 
 export interface LazyLoadPluginMeta {
   Module: Type<any>;
@@ -36,7 +37,11 @@ export abstract class PluginLazyLoad implements PluginOnInit {
   private registerPlugin(pluginName: string, load: () => Promise<LazyLoadPluginMeta>): Promise<void> {
     console.log(`PLUGIN "${pluginName}" LAZYLOAD`);
     return load()
-      .then((meta) => createNgModule(meta.Module, this._injector).instance)
-      .then(() => console.log(`MODULE "${pluginName}" REGISTERED`));
+      .then((meta) => createNgModule(meta.Module, this._injector))
+      .then((module) => {
+        // Inject module's interceptors to register them
+        const interceptors = module.injector.get(LAZY_LOAD_INTERCEPTORS, null, { optional: true });
+        console.log(`MODULE "${pluginName}" REGISTERED`);
+      });
   }
 }

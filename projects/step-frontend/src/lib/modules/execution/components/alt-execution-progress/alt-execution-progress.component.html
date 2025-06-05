@@ -81,7 +81,15 @@
       @if (!(isExecutionCompleted$ | async)) {
         @if (activeExecution$ | async; as activeExecution) {
           <step-btn-group class="without-borders">
-            <step-autorefresh-toggle [model]="activeExecution.autoRefreshModel" buttonType="stroke" />
+            <step-autorefresh-toggle
+              [model]="activeExecution.autoRefreshModel"
+              buttonType="stroke"
+              requestWarning="The request took too long to process. Displayed data may be older than the current refresh interval."
+              matTooltipPosition="below"
+              #requestWarningRef="StepRequestWarning"
+              [hideTooltip]="requestWarningRef.hasWarning()"
+              (intervalChangeExplicit)="requestWarningRef.resetWarning()"
+            />
           </step-btn-group>
         }
       }
@@ -103,7 +111,7 @@
             (click)="commands.execute(false)"
             matTooltipPosition="below"
           >
-            <step-icon name="repeat" aria-hidden="true" />
+            <step-icon name="play-refresh" aria-hidden="true" />
           </button>
           @if (execution.status; as status) {
             @if (status !== 'ENDED' && status !== 'ABORTING' && status !== 'FORCING_ABORT') {

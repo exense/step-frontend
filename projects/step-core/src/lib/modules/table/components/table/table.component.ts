@@ -6,6 +6,7 @@ import {
   contentChildren,
   ContentChildren,
   DestroyRef,
+  effect,
   EventEmitter,
   forwardRef,
   inject,
@@ -24,7 +25,18 @@ import {
   viewChildren,
   ViewEncapsulation,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, of, startWith, Subject, takeUntil, timestamp } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  switchMap,
+  takeUntil,
+  timestamp,
+} from 'rxjs';
 import { TableDataSource } from '../../shared/table-data-source';
 import { MatColumnDef, MatTable } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -46,7 +58,7 @@ import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
 import { TableHighlightItemContainer } from '../../services/table-highlight-item-container.service';
 import { TablePersistenceUrlStateService } from '../../services/table-persistence-url-state.service';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { TableCustomColumnsService } from '../../services/table-custom-columns.service';
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { CustomColumnsComponent } from '../custom-columns/custom-columns.component';
@@ -54,7 +66,7 @@ import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDefinitionService } from '../../services/table-columns-definition.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
-import { isValidRegex } from '../../../basics/step-basics.module';
+import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.module';
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
@@ -125,6 +137,7 @@ export class TableComponent<T>
     TableHighlightItemContainer,
     TableColumnsDictionaryService
 {
+  private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
   private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
@@ -164,6 +177,17 @@ export class TableComponent<T>
 
   /** @Input() **/
   noResultsPlaceholder = input<string | undefined>(undefined);
+
+  readonly blockGlobalReload = input(false);
+
+  private effectSetupGlobalReload = effect(() => {
+    const isGlobalBlocked = this.blockGlobalReload();
+    if (isGlobalBlocked) {
+      this._globalReloadService.unRegister(this);
+    } else {
+      this._globalReloadService.register(this);
+    }
+  });
 
   @ViewChild(MatTable) private table?: MatTable<any>;
   @ViewChild(PaginatorComponent, { static: true }) page!: PaginatorComponent;
@@ -242,9 +266,7 @@ export class TableComponent<T>
   protected _itemsPerPageService =
     inject(ItemsPerPageService, { optional: true }) ?? inject(ItemsPerPageDefaultService);
 
-  readonly pageSizeOptions = this._itemsPerPageService.getItemsPerPage((userPreferredItemsPerPage) =>
-    this.page.pageSize.set(userPreferredItemsPerPage),
-  );
+  readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
 
   readonly displayColumns = computed(() => {
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
@@ -379,7 +401,7 @@ export class TableComponent<T>
   }
 
   private setupPageStream(): Observable<PageEvent> {
-    let initialPage: PageEvent;
+    let initialPage$: Observable<PageEvent>;
 
     const statePage = this._tableState.getPage();
     if (statePage) {
@@ -391,18 +413,21 @@ export class TableComponent<T>
         }
         return statePage.length;
       });
-      initialPage = statePage;
+      initialPage$ = of(statePage);
     } else {
       this.page.firstPage();
-      initialPage = this.createPageInitialValue();
+      initialPage$ = this._itemsPerPageService
+        .getDefaultPageSizeItem()
+        .pipe(map((pageSize) => this.createPageInitialValue(pageSize)));
     }
 
-    return this.page.page$.pipe(startWith(initialPage));
+    return initialPage$.pipe(switchMap((initialPage) => this.page.page$.pipe(startWith(initialPage))));
   }
 
-  private createPageInitialValue(): PageEvent {
+  private createPageInitialValue(pageSize?: number): PageEvent {
+    pageSize = pageSize ?? (this.page.pageSize() || this.pageSizeOptions()[0]);
     return {
-      pageSize: this.page.pageSize() || this.pageSizeOptions[0],
+      pageSize,
       pageIndex: 0,
       length: 0,
     };
@@ -541,6 +566,7 @@ export class TableComponent<T>
   ngOnDestroy(): void {
     this.terminateDatasource();
     this.search$.complete();
+    this._globalReloadService.unRegister(this);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

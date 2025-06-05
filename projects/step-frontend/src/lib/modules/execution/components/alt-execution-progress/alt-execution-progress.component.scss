@@ -18,7 +18,8 @@ step-alt-execution-progress {
     grid-template-areas:
       'title controls ranger'
       'sub-title sub-title sub-title';
-    gap: 0.5rem;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
     align-items: flex-start;
 
     &.small-screen {
@@ -37,12 +38,14 @@ step-alt-execution-progress {
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
-      gap: 0.4rem;
+      gap: 1rem;
       white-space: nowrap;
       grid-area: sub-title;
 
-      step-alt-execution-parameters {
-        margin-left: 1rem;
+      button.mat-mdc-icon-button {
+        width: 3rem;
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
       }
     }
 
@@ -79,6 +82,11 @@ step-alt-execution-progress {
       }
     }
 
+    step-autorefresh-toggle {
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+    }
+
     .range-picker {
       grid-area: ranger;
       justify-self: flex-end;
@@ -94,8 +102,12 @@ step-alt-execution-progress {
       display: flex;
       align-items: center;
       align-content: flex-end;
-      gap: 0.25rem;
+      gap: 1rem;
       flex-wrap: nowrap;
+
+      router-outlet {
+        margin-left: -1rem;
+      }
 
       .controls-marker,
       .mat-mdc-icon-button.mat-mdc-button-base {
@@ -106,6 +118,18 @@ step-alt-execution-progress {
       .mat-mdc-icon-button.mat-mdc-button-base {
         margin-left: 0.25rem;
         margin-right: 0.25rem;
+      }
+
+      step-btn-group {
+        .mat-mdc-icon-button.mat-mdc-button-base {
+          margin: 0;
+          &:first-child {
+            margin-left: 0.25rem;
+          }
+          &:last-child {
+            margin-right: 0.25rem;
+          }
+        }
       }
 
       .controls-marker {
@@ -169,6 +193,12 @@ step-alt-execution-progress {
 
   button.warning {
     color: var.$red-50;
+  }
+
+  step-autorefresh-toggle.warning {
+    step-icon {
+      color: var.$orange;
+    }
   }
 }
 

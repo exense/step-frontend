@@ -12,6 +12,7 @@ export type AggregatedReportView = {
   artefactHash?: string;
   countByStatus?: Record<string, number>;
   children?: Array<AggregatedReportView>;
+  hasDescendantInvocations?: boolean;
   parentSource?: 'BEFORE' | 'BEFORE_THREAD' | 'MAIN' | 'SUB_PLAN' | 'AFTER_THREAD' | 'AFTER';
   singleInstanceReportNode?: ReportNode;
   bucketsByStatus?: Record<string, Bucket>;

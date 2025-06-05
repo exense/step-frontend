@@ -6,8 +6,8 @@ import {
   StepDataSource,
   StepDataSourceReloadOptions,
   TableRequestData,
-} from '../../../client/table/step-table-client.module';
-import { TableParameters } from '../../../client/generated';
+  TableParameters,
+} from '../../../client/step-client-module';
 
 export interface TableFilterOptions {
   search?: { [key: string]: SearchValue };

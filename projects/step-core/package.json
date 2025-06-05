@@ -29,6 +29,7 @@
     "@angular/material-luxon-adapter": "18.2.7",
     "@types/luxon": "3.4.2",
     "@angular/cdk": "18.2.7",
+    "@angular/cdk-experimental": "18.2.7",
     "@schematics/angular": "18.2.7",
     "@types/uuid": "8.3.4",
     "uuid": "8.3.2",
@@ -42,7 +43,7 @@
     "tslib": "2.3.0"
   },
   "devDependencies": {
-    "shelljs": "0.8.5"
+    "shelljs": "0.9.2"
   },
   "engines": {
     "node": ">=18.19.0"

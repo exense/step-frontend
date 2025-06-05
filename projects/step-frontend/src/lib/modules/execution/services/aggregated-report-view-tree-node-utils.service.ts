@@ -31,10 +31,10 @@ export class AggregatedReportViewTreeNodeUtilsService
     const icon = this._artefactTypes.getArtefactType(originalArtefact._class)?.icon ?? this._artefactTypes.defaultIcon;
     const expandable = !!item?.children?.length;
 
-    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item, parentId);
-    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item, parentId);
-    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item, parentId);
-    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item, parentId);
+    const beforeContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE, item, id);
+    const beforeThreadContainer = this.createPseudoContainer(ArtefactNodeSource.BEFORE_THREAD, item, id);
+    const afterContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER, item, id);
+    const afterThreadContainer = this.createPseudoContainer(ArtefactNodeSource.AFTER_THREAD, item, id);
 
     const children = (item?.children || [])
       .filter(
@@ -74,6 +74,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       artefactHash: item.artefactHash,
       countByStatus: item.countByStatus,
       nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
+      hasDescendantInvocations: item.hasDescendantInvocations,
     };
   }
 

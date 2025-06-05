@@ -117,8 +117,11 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   }
 
   private buildSearchIndex(item: AggregatedTreeNode, patentId?: string): void {
-    const artefact = item.originalArtefact!;
-    const artefactType = this._artefactService.getArtefactType(artefact._class!);
+    const artefact = item.originalArtefact;
+    if (!artefact?._class) {
+      return;
+    }
+    const artefactType = this._artefactService.getArtefactType(artefact._class);
 
     const items = runInInjectionContext(this._injector, () => artefactType?.getArtefactSearchValues?.(artefact) ?? []);
 

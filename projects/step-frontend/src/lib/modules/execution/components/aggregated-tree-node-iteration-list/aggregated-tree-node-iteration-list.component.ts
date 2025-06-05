@@ -28,15 +28,15 @@ import {
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
   TableStorageService,
+  TableMemoryStorageService,
   TableDataSource,
   AlertType,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { FormBuilder } from '@angular/forms';
-import { debounceTime, map, startWith, switchMap } from 'rxjs';
+import { debounceTime, map, startWith, switchMap, Observable, of } from 'rxjs';
 import { REPORT_NODE_STATUS, Status } from '../../../_common/shared/status.enum';
-import { TableMemoryStorageService } from '../../services/table-memory-storage.service';
 
 const PAGE_SIZE = 25;
 
@@ -170,8 +170,12 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
     }
   }
 
-  getItemsPerPage(loadedUserPreferences: (itemsPerPage: number) => void): number[] {
-    return [PAGE_SIZE];
+  getItemsPerPage(): Observable<number[]> {
+    return of([PAGE_SIZE]);
+  }
+
+  getDefaultPageSizeItem(): Observable<number> {
+    return of(PAGE_SIZE);
   }
 
   protected openNodeDetails(node: ReportNode): void {
