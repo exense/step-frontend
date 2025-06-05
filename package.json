@@ -41,7 +41,7 @@
   },
   "private": false,
   "dependencies": {
-    "@angular-architects/module-federation": "18.0.6",
+    "@angular-architects/module-federation": "19.0.3",
     "@angular/animations": "19.2.14",
     "@angular/cdk": "19.2.18",
     "@angular/cdk-experimental": "19.2.18",
@@ -56,7 +56,7 @@
     "@angular/router": "19.2.14",
     "@fontsource/roboto": "4.5.8",
     "ace-builds": "1.17.0",
-    "angular-split": "17.1.1",
+    "angular-split": "19.0.0",
     "feather-icons": "4.29.0",
     "luxon": "3.4.4",
     "ngx-mat-select-search": "^7.0.6",
