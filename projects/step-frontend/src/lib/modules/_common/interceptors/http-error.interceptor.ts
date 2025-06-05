@@ -6,6 +6,7 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpResponse,
+  HttpStatusCode,
 } from '@angular/common/http';
 import { Observable, of, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -36,11 +37,15 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       return of(false);
     }
 
-    const parsedError = this.parseHttpError(error);
+    const { parsedError, logMessages } = this.parseHttpError(error);
     const formattedError = HttpErrorInterceptor.formatError(parsedError);
 
     if (this.isConnectionError(formattedError, error)) {
       return throwError(() => new ConnectionError(error));
+    }
+
+    if (!!logMessages?.length) {
+      logMessages.forEach((errorMessage) => console.error(errorMessage));
     }
 
     this.showError(formattedError);
@@ -48,7 +53,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return throwError(() => error);
   }
 
-  private parseHttpError(error: HttpErrorResponse): string {
+  private parseHttpError(error: HttpErrorResponse): { parsedError: string; logMessages?: string[] } {
     const errorContentType = error.headers.get('Content-Type');
     const isJson = errorContentType?.includes?.('application/json') ?? false;
 
@@ -75,25 +80,30 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       jsonError = { errorMessage: error.error };
     }
 
+    const logMessages: string[] | undefined = [];
+
     if (jsonError?.errorMessage || jsonError?.errorName) {
       if (jsonError.errorMessage && typeof jsonError.errorMessage !== 'string') {
-        console.error(`Unexpected error type. isJson=${isJson}`, jsonError.errorMessage);
+        logMessages.push([`Unexpected error type. isJson=${isJson}`, jsonError.errorMessage].join(', '));
         try {
-          console.error(JSON.stringify(jsonError.errorMessage));
+          logMessages.push(JSON.stringify(jsonError.errorMessage));
         } catch (e) {}
       }
-      return `${jsonError.errorName ?? 'Error'}: ${jsonError.errorMessage}`;
+      return {
+        parsedError: `${jsonError.errorName ?? 'Error'}: ${jsonError.errorMessage}`,
+        logMessages,
+      };
     }
 
     if (error instanceof HttpErrorResponse && error.name && error.message) {
-      return `${error.name}: ${error.message}`;
+      return { parsedError: `${error.name}: ${error.message}` };
     }
 
     if (jsonError) {
-      return JSON.stringify(jsonError);
+      return { parsedError: JSON.stringify(jsonError) };
     }
 
-    return 'Unknown HTTP error';
+    return { parsedError: 'Unknown HTTP error' };
   }
 
   private handleAsyncError(response: HttpEvent<any>): HttpEvent<any> {
@@ -138,7 +148,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     }
   }
 
-  private isConnectionError(parsedError: any, error: any): boolean {
+  private isConnectionError(parsedError: string, error: HttpErrorResponse): boolean {
+    if (error.status === HttpStatusCode.BadGateway || error.status === HttpStatusCode.GatewayTimeout) {
+      return true;
+    }
+
     return (
       (typeof parsedError === 'string' && parsedError.endsWith(': 0 Unknown Error')) ||
       error.error instanceof ProgressEvent
