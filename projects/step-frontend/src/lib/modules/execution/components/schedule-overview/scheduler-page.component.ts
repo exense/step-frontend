@@ -192,7 +192,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
-        numberOfBuckets: 30,
+        numberOfBuckets: 30, // good amount of bars visually
         oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
         groupDimensions: [statusAttribute],
       };

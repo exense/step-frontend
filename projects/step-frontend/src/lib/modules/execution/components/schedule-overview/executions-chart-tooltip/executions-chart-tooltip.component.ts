@@ -9,8 +9,14 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
-import { ExecutionsService, TableApiWrapperService } from '@exense/step-core';
+import {
+  AugmentedTimeSeriesService,
+  ExecutionsService,
+  FetchBucketsRequest,
+  TableApiWrapperService,
+} from '@exense/step-core';
 import { TSChartSeries } from '../../../../timeseries/modules/chart';
+import { of, switchMap } from 'rxjs';
 
 interface TransformedSeries {
   label: string;
@@ -33,9 +39,9 @@ interface ExecutionItem {
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionsChartTooltipComponent {
-  private _tableApiWrapper = inject(TableApiWrapperService);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _executionService = inject(ExecutionsService);
+  private _timeSeriesService = inject(AugmentedTimeSeriesService);
 
   readonly data = input<TooltipContextData | undefined>(undefined);
   readonly taskId = input.required<string>();
@@ -77,11 +83,31 @@ export class ExecutionsChartTooltipComponent {
   }
 
   fetchExecutionsForSelectedItem(item: TransformedSeries) {
-    let data = this.data()!;
-    let chartInterval = data.xValues[1] - data.xValues[0];
-    const limit = 50;
-    this._executionService
-      .getLastExecutionsByTaskId(this.taskId(), limit, item.timestamp, item.timestamp + chartInterval)
+    const data = this.data()!;
+    const bucketInterval = data.xValues[1] - data.xValues[0];
+    const taskId = this.taskId();
+    const limit = 10;
+
+    const request: FetchBucketsRequest = {
+      start: item.timestamp,
+      end: item.timestamp + bucketInterval,
+      numberOfBuckets: 1, // good amount of bars visually
+      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId} and attributes.result = ${item.label}`,
+      collectAttributeKeys: ['eId'],
+      collectAttributesValuesLimit: 10,
+    };
+    this._timeSeriesService
+      .getTimeSeries(request)
+      .pipe(
+        switchMap((timeSeriesResponse) => {
+          const eIds = timeSeriesResponse.matrix[0][0]?.attributes?.['eId'];
+          if (eIds?.length > 0) {
+            return this._executionService.getExecutionsByIds(eIds);
+          } else {
+            return of([]);
+          }
+        }),
+      )
       .subscribe((executions) => {
         this.selectedSeriesExecutions = executions
           .filter((ex) => {
