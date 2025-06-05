@@ -3,6 +3,7 @@
 
 step-alt-execution-tree {
   display: block;
+  position: relative;
 
   @include core.reportNodeStatuses;
 

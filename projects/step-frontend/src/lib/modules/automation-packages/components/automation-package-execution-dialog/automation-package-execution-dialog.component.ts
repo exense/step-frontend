@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import {
+  AugmentedScreenService,
   AutomationPackage,
   AutomationPackageExecutionParameters,
   AutomationPackagesService,
@@ -10,7 +11,7 @@ import {
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, Validators } from '@angular/forms';
 import { startWith } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 interface AutomationPackageExecutionDialogData {
@@ -31,6 +32,7 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
   private _automationPackageApi = inject(AutomationPackagesService);
   private _automationPackage = inject<AutomationPackageExecutionDialogData>(MAT_DIALOG_DATA).automationPackage;
   private _router = inject(Router);
+  private _screenTemplates = inject(AugmentedScreenService);
   private _dialogRef = inject(MatDialogRef);
 
   protected readonly title = `Execute Automation Package: "${this._automationPackage.attributes?.['name']}"`;
@@ -43,6 +45,11 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
     includedCategories: this._fb.control<string[]>([]),
     excludedCategories: this._fb.control<string[]>([]),
   });
+
+  protected readonly executionParameters = toSignal(
+    this._screenTemplates.getDefaultParametersByScreenId('executionParameters'),
+    { initialValue: undefined },
+  );
 
   ngOnInit(): void {
     this.setupExecutionConfigFormBehavior();
@@ -79,12 +86,14 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
     ].filter((item) => !!item) as PlanFilter[];
 
     const planFilter = !!filters.length ? this._plansFilterFactory.byMultipleFilters(filters) : undefined;
+    const customParameters = this.executionParameters();
 
     return {
       mode: 'RUN',
       planFilter,
       wrapIntoTestSet,
       numberOfThreads,
+      customParameters,
     };
   }
 

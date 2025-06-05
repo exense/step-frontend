@@ -1,36 +1,46 @@
-:host {
+step-auto-shrank-list {
   width: 100%;
   overflow: hidden;
-}
 
-.visible-items,
-.invisible-items {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.invisible-items {
-  visibility: hidden;
-  height: 0;
-}
-
-.item,
-.popover-item {
-  display: flex;
-  gap: 0.8rem;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.item {
-  & > strong,
-  & > span {
-    display: block;
-    white-space: nowrap;
-    max-width: 15rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .visible-items,
+  .invisible-items {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
+    align-items: center;
   }
+
+  .invisible-items {
+    visibility: hidden;
+    height: 0;
+  }
+
+  .item {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    & > strong,
+    & > span {
+      display: block;
+      white-space: nowrap;
+      max-width: 15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  button.more {
+    .mdc-button__label {
+      gap: 0.1rem;
+    }
+  }
+}
+
+.auto-shrank-popover-item {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: center;
 }

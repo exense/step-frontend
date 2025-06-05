@@ -4,8 +4,14 @@ step-alt-execution-tree-tab {
   position: relative;
 
   step-alt-execution-tree {
-    height: 60vh;
-    max-height: 60vh;
+    height: calc(100vh - 30.2rem);
+    display: flex;
+    flex-direction: column;
+
+    step-tree {
+      flex: 1;
+      padding: 0;
+    }
   }
 
   .controls-container {
