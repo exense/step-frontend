@@ -9,6 +9,7 @@ type DisplayStatus = Execution['status'] | Execution['result'] | undefined;
   styleUrl: './execution-status.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionStatusComponent {
   /** @Input() **/

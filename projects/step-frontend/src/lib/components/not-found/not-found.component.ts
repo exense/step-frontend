@@ -6,6 +6,7 @@ import { DEFAULT_PAGE, ErrorMessageHandlerService } from '@exense/step-core';
   selector: 'step-not-found',
   templateUrl: './not-found.component.html',
   styleUrl: './not-found.component.scss',
+  standalone: false,
 })
 export class NotFoundComponent implements OnInit {
   private _router = inject(Router);

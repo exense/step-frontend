@@ -7,6 +7,7 @@ import { DialogsService, ModalWindowComponent } from '../../../basics/step-basic
   selector: 'step-wizard-dialog',
   templateUrl: './wizard-dialog.component.html',
   styleUrls: ['./wizard-dialog.component.scss'],
+  standalone: false,
 })
 export class WizardDialogComponent {
   @ViewChild(ModalWindowComponent, { static: true })

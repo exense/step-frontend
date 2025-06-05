@@ -29,7 +29,6 @@ type ItemTemplateRef<T> = TemplateRef<{ $implicit: T }>;
       multi: true,
     },
   ],
-  standalone: true,
   imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent],
 })
 export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {

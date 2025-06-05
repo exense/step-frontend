@@ -7,6 +7,7 @@ import { FilterConditionFactoryService } from '../../services/filter-condition-f
   selector: 'step-custom-search-dropdown',
   templateUrl: './custom-search-dropdown.component.html',
   styleUrls: ['./custom-search-dropdown.component.scss'],
+  standalone: false,
 })
 export class CustomSearchDropdownComponent implements CustomComponent {
   protected readonly _filterConditionFactory = inject(FilterConditionFactoryService);

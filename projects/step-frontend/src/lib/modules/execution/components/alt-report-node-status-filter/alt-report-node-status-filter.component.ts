@@ -6,6 +6,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
   selector: 'step-alt-report-node-status-filter',
   templateUrl: './alt-report-node-status-filter.component.html',
   styleUrl: './alt-report-node-status-filter.component.scss',
+  standalone: false,
 })
 export class AltReportNodeStatusFilterComponent {
   protected readonly _state = inject(AltReportNodesFilterService);

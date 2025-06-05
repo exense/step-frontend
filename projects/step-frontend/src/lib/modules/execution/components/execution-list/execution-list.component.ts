@@ -38,6 +38,7 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
     FilterConditionFactoryService,
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionListComponent implements OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);

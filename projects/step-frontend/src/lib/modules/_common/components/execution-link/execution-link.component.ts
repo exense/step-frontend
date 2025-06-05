@@ -5,6 +5,7 @@ import { Execution, ExecutionsService } from '@exense/step-core';
   selector: 'step-execution-link',
   templateUrl: './execution-link.component.html',
   styleUrls: ['./execution-link.component.scss'],
+  standalone: false,
 })
 export class ExecutionLinkComponent implements OnInit {
   private _executionService = inject(ExecutionsService);

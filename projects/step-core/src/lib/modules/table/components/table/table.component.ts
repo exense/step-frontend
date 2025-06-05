@@ -123,6 +123,7 @@ interface SearchData {
     TableCustomColumnsService,
     TableColumnsService,
   ],
+  standalone: false,
 })
 export class TableComponent<T>
   implements

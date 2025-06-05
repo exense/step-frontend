@@ -16,6 +16,7 @@ import { ExportArtefact } from '../../types/export.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ExportReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ExportArtefact>> {
   private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);

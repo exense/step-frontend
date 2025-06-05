@@ -16,6 +16,7 @@ import { EntityColumnContext } from '../entity-column/entity-column.component';
       useExisting: forwardRef(() => EntityColumnContainerComponent),
     },
   ],
+  standalone: false,
 })
 export class EntityColumnContainerComponent extends BaseColumnContainerComponent implements OnChanges {
   @Input() entityName!: string;

@@ -29,6 +29,7 @@ type FieldsAccessor = Mutable<Pick<ReportNodeShortComponent, 'headerText' | 'rep
   selector: 'step-report-node-short',
   templateUrl: './report-node-short.component.html',
   styleUrls: ['./report-node-short.component.scss'],
+  standalone: false,
 })
 export class ReportNodeShortComponent implements OnChanges {
   private _artefactTypes = inject(ArtefactService);

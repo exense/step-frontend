@@ -14,7 +14,6 @@ const ALL_MODES: Record<AceMode, string> = Object.keys(AceMode).reduce(
 
 @Component({
   selector: 'step-rich-editor-settings-bar',
-  standalone: true,
   imports: [StepBasicsModule],
   templateUrl: './rich-editor-settings-bar.component.html',
   styleUrl: './rich-editor-settings-bar.component.scss',

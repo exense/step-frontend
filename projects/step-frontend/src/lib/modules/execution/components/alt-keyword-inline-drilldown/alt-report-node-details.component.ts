@@ -33,6 +33,7 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
       useValue: ClickStrategyType.DOUBLE_CLICK,
     },
   ],
+  standalone: false,
 })
 export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);

@@ -16,6 +16,7 @@ import {
   providers: [
     ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
   ],
+  standalone: false,
 })
 export class SchedulerTaskSelectionComponent extends BaseEntitySelectionTableComponent {
   @ViewChild('tableRef', { read: TableComponent })

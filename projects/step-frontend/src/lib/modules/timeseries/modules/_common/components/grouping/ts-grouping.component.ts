@@ -8,7 +8,6 @@ const EMPTY_DIMENSIONS_LABEL = 'Empty';
   selector: 'step-timeseries-grouping',
   templateUrl: './ts-grouping.component.html',
   styleUrls: ['./ts-grouping.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TsGroupingComponent implements OnInit, OnChanges {

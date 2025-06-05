@@ -10,6 +10,7 @@ import { CRON_PRESETS } from '../../../basics/step-basics.module';
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class PresetEditorComponent extends BaseEditorComponent {
   protected readonly items = inject(CRON_PRESETS);

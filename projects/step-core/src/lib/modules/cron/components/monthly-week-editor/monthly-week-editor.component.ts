@@ -10,6 +10,7 @@ import { RANGE_DAY_NUM, RANGE_MONTHS_NUMBERS, RANGE_WEEK_DAY } from '../../injec
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class MonthlyWeekEditorComponent extends HoursEditorComponent {
   readonly _MONTHS = inject(RANGE_MONTHS_NUMBERS);

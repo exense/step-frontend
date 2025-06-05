@@ -7,6 +7,7 @@ import { Keyword } from '../../../../client/step-client-module';
   selector: 'step-function-link-editor',
   templateUrl: './function-link.component.html',
   styleUrls: ['./function-link.component.scss'],
+  standalone: false,
 })
 export class FunctionLinkEditorComponent extends BaseFunctionLinkComponent implements CustomComponent {
   @Output() edit = new EventEmitter<void>();

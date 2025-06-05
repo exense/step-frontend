@@ -3,6 +3,7 @@ import { MultipleProjectsService } from '../injectables/multiple-projects.servic
 
 @Pipe({
   name: 'projectName',
+  standalone: false,
 })
 export class ProjectNamePipe implements PipeTransform {
   private _projects = inject(MultipleProjectsService);

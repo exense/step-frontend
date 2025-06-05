@@ -4,6 +4,7 @@ import { getControlWarningsContainer } from '../types/form-control-warnings-exte
 
 @Pipe({
   name: 'controlHasWarnings',
+  standalone: false,
 })
 export class ControlHasWarningsPipe implements PipeTransform {
   transform(control?: NgControl | AbstractControl): boolean {

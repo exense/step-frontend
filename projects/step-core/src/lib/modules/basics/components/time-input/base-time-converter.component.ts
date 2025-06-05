@@ -19,6 +19,7 @@ export const DEFAULT_TIME_LABELS_DICTIONARY: TimeUnitDictionary = {
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseTimeConverterComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Input() label?: string;

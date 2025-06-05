@@ -66,6 +66,7 @@ interface EntityWithKeywordsStats {
       },
     },
   ],
+  standalone: false,
 })
 export class ScheduleOverviewComponent {
   readonly LAST_EXECUTIONS_TO_DISPLAY = 30;

@@ -6,6 +6,7 @@ import { AuthService, GLOBAL_INDICATOR, STATUS_COLORS, ViewRegistryService } fro
   templateUrl: './root.component.html',
   styleUrls: ['./root.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class RootComponent implements OnInit {
   private _globalIndicator = inject(GLOBAL_INDICATOR);

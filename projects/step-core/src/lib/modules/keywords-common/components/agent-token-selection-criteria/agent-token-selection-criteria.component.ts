@@ -9,6 +9,7 @@ import {
   selector: 'step-agent-token-selection-criteria',
   templateUrl: './agent-token-selection-criteria.component.html',
   styleUrls: ['./agent-token-selection-criteria.component.scss'],
+  standalone: false,
 })
 export class AgentTokenSelectionCriteriaComponent {
   @Input() tokenSelectionCriteria!: FormArray<AgentTokenSelectionCriteriaForm>;

@@ -75,7 +75,6 @@ import { MatTooltip } from '@angular/material/tooltip';
   selector: 'step-timeseries-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  standalone: true,
   providers: [DashboardUrlParamsService],
   imports: [
     COMMON_IMPORTS,

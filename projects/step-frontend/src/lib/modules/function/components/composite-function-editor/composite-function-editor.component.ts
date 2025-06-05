@@ -15,6 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       useExisting: CompositeKeywordPlanContextApiService,
     },
   ],
+  standalone: false,
 })
 export class CompositeFunctionEditorComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);

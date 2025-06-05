@@ -11,7 +11,6 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 
 @Component({
   selector: 'step-table-keywords',
-  standalone: true,
   imports: [StepCommonModule],
   templateUrl: './table-keywords.component.html',
   styleUrl: './table-keywords.component.scss',

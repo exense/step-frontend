@@ -20,6 +20,7 @@ import { DatePipe } from '@angular/common';
     DateRangeAdapterService,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AltExecutionTimeComponent {
   private _datePipe = inject(DatePipe);

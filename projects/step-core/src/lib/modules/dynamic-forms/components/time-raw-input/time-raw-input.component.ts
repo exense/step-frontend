@@ -8,6 +8,7 @@ import { NUMBER_CHARS_POSITIVE_ONLY } from '../../shared/constants';
   templateUrl: './time-raw-input.component.html',
   styleUrls: ['./time-raw-input.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class TimeRawInputComponent extends TimeInputComponent {
   @Input() parentControl?: NgControl;

@@ -26,6 +26,7 @@ import { RegistrationStrategy } from '../../shared/registration.strategy';
       } as MatCheckboxDefaultOptions,
     },
   ],
+  standalone: false,
 })
 export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
   private terminator$?: Subject<void>;

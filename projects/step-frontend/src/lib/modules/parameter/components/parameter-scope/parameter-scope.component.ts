@@ -6,6 +6,7 @@ import { ParameterScopeRendererService } from '../../services/parameter-scope-re
   selector: 'step-parameter-scope',
   templateUrl: './parameter-scope.component.html',
   styleUrls: ['./parameter-scope.component.scss'],
+  standalone: false,
 })
 export class ParameterScopeComponent implements OnInit {
   private _parameterScopeRendererService = inject(ParameterScopeRendererService);

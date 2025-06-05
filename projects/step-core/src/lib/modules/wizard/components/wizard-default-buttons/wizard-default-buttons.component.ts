@@ -6,6 +6,7 @@ import { WIZARD_STEP_BEHAVIOR_CONFIG } from '../../injectables/wizard-step-behav
   selector: 'step-wizard-default-buttons',
   templateUrl: './wizard-default-buttons.component.html',
   styleUrls: ['./wizard-default-buttons.component.scss'],
+  standalone: false,
 })
 export class WizardDefaultButtonsComponent {
   protected _actions = inject(WizardStepActionsService);

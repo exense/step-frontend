@@ -6,6 +6,7 @@ const RENDER_COL_TYPES: Array<ColInput['type']> = ['DROPDOWN', 'CHECKBOX'];
 
 @Pipe({
   name: 'customSearchCellComponent',
+  standalone: false,
 })
 export class CustomSearchCellComponentsPipe implements PipeTransform {
   private _customSearchCells = inject(CustomSearchCellRegistryService);

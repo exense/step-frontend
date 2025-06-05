@@ -9,6 +9,7 @@ import { CustomComponent } from '@exense/step-core';
   selector: 'step-dashlet-execution-viz',
   templateUrl: './dashlet-execution-viz.component.html',
   styleUrls: ['./dashlet-execution-viz.component.scss'],
+  standalone: false,
 })
 export class DashletExecutionVizComponent implements CustomComponent {
   _state = inject(ExecutionStateService);

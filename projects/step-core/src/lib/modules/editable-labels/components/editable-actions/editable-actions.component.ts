@@ -5,7 +5,6 @@ import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-comm
   selector: 'step-editable-actions',
   templateUrl: './editable-actions.component.html',
   styleUrls: ['./editable-actions.component.scss'],
-  standalone: true,
   imports: [...EDITABLE_LABELS_COMMON_IMPORTS],
 })
 export class EditableActionsComponent {

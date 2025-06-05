@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
   selector: 'step-progress-bar',
   templateUrl: './progress-bar.component.html',
   styleUrls: ['./progress-bar.component.scss'],
+  standalone: false,
 })
 export class ProgressBarComponent {
   @Input() progress$!: Observable<number>;

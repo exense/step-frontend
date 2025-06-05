@@ -30,6 +30,7 @@ const ARTEFACT_REPORT_NODE_MAP: Record<string, string> = {
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseAltReportNodeTableContentComponent implements ItemsPerPageService, AfterViewInit {
   protected _state = inject(AltReportNodesStateService);

@@ -10,7 +10,6 @@ import { COMMON_IMPORTS } from '../../../_common';
   styleUrls: ['./chart-skeleton.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class ChartSkeletonComponent {

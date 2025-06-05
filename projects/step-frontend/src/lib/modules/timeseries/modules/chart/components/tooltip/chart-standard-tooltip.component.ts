@@ -19,7 +19,6 @@ import { defer, Observable, of, switchMap } from 'rxjs';
   selector: 'step-chart-standard-tooltip',
   templateUrl: './chart-standard-tooltip.component.html',
   styleUrls: ['./chart-standard-tooltip.component.scss'],
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     NgTemplateOutlet,

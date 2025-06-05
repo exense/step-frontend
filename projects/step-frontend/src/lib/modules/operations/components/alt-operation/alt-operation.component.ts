@@ -5,7 +5,6 @@ import { KeyValuePipe, NgForOf, NgIf } from '@angular/common';
 
 @Component({
   selector: 'step-alt-operation',
-  standalone: true,
   imports: [NgIf, KeyValuePipe, NgForOf],
   templateUrl: './alt-operation.component.html',
   styleUrl: './alt-operation.component.scss',

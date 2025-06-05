@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   selector: 'step-search-resource-dialog',
   templateUrl: './search-resource-dialog.component.html',
   styleUrls: ['./search-resource-dialog.component.scss'],
+  standalone: false,
 })
 export class SearchResourceDialogComponent {
   private _augmentedResourceService = inject(AugmentedResourcesService);

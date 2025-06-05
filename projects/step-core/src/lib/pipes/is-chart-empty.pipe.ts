@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'isChartEmpty',
+  standalone: false,
 })
 export class IsChartEmptyPipe implements PipeTransform {
   transform(value: any | { series: any[]; data: any[][] }): boolean {

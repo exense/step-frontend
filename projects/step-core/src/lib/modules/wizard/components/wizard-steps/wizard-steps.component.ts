@@ -39,6 +39,7 @@ import { WizardStep } from '../../types/wizard-step.interface';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class WizardStepsComponent implements OnChanges, OnDestroy, WizardGlobalContext {
   private _wizardsRegistry = inject(WizardStepRegistryService);

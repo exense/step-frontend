@@ -31,6 +31,7 @@ type LabelTemplateAccessor = Mutable<Pick<EditableComponent<any>, 'labelTemplate
 @Component({
   // The provided template in our case is irrelevant
   template: '',
+  standalone: false,
 })
 export abstract class EditableComponent<T> implements ControlValueAccessor {
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

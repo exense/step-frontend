@@ -8,7 +8,6 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   templateUrl: './artefact-inline-field-list.component.html',
   styleUrl: './artefact-inline-field-list.component.scss',
   imports: [StepBasicsModule, ArtefactInlineFieldComponent],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })

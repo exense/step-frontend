@@ -8,6 +8,7 @@ import { ExecutionErrorCodeItem } from '../../shared/execution-error-code-item';
   selector: 'step-execution-errors',
   templateUrl: './execution-errors.component.html',
   styleUrls: ['./execution-errors.component.scss'],
+  standalone: false,
 })
 export class ExecutionErrorsComponent implements OnChanges {
   readonly ErrorDistributionStatus = ErrorDistributionStatus;

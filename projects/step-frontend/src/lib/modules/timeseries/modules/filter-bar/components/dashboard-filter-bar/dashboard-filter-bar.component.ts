@@ -59,7 +59,6 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   templateUrl: './dashboard-filter-bar.component.html',
   styleUrls: ['./dashboard-filter-bar.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     PerformanceViewTimeSelectionComponent,

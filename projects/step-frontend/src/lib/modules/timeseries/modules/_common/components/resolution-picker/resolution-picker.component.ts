@@ -10,7 +10,6 @@ export interface ResolutionPickerOption {
   selector: 'step-ts-resolution-picker',
   templateUrl: './resolution-picker.component.html',
   styleUrls: ['./resolution-picker.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class ResolutionPickerComponent implements OnInit {

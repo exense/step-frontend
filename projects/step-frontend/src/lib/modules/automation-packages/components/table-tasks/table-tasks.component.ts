@@ -11,7 +11,6 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 
 @Component({
   selector: 'step-table-tasks',
-  standalone: true,
   imports: [StepCommonModule],
   templateUrl: './table-tasks.component.html',
   styleUrl: './table-tasks.component.scss',

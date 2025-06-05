@@ -6,7 +6,6 @@ import { COMMON_IMPORTS } from '../../types/common-imports.constant';
   selector: 'step-discover-attribute-stats',
   templateUrl: './attribute-stats.component.html',
   styleUrls: ['./attribute-stats.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class DiscoverAttributeStatsComponent {

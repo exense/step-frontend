@@ -14,6 +14,7 @@ import { SwitchArtefact } from '../../types/switch.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SwitchInlineComponent extends BaseInlineArtefactComponent<SwitchArtefact> {
   private _artefactInlineUtilsService = inject(ArtefactInlineItemUtilsService);
