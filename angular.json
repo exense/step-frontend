@@ -37,7 +37,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "ngx-build-plus:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/step-app",
             "index": "projects/step-app/src/index.html",
@@ -68,7 +68,6 @@
             ],
             "styles": ["projects/step-app/src/styles.scss", "node_modules/uplot/dist/uPlot.min.css"],
             "scripts": ["node_modules/uplot/dist/uPlot.iife.min.js"],
-            "extraWebpackConfig": "projects/step-app/webpack.config.js",
             "commonChunk": false,
             "allowedCommonJsDependencies": ["ace-builds", "luxon"]
           },
@@ -96,8 +95,7 @@
                   "with": "projects/step-app/src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all",
-              "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
+              "outputHashing": "all"
             },
             "development": {
               "buildOptimizer": false,
@@ -111,11 +109,10 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "ngx-build-plus:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "@exense/step-app:build:production",
-              "extraWebpackConfig": "projects/step-app/webpack.prod.config.js"
+              "buildTarget": "@exense/step-app:build:production"
             },
             "development": {
               "buildTarget": "@exense/step-app:build:development",
@@ -129,8 +126,7 @@
           "defaultConfiguration": "development",
           "options": {
             "port": 4201,
-            "publicHost": "http://localhost:4201",
-            "extraWebpackConfig": "projects/step-app/webpack.config.js"
+            "publicHost": "http://localhost:4201"
           }
         },
         "extract-i18n": {
