@@ -517,7 +517,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
           let foundRelativeOption = this.timeRangeOptions.find(
             (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
           );
-          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label || `Last ${time} ms`;
+          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label;
         }
       } else if (selection.type === 'FULL') {
         selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };

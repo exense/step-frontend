@@ -9,7 +9,7 @@ type OnTouch = () => void;
 
 export type TimeUnitDictionary = Partial<Record<TimeUnit, string>>;
 
-const DEFAULT_TIME_LABELS_DICTIONARY: TimeUnitDictionary = {
+export const DEFAULT_TIME_LABELS_DICTIONARY: TimeUnitDictionary = {
   [TimeUnit.MILLISECOND]: 'Millisecond(s)',
   [TimeUnit.SECOND]: 'Second(s)',
   [TimeUnit.MINUTE]: 'Minute(s)',
