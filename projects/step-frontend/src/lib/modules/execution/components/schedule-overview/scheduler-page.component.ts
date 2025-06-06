@@ -429,7 +429,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                   return s;
                 });
                 this.cumulateSeriesData(series);
-                console.log(series);
                 return this.createTestCasesChart(executions, series);
               }),
             );
@@ -488,7 +487,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   }
 
   private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
-    console.log('received url params', urlParams);
     if (urlParams.refreshInterval === undefined) {
       urlParams.refreshInterval = 0;
     }
@@ -586,7 +584,10 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     };
   }
 
-  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
+  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings | null {
+    if (executions.length === 0) {
+      return null;
+    }
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
