@@ -155,22 +155,11 @@
             <step-icon name="play" />
           </button>
           <a
-            data-step-testid="analyze-performance-btn"
-            mat-icon-button
-            matTooltip="Analyze performance"
-            [disabled]="!('execution-read' | hasRight | async)"
-            routerLink="/analytics"
-            [queryParams]="element | dashboardNavigationParams"
-            queryParamsHandling="merge"
-          >
-            <step-icon name="line-chart-up-01" />
-          </a>
-          <a
             stepTestId="cross-execution-schedule-btn"
             mat-icon-button
             matTooltip="Open scheduled execution report"
             [disabled]="!('execution-read' | hasRight | async)"
-            [routerLink]="element | taskCrossExecutionUrl"
+            [routerLink]="element | taskReportPageUrl"
           >
             <step-icon name="file-07" />
           </a>

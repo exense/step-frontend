@@ -3,8 +3,8 @@
     <div>
       @for (series of transformedData(); track series.label) {
         <div class="row" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
-          <div class="step-marker-filled-square" [style.--item-color]="series.color"></div>
-          <div>{{ series.label }} ({{ series.value }})</div>
+          <step-status [status]="series.label" [iconMode]="false" />
+          ({{ series.value }})
         </div>
       }
     </div>

@@ -52,12 +52,12 @@ export class CommonEntitiesUrlsService {
     return `/scheduler/editor/${id}`;
   }
 
-  schedulerCrossExecutionUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+  schedulerReportPageUrl(idOrTask?: string | ExecutiontTaskParameters): string {
     if (!idOrTask) {
       return '';
     }
     const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
-    return `/cross-executions/${id}`;
+    return `/scheduler/${id}/report`;
   }
 
   legacyExecutionUrl(idOrExecution?: string | Execution, isDirectLink = true): string {

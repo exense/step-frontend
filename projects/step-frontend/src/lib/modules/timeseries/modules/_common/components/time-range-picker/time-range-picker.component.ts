@@ -62,6 +62,7 @@ export class TimeRangePickerComponent implements OnInit {
 
   protected mainPickerLabel = computed(() => {
     const selection = this.activeSelection();
+    console.log('active selection changed', selection);
     if (!selection) {
       return;
     }
