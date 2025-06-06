@@ -40,6 +40,9 @@ step-plan-function-list {
     padding-left: 0;
     padding-right: 0;
     text-align: center;
+    entity-icon {
+      margin-right: 0.3rem;
+    }
   }
 
   .move {
@@ -48,6 +51,7 @@ step-plan-function-list {
     width: 0;
     text-align: center;
     step-icon {
+      width: auto;
       cursor: grab;
     }
   }

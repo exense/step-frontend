@@ -6,9 +6,9 @@ import { StepBasicsModule, IsUsedBySearchType, ProjectNamePipe } from '../../../
 import { TableModule } from '../../../table/table.module';
 import { PlanLinkComponent } from '../../../plan-common/components/plan-link/plan-link.component';
 import { EntityModule } from '../../../entity/entity.module';
-import { KeywordsCommonModule } from '../../../keywords-common/keywords-common.module';
 import { NavigationStart, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { KEYWORDS_COMMON_IMPORTS } from '../../../keywords-common';
 
 interface FindReferenceWithLinkContext extends FindReferencesResponse {
   linkContext?: {
@@ -23,7 +23,7 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
   selector: 'step-is-used-by-list',
   templateUrl: './is-used-by-list.component.html',
   styleUrls: ['./is-used-by-list.component.scss'],
-  imports: [StepBasicsModule, TableModule, PlanLinkComponent, KeywordsCommonModule, EntityModule],
+  imports: [StepBasicsModule, TableModule, PlanLinkComponent, KEYWORDS_COMMON_IMPORTS, EntityModule],
   providers: [ProjectNamePipe],
   standalone: true,
 })
