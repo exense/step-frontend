@@ -79,6 +79,7 @@
     & > step-simple-object-input,
     & > step-autocomplete-input,
     & > mat-date-range-input,
+    & > step-rich-editor,
     & > textarea {
       border-color: $highlight-color;
     }
@@ -202,8 +203,8 @@
         & > step-password,
         & > step-simple-object-input,
         & > step-autocomplete-input,
+        & > step-rich-editor,
         & > textarea,
-        step-rich-editor,
         & > step-suffix,
         & > step-prefix {
           border-color: $primary-color;
@@ -243,6 +244,7 @@
       & > step-password,
       & > step-simple-object-input,
       & > step-autocomplete-input,
+      & > step-rich-editor,
       & > textarea {
         border-color: $border-color;
         font-weight: 400;
@@ -252,6 +254,13 @@
         margin-bottom: 0;
         box-sizing: border-box;
         outline: none;
+      }
+
+      & > step-rich-editor {
+        padding: 0;
+        & > div {
+          border-radius: var(--form-field-border-radius);
+        }
       }
 
       & > mat-radio-group {
