@@ -22,6 +22,9 @@ export const $AggregatedReportView = {
         type: 'AggregatedReportView',
       },
     },
+    hasDescendantInvocations: {
+      type: 'boolean',
+    },
     parentSource: {
       type: 'Enum',
     },

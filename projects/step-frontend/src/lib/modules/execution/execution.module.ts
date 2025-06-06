@@ -139,7 +139,6 @@ import { AggregatedReportViewDurationValuePipe } from './pipes/aggregated-report
 import { IsAverageDurationPipe } from './pipes/is-average-duration.pipe';
 import { DashboardPageComponent } from '../timeseries/components/dashboard-page/dashboard-page.component';
 import { LegacyExecutionViewComponent } from './components/dashlet-execution-viz/wrapper/legacy-execution-view.component';
-import { MatButton } from '@angular/material/button';
 import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-tree-node-addon.directive';
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
@@ -250,7 +249,6 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/rep
     TimeRangePickerComponent,
     AltReportWidgetContentDirective,
     DashboardPageComponent,
-    MatButton,
     ToggleRequestWarningDirective,
   ],
   exports: [

@@ -155,7 +155,7 @@ export class DashboardPageComponent implements OnInit {
     return (
       this.timeRangeOptions.find((o) => o.relativeSelection?.timeInMs === relativeMs) || {
         type: 'RELATIVE',
-        relativeSelection: { timeInMs: relativeMs, label: `Last ${relativeMs} ms` },
+        relativeSelection: { timeInMs: relativeMs },
       }
     );
   }

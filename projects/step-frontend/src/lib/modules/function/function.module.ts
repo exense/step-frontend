@@ -28,18 +28,15 @@ import { CompositeFunctionEditorComponent } from './components/composite-functio
 import { FunctionConfigurationDialogComponent } from './components/function-configuration-dialog/function-configuration-dialog.component';
 import { FunctionListComponent } from './components/function-list/function-list.component';
 import { FunctionTypeCompositeComponent } from './components/function-type-composite/function-type-composite.component';
-import { FunctionTypeFilterComponent } from './components/function-type-filter/function-type-filter.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { CompositeKeywordPlanContextApiService } from './injectables/composite-keyword-plan-context-api.service';
 import { map } from 'rxjs';
 import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
-import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
-  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule, NgxMatSelectSearchModule],
+  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
   declarations: [
     FunctionListComponent,
-    FunctionTypeFilterComponent,
     CompositeFunctionEditorComponent,
     FunctionConfigurationDialogComponent,
     FunctionTypeCompositeComponent,

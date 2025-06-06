@@ -39,6 +39,9 @@ step-plan-otherplan-list {
     padding-left: 0;
     padding-right: 0;
     text-align: center;
+    entity-icon {
+      margin-right: 0.3rem;
+    }
   }
 
   .move {
@@ -47,6 +50,7 @@ step-plan-otherplan-list {
     width: 0;
     text-align: center;
     step-icon {
+      width: auto;
       cursor: grab;
     }
   }

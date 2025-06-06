@@ -4,6 +4,7 @@ import { Keyword } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'keywordConfigurerUrl',
+  standalone: true,
 })
 export class KeywordConfigurerUrlPipe implements PipeTransform {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);

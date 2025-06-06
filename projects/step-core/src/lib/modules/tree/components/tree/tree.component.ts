@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   contentChild,
   effect,
   ElementRef,
@@ -11,6 +12,8 @@ import {
   input,
   Input,
   Output,
+  signal,
+  TrackByFunction,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -31,6 +34,8 @@ import { TreeNodeComponent } from '../tree-node/tree-node.component';
 import { TreeNodeActionsPipe } from '../../pipes/tree-node-actions.pipe';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { OriginalNodePipe } from '../../pipes/original-node.pipe';
+import { TreeVirtualScrollDirective } from '../../directives/tree-virtual-scroll.directive';
+import { TreeAutoChooseVirtualScrollDirective } from '../../directives/tree-auto-choose-virtual-scroll.directive';
 
 @Component({
   selector: 'step-tree',
@@ -52,7 +57,25 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _doc = inject(DOCUMENT);
 
+  protected readonly _stepTreeVirtualScroll = inject(TreeVirtualScrollDirective, { optional: true });
+  protected readonly _strepTreeAutoChooseVirtualScroll = inject(TreeAutoChooseVirtualScrollDirective, {
+    optional: true,
+  });
   readonly _treeState = inject<TreeStateService<any, N>>(TreeStateService);
+
+  protected readonly itemTrackBy: TrackByFunction<N> = (index, item) => item.id;
+
+  private applyVirtualScrollFrom = this._strepTreeAutoChooseVirtualScroll?.applyVirtualScrollFrom ?? signal(undefined);
+  private displayedItems = computed(() => this._treeState.flatTree()?.length ?? 0);
+
+  protected readonly hasVirtualScroll = computed(() => {
+    const applyVirtualScrollFrom = this.applyVirtualScrollFrom();
+    const displayedItems = this.displayedItems();
+    if (typeof applyVirtualScrollFrom === 'number') {
+      return displayedItems >= applyVirtualScrollFrom;
+    }
+    return !!this._stepTreeVirtualScroll;
+  });
 
   readonly contextMenuPosition = { x: 0, y: 0 };
 
@@ -117,6 +140,32 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
 
   handleContextClose(): void {
     this.openedMenuNodeId = undefined;
+  }
+
+  scrollToNode(nodeId?: string): void {
+    if (!nodeId) {
+      return;
+    }
+    if (!this.hasVirtualScroll) {
+      this.nativeScroll(nodeId);
+      return;
+    }
+
+    const index = this._treeState.indexOf(nodeId);
+    if (index < 0) {
+      return;
+    }
+
+    this._stepTreeVirtualScroll!.strategy!.scrollToIndexApproximately(index);
+    this.nativeScroll(nodeId);
+    // sometimes scroll to element doesn't performed correctly after virtual scroll
+    // invoke another autoscroll to correct the position (but without scrolling effect)
+    setTimeout(() => this.nativeScroll(nodeId, 'instant'), 300);
+  }
+
+  private nativeScroll(nodeId: string, behavior: ScrollBehavior = 'smooth'): void {
+    const nodeElement = this._elRef.nativeElement.querySelector<HTMLElement>(`[data-tree-node-id="${nodeId}"]`);
+    nodeElement?.scrollIntoView?.({ behavior, block: 'nearest' });
   }
 
   private setFocus(isInFocus: boolean) {

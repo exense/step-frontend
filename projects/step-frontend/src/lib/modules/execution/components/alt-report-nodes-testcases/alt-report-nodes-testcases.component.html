@@ -1,5 +1,5 @@
 <step-alt-report-node-list title="Test Cases" [mode]="_mode">
-  <step-table #table [dataSource]="(dataSource$ | async)!" class="paddingless-full no-border hide-header">
+  <step-table #table [dataSource]="(dataSource$ | async)!" class="paddingless-all-sides no-border hide-header">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
@@ -13,6 +13,7 @@
             </div>
           </div>
           <step-aggregated-status
+            [hasDescendantInvocations]="element.hasDescendantInvocations"
             [countByStatus]="element.countByStatus"
             (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
           />

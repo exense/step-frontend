@@ -37,3 +37,13 @@ step-drag-column-caption {
     }
   }
 }
+
+.paddingless-cells,
+.paddingless-full {
+  step-drag-column-caption {
+    .drag-pointer:hover:not(:empty) {
+      padding: 0 0.5rem 0 0rem;
+      margin: 0 -0.1rem;
+    }
+  }
+}

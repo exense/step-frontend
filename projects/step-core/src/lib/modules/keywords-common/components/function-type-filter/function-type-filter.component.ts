@@ -3,9 +3,9 @@ import {
   ArrayFilterComponent,
   ArrayItemLabelValueExtractor,
   BaseFilterComponent,
-  FunctionTypeRegistryService,
-  ItemInfo,
-} from '@exense/step-core';
+  StepBasicsModule,
+} from '../../../basics/step-basics.module';
+import { FunctionTypeRegistryService, ItemInfo } from '../../../custom-registeries/custom-registries.module';
 
 @Component({
   selector: 'step-function-type-filter',
@@ -17,6 +17,8 @@ import {
       useExisting: forwardRef(() => FunctionTypeFilterComponent),
     },
   ],
+  imports: [StepBasicsModule],
+  standalone: true,
 })
 export class FunctionTypeFilterComponent
   extends ArrayFilterComponent<ItemInfo>

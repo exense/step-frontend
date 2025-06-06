@@ -14,13 +14,9 @@ step-plan-artefact-list {
 
   .icon-cell {
     width: 1%;
-  }
-
-  .entity-column-header,
-  .entity-column-cell {
-    padding-left: 0;
-    padding-right: 0;
-    text-align: center;
+    step-icon {
+      margin-right: 0.3rem;
+    }
   }
 
   .move {
@@ -29,6 +25,7 @@ step-plan-artefact-list {
     width: 0;
     text-align: center;
     step-icon {
+      width: auto;
       cursor: grab;
     }
   }

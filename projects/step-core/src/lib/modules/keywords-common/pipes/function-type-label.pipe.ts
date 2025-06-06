@@ -3,6 +3,7 @@ import { FunctionTypeRegistryService } from '../../custom-registeries/custom-reg
 
 @Pipe({
   name: 'functionTypeLabel',
+  standalone: true,
 })
 export class FunctionTypeLabelPipe implements PipeTransform {
   private _functionTypeRegistry = inject(FunctionTypeRegistryService);

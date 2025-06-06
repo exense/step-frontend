@@ -7,12 +7,11 @@ import {
   input,
   Input,
   model,
-  OnChanges,
   OnInit,
   Output,
-  signal,
-  SimpleChanges,
+  untracked,
   ViewChild,
+  signal,
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TimeRangePickerSelection } from '../../types/time-selection/time-range-picker-selection';
@@ -20,8 +19,7 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TIME_UNIT_DICTIONARY, TimeRange, TimeUnit } from '@exense/step-core';
-import { FormsModule } from '@angular/forms';
+import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit } from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -32,20 +30,32 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   standalone: true,
-  imports: [COMMON_IMPORTS, FormsModule],
+  imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {
+  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY];
+  readonly TIME_UNIT_LABELS: Record<string, string> = {
+    [TimeUnit.MINUTE]: 'minutes',
+    [TimeUnit.HOUR]: 'hours',
+    [TimeUnit.DAY]: 'days',
+  };
   private _snackBar = inject(MatSnackBar);
+  private _converter = inject(TimeConvertersFactoryService).timeConverter();
 
   @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
 
   activeSelection = input.required<TimeRangePickerSelection>();
+  draftSelection = signal<TimeRangePickerSelection | undefined>(undefined);
   selectOptions = input.required<TimeRangePickerSelection[]>();
   activeTimeRange = input<TimeRange>(); // represent the time-range that should be displayed in the inputs
   @Input() compact = false;
   @Input() fullRangeLabel?: string; // used to override the "Full Selection" default label
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
+
+  otherOptionSelected = signal<boolean>(false);
+  otherOptionValue = model<number | undefined>(undefined);
+  otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
 
   // when auto-refresh is enabled or the changes come from exterior, the inputs may be updated in the middle of editing
   dateTimeInputsLocked = false;
@@ -56,24 +66,47 @@ export class TimeRangePickerComponent implements OnInit {
     if (!selection) {
       return;
     }
+
     if (selection.type === 'FULL' || selection.type === 'ABSOLUTE') {
       const range = selection.absoluteSelection;
-      if (range) {
-        return TimeSeriesUtils.formatRange(range);
-      } else {
-        return 'Full range';
-      }
-    } else {
-      return selection.relativeSelection!.label!;
+      return range ? TimeSeriesUtils.formatRange(range) : 'Full range';
     }
+
+    if (selection.type === 'RELATIVE') {
+      let convertedValue = this.convertMsValue(selection.relativeSelection!.timeInMs);
+
+      return `Last ${convertedValue.value} ${this.TIME_UNIT_LABELS[convertedValue.unit]}`;
+    }
+
+    return 'Unknown';
   });
 
-  timeRangeInputsSyncEffect = effect(() => {
-    const timeRange = this.activeTimeRange();
-    if (!this.dateTimeInputsLocked) {
-      this.fillInputs(timeRange);
+  private convertMsValue(timeInMs: number): { value: number; unit: TimeUnit } {
+    const displayUnit = this._converter.autoDetermineDisplayMeasure(
+      timeInMs,
+      TimeUnit.MILLISECOND,
+      Object.values(TIME_UNIT_DICTIONARY),
+      TimeUnit.MINUTE,
+    );
+    const displayValue = this._converter.calculateDisplayValue(timeInMs, TimeUnit.MILLISECOND, displayUnit);
+    return { value: displayValue, unit: displayUnit };
+  }
+
+  applyRelativeTimeRange() {
+    if (this.draftSelection()?.type === 'FULL') {
+      this.emitSelectionChange({ type: 'FULL' });
+      this.closeMenu();
+      return;
     }
-  });
+    let unit: TimeUnit = this.otherOptionUnit()!;
+    let value = this.otherOptionValue();
+    if (!unit || !value) {
+      return;
+    }
+    this.draftSelection.set({ type: 'RELATIVE', relativeSelection: { timeInMs: value! * unit } });
+    this.emitSelectionChange(this.draftSelection()!);
+    this.closeMenu();
+  }
 
   fillInputs(range?: TimeRange) {
     if (range) {
@@ -101,6 +134,14 @@ export class TimeRangePickerComponent implements OnInit {
 
   handleMenuOpen() {
     // make sure fresh data is displayed
+    let activeSelection = this.activeSelection();
+    this.draftSelection.set({ ...activeSelection });
+    if (activeSelection.type === 'RELATIVE') {
+      // we deal with a custom relative range
+      const convertedValue = this.convertMsValue(activeSelection.relativeSelection!.timeInMs);
+      this.otherOptionValue.set(convertedValue.value);
+      this.otherOptionUnit.set(convertedValue.unit);
+    }
     this.fillInputs(this.activeTimeRange());
   }
 
@@ -199,23 +240,12 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
+    this.draftSelection.set(option);
     if (option.type === 'RELATIVE') {
-      if (option.relativeSelection!.timeInMs === this.activeSelection()?.relativeSelection?.timeInMs) {
-        return;
-      }
-    } else if (option.type === 'FULL') {
-      const selectionFrom = option.absoluteSelection?.from;
-      const selectionTo = option.absoluteSelection?.to;
-      if (selectionFrom) {
-        // this.fromDate = DateTime.fromMillis(selectionFrom!);
-        // this.fromDateString = TimeSeriesUtils.formatInputDate(new Date(selectionFrom!));
-      }
-      if (selectionTo) {
-        // this.toDate = DateTime.fromMillis(selectionTo!);
-        // this.toDateString = TimeSeriesUtils.formatInputDate(new Date(selectionTo!));
-      }
+      const convertedValue = this.convertMsValue(option.relativeSelection!.timeInMs);
+      this.otherOptionUnit.set(convertedValue.unit);
+      this.otherOptionValue.set(convertedValue.value);
     }
-    this.emitSelectionChange(option);
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {
