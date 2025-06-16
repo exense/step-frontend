@@ -91,16 +91,16 @@ export class ExecutionsChartTooltipComponent {
     const request: FetchBucketsRequest = {
       start: item.timestamp,
       end: item.timestamp + bucketInterval,
-      numberOfBuckets: 1, // good amount of bars visually
+      numberOfBuckets: 1,
       oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId} and attributes.result = ${item.label}`,
-      collectAttributeKeys: ['eId'],
-      collectAttributesValuesLimit: 10,
+      groupDimensions: ['eId'],
+      maxNumberOfSeries: 10,
     };
     this._timeSeriesService
       .getTimeSeries(request)
       .pipe(
         switchMap((timeSeriesResponse) => {
-          const eIds = timeSeriesResponse.matrix[0][0]?.attributes?.['eId'];
+          const eIds = timeSeriesResponse.matrixKeys.map((attr) => attr['eId']);
           if (eIds?.length > 0) {
             return this._executionService.getExecutionsByIds(eIds);
           } else {
