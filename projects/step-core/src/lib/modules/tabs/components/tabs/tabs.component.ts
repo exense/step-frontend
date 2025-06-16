@@ -2,11 +2,8 @@ import {
   Component,
   computed,
   contentChild,
-  effect,
-  HostBinding,
   inject,
   input,
-  Input,
   output,
   TemplateRef,
   viewChild,
@@ -28,53 +25,41 @@ import { TestIdDirective } from '../../../../directives/test-id.directive';
   standalone: true,
   exportAs: 'StepTabs',
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.shrink]': 'shrink()',
+    '[class.tab-mode-buttons]': 'isTabModeButtons()',
+    '[class.tab-mode-tabs]': 'isTabModeTabs()',
+  },
 })
 export class TabsComponent<T extends string | number> {
   readonly _activatedRoute = inject(ActivatedRoute, { optional: true });
 
-  /** @ViewChild(MatTabNav) **/
   private tabBar = viewChild(MatTabNav);
 
-  /** @Input() **/
-  tabMode = input<'buttons' | 'tabs'>('buttons');
+  readonly tabMode = input<'buttons' | 'tabs'>('buttons');
 
-  /** @Input() **/
-  userRouteLinks = input(false);
+  readonly userRouteLinks = input(false);
 
-  /** @Iput() **/
-  disablePagination = input(false);
+  readonly disablePagination = input(false);
 
-  /** @Input() **/
-  tabs = input<Tab<T>[]>([]);
+  readonly tabs = input<Tab<T>[]>([]);
 
-  /** @Input() **/
-  activeTabId = input<T | undefined>();
+  readonly activeTabId = input<T | undefined>();
+  readonly activeTabIdChange = output<T>();
 
-  /** @Input() **/
-  compactTabs = input<boolean>(false);
+  readonly compactTabs = input<boolean>(false);
 
-  /** @Output() **/
-  activeTabIdChange = output<T>();
-
-  /** @Input('tabTemplate') **/
-  tabTemplateInput = input<TemplateRef<unknown> | undefined>(undefined, {
+  readonly tabTemplateInput = input<TemplateRef<unknown> | undefined>(undefined, {
     alias: 'tabTemplate',
   });
 
-  /** @ContentChild(TabTemplateDirective) **/
   private tabTemplateDirective = contentChild(TabTemplateDirective);
 
   readonly tabTemplate = computed(() => this.tabTemplateDirective()?.templateRef ?? this.tabTemplateInput()!);
 
-  @HostBinding('class.shrink') @Input() shrink: boolean = false;
-  @HostBinding('class.tab-mode-buttons') isTabModeButtons: boolean = true;
-  @HostBinding('class.tab-mode-tabs') isTabModeTabs: boolean = false;
-
-  private effectModeChange = effect(() => {
-    const tabMode = this.tabMode();
-    this.isTabModeButtons = tabMode === 'buttons';
-    this.isTabModeTabs = tabMode === 'tabs';
-  });
+  readonly shrink = input(false);
+  protected readonly isTabModeButtons = computed(() => this.tabMode() === 'buttons');
+  protected readonly isTabModeTabs = computed(() => this.tabMode() === 'tabs');
 
   selectTab(tab: Tab<T>): void {
     this.activeTabIdChange.emit(tab.id);
