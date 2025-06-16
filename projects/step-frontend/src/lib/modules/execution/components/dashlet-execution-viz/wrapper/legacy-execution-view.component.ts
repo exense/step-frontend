@@ -43,7 +43,6 @@ export class LegacyExecutionViewComponent implements OnInit {
   isLoading = signal<boolean>(false);
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
-    console.log('time ranged changed');
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
       const execution = this.execution();
