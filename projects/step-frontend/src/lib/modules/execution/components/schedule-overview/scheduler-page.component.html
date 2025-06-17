@@ -8,7 +8,7 @@
         @if ((lastExecution$ | async)?.execution; as lastExecution) {
           <a
             class="plan-link"
-            routerLink="/plans/editor/{{ lastExecution.planId }}"
+            [routerLink]="['/plans/editor', lastExecution.planId]"
             matTooltip="Navigate to plan"
             matTooltipPosition="right"
           >
@@ -34,9 +34,6 @@
       <button type="button" mat-icon-button color="default" [matTooltip]="'Cron expression: ' + task.cronExpression">
         <step-icon name="clock" />
       </button>
-      <!--      @if (displayStatus$ | async; as status) {-->
-      <!--        <step-status [status]="status" [iconMode]="true" />-->
-      <!--      }-->
     </div>
     <div class="controls">
       <step-autorefresh-toggle
