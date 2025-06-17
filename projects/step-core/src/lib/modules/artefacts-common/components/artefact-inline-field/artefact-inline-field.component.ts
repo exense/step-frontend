@@ -37,7 +37,6 @@ const DEFAULT_MARGIN = '0.5rem';
 export class ArtefactInlineFieldComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
 
-  private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private elPrefix = viewChild('elPrefix', { read: ElementRef<HTMLElement> });
   private elLabel = viewChild('elLabel', { read: ElementRef<HTMLElement> });
   private elValue = viewChild('elValue', { read: ElementRef<HTMLElement> });
@@ -158,15 +157,6 @@ export class ArtefactInlineFieldComponent {
     }
     return value?.expression;
   });
-
-  /*
-  protected readonly trackOverflowContent = computed(() => {
-    const hasIcon = !!this.item()?.icon;
-    const label = this.itemLabel()?.toString() ?? '';
-    const value = this.itemValue()?.toString() ?? '';
-    return `${hasIcon ? '   ' : ''}${label}:${value}`;
-  });
-*/
 
   protected displayValue($event: MouseEvent): void {
     const label = this.itemLabel()?.toString() ?? '';

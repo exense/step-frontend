@@ -43,22 +43,12 @@ export class ArtefactInlineFieldListComponent {
     transform: (value: ArtefactInlineItem[] | undefined) => value ?? [],
   });
 
-  readonly logOn = computed(() => {
-    const items = this.items();
-    if (!items.length) {
-      return false;
-    }
-    const firstItem = items[0];
-    return firstItem?.label?.value === 'name' && firstItem?.value?.value === 'test';
-  });
-
   protected readonly displayItems = computed(() => {
     const items = this.items();
     const renderedElements = (this.renderedElements() ?? []).map((item) => item);
     const availableWidth = this._parentContainerSizes?.width?.();
     const listPrefixWidth = this.listPrefix()?.nativeElement?.offsetWidth ?? 0;
     const isVertical = this.isVertical();
-    const isLog = this.logOn();
     if (isVertical || !availableWidth || !renderedElements?.length) {
       return items;
     }
@@ -80,7 +70,6 @@ export class ArtefactInlineFieldListComponent {
   private determineElementsWithWidths(
     renderedElementsWithInitialWidths: ArtefactInlineFieldComponent[],
     availableWidth: number,
-    isLog?: boolean,
   ): ArtefactInlineItemExplicitWidths[] {
     let wholeTotal = this.countTotal(renderedElementsWithInitialWidths.map((element) => element.getWidths()));
 
@@ -94,25 +83,9 @@ export class ArtefactInlineFieldListComponent {
         fareShare = MIN_WIDTH;
       }
 
-      if (isLog) {
-        console.log('CALCULATIONS');
-        console.log('AVAILABLE WIDTH:', availableWidth);
-        console.log('ITEMS TOTAL WIDTH:', wholeTotal);
-        const widthsString = this.getWidthString(renderedElementsWithInitialWidths.map((el) => el.getWidths()));
-        console.log('ELEMENTS: ', widthsString);
-        console.log('ELEMENTS COUNT:', totalCount);
-        console.log('FARE SHARE:', fareShare, '(availableWidth / totalCount)');
-      }
-
       const fareShareContext: FareShareContext = { fareShare, fareShareApplied: 0 };
       changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, fareShareContext);
       wholeTotal = this.countTotal(changedItems.map((item) => item.explicitWidths));
-      if (isLog) {
-        console.log('APPLY FARE SHARE COUNT:', fareShareContext.fareShareApplied);
-        const widthsString = this.getWidthString(changedItems.map((item) => item.explicitWidths));
-        console.log('ELEMENT RECALCULATED WIDTHS: ', widthsString);
-        console.log('RECALCULATED TOTAL WIDTHS:', wholeTotal);
-      }
 
       if (wholeTotal < availableWidth) {
         const unallocated = availableWidth - wholeTotal;
@@ -123,13 +96,6 @@ export class ArtefactInlineFieldListComponent {
         const newFareShareContext: FareShareContext = { fareShare, fareShareApplied: 0 };
         changedItems = this.createItemsWithReallocatedWidths(renderedElementsWithInitialWidths, newFareShareContext);
         wholeTotal = this.countTotal(changedItems.map((item) => item.explicitWidths));
-
-        if (isLog) {
-          console.log('UNALLOCATED WIDTH:', unallocated);
-          console.log('RECALCULATED FARE SHARE:', fareShare, `(fareShare + unallocated) / applyFareShareCount`);
-          const widthsString = this.getWidthString(changedItems.map((item) => item.explicitWidths));
-          console.log('RECALCULATED WIDTHS WITH NEW FARE SHARE: ', widthsString);
-        }
       }
 
       if (wholeTotal > availableWidth) {
@@ -191,18 +157,5 @@ export class ArtefactInlineFieldListComponent {
         }
         return value;
       }, 0);
-  }
-
-  private getWidthString(widths: (WidthContainer | undefined)[]): string {
-    return widths
-      .filter((widthContainer) => !!widthContainer)
-      .reduce(
-        (res, widthContainer) => [
-          ...res,
-          `{label: ${widthContainer?.label ?? ''}px, value: ${widthContainer?.value ?? ''}px}`,
-        ],
-        [] as string[],
-      )
-      .join('');
   }
 }

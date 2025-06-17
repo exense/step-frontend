@@ -26,7 +26,7 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
-        <div class="details-trigger" (click)="openDetails(element)">
+        <div class="details-trigger" stepElementSize (click)="openDetails(element)">
           <div class="larger-view">
             <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
             <step-status

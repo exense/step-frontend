@@ -10,7 +10,7 @@
           [statusFilter]="statusFilter()"
           (statusClick)="showDetails($event.status, $event.count, $event.event)"
         />
-        <span [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
+        <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
           node?.originalArtefact?.description | treeNodeDescription
         }}</span>
         <step-artefact-inline-details class="smaller-view" [aggregatedInfo]="node" />

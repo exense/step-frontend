@@ -59,7 +59,10 @@ step-alt-execution-tree {
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-    min-height: 3.1rem;
+    min-height: 2rem;
+    align-items: flex-start;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     &.not-selectable {
       background: none !important;
     }
