@@ -10,6 +10,7 @@ step-artefact-inline-field section.field-content {
 }
 
 step-artefact-inline-field {
+  /*
   .ellipsis {
     display: none;
   }
@@ -21,6 +22,19 @@ step-artefact-inline-field {
     &.step-overflow-indicator-has-overflow + .ellipsis {
       display: block;
     }
+  }
+  */
+
+  .field-label {
+    max-width: var(--style__label-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .field-value {
+    max-width: var(--style__value-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   label,

@@ -1,6 +1,6 @@
 <ng-template #tplLabel>
   @if (hasLabel()) {
-    <label [class.not-resolved-text]="!isLabelResolved()">
+    <label #elLabel class="field-label" [class.not-resolved-text]="!isLabelResolved()">
       {{ itemLabel() }}
       @if (showColon()) {
         {{ ':' }}
@@ -10,18 +10,18 @@
 </ng-template>
 <ng-template #tplValue>
   @if (hasValue()) {
-    <span [class.not-resolved-text]="!isValueResolved()">
+    <span #elValue class="field-value" [class.not-resolved-text]="!isValueResolved()">
       {{ itemValue() }}
     </span>
   }
 </ng-template>
 @if (item(); as item) {
   @if (prefix(); as prefix) {
-    <span>{{ prefix }}</span>
+    <span #elPrefix class="field-prefix">{{ prefix }}</span>
   }
-  <section class="field-content" [stepOverflowIndicator]="trackOverflowContent()" (click)="displayValue($event)">
+  <section class="field-content" (click)="displayValue($event)">
     @if (icon(); as icon) {
-      <step-icon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
+      <step-icon #elIcon class="field-icon" [name]="icon" [matTooltip]="iconTooltip()" matTooltipPosition="below" />
     }
     @if (hasDynamicExpression()) {
       <step-popover [mode]="PopoverMode.HOVER" yPosition="below">
@@ -79,8 +79,7 @@
       }
     }
   </section>
-  <div class="ellipsis">...</div>
   @if (suffix(); as suffix) {
-    <span>{{ suffix }}</span>
+    <span #elSuffix class="field-suffix">{{ suffix }}</span>
   }
 }

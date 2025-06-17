@@ -1,8 +1,23 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-artefact-inline-field-list {
   display: flex;
   align-items: center;
+
+  .invisible-items {
+    visibility: hidden;
+    height: 0;
+    width: 0;
+  }
+
+  &.bold-labels {
+    step-artefact-inline-field {
+      label {
+        font-weight: bold;
+      }
+    }
+  }
 
   section.list {
     display: flex;
@@ -21,10 +36,6 @@ step-artefact-inline-field-list {
       }
     }
 
-    &.wrap {
-      flex-wrap: wrap;
-    }
-
     &:not(.vertical) {
       align-items: center;
       step-artefact-inline-field {
@@ -36,6 +47,11 @@ step-artefact-inline-field-list {
         }
       }
     }
+  }
+
+  .ellipsis {
+    border: solid 0.1rem var.$gray-450;
+    border-radius: 4rem;
   }
 
   step-icon.more-icon {
