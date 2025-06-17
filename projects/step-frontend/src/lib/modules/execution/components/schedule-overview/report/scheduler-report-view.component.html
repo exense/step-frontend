@@ -14,7 +14,11 @@
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (_stateService.executionsChartSettings$ | async; as executionsChartSettings) {
-          <step-timeseries-chart [settings]="executionsChartSettings" (zoomChange)="handleMainChartZoom($event)">
+          <step-timeseries-chart
+            [settings]="executionsChartSettings"
+            (zoomChange)="handleMainChartZoom($event)"
+            [height]="340"
+          >
             <ng-template tooltipContent let-data>
               <step-executions-chart-tooltip [data]="data" [taskId]="_stateService.taskId()!" />
             </ng-template>
@@ -32,7 +36,7 @@
     >
       <step-alt-report-widget-content class="widget-content">
         @if (_stateService.keywordsChartSettings$ | async; as settings) {
-          <step-timeseries-chart [settings]="settings.chartSettings">
+          <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
             <ng-template tooltipContent let-data>
               <div class="ts-tooltip">
                 <div
@@ -60,7 +64,7 @@
           [title]="'Test cases by execution (last ' + _stateService.LAST_EXECUTIONS_TO_DISPLAY + ')'"
         >
           <step-alt-report-widget-content class="widget-content">
-            <step-timeseries-chart [settings]="testCasesData.chartSettings!">
+            <step-timeseries-chart [settings]="testCasesData.chartSettings!" [height]="350">
               <ng-template tooltipContent let-data>
                 <div class="ts-tooltip">
                   <div
