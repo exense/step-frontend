@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, TableFetchLocalDataSource, TimeRange, TimeSeriesErrorEntry } from '@exense/step-core';
 import { FilterBarItem } from '../../../timeseries/modules/_common';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { TSChartSettings } from '../../../timeseries/modules/chart';
@@ -23,6 +23,7 @@ export abstract class SchedulerPageStateService {
     chartSettings: TSChartSettings | null;
     lastExecutions: Execution[];
   }>;
+  abstract readonly errorsDataSource: TableFetchLocalDataSource<TimeSeriesErrorEntry>;
 
   abstract getDashboardFilters(): FilterBarItem[];
 }

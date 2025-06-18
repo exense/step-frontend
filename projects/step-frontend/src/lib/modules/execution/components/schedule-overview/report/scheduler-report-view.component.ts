@@ -2,10 +2,11 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { SchedulerPageStateService } from '../scheduler-page-state.service';
 import { TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, pairwise, scan } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, pairwise, scan } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { Status } from '../../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -60,6 +61,14 @@ export class SchedulerReportViewComponent implements OnInit {
     timeRange = { from: Math.round(timeRange.from), to: Math.round(timeRange.to) };
     this._stateService.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
   }
+
+  protected readonly availableErrorTypes = toSignal(
+    this._stateService.errorsDataSource.allData$.pipe(
+      map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+      map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
+    ),
+    { initialValue: [] },
+  );
 
   private subscribeToBackEvents() {
     // subscribe to back and forward events

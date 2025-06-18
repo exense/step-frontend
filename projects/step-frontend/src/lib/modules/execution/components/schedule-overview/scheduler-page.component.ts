@@ -439,6 +439,12 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     }),
   );
 
+  readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
+
+  x = this.timeRange$.subscribe((timeRange) => {
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, taskId: this._taskIdFn() } });
+  });
+
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
@@ -454,11 +460,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   constructor() {
     super();
-    // const urlParams = this._urlParamsService.collectUrlParams();
-    // this.refresh$.subscribe(() => {
-    //   this.refreshCharts(this._taskId, this.timeRange()!);
-    // });
-    // this.subscribeToUrlNavigation();
   }
 
   ngOnInit(): void {
