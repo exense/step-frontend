@@ -3,4 +3,5 @@ export enum AttachmentType {
   IMG,
   TEXT,
   VIDEO,
+  SKIPPED,
 }
