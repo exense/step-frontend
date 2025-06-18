@@ -54,7 +54,7 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   jumpToExecution(eId: string) {
-    window.open(`#/executions/${eId!}/viz`);
+    window.open(`#/executions/${eId!}/report`);
   }
 
   handleMainChartZoom(timeRange: TimeRange) {
