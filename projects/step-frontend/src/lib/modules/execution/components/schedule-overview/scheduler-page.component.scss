@@ -67,6 +67,13 @@ step-scheduler-page {
       }
     }
 
+    .cron-label {
+      cursor: pointer;
+      background: var.$light-blue-gray;
+      border-radius: 1.6rem;
+      padding: 0.4rem 1rem;
+    }
+
     .controls {
       grid-area: controls;
       justify-self: flex-end;

@@ -31,9 +31,14 @@
           <div>No execution</div>
         }
       }
-      <button type="button" mat-icon-button color="default" [matTooltip]="'Cron expression: ' + task.cronExpression">
-        <step-icon name="clock" />
-      </button>
+      <step-popover yPosition="below">
+        <section class="cron-label">
+          {{ task.cronExpression }}
+        </section>
+        <step-popover-content>
+          <div>Cron expression</div>
+        </step-popover-content>
+      </step-popover>
     </div>
     <div class="controls">
       <step-autorefresh-toggle
