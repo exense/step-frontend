@@ -15,6 +15,7 @@ import { ArtefactInlineItemExplicitWidths } from '../../types/artefact-inline-it
 import { WidthContainer } from '../../types/width-container';
 
 const DEFAULT_MARGIN = '0.5rem';
+const GAP = 1;
 
 @Component({
   selector: 'step-artefact-inline-field',
@@ -69,20 +70,27 @@ export class ArtefactInlineFieldComponent {
     return this.elementCount();
   }
 
-  getWidths(): WidthContainer {
+  getWidths(maxSubItemWidth?: number): WidthContainer {
     const prefix = this.widthPrefix();
     const label = this.widthLabel();
     const value = this.widthValue();
     const icon = this.widthIcon();
     const suffix = this.widthSuffix();
 
+    const correctWidth = (val: number) => {
+      if (!val || !maxSubItemWidth) {
+        return val;
+      }
+      return Math.min(val, maxSubItemWidth);
+    };
+
     const result: WidthContainer = { prefix, label, value, icon, suffix };
     let total = [prefix, label, value, icon, suffix]
       .filter((item) => item !== undefined)
       .reduce((res, item, index, self) => {
-        let value = res + item;
+        let value = res + correctWidth(item);
         if (index < self.length - 1) {
-          value += 1;
+          value += GAP;
         }
         return value;
       }, 0);
