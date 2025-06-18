@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { AuthService } from '@exense/step-core';
+import { AuthService, TimeRange } from '@exense/step-core';
 import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../timeseries/modules/_common';
 import { SchedulerPageStateService } from '../scheduler-page-state.service';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
@@ -42,6 +42,10 @@ export class SchedulerPerformanceViewComponent implements OnInit {
 
   handleDashboardSettingsInit(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, true);
+  }
+
+  handleFullRangeChangeRequest(range: TimeRange) {
+    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
   private subscribeToUrlNavigation() {
