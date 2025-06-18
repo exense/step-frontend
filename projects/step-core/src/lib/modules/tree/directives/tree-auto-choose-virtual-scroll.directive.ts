@@ -7,7 +7,7 @@ import { TreeVirtualScrollDirective } from './tree-virtual-scroll.directive';
   hostDirectives: [
     {
       directive: TreeVirtualScrollDirective,
-      inputs: ['stepTreeVirtualScroll: stepTreeAutoChooseVirtualScroll', 'maxBufferPx', 'minBufferPx'],
+      inputs: ['stepTreeVirtualScroll: stepTreeAutoChooseVirtualScroll', 'minItemSizePx'],
     },
   ],
 })

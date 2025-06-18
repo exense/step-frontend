@@ -14,6 +14,7 @@ import {
   Output,
   signal,
   TrackByFunction,
+  viewChild,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -36,6 +37,7 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
 import { OriginalNodePipe } from '../../pipes/original-node.pipe';
 import { TreeVirtualScrollDirective } from '../../directives/tree-virtual-scroll.directive';
 import { TreeAutoChooseVirtualScrollDirective } from '../../directives/tree-auto-choose-virtual-scroll.directive';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'step-tree',
@@ -85,6 +87,8 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
   @ViewChild(DragDataService, { static: true }) private dragData!: DragDataService;
 
   @ViewChild('nodeContextMenuTrigger', { static: true, read: MatMenuTrigger }) contextMenuTrigger!: MatMenuTrigger;
+
+  private virtualScrollViewport = viewChild('virtualViewport', { read: CdkVirtualScrollViewport });
 
   readonly treeNodeTemplate = contentChild(TreeNodeTemplateDirective);
   readonly treeNodeNameTemplate = contentChild(TreeNodeNameTemplateDirective);
@@ -156,7 +160,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
       return;
     }
 
-    this._stepTreeVirtualScroll!.strategy!.scrollToIndexApproximately(index);
+    this.virtualScrollViewport()!.scrollToIndex(index, 'smooth');
     this.nativeScroll(nodeId);
     // sometimes scroll to element doesn't performed correctly after virtual scroll
     // invoke another autoscroll to correct the position (but without scrolling effect)
