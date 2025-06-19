@@ -4,12 +4,12 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <section (click)="showIterations(element)">
-          <div class="details-trigger">
+          <div class="details-trigger larger-view">
             <div>
               <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
-              <span>
+              <strong>
                 {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
-              </span>
+              </strong>
             </div>
           </div>
           <step-aggregated-status

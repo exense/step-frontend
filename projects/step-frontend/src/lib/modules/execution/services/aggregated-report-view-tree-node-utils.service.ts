@@ -8,6 +8,7 @@ import {
 } from '@exense/step-core';
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 import { v5 } from 'uuid';
+import { chooseStatusWithMostPriority, Status } from '../../_common/shared/status.enum';
 
 const HASH_NAMESPACE = 'e9903ee9-1674-45a6-a044-62702dfe0865';
 
@@ -58,6 +59,13 @@ export class AggregatedReportViewTreeNodeUtilsService
       children.push(afterContainer);
     }
 
+    const iconClassName = ['larger-icon'];
+    const statuses = Object.keys(item?.countByStatus ?? {}) as Status[];
+    const priorityStatus = chooseStatusWithMostPriority(...statuses);
+    if (priorityStatus) {
+      iconClassName.push(`step-icon-${priorityStatus}`);
+    }
+
     return {
       id,
       artefactId,
@@ -65,7 +73,7 @@ export class AggregatedReportViewTreeNodeUtilsService
       isSkipped: false,
       isVisuallySkipped: isParentVisuallySkipped ?? false,
       icon,
-      iconClassName: 'larger-icon',
+      iconClassName: iconClassName.join(' '),
       expandable,
       children,
       parentId,

@@ -5,7 +5,6 @@
         <step-artefact-inline-details class="shift-rows smaller-view" [aggregatedInfo]="node">
           <ng-container *stepArtefactInlineDetailsHeader>
             <div class="node-header larger-view">
-              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
               <step-aggregated-status
                 [class.hide-status]="!showStatus()"
                 [hasDescendantInvocations]="node?.hasDescendantInvocations"
@@ -13,6 +12,7 @@
                 [statusFilter]="statusFilter()"
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
+              <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>
               <span class="description" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{
                 node?.originalArtefact?.description | treeNodeDescription
               }}</span>

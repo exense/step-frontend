@@ -24,9 +24,9 @@
                   [duration]="element.duration"
                   [timeOnly]="true"
                 />
-                <step-report-node-icon [node]="element" [highlightStatus]="false" />
+                <step-report-node-icon [node]="element" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
-                <span>{{ element.name }}</span>
+                <span class="name">{{ element.name }}</span>
               </div>
             </ng-container>
           </step-artefact-inline-details>
