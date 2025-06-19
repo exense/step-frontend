@@ -6,6 +6,7 @@
   @include execution-report-node-inline-details;
   @include execution-report-node-details;
   @include highlight-inline-item;
+  @include special-selection;
 
   /*
   .smaller-view {
@@ -184,4 +185,57 @@
       }
     }
   }
+}
+
+@mixin special-selection {
+  step-alt-execution-time.special-selection {
+    position: relative;
+    section {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      min-width: 15rem;
+      &:after {
+        content: ' ';
+        position: absolute;
+        display: block;
+        background: var.$white;
+        top: 0;
+        bottom: 0;
+        width: 0.5rem;
+        right: 1rem;
+        transform: skewX(-10deg);
+      }
+    }
+    &:after {
+      @include special-selection-item;
+    }
+  }
+
+  step-alt-execution-time.special-selection ~ * {
+    z-index: 2;
+  }
+
+  step-table {
+    tr:hover {
+      step-alt-execution-time.special-selection:after {
+        @include special-selection-item-hover;
+      }
+    }
+  }
+}
+
+@mixin special-selection-item {
+  content: ' ';
+  position: absolute;
+  display: block;
+  background: linear-gradient(to right, var.$light-blue-gray 50%, var.$transparent);
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 15rem;
+}
+
+@mixin special-selection-item-hover {
+  width: 60rem;
+  background: linear-gradient(to right, var.$light-blue-gray 60%, var.$transparent);
 }

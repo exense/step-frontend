@@ -9,7 +9,7 @@
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
-    class="paddingless no-border hide-header"
+    class="paddingless no-border hide-header no-highlight"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
@@ -19,11 +19,12 @@
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time
+                  class="special-selection"
                   [startTime]="element.executionTime"
                   [duration]="element.duration"
                   [timeOnly]="true"
                 />
-                <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+                <step-report-node-icon [node]="element" [highlightStatus]="false" />
                 <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
                 <span>{{ element.name }}</span>
               </div>

@@ -22,6 +22,10 @@ step-artefact-inline-field-list {
   section.list {
     display: flex;
 
+    step-artefact-inline-field {
+      z-index: 2;
+    }
+
     &.vertical {
       flex-direction: column;
       width: 100%;
