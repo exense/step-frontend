@@ -25,20 +25,15 @@
             [startTime]="lastExecution.startTime"
             [endTime]="lastExecution.endTime"
             [isRunning]="lastExecution.status === 'RUNNING'"
+            [status]="lastExecution?.result"
           />
-          <step-status [status]="lastExecution?.result" [iconMode]="false" />
         } @else {
           <div>No execution</div>
         }
       }
-      <step-popover yPosition="below">
-        <section class="cron-label">
-          {{ task.cronExpression }}
-        </section>
-        <step-popover-content>
-          <div>Cron expression</div>
-        </step-popover-content>
-      </step-popover>
+      <span class="cron-label" matTooltip="Cron expression">
+        {{ task.cronExpression }}
+      </span>
     </div>
     <div class="controls">
       <step-autorefresh-toggle
@@ -52,6 +47,7 @@
             (selectionChange)="handleTimeRangeChange($event)"
             [selectOptions]="timeRangeOptions"
             [activeSelection]="activeTimeRangeSelection()!"
+            [activeTimeRange]="(timeRange$ | async) || undefined"
           />
         </div>
       }

@@ -44,20 +44,20 @@ export class TimeSeriesConfig {
   ];
 
   static readonly ANALYTICS_TIME_SELECTION_OPTIONS: TimeRangePickerSelection[] = [
-    { type: 'RELATIVE', relativeSelection: { label: 'Last Minute', timeInMs: this.ONE_HOUR_MS / 60 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 minute', timeInMs: this.ONE_HOUR_MS / 60 } },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 15 Minutes', timeInMs: this.ONE_HOUR_MS / 4 },
+      relativeSelection: { label: 'Last 15 minutes', timeInMs: this.ONE_HOUR_MS / 4 },
     },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last Hour', timeInMs: this.ONE_HOUR_MS } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last Day', timeInMs: this.ONE_HOUR_MS * 24 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: this.ONE_HOUR_MS * 24 } },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last Week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
+      relativeSelection: { label: 'Last 1 week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
     },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last Month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
+      relativeSelection: { label: 'Last 1 month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
     },
   ];
 
@@ -79,8 +79,7 @@ export class TimeSeriesConfig {
       relativeSelection: { label: 'Last 30 minutes', timeInMs: this.ONE_HOUR_MS / 2 },
     },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 hours', timeInMs: this.ONE_HOUR_MS * 3 } },
-    { type: 'FULL' },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 2 hours', timeInMs: this.ONE_HOUR_MS * 2 } },
   ];
 
   /**

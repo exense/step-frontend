@@ -33,7 +33,10 @@ export class LegacyExecutionViewComponent implements OnInit {
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
-  readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
+  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'FULL' },
+    ...TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS,
+  ];
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
   refreshInterval = signal<number>(0);

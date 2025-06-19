@@ -126,6 +126,6 @@ export class ExecutionsChartTooltipComponent {
   }
 
   jumpToExecution(execution: ExecutionItem) {
-    window.open(`#/executions/${execution.id!}/viz`);
+    window.open(`#/executions/${execution.id!}/report`);
   }
 }

@@ -293,7 +293,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
               start: timeRange.from,
               end: timeRange.to,
               numberOfBuckets: 1,
-              oqlFilter: executionsIdsJoined,
+              oqlFilter: `(attributes.type = keyword) and ${executionsIdsJoined}`,
               groupDimensions: ['executionId', 'status'],
             };
 
@@ -448,13 +448,13 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
-    { type: 'RELATIVE', relativeSelection: { label: 'Last day', timeInMs: TimeUnit.DAY } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last week', timeInMs: TimeUnit.DAY * 7 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.DAY * 7 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.DAY * 14 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last month', timeInMs: TimeUnit.DAY * 30 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 month', timeInMs: TimeUnit.DAY * 30 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 3 months', timeInMs: TimeUnit.DAY * 30 * 3 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 6 months', timeInMs: TimeUnit.DAY * 30 * 6 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last year', timeInMs: TimeUnit.DAY * 365 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 year', timeInMs: TimeUnit.DAY * 365 } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.DAY * 365 * 3 } },
   ];
 

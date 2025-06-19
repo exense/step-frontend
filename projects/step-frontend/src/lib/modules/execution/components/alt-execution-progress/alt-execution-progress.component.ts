@@ -167,7 +167,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'FULL' },
-    ...TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS,
+    ...TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS,
   ];
 
   protected readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
