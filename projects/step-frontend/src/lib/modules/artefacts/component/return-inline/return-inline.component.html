@@ -1,4 +1,10 @@
 @if (items(); as items) {
-  <step-artefact-inline-field-list [items]="items" hiddenItemsTooltipSuffix="output(s)" />
+  <step-artefact-inline-field-list [items]="items" hiddenItemsTooltipSuffix="output(s)">
+    <step-artefact-inline-field-list-prefix>
+      <step-artefact-inline-details-header [template]="headerTemplate()" />
+    </step-artefact-inline-field-list-prefix>
+  </step-artefact-inline-field-list>
+} @else {
+  <step-artefact-inline-details-header [template]="headerTemplate()" />
 }
 <step-artefact-inline-additional-info [context]="currentContext()" />
