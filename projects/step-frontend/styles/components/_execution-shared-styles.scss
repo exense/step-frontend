@@ -30,12 +30,19 @@
   .larger-view {
     font-size: 1.4rem;
     step-icon {
-      @include core.step-icon-size(1.8rem, true);
+      @include core.step-icon-size(2rem, true);
     }
   }
 
   step-icon.larger-icon {
-    @include core.step-icon-size(1.8rem, true);
+    @include core.step-icon-size(2rem, true);
+  }
+
+  step-artefact-inline-details.shift-rows {
+    max-width: calc(100% - 4rem);
+    .execution-report-node-inline-details > :not(:first-child) {
+      transform: translateX(4rem);
+    }
   }
 }
 

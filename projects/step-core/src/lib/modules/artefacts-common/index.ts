@@ -7,6 +7,8 @@ import { ReportDetailsAttachmentsComponent } from './components/report-details-a
 import { ArtefactInlineFieldComponent } from './components/artefact-inline-field/artefact-inline-field.component';
 import { ArtefactInlineFieldListComponent } from './components/artefact-inline-field-list/artefact-inline-field-list.component';
 import { ArtefactInlineFieldListPrefixDirective } from './directives/artefact-inline-field-list-prefix.directive';
+import { ArtefactInlineDetailsHeaderDirective } from './directives/artefact-inline-details-header.directive';
+import { ArtefactInlineDetailsHeaderComponent } from './components/artefact-inline-details-header/artefact-inline-details-header.component';
 
 export * from './components/base-inline-artefact.component';
 export * from './components/base-inline-artefact-legacy.component';
@@ -29,6 +31,8 @@ export * from './injectables/artefact-refresh-notification.service';
 export * from './injectables/artefact-inline-item-utils.service';
 export * from './injectables/artefact-inline-items-builder.service';
 export * from './directives/artefact-inline-field-list-prefix.directive';
+export * from './directives/artefact-inline-details-header.directive';
+export * from './components/artefact-inline-details-header/artefact-inline-details-header.component';
 
 export const ARTEFACTS_COMMON_EXPORTS = [
   ArtefactInlineDetailsComponent,
@@ -40,4 +44,6 @@ export const ARTEFACTS_COMMON_EXPORTS = [
   ArtefactInlineFieldComponent,
   ArtefactInlineFieldListComponent,
   ArtefactInlineFieldListPrefixDirective,
+  ArtefactInlineDetailsHeaderComponent,
+  ArtefactInlineDetailsHeaderDirective,
 ];

@@ -26,10 +26,17 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0.2rem;
+
+  .node-header {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.2rem;
+  }
 }
 
 step-aggregated-status {
   align-self: flex-start;
+  padding-top: 0.1rem;
 }
 
 //step-artefact-inline-details {

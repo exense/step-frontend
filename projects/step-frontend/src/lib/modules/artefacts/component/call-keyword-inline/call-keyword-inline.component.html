@@ -3,7 +3,11 @@
     class="bold-labels"
     [items]="inputItems"
     hiddenItemsTooltipSuffix="additional input(s)"
-  />
+  >
+    <step-artefact-inline-field-list-prefix>
+      <step-artefact-inline-details-header [template]="headerTemplate()" />
+    </step-artefact-inline-field-list-prefix>
+  </step-artefact-inline-field-list>
 }
 @if (outputItems(); as outputItems) {
   <step-artefact-inline-field-list
@@ -12,8 +16,13 @@
     hiddenItemsTooltipSuffix="additional output(s)"
   >
     <step-artefact-inline-field-list-prefix>
+      <step-artefact-inline-details-header [template]="headerTemplate()" [isVisible]="!inputItems()?.length" />
       <step-icon name="log-out" matTooltip="Outputs" />
     </step-artefact-inline-field-list-prefix>
   </step-artefact-inline-field-list>
 }
+<step-artefact-inline-details-header
+  [template]="headerTemplate()"
+  [isVisible]="!inputItems()?.length && !outputItems()?.length"
+/>
 <step-artefact-inline-additional-info [context]="currentContext()" />

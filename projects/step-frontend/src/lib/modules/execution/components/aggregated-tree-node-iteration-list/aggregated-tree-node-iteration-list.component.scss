@@ -11,7 +11,7 @@ step-table {
   }
 }
 
-.name {
+.data-cell {
   width: 100%;
   padding-left: 0;
 }
@@ -22,7 +22,7 @@ step-table {
   gap: 0.5rem;
   flex-direction: column;
   max-width: 60rem;
-  & > div:first-child {
+  .artefact-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
