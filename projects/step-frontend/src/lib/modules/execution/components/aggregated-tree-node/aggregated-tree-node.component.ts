@@ -38,8 +38,8 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   readonly width = computed(() => {
     const parentWidth = this._parentElementSize?.width?.() ?? 0;
     const levelOffset = this._treeNodeData.levelOffset();
-    let result = !parentWidth ? 0 : parentWidth - levelOffset - 200;
-    result = Math.max(result, 200);
+    let result = !parentWidth ? 0 : parentWidth - levelOffset - 150;
+    result = Math.max(result, 150);
     return result;
   });
 

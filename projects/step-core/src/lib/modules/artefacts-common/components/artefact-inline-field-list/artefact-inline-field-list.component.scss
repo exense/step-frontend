@@ -14,7 +14,7 @@ step-artefact-inline-field-list {
   &.bold-labels {
     step-artefact-inline-field {
       label {
-        font-weight: bold;
+        font-weight: 500;
       }
     }
   }
@@ -51,11 +51,6 @@ step-artefact-inline-field-list {
         }
       }
     }
-  }
-
-  .ellipsis {
-    border: solid 0.1rem var.$gray-450;
-    border-radius: 4rem;
   }
 
   step-icon.more-icon {

@@ -20,7 +20,7 @@ interface FairShareContext {
   fairShareApplied: number;
 }
 
-const MIN_WIDTH = 120;
+const MIN_WIDTH = 100;
 const PADDINGS = 6;
 const GAP = 6;
 const CAP_ICON_SPACE = 20;

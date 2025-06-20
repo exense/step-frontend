@@ -32,7 +32,8 @@ step-alt-report-node-keywords {
       gap: 0.5rem;
       margin-right: 0.5rem;
       .name {
-        font-weight: bold;
+        font-weight: 500;
+        white-space: nowrap;
       }
     }
   }
