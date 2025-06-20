@@ -39,6 +39,7 @@ export * from './services/tree-actions.service';
 export * from './services/tree-node-utils.service';
 export * from './services/tree-state.service';
 export * from './services/tree-focus-state.service';
+export * from './services/tree-node-data';
 export * from './types/tree-action';
 export * from './types/tree-flat-node';
 export * from './types/tree-node';

@@ -37,7 +37,7 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="data-cell" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          <step-artefact-inline-details [reportInfo]="element" class="shift-rows smaller-view">
+          <step-artefact-inline-details stepElementSize [reportInfo]="element" class="shift-rows smaller-view">
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time

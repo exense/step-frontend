@@ -3,7 +3,6 @@ import { ArtefactService } from '../../injectables/artefact.service';
 import { AbstractArtefact, ReportNode } from '../../../../client/step-client-module';
 import { AggregatedArtefactInfo } from '../../types/artefact-types';
 import { CustomRegistriesModule } from '../../../custom-registeries/custom-registries.module';
-import { ElementSizeDirective } from '../../../basics/step-basics.module';
 import { ArtefactInlineDetailsHeaderDirective } from '../../directives/artefact-inline-details-header.directive';
 
 @Component({
@@ -11,7 +10,6 @@ import { ArtefactInlineDetailsHeaderDirective } from '../../directives/artefact-
   templateUrl: './artefact-inline-details.component.html',
   styleUrl: './artefact-inline-details.component.scss',
   imports: [CustomRegistriesModule],
-  hostDirectives: [ElementSizeDirective],
   host: {
     '[class.overflow]': 'overflowContent()',
   },

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Injector, ViewEncapsulation } from '@angular/core';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
 import { TreeNodeDirective } from '../../directives/tree-node.directive';
 import { NgTemplateOutlet } from '@angular/common';
@@ -25,4 +25,5 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
 export class TreeNodeComponent {
   protected readonly _treeNode = inject(TreeNodeDirective, { self: true });
   protected readonly _treeNodeTemplateContainer = inject(TreeNodeTemplateContainerService);
+  protected readonly _injector = inject(Injector);
 }

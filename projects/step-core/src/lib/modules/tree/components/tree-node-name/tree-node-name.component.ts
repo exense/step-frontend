@@ -1,4 +1,14 @@
-import { Component, computed, effect, ElementRef, inject, input, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Injector,
+  input,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { TreeStateService } from '../../services/tree-state.service';
 import { TreeNode } from '../../types/tree-node';
 import { TreeNodeTemplateContainerService } from '../../services/tree-node-template-container.service';
@@ -14,6 +24,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
 })
 export class TreeNodeNameComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
+  protected readonly _injector = inject(Injector);
 
   readonly templateContainer = inject(TreeNodeTemplateContainerService);
 

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
-import { ReportNode, TreeStateService } from '@exense/step-core';
+import { ElementSizeDirective, ReportNode, TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
   AggregatedReportViewTreeStateService,
@@ -32,6 +32,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useExisting: AltKeywordNodesStateService,
     },
   ],
+  hostDirectives: [ElementSizeDirective],
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);

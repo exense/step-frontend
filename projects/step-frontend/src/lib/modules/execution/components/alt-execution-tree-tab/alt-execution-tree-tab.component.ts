@@ -18,7 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
-import { TreeStateService } from '@exense/step-core';
+import { ElementSizeDirective, TreeStateService } from '@exense/step-core';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeFilterService } from '../../services/aggregated-report-view-tree-filter.service';
@@ -44,6 +44,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       useExisting: AggregatedReportViewTreeFilterService,
     },
   ],
+  hostDirectives: [ElementSizeDirective],
 })
 export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
