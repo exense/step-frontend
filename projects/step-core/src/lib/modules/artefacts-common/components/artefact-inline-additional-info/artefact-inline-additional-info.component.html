@@ -6,8 +6,12 @@
           <step-icon name="paperclip" matTooltip="Attachments" />
           @for (att of attachments; track att.id) {
             <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER" [withBorder]="true">
-              <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
-              <step-popover-content>
+              @if ((att | attachmentType) !== AttachmentType.SKIPPED) {
+                <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
+              } @else {
+                <span class="highlight-inline-item skipped">{{ att.name }}</span>
+              }
+              <step-popover-content class="{{ att | attachmentType }}">
                 @switch (att | attachmentType) {
                   @case (AttachmentType.IMG) {
                     <step-attachment-preview
@@ -16,6 +20,11 @@
                       [showDownload]="false"
                       [withBorder]="false"
                     />
+                  }
+                  @case (AttachmentType.SKIPPED) {
+                    <div class="default-attachment-popover-view">
+                      <p class="reason">{{ att.reason }}</p>
+                    </div>
                   }
                   @default {
                     <div class="default-attachment-popover-view">

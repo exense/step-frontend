@@ -13,11 +13,13 @@
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG
+    overlay: attachmentType() === AttachmentType.IMG,
+    skipped: attachmentType() === AttachmentType.SKIPPED
   }"
 >
   {{ attachment()?.name }}
 </div>
+
 <div class="actions">
   <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
     <step-icon name="download" />

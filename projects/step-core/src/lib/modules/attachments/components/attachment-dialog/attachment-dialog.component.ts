@@ -20,7 +20,7 @@ import { from } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.small]': 'attachmentType === AttachmentType.DEFAULT',
+    '[class.small]': 'attachmentType === AttachmentType.DEFAULT || attachmentType === AttachmentType.SKIPPED',
   },
 })
 export class AttachmentDialogComponent implements OnInit {
