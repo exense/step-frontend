@@ -32,7 +32,7 @@
 @if (_treeNodeTemplateContainer.treeNodeDetailsTemplate(); as detailsTemplate) {
   @if (_treeNode.node(); as n) {
     <div class="tree-node-details">
-      <ng-container *ngTemplateOutlet="detailsTemplate.templateRef; context: { $implicit: n }" />
+      <ng-container *ngTemplateOutlet="detailsTemplate.templateRef; context: { $implicit: n }; injector: _injector" />
     </div>
   }
 }

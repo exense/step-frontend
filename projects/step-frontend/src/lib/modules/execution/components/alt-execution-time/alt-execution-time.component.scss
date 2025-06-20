@@ -1,30 +1,30 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-section {
-  background: var.$light-blue-gray;
-  border-radius: 1.6rem;
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 0.8rem;
-  padding: 0.4rem 1rem 0.4rem 0.4rem;
-  font-size: 1.2rem;
-  line-height: 1.8rem;
-  font-weight: 500;
-  cursor: pointer;
-}
+step-alt-execution-time {
+  section {
+    background: var.$light-blue-gray;
+    border-radius: 1.6rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.8rem;
+    padding: 0.4rem 1rem 0.4rem 0.4rem;
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+    font-weight: 500;
+    cursor: pointer;
 
-div {
-  white-space: nowrap;
-}
-
-div.date {
-  background: var.$white;
-  border-radius: 1.6rem;
-  padding: 0.2rem 0.8rem;
-}
-
-div.duration {
-  flex: 1;
-  text-align: center;
+    div {
+      white-space: nowrap;
+      &.date {
+        background: var.$white;
+        border-radius: 1.6rem;
+        padding: 0.2rem 0.8rem;
+      }
+      &.duration {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  }
 }

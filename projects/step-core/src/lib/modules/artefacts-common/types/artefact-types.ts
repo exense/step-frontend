@@ -1,4 +1,5 @@
 import { AbstractArtefact, ReportNode } from '../../../client/step-client-module';
+import { TemplateRef } from '@angular/core';
 
 export interface ReportNodeWithArtefact<A extends AbstractArtefact> extends ReportNode {
   resolvedArtefact?: A;
@@ -14,4 +15,5 @@ export interface InlineArtefactContext<A extends AbstractArtefact, R extends Rep
   aggregatedInfo?: AggregatedArtefactInfo<A, R>;
   reportInfo?: R;
   isVertical?: boolean;
+  headerTemplate?: TemplateRef<unknown>;
 }

@@ -1,5 +1,6 @@
-@use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-alt-execution-tree {
   display: block;
@@ -42,8 +43,28 @@ step-alt-execution-tree {
     flex: 1;
     .node-content {
       align-items: flex-start !important;
+      max-width: 100%;
+      min-width: 50rem;
+      overflow: hidden;
       .node-icon {
         transform: translateX(0.6rem);
+        position: relative;
+        border: none !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        &:after {
+          @include common.special-selection-item;
+        }
+      }
+    }
+
+    &.tree-node-selected {
+      step-tree-node-name {
+        background: none !important;
+      }
+
+      .node-content .node-icon::after {
+        @include common.special-selection-item-hover;
       }
     }
   }
@@ -54,7 +75,13 @@ step-alt-execution-tree {
 
   step-tree-node-name {
     width: 100%;
-    min-height: 3.1rem;
+    max-width: 100%;
+    overflow: hidden;
+    min-height: 2rem;
+    align-items: flex-start;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    z-index: 2;
     &.not-selectable {
       background: none !important;
     }

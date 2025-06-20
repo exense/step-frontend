@@ -75,6 +75,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ReloadableDirective } from './directives/reloadable.directive';
+import { ElementSizeDirective } from './directives/element-size.directive';
 
 @NgModule({
   imports: [
@@ -89,6 +90,7 @@ import { ReloadableDirective } from './directives/reloadable.directive';
     OverflowIndicatorDirective,
     SelectComponent,
     ReloadableDirective,
+    ElementSizeDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -235,6 +237,7 @@ import { ReloadableDirective } from './directives/reloadable.directive';
     TruncateStringPipe,
     StrategyClickDirective,
     ReloadableDirective,
+    ElementSizeDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -379,3 +382,5 @@ export * from './injectables/text-types.token';
 export * from './directives/strategy-click.directive';
 export * from './injectables/click-strategy.token';
 export * from './types/click-strategy.type';
+export * from './directives/element-size.directive';
+export * from './injectables/element-size.service';

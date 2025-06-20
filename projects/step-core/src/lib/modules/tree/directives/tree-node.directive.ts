@@ -1,8 +1,9 @@
-import { computed, Directive, inject, input, output } from '@angular/core';
+import { computed, Directive, forwardRef, inject, input, output } from '@angular/core';
 import { TreeStateService } from '../services/tree-state.service';
 import { TreeNode } from '../types/tree-node';
 import { TreeNodeUtilsService } from '../services/tree-node-utils.service';
 import { TreeFlatNode } from '../types/tree-flat-node';
+import { TreeNodeData } from '../services/tree-node-data';
 
 const ICON_EXPANDED = 'chevron-down';
 const ICON_COLLAPSED = 'chevron-right';
@@ -12,11 +13,17 @@ const ICON_COLLAPSED = 'chevron-right';
   standalone: true,
   host: {
     '[class]': 'containerClasses()',
-    '[style.--level]': 'node().parentPath.length',
-    '[attr.data-tree-node-id]': 'node().id',
+    '[style.--level]': 'level()',
+    '[attr.data-tree-node-id]': 'id()',
   },
+  providers: [
+    {
+      provide: TreeNodeData,
+      useExisting: forwardRef(() => TreeNodeDirective),
+    },
+  ],
 })
-export class TreeNodeDirective {
+export class TreeNodeDirective implements TreeNodeData {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);
   private _utils = inject(TreeNodeUtilsService);
 
@@ -54,6 +61,10 @@ export class TreeNodeDirective {
 
   /** @Output() **/
   readonly contextMenu = output<{ event: MouseEvent; nodeId: string }>();
+
+  readonly id = computed(() => this.node().id);
+  readonly level = computed(() => this.node().parentPath.length);
+  readonly levelOffset = computed(() => this.level() * 30);
 
   toggle(): void {
     this._treeState.toggleNode(this.node().id);

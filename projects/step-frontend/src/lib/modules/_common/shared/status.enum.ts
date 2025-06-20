@@ -18,29 +18,8 @@ export enum Status {
   PROVISIONING = 'PROVISIONING',
   DEPROVISIONING = 'DEPROVISIONING',
   IMPORT_ERROR = 'IMPORT_ERROR',
+  VETOED = 'VETOED',
 }
-
-export const EXECUTION_RESULT: ReadonlyArray<Status> = [
-  Status.TECHNICAL_ERROR,
-  Status.FAILED,
-  Status.PASSED,
-  Status.INTERRUPTED,
-  Status.SKIPPED,
-  Status.NORUN,
-  Status.RUNNING,
-];
-
-export const EXECUTION_STATUS: ReadonlyArray<Status> = [
-  Status.INITIALIZING,
-  Status.IMPORTING,
-  Status.RUNNING,
-  Status.ABORTING,
-  Status.EXPORTING,
-  Status.ENDED,
-  Status.ESTIMATING,
-  Status.PROVISIONING,
-  Status.DEPROVISIONING,
-];
 
 export const EXECUTION_ENDED_STATUSES: ReadonlyArray<Status> = [
   Status.TECHNICAL_ERROR,
@@ -49,6 +28,7 @@ export const EXECUTION_ENDED_STATUSES: ReadonlyArray<Status> = [
   Status.INTERRUPTED,
   Status.SKIPPED,
   Status.IMPORT_ERROR,
+  Status.VETOED,
 ];
 
 export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
@@ -76,11 +56,23 @@ export const EXECUTION_STATUS_TREE: MultiLevelItem<Status>[] = [
 ];
 
 export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
+  Status.VETOED,
+  Status.IMPORT_ERROR,
   Status.TECHNICAL_ERROR,
   Status.FAILED,
-  Status.PASSED,
   Status.INTERRUPTED,
+  Status.PASSED,
   Status.SKIPPED,
   Status.NORUN,
   Status.RUNNING,
 ];
+
+export const chooseStatusWithMostPriority = (...statues: Status[]): Status | undefined => {
+  const statusSet = new Set(statues);
+  for (const status of REPORT_NODE_STATUS) {
+    if (statusSet.has(status)) {
+      return status;
+    }
+  }
+  return statues[0];
+};

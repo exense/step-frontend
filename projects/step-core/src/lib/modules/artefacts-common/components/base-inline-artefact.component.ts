@@ -13,6 +13,7 @@ export abstract class BaseInlineArtefactComponent<
 {
   private contextInternal = signal<InlineArtefactContext<A, R> | undefined>(undefined);
   protected info = computed(() => this.contextInternal()?.aggregatedInfo);
+  protected headerTemplate = computed(() => this.contextInternal()?.headerTemplate);
 
   protected readonly currentContext = this.contextInternal.asReadonly();
 

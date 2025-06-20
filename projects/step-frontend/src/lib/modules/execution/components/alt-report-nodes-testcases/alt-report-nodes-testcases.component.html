@@ -4,19 +4,19 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <section (click)="showIterations(element)">
-          <div class="details-trigger">
+          <div class="details-trigger larger-view">
             <div>
               <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+              <step-aggregated-status
+                [hasDescendantInvocations]="element.hasDescendantInvocations"
+                [countByStatus]="element.countByStatus"
+                (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
+              />
               <span>
                 {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
               </span>
             </div>
           </div>
-          <step-aggregated-status
-            [hasDescendantInvocations]="element.hasDescendantInvocations"
-            [countByStatus]="element.countByStatus"
-            (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
-          />
           @if (element | aggregatedReportViewDurationValue; as duration) {
             <step-execution-duration-simple [duration]="duration" [isAverage]="element | isAverageDuration" />
           }

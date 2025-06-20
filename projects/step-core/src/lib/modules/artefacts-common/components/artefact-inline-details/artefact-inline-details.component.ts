@@ -1,17 +1,18 @@
-import { Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { Component, computed, contentChild, inject, input, ViewEncapsulation } from '@angular/core';
 import { ArtefactService } from '../../injectables/artefact.service';
 import { AbstractArtefact, ReportNode } from '../../../../client/step-client-module';
 import { AggregatedArtefactInfo } from '../../types/artefact-types';
 import { CustomRegistriesModule } from '../../../custom-registeries/custom-registries.module';
+import { ArtefactInlineDetailsHeaderDirective } from '../../directives/artefact-inline-details-header.directive';
 
 @Component({
   selector: 'step-artefact-inline-details',
   templateUrl: './artefact-inline-details.component.html',
   styleUrl: './artefact-inline-details.component.scss',
+  imports: [CustomRegistriesModule],
   host: {
     '[class.overflow]': 'overflowContent()',
   },
-  imports: [CustomRegistriesModule],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
 })
@@ -23,6 +24,8 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
   readonly isVertical = input(false);
   readonly overflowContent = input(false);
 
+  private header = contentChild(ArtefactInlineDetailsHeaderDirective);
+
   private artefactClass = computed(() => {
     const aggregatedInfo = this.aggregatedInfo();
     const reportInfo = this.reportInfo();
@@ -33,7 +36,8 @@ export class ArtefactInlineDetailsComponent<A extends AbstractArtefact, R extend
     const aggregatedInfo = this.aggregatedInfo();
     const reportInfo = this.reportInfo();
     const isVertical = this.isVertical();
-    return { aggregatedInfo, reportInfo, isVertical };
+    const headerTemplate = this.header()?.templateRef;
+    return { headerTemplate, aggregatedInfo, reportInfo, isVertical };
   });
 
   protected componentToRender = computed(() => {

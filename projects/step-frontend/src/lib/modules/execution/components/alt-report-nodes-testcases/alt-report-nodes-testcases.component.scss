@@ -33,6 +33,10 @@ step-table {
     align-items: center;
     padding: 1rem;
     cursor: pointer;
+
+    .details-trigger span {
+      font-weight: 500;
+    }
   }
 }
 

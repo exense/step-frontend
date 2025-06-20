@@ -1,14 +1,14 @@
-import { Component, inject, output, viewChild } from '@angular/core';
+import { Component, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedScreenService,
   ItemsPerPageService,
   ReportNode,
   STORE_ALL,
+  TableMemoryStorageService,
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
   TableSearch,
   TableStorageService,
-  TableMemoryStorageService,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
@@ -44,6 +44,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
     TablePersistenceStateService,
     tablePersistenceConfigProvider('keywords', STORE_ALL),
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _screenApiService = inject(AugmentedScreenService);
