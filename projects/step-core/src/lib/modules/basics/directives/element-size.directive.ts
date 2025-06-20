@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, forwardRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Directive, ElementRef, forwardRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ElementSizeService } from '../injectables/element-size.service';
 
 @Directive({
