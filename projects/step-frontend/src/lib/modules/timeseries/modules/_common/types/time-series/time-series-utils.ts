@@ -191,4 +191,11 @@ export class TimeSeriesUtils {
       return field;
     }
   };
+
+  static removeFloatingDigits(timeRange: TimeRange): TimeRange {
+    if (!timeRange) {
+      return timeRange;
+    }
+    return { from: Math.floor(timeRange.from), to: Math.floor(timeRange.to) };
+  }
 }

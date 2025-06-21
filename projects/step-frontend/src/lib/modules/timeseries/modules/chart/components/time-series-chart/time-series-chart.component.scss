@@ -31,15 +31,11 @@ step-timeseries-chart {
   .u-legend {
     font-size: 1.3rem;
     display: flex;
-    justify-content: space-around;
+    gap: 1rem;
 
     .u-series {
       margin-right: 0.8rem;
       white-space: nowrap;
-
-      .u-marker:empty {
-        display: none;
-      }
     }
   }
 

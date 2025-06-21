@@ -4,6 +4,9 @@ export enum TimeUnit {
   MINUTE = TimeUnit.SECOND * 60,
   HOUR = TimeUnit.MINUTE * 60,
   DAY = TimeUnit.HOUR * 24,
+  WEEK = TimeUnit.DAY * 7,
+  MONTH = TimeUnit.DAY * 31,
+  YEAR = TimeUnit.DAY * 365,
 }
 
 export const TIME_UNIT_DICTIONARY = {
@@ -12,6 +15,9 @@ export const TIME_UNIT_DICTIONARY = {
   m: TimeUnit.MINUTE,
   h: TimeUnit.HOUR,
   d: TimeUnit.DAY,
+  w: TimeUnit.WEEK,
+  mo: TimeUnit.MONTH,
+  y: TimeUnit.YEAR,
 };
 
 export const TIME_UNIT_LABELS = Object.entries(TIME_UNIT_DICTIONARY).reduce(

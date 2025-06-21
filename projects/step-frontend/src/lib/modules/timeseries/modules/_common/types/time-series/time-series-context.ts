@@ -98,6 +98,8 @@ export class TimeSeriesContext {
   }
 
   updateTimeRangeSettings(settings: DashboardTimeRangeSettings) {
+    settings.fullRange = TimeSeriesUtils.removeFloatingDigits(settings.fullRange);
+    settings.selectedRange = TimeSeriesUtils.removeFloatingDigits(settings.selectedRange);
     this.timeRangeSettings = settings;
     this.stateChangeInternal$.next();
     this.timeRangeSettingsChange.next(settings);
@@ -109,6 +111,7 @@ export class TimeSeriesContext {
    * @param range
    */
   updateFullTimeRange(range: TimeRange) {
+    range = TimeSeriesUtils.removeFloatingDigits(range);
     const isFullRangeSelected = this.isFullRangeSelected();
     const previousSelection = this.timeRangeSettings.selectedRange;
     if (isFullRangeSelected || !TimeSeriesUtils.intervalIsInside(range, previousSelection)) {
@@ -250,6 +253,7 @@ export class TimeSeriesContext {
   }
 
   updateSelectedRange(range: TimeRange, emitEvent = true) {
+    range = TimeSeriesUtils.removeFloatingDigits(range);
     this.timeRangeSettings.selectedRange = range;
     if (emitEvent) {
       this.selectedTimeRangeChange$.next(range);
