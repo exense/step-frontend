@@ -285,25 +285,27 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
+          const statusAttribute = 'rnStatus';
+          const executionIdAttribute = 'eId';
           if (executions.length === 0) {
             return of(this.createKeywordsChart([], []));
           } else {
-            const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
+            const executionsIdsJoined =
+              executions.map((e) => `attributes.${executionIdAttribute} = ${e.id!}`).join(' or ') || '1 = 1';
             const request: FetchBucketsRequest = {
               start: timeRange.from,
               end: timeRange.to,
               numberOfBuckets: 1,
-              oqlFilter: `(attributes.type = keyword) and ${executionsIdsJoined}`,
-              groupDimensions: ['executionId', 'status'],
+              oqlFilter: `(attributes.type = keyword) and (${executionsIdsJoined})`,
+              groupDimensions: [executionIdAttribute, statusAttribute],
             };
 
-            return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+            return this._timeSeriesService.getTimeSeries(request).pipe(
               map((timeSeriesResponse) => {
-                const statusAttribute = 'status';
                 let executionStats: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
                 timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-                  const executionId = attributes['executionId'];
+                  const executionId = attributes[executionIdAttribute];
                   const status = attributes[statusAttribute];
                   allStatuses.add(status);
                   let executionEntry: EntityWithKeywordsStats = {
@@ -323,6 +325,10 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                     }
                   });
                 });
+                if (timeSeriesResponse.matrixKeys.length === 0) {
+                  // add a default series when there is no data
+                  allStatuses.add('PASSED');
+                }
                 let series: TSChartSeries[] = Array.from(allStatuses).map((status) => {
                   let color = this._statusColors[status as Status];
                   const fill = color + 'cc';
@@ -449,13 +455,13 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.DAY * 7 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.DAY * 14 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 month', timeInMs: TimeUnit.DAY * 30 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 months', timeInMs: TimeUnit.DAY * 30 * 3 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 6 months', timeInMs: TimeUnit.DAY * 30 * 6 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 year', timeInMs: TimeUnit.DAY * 365 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.DAY * 365 * 3 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.WEEK } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.WEEK * 2 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 month', timeInMs: TimeUnit.MONTH } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 months', timeInMs: TimeUnit.MONTH * 3 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 6 months', timeInMs: TimeUnit.MONTH * 6 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 year', timeInMs: TimeUnit.YEAR } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.YEAR * 3 } },
   ];
 
   constructor() {
@@ -546,9 +552,8 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
-        values: (u, vals) => {
-          return vals;
-        },
+        values: (u, vals) => vals,
+        incrs: [1],
       },
     ];
 
@@ -571,7 +576,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       scales: {
         y: {
           range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-            return [0, initMax];
+            return [0, initMax || 10];
           },
         },
       },
@@ -593,9 +598,8 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
         scale: 'y',
-        values: (u, vals) => {
-          return vals;
-        },
+        values: (u, vals) => vals,
+        incrs: [1],
       },
     ];
     return {

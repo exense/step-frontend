@@ -1,5 +1,5 @@
 import { TimeRangePickerSelection } from '../time-selection/time-range-picker-selection';
-import { MetricAttribute } from '@exense/step-core';
+import { MetricAttribute, TimeUnit } from '@exense/step-core';
 
 export class TimeSeriesConfig {
   static readonly MAX_BUCKETS_IN_CHART = 100;
@@ -44,39 +44,39 @@ export class TimeSeriesConfig {
   ];
 
   static readonly ANALYTICS_TIME_SELECTION_OPTIONS: TimeRangePickerSelection[] = [
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 minute', timeInMs: this.ONE_HOUR_MS / 60 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 minute', timeInMs: TimeUnit.MINUTE } },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 15 minutes', timeInMs: this.ONE_HOUR_MS / 4 },
+      relativeSelection: { label: 'Last 15 minutes', timeInMs: TimeUnit.MINUTE * 15 },
     },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: this.ONE_HOUR_MS * 24 } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: TimeUnit.HOUR } },
+    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 1 week', timeInMs: this.ONE_HOUR_MS * 24 * 7 },
+      relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.WEEK },
     },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 1 month', timeInMs: this.ONE_HOUR_MS * 24 * 31 },
+      relativeSelection: { label: 'Last 1 month', timeInMs: TimeUnit.MONTH },
     },
   ];
 
   static readonly EXECUTION_PAGE_TIME_SELECTION_OPTIONS: TimeRangePickerSelection[] = [
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 1 minute', timeInMs: this.ONE_HOUR_MS / 60 },
+      relativeSelection: { label: 'Last 1 minute', timeInMs: TimeUnit.MINUTE },
     },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 5 minutes', timeInMs: this.ONE_HOUR_MS / 12 },
+      relativeSelection: { label: 'Last 5 minutes', timeInMs: TimeUnit.MINUTE * 5 },
     },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 15 minutes', timeInMs: this.ONE_HOUR_MS / 4 },
+      relativeSelection: { label: 'Last 15 minutes', timeInMs: TimeUnit.MINUTE * 15 },
     },
     {
       type: 'RELATIVE',
-      relativeSelection: { label: 'Last 30 minutes', timeInMs: this.ONE_HOUR_MS / 2 },
+      relativeSelection: { label: 'Last 30 minutes', timeInMs: TimeUnit.MINUTE * 30 },
     },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 hour', timeInMs: this.ONE_HOUR_MS } },
     { type: 'RELATIVE', relativeSelection: { label: 'Last 2 hours', timeInMs: this.ONE_HOUR_MS * 2 } },

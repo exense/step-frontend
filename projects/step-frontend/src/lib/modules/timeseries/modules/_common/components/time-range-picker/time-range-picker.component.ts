@@ -45,11 +45,18 @@ export class TimeRangePickerComponent implements OnInit {
     [TimeUnit.MINUTE]: 'minute',
     [TimeUnit.HOUR]: 'hour',
     [TimeUnit.DAY]: 'day',
+    [TimeUnit.WEEK]: 'week',
+    [TimeUnit.MONTH]: 'month',
+    [TimeUnit.YEAR]: 'year',
   };
   readonly TIME_UNIT_LABELS_PLURAL: Record<string, string> = {
+    [TimeUnit.SECOND]: 'seconds',
     [TimeUnit.MINUTE]: 'minutes',
     [TimeUnit.HOUR]: 'hours',
     [TimeUnit.DAY]: 'days',
+    [TimeUnit.WEEK]: 'weeks',
+    [TimeUnit.MONTH]: 'months',
+    [TimeUnit.YEAR]: 'years',
   };
   private _snackBar = inject(MatSnackBar);
   private _converter = inject(TimeConvertersFactoryService).timeConverter();
