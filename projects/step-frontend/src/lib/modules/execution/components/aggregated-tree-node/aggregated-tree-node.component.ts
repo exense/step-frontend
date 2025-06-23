@@ -4,7 +4,6 @@ import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { Status } from '../../../_common/shared/status.enum';
 import { IsEmptyStatusPipe } from '../../pipes/is-empty-status.pipe';
-import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
 import { ElementSizeService, TreeNodeData } from '@exense/step-core';
 
 @Component({
@@ -24,7 +23,6 @@ import { ElementSizeService, TreeNodeData } from '@exense/step-core';
 export class AggregatedTreeNodeComponent implements ElementSizeService {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _executionDialogs = inject(AltExecutionDialogsService);
-  private _reportNodesFilter = inject(AltReportNodesFilterService, { optional: true });
   private _parentElementSize = inject(ElementSizeService, { skipSelf: true, optional: true });
   private _treeNodeData = inject(TreeNodeData);
 
@@ -59,17 +57,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     const selectedSearchResult = this._treeState.selectedSearchResult();
     return selectedSearchResult === nodeId;
   });
-
-  protected showStatus = computed(() => {
-    const node = this.node();
-    const artefactClass = this._reportNodesFilter?.artefactClassValue?.();
-    if (!artefactClass?.size) {
-      return true;
-    }
-    return artefactClass.has(node?.originalArtefact?._class ?? '');
-  });
-
-  protected statusFilter = computed(() => this._reportNodesFilter?.statusCtrlValue?.() ?? []);
 
   protected readonly detailsTooltip = 'Open execution details';
 

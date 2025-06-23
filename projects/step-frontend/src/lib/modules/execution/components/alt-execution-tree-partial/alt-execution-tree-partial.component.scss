@@ -16,6 +16,10 @@ step-alt-execution-tree-partial {
         }
       }
     }
+
+    step-tree-node.not-significant {
+      opacity: 1 !important;
+    }
   }
 
   .spinner-container {
