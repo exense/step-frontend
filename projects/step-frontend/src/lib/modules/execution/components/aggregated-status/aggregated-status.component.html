@@ -9,7 +9,7 @@
     <step-icon name="out-of-scope" [matTooltip]="emptyStatusMessage()" matTooltipPosition="below" />
   </div>
 } @else {
-  @for (item of filteredStatusItems(); track item.status) {
+  @for (item of allStatusItems(); track item.status) {
     @if (item.status === Status.RUNNING && item.count === 1) {
       <step-status [status]="item.status" [iconMode]="true" (stepStrategyClick)="handleClick(item, $event)" />
     } @else {

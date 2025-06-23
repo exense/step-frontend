@@ -37,13 +37,9 @@ export class TreeNodeVisualStateDirective {
     return new Set(result);
   });
 
-  private hasDescendantInvocations = computed(() => !!this.node()?.hasDescendantInvocations);
-
   protected notSignificantByStatus = computed(() => {
-    const hasDescendants = this.hasDescendantInvocations();
     const filteredStatuses = this.filteredStatuses();
-
-    return filteredStatuses.size === 0 && !hasDescendants;
+    return filteredStatuses.size === 0;
   });
 
   protected isSkipped = computed(() => {

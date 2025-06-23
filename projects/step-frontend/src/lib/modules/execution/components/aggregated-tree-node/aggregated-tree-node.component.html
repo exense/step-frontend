@@ -6,10 +6,8 @@
           <ng-container *stepArtefactInlineDetailsHeader>
             <div class="node-header larger-view">
               <step-aggregated-status
-                [class.hide-status]="!showStatus()"
                 [hasDescendantInvocations]="node?.hasDescendantInvocations"
                 [countByStatus]="node?.countByStatus"
-                [statusFilter]="statusFilter()"
                 (statusClick)="showDetails($event.status, $event.count, $event.event)"
               />
               <span class="name" [matTooltip]="detailsTooltip" matTooltipPosition="below">{{ node?.name }}</span>

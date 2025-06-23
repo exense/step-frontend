@@ -27,34 +27,23 @@ export class AggregatedStatusComponent {
   readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
   readonly hasDescendantInvocations = input<boolean | undefined>(false);
-  readonly statusFilter = input<Status[]>([]);
 
-  private allStatusItems = computed(() => {
+  protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
     return Object.entries(countByStatus)
       .map(([status, count]) => this.createStatusItem(status, count))
       .filter((item) => !!item) as StatusItem[];
   });
 
-  protected readonly filteredStatusItems = computed(() => {
-    const allStatuses = this.allStatusItems();
-    const statusFilter = this.statusFilter();
-
-    if (statusFilter?.length) {
-      return allStatuses.filter((item) => statusFilter.includes(item.status));
-    }
-    return allStatuses;
-  });
-
   protected readonly singleStatus = computed(() => {
-    const items = this.filteredStatusItems();
+    const items = this.allStatusItems();
     if (items.length === 1 && items[0].count === 1) {
       return items[0];
     }
     return undefined;
   });
 
-  protected readonly isEmptyStatus = computed(() => !this.filteredStatusItems().length);
+  protected readonly isEmptyStatus = computed(() => !this.allStatusItems().length);
 
   protected readonly emptyStatusMessage = computed(() => {
     const isEmptyStatus = this.isEmptyStatus();
