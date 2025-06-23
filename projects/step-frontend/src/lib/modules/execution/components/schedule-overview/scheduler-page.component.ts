@@ -20,7 +20,23 @@ import {
 } from '@exense/step-core';
 import { SCHEDULE_ID } from '../../services/schedule-id.token';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { count, filter, interval, map, Observable, of, range, scan, shareReplay, switchMap, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  count,
+  filter,
+  interval,
+  map,
+  Observable,
+  of,
+  range,
+  scan,
+  shareReplay,
+  startWith,
+  Subject,
+  switchMap,
+  take,
+  withLatestFrom,
+} from 'rxjs';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { SchedulerPageStateService } from './scheduler-page-state.service';
 import { FilterBarItem, FilterBarItemType } from '../../../timeseries/time-series.module';
@@ -101,44 +117,9 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     this.refreshInterval.set(interval);
   }
 
-  // private refreshIntervalEffect = effect(() => {
-  //   let refreshInterval = this.refreshInterval();
-  // this._urlParamsService.updateRefreshInterval(refreshInterval, false);
-  // });
-
-  private updateUrlRefreshInterval = toObservable(this.refreshInterval)
-    .pipe(
-      scan(
-        (acc, interval) => {
-          const isFirst = !acc.hasEmitted;
-          return { range: interval, isFirst, hasEmitted: true };
-        },
-        { range: null as unknown as number, isFirst: true, hasEmitted: false },
-      ),
-      takeUntilDestroyed(),
-    )
-    .subscribe(({ range, isFirst }: { range: number; isFirst: boolean }) => {
-      // this._urlParamsService.updateRefreshInterval(range, isFirst);
-    });
-
-  private updateUrlTimeRange = this.timeRangeSelection$
-    .pipe(
-      scan(
-        (acc, range) => {
-          const isFirst = !acc.hasEmitted;
-          return { range, isFirst, hasEmitted: true };
-        },
-        { range: null as unknown as TimeRangePickerSelection, isFirst: true, hasEmitted: false },
-      ),
-      takeUntilDestroyed(),
-    )
-    .subscribe(({ range, isFirst }: { range: TimeRangePickerSelection; isFirst: boolean }) => {
-      // analytics tab is handling events itself
-      // this._urlParamsService.patchUrlParams(range, undefined, isFirst);
-    });
-
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
     map((rangeSelection) => {
+      console.log('CALCULATING');
       switch (rangeSelection.type) {
         case 'FULL':
           throw new Error('Full range is not supported');
@@ -153,12 +134,13 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     shareReplay(1),
   ) as Observable<TimeRange>;
 
-  readonly lastExecution$: Observable<{ execution: Execution | null }> = this.taskId$.pipe(
-    switchMap((taskId) => {
-      return this._executionService
-        .getLastExecutionsByTaskId(taskId, 1, undefined, undefined)
-        .pipe(map((executions) => ({ execution: executions[0] || null })));
-    }),
+  private readonly fetchLastExecutionTrigger$ = new Subject<void>();
+
+  readonly lastExecution$: Observable<{ execution: Execution | null }> = this.fetchLastExecutionTrigger$.pipe(
+    startWith(undefined),
+    switchMap(() => this._executionService.getLastExecutionsByTaskId(this._taskIdFn(), 1, undefined, undefined)),
+    map((executions) => ({ execution: executions[0] || null })),
+    shareReplay(1),
   );
 
   readonly summaryData$: Observable<ReportNodeSummary> = this.timeRange$.pipe(
@@ -278,6 +260,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
           }),
         );
     }),
+    shareReplay(1),
   );
 
   readonly keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
@@ -285,8 +268,8 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
-          const statusAttribute = 'rnStatus';
-          const executionIdAttribute = 'eId';
+          const statusAttribute = 'status';
+          const executionIdAttribute = 'executionId';
           if (executions.length === 0) {
             return of(this.createKeywordsChart([], []));
           } else {
@@ -296,11 +279,11 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
               start: timeRange.from,
               end: timeRange.to,
               numberOfBuckets: 1,
-              oqlFilter: `(attributes.type = keyword) and (${executionsIdsJoined})`,
+              oqlFilter: `(attributes.type = CallFunction) and (${executionsIdsJoined})`,
               groupDimensions: [executionIdAttribute, statusAttribute],
             };
 
-            return this._timeSeriesService.getTimeSeries(request).pipe(
+            return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
               map((timeSeriesResponse) => {
                 let executionStats: Record<string, EntityWithKeywordsStats> = {};
                 const allStatuses = new Set<string>();
@@ -447,7 +430,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
 
-  x = this.timeRange$.subscribe((timeRange) => {
+  errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
     this.errorsDataSource.reload({ request: { timeRange: timeRange, taskId: this._taskIdFn() } });
   });
 
@@ -464,10 +447,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.YEAR * 3 } },
   ];
 
-  constructor() {
-    super();
-  }
-
   ngOnInit(): void {
     const urlParams = this._urlParamsService.collectUrlParams();
     this.updateTimeAndRefresh(urlParams);
@@ -480,8 +459,8 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   }
 
   triggerRefresh() {
-    // this.refresh$.next();
     this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+    this.fetchLastExecutionTrigger$.next();
   }
 
   handleRefreshIntervalChange(interval: number) {
@@ -490,7 +469,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
-    // this.timeRangeChange.next({ selection, triggerRefresh: true });
   }
 
   private updateTimeAndRefresh(urlParams: DashboardUrlParams) {

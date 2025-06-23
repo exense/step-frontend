@@ -14,11 +14,14 @@
         <div class="message" (click)="showError(element.errorMessage)">{{ element.errorMessage }}</div>
         @if (showExecutionsMenu()) {
           <step-icon class="icon" matTooltip="See executions" name="external-link" [matMenuTriggerFor]="menu" />
+
           <mat-menu #menu="matMenu" class="wide-menu">
-            <step-error-details-menu
-              [executionIds]="element.executionIds"
-              [truncated]="element.executionIdsTruncated"
-            />
+            <ng-template matMenuContent>
+              <step-error-details-menu
+                [executionIds]="element.executionIds"
+                [truncated]="element.executionIdsTruncated"
+              />
+            </ng-template>
           </mat-menu>
         }
       </div>
