@@ -554,7 +554,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       scales: {
         y: {
           range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-            return [0, initMax || 10];
+            return [0, Math.max(initMax, 5)];
           },
         },
       },
@@ -599,7 +599,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
       scales: {
         y: {
           range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
-            return [0, initMax || 10];
+            return [0, Math.max(initMax, 5)];
           },
         },
       },

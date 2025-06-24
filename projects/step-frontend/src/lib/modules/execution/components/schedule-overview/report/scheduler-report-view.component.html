@@ -2,7 +2,7 @@
   <div class="row">
     <div class="piechart-container">
       @if (_stateService.summaryData$ | async; as summary) {
-        <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" />
+        <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
       } @else {
         <step-alt-report-widget title="Summary: Executions">
           <step-alt-report-widget-content class="widget-content">

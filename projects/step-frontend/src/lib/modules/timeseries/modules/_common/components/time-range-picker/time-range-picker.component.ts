@@ -39,7 +39,7 @@ import {
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {
-  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY];
+  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH, TimeUnit.YEAR];
   readonly TIME_UNIT_LABELS_SINGULAR: Record<string, string> = {
     [TimeUnit.SECOND]: 'second',
     [TimeUnit.MINUTE]: 'minute',
