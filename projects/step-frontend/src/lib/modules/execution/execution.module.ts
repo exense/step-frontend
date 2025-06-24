@@ -144,6 +144,7 @@ import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-t
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
+import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
 
 @NgModule({
   declarations: [
@@ -246,6 +247,7 @@ import { ToggleRequestWarningDirective } from './directives/toggle-request-warni
     AltReportWidgetContentDirective,
     DashboardPageComponent,
     ToggleRequestWarningDirective,
+    ParentElementSizeDirective,
   ],
   exports: [
     ExecutionListComponent,

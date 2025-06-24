@@ -1,6 +1,6 @@
 :host {
   display: block;
-  max-width: 70rem;
+  width: 60rem;
 }
 
 .pointer {
@@ -14,4 +14,8 @@
   overflow: hidden;
   white-space: break-spaces;
   word-break: break-all;
+}
+
+.param-cell {
+  width: 50%;
 }
