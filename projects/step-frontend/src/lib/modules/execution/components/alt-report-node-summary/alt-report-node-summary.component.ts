@@ -139,6 +139,9 @@ export class AltReportNodeSummaryComponent {
   }
 
   protected toggleStatusFilter(status: Status, preventOtherSelection: boolean) {
+    if (this.disableChartItemClick()) {
+      return;
+    }
     this.statusFilterModel.update((value) => {
       const statusSet = new Set(value);
       if (!preventOtherSelection) {
