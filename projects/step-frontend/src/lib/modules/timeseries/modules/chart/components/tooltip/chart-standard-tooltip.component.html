@@ -28,7 +28,7 @@
         {{ entry.formattedValue || entry.value || 0 }}
         @if (!entry.isSummary && settings()?.useExecutionLinks && entry.value) {
           <span matTooltip="See Execution" class="link-icon" [matMenuTriggerFor]="executionsMenu"></span>
-          <mat-menu #executionsMenu class="tooltip-menu">
+          <mat-menu #executionsMenu>
             <ng-template matMenuContent>
               <step-tooltip-executions-menu [executions]="entry.executionsFn | async" />
             </ng-template>
