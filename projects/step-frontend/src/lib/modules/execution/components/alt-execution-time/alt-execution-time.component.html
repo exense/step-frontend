@@ -1,11 +1,19 @@
 @if (hasContent()) {
   <step-popover yPosition="below">
     <section>
+      @if (popoverTitle()) {
+        <div class="popover-title">{{ popoverTitle() }}</div>
+      }
       @if (displayDate(); as date) {
         <div class="date">{{ date }}</div>
       }
       @if (duration(); as duration) {
         <div class="duration">{{ duration }}</div>
+      }
+      @if (status()) {
+        <div class="status">
+          <step-status [status]="status()" [iconMode]="false" />
+        </div>
       }
     </section>
     <step-popover-content>

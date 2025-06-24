@@ -58,7 +58,6 @@ import { ExecutionOpenerComponent } from './components/execution-opener/executio
 import { ExecutionRunningStatusHeaderComponent } from './components/execution-running-status-header/execution-running-status-header.component';
 import { ExecutionStatusComponent } from './components/execution-status/execution-status.component';
 import { ExecutionDurationComponent } from './components/execution-duration/execution-duration.component';
-import { ScheduleOverviewComponent } from './components/schedule-overview/schedule-overview.component';
 import { AltExecutionsComponent } from './components/alt-executions/alt-executions.component';
 import { AltExecutionProgressComponent } from './components/alt-execution-progress/alt-execution-progress.component';
 import { AltExecutionReportComponent } from './components/alt-execution-report/alt-execution-report.component';
@@ -144,6 +143,9 @@ import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-t
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
+import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
+import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
+import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
 
 @NgModule({
   declarations: [
@@ -177,7 +179,6 @@ import { ToggleRequestWarningDirective } from './directives/toggle-request-warni
     ExecutionRunningStatusHeaderComponent,
     ExecutionStatusComponent,
     ExecutionDurationComponent,
-    ScheduleOverviewComponent,
     AltExecutionsComponent,
     AltExecutionTabsComponent,
     AltExecutionProgressComponent,
@@ -232,6 +233,9 @@ import { ToggleRequestWarningDirective } from './directives/toggle-request-warni
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,
     IsCurrentReportDetailsOpenedPipe,
+    SchedulerPageComponent,
+    SchedulerPerformanceViewComponent,
+    SchedulerReportViewComponent,
   ],
   imports: [
     StepCommonModule,
@@ -429,8 +433,22 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'cross-executions/:id',
-      component: ScheduleOverviewComponent,
+      path: 'scheduler/:id',
+      component: SchedulerPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
+      ],
     });
     this._viewRegistry.registerRoute({
       path: 'executions',

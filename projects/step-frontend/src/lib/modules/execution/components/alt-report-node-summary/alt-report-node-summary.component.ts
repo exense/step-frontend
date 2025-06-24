@@ -26,6 +26,7 @@ export class AltReportNodeSummaryComponent {
   protected readonly _mode = inject(VIEW_MODE);
 
   readonly title = input('');
+  readonly disableChartItemClick = input(false);
 
   readonly summary = input.required<ReportNodeSummary>();
 
@@ -129,12 +130,18 @@ export class AltReportNodeSummaryComponent {
   protected readonly totalForecast = computed(() => this.summaryDistinct()?.countForecast);
 
   protected toggleChartItem(event: ChartItemClickEvent) {
+    if (this.disableChartItemClick()) {
+      return;
+    }
     const status = event.item.label as Status;
     const preventOtherSelection = !!event.ctrlKey || !!event.shiftKey;
     this.toggleStatusFilter(status, preventOtherSelection);
   }
 
   protected toggleStatusFilter(status: Status, preventOtherSelection: boolean) {
+    if (this.disableChartItemClick()) {
+      return;
+    }
     this.statusFilterModel.update((value) => {
       const statusSet = new Set(value);
       if (!preventOtherSelection) {

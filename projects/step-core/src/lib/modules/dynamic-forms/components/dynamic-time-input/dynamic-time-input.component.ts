@@ -16,6 +16,9 @@ export class DynamicTimeInputComponent extends DynamicValueBaseComponent<Dynamic
     TimeUnit.MINUTE,
     TimeUnit.HOUR,
     TimeUnit.DAY,
+    TimeUnit.WEEK,
+    TimeUnit.MONTH,
+    TimeUnit.YEAR,
   ];
 
   @Input() measuresDictionary?: TimeUnitDictionary;

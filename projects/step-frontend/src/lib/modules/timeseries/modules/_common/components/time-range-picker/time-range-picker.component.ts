@@ -19,7 +19,13 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit } from '@exense/step-core';
+import {
+  TIME_UNIT_DICTIONARY,
+  TIME_UNIT_LABELS,
+  TimeConvertersFactoryService,
+  TimeRange,
+  TimeUnit,
+} from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -33,11 +39,24 @@ import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {
-  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY];
-  readonly TIME_UNIT_LABELS: Record<string, string> = {
+  timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH, TimeUnit.YEAR];
+  readonly TIME_UNIT_LABELS_SINGULAR: Record<string, string> = {
+    [TimeUnit.SECOND]: 'second',
+    [TimeUnit.MINUTE]: 'minute',
+    [TimeUnit.HOUR]: 'hour',
+    [TimeUnit.DAY]: 'day',
+    [TimeUnit.WEEK]: 'week',
+    [TimeUnit.MONTH]: 'month',
+    [TimeUnit.YEAR]: 'year',
+  };
+  readonly TIME_UNIT_LABELS_PLURAL: Record<string, string> = {
+    [TimeUnit.SECOND]: 'seconds',
     [TimeUnit.MINUTE]: 'minutes',
     [TimeUnit.HOUR]: 'hours',
     [TimeUnit.DAY]: 'days',
+    [TimeUnit.WEEK]: 'weeks',
+    [TimeUnit.MONTH]: 'months',
+    [TimeUnit.YEAR]: 'years',
   };
   private _snackBar = inject(MatSnackBar);
   private _converter = inject(TimeConvertersFactoryService).timeConverter();
@@ -53,7 +72,6 @@ export class TimeRangePickerComponent implements OnInit {
 
   @Output() selectionChange = new EventEmitter<TimeRangePickerSelection>();
 
-  otherOptionSelected = signal<boolean>(false);
   otherOptionValue = model<number | undefined>(undefined);
   otherOptionUnit = model<TimeUnit>(TimeUnit.MINUTE);
 
@@ -73,8 +91,14 @@ export class TimeRangePickerComponent implements OnInit {
 
     if (selection.type === 'RELATIVE') {
       let convertedValue = this.convertMsValue(selection.relativeSelection!.timeInMs);
+      let unit = '';
+      if (convertedValue.value === 1) {
+        unit = this.TIME_UNIT_LABELS_SINGULAR[convertedValue.unit];
+      } else {
+        unit = this.TIME_UNIT_LABELS_PLURAL[convertedValue.unit];
+      }
 
-      return `Last ${convertedValue.value} ${this.TIME_UNIT_LABELS[convertedValue.unit]}`;
+      return `Last ${convertedValue.value} ${unit}`;
     }
 
     return 'Unknown';
@@ -239,16 +263,12 @@ export class TimeRangePickerComponent implements OnInit {
   }
 
   onRelativeOrFullSelectionSelected(option: TimeRangePickerSelection) {
-    this.draftSelection.set(option);
-    if (option.type === 'RELATIVE') {
-      const convertedValue = this.convertMsValue(option.relativeSelection!.timeInMs);
-      this.otherOptionUnit.set(convertedValue.unit);
-      this.otherOptionValue.set(convertedValue.value);
-    }
+    this.emitSelectionChange(option);
   }
 
   emitSelectionChange(selection: TimeRangePickerSelection) {
     this.selectionChange.emit(selection);
+    this.closeMenu();
   }
 
   setFromDate(date?: DateTime | null): void {
