@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, inject, input, signal, TemplateRef } from '@angular/core';
+import { Component, computed, forwardRef, inject, input, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
@@ -10,9 +10,6 @@ import { ElementSizeService, TreeNodeData } from '@exense/step-core';
   selector: 'step-aggregated-tree-node',
   templateUrl: './aggregated-tree-node.component.html',
   styleUrl: './aggregated-tree-node.component.scss',
-  host: {
-    '[class.highlight]': 'isInSearchResult()',
-  },
   providers: [
     {
       provide: ElementSizeService,
@@ -50,12 +47,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     const nodeId = this.nodeId();
     const selectedNodes = this._treeState.selectedNodeIds();
     return selectedNodes.includes(nodeId);
-  });
-
-  protected isInSearchResult = computed(() => {
-    const nodeId = this.nodeId();
-    const selectedSearchResult = this._treeState.selectedSearchResult();
-    return selectedSearchResult === nodeId;
   });
 
   protected readonly detailsTooltip = 'Open execution details';
