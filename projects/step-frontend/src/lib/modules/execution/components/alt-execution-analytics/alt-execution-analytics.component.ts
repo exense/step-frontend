@@ -17,7 +17,6 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   readonly _state = inject(AltExecutionStateService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
-  protected _cd = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
   private dashboardComponent = viewChild('dashboard', { read: ExecutionDashboardComponent });
   isLoading = false;

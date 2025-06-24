@@ -33,7 +33,10 @@ export class LegacyExecutionViewComponent implements OnInit {
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
 
-  readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS;
+  readonly timeRangeOptions: TimeRangePickerSelection[] = [
+    { type: 'FULL' },
+    ...TimeSeriesConfig.EXECUTION_PAGE_TIME_SELECTION_OPTIONS,
+  ];
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
   refreshInterval = signal<number>(0);
@@ -43,7 +46,6 @@ export class LegacyExecutionViewComponent implements OnInit {
   isLoading = signal<boolean>(false);
 
   timeRange: Signal<TimeRange | undefined> = computed(() => {
-    console.log('time ranged changed');
     const pickerSelection = this.activeTimeRangeSelection();
     if (pickerSelection) {
       const execution = this.execution();

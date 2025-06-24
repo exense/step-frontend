@@ -15,6 +15,9 @@ export const DEFAULT_TIME_LABELS_DICTIONARY: TimeUnitDictionary = {
   [TimeUnit.MINUTE]: 'Minute(s)',
   [TimeUnit.HOUR]: 'Hour(s)',
   [TimeUnit.DAY]: 'Day(s)',
+  [TimeUnit.WEEK]: 'Week(s)',
+  [TimeUnit.MONTH]: 'Month(s)',
+  [TimeUnit.YEAR]: 'Year(s)',
 };
 
 @Component({
@@ -34,6 +37,9 @@ export abstract class BaseTimeConverterComponent implements ControlValueAccessor
     TimeUnit.MINUTE,
     TimeUnit.HOUR,
     TimeUnit.DAY,
+    TimeUnit.WEEK,
+    TimeUnit.MONTH,
+    TimeUnit.YEAR,
   ];
 
   @Input() measuresDictionary?: TimeUnitDictionary;
