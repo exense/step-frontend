@@ -32,7 +32,7 @@ import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.modul
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class AutoShrankListComponent implements ItemWidthRegisterService, OnInit, OnDestroy {
+export class AutoShrankListComponent implements ItemWidthRegisterService<KeyValue<string, string>>, OnInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private observer?: ResizeObserver;

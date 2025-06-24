@@ -10,17 +10,34 @@ step-artefact-inline-field section.field-content {
 }
 
 step-artefact-inline-field {
-  .ellipsis {
-    display: none;
+  .field-prefix {
+    max-width: var(--style__prefix-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
-  & > section {
+  .field-label {
+    max-width: var(--style__label-width, unset);
+    text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 20rem;
+  }
 
-    &.step-overflow-indicator-has-overflow + .ellipsis {
-      display: block;
-    }
+  .field-value {
+    max-width: var(--style__value-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .field-icon {
+    max-width: var(--style__icon-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .field-suffix {
+    max-width: var(--style__suffix-width, unset);
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   label,

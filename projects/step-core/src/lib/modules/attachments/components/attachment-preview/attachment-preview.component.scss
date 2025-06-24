@@ -51,6 +51,10 @@ step-attachment-preview {
     &.overlay {
       background: var.$white-transparent;
     }
+
+    &.skipped {
+      text-decoration: line-through;
+    }
   }
 
   .actions {

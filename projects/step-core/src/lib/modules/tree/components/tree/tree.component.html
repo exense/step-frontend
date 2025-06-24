@@ -1,5 +1,6 @@
 @if (hasVirtualScroll()) {
   <cdk-virtual-scroll-viewport
+    #virtualViewport
     class="virtual-scroll-container"
     [style.--style__height]="_stepTreeVirtualScroll!.containerHeight()"
     orientation="vertical"

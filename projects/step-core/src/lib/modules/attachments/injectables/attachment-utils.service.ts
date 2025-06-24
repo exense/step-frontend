@@ -14,7 +14,11 @@ export class AttachmentUtilsService {
 
   determineAttachmentType(attachment?: AttachmentMeta): AttachmentType {
     if (!attachment) {
-      return AttachmentType.DEFAULT;
+      return AttachmentType.SKIPPED;
+    }
+
+    if (attachment.type === 'step.attachments.SkippedAttachmentMeta') {
+      return AttachmentType.SKIPPED;
     }
 
     const nameParts = (attachment.name ?? '').split('.');
@@ -46,6 +50,8 @@ export class AttachmentUtilsService {
         return 'image';
       case AttachmentType.VIDEO:
         return 'film';
+      case AttachmentType.SKIPPED:
+        return 'alert-circle';
       default:
         return 'paperclip';
     }

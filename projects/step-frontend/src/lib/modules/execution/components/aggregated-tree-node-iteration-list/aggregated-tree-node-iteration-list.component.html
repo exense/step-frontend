@@ -31,35 +31,27 @@
     #table
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
-    class="paddingless no-border hide-header"
+    class="paddingless no-border hide-header no-highlight"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
+      <td class="data-cell" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          <step-alt-execution-time
-            [startTime]="element.executionTime"
-            [duration]="element.duration"
-            [timeOnly]="true"
-          />
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td class="name" mat-cell *matCellDef="let element">
-        <div class="details-trigger" (click)="openNodeDetails(element)">
-          <div class="larger-view">
-            <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
-            <step-status
-              class="details-trigger"
-              [status]="element.status"
-              [iconMode]="true"
-              (click)="openNodeDetails(element)"
-            />
-            {{ element.name }}
-          </div>
-          <step-artefact-inline-details class="smaller-view" [reportInfo]="element" />
+          <step-artefact-inline-details stepElementSize [reportInfo]="element" class="shift-rows smaller-view">
+            <ng-container *stepArtefactInlineDetailsHeader>
+              <div class="larger-view artefact-header">
+                <step-alt-execution-time
+                  class="special-selection"
+                  [startTime]="element.executionTime"
+                  [duration]="element.duration"
+                  [timeOnly]="true"
+                />
+                <step-report-node-icon [node]="element" />
+                <step-status class="details-trigger" [status]="element.status" [iconMode]="true" />
+                <span class="name">{{ element.name }}</span>
+              </div>
+            </ng-container>
+          </step-artefact-inline-details>
         </div>
       </td>
     </ng-container>

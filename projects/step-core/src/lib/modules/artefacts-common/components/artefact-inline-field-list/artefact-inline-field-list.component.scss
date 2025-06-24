@@ -1,11 +1,30 @@
+@use 'projects/step-core/styles/core-variables' as var;
 @use 'projects/step-core/styles/core-mixins' as core;
 
 step-artefact-inline-field-list {
   display: flex;
   align-items: center;
 
+  .invisible-items {
+    visibility: hidden;
+    height: 0;
+    width: 0;
+  }
+
+  &.bold-labels {
+    step-artefact-inline-field {
+      label {
+        font-weight: 500;
+      }
+    }
+  }
+
   section.list {
     display: flex;
+
+    step-artefact-inline-field {
+      z-index: 2;
+    }
 
     &.vertical {
       flex-direction: column;
@@ -19,10 +38,6 @@ step-artefact-inline-field-list {
           max-width: unset;
         }
       }
-    }
-
-    &.wrap {
-      flex-wrap: wrap;
     }
 
     &:not(.vertical) {

@@ -11,4 +11,5 @@
 @forward 'components/executions-menu';
 @forward 'components/custom-menu';
 @forward 'components/settings-menu';
-@forward 'components/execution-shared-styles' show execution-shared-styles;
+@forward 'components/execution-shared-styles' show execution-shared-styles, special-selection-item,
+  special-selection-item-hover;

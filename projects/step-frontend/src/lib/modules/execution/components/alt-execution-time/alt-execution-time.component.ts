@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import {
   DateFormat,
   DateRangeAdapterService,
@@ -20,6 +20,7 @@ import { DatePipe } from '@angular/common';
     DateRangeAdapterService,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltExecutionTimeComponent {
   private _datePipe = inject(DatePipe);

@@ -1,9 +1,20 @@
-<section class="list" [class.vertical]="isVertical()" [class.wrap]="wrap()">
-  <ng-content select="step-artefact-inline-field-list-prefix"></ng-content>
+@if (!isVertical()) {
+  <section class="list invisible-items">
+    @for (item of items(); track item.label) {
+      <step-artefact-inline-field #items [item]="item" />
+    }
+  </section>
+}
+<section class="list" [class.vertical]="isVertical()">
+  <div #listPrefix>
+    <ng-content select="step-artefact-inline-field-list-prefix"></ng-content>
+  </div>
   @for (item of displayItems(); track item.label) {
-    <step-artefact-inline-field [item]="item" />
+    <step-artefact-inline-field [item]="item" [applyExplicitWidths]="true" />
+  }
+  @if (showMoreButton()) {
+    <div class="ellipsis" matTooltip="Has more items" matTooltipPosition="below">
+      <step-icon class="more-icon" name="more-horizontal" />
+    </div>
   }
 </section>
-@if (hasHiddenItems()) {
-  <step-icon class="more-icon" name="more-horizontal" [matTooltip]="hiddenItemsTooltip()" matTooltipPosition="below" />
-}

@@ -17,9 +17,10 @@ import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.with-actions]': 'showDownload()',
+    '[class.with-actions]': 'showDownload() && attachmentType() !== AttachmentType.SKIPPED',
     '[class.with-border]': 'withBorder()',
     '(click)': 'open()',
+    '[matTooltip]': 'attachmentType() !== AttachmentType.SKIPPED ? "open attachment" : this.attachment().reason',
   },
 })
 export class AttachmentPreviewComponent {

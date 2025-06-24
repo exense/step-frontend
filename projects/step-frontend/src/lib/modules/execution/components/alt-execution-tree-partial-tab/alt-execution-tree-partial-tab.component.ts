@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { AugmentedControllerService } from '@exense/step-core';
+import { AugmentedControllerService, ElementSizeDirective } from '@exense/step-core';
 import { ActivatedRoute } from '@angular/router';
 import { filter, map, shareReplay, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,6 +10,7 @@ import { AltExecutionTabsService, STATIC_TABS } from '../../services/alt-executi
   templateUrl: './alt-execution-tree-partial-tab.component.html',
   styleUrl: './alt-execution-tree-partial-tab.component.scss',
   encapsulation: ViewEncapsulation.None,
+  hostDirectives: [ElementSizeDirective],
 })
 export class AltExecutionTreePartialTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
