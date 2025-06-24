@@ -119,7 +119,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
     map((rangeSelection) => {
-      console.log('CALCULATING');
       switch (rangeSelection.type) {
         case 'FULL':
           throw new Error('Full range is not supported');
