@@ -3,8 +3,7 @@
     <div>
       @for (series of transformedData(); track series.label) {
         <div class="row" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
-          <step-status [status]="series.label" [iconMode]="false" />
-          ({{ series.value }})
+          <step-status-count-badge [status]="series.label" [count]="series.value" />
         </div>
       }
     </div>
@@ -13,7 +12,7 @@
         <div class="separator"></div>
         @for (exec of selectedSeriesExecutions; track exec.id) {
           <div class="link-item" (click)="jumpToExecution(exec)" title="See Execution">
-            <span>{{ exec.name }}</span>
+            <span>{{ exec.name }} ({{ exec.timestamp }})</span>
             <span class="link-icon"></span>
           </div>
         }

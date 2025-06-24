@@ -7,7 +7,7 @@ import { NgTemplateOutlet } from '@angular/common';
   template: `
     @if (template) {
       <ng-container>
-        <ng-container *ngTemplateOutlet="template; context: { $implicit: data }"></ng-container>
+        <ng-container *ngTemplateOutlet="template; context: context"></ng-container>
       </ng-container>
     }
   `,
@@ -16,9 +16,18 @@ import { NgTemplateOutlet } from '@angular/common';
 export class TooltipContainerComponent {
   @Input() template!: TemplateRef<any>;
   @Input() data!: any;
+  @Input() reposition?: () => void;
 
-  update(template: TemplateRef<any>, data: any) {
+  update(template: TemplateRef<any>, data: any, reposition?: () => void) {
     this.template = template;
     this.data = data;
+    this.reposition = reposition;
+  }
+
+  get context() {
+    return {
+      $implicit: this.data, // for let-data
+      reposition: this.reposition, // for let-reposition
+    };
   }
 }
