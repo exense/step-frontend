@@ -19,8 +19,12 @@
             (zoomChange)="handleMainChartZoom($event)"
             [height]="340"
           >
-            <ng-template tooltipContent let-data>
-              <step-executions-chart-tooltip [data]="data" [taskId]="_stateService.taskId()!" />
+            <ng-template tooltipContent let-data let-reposition="reposition">
+              <step-executions-chart-tooltip
+                (reposition)="reposition()"
+                [data]="data"
+                [taskId]="_stateService.taskId()!"
+              />
             </ng-template>
           </step-timeseries-chart>
         } @else {

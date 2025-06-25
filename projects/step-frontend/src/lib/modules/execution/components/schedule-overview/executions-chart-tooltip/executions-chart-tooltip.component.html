@@ -1,19 +1,19 @@
 @if (transformedData().length) {
   <div class="ts-tooltip">
-    <div>
+    <div class="items-container">
       @for (series of transformedData(); track series.label) {
-        <div class="row" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
-          <step-status [status]="series.label" [iconMode]="false" />
-          ({{ series.value }})
+        <div class="item" (click)="selectSeries(series)" [class.selected]="selectedSeries?.label === series.label">
+          <step-status-count-badge [status]="series.label" [count]="series.value" />
         </div>
       }
     </div>
     <div>
       @if (selectedSeries) {
         <div class="separator"></div>
+        <div class="selected-series-title">{{ selectedSeries.label }}</div>
         @for (exec of selectedSeriesExecutions; track exec.id) {
           <div class="link-item" (click)="jumpToExecution(exec)" title="See Execution">
-            <span>{{ exec.name }}</span>
+            <span>{{ exec.name }} ({{ exec.timestamp }})</span>
             <span class="link-icon"></span>
           </div>
         }

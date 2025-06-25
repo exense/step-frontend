@@ -5,16 +5,12 @@ import {
   computed,
   inject,
   input,
+  output,
   Signal,
   ViewEncapsulation,
 } from '@angular/core';
 import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
-import {
-  AugmentedTimeSeriesService,
-  ExecutionsService,
-  FetchBucketsRequest,
-  TableApiWrapperService,
-} from '@exense/step-core';
+import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
 import { TSChartSeries } from '../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
 
@@ -42,6 +38,8 @@ export class ExecutionsChartTooltipComponent {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _executionService = inject(ExecutionsService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
+
+  reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
   readonly taskId = input.required<string>();
@@ -79,10 +77,11 @@ export class ExecutionsChartTooltipComponent {
 
   selectSeries(series: TransformedSeries) {
     this.selectedSeries = series;
-    this.fetchExecutionsForSelectedItem(series);
+    // wait for the rendering to takes effect
+    this.fetchExecutionsForSelectedItem(series, () => setTimeout(() => this.reposition.emit(), 200));
   }
 
-  fetchExecutionsForSelectedItem(item: TransformedSeries) {
+  fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void) {
     const data = this.data()!;
     const bucketInterval = data.xValues[1] - data.xValues[0];
     const taskId = this.taskId();
@@ -122,6 +121,7 @@ export class ExecutionsChartTooltipComponent {
           });
         this.executionsListTruncated = executions.length >= limit;
         this._changeDetectorRef.detectChanges();
+        callback?.();
       });
   }
 
