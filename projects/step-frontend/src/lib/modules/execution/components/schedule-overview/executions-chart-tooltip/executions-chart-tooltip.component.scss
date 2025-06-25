@@ -1,20 +1,21 @@
 step-executions-chart-tooltip {
-  .row {
+  .items-container {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 1rem;
-    cursor: pointer;
-    padding: 2px 0;
-    white-space: nowrap;
 
-    &:hover {
-      text-decoration: underline;
-    }
+    .item {
+      cursor: pointer;
 
-    &.selected {
-      font-weight: bold;
+      &:hover {
+        text-decoration: underline;
+      }
     }
+  }
+
+  .selected-series-title {
+    font-weight: bold;
+    margin: 0.5rem 0;
   }
 
   .link-item {
