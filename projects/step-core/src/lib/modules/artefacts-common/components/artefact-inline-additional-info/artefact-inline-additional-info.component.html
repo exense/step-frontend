@@ -11,7 +11,7 @@
               } @else {
                 <span class="highlight-inline-item skipped">{{ att.name }}</span>
               }
-              <step-popover-content class="{{ att | attachmentType }}">
+              <step-popover-content [class]="att | attachmentType">
                 @switch (att | attachmentType) {
                   @case (AttachmentType.IMG) {
                     <step-attachment-preview

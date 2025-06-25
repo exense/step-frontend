@@ -21,8 +21,7 @@
     </step-artefact-inline-field-list-prefix>
   </step-artefact-inline-field-list>
 }
-<step-artefact-inline-details-header
-  [template]="headerTemplate()"
-  [isVisible]="!inputItems()?.length && !outputItems()?.length"
-/>
+@if (!inputItems()?.length && !outputItems()?.length) {
+  <step-artefact-inline-details-header [template]="headerTemplate()" />
+}
 <step-artefact-inline-additional-info [context]="currentContext()" />

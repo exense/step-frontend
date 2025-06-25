@@ -143,6 +143,7 @@ import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-t
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
+import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
 import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
 import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
@@ -250,6 +251,7 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/rep
     AltReportWidgetContentDirective,
     DashboardPageComponent,
     ToggleRequestWarningDirective,
+    ParentElementSizeDirective,
   ],
   exports: [
     ExecutionListComponent,

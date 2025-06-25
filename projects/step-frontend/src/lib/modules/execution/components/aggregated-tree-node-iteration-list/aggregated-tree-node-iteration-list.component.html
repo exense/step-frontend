@@ -1,4 +1,4 @@
-<section matSort [matSortDisableClear]="true">
+<section matSort [matSortDisableClear]="true" stepElementSize>
   <div>
     <div class="sort-container">
       <button class="sort-handler" type="button" mat-icon-button (click)="toggleSort()">
@@ -31,13 +31,18 @@
     #table
     [dataSource]="dataSource()"
     [tableParams]="keywordParameters()"
-    class="paddingless no-border hide-header no-highlight"
+    class="paddingless no-border hide-header no-highlight special-selection"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="data-cell" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openNodeDetails(element)">
-          <step-artefact-inline-details stepElementSize [reportInfo]="element" class="shift-rows smaller-view">
+          <step-artefact-inline-details
+            parentElementSize
+            [offset]="100"
+            [reportInfo]="element"
+            class="shift-rows smaller-view"
+          >
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time

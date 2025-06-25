@@ -4,18 +4,19 @@
   [mode]="_mode"
   matSort
   [matSortDisableClear]="true"
+  stepElementSize
 >
   <step-table
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
-    class="paddingless no-border hide-header no-highlight"
+    class="paddingless no-border hide-header no-highlight special-selection"
   >
     <ng-container matColumnDef="executionTime">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="data-cell" mat-cell *matCellDef="let element">
         <div class="details-trigger" (click)="openDetails(element)">
-          <step-artefact-inline-details stepElementSize [reportInfo]="element" class="smaller-view shift-rows">
+          <step-artefact-inline-details parentElementSize [reportInfo]="element" class="smaller-view shift-rows">
             <ng-container *stepArtefactInlineDetailsHeader>
               <div class="larger-view artefact-header">
                 <step-alt-execution-time

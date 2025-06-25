@@ -150,7 +150,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
     if (!nodeId) {
       return;
     }
-    if (!this.hasVirtualScroll) {
+    if (!this.hasVirtualScroll()) {
       this.nativeScroll(nodeId);
       return;
     }

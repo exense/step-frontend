@@ -1,13 +1,15 @@
-<step-table [dataSource]="parameters()">
-  <ng-container matColumnDef="key">
-    <th mat-header-cell *matHeaderCellDef>Key</th>
-    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="pointer">
+<step-table [dataSource]="parametersDataSource()" matSort [matSortDisableClear]="true">
+  <ng-container matColumnDef="key" stepSearchCol>
+    <step-input-filter *stepSearchCellDef stepFilterConnect />
+    <th mat-header-cell mat-sort-header *matHeaderCellDef>Key</th>
+    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="param-cell pointer">
       <span class="truncate">{{ element.key }}</span>
     </td>
   </ng-container>
-  <ng-container matColumnDef="value">
-    <th mat-header-cell *matHeaderCellDef>Value</th>
-    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="pointer">
+  <ng-container matColumnDef="value" stepSearchCol>
+    <step-input-filter *stepSearchCellDef stepFilterConnect />
+    <th mat-header-cell mat-sort-header *matHeaderCellDef>Value</th>
+    <td mat-cell *matCellDef="let element" (click)="showParameter(element)" class="param-cell pointer">
       <span class="truncate">{{ element.value }}</span>
     </td>
   </ng-container>
