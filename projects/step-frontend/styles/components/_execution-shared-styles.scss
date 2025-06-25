@@ -187,6 +187,9 @@
         right: 1rem;
         transform: skewX(-10deg);
       }
+      .duration {
+        text-align: left;
+      }
     }
     &:after {
       @include special-selection-item;

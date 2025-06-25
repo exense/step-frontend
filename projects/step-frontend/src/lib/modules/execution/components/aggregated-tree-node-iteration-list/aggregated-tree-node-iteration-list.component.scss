@@ -29,6 +29,8 @@ step-table {
     .name {
       font-weight: 500;
       white-space: nowrap;
+      line-height: 2;
+      align-self: baseline;
     }
   }
 }

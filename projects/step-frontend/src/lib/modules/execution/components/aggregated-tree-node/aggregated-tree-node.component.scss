@@ -8,9 +8,11 @@
 
 .name {
   cursor: pointer;
-  padding: 0.2rem 0.6rem;
+  padding: 0rem 0.6rem;
   border-radius: 1rem;
   font-weight: 500;
+  line-height: 1.5;
+  align-self: baseline;
 }
 
 .description {
@@ -31,14 +33,4 @@
 
 step-aggregated-status {
   align-self: flex-start;
-  padding-top: 0.1rem;
-}
-
-//step-artefact-inline-details {
-//  overflow: hidden;
-//  width: 100%;
-//}
-
-.hide-status {
-  display: none;
 }
