@@ -24,16 +24,7 @@ import { DashboardPageComponent } from '../dashboard-page/dashboard-page.compone
   selector: 'step-analytics-page',
   templateUrl: './analytics-page.component.html',
   styleUrls: ['./analytics-page.component.scss'],
-  imports: [
-    COMMON_IMPORTS,
-    DashboardFilterBarComponent,
-    ChartDashletComponent,
-    ResolutionPickerComponent,
-    TimeRangePickerComponent,
-    TableDashletComponent,
-    DashboardComponent,
-    DashboardPageComponent,
-  ],
+  imports: [DashboardPageComponent],
 })
 export class AnalyticsPageComponent implements OnInit, OnDestroy {
   private _authService: AuthService = inject(AuthService);

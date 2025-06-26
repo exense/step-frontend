@@ -13,11 +13,16 @@ const libraryConfig = (conf = {}, disableSecondaries = true) => {
   return res;
 };
 
-module.exports = {
+const config = {
   '@angular/core': libraryConfig(),
-  '@angular/animations': libraryConfig(),
+  '@angular/core/primitives/di': libraryConfig(),
+  '@angular/core/primitives/signals': libraryConfig(),
+  '@angular/core/primitives/event-dispatch': libraryConfig(),
+  '@angular/core/rxjs-interop': libraryConfig(),
   '@angular/common': libraryConfig(),
   '@angular/common/http': libraryConfig(),
+  '@angular/animations': libraryConfig(),
+  '@angular/animations/browser': libraryConfig(),
   '@angular/router': libraryConfig(),
   '@angular/forms': libraryConfig(),
   '@angular/material/checkbox': libraryConfig(),
@@ -50,11 +55,22 @@ module.exports = {
   '@angular/material/autocomplete': libraryConfig(),
   '@angular/material-luxon-adapter': libraryConfig(),
   '@angular/material/form-field': libraryConfig(),
+  '@angular/cdk/a11y': libraryConfig(),
+  '@angular/cdk/bidi': libraryConfig(),
+  '@angular/cdk/observers': libraryConfig(),
+  '@angular/cdk/observers/private': libraryConfig(),
+  '@angular/cdk/coercion': libraryConfig(),
   '@angular/cdk/overlay': libraryConfig(),
   '@angular/cdk/portal': libraryConfig(),
   '@angular/cdk/scrolling': libraryConfig(),
   'ngx-mat-select-search': libraryConfig(),
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
+  '@exense/step-frontend': libraryConfig({ requiredVersion: '0.2.0' }),
   luxon: libraryConfig({ requiredVersion: '3.4.4' }),
+};
+
+module.exports = {
+  libraryConfig,
+  config,
 };

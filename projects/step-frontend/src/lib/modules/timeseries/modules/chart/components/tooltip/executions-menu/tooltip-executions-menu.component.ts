@@ -1,12 +1,11 @@
-import { Component, computed, input, Input } from '@angular/core';
-import { Execution } from '@exense/step-core';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { Component, computed, input } from '@angular/core';
+import { Execution, StepCoreModule } from '@exense/step-core';
 
 @Component({
   selector: 'step-tooltip-executions-menu',
   templateUrl: './tooltip-executions-menu.component.html',
   styleUrls: ['./tooltip-executions-menu.component.scss'],
-  imports: [MatProgressSpinner],
+  imports: [StepCoreModule],
 })
 export class TooltipExecutionsMenuComponent {
   executions = input<Execution[] | null>(null);

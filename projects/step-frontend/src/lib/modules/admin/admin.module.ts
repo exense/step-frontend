@@ -21,7 +21,6 @@ import { ActivatedRouteSnapshot, Router, RouterLinkActive } from '@angular/route
 import { CURRENT_SCREEN_CHOICE_DEFAULT } from './types/constants';
 import { first, map } from 'rxjs';
 import { ProjectSettingsMenuComponent } from './components/project-settings-menu/project-settings-menu.component';
-import { MatListItem, MatNavList } from '@angular/material/list';
 import { AdminSettingsMenuComponent } from './components/admin-settings-menu/admin-settings-menu.component';
 
 @NgModule({
@@ -43,7 +42,7 @@ import { AdminSettingsMenuComponent } from './components/admin-settings-menu/adm
     ProjectSettingsMenuComponent,
     AdminSettingsMenuComponent,
   ],
-  imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive],
+  imports: [StepCoreModule, StepCommonModule, RouterLinkActive],
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {

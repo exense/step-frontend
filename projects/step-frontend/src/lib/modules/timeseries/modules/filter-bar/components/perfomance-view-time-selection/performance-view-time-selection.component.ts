@@ -28,7 +28,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './performance-view-time-selection.component.html',
   styleUrls: ['./performance-view-time-selection.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, TSRangerComponent],
+  imports: [TSRangerComponent],
 })
 export class PerformanceViewTimeSelectionComponent implements OnInit {
   @Input() context!: TimeSeriesContext;

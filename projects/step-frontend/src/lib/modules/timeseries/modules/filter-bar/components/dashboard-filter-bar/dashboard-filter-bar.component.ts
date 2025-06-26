@@ -41,10 +41,7 @@ import {
 } from '../../../_common';
 import { PerformanceViewTimeSelectionComponent } from '../perfomance-view-time-selection/performance-view-time-selection.component';
 import { FilterBarItemComponent } from '../filter-bar-item/filter-bar-item.component';
-import { VisibleFilterBarItemPipe } from '../../pipes/visible-filter-item.pipe';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { TimeRangePickerComponent } from '../../../_common/components/time-range-picker/time-range-picker.component';
-import { MatDivider } from '@angular/material/divider';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   if (field.startsWith('attributes.')) {
@@ -59,15 +56,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   templateUrl: './dashboard-filter-bar.component.html',
   styleUrls: ['./dashboard-filter-bar.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [
-    COMMON_IMPORTS,
-    PerformanceViewTimeSelectionComponent,
-    TimeRangePickerComponent,
-    TsGroupingComponent,
-    FilterBarItemComponent,
-    VisibleFilterBarItemPipe,
-    MatDivider,
-  ],
+  imports: [COMMON_IMPORTS, TsGroupingComponent, FilterBarItemComponent],
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   context = input.required<TimeSeriesContext>();

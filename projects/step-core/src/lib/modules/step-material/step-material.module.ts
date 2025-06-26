@@ -36,11 +36,13 @@ import { StepIconsModule } from '../step-icons/step-icons.module';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
   imports: [CommonModule, StepIconsModule],
   declarations: [BtnGroupComponent, ThemeComponent],
   exports: [
+    A11yModule,
     MatBadgeModule,
     MatCheckboxModule,
     MatChipsModule,

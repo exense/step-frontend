@@ -80,14 +80,9 @@ import { MatTooltip } from '@angular/material/tooltip';
     COMMON_IMPORTS,
     DashboardFilterBarComponent,
     ChartDashletComponent,
-    ResolutionPickerComponent,
     TimeRangePickerComponent,
     TableDashletComponent,
-    MatProgressSpinner,
     PerformanceViewTimeSelectionComponent,
-    MatIconButton,
-    MatTooltip,
-    TsGroupingComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {

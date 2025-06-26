@@ -41,15 +41,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
   selector: 'step-execution-dashboard',
   templateUrl: './execution-dashboard.component.html',
   styleUrls: ['./execution-dashboard.component.scss'],
-  imports: [
-    COMMON_IMPORTS,
-    DashboardFilterBarComponent,
-    ChartDashletComponent,
-    ResolutionPickerComponent,
-    TimeRangePickerComponent,
-    TableDashletComponent,
-    DashboardComponent,
-  ],
+  imports: [COMMON_IMPORTS, DashboardComponent],
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();

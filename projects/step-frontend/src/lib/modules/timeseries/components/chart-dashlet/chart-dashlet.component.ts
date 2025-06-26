@@ -45,7 +45,6 @@ import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,
 } from '../../modules/_common/components/aggregate-picker/timeseries-aggregate-picker.component';
-import { MatTooltip } from '@angular/material/tooltip';
 import { TooltipContentDirective } from '../../modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ChartStandardTooltipComponent } from '../../modules/chart/components/tooltip/chart-standard-tooltip.component';
 
@@ -76,7 +75,6 @@ const resolutionLabels: Record<string, string> = {
     ChartSkeletonComponent,
     TimeSeriesChartComponent,
     TimeseriesAggregatePickerComponent,
-    MatTooltip,
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],

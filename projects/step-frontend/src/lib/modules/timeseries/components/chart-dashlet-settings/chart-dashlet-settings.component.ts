@@ -18,7 +18,6 @@ import {
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,

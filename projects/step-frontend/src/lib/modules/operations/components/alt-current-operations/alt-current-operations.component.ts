@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
 import { Operation, StepIconsModule } from '@exense/step-core';
 import { AltOperationComponent } from '../alt-operation/alt-operation.component';
-import { MatIconButton } from '@angular/material/button';
 
 @Component({
   selector: 'step-alt-current-operations',
-  imports: [AltOperationComponent, MatIconButton, StepIconsModule],
+  imports: [AltOperationComponent, StepIconsModule],
   templateUrl: './alt-current-operations.component.html',
   styleUrl: './alt-current-operations.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

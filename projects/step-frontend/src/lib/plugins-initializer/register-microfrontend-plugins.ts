@@ -1,4 +1,4 @@
-import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/module-federation';
+import { loadRemoteModule, LoadRemoteModuleOptions } from '@angular-architects/native-federation';
 import { Injector, Type } from '@angular/core';
 import { CompiledModule, compileModule, registerCompiledModules } from './shared/module-utils';
 
@@ -25,7 +25,7 @@ const loadModule = async (entryPoint: string): Promise<PluginCtx | undefined> =>
     const remoteEntry = href + entryPoint;
 
     const options: LoadRemoteModuleOptions = {
-      type: 'module',
+      //type: 'module',
       exposedModule: './Module',
       remoteEntry,
     };

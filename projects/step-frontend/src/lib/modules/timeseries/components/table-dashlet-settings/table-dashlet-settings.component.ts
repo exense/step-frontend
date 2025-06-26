@@ -17,7 +17,6 @@ import {
   TimeSeriesContext,
 } from '../../modules/_common';
 import { FilterBarItemComponent } from '../../modules/filter-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ChartDashletSettingsData {
   item: DashboardItem;

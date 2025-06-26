@@ -12,8 +12,7 @@ import {
 } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { DateTime } from 'luxon';
-import { TimeSeriesUtils, FilterBarItemType, FilterBarItem, COMMON_IMPORTS, FilterUtils } from '../../../_common';
-import { MatCheckbox } from '@angular/material/checkbox';
+import { TimeSeriesUtils, FilterBarItemType, FilterBarItem, COMMON_IMPORTS } from '../../../_common';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { FilterBarPlanItemComponent } from '../filter-bar-plan-item/filter-bar-plan-item.component';
 import { FilterBarTaskItemComponent } from '../filter-bar-task-item/filter-bar-task-item.component';

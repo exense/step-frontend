@@ -1,4 +1,4 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DateFormat, Measurement, MeasurementsStats, TimeSeriesService } from '@exense/step-core';
 import { MatTableDataSource } from '@angular/material/table';
