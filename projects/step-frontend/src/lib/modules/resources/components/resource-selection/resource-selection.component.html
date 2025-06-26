@@ -7,16 +7,16 @@
   [matSortDisableClear]="true"
   filter="not(resourceType=attachment)"
 >
-  <step-bulk-operations *stepAdditionalHeader></step-bulk-operations>
+  <step-bulk-operations *stepAdditionalHeader />
 
   <ng-container matColumnDef="bulkSelection">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let element">
-      <step-entity-selection-di [entity]="element"></step-entity-selection-di>
+      <step-entity-selection-di [entity]="element" />
     </td>
   </ng-container>
 
-  <step-entity-column-container entityName="resources"> </step-entity-column-container>
+  <step-entity-column-container entityName="resources" />
 
   <ng-container matColumnDef="id" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>

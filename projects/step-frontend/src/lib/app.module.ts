@@ -15,7 +15,6 @@ import { FunctionModule } from './modules/function/function.module';
 import { GridModule } from './modules/grid/grid.module';
 import { ParameterModule } from './modules/parameter/parameter.module';
 import { PlanModule } from './modules/plan/plan.module';
-import { ResourcesModule } from './modules/resources/resources.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { TimeSeriesModule } from './modules/timeseries/time-series.module';
 import { ArtefactsModule } from './modules/artefacts/artefacts.module';
@@ -30,10 +29,16 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './modules/automation-packages';
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
+import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 
 Settings.defaultLocale = 'en';
 
-const MODULES_INITIALIZERS = [KEYWORDS_COMMON_INITIALIZER, AUTOMATION_PACKAGE_INITIALIZER, ERRORS_VIEW_INITIALIZER];
+const MODULES_INITIALIZERS = [
+  KEYWORDS_COMMON_INITIALIZER,
+  AUTOMATION_PACKAGE_INITIALIZER,
+  ERRORS_VIEW_INITIALIZER,
+  RESOURCES_INITIALIZER,
+];
 
 @NgModule({
   declarations: [RootComponent, MainViewComponent, NotFoundComponent],
@@ -54,7 +59,7 @@ const MODULES_INITIALIZERS = [KEYWORDS_COMMON_INITIALIZER, AUTOMATION_PACKAGE_IN
     TimeSeriesModule,
     DefaultThemeModule,
     ArtefactsModule,
-    ResourcesModule,
+    ...RESOURCE_IMPORTS,
     BookmarksModule,
     RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],

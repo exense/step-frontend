@@ -1,6 +1,5 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
-  AugmentedParametersService,
   AugmentedResourcesService,
   AutoDeselectStrategy,
   DialogParentService,
@@ -8,15 +7,19 @@ import {
   ResourceDialogsService,
   ResourceInputBridgeService,
   selectionCollectionProvider,
+  StepCoreModule,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
+import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
 
 @Component({
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
+  standalone: true,
+  imports: [StepCoreModule, ResourceUrlPipe],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
