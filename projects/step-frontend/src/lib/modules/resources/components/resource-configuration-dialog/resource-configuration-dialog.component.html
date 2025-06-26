@@ -1,17 +1,19 @@
 <step-modal-window [title]="title" [showSpinner]="initializingResource" [disableCloseByEsc]="true">
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
-      <step-form-field *ngIf="_resourceConfigurationDialogData.resource">
-        <step-label>Name</step-label>
-        <input type="text" [formControl]="formGroup.controls.name" />
-      </step-form-field>
+      @if (_resourceConfigurationDialogData.resource) {
+        <step-form-field>
+          <step-label>Name</step-label>
+          <input type="text" [formControl]="formGroup.controls.name" />
+        </step-form-field>
+      }
 
       <step-predefined-options-input
         label="Resource type"
         [formControl]="formGroup.controls.resourceType"
         [predefinedOptions]="_predefinedResourceTypes"
         predefinedOptionsLabel="Types"
-      ></step-predefined-options-input>
+      />
 
       <step-resource-input
         *ngIf="formGroup.controls.content.enabled; else readonlyContent"
@@ -25,7 +27,7 @@
         (stModelChange)="onContentChange($event)"
         (filesChange)="onFilesChange()"
         (initializingResourceChange)="handleResourceInitialize($event)"
-      ></step-resource-input>
+      />
       <ng-template #readonlyContent>
         <step-form-field>
           <step-label>Content</step-label>
