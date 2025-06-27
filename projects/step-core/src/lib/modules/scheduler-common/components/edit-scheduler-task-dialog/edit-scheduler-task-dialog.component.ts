@@ -39,6 +39,7 @@ import { JSON_FORM_EXPORTS, JsonFieldsSchema, JsonFieldUtilsService } from '../.
 import { RepositoryParametersSchemasService } from '../../../repository-parameters';
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 import { catchError } from 'rxjs/operators';
+import { HasRightPipe } from '../../../auth';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -69,6 +70,7 @@ const LOCAL_REPOSITORY_ID = 'local';
     SelectPlanComponent,
     JSON_FORM_EXPORTS,
     LIST_SELECTION_EXPORTS,
+    HasRightPipe,
   ],
 })
 export class EditSchedulerTaskDialogComponent implements OnInit {
