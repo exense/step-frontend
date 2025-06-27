@@ -90,7 +90,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   private _destroyRef = inject(DestroyRef);
   private _schedulerService = inject(AugmentedSchedulerService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
+  private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
   private _statusColors = inject(STATUS_COLORS);
   private _executionService = inject(ExecutionsService);
 
