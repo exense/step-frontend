@@ -25,6 +25,7 @@ const config = {
   'angular-split': libraryConfig(),
   '@exense/step-core': libraryConfig({ requiredVersion: '0.2.0' }),
   luxon: libraryConfig({ requiredVersion: '3.4.4' }),
+  '@angular/platform-browser': libraryConfig(),
 };
 
 module.exports = {
