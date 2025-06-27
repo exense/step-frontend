@@ -1,9 +1,9 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { AuthService, TimeRange } from '@exense/step-core';
-import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../timeseries/modules/_common';
-import { SchedulerPageStateService } from '../scheduler-page-state.service';
-import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../../timeseries/modules/_common';
+import { SchedulerPageStateService } from '../../legacyu/scheduler-page-state.service';
+import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, pairwise } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';

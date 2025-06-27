@@ -1,0 +1,61 @@
+<section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
+  <!--  @if (task(); as task) {-->
+  <!--    <div class="title">-->
+  <!--      <h3 data-step-testid>-->
+  <!--        <entity-icon entityName="tasks" [entity]="task"></entity-icon>-->
+
+  <!--        <div>{{ task.attributes?.['name'] }}</div>-->
+  <!--        @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {-->
+  <!--          <a-->
+  <!--            class="plan-link"-->
+  <!--            [routerLink]="['/plans/editor', lastExecution.planId]"-->
+  <!--            matTooltip="Navigate to plan"-->
+  <!--            matTooltipPosition="right"-->
+  <!--          >-->
+  <!--            <step-icon name="external-link" />-->
+  <!--          </a>-->
+  <!--        }-->
+  <!--      </h3>-->
+  <!--    </div>-->
+  <div class="sub-title">
+    @if (_state.lastExecution$ | async; as lastExecutionResponse) {
+      @if (lastExecutionResponse.execution; as lastExecution) {
+        <step-alt-execution-time
+          popoverTitle="Last execution"
+          [startTime]="lastExecution.startTime"
+          [endTime]="lastExecution.endTime"
+          [isRunning]="lastExecution.status === 'RUNNING'"
+          [status]="lastExecution?.result"
+        />
+      } @else {
+        <div>No execution</div>
+      }
+    }
+    <!--      <span class="cron-label" matTooltip="Cron expression">-->
+    <!--        {{ task.cronExpression }}-->
+    <!--      </span>-->
+  </div>
+  <div class="controls">
+    <step-autorefresh-toggle
+      [interval]="_state.refreshInterval()"
+      (refresh)="triggerRefresh()"
+      (intervalChange)="handleRefreshIntervalChange($event)"
+    />
+    @if (_state.activeTimeRangeSelection()) {
+      <div class="range-picker">
+        <step-time-range-picker
+          (selectionChange)="handleTimeRangeChange($event)"
+          [selectOptions]="timeRangeOptions"
+          [activeSelection]="_state.activeTimeRangeSelection()!"
+          [activeTimeRange]="(_state.timeRange$ | async) || undefined"
+        />
+      </div>
+    }
+  </div>
+  <!--  }-->
+</section>
+
+<section class="main">
+  <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
+  <router-outlet />
+</section>

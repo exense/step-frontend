@@ -1,12 +1,12 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { SchedulerPageStateService } from '../scheduler-page-state.service';
+import { SchedulerPageStateService } from '../../legacyu/scheduler-page-state.service';
 import { TimeRange } from '@exense/step-core';
-import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, pairwise, scan } from 'rxjs';
-import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
-import { Status } from '../../../../_common/shared/status.enum';
+import { Status } from '../../../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-scheduler-report-view',

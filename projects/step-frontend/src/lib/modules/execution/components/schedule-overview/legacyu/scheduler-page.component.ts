@@ -2,7 +2,7 @@ import { Component, DestroyRef, effect, inject, OnInit, Signal, signal, ViewEnca
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
-} from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+} from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { ActivatedRoute } from '@angular/router';
 import {
   AugmentedSchedulerService,
@@ -18,33 +18,17 @@ import {
   TimeRange,
   TimeUnit,
 } from '@exense/step-core';
-import { SCHEDULE_ID } from '../../services/schedule-id.token';
+import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import {
-  BehaviorSubject,
-  count,
-  filter,
-  interval,
-  map,
-  Observable,
-  of,
-  range,
-  scan,
-  shareReplay,
-  startWith,
-  Subject,
-  switchMap,
-  take,
-  withLatestFrom,
-} from 'rxjs';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take } from 'rxjs';
+import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { SchedulerPageStateService } from './scheduler-page-state.service';
-import { FilterBarItem, FilterBarItemType } from '../../../timeseries/time-series.module';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { Status } from '../../../_common/shared/status.enum';
+import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/time-series.module';
+import { ReportNodeSummary } from '../../../shared/report-node-summary';
+import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig, TimeSeriesUtils } from '../../../../timeseries/modules/_common';
+import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
+import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
@@ -144,11 +128,16 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly summaryData$: Observable<ReportNodeSummary> = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      const oql = new OQLBuilder()
+        .open('and')
+        .append('attributes.metricType = "executions/duration"')
+        .append(FilterUtils.filtersToOQL(this.getDashboardFilters(), 'attributes'))
+        .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
         numberOfBuckets: 1,
-        oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${this._taskIdFn()}`,
+        oqlFilter: oql,
         groupDimensions: ['result'],
       };
       return this._timeSeriesService.getTimeSeries(request).pipe(
@@ -168,13 +157,17 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
 
   readonly executionsChartSettings$ = this.timeRange$.pipe(
     switchMap((timeRange) => {
-      const taskId = this._taskIdFn();
       const statusAttribute = 'result';
+      const oql = new OQLBuilder()
+        .open('and')
+        .append('attributes.metricType = "executions/duration"')
+        .append(FilterUtils.filtersToOQL(this.getDashboardFilters(), 'attributes'))
+        .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
         numberOfBuckets: 30, // good amount of bars visually
-        oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
+        oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
       return this._timeSeriesService.getTimeSeries(request).pipe(

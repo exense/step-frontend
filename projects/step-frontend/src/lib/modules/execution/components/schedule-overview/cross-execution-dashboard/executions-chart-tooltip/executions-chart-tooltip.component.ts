@@ -9,9 +9,9 @@ import {
   Signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
+import { TooltipContextData } from '../../../../../timeseries/modules/chart/injectables/tooltip-context-data';
 import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
-import { TSChartSeries } from '../../../../timeseries/modules/chart';
+import { TSChartSeries } from '../../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
 
 interface TransformedSeries {

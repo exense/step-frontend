@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Execution, TableFetchLocalDataSource, TimeRange, TimeSeriesErrorEntry } from '@exense/step-core';
-import { FilterBarItem } from '../../../timeseries/modules/_common';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { TSChartSettings } from '../../../timeseries/modules/chart';
+import { FilterBarItem } from '../../../../timeseries/modules/_common';
+import { ReportNodeSummary } from '../../../shared/report-node-summary';
+import { TSChartSettings } from '../../../../timeseries/modules/chart';
 import { Signal } from '@angular/core';
 
 export abstract class SchedulerPageStateService {
