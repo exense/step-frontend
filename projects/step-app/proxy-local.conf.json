@@ -1,6 +1,17 @@
 {
-  "context": ["/rest", "/rtm", "/doc"],
-  "target": "http://localhost:8080",
-  "secure": false,
-  "changeOrigin": true
+  "/rest": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/rtm": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/doc": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  }
 }

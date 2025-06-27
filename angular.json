@@ -52,8 +52,19 @@
         },
         "serve": {
           "builder": "@angular-architects/native-federation:build",
+          "configurations": {
+            "dev": {
+              "target": "@exense/step-app:serve-original:development"
+            },
+            "local": {
+              "target": "@exense/step-app:serve-original:local"
+            },
+            "prod": {
+              "target": "@exense/step-app:serve-original:prod"
+            }
+          },
+          "defaultConfiguration": "dev",
           "options": {
-            "target": "@exense/step-app:serve-original:development",
             "rebuildDelay": 0,
             "dev": true,
             "port": 0
@@ -150,7 +161,7 @@
               "proxyConfig": "projects/step-app/proxy.conf.json"
             },
             "local": {
-              "buildTarget": "@exense/step-app:build:development",
+              "buildTarget": "@exense/step-app:esbuild:development",
               "proxyConfig": "projects/step-app/proxy-local.conf.json"
             }
           },
