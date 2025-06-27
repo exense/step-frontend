@@ -60,7 +60,7 @@
               "target": "@exense/step-app:serve-original:local"
             },
             "prod": {
-              "target": "@exense/step-app:serve-original:prod"
+              "target": "@exense/step-app:serve-original:production"
             }
           },
           "defaultConfiguration": "dev",
