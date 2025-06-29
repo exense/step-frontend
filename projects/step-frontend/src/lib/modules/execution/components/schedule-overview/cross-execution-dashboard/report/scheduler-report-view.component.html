@@ -1,7 +1,7 @@
 <section>
   <div class="row">
     <div class="piechart-container">
-      @if (_stateService.summaryData$ | async; as summary) {
+      @if (_state.summaryData$ | async; as summary) {
         <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
       } @else {
         <step-alt-report-widget title="Summary: Executions">
@@ -13,18 +13,16 @@
     </div>
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
-        @if (_stateService.executionsChartSettings$ | async; as executionsChartSettings) {
+        @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
           <step-timeseries-chart
             [settings]="executionsChartSettings"
             (zoomChange)="handleMainChartZoom($event)"
             [height]="340"
           >
             <ng-template tooltipContent let-data let-reposition="reposition">
-              <step-executions-chart-tooltip
-                (reposition)="reposition()"
-                [data]="data"
-                [taskId]="_stateService.taskId()!"
-              />
+              @if (_state.task(); as task) {
+                <step-executions-chart-tooltip (reposition)="reposition()" [data]="data" [taskId]="task.id!" />
+              }
             </ng-template>
           </step-timeseries-chart>
         } @else {
@@ -36,10 +34,10 @@
   <div class="row">
     <step-alt-report-widget
       class="flex-grow-1"
-      [title]="'Keywords calls by execution (last ' + _stateService.LAST_EXECUTIONS_TO_DISPLAY + ')'"
+      [title]="'Keywords calls by execution (last ' + _state.LAST_EXECUTIONS_TO_DISPLAY + ')'"
     >
       <step-alt-report-widget-content class="widget-content">
-        @if (_stateService.keywordsChartSettings$ | async; as settings) {
+        @if (_state.keywordsChartSettings$ | async; as settings) {
           <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
             <ng-template tooltipContent let-data>
               <div class="ts-tooltip">
@@ -60,12 +58,12 @@
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
-  @if (_stateService.testCasesChartSettings$ | async; as testCasesData) {
+  @if (_state.testCasesChartSettings$ | async; as testCasesData) {
     @if (testCasesData.chartSettings) {
       <div class="row">
         <step-alt-report-widget
           class="flex-grow-1"
-          [title]="'Test cases by execution (last ' + _stateService.LAST_EXECUTIONS_TO_DISPLAY + ')'"
+          [title]="'Test cases by execution (last ' + _state.LAST_EXECUTIONS_TO_DISPLAY + ')'"
         >
           <step-alt-report-widget-content class="widget-content">
             <step-timeseries-chart [settings]="testCasesData.chartSettings!" [height]="350">
@@ -92,7 +90,7 @@
       <step-alt-report-widget class="flex-grow-1" title="Errors">
         <step-alt-report-widget-content class="widget-content">
           <step-alt-execution-errors
-            [dataSource]="_stateService.errorsDataSource"
+            [dataSource]="_state.errorsDataSource"
             [statusFilterItems]="availableErrorTypes()"
           />
         </step-alt-report-widget-content>

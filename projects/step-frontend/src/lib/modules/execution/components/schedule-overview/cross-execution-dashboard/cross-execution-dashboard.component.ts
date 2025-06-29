@@ -1,8 +1,12 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
 import { IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { Subject } from 'rxjs';
+import {
+  DashboardUrlParams,
+  DashboardUrlParamsService,
+} from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 
 @Component({
   selector: 'step-cross-execution-dashboard',
@@ -10,9 +14,10 @@ import { Subject } from 'rxjs';
   styleUrls: ['./cross-execution-dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class CrossExecutionDashboardComponent {
+export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  _state = inject(CrossExecutionDashboardState);
+  protected _state = inject(CrossExecutionDashboardState);
+  private _urlParamsService = inject(DashboardUrlParamsService);
 
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
@@ -29,6 +34,11 @@ export class CrossExecutionDashboardComponent {
     { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.YEAR * 3 } },
   ];
 
+  ngOnInit(): void {
+    const urlParams = this._urlParamsService.collectUrlParams();
+    this.updateTimeAndRefresh(urlParams);
+  }
+
   handleRefreshIntervalChange(interval: number) {
     this._state.refreshInterval.set(interval);
   }
@@ -40,6 +50,19 @@ export class CrossExecutionDashboardComponent {
   triggerRefresh() {
     this._state.activeTimeRangeSelection.set({ ...this._state.activeTimeRangeSelection()! });
     this.fetchLastExecutionTrigger$.next();
+  }
+
+  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
+    if (urlParams.refreshInterval === undefined) {
+      urlParams.refreshInterval = 0;
+    }
+    this._state.refreshInterval.set(urlParams.refreshInterval!);
+    if (urlParams.timeRange) {
+      let urlTimeRange = urlParams.timeRange!;
+      this._state.activeTimeRangeSelection.set(urlTimeRange);
+    } else {
+      this._state.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
+    }
   }
 
   private createTab(id: string, label: string, link?: string): Tab<string> {

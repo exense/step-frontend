@@ -1,11 +1,12 @@
 import { Component, DestroyRef, effect, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SchedulerPageStateService } from './scheduler-page-state.service';
+import { PlanPageStateService } from './plan-page-state.service';
 import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard/cross-execution-dashboard-state';
 import { VIEW_MODE, ViewMode } from '../../../shared/view-mode';
-import { AugmentedSchedulerService } from '@exense/step-core';
+import { AugmentedPlansService, AugmentedSchedulerService, PlansService } from '@exense/step-core';
+import { PLAN_ID } from '../../../services/plan-id.token';
 
 declare const uPlot: any;
 
@@ -17,13 +18,13 @@ interface EntityWithKeywordsStats {
 
 @Component({
   selector: 'step-scheduler-page',
-  templateUrl: './scheduler-page.component.html',
-  styleUrls: ['./scheduler-page.component.scss'],
+  templateUrl: './plan-page.component.html',
+  styleUrls: ['./plan-page.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
     DashboardUrlParamsService,
     {
-      provide: SCHEDULE_ID,
+      provide: PLAN_ID,
       useFactory: () => {
         const _activatedRoute = inject(ActivatedRoute);
         return () => _activatedRoute.snapshot.params?.['id'] ?? '';
@@ -38,18 +39,17 @@ interface EntityWithKeywordsStats {
     },
     {
       provide: CrossExecutionDashboardState,
-      useClass: SchedulerPageStateService,
+      useClass: PlanPageStateService,
     },
   ],
 })
-export class SchedulerPageComponent implements OnInit {
-  state = inject(CrossExecutionDashboardState);
-  readonly _taskIdFn = inject(SCHEDULE_ID);
+export class PlanPageComponent implements OnInit {
+  _state = inject(CrossExecutionDashboardState);
+  readonly _planIdFn = inject(PLAN_ID);
   private _schedulerService = inject(AugmentedSchedulerService);
+  private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {
-    this._schedulerService.getExecutionTaskById(this._taskIdFn()).subscribe((task) => {
-      this.state.task.set(task);
-    });
+    this._planService.getPlanById(this._planIdFn()).subscribe((plan) => this._state.plan.set(plan));
   }
 }

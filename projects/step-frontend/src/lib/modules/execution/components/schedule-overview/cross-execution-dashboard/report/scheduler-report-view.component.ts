@@ -1,5 +1,4 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { SchedulerPageStateService } from '../../legacyu/scheduler-page-state.service';
 import { TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -7,6 +6,7 @@ import { filter, map, pairwise, scan } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
+import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -14,12 +14,12 @@ import { Status } from '../../../../../_common/shared/status.enum';
   styleUrls: ['./scheduler-report-view.component.scss'],
 })
 export class SchedulerReportViewComponent implements OnInit {
-  readonly _stateService = inject(SchedulerPageStateService);
+  readonly _state = inject(CrossExecutionDashboardState);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
 
-  private updateUrlRefreshInterval = toObservable(this._stateService.refreshInterval)
+  private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(
       scan(
         (acc, interval) => {
@@ -34,7 +34,7 @@ export class SchedulerReportViewComponent implements OnInit {
       this._urlParamsService.updateRefreshInterval(range, isFirst);
     });
 
-  private updateUrlTimeRange = this._stateService.timeRangeSelection$
+  private updateUrlTimeRange = this._state.timeRangeSelection$
     .pipe(
       scan(
         (acc, range) => {
@@ -59,11 +59,11 @@ export class SchedulerReportViewComponent implements OnInit {
 
   handleMainChartZoom(timeRange: TimeRange) {
     timeRange = { from: Math.round(timeRange.from), to: Math.round(timeRange.to) };
-    this._stateService.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
   }
 
   protected readonly availableErrorTypes = toSignal(
-    this._stateService.errorsDataSource.allData$.pipe(
+    this._state.errorsDataSource.allData$.pipe(
       map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
       map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
     ),
@@ -86,9 +86,9 @@ export class SchedulerReportViewComponent implements OnInit {
         // analytics tab is handling events itself
         let urlParams = this._urlParamsService.collectUrlParams();
         if (urlParams.timeRange) {
-          this._stateService.updateTimeRangeSelection(urlParams.timeRange);
+          this._state.updateTimeRangeSelection(urlParams.timeRange);
         }
-        this._stateService.updateRefreshInterval(urlParams.refreshInterval || 0);
+        this._state.updateRefreshInterval(urlParams.refreshInterval || 0);
       });
   }
 }

@@ -147,6 +147,7 @@ import { SchedulerPerformanceViewComponent } from './components/schedule-overvie
 import { SchedulerReportViewComponent } from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
 import { CrossExecutionDashboardComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
+import { PlanPageComponent } from './components/schedule-overview/plan-page/plan-page.component';
 
 @NgModule({
   declarations: [
@@ -238,6 +239,7 @@ import { SchedulerPageComponent } from './components/schedule-overview/scheduler
     SchedulerReportViewComponent,
     CrossExecutionDashboardComponent,
     SchedulerPageComponent,
+    PlanPageComponent,
   ],
   imports: [
     StepCommonModule,
@@ -432,6 +434,24 @@ export class ExecutionModule {
             children: [schedulePlanRoute('modal')],
           },
         ),
+      ],
+    });
+    this._viewRegistry.registerRoute({
+      path: 'plan-view/:id',
+      component: PlanPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
       ],
     });
     this._viewRegistry.registerRoute({

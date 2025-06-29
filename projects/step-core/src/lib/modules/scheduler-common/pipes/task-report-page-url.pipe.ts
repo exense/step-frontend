@@ -9,6 +9,6 @@ import { ExecutiontTaskParameters } from '../../../client/step-client-module';
 export class TaskReportPageUrlPipe implements PipeTransform {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   transform(idOrTask?: string | ExecutiontTaskParameters): string {
-    return this._commonEntitiesUrls.schedulerReportPageUrl(idOrTask);
+    return this._commonEntitiesUrls.crossExecutionTaskPageUrl(idOrTask);
   }
 }

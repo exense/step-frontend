@@ -5,7 +5,9 @@ import {
   BucketResponse,
   Execution,
   ExecutionsService,
+  ExecutiontTaskParameters,
   FetchBucketsRequest,
+  Plan,
   STATUS_COLORS,
   TableFetchLocalDataSource,
   TimeRange,
@@ -21,7 +23,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesUtils,
 } from '../../../../timeseries/modules/_common';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
@@ -38,10 +40,15 @@ interface EntityWithKeywordsStats {
 export type CrossExecutionViewType = 'task' | 'plan';
 
 export abstract class CrossExecutionDashboardState {
+  public LAST_EXECUTIONS_TO_DISPLAY = 30;
+
   protected _executionService = inject(ExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
+
+  readonly task = signal<ExecutiontTaskParameters | undefined>(undefined);
+  readonly plan = signal<Plan | undefined>(undefined);
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -49,12 +56,21 @@ export abstract class CrossExecutionDashboardState {
 
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
-  abstract getDashboardFilters(): FilterBarItem[];
+  abstract getDashboardFilter(): FilterBarItem;
   abstract getViewType(): CrossExecutionViewType;
+
+  updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+    // this.activeTimeRangeSelection.set(selection);
+  }
+
+  updateRefreshInterval(interval: number): void {
+    // this.refreshInterval.set(interval);
+  }
 
   timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
     filter((value): value is TimeRangePickerSelection => value != null),
   );
+
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
     map((rangeSelection) => {
       switch (rangeSelection.type) {
@@ -85,7 +101,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL(this.getDashboardFilters(), 'attributes'))
+        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -115,7 +131,7 @@ export abstract class CrossExecutionDashboardState {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
-        .append(FilterUtils.filtersToOQL(this.getDashboardFilters(), 'attributes'))
+        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
         .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
@@ -194,175 +210,6 @@ export abstract class CrossExecutionDashboardState {
     }),
   );
 
-  get keywordsChartSettings$(): Observable<any> {
-    return this.lastExecutionsSorted$.pipe(
-      switchMap((executions) => {
-        return this.timeRange$.pipe(
-          take(1),
-          switchMap((timeRange) => {
-            const statusAttribute = 'status';
-            const executionIdAttribute = 'executionId';
-            if (executions.length === 0) {
-              return of(this.createKeywordsChart([], []));
-            } else {
-              const executionsIdsJoined =
-                executions.map((e) => `attributes.${executionIdAttribute} = ${e.id!}`).join(' or ') || '1 = 1';
-              const request: FetchBucketsRequest = {
-                start: timeRange.from,
-                end: timeRange.to,
-                numberOfBuckets: 1,
-                oqlFilter: `(attributes.type = CallFunction) and (${executionsIdsJoined})`,
-                groupDimensions: [executionIdAttribute, statusAttribute],
-              };
-
-              return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
-                map((timeSeriesResponse) => {
-                  let executionStats: Record<string, EntityWithKeywordsStats> = {};
-                  const allStatuses = new Set<string>();
-                  timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-                    const executionId = attributes[executionIdAttribute];
-                    const status = attributes[statusAttribute];
-                    allStatuses.add(status);
-                    let executionEntry: EntityWithKeywordsStats = {
-                      entity: executionId,
-                      statuses: {},
-                      timestamp: 0,
-                    };
-                    if (executionStats[executionId]) {
-                      executionEntry = executionStats[executionId];
-                    } else {
-                      executionStats[executionId] = executionEntry;
-                    }
-                    timeSeriesResponse.matrix[i].forEach((bucket) => {
-                      if (bucket) {
-                        const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
-                        executionEntry.statuses[status] = newCount;
-                      }
-                    });
-                  });
-                  if (timeSeriesResponse.matrixKeys.length === 0) {
-                    // add a default series when there is no data
-                    allStatuses.add('PASSED');
-                  }
-                  let series: TSChartSeries[] = Array.from(allStatuses).map((status) => {
-                    let color = this._statusColors[status as Status];
-                    const fill = color + 'cc';
-                    const s: TSChartSeries = {
-                      id: status,
-                      scale: 'y',
-                      labelItems: [status],
-                      legendName: status,
-                      data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
-                      width: 1,
-                      value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                        this.calculateStackedValue(self, rawValue, seriesIdx, idx),
-                      stroke: color,
-                      fill: fill,
-                      paths: uplotBarsFn,
-                      points: { show: false },
-                      show: true,
-                    };
-                    return s;
-                  });
-                  this.cumulateSeriesData(series);
-                  return this.createKeywordsChart(executions, series);
-                }),
-              );
-            }
-          }),
-          map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
-        );
-      }),
-    );
-  }
-
-  get testCasesChartSettings$() {
-    return this.lastExecutionsSorted$.pipe(
-      switchMap((executions) => {
-        return this.timeRange$.pipe(
-          take(1),
-          switchMap((timeRange) => {
-            if (executions.length === 0) {
-              return of(this.createTestCasesChart([], []));
-            } else {
-              const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
-              let oqlFilter = 'attributes.type = TestCase';
-              if (executionsIdsJoined) {
-                oqlFilter += ` and (${executionsIdsJoined})`;
-              }
-              const request: FetchBucketsRequest = {
-                start: timeRange.from,
-                end: timeRange.to,
-                numberOfBuckets: 1,
-                oqlFilter: oqlFilter,
-                groupDimensions: ['executionId', 'status'],
-              };
-
-              return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
-                map((timeSeriesResponse) => {
-                  let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
-                  const allStatuses = new Set<string>();
-                  if (timeSeriesResponse.matrixKeys.length === 0) {
-                    // add a default series when there is no data
-                    allStatuses.add('PASSED');
-                  }
-                  timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-                    // const nodeName = attributes['name'];
-                    // let artefactHash = attributes['artefactHash'];
-                    const executionId = attributes['executionId'];
-                    const status = attributes['status'];
-                    // const nodeUniqueId = nodeName + artefactHash;
-
-                    allStatuses.add(status);
-                    let executionEntry: EntityWithKeywordsStats = {
-                      entity: executionId,
-                      statuses: {},
-                      timestamp: 0,
-                    };
-                    if (statsByNodes[executionId]) {
-                      executionEntry = statsByNodes[executionId];
-                    } else {
-                      statsByNodes[executionId] = executionEntry;
-                    }
-                    timeSeriesResponse.matrix[i].forEach((bucket) => {
-                      if (bucket) {
-                        const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
-                        executionEntry.statuses[status] = newCount;
-                      }
-                    });
-                  });
-                  let series = Array.from(allStatuses).map((status) => {
-                    let color = this._statusColors[status as Status];
-                    const fill = color + 'cc';
-                    const s: TSChartSeries = {
-                      id: status,
-                      scale: 'y',
-                      labelItems: [status],
-                      legendName: status,
-                      data: executions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
-                      width: 1,
-                      value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                        this.calculateStackedValue(self, rawValue, seriesIdx, idx),
-                      stroke: color,
-                      fill: fill,
-                      paths: uplotBarsFn,
-                      points: { show: false },
-                      show: true,
-                    };
-                    return s;
-                  });
-                  this.cumulateSeriesData(series);
-                  return this.createTestCasesChart(executions, series);
-                }),
-              );
-            }
-          }),
-          map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
-        );
-      }),
-    );
-  }
-
   readonly lastExecutionsSorted$ = this.timeRange$.pipe(
     switchMap((timeRange) => this.fetchLastExecutions(timeRange)),
     map((executions) => {
@@ -372,7 +219,179 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
+  keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
+    switchMap((executions) => {
+      return this.timeRange$.pipe(
+        take(1),
+        switchMap((timeRange) => {
+          const statusAttribute = 'status';
+          const executionIdAttribute = 'executionId';
+          if (executions.length === 0) {
+            return of(this.createKeywordsChart([], []));
+          } else {
+            const executionsIdsJoined =
+              executions.map((e) => `attributes.${executionIdAttribute} = ${e.id!}`).join(' or ') || '1 = 1';
+            const request: FetchBucketsRequest = {
+              start: timeRange.from,
+              end: timeRange.to,
+              numberOfBuckets: 1,
+              oqlFilter: `(attributes.type = CallFunction) and (${executionsIdsJoined})`,
+              groupDimensions: [executionIdAttribute, statusAttribute],
+            };
+
+            return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              map((timeSeriesResponse) => {
+                let executionStats: Record<string, EntityWithKeywordsStats> = {};
+                const allStatuses = new Set<string>();
+                timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
+                  const executionId = attributes[executionIdAttribute];
+                  const status = attributes[statusAttribute];
+                  allStatuses.add(status);
+                  let executionEntry: EntityWithKeywordsStats = {
+                    entity: executionId,
+                    statuses: {},
+                    timestamp: 0,
+                  };
+                  if (executionStats[executionId]) {
+                    executionEntry = executionStats[executionId];
+                  } else {
+                    executionStats[executionId] = executionEntry;
+                  }
+                  timeSeriesResponse.matrix[i].forEach((bucket) => {
+                    if (bucket) {
+                      const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+                      executionEntry.statuses[status] = newCount;
+                    }
+                  });
+                });
+                if (timeSeriesResponse.matrixKeys.length === 0) {
+                  // add a default series when there is no data
+                  allStatuses.add('PASSED');
+                }
+                let series: TSChartSeries[] = Array.from(allStatuses).map((status) => {
+                  let color = this._statusColors[status as Status];
+                  const fill = color + 'cc';
+                  const s: TSChartSeries = {
+                    id: status,
+                    scale: 'y',
+                    labelItems: [status],
+                    legendName: status,
+                    data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
+                    // width: 1,
+                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+                      this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                    stroke: color,
+                    fill: fill,
+                    paths: uplotBarsFn,
+                    points: { show: false },
+                    show: true,
+                  };
+                  return s;
+                });
+                this.cumulateSeriesData(series);
+                return this.createKeywordsChart(executions, series);
+              }),
+            );
+          }
+        }),
+        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
+      );
+    }),
+  );
+
+  testCasesChartSettings$ = this.lastExecutionsSorted$.pipe(
+    switchMap((executions) => {
+      return this.timeRange$.pipe(
+        take(1),
+        switchMap((timeRange) => {
+          if (executions.length === 0) {
+            return of(this.createTestCasesChart([], []));
+          } else {
+            const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
+            let oqlFilter = 'attributes.type = TestCase';
+            if (executionsIdsJoined) {
+              oqlFilter += ` and (${executionsIdsJoined})`;
+            }
+            const request: FetchBucketsRequest = {
+              start: timeRange.from,
+              end: timeRange.to,
+              numberOfBuckets: 1,
+              oqlFilter: oqlFilter,
+              groupDimensions: ['executionId', 'status'],
+            };
+
+            return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+              map((timeSeriesResponse) => {
+                let statsByNodes: Record<string, EntityWithKeywordsStats> = {};
+                const allStatuses = new Set<string>();
+                if (timeSeriesResponse.matrixKeys.length === 0) {
+                  // add a default series when there is no data
+                  allStatuses.add('PASSED');
+                }
+                timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
+                  // const nodeName = attributes['name'];
+                  // let artefactHash = attributes['artefactHash'];
+                  const executionId = attributes['executionId'];
+                  const status = attributes['status'];
+                  // const nodeUniqueId = nodeName + artefactHash;
+
+                  allStatuses.add(status);
+                  let executionEntry: EntityWithKeywordsStats = {
+                    entity: executionId,
+                    statuses: {},
+                    timestamp: 0,
+                  };
+                  if (statsByNodes[executionId]) {
+                    executionEntry = statsByNodes[executionId];
+                  } else {
+                    statsByNodes[executionId] = executionEntry;
+                  }
+                  timeSeriesResponse.matrix[i].forEach((bucket) => {
+                    if (bucket) {
+                      const newCount = (executionEntry.statuses[status] || 0) + (bucket.count || 0);
+                      executionEntry.statuses[status] = newCount;
+                    }
+                  });
+                });
+                let series = Array.from(allStatuses).map((status) => {
+                  let color = this._statusColors[status as Status];
+                  const fill = color + 'cc';
+                  const s: TSChartSeries = {
+                    id: status,
+                    scale: 'y',
+                    labelItems: [status],
+                    legendName: status,
+                    data: executions.map((item) => statsByNodes[item.id!]?.statuses[status] || 0),
+                    width: 1,
+                    value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
+                      this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                    stroke: color,
+                    fill: fill,
+                    paths: uplotBarsFn,
+                    points: { show: false },
+                    show: true,
+                  };
+                  return s;
+                });
+                this.cumulateSeriesData(series);
+                return this.createTestCasesChart(executions, series);
+              }),
+            );
+          }
+        }),
+        map((chartSettings) => ({ chartSettings: chartSettings, lastExecutions: executions })),
+      );
+    }),
+  );
+
   readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
+
+  errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
+    let filterItem = this.getDashboardFilter();
+    // this is working only with searchEntities for now. extend it if needed
+    const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
+  });
 
   private getDefaultBands(count: number): Band[] {
     const bands: Band[] = [];
@@ -385,6 +404,7 @@ export abstract class CrossExecutionDashboardState {
   private cumulateSeriesData(series: TSChartSeries[]): void {
     series.forEach((s, i) => {
       if (i == 0) {
+        // skip time series
         return;
       }
       s.data.forEach((point, j) => {
@@ -397,7 +417,8 @@ export abstract class CrossExecutionDashboardState {
   private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
     if (seriesIdx > 1) {
       const valueBelow = self.data[seriesIdx - 1][idx] || 0;
-      return currentValue - valueBelow;
+      const value = currentValue - valueBelow;
+      return value;
     }
     return currentValue;
   }
