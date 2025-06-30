@@ -4,15 +4,31 @@
 import { Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
+import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
 import type { Resource } from '../models/Resource';
 import type { ResourceUploadResponse } from '../models/ResourceUploadResponse';
+import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 @Injectable({ providedIn: 'root' })
 export class ResourcesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
+
+  /**
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public bulkDelete1(requestBody?: TableBulkOperationRequest): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/resources/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
 
   /**
    * @param type

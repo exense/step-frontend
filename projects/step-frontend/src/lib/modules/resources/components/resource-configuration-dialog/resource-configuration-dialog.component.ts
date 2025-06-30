@@ -8,6 +8,7 @@ import {
   MultipleProjectsService,
   Resource,
   ResourceInputComponent,
+  StepCoreModule,
 } from '@exense/step-core';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
 import {
@@ -21,6 +22,8 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   selector: 'step-resource-configuration-dialog',
   templateUrl: './resource-configuration-dialog.component.html',
   styleUrls: ['./resource-configuration-dialog.component.scss'],
+  imports: [StepCoreModule],
+  standalone: true,
 })
 export class ResourceConfigurationDialogComponent implements OnInit {
   private _cd = inject(ChangeDetectorRef);
