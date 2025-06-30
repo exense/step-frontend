@@ -124,7 +124,7 @@
             'status-off': !element.active,
             'scheduler-disabled': isSchedulerDisabled()
           }"
-          [disabled]="!('task-(de)activate' | hasRight | async)"
+          [disabled]="!('task-activate' | hasRight | async)"
           (click)="switchActive(element)"
         >
           {{ element.active ? ActiveLabels.ACTIVE : ActiveLabels.INACTIVE }}
