@@ -72,7 +72,9 @@ export class CustomTooltipPlugin {
             hideTooltip();
             return;
           }
-          const { left, top, idx } = u.cursor;
+          const { left, top, idxs } = u.cursor;
+          // idxs is a custom calculation function for which points to highlight.
+          const idx = idxs![0];
           if (!top || top < 0 || idx === null || left === undefined) {
             // some weird uPlot behaviour. it happens to be -10 many times
             return;

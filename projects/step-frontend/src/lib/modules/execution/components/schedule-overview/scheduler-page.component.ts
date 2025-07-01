@@ -223,10 +223,19 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
             showDefaultLegend: true,
             xAxesSettings: {
               values: xLabels,
-              valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleDateString(),
+              valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleString(),
             },
             cursor: {
               lock: true,
+              dataIdx: (self: uPlot, seriesIdx: number, closestIdx: number, xValue: number) => {
+                let timeItems = self.data[0];
+                const closestValue = timeItems[closestIdx];
+                if (closestValue <= xValue) {
+                  return closestIdx;
+                } else {
+                  return closestIdx - 1;
+                }
+              },
             },
             scales: {
               y: {
