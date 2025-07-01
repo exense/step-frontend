@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, pairwise, scan } from 'rxjs';
+import { filter, map, pairwise, scan, take } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
@@ -63,8 +63,6 @@ export class SchedulerReportViewComponent implements OnInit {
       const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];
       const snappedFrom = base + Math.ceil((timeRange.from - base) / interval) * interval;
       const snappedTo = base + Math.ceil((timeRange.to - base) / interval) * interval;
-      console.log('ORIGINAL', new Date(timeRange.from).toLocaleString(), new Date(timeRange.to).toLocaleString());
-      console.log('SNAPPED', new Date(snappedFrom).toLocaleString(), new Date(snappedTo).toLocaleString());
       timeRange = { from: Math.round(snappedFrom), to: Math.round(snappedTo) };
       this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
     });

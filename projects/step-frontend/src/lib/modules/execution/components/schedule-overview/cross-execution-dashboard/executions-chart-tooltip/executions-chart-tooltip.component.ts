@@ -86,13 +86,13 @@ export class ExecutionsChartTooltipComponent {
     const bucketInterval = data.xValues[1] - data.xValues[0];
     const limit = 10;
 
-    const statusAttribute = this._state.getViewType() === 'task' ? 'result' : 'rnStatus';
+    // const statusAttribute = this._state.getViewType() === 'task' ? 'result' : 'rnStatus';
 
     const oql = new OQLBuilder()
       .open('and')
       .append('attributes.metricType = "executions/duration"')
       .append(FilterUtils.filtersToOQL([this._state.getDashboardFilter()], 'attributes'))
-      // .append(`attributes.result = ${item.label}`)
+      .append(`attributes.result = ${item.label}`)
       .build();
 
     const request: FetchBucketsRequest = {
@@ -101,7 +101,7 @@ export class ExecutionsChartTooltipComponent {
       numberOfBuckets: 1,
       oqlFilter: oql,
       groupDimensions: ['eId'],
-      maxNumberOfSeries: 10,
+      maxNumberOfSeries: limit,
     };
     this._timeSeriesService
       .getTimeSeries(request)
@@ -116,17 +116,13 @@ export class ExecutionsChartTooltipComponent {
         }),
       )
       .subscribe((executions) => {
-        this.selectedSeriesExecutions = executions
-          .filter((ex) => {
-            return ex.result === item.label;
-          })
-          .map((execution) => {
-            return {
-              id: execution.id!,
-              name: execution.description!,
-              timestamp: new Date(execution.startTime!).toLocaleString(),
-            };
-          });
+        this.selectedSeriesExecutions = executions.map((execution) => {
+          return {
+            id: execution.id!,
+            name: execution.description!,
+            timestamp: new Date(execution.startTime!).toLocaleString(),
+          };
+        });
         this.executionsListTruncated = executions.length >= limit;
         this._changeDetectorRef.detectChanges();
         callback?.();

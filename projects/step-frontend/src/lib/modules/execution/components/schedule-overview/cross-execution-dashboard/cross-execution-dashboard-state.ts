@@ -29,7 +29,7 @@ import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100] });
+const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -60,11 +60,11 @@ export abstract class CrossExecutionDashboardState {
   abstract getViewType(): CrossExecutionViewType;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
-    // this.activeTimeRangeSelection.set(selection);
+    this.activeTimeRangeSelection.set(selection);
   }
 
   updateRefreshInterval(interval: number): void {
-    // this.refreshInterval.set(interval);
+    this.refreshInterval.set(interval);
   }
 
   timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
@@ -190,6 +190,15 @@ export abstract class CrossExecutionDashboardState {
             },
             cursor: {
               lock: true,
+              dataIdx: (self: uPlot, seriesIdx: number, closestIdx: number, xValue: number) => {
+                let timeItems = self.data[0];
+                const closestValue = timeItems[closestIdx];
+                if (closestValue <= xValue) {
+                  return closestIdx;
+                } else {
+                  return closestIdx - 1;
+                }
+              },
             },
             scales: {
               y: {

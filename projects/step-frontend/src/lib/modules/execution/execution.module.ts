@@ -148,6 +148,7 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/cro
 import { CrossExecutionDashboardComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
 import { PlanPageComponent } from './components/schedule-overview/plan-page/plan-page.component';
+import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
 
 @NgModule({
   declarations: [
