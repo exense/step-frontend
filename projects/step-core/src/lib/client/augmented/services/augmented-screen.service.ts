@@ -21,6 +21,15 @@ export class AugmentedScreenService extends ScreensService implements HttpOverri
     this.screenInputCache = {};
   }
 
+  clearCacheForScreen(screenId?: string): void {
+    if (screenId && this.screenCache[screenId]) {
+      delete this.screenCache[screenId];
+    }
+    if (screenId && this.screenInputCache[screenId]) {
+      delete this.screenInputCache[screenId];
+    }
+  }
+
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
     return this;
@@ -52,15 +61,15 @@ export class AugmentedScreenService extends ScreensService implements HttpOverri
 
   override saveInput(requestBody?: ScreenInput): Observable<any> {
     const screenId = requestBody?.screenId;
-    return super.saveInput(requestBody).pipe(this.clearCacheForScreen(screenId));
+    return super.saveInput(requestBody).pipe(this.clearCacheForScreenPipe(screenId));
   }
 
   override moveInput(id: string, requestBody?: number, screenId?: string): Observable<any> {
-    return super.moveInput(id, requestBody).pipe(this.clearCacheForScreen(screenId));
+    return super.moveInput(id, requestBody).pipe(this.clearCacheForScreenPipe(screenId));
   }
 
   override deleteInput(id: string, screenId?: string): Observable<any> {
-    return super.deleteInput(id).pipe(this.clearCacheForScreen(screenId));
+    return super.deleteInput(id).pipe(this.clearCacheForScreenPipe(screenId));
   }
 
   getDefaultParametersByScreenId(screenId: string): Observable<Record<string, string>> {
@@ -91,16 +100,7 @@ export class AugmentedScreenService extends ScreensService implements HttpOverri
     );
   }
 
-  private clearCacheForScreen(screenId?: string): UnaryFunction<Observable<unknown>, Observable<unknown>> {
-    return pipe(
-      tap(() => {
-        if (screenId && this.screenCache[screenId]) {
-          delete this.screenCache[screenId];
-        }
-        if (screenId && this.screenInputCache[screenId]) {
-          delete this.screenInputCache[screenId];
-        }
-      }),
-    );
+  private clearCacheForScreenPipe(screenId?: string): UnaryFunction<Observable<unknown>, Observable<unknown>> {
+    return pipe(tap(() => this.clearCacheForScreen(screenId)));
   }
 }

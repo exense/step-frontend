@@ -1,25 +1,35 @@
-import { Injectable, OnDestroy, Signal } from '@angular/core';
+import { effect, inject, Injectable, Injector, signal, Signal } from '@angular/core';
 import { ColumnDirective } from '../directives/column.directive';
-import { Mutable } from '../../basics/types/mutable';
 import { CustomColumnsScreenInputs } from '../components/custom-columns/custom-columns-screen-inputs';
 
-type FieldAccessor = Mutable<Pick<TableColumnsDefinitionService, 'contentColumns' | 'customRemoteColumns'>>;
-
 @Injectable()
-export class TableColumnsDefinitionService implements OnDestroy {
-  readonly contentColumns?: Signal<readonly ColumnDirective[]>;
-  readonly customRemoteColumns?: Signal<CustomColumnsScreenInputs | undefined>;
+export class TableColumnsDefinitionService {
+  private _injector = inject(Injector);
+
+  private contentColumnsInternal = signal<readonly ColumnDirective[]>([]);
+  private customRemoteColumnsInternal = signal<CustomColumnsScreenInputs | undefined>(undefined);
+
+  readonly contentColumns = this.contentColumnsInternal.asReadonly();
+  readonly customRemoteColumns = this.customRemoteColumnsInternal.asReadonly();
 
   setup(
-    contentColumns: Signal<readonly ColumnDirective[]>,
-    customRemoteColumns: Signal<CustomColumnsScreenInputs | undefined>,
+    contentColumnsExternal: Signal<readonly ColumnDirective[]>,
+    customRemoteColumnsExternal: Signal<CustomColumnsScreenInputs | undefined>,
   ): void {
-    (this as FieldAccessor).contentColumns = contentColumns;
-    (this as FieldAccessor).customRemoteColumns = customRemoteColumns;
-  }
+    effect(
+      () => {
+        const contentCols = contentColumnsExternal();
+        this.contentColumnsInternal.set(contentCols);
+      },
+      { injector: this._injector, allowSignalWrites: true },
+    );
 
-  ngOnDestroy(): void {
-    (this as FieldAccessor).contentColumns = undefined;
-    (this as FieldAccessor).customRemoteColumns = undefined;
+    effect(
+      () => {
+        const remoteCols = customRemoteColumnsExternal();
+        this.customRemoteColumnsInternal.set(remoteCols);
+      },
+      { injector: this._injector, allowSignalWrites: true },
+    );
   }
 }

@@ -12,9 +12,12 @@ export class TableCustomColumnsService implements OnDestroy {
     return this.getScreenColumnsSignalInternal(screen).asReadonly();
   }
 
-  updateColumnsForScreen(screen?: string): Observable<boolean> {
+  updateColumnsForScreen(screen?: string, clearCache?: boolean): Observable<boolean> {
     if (!screen) {
       return of(false);
+    }
+    if (clearCache) {
+      this._screenApiService.clearCacheForScreen(screen);
     }
     return this._screenApiService.getScreenInputsByScreenIdWithCache(screen).pipe(
       tap((columns) => {
