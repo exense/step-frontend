@@ -2,6 +2,35 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-frontend/styles/common-mixins' as common;
 
+@mixin highlight-node($color) {
+  step-tree-node-name {
+    background: none !important;
+  }
+  .node-content {
+    position: relative;
+
+    .node-icon {
+      background: $color;
+
+      &:after {
+        background: $color;
+      }
+    }
+    &:after {
+      content: ' ';
+      display: block;
+      position: absolute;
+      height: 3rem;
+      top: 0.8rem;
+      left: 4rem;
+      right: 0;
+      background: $color;
+      border-top-right-radius: 4rem;
+      border-bottom-right-radius: 4rem;
+    }
+  }
+}
+
 step-alt-execution-tree {
   display: block;
   position: relative;
@@ -39,6 +68,10 @@ step-alt-execution-tree {
     }
   }
 
+  step-tree-node.highlight .tree-node {
+    @include highlight-node(var.$blue-15);
+  }
+
   .tree-node {
     flex: 1;
     .node-content {
@@ -52,6 +85,7 @@ step-alt-execution-tree {
         border: none !important;
         border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
+        height: 3rem;
         &:after {
           @include common.special-selection-item;
         }
@@ -59,13 +93,7 @@ step-alt-execution-tree {
     }
 
     &.tree-node-selected {
-      step-tree-node-name {
-        background: none !important;
-      }
-
-      .node-content .node-icon::after {
-        @include common.special-selection-item-hover;
-      }
+      @include highlight-node(var.$light-blue-gray);
     }
   }
 
