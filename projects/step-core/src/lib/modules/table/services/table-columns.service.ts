@@ -57,7 +57,6 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     const contentColumns = this._columnsDefinition.contentColumns() ?? [];
     const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
 
-    console.log('DEFAULT SETTINGS');
 
     const infoDictionary = contentColumns
       .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
