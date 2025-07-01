@@ -1,17 +1,24 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Input, ScreenInput, ScreensService } from '../../generated';
 import { map, Observable, of, OperatorFunction, pipe, tap, UnaryFunction } from 'rxjs';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 import { HttpEvent } from '@angular/common/http';
+import { Reloadable } from '../../../modules/basics/types/reloadable';
+import { GlobalReloadService } from '../../../modules/basics/injectables/global-reload.service';
+import { BaseHttpRequest } from '../../generated/core/BaseHttpRequest';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AugmentedScreenService extends ScreensService implements HttpOverrideResponseInterceptor {
+export class AugmentedScreenService
+  extends ScreensService
+  implements HttpOverrideResponseInterceptor, Reloadable, OnDestroy
+{
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _requestContextHolder = inject(HttpRequestContextHolderService);
+  private _globalReload = inject(GlobalReloadService);
 
   private screenCache: Record<string, Input[]> = {};
   private screenInputCache: Record<string, ScreenInput[]> = {};
@@ -19,6 +26,19 @@ export class AugmentedScreenService extends ScreensService implements HttpOverri
   clearCache(): void {
     this.screenCache = {};
     this.screenInputCache = {};
+  }
+
+  constructor(httpRequest: BaseHttpRequest) {
+    super(httpRequest);
+    this._globalReload.register(this);
+  }
+
+  reload(): void {
+    this.clearCache();
+  }
+
+  ngOnDestroy(): void {
+    this._globalReload.unRegister(this);
   }
 
   clearCacheForScreen(screenId?: string): void {
