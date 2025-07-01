@@ -254,6 +254,7 @@ import { PlanPageComponent } from './components/schedule-overview/plan-page/plan
     AltReportWidgetContentDirective,
     DashboardPageComponent,
     ToggleRequestWarningDirective,
+    ParentElementSizeDirective,
   ],
   exports: [
     ExecutionListComponent,

@@ -7,6 +7,7 @@ import { AltReportNodesFilterService } from '../services/alt-report-nodes-filter
   selector: '[stepTreeNodeVisualState]',
   host: {
     '[class.not-significant]': `notSignificantByStatus() || isSkipped() || anotherClass()`,
+    '[class.highlight]': `isInSearchResult()`,
   },
 })
 export class TreeNodeVisualStateDirective {
@@ -57,5 +58,11 @@ export class TreeNodeVisualStateDirective {
       return false;
     }
     return !artefactClassValue.has(node?.originalArtefact?._class ?? '');
+  });
+
+  protected isInSearchResult = computed(() => {
+    const nodeId = this.nodeId();
+    const selectedSearchResult = this._treeState.selectedSearchResult();
+    return selectedSearchResult === nodeId;
   });
 }

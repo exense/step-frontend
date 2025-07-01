@@ -1,5 +1,10 @@
-import { Directive, ElementRef, forwardRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Directive, ElementRef, forwardRef, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { ElementSizeService } from '../injectables/element-size.service';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
+
+const debounceSignal = (value: WritableSignal<number>, dueTime: number = 300, initialValue: number = 0) =>
+  toSignal(toObservable(value).pipe(debounceTime(dueTime)), { initialValue });
 
 @Directive({
   selector: '[stepElementSize]',
@@ -19,8 +24,8 @@ export class ElementSizeDirective implements OnInit, OnDestroy, ElementSizeServi
   private widthInternal = signal(0);
   private heightInternal = signal(0);
 
-  readonly width = this.widthInternal.asReadonly();
-  readonly height = this.heightInternal.asReadonly();
+  readonly width = debounceSignal(this.widthInternal);
+  readonly height = debounceSignal(this.heightInternal);
 
   ngOnInit(): void {
     this.updateSizes();

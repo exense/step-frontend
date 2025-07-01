@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import {
   AceMode,
@@ -9,6 +9,8 @@ import {
   TablePersistenceStateService,
   TableStorageService,
   TableMemoryStorageService,
+  TableDataSource,
+  TableLocalDataSource,
 } from '@exense/step-core';
 
 @Component({
@@ -28,7 +30,19 @@ export class AltExecutionResolvedParametersComponent {
   private _richEditorDialog = inject(RichEditorDialogService);
   private _popoverService = inject(PopoverService, { optional: true });
 
+  private dataSourceConfig = TableLocalDataSource.configBuilder<KeyValue<string, string>>()
+    .addSearchStringPredicate('key', (item) => item.key)
+    .addSearchStringPredicate('value', (item) => item.value)
+    .addSortStringPredicate('key', (item) => item.key)
+    .addSortStringPredicate('value', (item) => item.value)
+    .build();
+
   readonly parameters = input<KeyValue<string, string>[]>([]);
+
+  protected readonly parametersDataSource = computed(() => {
+    const parameters = this.parameters();
+    return new TableLocalDataSource(parameters, this.dataSourceConfig);
+  });
 
   protected showParameter({ key, value }: KeyValue<string, string>): void {
     this._popoverService?.freezePopover();

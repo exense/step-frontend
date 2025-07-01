@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, inject, input, signal, TemplateRef } from '@angular/core';
+import { Component, computed, forwardRef, inject, input, TemplateRef } from '@angular/core';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedTreeNodeType } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
@@ -10,9 +10,6 @@ import { ElementSizeService, TreeNodeData } from '@exense/step-core';
   selector: 'step-aggregated-tree-node',
   templateUrl: './aggregated-tree-node.component.html',
   styleUrl: './aggregated-tree-node.component.scss',
-  host: {
-    '[class.highlight]': 'isInSearchResult()',
-  },
   providers: [
     {
       provide: ElementSizeService,
@@ -31,13 +28,13 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
   readonly nodeId = input.required<string>();
   readonly addonTemplate = input<TemplateRef<unknown> | undefined>(undefined);
 
-  readonly height = signal(0);
+  readonly height = computed(() => this._parentElementSize?.height?.() ?? 0);
 
   readonly width = computed(() => {
     const parentWidth = this._parentElementSize?.width?.() ?? 0;
     const levelOffset = this._treeNodeData.levelOffset();
-    let result = !parentWidth ? 0 : parentWidth - levelOffset - 150;
-    result = Math.max(result, 150);
+    let result = !parentWidth ? 0 : parentWidth - levelOffset - 200;
+    result = Math.max(result, 200);
     return result;
   });
 
@@ -50,12 +47,6 @@ export class AggregatedTreeNodeComponent implements ElementSizeService {
     const nodeId = this.nodeId();
     const selectedNodes = this._treeState.selectedNodeIds();
     return selectedNodes.includes(nodeId);
-  });
-
-  protected isInSearchResult = computed(() => {
-    const nodeId = this.nodeId();
-    const selectedSearchResult = this._treeState.selectedSearchResult();
-    return selectedSearchResult === nodeId;
   });
 
   protected readonly detailsTooltip = 'Open execution details';

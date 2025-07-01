@@ -58,8 +58,16 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   handleMainChartZoom(timeRange: TimeRange) {
-    timeRange = { from: Math.round(timeRange.from), to: Math.round(timeRange.to) };
-    this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+    this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
+      const base = chartSettings.xAxesSettings.values[0];
+      const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];
+      const snappedFrom = base + Math.ceil((timeRange.from - base) / interval) * interval;
+      const snappedTo = base + Math.ceil((timeRange.to - base) / interval) * interval;
+      console.log('ORIGINAL', new Date(timeRange.from).toLocaleString(), new Date(timeRange.to).toLocaleString());
+      console.log('SNAPPED', new Date(snappedFrom).toLocaleString(), new Date(snappedTo).toLocaleString());
+      timeRange = { from: Math.round(snappedFrom), to: Math.round(snappedTo) };
+      this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+    });
   }
 
   protected readonly availableErrorTypes = toSignal(
