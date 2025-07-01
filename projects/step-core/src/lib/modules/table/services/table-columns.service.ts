@@ -76,7 +76,6 @@ export class TableColumnsService implements Reloadable, OnDestroy {
       .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
       .map((col, i) => this.createStandardColumnSettings(col, i, infoDictionary));
 
-    console.log('COLUMN SETTINGS LIST', columnSettingList);
 
     const remoteColumns = remoteColumnsDefinitions.map((screenInput, i) =>
       this.createScreenInputColumnSettings(screenInput, columnSettingList.length + i),
