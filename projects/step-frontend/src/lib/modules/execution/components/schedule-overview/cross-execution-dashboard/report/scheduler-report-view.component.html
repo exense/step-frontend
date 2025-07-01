@@ -20,9 +20,7 @@
             [height]="340"
           >
             <ng-template tooltipContent let-data let-reposition="reposition">
-              @if (_state.task(); as task) {
-                <step-executions-chart-tooltip (reposition)="reposition()" [data]="data" [taskId]="task.id!" />
-              }
+              <step-executions-chart-tooltip (reposition)="reposition()" [data]="data" />
             </ng-template>
           </step-timeseries-chart>
         } @else {
