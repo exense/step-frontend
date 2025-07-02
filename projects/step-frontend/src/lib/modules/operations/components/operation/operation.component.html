@@ -30,8 +30,8 @@
     <div *ngIf="operation?.details">
       <small>
         <label>Criteria: </label>
-        <span *ngFor="let item; in: operation!.details | keyvalue">
-          <strong>{{ item.key }}=</strong>{{ item.value.selectionPattern }}
+        <span *ngFor="let item of operation!.details | keyvalue">
+          <strong>{{ item.key }}=</strong>{{ $any(item.value).selectionPattern }}
         </span>
       </small>
     </div>
