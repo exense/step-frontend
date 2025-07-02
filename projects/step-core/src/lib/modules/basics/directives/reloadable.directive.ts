@@ -6,7 +6,6 @@ import { first, map } from 'rxjs';
 
 @Directive({
   selector: '[stepReloadable]',
-  standalone: true,
 })
 export class ReloadableDirective implements OnInit, OnDestroy, Reloadable {
   private _globalReload = inject(GlobalReloadService);

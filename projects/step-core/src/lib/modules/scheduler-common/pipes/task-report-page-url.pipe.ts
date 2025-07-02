@@ -4,7 +4,6 @@ import { ExecutiontTaskParameters } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'taskReportPageUrl',
-  standalone: true,
 })
 export class TaskReportPageUrlPipe implements PipeTransform {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);

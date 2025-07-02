@@ -3,17 +3,13 @@ import {
   Component,
   DestroyRef,
   effect,
-  EventEmitter,
   inject,
   input,
   Input,
-  OnChanges,
   OnDestroy,
   OnInit,
   output,
-  Output,
   QueryList,
-  SimpleChanges,
   ViewChild,
   ViewChildren,
 } from '@angular/core';
@@ -30,23 +26,19 @@ import {
   MetricType,
   Plan,
   TimeRange,
-  TimeRangeSelection,
   TimeSeriesFilterItem,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterUtils,
-  ResolutionPickerComponent,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesContextsFactory,
-  TimeSeriesUtils,
   TsFilteringMode,
   TsFilteringSettings,
-  TsGroupingComponent,
 } from '../../modules/_common';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardFilterBarComponent, PerformanceViewTimeSelectionComponent } from '../../modules/filter-bar';
 import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -57,7 +49,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { filter, forkJoin, map, Observable, of, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -68,7 +60,6 @@ import { ChartAggregation } from '../../modules/_common/types/chart-aggregation'
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
@@ -80,14 +71,11 @@ import { MatTooltip } from '@angular/material/tooltip';
     COMMON_IMPORTS,
     DashboardFilterBarComponent,
     ChartDashletComponent,
-    ResolutionPickerComponent,
     TimeRangePickerComponent,
     TableDashletComponent,
     MatProgressSpinner,
     PerformanceViewTimeSelectionComponent,
-    MatIconButton,
     MatTooltip,
-    TsGroupingComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {

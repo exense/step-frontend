@@ -3,7 +3,6 @@ import { ItemWidthRegisterService } from '../injectables/item-width-register.ser
 
 @Directive({
   selector: '[stepAutoShrankItem]',
-  standalone: true,
 })
 export class AutoShrankItemDirective<T> implements AfterViewInit {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

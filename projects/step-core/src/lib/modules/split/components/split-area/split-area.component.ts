@@ -19,7 +19,6 @@ type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
   selector: 'step-split-area',
   templateUrl: './split-area.component.html',
   styleUrls: ['./split-area.component.scss'],
-  standalone: true,
 })
 export class SplitAreaComponent implements AfterViewInit, OnChanges, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

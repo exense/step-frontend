@@ -11,7 +11,6 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   templateUrl: './agent-token-selection-criteria.component.html',
   styleUrls: ['./agent-token-selection-criteria.component.scss'],
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class AgentTokenSelectionCriteriaComponent {
   @Input() tokenSelectionCriteria!: FormArray<AgentTokenSelectionCriteriaForm>;

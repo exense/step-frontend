@@ -9,25 +9,14 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import {
-  COMMON_IMPORTS,
-  FilterBarItem,
-  FilterBarItemType,
-  FilterUtils,
-  TimeSeriesConfig,
-  TimeSeriesContext,
-  TimeSeriesEntityService,
-} from '../../modules/_common';
+import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesEntityService } from '../../modules/_common';
 import { ChartSkeletonComponent } from '../../modules/chart';
 import {
-  AggregatorType,
   BucketResponse,
   ColumnSelection,
   DashboardItem,
   FetchBucketsRequest,
-  MarkerType,
   MetricAttribute,
-  TableDashletSettings,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
   TimeSeriesAPIResponse,
@@ -94,7 +83,7 @@ interface ProcessedBucketResponse {
   templateUrl: './table-dashlet.component.html',
   styleUrls: ['./table-dashlet.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
+  imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';

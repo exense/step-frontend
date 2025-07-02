@@ -3,7 +3,6 @@ import { Plan } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'planName',
-  standalone: true,
 })
 export class PlanNamePipe implements PipeTransform {
   transform(plan?: Plan): string | undefined {

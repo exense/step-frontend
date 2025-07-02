@@ -3,7 +3,6 @@ import { DragItemBaseDirective } from './drag-item-base.directive';
 
 @Directive({
   selector: '[stepDragItem]',
-  standalone: true,
 })
 export class DragItemDirective extends DragItemBaseDirective {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

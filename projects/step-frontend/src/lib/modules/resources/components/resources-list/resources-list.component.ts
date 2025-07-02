@@ -18,7 +18,6 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
-  standalone: true,
   imports: [StepCoreModule, ResourceUrlPipe],
   providers: [
     tableColumnsConfigProvider({
@@ -31,7 +30,6 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
       useExisting: forwardRef(() => ResourcesListComponent),
     },
   ],
-  standalone: false,
 })
 export class ResourcesListComponent implements DialogParentService {
   private _resourceDialogs = inject(ResourceDialogsService);
