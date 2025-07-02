@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { AggregatedReportViewRequest, AugmentedExecutionsService, ReportNode } from '@exense/step-core';
 import { catchError, combineLatest, finalize, map, of, switchMap } from 'rxjs';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
@@ -37,6 +37,11 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   private _executionDialogs = inject(AltExecutionDialogsService);
 
+  private isRunningExecution = toSignal(
+    this._executionState.execution$.pipe(map((execution) => execution.status === 'RUNNING')),
+    { initialValue: false },
+  );
+
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   readonly node = input.required<ReportNode>();
@@ -48,8 +53,9 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private loadInProgress = signal(false);
   protected showSpinner = computed(() => {
     const isFirstLoad = this.isFirstLoad();
+    const isRunningExecution = this.isRunningExecution();
     const loadInProgress = this.loadInProgress();
-    return isFirstLoad && loadInProgress;
+    return (isFirstLoad || !isRunningExecution) && loadInProgress;
   });
 
   private reportNode$ = toObservable(this.node);
