@@ -16,6 +16,7 @@ import { KeyValue } from '@angular/common';
   selector: 'step-function-package-configuration-dialog',
   templateUrl: './function-package-configuration-dialog.component.html',
   styleUrls: ['./function-package-configuration-dialog.component.scss'],
+  standalone: false,
 })
 export class FunctionPackageConfigurationDialogComponent {
   readonly AlertType = AlertType;

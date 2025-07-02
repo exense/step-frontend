@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'comparePercentage',
-  standalone: true,
 })
 export class TsComparePercentagePipe implements PipeTransform {
   transform(value: number | undefined, precision: number = 2): any {

@@ -13,6 +13,7 @@ export type MessageDialogResult = boolean | undefined;
   selector: 'step-message-dialog',
   templateUrl: './message-dialog.component.html',
   styleUrls: ['./message-dialog.component.scss'],
+  standalone: false,
 })
 export class MessageDialogComponent implements AfterViewInit {
   private _dialogRef = inject<MatDialogRef<MessageDialogComponent, MessageDialogResult>>(MatDialogRef);

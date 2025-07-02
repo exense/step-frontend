@@ -82,6 +82,7 @@ interface EntityWithKeywordsStats {
       },
     },
   ],
+  standalone: false,
 })
 export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);

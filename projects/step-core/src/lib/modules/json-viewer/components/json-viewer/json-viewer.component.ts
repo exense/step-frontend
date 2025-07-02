@@ -8,6 +8,7 @@ import { DOCUMENT } from '@angular/common';
   templateUrl: './json-viewer.component.html',
   styleUrls: ['./json-viewer.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class JsonViewerComponent implements OnChanges {
   private _formatter = inject(JsonViewerFormatterService);

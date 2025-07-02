@@ -18,6 +18,7 @@ import { IconProviderService } from '../../services/icon-provider.service';
   styleUrls: ['./step-icon.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class StepIconComponent implements OnChanges {
   private _iconProvider = inject(IconProviderService);

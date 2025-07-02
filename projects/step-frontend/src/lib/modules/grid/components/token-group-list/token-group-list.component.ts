@@ -14,6 +14,7 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
   templateUrl: './token-group-list.component.html',
   styleUrls: ['./token-group-list.component.scss'],
   providers: [tablePersistenceConfigProvider('tokenGroupList', STORE_ALL)],
+  standalone: false,
 })
 export class TokenGroupListComponent {
   private _gridService = inject(GridService);
@@ -22,7 +23,7 @@ export class TokenGroupListComponent {
     () => this._gridService.getUsageByIdentity(this.getCheckedKeyList()),
     TableFetchLocalDataSource.configBuilder<TokenGroupCapacity>()
       .addSearchStringPredicate('key', (item) => FlatObjectStringFormatPipe.format(item.key!))
-      .build()
+      .build(),
   );
 
   readonly checkedMap: Record<string, boolean | undefined> = { url: true };

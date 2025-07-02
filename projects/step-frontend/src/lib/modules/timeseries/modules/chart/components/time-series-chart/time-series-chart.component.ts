@@ -50,7 +50,6 @@ const DEFAULT_TIMESTAMP_FORMAT_FN: (
   styleUrls: ['./time-series-chart.component.scss'],
   providers: [CustomTooltipPlugin],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, TooltipParentContainer {

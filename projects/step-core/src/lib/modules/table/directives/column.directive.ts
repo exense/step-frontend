@@ -10,6 +10,7 @@ import { ActionColDirective } from './action-col.directive';
 @Directive({
   selector:
     '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container,step-lock-column-container',
+  standalone: false,
 })
 export class ColumnDirective {
   private _matColumnDef = inject(MatColumnDef, { self: true, optional: true });

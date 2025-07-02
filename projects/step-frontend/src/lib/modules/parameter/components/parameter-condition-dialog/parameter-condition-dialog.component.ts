@@ -16,6 +16,7 @@ const createPredicateItem = (key: Predicate, value: string): PredicateItem => ({
   selector: 'step-parameter-condition-dialog',
   templateUrl: './parameter-condition-dialog.component.html',
   styleUrls: ['./parameter-condition-dialog.component.scss'],
+  standalone: false,
 })
 export class ParameterConditionDialogComponent implements OnInit {
   private _dialogData = inject<ParameterConditionDialogData>(MAT_DIALOG_DATA);

@@ -15,6 +15,7 @@ import { IfArtefact } from '../../types/if.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class IfReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<IfArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

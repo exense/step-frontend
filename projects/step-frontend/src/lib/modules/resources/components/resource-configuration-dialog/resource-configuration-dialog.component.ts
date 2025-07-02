@@ -23,7 +23,6 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   templateUrl: './resource-configuration-dialog.component.html',
   styleUrls: ['./resource-configuration-dialog.component.scss'],
   imports: [StepCoreModule],
-  standalone: true,
 })
 export class ResourceConfigurationDialogComponent implements OnInit {
   private _cd = inject(ChangeDetectorRef);

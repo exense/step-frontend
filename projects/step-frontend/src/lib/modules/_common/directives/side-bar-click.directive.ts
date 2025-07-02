@@ -2,6 +2,7 @@ import { Directive, HostListener, output } from '@angular/core';
 
 @Directive({
   selector: '[stepSideBarClick]',
+  standalone: false,
 })
 export class SideBarClickDirective {
   /**

@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'containsVersion',
+  standalone: false,
 })
 export class ContainsVersionPipe implements PipeTransform {
   transform(value: string): boolean {

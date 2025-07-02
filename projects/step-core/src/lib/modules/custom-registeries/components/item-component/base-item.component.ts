@@ -10,6 +10,7 @@ type FieldAccessor = Mutable<Pick<BaseItemComponent<any>, 'component'>>;
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseItemComponent<T extends CustomRegistryItem> implements OnChanges {
   protected _customRegistryService = inject(CustomRegistryService);

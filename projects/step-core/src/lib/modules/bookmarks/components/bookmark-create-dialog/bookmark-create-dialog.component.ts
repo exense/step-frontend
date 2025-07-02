@@ -15,7 +15,6 @@ import { BookmarkService } from '../../injectables/bookmark.service';
   templateUrl: './bookmark-create-dialog.component.html',
   styleUrls: ['./bookmark-create-dialog.component.scss'],
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class BookmarkCreateDialogComponent implements OnInit {
   private _router = inject(Router);

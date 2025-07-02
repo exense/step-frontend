@@ -6,6 +6,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 @Pipe({
   name: 'dashboardNavigationParams',
+  standalone: false,
 })
 export class DashboardNavigationParamsPipe implements PipeTransform {
   transform(params?: string | ExecutiontTaskParameters | Record<string, any> | null): Params {

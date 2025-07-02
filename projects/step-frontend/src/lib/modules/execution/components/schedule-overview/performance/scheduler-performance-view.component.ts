@@ -12,6 +12,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
   selector: 'step-scheduler-performance-view',
   templateUrl: './scheduler-performance-view.component.html',
   styleUrls: ['./scheduler-performance-view.component.scss'],
+  standalone: false,
 })
 export class SchedulerPerformanceViewComponent implements OnInit {
   private _authService = inject(AuthService);

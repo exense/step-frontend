@@ -8,6 +8,7 @@ import { WhileArtefact } from '../../types/while.artefact';
   templateUrl: './while.component.html',
   styleUrls: ['./while.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class WhileComponent extends BaseArtefactComponent<WhileArtefact> {
   @ViewChild('form')

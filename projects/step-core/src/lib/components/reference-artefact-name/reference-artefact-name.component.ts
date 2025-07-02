@@ -61,6 +61,7 @@ export abstract class ReferenceArtefactNameConfig<A extends Artefact, T = any> {
   templateUrl: './reference-artefact-name.component.html',
   styleUrls: ['./reference-artefact-name.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ReferenceArtefactNameComponent<A extends Artefact, T = any> implements OnChanges, OnInit {
   private _schemaFactory = inject(SchemasFactoryService);

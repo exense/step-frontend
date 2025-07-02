@@ -11,7 +11,6 @@ import { StepIconsModule } from '../../../step-icons/step-icons.module';
   templateUrl: './tree-drag-preview.component.html',
   styleUrl: './tree-drag-preview.component.scss',
   imports: [StepIconsModule],
-  standalone: true,
 })
 export class TreeDragPreviewComponent {
   private _treeState = inject<TreeStateService<any, TreeNode>>(TreeStateService);

@@ -15,7 +15,6 @@ import { CUSTOM_FORMS_COMMON_IMPORTS } from '../../types/custom-from-common-impo
       multi: true,
     },
   ],
-  standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS, EditableLabelComponent, EditableDropdownLabelComponent],
   encapsulation: ViewEncapsulation.None,
 })

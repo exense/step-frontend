@@ -34,7 +34,6 @@ import { ExecutionModule } from '../../../execution/execution.module';
       useExisting: forwardRef(() => AutomationPackageListComponent),
     },
   ],
-  standalone: true,
   imports: [StepCoreModule, ExecutionModule],
 })
 export class AutomationPackageListComponent implements OnInit, DialogParentService {

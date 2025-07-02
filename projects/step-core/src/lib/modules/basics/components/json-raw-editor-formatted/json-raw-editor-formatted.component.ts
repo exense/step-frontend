@@ -12,6 +12,7 @@ enum InitializeValueState {
   selector: 'step-json-raw-editor-formatted',
   templateUrl: './json-raw-editor-formatted.component.html',
   styleUrls: ['./json-raw-editor-formatted.component.scss'],
+  standalone: false,
 })
 export class JsonRawEditorFormattedComponent extends JsonRawEditorComponent implements AfterViewInit {
   private initializeValueState: InitializeValueState = InitializeValueState.UNKNOWN;

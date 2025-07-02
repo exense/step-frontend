@@ -4,7 +4,6 @@ import { AttachmentPreviewComponent } from '../attachment-preview/attachment-pre
 
 @Component({
   selector: 'step-attachment-preview-list',
-  standalone: true,
   imports: [AttachmentPreviewComponent],
   templateUrl: './attachment-preview-list.component.html',
   styleUrl: './attachment-preview-list.component.scss',

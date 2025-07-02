@@ -21,6 +21,7 @@ import { ArrayItemLabelValueExtractor } from '../../../basics/step-basics.module
       useFactory: () => inject(AddFieldButtonComponent).extractor,
     },
   ],
+  standalone: false,
 })
 export class AddFieldButtonComponent<T = string, V = string> {
   private _elRef = inject(ElementRef);

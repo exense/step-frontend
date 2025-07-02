@@ -12,6 +12,7 @@ import { TimeRange } from '@exense/step-core';
   selector: 'step-alt-execution-analytics',
   templateUrl: './alt-execution-analytics.component.html',
   styleUrl: './alt-execution-analytics.component.scss',
+  standalone: false,
 })
 export class AltExecutionAnalyticsComponent implements OnInit {
   readonly _state = inject(AltExecutionStateService);

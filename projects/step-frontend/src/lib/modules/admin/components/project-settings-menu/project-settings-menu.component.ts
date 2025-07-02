@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './project-settings-menu.component.html',
   styleUrl: './project-settings-menu.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ProjectSettingsMenuComponent {
   private _auth = inject(AuthService);

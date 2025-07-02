@@ -8,6 +8,7 @@ import { TestSetArtefact } from '../../types/test-set.artefact';
   templateUrl: './test-set.component.html',
   styleUrls: ['./test-set.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class TestSetComponent extends BaseArtefactComponent<TestSetArtefact> {
   @ViewChild('form')

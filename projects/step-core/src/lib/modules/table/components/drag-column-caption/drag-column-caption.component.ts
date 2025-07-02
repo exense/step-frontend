@@ -20,6 +20,7 @@ import { TableReload } from '../../services/table-reload';
   templateUrl: './drag-column-caption.component.html',
   styleUrl: './drag-column-caption.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DragColumnCaptionComponent implements AfterViewInit {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

@@ -14,6 +14,7 @@ import { map, Observable } from 'rxjs';
       useExisting: forwardRef(() => SingleItemArrayFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class SingleItemArrayFilterComponent extends ArrayFilterComponent {
   protected override createControl(fb: FormBuilder): FormControl<unknown> {

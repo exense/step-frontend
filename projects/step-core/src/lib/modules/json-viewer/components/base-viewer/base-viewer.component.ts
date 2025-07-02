@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseViewerComponent<T = string> implements OnChanges {
   @Input() json?: unknown;

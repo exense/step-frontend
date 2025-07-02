@@ -7,6 +7,7 @@ import { UpdateResourceWarningResultState } from '../../shared/update-resource-w
   selector: 'step-update-resource-warning-dialog',
   templateUrl: './update-resource-warning-dialog.component.html',
   styleUrls: ['./update-resource-warning-dialog.component.scss'],
+  standalone: false,
 })
 export class UpdateResourceWarningDialogComponent implements AfterViewInit {
   @ViewChild(ModalWindowComponent, { static: true })

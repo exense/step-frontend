@@ -19,6 +19,7 @@ import { DateTime } from 'luxon';
   templateUrl: './execution-selection-table.component.html',
   styleUrls: ['./execution-selection-table.component.scss'],
   providers: [...selectionCollectionProvider<string, Execution>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  standalone: false,
 })
 export class ExecutionSelectionTableComponent extends BaseEntitySelectionTableComponent {
   private _filterConditionFactory = inject(FilterConditionFactoryService);

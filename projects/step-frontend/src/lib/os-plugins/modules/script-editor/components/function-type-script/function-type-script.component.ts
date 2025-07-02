@@ -19,6 +19,7 @@ import {
   selector: 'step-function-type-script',
   templateUrl: './function-type-script.component.html',
   styleUrls: ['./function-type-script.component.scss'],
+  standalone: false,
 })
 export class FunctionTypeScriptComponent extends FunctionTypeFormComponent<FunctionTypeScriptForm> {
   private _formBuilder = inject(FormBuilder);

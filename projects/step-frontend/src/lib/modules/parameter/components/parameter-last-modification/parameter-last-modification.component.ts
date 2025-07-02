@@ -5,6 +5,7 @@ import { CustomComponent, Parameter, DateFormat } from '@exense/step-core';
   selector: 'step-parameter-last-modification',
   templateUrl: './parameter-last-modification.component.html',
   styleUrls: [],
+  standalone: false,
 })
 export class ParameterLastModificationComponent implements CustomComponent {
   @Input() context?: Parameter;

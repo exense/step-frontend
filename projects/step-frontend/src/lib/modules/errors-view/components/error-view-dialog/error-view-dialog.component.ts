@@ -4,7 +4,6 @@ import { ErrorsViewStateService } from '../../injectables/errors-view-state.serv
 
 @Component({
   selector: 'step-error-view-dialog',
-  standalone: true,
   imports: [StepCoreModule],
   templateUrl: './error-view-dialog.component.html',
   styleUrl: './error-view-dialog.component.scss',

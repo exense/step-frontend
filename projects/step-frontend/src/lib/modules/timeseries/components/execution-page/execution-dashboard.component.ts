@@ -14,13 +14,9 @@ import {
   COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
-  ResolutionPickerComponent,
   TimeSeriesConfig,
   TimeSeriesContext,
 } from '../../modules/_common';
-import { DashboardFilterBarComponent } from '../../modules/filter-bar';
-import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
-import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import {
   AsyncTasksService,
@@ -33,24 +29,14 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, Observable, pairwise, take } from 'rxjs';
-import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
+import { filter, Observable, pairwise } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'step-execution-dashboard',
   templateUrl: './execution-dashboard.component.html',
   styleUrls: ['./execution-dashboard.component.scss'],
-  standalone: true,
-  imports: [
-    COMMON_IMPORTS,
-    DashboardFilterBarComponent,
-    ChartDashletComponent,
-    ResolutionPickerComponent,
-    TimeRangePickerComponent,
-    TableDashletComponent,
-    DashboardComponent,
-  ],
+  imports: [COMMON_IMPORTS, DashboardComponent],
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();

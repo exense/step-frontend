@@ -10,6 +10,7 @@ import { RANGE_DAYS } from '../../injectables/ranges.tokens';
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class EveryDayEditorComponent extends HoursEditorComponent {
   readonly _DAYS = inject(RANGE_DAYS);

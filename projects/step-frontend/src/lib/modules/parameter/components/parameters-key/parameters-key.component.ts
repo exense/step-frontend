@@ -7,6 +7,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'step-parameters-key',
   templateUrl: './parameters-key.component.html',
   styleUrls: ['./parameters-key.component.scss'],
+  standalone: false,
 })
 export class ParametersKeyComponent implements CustomComponent {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });

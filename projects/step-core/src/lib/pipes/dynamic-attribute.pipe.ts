@@ -3,6 +3,7 @@ import { DynamicValue } from '../client/step-client-module';
 
 @Pipe({
   name: 'dynamicAttribute',
+  standalone: false,
 })
 export class DynamicAttributePipe implements PipeTransform {
   transform(attribute?: DynamicValue): string | boolean | number | undefined {

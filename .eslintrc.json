@@ -10,6 +10,7 @@
       },
       "extends": ["plugin:@angular-eslint/recommended", "plugin:@angular-eslint/template/process-inline-templates"],
       "rules": {
+        "@angular-eslint/prefer-standalone": "warn",
         "@angular-eslint/no-output-on-prefix": "warn",
         "@angular-eslint/no-output-native": "warn",
         "@angular-eslint/no-input-rename": "off",

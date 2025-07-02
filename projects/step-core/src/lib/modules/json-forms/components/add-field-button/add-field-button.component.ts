@@ -15,7 +15,6 @@ import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'step-add-field-button',
-  standalone: true,
   imports: [StepBasicsModule],
   templateUrl: './add-field-button.component.html',
   styleUrl: './add-field-button.component.scss',

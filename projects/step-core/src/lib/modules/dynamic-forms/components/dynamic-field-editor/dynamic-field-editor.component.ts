@@ -7,6 +7,7 @@ import { JsonFieldsSchema, SchemaObjectField } from '../../../json-forms';
   selector: 'step-dynamic-field-editor',
   templateUrl: './dynamic-field-editor.component.html',
   styleUrls: ['./dynamic-field-editor.component.scss'],
+  standalone: false,
 })
 export class DynamicFieldEditorComponent implements OnChanges {
   @Input() isDisabled?: boolean;

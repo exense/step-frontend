@@ -14,6 +14,7 @@ import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe'
   templateUrl: './token-list.component.html',
   styleUrls: ['./token-list.component.scss'],
   providers: [tablePersistenceConfigProvider('tokenList', STORE_ALL)],
+  standalone: false,
 })
 export class TokenListComponent {
   private _gridService = inject(GridService);

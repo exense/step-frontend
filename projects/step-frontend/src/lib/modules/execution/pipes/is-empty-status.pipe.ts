@@ -3,6 +3,7 @@ import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 
 @Pipe({
   name: 'isEmptyStatus',
+  standalone: false,
 })
 export class IsEmptyStatusPipe implements PipeTransform {
   transform(value: AggregatedTreeNode): boolean {

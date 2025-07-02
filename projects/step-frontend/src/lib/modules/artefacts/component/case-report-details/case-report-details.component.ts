@@ -15,6 +15,7 @@ import { CaseArtefact } from '../../types/case.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CaseReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<CaseArtefact>> {
   private _artefactInlineItems = inject(ArtefactInlineItemUtilsService);

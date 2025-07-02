@@ -3,6 +3,7 @@ import { AuthService } from '../modules/auth';
 
 @Pipe({
   name: 'matchingAuthenticator',
+  standalone: false,
 })
 export class MatchingAuthenticator implements PipeTransform {
   private _authService = inject(AuthService);

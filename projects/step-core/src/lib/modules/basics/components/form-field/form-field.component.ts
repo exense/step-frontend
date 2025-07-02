@@ -11,6 +11,7 @@ import { getControlWarningsContainer } from '../../types/form-control-warnings-e
     '[class.step-has-warnings]': 'hasWarnings()',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class FormFieldComponent {
   /*

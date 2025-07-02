@@ -6,6 +6,7 @@ const ACTIONS_COLUMN_SETTINGS_CONTAINER = 'actions-column-settings-container';
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-column-settings',
+  standalone: false,
 })
 export class SettingsInsideActionColDirective implements AfterViewInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

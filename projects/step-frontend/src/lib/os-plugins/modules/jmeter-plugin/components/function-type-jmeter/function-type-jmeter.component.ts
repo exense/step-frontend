@@ -13,6 +13,7 @@ import {
   selector: 'step-function-type-jmeter',
   templateUrl: './function-type-jmeter.component.html',
   styleUrls: ['./function-type-jmeter.component.scss'],
+  standalone: false,
 })
 export class FunctionTypeJMeterComponent extends FunctionTypeFormComponent<FunctionTypeJMeterForm> {
   private _formBuilder = inject(FormBuilder);

@@ -14,7 +14,6 @@ const OVERFLOW_INDICATOR_CLASS = 'step-overflow-indicator-has-overflow';
 
 @Directive({
   selector: '[stepOverflowIndicator]',
-  standalone: true,
 })
 export class OverflowIndicatorDirective {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

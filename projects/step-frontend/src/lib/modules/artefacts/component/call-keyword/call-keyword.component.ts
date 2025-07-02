@@ -8,6 +8,7 @@ import { KeywordArtefact } from '../../types/keyword.artefact';
   templateUrl: './call-keyword.component.html',
   styleUrls: ['./call-keyword.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class CallKeywordComponent extends BaseArtefactComponent<KeywordArtefact> {
   @ViewChild('form')

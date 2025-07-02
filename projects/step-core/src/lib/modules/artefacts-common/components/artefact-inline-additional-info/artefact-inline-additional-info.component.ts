@@ -8,7 +8,6 @@ import { AttachmentType } from '../../../attachments/types/attachment-type.enum'
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
-  standalone: true,
   imports: [StepBasicsModule, ATTACHMENTS_EXPORTS],
   templateUrl: './artefact-inline-additional-info.component.html',
   styleUrl: './artefact-inline-additional-info.component.scss',

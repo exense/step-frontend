@@ -7,7 +7,6 @@ const DRAG_ITEM_CLASS = 'step-draggable-item';
 
 @Component({
   selector: 'step-drag-item',
-  standalone: true,
   template: '',
 })
 export class DragItemComponent extends DragItemBaseDirective implements OnDestroy {

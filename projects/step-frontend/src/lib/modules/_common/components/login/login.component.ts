@@ -7,6 +7,7 @@ import { HttpErrorInterceptor } from '../../interceptors/http-error.interceptor'
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class LoginComponent implements OnInit {
   credentials = {

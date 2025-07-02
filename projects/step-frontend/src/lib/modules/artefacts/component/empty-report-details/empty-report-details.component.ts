@@ -9,5 +9,6 @@ import { BaseReportDetailsComponent, ReportNode } from '@exense/step-core';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class EmptyReportDetailsComponent extends BaseReportDetailsComponent<ReportNode> {}

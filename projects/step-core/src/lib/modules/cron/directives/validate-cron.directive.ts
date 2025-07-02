@@ -11,6 +11,7 @@ import { cronValidator } from '../types/cron-validator';
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class ValidateCronDirective implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {

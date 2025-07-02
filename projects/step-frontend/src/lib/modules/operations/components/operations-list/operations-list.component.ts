@@ -13,6 +13,7 @@ import { ExecutionViewServices } from '../../operations.module';
   templateUrl: './operations-list.component.html',
   styleUrls: ['./operations-list.component.scss'],
   providers: [tablePersistenceConfigProvider('operationList', STORE_ALL)],
+  standalone: false,
 })
 export class OperationsListComponent {
   private _systemService = inject(SystemService);

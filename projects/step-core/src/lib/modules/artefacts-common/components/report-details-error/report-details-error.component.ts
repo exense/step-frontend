@@ -4,7 +4,6 @@ import { ReportNode } from '../../../../client/step-client-module';
 
 @Component({
   selector: 'step-report-details-error',
-  standalone: true,
   imports: [StepBasicsModule],
   templateUrl: './report-details-error.component.html',
   styleUrl: './report-details-error.component.scss',

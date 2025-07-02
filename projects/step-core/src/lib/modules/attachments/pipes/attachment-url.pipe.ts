@@ -3,7 +3,6 @@ import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-
 
 @Pipe({
   name: 'attachmentUrl',
-  standalone: true,
 })
 export class AttachmentUrlPipe implements PipeTransform {
   protected _resourceService = inject(AugmentedResourcesService);

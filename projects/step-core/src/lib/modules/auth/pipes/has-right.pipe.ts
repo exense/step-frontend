@@ -4,7 +4,6 @@ import { AuthService } from '../injectables/auth.service';
 
 @Pipe({
   name: 'hasRight',
-  standalone: true,
 })
 export class HasRightPipe implements PipeTransform {
   private _authService = inject(AuthService);

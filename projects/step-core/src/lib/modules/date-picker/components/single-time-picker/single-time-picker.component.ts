@@ -21,6 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'step-single-time-picker',
   templateUrl: './single-time-picker.component.html',
   styleUrls: ['./single-time-picker.component.scss'],
+  standalone: false,
 })
 export class SingleTimePickerComponent implements OnInit, OnChanges {
   private _destroyRef = inject(DestroyRef);

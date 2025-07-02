@@ -5,6 +5,7 @@ import { Execution } from '@exense/step-core';
   selector: 'step-execution-details',
   templateUrl: './execution-details.component.html',
   styleUrl: './execution-details.component.scss',
+  standalone: false,
 })
 export class ExecutionDetailsComponent {
   /** @Input() **/

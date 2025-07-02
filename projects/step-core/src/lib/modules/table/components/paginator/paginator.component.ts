@@ -7,6 +7,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
   templateUrl: './paginator.component.html',
   styleUrl: './paginator.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class PaginatorComponent {
   readonly showPageSizeOptions = input(true);

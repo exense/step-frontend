@@ -18,7 +18,6 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
-  standalone: true,
   imports: [StepCoreModule, ResourceUrlPipe],
   providers: [
     tableColumnsConfigProvider({

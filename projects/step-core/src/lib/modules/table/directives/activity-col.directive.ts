@@ -4,6 +4,7 @@ import { ColumnInfo } from '../types/column-info';
 
 @Directive({
   selector: '[matColumnDef][stepActivityCol]',
+  standalone: false,
 })
 export class ActivityColDirective {
   private matColumnDef = inject(MatColumnDef, { host: true });

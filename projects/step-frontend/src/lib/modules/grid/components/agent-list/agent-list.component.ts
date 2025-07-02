@@ -13,6 +13,7 @@ import { TokenTypeComponent } from '../token-type/token-type.component';
   templateUrl: './agent-list.component.html',
   styleUrls: ['./agent-list.component.scss'],
   providers: [tablePersistenceConfigProvider('agentList', STORE_ALL)],
+  standalone: false,
 })
 export class AgentListComponent {
   private _gridService = inject(GridService);

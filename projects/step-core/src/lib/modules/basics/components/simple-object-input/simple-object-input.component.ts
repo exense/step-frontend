@@ -15,6 +15,7 @@ interface ObjectField {
   templateUrl: './simple-object-input.component.html',
   styleUrl: './simple-object-input.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class SimpleObjectInputComponent implements ControlValueAccessor {
   private onChange?: OnChange;

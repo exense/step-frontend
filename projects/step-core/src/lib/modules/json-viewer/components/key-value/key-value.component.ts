@@ -8,6 +8,7 @@ import { JsonViewerFormatterService } from '../../services/json-viewer-formatter
   templateUrl: './key-value.component.html',
   styleUrls: ['./key-value.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class KeyValueComponent extends BaseViewerComponent<KeyValue<string, string>[]> {
   private _jsonViewerFormatter = inject(JsonViewerFormatterService);

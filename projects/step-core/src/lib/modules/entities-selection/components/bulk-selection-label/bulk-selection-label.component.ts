@@ -8,6 +8,7 @@ import { HasFilter } from '../../services/has-filter';
   selector: 'step-bulk-selection-label',
   templateUrl: './bulk-selection-label.component.html',
   styleUrls: ['./bulk-selection-label.component.scss'],
+  standalone: false,
 })
 export class BulkSelectionLabelComponent<KEY, ENTITY> {
   readonly hasFilter$ = inject(HasFilter, { optional: true })?.hasFilter$ ?? of(false);

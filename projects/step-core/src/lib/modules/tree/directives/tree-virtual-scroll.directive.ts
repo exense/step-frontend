@@ -6,7 +6,6 @@ const MIN_ITEM_SIZE = 47;
 
 @Directive({
   selector: '[stepTreeVirtualScroll]',
-  standalone: true,
   providers: [
     {
       provide: VIRTUAL_SCROLL_STRATEGY,

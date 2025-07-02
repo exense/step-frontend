@@ -36,6 +36,7 @@ import {
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltExecutionReportComponent implements OnInit, OnDestroy, AggregatedTreeNodeDialogHooksStrategy {
   private _activatedRoute = inject(ActivatedRoute);

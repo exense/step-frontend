@@ -6,6 +6,7 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   selector: 'step-dashlet-execution-step',
   templateUrl: './dashlet-execution-step.component.html',
   styleUrls: ['./dashlet-execution-step.component.scss'],
+  standalone: false,
 })
 export class DashletExecutionStepComponent implements CustomComponent {
   _state = inject(ExecutionStateService);

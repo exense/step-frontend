@@ -6,7 +6,6 @@ import { IsUsedByListComponent } from '../is-used-by-list/is-used-by-list.compon
 @Component({
   selector: 'step-is-used-by-modal',
   templateUrl: './is-used-by-modal.component.html',
-  standalone: true,
   imports: [StepBasicsModule, IsUsedByListComponent],
 })
 export class IsUsedByModalComponent {

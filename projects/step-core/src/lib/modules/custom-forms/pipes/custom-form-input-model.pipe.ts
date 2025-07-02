@@ -5,7 +5,6 @@ import { ObjectUtilsService } from '../../basics/step-basics.module';
 @Pipe({
   name: 'stepCustomFormInputModel',
   pure: false,
-  standalone: true,
 })
 export class CustomFormInputModelPipe implements PipeTransform {
   private _objectUtils = inject(ObjectUtilsService);

@@ -4,7 +4,6 @@ import { AttachmentUtilsService } from '../injectables/attachment-utils.service'
 
 @Pipe({
   name: 'attachmentTypeIcon',
-  standalone: true,
 })
 export class AttachmentTypeIconPipe implements PipeTransform {
   private _utils = inject(AttachmentUtilsService);

@@ -9,6 +9,7 @@ import { AfterViewInit, Directive, inject, Input, OnDestroy } from '@angular/cor
  */
 @Directive({
   selector: '[stepZIndex]',
+  standalone: false,
 })
 export class ZIndexDirective implements AfterViewInit, OnDestroy {
   private static zIndexStack: number[] = [];

@@ -10,7 +10,6 @@ type Node = ReportNode & { message?: string };
   styleUrl: './report-node-error.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReportNodeIconComponent],
-  standalone: true,
 })
 export class ReportNodeErrorComponent {
   /** @Input() **/

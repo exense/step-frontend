@@ -5,7 +5,7 @@ step-execution-running-status-header {
   display: flex;
   gap: 0.5rem;
   .step-badge {
-    background: map-get(var.$statuses, 'RUNNING') !important;
+    background: map.get(var.$statuses, 'RUNNING') !important;
     color: var.$white;
     width: 1.6rem;
     height: 1.6rem;

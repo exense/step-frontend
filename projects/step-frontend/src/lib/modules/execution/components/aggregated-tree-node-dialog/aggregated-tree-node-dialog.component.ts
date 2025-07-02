@@ -33,6 +33,7 @@ export interface AggregatedTreeNodeDialogData {
   styleUrl: './aggregated-tree-node-dialog.component.scss',
   encapsulation: ViewEncapsulation.None,
   providers: [AltExecutionDialogsService],
+  standalone: false,
 })
 export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);

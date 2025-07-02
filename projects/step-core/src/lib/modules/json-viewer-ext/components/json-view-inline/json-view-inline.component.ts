@@ -4,7 +4,6 @@ import { SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'step-json-view-inline',
-  standalone: true,
   imports: [SlicePipe],
   templateUrl: './json-view-inline.component.html',
   styleUrl: './json-view-inline.component.scss',

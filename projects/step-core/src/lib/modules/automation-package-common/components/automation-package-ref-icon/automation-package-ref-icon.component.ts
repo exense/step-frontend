@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
   selector: 'step-automation-package-ref-icon',
   templateUrl: './automation-package-ref-icon.component.html',
   styleUrls: ['./automation-package-ref-icon.component.scss'],
+  standalone: false,
 })
 export class AutomationPackageRefIconComponent<T extends AutomationPackageChildEntity> implements OnChanges {
   private _router = inject(Router);

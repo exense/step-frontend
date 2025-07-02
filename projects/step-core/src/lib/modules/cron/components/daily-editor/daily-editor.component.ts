@@ -13,6 +13,7 @@ enum DailyType {
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DailyEditorComponent {
   @Output() expressionChange = new EventEmitter<string>();

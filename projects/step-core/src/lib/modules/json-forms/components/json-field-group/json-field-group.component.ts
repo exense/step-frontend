@@ -25,7 +25,6 @@ type OnTouch = () => void;
 
 @Component({
   selector: 'step-json-field-group',
-  standalone: true,
   imports: [StepBasicsModule, JsonFieldInputComponent, AddFieldButtonComponent],
   templateUrl: './json-field-group.component.html',
   styleUrl: './json-field-group.component.scss',

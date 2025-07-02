@@ -23,7 +23,6 @@ type DialogRef = MatDialogRef<RichEditorDialogComponent, string>;
 
 @Component({
   selector: 'step-rich-editor-dialog',
-  standalone: true,
   imports: [StepBasicsModule, RichEditorComponent, RichEditorSettingsBarComponent, RichEditorChangeStatusComponent],
   templateUrl: './rich-editor-dialog.component.html',
   styleUrl: './rich-editor-dialog.component.scss',

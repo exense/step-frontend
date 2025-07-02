@@ -16,6 +16,7 @@ import { DatePickerComponent } from '../../../date-picker/date-picker.module';
     },
   ],
   exportAs: 'stepDateFilter',
+  standalone: false,
 })
 export class DateFilterComponent extends BaseFilterComponent<DateTime | undefined, DateTime | null> {
   @Input() label?: string;

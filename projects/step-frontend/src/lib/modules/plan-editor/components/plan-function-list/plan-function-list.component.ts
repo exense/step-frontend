@@ -26,6 +26,7 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
       customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
     }),
   ],
+  standalone: false,
 })
 export class PlanFunctionListComponent {
   private _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);

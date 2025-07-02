@@ -11,6 +11,7 @@ import { jsonValidator } from '../types/validators/json-validator';
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class ValidateJsonDirective implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {

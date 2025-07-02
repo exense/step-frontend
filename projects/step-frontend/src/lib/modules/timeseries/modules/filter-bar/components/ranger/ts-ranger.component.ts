@@ -35,7 +35,6 @@ import UPlot from '../../../_common/types/uPlot';
   templateUrl: './ts-ranger.component.html',
   styleUrls: ['./ts-ranger.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TSRangerComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {

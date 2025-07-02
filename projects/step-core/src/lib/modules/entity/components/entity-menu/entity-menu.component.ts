@@ -33,6 +33,7 @@ type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
       useExisting: forwardRef(() => EntityMenuComponent),
     },
   ],
+  standalone: false,
 })
 export class EntityMenuComponent implements OperationCompleteHandler, AfterContentInit, OnChanges {
   private _menuItemRegistry = inject(EntityMenuItemsRegistryService);

@@ -10,6 +10,7 @@ import { extractTime } from '../../types/extract-time';
   selector: 'step-time-picker',
   templateUrl: './time-picker.component.html',
   styleUrls: ['./time-picker.component.scss'],
+  standalone: false,
 })
 export class TimePickerComponent implements OnChanges {
   readonly _isRange = inject(DateFieldContainerService).isRangeField();

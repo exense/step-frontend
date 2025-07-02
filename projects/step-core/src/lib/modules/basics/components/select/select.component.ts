@@ -34,7 +34,6 @@ type OnTouch = () => void;
   styleUrl: './select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [StepMaterialModule, FormsModule, ReactiveFormsModule, NgxMatSelectSearchModule],
   host: {
     '[class.with-empty-placeholder]': '!!emptyPlaceholder()',

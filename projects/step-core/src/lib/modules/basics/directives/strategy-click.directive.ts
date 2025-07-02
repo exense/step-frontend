@@ -8,6 +8,7 @@ import { ClickStrategyType } from '../types/click-strategy.type';
     '(click)': 'handleSingleClick($event)',
     '(dblclick)': 'handleDoubleClick($event)',
   },
+  standalone: false,
 })
 export class StrategyClickDirective {
   private _strategy = inject(CLICK_STRATEGY, { optional: true }) ?? ClickStrategyType.SINGLE_CLICK;

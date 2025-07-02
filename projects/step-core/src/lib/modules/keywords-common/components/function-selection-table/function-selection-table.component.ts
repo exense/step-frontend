@@ -16,7 +16,6 @@ import { DateFormat, StepBasicsModule } from '../../../basics/step-basics.module
   styleUrls: ['./function-selection-table.component.scss'],
   providers: [...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
   imports: [TableModule, StepBasicsModule, EntitiesSelectionModule],
-  standalone: true,
 })
 export class FunctionSelectionTableComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);

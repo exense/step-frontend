@@ -17,7 +17,6 @@ const MAIN_TABS_ORDER = [
 
 @Component({
   selector: 'step-automation-package-entities-dialog',
-  standalone: true,
   imports: [StepCoreModule, AutomationPackageEntityTableComponent],
   templateUrl: './automation-package-entities-dialog.component.html',
   styleUrl: './automation-package-entities-dialog.component.scss',

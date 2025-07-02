@@ -36,7 +36,6 @@ export enum SelectAll {
   styleUrl: './list-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [StepBasicsModule, TableModule, EntitiesSelectionModule],
-  standalone: true,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

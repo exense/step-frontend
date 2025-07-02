@@ -6,6 +6,7 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   selector: 'step-dashlet-execution-errors',
   templateUrl: './dashlet-execution-errors.component.html',
   styleUrls: ['./dashlet-execution-errors.component.scss'],
+  standalone: false,
 })
 export class DashletExecutionErrorsComponent implements CustomComponent {
   _state = inject(ExecutionStateService);

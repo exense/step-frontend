@@ -17,6 +17,7 @@ export const UNSET_VALUE = 'unset';
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ArrayFilterAdvancedComponent<T = unknown> extends BaseFilterComponent<string[], unknown> {
   readonly items = input<T[] | ReadonlyArray<T>>([]);
