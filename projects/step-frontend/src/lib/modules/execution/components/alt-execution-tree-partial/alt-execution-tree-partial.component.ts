@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   inject,
   input,
@@ -43,7 +44,13 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly autoFocusNode = input(true);
   readonly showDetailsButton = input(false);
 
-  protected showSpinner = signal(false);
+  private isFirstLoad = signal(true);
+  private loadInProgress = signal(false);
+  protected showSpinner = computed(() => {
+    const isFirstLoad = this.isFirstLoad();
+    const loadInProgress = this.loadInProgress();
+    return isFirstLoad && loadInProgress;
+  });
 
   private reportNode$ = toObservable(this.node);
 
@@ -63,7 +70,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     combineLatest([this._executionState.executionId$, this._executionState.timeRange$, this.reportNode$])
       .pipe(
         switchMap(([executionId, range, reportNode]) => {
-          this.showSpinner.set(true);
+          this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
             map((response) => {
@@ -77,7 +84,10 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
               };
             }),
             catchError(() => of(undefined)),
-            finalize(() => this.showSpinner.set(false)),
+            finalize(() => {
+              this.isFirstLoad.set(false);
+              this.loadInProgress.set(false);
+            }),
           );
         }),
         takeUntilDestroyed(this._destroyRef),
