@@ -98,6 +98,15 @@
           >
             <step-icon name="copy" />
           </button>
+          <a
+            stepTestId="cross-execution-plan-btn"
+            mat-icon-button
+            matTooltip="Open plan report"
+            [disabled]="!('plan-read' | hasRight | async)"
+            [routerLink]="element.id | crossExecutionPlanUrl"
+          >
+            <step-icon name="file-07" />
+          </a>
           <button
             data-step-testid="delete-plan-btn"
             mat-icon-button

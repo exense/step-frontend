@@ -41,6 +41,6 @@ export class ErrorDetailsMenuComponent {
   protected readonly executions = toSignal(this.executions$, { initialValue: [] });
 
   protected jumpToExecution(eId: string) {
-    this._doc.defaultView?.open(`#/executions/${eId!}/viz`);
+    this._doc.defaultView?.open(`#/executions/${eId!}/report`);
   }
 }

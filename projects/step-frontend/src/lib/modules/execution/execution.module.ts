@@ -119,7 +119,7 @@ import { ExecutionViewDialogUrlCleanupService } from './services/execution-view-
 import { TimeRangePickerComponent } from '../timeseries/modules/_common/components/time-range-picker/time-range-picker.component';
 import { StatusCountBadgeComponent } from './components/status-count-badge/status-count-badge.component';
 import { TimeSeriesChartComponent } from '../timeseries/modules/chart';
-import { ExecutionsChartTooltipComponent } from './components/schedule-overview/executions-chart-tooltip/executions-chart-tooltip.component';
+import { ExecutionsChartTooltipComponent } from './components/schedule-overview/cross-execution-dashboard/executions-chart-tooltip/executions-chart-tooltip.component';
 import { TooltipContentDirective } from '../timeseries/modules/chart/components/time-series-chart/tooltip-content.directive';
 import { ErrorDetailsMenuComponent } from './components/error-details-menu/error-details-menu.component';
 import { AltExecutionErrorsComponent } from './components/alt-execution-errors/alt-execution-errors.component';
@@ -143,10 +143,12 @@ import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-t
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
+import { SchedulerPerformanceViewComponent } from './components/schedule-overview/cross-execution-dashboard/performance/scheduler-performance-view.component';
+import { SchedulerReportViewComponent } from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
+import { CrossExecutionDashboardComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
+import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
+import { PlanPageComponent } from './components/schedule-overview/plan-page/plan-page.component';
 import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
-import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
-import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
-import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
 
 @NgModule({
   declarations: [
@@ -234,9 +236,11 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/rep
     AltExecutionTreeNodeAddonDirective,
     IsEmptyStatusPipe,
     IsCurrentReportDetailsOpenedPipe,
-    SchedulerPageComponent,
     SchedulerPerformanceViewComponent,
     SchedulerReportViewComponent,
+    CrossExecutionDashboardComponent,
+    SchedulerPageComponent,
+    PlanPageComponent,
   ],
   imports: [
     StepCommonModule,
@@ -432,6 +436,24 @@ export class ExecutionModule {
             children: [schedulePlanRoute('modal')],
           },
         ),
+      ],
+    });
+    this._viewRegistry.registerRoute({
+      path: 'plan-view/:id',
+      component: PlanPageComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'report',
+        },
+        {
+          path: 'report',
+          component: SchedulerReportViewComponent,
+        },
+        {
+          path: 'performance',
+          component: SchedulerPerformanceViewComponent,
+        },
       ],
     });
     this._viewRegistry.registerRoute({
