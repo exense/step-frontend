@@ -38,7 +38,9 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   readonly repoRef = input<RepositoryObjectReference | undefined>(undefined);
   readonly explicitTestCases = input<TestRunStatus[] | undefined>(undefined);
 
-  private selected = toSignal(this._selectionCollector.selected$);
+  private selected = toSignal(this._selectionCollector.selected$.pipe(map((selected) => new Set(selected))), {
+    initialValue: new Set<string>(),
+  });
   readonly selectionType = model(BulkSelectionType.NONE);
 
   /** @Output **/
@@ -53,25 +55,34 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   });
 
   private allData$ = toObservable(this.dataSource).pipe(switchMap((dataSource) => dataSource.allData$));
+  private allData = toSignal(this.allData$, { initialValue: [] });
 
-  private statusItems$ = this.allData$.pipe(
-    map((testRunStatusList) => testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique)),
-  );
+  protected statusItems = computed(() => {
+    const testRunStatusList = this.allData();
+    return testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique);
+  });
 
-  protected statusItems = toSignal(this.statusItems$, { initialValue: [] });
+  private selectedItems = computed(() => {
+    const allData = this.allData();
+    const selected = this.selected();
+    return allData.filter((item) => selected.has(item.id!));
+  });
 
   private effectEmitTestCases = effect(() => {
     const includedTestCases = this.includedTestCases();
+    console.log('INCLUDED TEST CASE CHANGE', includedTestCases);
     this.includedTestCasesChange.emit(includedTestCases);
   });
 
   readonly includedTestCases = computed(() => {
     const repoRef = this.repoRef();
-    const list = this.selected() as string[];
+    const selectedItems = this.selectedItems();
     const selectionType = this.selectionType();
 
     let by: IncludeTestcases['by'] = repoRef?.repositoryID === 'local' ? 'id' : 'name';
     by = selectionType === BulkSelectionType.ALL ? 'all' : by;
+
+    const list = selectedItems.map((item) => (by === 'name' ? item.testplanName : item.id));
     return { by, list } as IncludeTestcases;
   });
 
