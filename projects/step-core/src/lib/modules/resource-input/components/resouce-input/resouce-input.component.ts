@@ -36,7 +36,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() stModel?: string;
   @Input() stBounded?: boolean;
-  @Input() stDirectory?: boolean;
+  @Input() supportsDirectory?: boolean;
   @Input() stType!: string;
   @Input() withSaveButton: boolean = false;
   @Input() saveButtonLabel: string = 'Save';
@@ -273,6 +273,8 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    const directory = !!this.supportsDirectory && file.name.endsWith('.zip');
+
     // do not perform any duplicate check for bounded resources
     // as we do not want to link bounded resources to any other resource
     const { progress$, response$ } = this._augmentedResourcesService.createResourceWithProgress({
@@ -280,7 +282,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       queryParams: {
         type: this.stType,
         duplicateCheck: !this.stBounded,
-        directory: !!this.stDirectory,
+        directory,
       },
       resourceId,
     });
