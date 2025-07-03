@@ -15,7 +15,8 @@
       </div>
       <step-popover-content>
         <div class="popover-item">
-          <strong>{{ item.key }}</strong>
+          <strong>{{ item.key }}</strong
+          >&nbsp;
           <span>{{ item.value }}</span>
         </div>
       </step-popover-content>
@@ -29,10 +30,19 @@
       </button>
       <step-popover-content>
         @for (item of hiddenItems(); track item.key; let isLast = $last) {
-          <div class="auto-shrank-popover-item">
-            <strong>{{ item.key }}</strong>
-            <span>{{ item.value }}</span>
-          </div>
+          <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
+            <div class="auto-shrank-popover-item">
+              <strong>{{ item.key }}</strong>
+              <span>{{ item.value }}</span>
+            </div>
+            <step-popover-content>
+              <div class="popover-item">
+                <strong>{{ item.key }}</strong
+                >&nbsp;
+                <span>{{ item.value }}</span>
+              </div>
+            </step-popover-content>
+          </step-popover>
           @if (!isLast) {
             <br />
           }
