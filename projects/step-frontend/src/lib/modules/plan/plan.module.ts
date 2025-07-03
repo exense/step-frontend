@@ -27,10 +27,11 @@ import { PlansBulkOperationsRegisterService } from './injectables/plans-bulk-ope
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { map } from 'rxjs';
 import { PurePlanContextApiService } from './injectables/pure-plan-context-api.service';
+import { PlanRepoRefPipe } from './pipes/plan-repo-ref.pipe';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  imports: [StepCommonModule, ExecutionModule, PlanEditorModule],
+  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanRepoRefPipe],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
 })
 export class PlanModule {

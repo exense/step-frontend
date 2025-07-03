@@ -118,16 +118,27 @@
 <step-entity-menu #entityMenu entity="plans" (entityOperationSuccess)="table.reload()">
   <ng-container *stepEntityMenuContent="let element">
     <a mat-menu-item [disabled]="!('plan-write' | hasRight | async)" [routerLink]="element | planUrl">
-      <step-icon name="edit-2" />
+      <step-icon name="edit-2" aria-hidden="true" />
       Edit plan
     </a>
+    <button mat-menu-item (click)="scheduleCommands.schedule()" [disabled]="!('task-write' | hasRight | async)">
+      <ng-container
+        stepExecutionCommands
+        #scheduleCommands="StepExecutionCommands"
+        [description]="element.attributes.name"
+        [repositoryObjectRef]="element | planRepoRef"
+        (scheduleTask)="openScheduler($event)"
+      />
+      <step-icon name="clock" aria-hidden="true" />
+      Schedule this plan
+    </button>
     <a
       data-step-testid="export-plan-btn"
       mat-menu-item
       [disabled]="!('plan-read' | hasRight | async)"
       [routerLink]="['/', 'plans', 'list', 'export', element.id]"
     >
-      <step-icon name="upload" />
+      <step-icon name="upload" aria-hidden="true" />
       Export plan
     </a>
     <button
@@ -136,7 +147,7 @@
       [disabled]="!('plan-read' | hasRight | async)"
       (click)="lookUp(element.id, element.attributes.name)"
     >
-      <step-icon name="search" />
+      <step-icon name="search" aria-hidden="true" />
       Find usages
     </button>
   </ng-container>
