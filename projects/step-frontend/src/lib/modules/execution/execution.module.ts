@@ -35,6 +35,7 @@ import {
   TestRunStatus,
   ReportNode,
   SimpleOutletComponent,
+  editScheduledTaskRoute,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -147,6 +148,9 @@ import { ParentElementSizeDirective } from './directives/parent-element-size.dir
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
 import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
 import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
+import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
+import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
+import { AltExecutionTimePopoverAddonDirective } from './components/alt-execution-time/alt-execution-time-popover-addon.directive';
 
 @NgModule({
   declarations: [
@@ -252,6 +256,9 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/rep
     DashboardPageComponent,
     ToggleRequestWarningDirective,
     ParentElementSizeDirective,
+    AltExecutionTimePrefixDirective,
+    AltExecutionTimeSuffixDirective,
+    AltExecutionTimePopoverAddonDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -450,6 +457,12 @@ export class ExecutionModule {
           path: 'performance',
           component: SchedulerPerformanceViewComponent,
         },
+        editScheduledTaskRoute({
+          path: 'configure',
+          outlet: 'modal',
+          idExtractor: (route) => route.parent!.params!['id'],
+          getEditorUrl: (id) => `/scheduler/${id}/(report//modal:configure)`,
+        }),
       ],
     });
     this._viewRegistry.registerRoute({

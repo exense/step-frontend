@@ -7,26 +7,43 @@
         <div>{{ task.attributes?.['name'] }}</div>
         @if ((lastExecution$ | async)?.execution; as lastExecution) {
           <a
-            class="plan-link"
-            [routerLink]="['/plans/editor', lastExecution.planId]"
+            [routerLink]="['/', 'plans', 'editor', lastExecution.planId]"
             matTooltip="Navigate to plan"
             matTooltipPosition="right"
           >
             <step-icon name="external-link" />
           </a>
         }
+        <button
+          mat-icon-button
+          (click)="configureSchedule()"
+          matTooltip="Configure schedule"
+          matTooltipPosition="below"
+        >
+          <step-icon name="settings" />
+        </button>
       </h3>
     </div>
     <div class="sub-title">
       @if (lastExecution$ | async; as lastExecutionResponse) {
         @if (lastExecutionResponse.execution; as lastExecution) {
           <step-alt-execution-time
-            popoverTitle="Last execution"
             [startTime]="lastExecution.startTime"
             [endTime]="lastExecution.endTime"
             [isRunning]="lastExecution.status === 'RUNNING'"
-            [status]="lastExecution?.result"
-          />
+          >
+            <step-alt-execution-time-prefix>
+              <div class="time-title">Last execution</div>
+            </step-alt-execution-time-prefix>
+            <step-alt-execution-time-suffix>
+              <step-status [status]="lastExecution.result" [iconMode]="false" />
+            </step-alt-execution-time-suffix>
+            <step-alt-execution-time-popover-addon>
+              <a class="scheduler-execution-link" [routerLink]="['/', 'executions', lastExecution.id]"
+                >Open execution</a
+              >
+            </step-alt-execution-time-popover-addon>
+          </step-alt-execution-time>
         } @else {
           <div>No execution</div>
         }
@@ -59,3 +76,4 @@
   <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
   <router-outlet />
 </section>
+<router-outlet name="modal" />

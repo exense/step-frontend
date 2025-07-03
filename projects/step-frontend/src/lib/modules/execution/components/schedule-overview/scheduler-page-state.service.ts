@@ -12,7 +12,7 @@ export abstract class SchedulerPageStateService {
   abstract readonly timeRange$: Observable<TimeRange>;
   abstract updateTimeRangeSelection(selection: TimeRangePickerSelection): void;
   abstract updateRefreshInterval(interval: number): void;
-  abstract taskId: Signal<string>;
+  abstract taskId: Signal<String>;
   abstract refreshInterval: Signal<number>;
 
   // charts data
