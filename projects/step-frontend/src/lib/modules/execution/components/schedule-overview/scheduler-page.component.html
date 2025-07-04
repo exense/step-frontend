@@ -6,13 +6,15 @@
 
         <div>{{ task.attributes?.['name'] }}</div>
         @if ((lastExecution$ | async)?.execution; as lastExecution) {
-          <a
+          <button
+            mat-icon-button
             [routerLink]="['/', 'plans', 'editor', lastExecution.planId]"
             matTooltip="Navigate to plan"
-            matTooltipPosition="right"
+            matTooltipPosition="below"
+            style="margin-right: -1rem"
           >
             <step-icon name="external-link" />
-          </a>
+          </button>
         }
         <button
           mat-icon-button
