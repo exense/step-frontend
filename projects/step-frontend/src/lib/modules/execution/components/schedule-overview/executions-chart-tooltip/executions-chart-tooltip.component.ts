@@ -42,7 +42,9 @@ export class ExecutionsChartTooltipComponent {
   reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
-  readonly taskId = input.required<string>();
+  readonly taskId = input.required({
+    transform: (value: string | String) => value.toString(),
+  });
 
   readonly EXECUTIONS_LIST_LIMIT = 10;
 

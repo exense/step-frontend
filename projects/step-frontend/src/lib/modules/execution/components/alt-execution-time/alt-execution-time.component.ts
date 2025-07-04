@@ -28,13 +28,11 @@ export class AltExecutionTimeComponent {
 
   private todayDate = this._datePipe.transform(new Date().getTime(), DateFormat.DATE_SHORT);
 
-  readonly popoverTitle = input<string | undefined>(undefined);
   readonly startTimeInput = input<number | undefined>(undefined, { alias: 'startTime' });
   readonly endTimeInput = input<number | undefined>(undefined, { alias: 'endTime' });
   readonly durationInput = input<number | undefined>(undefined, { alias: 'duration' });
   readonly isRunning = input(false);
   readonly timeOnly = input(false);
-  readonly status = input<string>();
 
   protected readonly displayDate = computed(() => {
     const startTime = this.startTimeInput();

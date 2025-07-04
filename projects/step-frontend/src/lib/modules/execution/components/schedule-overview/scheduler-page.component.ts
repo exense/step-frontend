@@ -1,13 +1,14 @@
-import { Component, DestroyRef, effect, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
 import {
   DashboardUrlParams,
   DashboardUrlParamsService,
 } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   AugmentedSchedulerService,
   AugmentedTimeSeriesService,
   BucketResponse,
+  DialogParentService,
   Execution,
   ExecutionsService,
   ExecutiontTaskParameters,
@@ -19,24 +20,8 @@ import {
   TimeUnit,
 } from '@exense/step-core';
 import { SCHEDULE_ID } from '../../services/schedule-id.token';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import {
-  BehaviorSubject,
-  count,
-  filter,
-  interval,
-  map,
-  Observable,
-  of,
-  range,
-  scan,
-  shareReplay,
-  startWith,
-  Subject,
-  switchMap,
-  take,
-  withLatestFrom,
-} from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { SchedulerPageStateService } from './scheduler-page-state.service';
 import { FilterBarItem, FilterBarItemType } from '../../../timeseries/time-series.module';
@@ -81,9 +66,13 @@ interface EntityWithKeywordsStats {
         return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
       },
     },
+    {
+      provide: DialogParentService,
+      useExisting: SchedulerPageComponent,
+    },
   ],
 })
-export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit {
+export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit, DialogParentService {
   private _urlParamsService = inject(DashboardUrlParamsService);
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
   readonly _taskIdFn = inject(SCHEDULE_ID);
@@ -93,12 +82,16 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
   private _statusColors = inject(STATUS_COLORS);
   private _executionService = inject(ExecutionsService);
+  private _router = inject(Router);
+  protected readonly _activatedRoute = inject(ActivatedRoute);
 
-  readonly taskId = signal(this._taskIdFn());
+  readonly taskId = signal(new String(this._taskIdFn()));
 
   protected readonly taskId$ = toObservable(this.taskId);
 
-  protected readonly task$ = this.taskId$.pipe(switchMap((id) => this._schedulerService.getExecutionTaskById(id)));
+  protected readonly task$ = this.taskId$.pipe(
+    switchMap((id) => this._schedulerService.getExecutionTaskById(id.toString())),
+  );
 
   protected readonly task: Signal<ExecutiontTaskParameters | undefined> = toSignal(this.task$);
 
@@ -458,6 +451,17 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   ngOnInit(): void {
     const urlParams = this._urlParamsService.collectUrlParams();
     this.updateTimeAndRefresh(urlParams);
+  }
+
+  dialogSuccessfullyClosed(): void {
+    this.taskId.set(new String(this._taskIdFn()));
+  }
+
+  protected configureSchedule(): void {
+    this._router.navigate([{ outlets: { modal: 'configure' } }], {
+      relativeTo: this._activatedRoute,
+      queryParamsHandling: 'preserve',
+    });
   }
 
   getDashboardFilters(): FilterBarItem[] {
