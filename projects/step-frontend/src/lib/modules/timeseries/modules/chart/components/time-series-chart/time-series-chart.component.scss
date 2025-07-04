@@ -32,6 +32,7 @@ step-timeseries-chart {
     font-size: 1.3rem;
     display: flex;
     gap: 1rem;
+    overflow: auto;
 
     .u-series {
       margin-right: 0.8rem;
