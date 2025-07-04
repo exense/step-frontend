@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { computed, inject, Injectable, model, OnDestroy, signal } from '@angular/core';
 import {
   AugmentedInteractivePlanExecutionService,
   AugmentedScreenService,
@@ -11,7 +11,8 @@ import { KeywordParameters, TYPE_LEAF_REPORT_NODES_TABLE_PARAMS } from '../../ex
 
 @Injectable()
 export class InteractiveSessionService implements OnDestroy {
-  executionParameters?: Record<string, any>;
+  readonly executionParameters = signal<Record<string, any> | undefined>(undefined);
+  readonly hasExecutionParameters = computed(() => !!this.executionParameters());
 
   private lastRepositoryObject?: RepositoryObjectReference;
   private interactiveSessionId$ = new BehaviorSubject<string | undefined>(undefined);
@@ -29,7 +30,7 @@ export class InteractiveSessionService implements OnDestroy {
   init(): void {
     this._screenTemplates
       .getDefaultParametersByScreenId('executionParameters')
-      .subscribe((data) => (this.executionParameters = data));
+      .subscribe((data) => this.executionParameters.set(data));
   }
 
   isInteractiveSessionActive(): boolean {
@@ -48,7 +49,7 @@ export class InteractiveSessionService implements OnDestroy {
       repositoryObject,
       userID: '',
       mode: 'RUN',
-      customParameters: this.executionParameters,
+      customParameters: this.executionParameters(),
     };
 
     return this._interactiveApi

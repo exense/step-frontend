@@ -45,6 +45,14 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
       .subscribe(() => this._cd.detectChanges());
   }
 
+  protected handlePlanChange(plan: Plan): void {
+    const ctx = this._planEditorService.planContext();
+    if (!ctx) {
+      return;
+    }
+    this._planEditorService.handlePlanContextChange({ ...ctx, plan });
+  }
+
   launchPlan(): void {
     this._router.navigate(['.', 'launch'], { relativeTo: this._activatedRoute });
   }
