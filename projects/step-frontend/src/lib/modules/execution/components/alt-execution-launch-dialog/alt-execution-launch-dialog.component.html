@@ -21,9 +21,7 @@
             <step-alt-execution-repository [repositoryParams]="repoRef" />
           }
         </section>
-        @if (parameters(); as params) {
-          <step-custom-forms [stModel]="params" stScreen="executionParameters" />
-        }
+        <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
       </div>
       @if (artefact.type === 'TestSet') {
         <hr />
