@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core';
 import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
@@ -58,6 +49,7 @@ interface ArtefactInfo extends ArtefactInfoInternal {
     },
     ExecutionCommandsService,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltExecutionLaunchDialogComponent
   extends ExecutionCommandsDirective
