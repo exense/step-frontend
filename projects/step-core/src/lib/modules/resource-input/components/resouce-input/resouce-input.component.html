@@ -72,11 +72,11 @@
   }
 </ng-template>
 
-<step-upload-container (filesChange)="onFilesChange($event)">
+<step-upload-container (filesChange)="handleFilesChange($event)">
   @if (!isResource()) {
     <step-form-field
-      [class.ng-invalid]="isInvalid"
-      [class.ng-touched]="isTouched"
+      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+      [class.ng-touched]="_ngControl.touched"
       alignLabelAddon="near"
       [showRequiredMarker]="showRequiredMarker()"
     >
@@ -92,7 +92,8 @@
       }
       <input
         type="text"
-        [(ngModel)]="stModel"
+        [ngModel]="modelInternal()"
+        (ngModelChange)="handleModelChange($event)"
         [readonly]="!!_config.disableServerPath()"
         [disabled]="isDisabled()"
         [matTooltip]="
@@ -100,7 +101,7 @@
             ? 'Drag and drop your file here'
             : 'Drag and drop your file here or enter the path to a file accessible from the controller'
         "
-        (blur)="onBlur()"
+        (blur)="handleBlur()"
       />
 
       <ng-container *ngTemplateOutlet="saveButtonTemplate" />
@@ -110,8 +111,8 @@
     </step-form-field>
   } @else if (!resourceNotExisting()) {
     <step-form-field
-      [class.ng-invalid]="isInvalid"
-      [class.ng-touched]="isTouched"
+      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+      [class.ng-touched]="_ngControl.touched"
       alignLabelAddon="near"
       [showRequiredMarker]="showRequiredMarker()"
     >
@@ -139,8 +140,8 @@
     </step-form-field>
   } @else {
     <step-form-field
-      [class.ng-invalid]="isInvalid"
-      [class.ng-touched]="isTouched"
+      [class.ng-invalid]="_ngControl.invalid || isParentInvalid()"
+      [class.ng-touched]="_ngControl.touched"
       alignLabelAddon="near"
       [showRequiredMarker]="showRequiredMarker()"
     >
@@ -166,7 +167,7 @@
   }
 </step-upload-container>
 
-<input #fileInput type="file" (input)="onChooseFile()" [disabled]="isDisabled()" />
+<input #fileInput type="file" (input)="handleChooseFile()" [disabled]="isDisabled()" />
 
 @if (uploadProgress() !== undefined) {
   <step-progress-bar [progress]="uploadProgress()!" />

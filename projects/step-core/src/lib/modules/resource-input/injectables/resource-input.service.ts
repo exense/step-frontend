@@ -5,7 +5,7 @@ import {
   ResourceDialogsService,
   ResourceInputBridgeService,
 } from '@exense/step-core';
-import { BehaviorSubject, filter, finalize, forkJoin, map, Observable, of, pipe, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, pipe, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { ResourceConfig } from '../types/resource-config';

@@ -57,7 +57,7 @@ export class ResourceConfigurationDialogComponent implements OnInit {
     this.setFormValue(resource, isReadonly);
   }
 
-  protected onContentChange(resourceId?: string): void {
+  protected handleContentChange(resourceId?: string): void {
     if (!resourceId?.startsWith?.('resource:')) {
       return;
     }
@@ -73,7 +73,7 @@ export class ResourceConfigurationDialogComponent implements OnInit {
     });
   }
 
-  protected onFilesChange(): void {
+  protected handleFilesChange(): void {
     this.uploading = true;
   }
 

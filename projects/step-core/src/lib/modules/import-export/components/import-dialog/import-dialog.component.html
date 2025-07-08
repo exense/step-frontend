@@ -1,7 +1,7 @@
 <step-modal-window [title]="title">
   <div step-modal-window-body>
     <div *ngIf="isImporting" class="alert alert-info">Importing, please wait...</div>
-    <step-resource-input [stType]="'temp'" [(stModel)]="resourcePath"></step-resource-input>
+    <step-resource-input resourceType="temp" [(ngModel)]="resourcePath" />
     <mat-expansion-panel [(expanded)]="showOptions">
       <mat-expansion-panel-header>
         <mat-panel-title>Advanced Options</mat-panel-title>

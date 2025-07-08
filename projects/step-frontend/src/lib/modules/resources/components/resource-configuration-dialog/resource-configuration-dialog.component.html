@@ -22,13 +22,14 @@
       @if (formGroup.controls.content.enabled) {
         <step-resource-input
           label="Content"
-          [stType]="formGroup.controls.resourceType.value"
+          [resourceType]="formGroup.controls.resourceType.value"
           [disableServerPath]="true"
           [withClearButton]="false"
           [withChooseExistingResourceButton]="false"
-          [stModel]="formGroup.controls.content.value.value"
-          (stModelChange)="onContentChange($event)"
-          (filesChange)="onFilesChange()"
+          [ngModel]="formGroup.controls.content.value.value"
+          (ngModelChange)="handleContentChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          (filesChange)="handleFilesChange()"
         />
       } @else {
         <step-form-field>

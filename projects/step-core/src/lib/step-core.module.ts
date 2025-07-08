@@ -40,7 +40,6 @@ import { ResourceInputModule } from './modules/resource-input/resource-input.mod
 import { FunctionActionsService } from './modules/keywords-common';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
-import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { CronModule } from './modules/cron/cron.module';
@@ -98,7 +97,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     WaitingArtefactsAdvancedComponent,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     SimpleOutletComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
@@ -188,7 +186,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
@@ -269,7 +266,6 @@ export * from './components/link-button/link-button.component';
 export * from './components/user-settings-button/user-settings-button.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
-export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';

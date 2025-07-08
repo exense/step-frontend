@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, input, Input, model, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { filter, Observable, of, switchMap } from 'rxjs';
 import { Resource } from '../../../../client/step-client-module';
 import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
@@ -6,8 +6,12 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ResourceInputConfigDirective } from '../../directives/resource-input-config.directive';
 import { ResourceInputService } from '../../injectables/resource-input.service';
 import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 const MAX_FILES = 1;
+
+type OnChange = (value?: string) => void;
+type OnTouch = () => void;
 
 @Component({
   selector: 'step-resource-input',
@@ -17,7 +21,7 @@ const MAX_FILES = 1;
     {
       directive: ResourceInputConfigDirective,
       inputs: [
-        'type: stType',
+        'type: resourceType',
         'isBounded',
         'supportsDirectory',
         'withSaveButton',
@@ -43,42 +47,36 @@ const MAX_FILES = 1;
     },
   ],
 })
-export class ResourceInputComponent {
+export class ResourceInputComponent implements ControlValueAccessor {
   private _resourceInputService = inject(RESOURCE_INPUT);
   protected _config = inject(ResourceInputConfigDirective, { self: true });
 
-  readonly uploadProgress = this._resourceInputService.uploadProgress;
+  private onChange?: OnChange;
+  private onTouch?: OnTouch;
 
-  readonly stModel = model<string | undefined>();
+  private fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
+
+  readonly uploadProgress = this._resourceInputService.uploadProgress;
 
   readonly label = input<string | undefined>(undefined);
   readonly helpIconTooltip = input<string | undefined>(undefined);
   readonly showRequiredMarker = input(false);
-  readonly isDisabled = input(false);
-
-  @Input() isInvalid?: boolean;
-  @Input() isTouched?: boolean;
+  readonly isParentInvalid = input(false);
 
   readonly dynamicSwitch = output();
-  readonly blur = output();
   readonly filesChange = output();
 
-  private fileInput = viewChild('fileInput', { read: ElementRef<HTMLInputElement> });
+  protected readonly isDisabled = signal(false);
+  protected readonly modelInternal = signal<string | undefined>(undefined);
 
-  protected readonly resourceId = computed(() => {
-    const model = this.stModel();
-    return !model ? undefined : model.replace('resource:', '');
-  });
+  protected readonly resourceId = computed(() => this.getResourceId(this.modelInternal()));
 
   protected readonly downloadResourceUrl = computed(() => this._resourceInputService.getDownloadUrl(this.resourceId()));
 
-  readonly isResource = computed(() => {
-    const model = this.stModel();
-    return !!model && typeof model === 'string' && model.startsWith('resource:');
-  });
+  readonly isResource = computed(() => this.isResourceValue(this.modelInternal()));
 
   protected readonly absoluteFilepath = computed(() => {
-    const model = this.stModel();
+    const model = this.modelInternal();
     const isResource = this.isResource();
     return !isResource ? model ?? '' : '';
   });
@@ -95,19 +93,44 @@ export class ResourceInputComponent {
     )
     .subscribe((resource) => this.resource.set(resource));
 
-  protected onBlur(): void {
+  constructor(protected _ngControl: NgControl) {
+    this._ngControl.valueAccessor = this;
+  }
+
+  registerOnChange(onChange?: OnChange): void {
+    this.onChange = onChange;
+  }
+
+  registerOnTouched(onTouch?: OnTouch): void {
+    this.onTouch = onTouch;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
+  }
+
+  writeValue(value?: string): void {
+    this.modelInternal.set(value);
+  }
+
+  protected handleModelChange(value?: string): void {
+    this.modelInternal.set(value);
+    this.onChange?.(value);
+  }
+
+  protected handleBlur(): void {
     if (this._config.withSaveButton()) {
       return;
     }
 
-    this.blur.emit();
+    this.onTouch?.();
   }
 
   protected saveChanges(): void {
     //this.setStModel(this.stModel);
   }
 
-  onFilesChange(files: File[]): void {
+  protected handleFilesChange(files: File[]): void {
     if (files.length > MAX_FILES) {
       return;
     }
@@ -145,7 +168,7 @@ export class ResourceInputComponent {
         this.setResourceIdToFieldValue(resource.id!);
         this.resource.set(resource);
       } else {
-        this.stModel.set(undefined);
+        this.handleModelChange(undefined);
         this.resource.set(undefined);
       }
     });
@@ -157,7 +180,7 @@ export class ResourceInputComponent {
     this.fileInput()?.nativeElement?.click?.();
   }
 
-  protected onChooseFile(): void {
+  protected handleChooseFile(): void {
     const fileInput = this.fileInput();
     if (!fileInput) {
       return;
@@ -169,7 +192,7 @@ export class ResourceInputComponent {
 
     const files = Array.from(fileInput.nativeElement.files) as File[];
 
-    this.onFilesChange(files);
+    this.handleFilesChange(files);
   }
 
   protected selectResource(): void {
@@ -182,10 +205,10 @@ export class ResourceInputComponent {
   }
 
   protected clear(): void {
-    this.stModel.set('');
+    this.handleModelChange(undefined);
     this.resource.set(undefined);
     this._resourceInputService.deleteUploadedResources();
-    this.blur.emit();
+    this.onTouch?.();
     this.filesChange.emit();
 
     const fileInput = this.fileInput();
@@ -197,6 +220,17 @@ export class ResourceInputComponent {
   }
 
   private setResourceIdToFieldValue(resourceId: string): void {
-    this.stModel.set(`resource:${resourceId}`);
+    this.handleModelChange(`resource:${resourceId}`);
+  }
+
+  private isResourceValue(value?: string): boolean {
+    return !!value && typeof value === 'string' && value.startsWith('resource:');
+  }
+
+  private getResourceId(value?: string): string | undefined {
+    if (!this.isResourceValue(value)) {
+      return undefined;
+    }
+    return value!.replace('resource:', '');
   }
 }
