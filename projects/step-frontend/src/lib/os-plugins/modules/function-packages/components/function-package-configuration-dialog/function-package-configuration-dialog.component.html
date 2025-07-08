@@ -7,11 +7,10 @@
       <mat-card-content>
         <step-resource-input
           label="Package file (Jar file, DLL file, or maven snippet)"
-          [withHelpIcon]="true"
           helpIconTooltip="Drag&drop your jar/DLL file containing keywords or copy-paste the maven snippet of the repository artifact"
           stType="functions"
           [preserveExistingResource]="true"
-          [stBounded]="true"
+          [isBounded]="true"
           [withChooseExistingResourceButton]="false"
           [stModel]="functionPackage.packageLocation"
           (stModelChange)="handlePackageLocationChange($event)"
@@ -20,7 +19,6 @@
         </step-resource-input>
         <step-resource-input
           label="Package dependencies (Folder or Zip of Jars or DLLs/PDBs)"
-          [withHelpIcon]="true"
           helpIconTooltip="Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies."
           stType="functions"
           [stModel]="functionPackage.packageLibrariesLocation"

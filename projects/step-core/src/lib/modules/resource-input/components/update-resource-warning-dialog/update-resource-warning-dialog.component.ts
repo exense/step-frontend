@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, HostListener, inject, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AlertType, ModalWindowComponent } from '../../../../modules/basics/step-basics.module';
-import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
+import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
 
 @Component({
   selector: 'step-update-resource-warning-dialog',

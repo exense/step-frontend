@@ -1,7 +1,7 @@
 <step-modal-window [title]="dialogTitle" [disableCloseByEsc]="!!progress$">
   <div step-modal-window-body>
     @if (progress$) {
-      <step-progress-bar [progress$]="progress$" />
+      <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
       <step-tabs [tabs]="_tabs" [(activeTabId)]="selectedTab" [compactTabs]="true" />
       <form [formGroup]="form">

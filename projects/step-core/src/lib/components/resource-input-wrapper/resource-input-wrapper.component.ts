@@ -46,7 +46,7 @@ export class ResourceInputWrapperComponent implements ControlValueAccessor {
     this.onTouch?.();
   }
 
-  onValueChange(value: string): void {
+  onValueChange(value: string = ''): void {
     this.value = value;
     this.onChange?.(value);
   }
