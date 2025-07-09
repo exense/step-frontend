@@ -44,7 +44,7 @@ export class CustomTooltipPlugin {
           over.onclick = () => {
             // @ts-ignore this is how we access the lock state directly in uPlot library
             const lockState = u.cursor._lock;
-            ref.lockStateChange.emit(lockState);
+            ref.lockState.set(lockState);
           };
 
           over.onmouseenter = () => {
@@ -59,7 +59,9 @@ export class CustomTooltipPlugin {
             }
           };
         },
-        destroy: (u: uPlot) => {},
+        destroy: (u: uPlot) => {
+          console.log('destroyed');
+        },
         setSize: (u: uPlot) => {},
         // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
@@ -96,9 +98,10 @@ export class CustomTooltipPlugin {
           ref.tooltipEvents.emit({
             type: 'POSITION_CHANGED',
             payload: {
-              x: left + boundingClientRect.left,
-              y: top + boundingClientRect.top,
+              x: left,
+              y: top,
               data: contextData,
+              over: over,
             },
           });
         },

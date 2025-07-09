@@ -4,6 +4,7 @@
   [style.minHeight.px]="height"
   [style.maxHeight.px]="height"
   [class.pointer]="!!settings.tooltipOptions.useExecutionLinks"
+  [class.locked]="lockState()"
   (stepElementResize)="resize()"
 >
   <div #chart></div>

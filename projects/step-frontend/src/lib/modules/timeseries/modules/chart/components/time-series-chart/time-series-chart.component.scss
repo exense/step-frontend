@@ -17,6 +17,10 @@ step-timeseries-chart {
     width: 100%;
   }
 
+  .locked {
+    filter: brightness(0.9) grayscale(0.2);
+  }
+
   .u-title {
     font-size: 1.4rem;
     font-weight: 600;
