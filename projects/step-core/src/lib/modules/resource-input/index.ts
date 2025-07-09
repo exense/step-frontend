@@ -14,6 +14,7 @@ export * from './components/file-already-existing-dialog/file-already-existing-d
 export * from './components/search-resource-dialog/search-resource-dialog.component';
 export * from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export * from './components/resource-input/resource-input.component';
+export * from './components/resource-input/resource-input-config.directive';
 export * from './injectables/resource-dialogs.service';
 export * from './injectables/resource-input-bridge.service';
 export * from './injectables/resource-input.service';
