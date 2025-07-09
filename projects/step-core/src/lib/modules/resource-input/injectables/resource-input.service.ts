@@ -1,16 +1,13 @@
 import { DestroyRef, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import {
-  AugmentedResourcesService,
-  Resource,
-  ResourceDialogsService,
-  ResourceInputBridgeService,
-} from '@exense/step-core';
 import { BehaviorSubject, finalize, forkJoin, map, Observable, of, pipe, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { ResourceConfig } from '../types/resource-config';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { UpdateResourceWarningResultState } from '../types/update-resource-warning-result-state.enum';
+import { AugmentedResourcesService, Resource } from '../../../client/step-client-module';
+import { ResourceDialogsService } from './resource-dialogs.service';
+import { ResourceInputBridgeService } from './resource-input-bridge.service';
 
 @Injectable()
 export class ResourceInputService implements OnDestroy {
@@ -119,10 +116,12 @@ export class ResourceInputService implements OnDestroy {
           return this._resourceDialogsService.showFileAlreadyExistsWarning(response.similarResources).pipe(
             map((existingResource) => {
               if (existingResource) {
-                this.deleteResource(resourceId!);
+                if (resourceId) {
+                  this.deleteResource(resourceId);
+                }
                 return existingResource;
               } else {
-                this.uploadedResourceIds.push(resourceId!);
+                this.uploadedResourceIds.push(response.resource!.id!);
                 return response.resource;
               }
             }),

@@ -12,7 +12,6 @@ import { AddFieldButtonComponent } from './components/add-field-button/add-field
 import { DynamicFieldEditorComponent } from './components/dynamic-field-editor/dynamic-field-editor.component';
 import { DynamicCheckboxComponent } from './components/dynamic-checkbox/dynamic-checkbox.component';
 import { DynamicJsonComponent } from './components/dynamic-json/dynamic-json.component';
-import { ResourceInputModule } from '../resource-input/resource-input.module';
 import { DynamicResourceComponent } from './components/dynamic-resource/dynamic-resource.component';
 import { AddFieldSchemaButtonComponent } from './components/add-field-schema-button/add-field-schema-button.component';
 import { AddSchemaFieldDialogComponent } from './components/add-schema-field-dialog/add-schema-field-dialog.component';
@@ -22,6 +21,7 @@ import { DynamicFieldIsExpressionEditorAllowedPipe } from './pipes/dynamic-field
 import { DynamicFieldComplexComponent } from './components/dynamic-field-complex/dynamic-field-complex.component';
 import { DynamicFieldArrayEditorComponent } from './components/dynamic-field-array-editor/dynamic-field-array-editor.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { RESOURCE_INPUT_IMPORTS } from '../resource-input';
 
 @NgModule({
   declarations: [
@@ -48,7 +48,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     StepMaterialModule,
     StepIconsModule,
     ReactiveFormsModule,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     DynamicFieldIsExpressionEditorAllowedPipe,
     NgxMatSelectSearchModule,
   ],

@@ -36,7 +36,6 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
-import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { FunctionActionsService } from './modules/keywords-common';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
@@ -75,6 +74,7 @@ import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
 import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
+import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
 
 @NgModule({
   declarations: [
@@ -119,7 +119,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     AngularSplitModule,
     DynamicFormsModule,
     JsonViewerModule,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     WizardModule,
@@ -182,7 +182,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     WaitingArtefactsAdvancedComponent,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
@@ -290,7 +290,7 @@ export * from './modules/tree';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/json-viewer-ext';
-export * from './modules/resource-input/resource-input.module';
+export * from './modules/resource-input';
 export * from './modules/keywords-common';
 export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';

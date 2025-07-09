@@ -3,10 +3,13 @@ import { filter, Observable, of, switchMap } from 'rxjs';
 import { Resource } from '../../../../client/step-client-module';
 import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { ResourceInputConfigDirective } from '../../directives/resource-input-config.directive';
+import { ResourceInputConfigDirective } from './resource-input-config.directive';
 import { ResourceInputService } from '../../injectables/resource-input.service';
 import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
+import { ResourceInputCustomAction } from '../../types/resource-input-custom-action';
 
 const MAX_FILES = 1;
 
@@ -15,8 +18,10 @@ type OnTouch = () => void;
 
 @Component({
   selector: 'step-resource-input',
-  templateUrl: './resouce-input.component.html',
-  styleUrls: ['./resouce-input.component.scss'],
+  templateUrl: './resource-input.component.html',
+  styleUrls: ['./resource-input.component.scss'],
+  standalone: true,
+  imports: [StepBasicsModule],
   hostDirectives: [
     {
       directive: ResourceInputConfigDirective,
@@ -24,8 +29,6 @@ type OnTouch = () => void;
         'type: resourceType',
         'isBounded',
         'supportsDirectory',
-        'withSaveButton',
-        'saveButtonLabel',
         'withChooseExistingResourceButton',
         'withClearButton',
         'withDynamicSwitch',
@@ -48,6 +51,7 @@ type OnTouch = () => void;
   ],
 })
 export class ResourceInputComponent implements ControlValueAccessor {
+  private _utils = inject(ResourceInputUtilsService);
   private _resourceInputService = inject(RESOURCE_INPUT);
   protected _config = inject(ResourceInputConfigDirective, { self: true });
 
@@ -62,18 +66,21 @@ export class ResourceInputComponent implements ControlValueAccessor {
   readonly helpIconTooltip = input<string | undefined>(undefined);
   readonly showRequiredMarker = input(false);
   readonly isParentInvalid = input(false);
+  readonly customActions = input<ResourceInputCustomAction[] | undefined>(undefined);
 
   readonly dynamicSwitch = output();
   readonly filesChange = output();
+  readonly customActionInvoke = output<string>();
 
   protected readonly isDisabled = signal(false);
   protected readonly modelInternal = signal<string | undefined>(undefined);
+  protected readonly hasCustomActions = computed(() => !!this.customActions()?.length);
 
-  protected readonly resourceId = computed(() => this.getResourceId(this.modelInternal()));
+  protected readonly resourceId = computed(() => this._utils.getResourceId(this.modelInternal()));
 
   protected readonly downloadResourceUrl = computed(() => this._resourceInputService.getDownloadUrl(this.resourceId()));
 
-  readonly isResource = computed(() => this.isResourceValue(this.modelInternal()));
+  readonly isResource = computed(() => this._utils.isResourceValue(this.modelInternal()));
 
   protected readonly absoluteFilepath = computed(() => {
     const model = this.modelInternal();
@@ -119,15 +126,11 @@ export class ResourceInputComponent implements ControlValueAccessor {
   }
 
   protected handleBlur(): void {
-    if (this._config.withSaveButton()) {
-      return;
-    }
-
     this.onTouch?.();
   }
 
-  protected saveChanges(): void {
-    //this.setStModel(this.stModel);
+  protected handleCustomAction(action: ResourceInputCustomAction): void {
+    this.customActionInvoke.emit(action.type);
   }
 
   protected handleFilesChange(files: File[]): void {
@@ -165,7 +168,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
     resource$.subscribe((resource) => {
       if (resource) {
-        this.setResourceIdToFieldValue(resource.id!);
+        this.handleModelChange(this._utils.convertIdToResourceValue(resource.id!));
         this.resource.set(resource);
       } else {
         this.handleModelChange(undefined);
@@ -200,7 +203,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
       .showSelectResourceDialog()
       .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
-        this.setResourceIdToFieldValue(resourceId!);
+        this.handleModelChange(this._utils.convertIdToResourceValue(resourceId!));
       });
   }
 
@@ -217,20 +220,5 @@ export class ResourceInputComponent implements ControlValueAccessor {
     }
 
     fileInput.nativeElement.value = '';
-  }
-
-  private setResourceIdToFieldValue(resourceId: string): void {
-    this.handleModelChange(`resource:${resourceId}`);
-  }
-
-  private isResourceValue(value?: string): boolean {
-    return !!value && typeof value === 'string' && value.startsWith('resource:');
-  }
-
-  private getResourceId(value?: string): string | undefined {
-    if (!this.isResourceValue(value)) {
-      return undefined;
-    }
-    return value!.replace('resource:', '');
   }
 }

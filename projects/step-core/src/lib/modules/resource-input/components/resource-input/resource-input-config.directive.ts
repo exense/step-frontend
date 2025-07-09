@@ -1,6 +1,6 @@
 import { computed, Directive, effect, inject, input } from '@angular/core';
-import { ResourceConfig } from '../types/resource-config';
-import { RESOURCE_INPUT } from '../injectables/resource-input.token';
+import { ResourceConfig } from '../../types/resource-config';
+import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 
 @Directive({
   selector: '[stepResourceInputConfig]',
@@ -12,8 +12,6 @@ export class ResourceInputConfigDirective {
   readonly type = input.required<string>();
   readonly isBounded = input(false);
   readonly supportsDirectory = input(false);
-  readonly withSaveButton = input(false);
-  readonly saveButtonLabel = input('Save');
 
   readonly withChooseExistingResourceButton = input(false);
   readonly withClearButton = input(true);
@@ -25,8 +23,6 @@ export class ResourceInputConfigDirective {
     const type = this.type();
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
-    const withSaveButton = this.withSaveButton();
-    const saveButtonLabel = this.saveButtonLabel();
     const withChooseExistingResourceButton = this.withChooseExistingResourceButton();
     const withClearButton = this.withClearButton();
     const withDynamicSwitch = this.withDynamicSwitch();
@@ -36,8 +32,6 @@ export class ResourceInputConfigDirective {
       type,
       isBounded,
       supportsDirectory,
-      withSaveButton,
-      saveButtonLabel,
       withChooseExistingResourceButton,
       withClearButton,
       withDynamicSwitch,

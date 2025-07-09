@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Resource } from '../../../../client/step-client-module';
-import { TableLocalDataSource } from '../../../../modules/table/table.module';
+import { TableLocalDataSource, TableModule } from '../../../../modules/table/table.module';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 export interface FileAlreadyExistingDialogData {
   similarResources: Resource[];
@@ -11,6 +12,8 @@ export interface FileAlreadyExistingDialogData {
   selector: 'step-file-already-existing-dialog',
   templateUrl: './file-already-existing-dialog.component.html',
   styleUrls: ['./file-already-existing-dialog.component.scss'],
+  standalone: true,
+  imports: [StepBasicsModule, TableModule],
   host: {
     '(keydown.enter)': 'createNewResource()',
   },

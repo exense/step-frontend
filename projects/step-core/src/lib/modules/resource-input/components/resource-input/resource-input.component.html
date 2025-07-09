@@ -1,17 +1,30 @@
-<ng-template #saveButtonTemplate>
-  @if (_config.withSaveButton()) {
-    <step-suffix class="button-suffix">
-      <button type="button" mat-stroked-button [disabled]="isDisabled()" (click)="saveChanges()">
-        {{ _config.saveButtonLabel() }}
-      </button>
-    </step-suffix>
+<ng-template #customActionsTemplate>
+  @if (hasCustomActions()) {
+    @for (action of customActions()!; track action.type) {
+      <step-suffix class="button-suffix">
+        <button
+          type="button"
+          mat-stroked-button
+          [disabled]="isDisabled()"
+          [matTooltip]="action.tooltip ?? ''"
+          (click)="handleCustomAction(action)"
+        >
+          @if (action.icon) {
+            <step-icon [name]="action.icon" />
+          }
+          @if (action.label) {
+            {{ action.label }}
+          }
+        </button>
+      </step-suffix>
+    }
   }
 </ng-template>
 
 <ng-template #downloadButtonTemplate>
   <step-suffix class="button-suffix">
     <a [href]="downloadResourceUrl()" mat-stroked-button matTooltip="Download this file">
-      <step-icon name="download"></step-icon>
+      <step-icon name="download" />
     </a>
   </step-suffix>
 </ng-template>
@@ -25,7 +38,7 @@
       (click)="openFileChooser()"
       [disabled]="isDisabled()"
     >
-      <step-icon name="folder-plus"></step-icon>
+      <step-icon name="folder-plus" />
     </button>
   </step-suffix>
 </ng-template>
@@ -40,7 +53,7 @@
         (click)="selectResource()"
         [disabled]="isDisabled()"
       >
-        <step-icon name="search"></step-icon>
+        <step-icon name="search" />
       </button>
     </step-suffix>
   }
@@ -50,7 +63,7 @@
   @if (_config.withClearButton()) {
     <step-suffix class="button-suffix">
       <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()" [disabled]="isDisabled()">
-        <step-icon name="x"></step-icon>
+        <step-icon name="x" />
       </button>
     </step-suffix>
   }
@@ -66,7 +79,7 @@
         (click)="dynamicSwitch.emit()"
         [disabled]="isDisabled()"
       >
-        <step-icon name="zap"></step-icon>
+        <step-icon name="zap" />
       </button>
     </step-suffix>
   }
@@ -104,7 +117,7 @@
         (blur)="handleBlur()"
       />
 
-      <ng-container *ngTemplateOutlet="saveButtonTemplate" />
+      <ng-container *ngTemplateOutlet="customActionsTemplate" />
       <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
