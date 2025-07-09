@@ -59,9 +59,7 @@ export class CustomTooltipPlugin {
             }
           };
         },
-        destroy: (u: uPlot) => {
-          console.log('destroyed');
-        },
+        destroy: (u: uPlot) => {},
         setSize: (u: uPlot) => {},
         // this event is called on mouse move, and it manipulates the display
         setCursor: (u: uPlot) => {
