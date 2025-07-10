@@ -19,4 +19,3 @@ export * from './injectables/resource-dialogs.service';
 export * from './injectables/resource-input-bridge.service';
 export * from './injectables/resource-input.service';
 export * from './injectables/resource-input-utils.service';
-export * from './types/resource-input-custom-action';

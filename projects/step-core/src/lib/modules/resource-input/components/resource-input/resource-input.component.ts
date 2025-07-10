@@ -9,7 +9,6 @@ import { RESOURCE_INPUT } from '../../injectables/resource-input.token';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ResourceInputUtilsService } from '../../injectables/resource-input-utils.service';
-import { ResourceInputCustomAction } from '../../types/resource-input-custom-action';
 
 const MAX_FILES = 1;
 
@@ -66,15 +65,12 @@ export class ResourceInputComponent implements ControlValueAccessor {
   readonly helpIconTooltip = input<string | undefined>(undefined);
   readonly showRequiredMarker = input(false);
   readonly isParentInvalid = input(false);
-  readonly customActions = input<ResourceInputCustomAction[] | undefined>(undefined);
 
   readonly dynamicSwitch = output();
   readonly filesChange = output();
-  readonly customActionInvoke = output<string>();
 
   protected readonly isDisabled = signal(false);
   protected readonly modelInternal = signal<string | undefined>(undefined);
-  protected readonly hasCustomActions = computed(() => !!this.customActions()?.length);
 
   protected readonly resourceId = computed(() => this._utils.getResourceId(this.modelInternal()));
 
@@ -127,10 +123,6 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   protected handleBlur(): void {
     this.onTouch?.();
-  }
-
-  protected handleCustomAction(action: ResourceInputCustomAction): void {
-    this.customActionInvoke.emit(action.type);
   }
 
   protected handleFilesChange(files: File[]): void {

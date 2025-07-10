@@ -12,16 +12,14 @@
           [preserveExistingResource]="true"
           [isBounded]="true"
           [withChooseExistingResourceButton]="false"
-          [ngModel]="functionPackage.packageLocation"
-          (ngModelChange)="handlePackageLocationChange($event)"
+          [(ngModel)]="packageLocation"
           [showRequiredMarker]="true"
         />
         <step-resource-input
           label="Package dependencies (Folder or Zip of Jars or DLLs/PDBs)"
           helpIconTooltip="Drag&drop your folder or zip containing Jars/DLLs/PDBs dependencies."
           resourceType="functions"
-          [ngModel]="functionPackage.packageLibrariesLocation"
-          (ngModelChange)="handlePackageLibrariesLocationChange($event)"
+          [(ngModel)]="packageLibrariesLocation"
         />
       </mat-card-content>
     </mat-card>
