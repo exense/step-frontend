@@ -58,7 +58,6 @@ import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
-import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
@@ -103,7 +102,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
-    DashboardNavigationParamsPipe,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -202,7 +200,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     DRAG_DROP_EXPORTS,
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
-    DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
     TestIdDirective,
@@ -342,7 +339,6 @@ export * from './services/keyword-executor.service';
 export * from './modules/artefacts-common/components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './modules/list-selection';
-export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
