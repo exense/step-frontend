@@ -68,6 +68,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   readonly dynamicSwitch = output();
   readonly filesChange = output();
+  readonly revisionChange = output();
 
   protected readonly isDisabled = signal(false);
   protected readonly modelInternal = signal<string | undefined>(undefined);
@@ -94,7 +95,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
       switchMap((resourceId) => this._resourceInputService.initResource(resourceId!)),
       takeUntilDestroyed(),
     )
-    .subscribe((resource) => this.resource.set(resource));
+    .subscribe((resource) => this.setResource(resource));
 
   constructor(protected _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
@@ -161,10 +162,10 @@ export class ResourceInputComponent implements ControlValueAccessor {
     resource$.subscribe((resource) => {
       if (resource) {
         this.handleModelChange(this._utils.convertIdToResourceValue(resource.id!));
-        this.resource.set(resource);
+        this.setResource(resource);
       } else {
         this.handleModelChange(undefined);
-        this.resource.set(undefined);
+        this.setResource(undefined);
       }
     });
 
@@ -201,7 +202,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
   protected clear(): void {
     this.handleModelChange(undefined);
-    this.resource.set(undefined);
+    this.setResource(undefined);
     this._resourceInputService.deleteUploadedResources();
     this.onTouch?.();
     this.filesChange.emit();
@@ -212,5 +213,18 @@ export class ResourceInputComponent implements ControlValueAccessor {
     }
 
     fileInput.nativeElement.value = '';
+  }
+
+  private setResource(resource?: Resource): void {
+    const currentResource = this.resource();
+    if (
+      !!currentResource &&
+      !!resource &&
+      currentResource.id === resource.id &&
+      currentResource.currentRevisionId !== resource.currentRevisionId
+    ) {
+      this.revisionChange.emit();
+    }
+    this.resource.set(resource);
   }
 }
