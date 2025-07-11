@@ -18,7 +18,7 @@ import { ResourceDialogsService } from '../../services/resource-dialogs.service'
 import { ResourceInputBridgeService } from '../../services/resource-input-bridge.service';
 import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 
 const MAX_FILES = 1;
@@ -76,7 +76,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   progress$?: Observable<number>;
   response$?: Observable<ResourceUploadResponse>;
   lastStModelValue?: string;
-  uploadedResourceIds: string[] = [];
+  private uploadedResourceIds = new Set<string>();
 
   ngOnInit(): void {
     this._resourceInputBridgeService.deleteUploadedResource$
@@ -256,16 +256,16 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  private setStModel(stModel: string = '') {
-    if (this.stModel === stModel) {
+  private setStModel(stModel: string = '', forceChange?: boolean) {
+    if (this.stModel === stModel && !forceChange) {
       return;
     }
     this.stModel = stModel;
     this.stModelChange.emit(stModel);
   }
 
-  private setResourceIdToFieldValue(resourceId: string): void {
-    this.setStModel(`resource:${resourceId}`);
+  private setResourceIdToFieldValue(resourceId: string, forceChange?: boolean): void {
+    this.setStModel(`resource:${resourceId}`, forceChange);
   }
 
   private uploadResource({ file, resourceId }: { file: File; resourceId?: string }): void {
@@ -298,10 +298,11 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
 
       if (!resourceUploadResponse.similarResources?.length) {
         // No similar resource found
-        this.setResourceIdToFieldValue(resourceId);
+        this.setResourceIdToFieldValue(resourceId, true);
         this.resourceFilename = resourceUploadResponse.resource!.resourceName;
-        this.deleteUploadedResource();
-        this.uploadedResourceIds.push(resourceId);
+        // Exclude current resource id to be deleted, in case if it is a reupload of the same resource
+        this.deleteUploadedResource(resourceId);
+        this.uploadedResourceIds.add(resourceId);
       } else {
         this._resourceDialogsService
           .showFileAlreadyExistsWarning(resourceUploadResponse.similarResources)
@@ -314,7 +315,7 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
             } else {
               // Creating a new resource
               this.setResourceIdToFieldValue(resourceId);
-              this.uploadedResourceIds.push(resourceId);
+              this.uploadedResourceIds.add(resourceId);
             }
           });
       }
@@ -324,18 +325,19 @@ export class ResourceInputComponent implements OnInit, OnChanges, OnDestroy {
   /*
    * Clean up all resources but the initial one
    */
-  private deleteUploadedResource(): void {
-    if (!this.uploadedResourceIds || this.uploadedResourceIds.length === 0) {
+  private deleteUploadedResource(...excludedIds: string[]): void {
+    if (!this.uploadedResourceIds || this.uploadedResourceIds.size === 0) {
       return;
     }
 
-    const cleanupIds = [...this.uploadedResourceIds];
-    const requests = cleanupIds.map((id) => this._augmentedResourcesService.deleteResource(id));
+    const cleanupIds = Array.from(this.uploadedResourceIds);
+    const excluded = new Set(excludedIds);
+    const requests = cleanupIds
+      .filter((id) => !excluded.has(id))
+      .map((id) => this._augmentedResourcesService.deleteResource(id).pipe(map(() => id)));
 
-    forkJoin(requests).subscribe({
-      next: (results) => {
-        this.uploadedResourceIds = this.uploadedResourceIds.filter((item) => !cleanupIds.includes(item));
-      },
+    forkJoin(requests).subscribe((ids) => {
+      ids.forEach((id) => this.uploadedResourceIds.delete(id));
     });
   }
 }
