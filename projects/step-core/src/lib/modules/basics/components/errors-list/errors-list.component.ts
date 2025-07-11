@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { ValidationErrors } from '@angular/forms';
 
 @Component({
@@ -6,38 +6,15 @@ import { ValidationErrors } from '@angular/forms';
   templateUrl: './errors-list.component.html',
   styleUrls: ['./errors-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ErrorsListComponent implements OnChanges {
-  protected displayErrors: string[] = [];
+export class ErrorsListComponent {
+  readonly errors = input<ValidationErrors | null | undefined>(undefined);
+  readonly keysDictionary = input<Record<string, string> | undefined>(undefined);
 
-  @Input() errors?: ValidationErrors | null;
-  @Input() keysDictionary?: Record<string, string>;
-
-  ngOnChanges(changes: SimpleChanges): void {
-    let errors: ValidationErrors | undefined = undefined;
-    let keysDictionary: Record<string, string> | undefined = undefined;
-
-    const cErrors = changes['errors'];
-    if (cErrors?.previousValue !== cErrors?.currentValue || cErrors?.firstChange) {
-      errors = cErrors?.currentValue;
-    }
-
-    const cKeysDictionary = changes['keysDictionary'];
-    if (cKeysDictionary?.previousValue !== cKeysDictionary?.currentValue || cKeysDictionary?.firstChange) {
-      keysDictionary = cKeysDictionary?.currentValue;
-    }
-
-    if (errors !== undefined || keysDictionary) {
-      this.buildDisplayErrors(errors, keysDictionary);
-    }
-  }
-
-  private buildDisplayErrors(errors?: ValidationErrors | null, keysDictionary?: Record<string, string>): void {
-    errors = errors !== undefined ? errors : this.errors;
-    keysDictionary = keysDictionary ?? this.keysDictionary ?? {};
-
-    this.displayErrors = Object.entries(errors ?? {}).map(
-      ([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue
-    );
-  }
+  protected readonly displayErrors = computed(() => {
+    const errors = this.errors() ?? {};
+    const keysDictionary = this.keysDictionary() ?? {};
+    return Object.entries(errors ?? {}).map(([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue);
+  });
 }

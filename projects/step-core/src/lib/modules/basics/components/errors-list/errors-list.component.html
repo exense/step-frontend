@@ -1,1 +1,3 @@
-<div *ngFor="let error of displayErrors">{{ error }}</div>
+@for (error of displayErrors(); track error) {
+  <div>{{ error }}</div>
+}
