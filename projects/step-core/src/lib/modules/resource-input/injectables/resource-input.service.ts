@@ -26,7 +26,7 @@ export class ResourceInputService implements OnDestroy {
   });
 
   private config?: ResourceConfig;
-  private uploadedResourceIds: string[] = [];
+  private uploadedResourceIds = new Set<string>();
 
   private deleteResourcesSubscription = this._resourceInputBridgeService.deleteUploadedResource$
     .pipe(takeUntilDestroyed())
@@ -109,8 +109,10 @@ export class ResourceInputService implements OnDestroy {
         this.uploadProgress$.next(of(undefined));
 
         if (!response.similarResources?.length) {
-          this.deleteUploadedResources();
-          this.uploadedResourceIds.push(response.resource!.id!);
+          const responseResourceId = response.resource!.id!;
+          // Exclude current resource id to be deleted, in case if it is a reupload of the same resource
+          this.deleteUploadedResources(responseResourceId);
+          this.uploadedResourceIds.add(responseResourceId);
           return of(response.resource);
         } else {
           return this._resourceDialogsService.showFileAlreadyExistsWarning(response.similarResources).pipe(
@@ -121,7 +123,7 @@ export class ResourceInputService implements OnDestroy {
                 }
                 return existingResource;
               } else {
-                this.uploadedResourceIds.push(response.resource!.id!);
+                this.uploadedResourceIds.add(response.resource!.id!);
                 return response.resource;
               }
             }),
@@ -131,16 +133,19 @@ export class ResourceInputService implements OnDestroy {
     );
   }
 
-  deleteUploadedResources(): void {
-    if (!this.uploadedResourceIds || this.uploadedResourceIds.length === 0) {
+  deleteUploadedResources(...excludedIds: string[]): void {
+    if (!this.uploadedResourceIds || this.uploadedResourceIds.size === 0) {
       return;
     }
 
-    const cleanupIds = [...this.uploadedResourceIds];
-    const requests = cleanupIds.map((id) => this._augmentedResourcesService.deleteResource(id));
+    const cleanupIds = Array.from(this.uploadedResourceIds);
+    const excluded = new Set(excludedIds);
+    const requests = cleanupIds
+      .filter((id) => !excluded.has(id))
+      .map((id) => this._augmentedResourcesService.deleteResource(id).pipe(map(() => id)));
 
-    forkJoin(requests).subscribe((results) => {
-      this.uploadedResourceIds = this.uploadedResourceIds.filter((item) => !cleanupIds.includes(item));
+    forkJoin(requests).subscribe((ids) => {
+      ids.forEach((id) => this.uploadedResourceIds.delete(id));
     });
   }
   private deleteResource(id: string): void {

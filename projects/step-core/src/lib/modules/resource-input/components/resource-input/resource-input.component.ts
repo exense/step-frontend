@@ -134,7 +134,7 @@ export class ResourceInputComponent implements ControlValueAccessor {
 
     let resource$: Observable<Resource | undefined>;
 
-    if (this.isResource() && !this.resourceNotExisting && !this._config.preserveExistingResource()) {
+    if (this.isResource() && !this.resourceNotExisting() && !this._config.preserveExistingResource()) {
       if (!this._config.isBounded()) {
         resource$ = this._resourceInputService.showUpdateResourceWarning().pipe(
           switchMap((resultState) => {
