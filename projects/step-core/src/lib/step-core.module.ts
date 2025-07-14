@@ -36,11 +36,9 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
-import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { FunctionActionsService } from './modules/keywords-common';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
-import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { CronModule } from './modules/cron/cron.module';
@@ -75,6 +73,7 @@ import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
 import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
+import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
 
 @NgModule({
   declarations: [
@@ -97,7 +96,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     WaitingArtefactsAdvancedComponent,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     SimpleOutletComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
@@ -119,7 +117,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     AngularSplitModule,
     DynamicFormsModule,
     JsonViewerModule,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     WizardModule,
@@ -182,11 +180,10 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     WaitingArtefactsAdvancedComponent,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
@@ -266,7 +263,6 @@ export * from './components/link-button/link-button.component';
 export * from './components/user-settings-button/user-settings-button.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
-export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
@@ -291,7 +287,7 @@ export * from './modules/tree';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/json-viewer-ext';
-export * from './modules/resource-input/resource-input.module';
+export * from './modules/resource-input';
 export * from './modules/keywords-common';
 export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
