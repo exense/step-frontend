@@ -160,7 +160,7 @@ export class TreeComponent<N extends TreeNode> implements TreeNodeTemplateContai
       return;
     }
 
-    this.virtualScrollViewport()!.scrollToIndex(index, 'smooth');
+    this.virtualScrollViewport()?.scrollToIndex?.(index, 'smooth');
     this.nativeScroll(nodeId);
     // sometimes scroll to element doesn't performed correctly after virtual scroll
     // invoke another autoscroll to correct the position (but without scrolling effect)

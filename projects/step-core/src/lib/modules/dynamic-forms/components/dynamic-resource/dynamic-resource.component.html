@@ -13,8 +13,8 @@
 } @else {
   <step-resource-input
     [label]="label"
-    [stType]="type"
-    [stDirectory]="directory"
+    [stType]="type()"
+    [supportsDirectory]="supportsDirectory()"
     [withHelpIcon]="!!tooltip"
     [helpIconTooltip]="tooltip"
     [withDynamicSwitch]="true"

@@ -1,23 +1,18 @@
 @if (hasContent()) {
   <step-popover yPosition="below">
     <section>
-      @if (popoverTitle()) {
-        <div class="popover-title">{{ popoverTitle() }}</div>
-      }
+      <ng-content select="step-alt-execution-time-prefix" />
       @if (displayDate(); as date) {
         <div class="date">{{ date }}</div>
       }
       @if (duration(); as duration) {
         <div class="duration">{{ duration }}</div>
       }
-      @if (status()) {
-        <div class="status">
-          <step-status [status]="status()" [iconMode]="false" />
-        </div>
-      }
+      <ng-content select="step-alt-execution-time-suffix" />
     </section>
     <step-popover-content>
       <step-duration-description [startTime]="startTimeInput()" [endTime]="endTime()" [isRunning]="isRunning()" />
+      <ng-content select="step-alt-execution-time-popover-addon" />
     </step-popover-content>
   </step-popover>
 }

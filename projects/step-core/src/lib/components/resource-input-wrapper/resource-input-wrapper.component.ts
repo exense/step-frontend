@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 type OnChange = (value: string) => void;
@@ -10,11 +10,11 @@ type OnTouch = () => void;
   styleUrls: ['./resource-input-wrapper.component.scss'],
 })
 export class ResourceInputWrapperComponent implements ControlValueAccessor {
-  @Input() label?: string;
-  @Input() type!: string;
-  @Input() directory?: boolean;
-  @Input() tooltip?: string;
-  @Input() showRequiredMarker?: boolean;
+  readonly label = input<string>();
+  readonly type = input.required<string>();
+  readonly supportsDirectory = input(false);
+  readonly tooltip = input<string>();
+  readonly showRequiredMarker = input(false);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;

@@ -29,6 +29,11 @@ export const checkEntityGuardFactory =
     const id = config.idExtractor ? config.idExtractor(route, state) : route.params[idParameterName];
 
     if (!id) {
+      const path = route.pathFromRoot
+        .flatMap((item) => item.url)
+        .filter((item) => !!item)
+        .join('/');
+      console.warn(`Entity id of type "${config.entityType}" not found for route ${path}`);
       return false;
     }
 

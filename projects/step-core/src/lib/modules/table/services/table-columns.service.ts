@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import {
   ColumnSettings,
   ScreenInput,
@@ -9,9 +9,12 @@ import {
 import { MatColumnDef } from '@angular/material/table';
 import { TableColumnsConfig } from './table-columns-config.provider';
 import { TableColumnsDefinitionService } from './table-columns-definition.service';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { ColumnInfo } from '../types/column-info';
 import { CustomCellApplySubPathPipe } from '../pipe/custom-cell-apply-sub-path.pipe';
+import { Reloadable } from '../../basics/types/reloadable';
+import { GlobalReloadService } from '../../basics/injectables/global-reload.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 enum VisibilityState {
   HIDDEN,
@@ -26,13 +29,15 @@ export enum PlacePosition {
 interface DefaultSettings {
   tableSettings: TableSettings;
   actionColumnsIds: string[];
+  entityTableRemoteId?: string;
 }
 
 @Injectable()
-export class TableColumnsService {
+export class TableColumnsService implements Reloadable, OnDestroy {
   private _tableApi = inject(TableApiWrapperService);
   private _columnsConfig = inject(TableColumnsConfig, { optional: true });
   private _columnsDefinition = inject(TableColumnsDefinitionService);
+  private _globalReload = inject(GlobalReloadService);
 
   private defaultVisibleScreenColumns?: Set<string> = !!this._columnsConfig?.entityScreenDefaultVisibleFields
     ? new Set(this._columnsConfig?.entityScreenDefaultVisibleFields)
@@ -42,6 +47,57 @@ export class TableColumnsService {
   readonly remoteColumnsScreenId = this._columnsConfig?.entityScreenId;
   readonly entityScreenSubPath = this._columnsConfig?.entityScreenSubPath;
   readonly customColumnOptions = this._columnsConfig?.customColumnOptions;
+
+  private entityTableRemoteId = signal(
+    !this._columnsConfig?.entityTableRemoteId ? undefined : new String(this._columnsConfig.entityTableRemoteId),
+  );
+
+  private defaultSettings = computed(() => {
+    const entityTableRemoteId = this.entityTableRemoteId()?.toString?.();
+    const contentColumns = this._columnsDefinition.contentColumns() ?? [];
+    const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
+
+    const infoDictionary = contentColumns
+      .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
+      .reduce(
+        (res, item) => {
+          res[item.columnId] = item;
+          return res;
+        },
+        {} as Record<string, ColumnInfo>,
+      );
+
+    const mainColumnsDefinitions = contentColumns.filter((col) => !col.isActionColumn);
+
+    const actionColumnsDefinitions = contentColumns.filter((col) => col.isActionColumn);
+
+    let columnSettingList = mainColumnsDefinitions
+      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
+      .map((col, i) => this.createStandardColumnSettings(col, i, infoDictionary));
+
+    const remoteColumns = remoteColumnsDefinitions.map((screenInput, i) =>
+      this.createScreenInputColumnSettings(screenInput, columnSettingList.length + i),
+    );
+
+    columnSettingList = [...columnSettingList, ...remoteColumns];
+
+    const actionsColumns = actionColumnsDefinitions
+      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
+      .map((col, i) => this.createStandardColumnSettings(col, columnSettingList.length + i, infoDictionary));
+
+    columnSettingList = [...columnSettingList, ...actionsColumns];
+
+    const tableSettings: TableSettings = { columnSettingList };
+    const actionColumnsIds = actionsColumns.map((col) => col.columnId!);
+
+    return { tableSettings, actionColumnsIds, entityTableRemoteId };
+  });
+
+  private remoteSettings$ = toObservable(this.defaultSettings).pipe(
+    switchMap((defaultSettings) => this.loadSettings(defaultSettings)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
 
   private hasChangesInternal = signal(false);
 
@@ -57,11 +113,25 @@ export class TableColumnsService {
     this.prepareColumns(this.settings()?.columnSettingList, VisibilityState.VISIBLE),
   );
 
+  constructor() {
+    this._globalReload.register(this);
+  }
+
+  ngOnDestroy(): void {
+    this._globalReload.unRegister(this);
+  }
+
   initialize(): void {
-    this.getTableSettings().subscribe((settings) => {
+    this.remoteSettings$.subscribe((settings) => {
+      this.hasChangesInternal.set(false);
       this.originalSettings = settings;
       this.settings.set(settings);
     });
+  }
+
+  reload(): void {
+    const entityTableRemoteId = this._columnsConfig?.entityTableRemoteId;
+    this.entityTableRemoteId.set(!entityTableRemoteId ? undefined : new String(entityTableRemoteId));
   }
 
   showColumn(columnId: string): void {
@@ -130,63 +200,6 @@ export class TableColumnsService {
     this.hasChangesInternal.set(false);
   }
 
-  private getTableSettings(): Observable<TableSettings> {
-    const defaultSettings = this.getDefaultSettings();
-    if (!this._columnsConfig?.entityTableRemoteId) {
-      return of(defaultSettings.tableSettings);
-    }
-    return this._tableApi
-      .getTableSettings(this._columnsConfig.entityTableRemoteId)
-      .pipe(
-        map((settings) =>
-          this.mergeSettings(settings, defaultSettings.tableSettings, defaultSettings.actionColumnsIds),
-        ),
-      );
-  }
-
-  private getDefaultSettings(): DefaultSettings {
-    const infoDictionary = (this._columnsDefinition.contentColumns?.() ?? [])
-      .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
-      .reduce(
-        (res, item) => {
-          res[item.columnId] = item;
-          return res;
-        },
-        {} as Record<string, ColumnInfo>,
-      );
-
-    const mainColumnsDefinitions = (this._columnsDefinition.contentColumns?.() ?? []).filter(
-      (col) => !col.isActionColumn,
-    );
-
-    const actionColumnsDefinitions = (this._columnsDefinition.contentColumns?.() ?? []).filter(
-      (col) => col.isActionColumn,
-    );
-
-    const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
-
-    let columnSettingList = mainColumnsDefinitions
-      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
-      .map((col, i) => this.createStandardColumnSettings(col, i, infoDictionary));
-
-    const remoteColumns = remoteColumnsDefinitions.map((screenInput, i) =>
-      this.createScreenInputColumnSettings(screenInput, columnSettingList.length + i),
-    );
-
-    columnSettingList = [...columnSettingList, ...remoteColumns];
-
-    const actionsColumns = actionColumnsDefinitions
-      .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
-      .map((col, i) => this.createStandardColumnSettings(col, columnSettingList.length + i, infoDictionary));
-
-    columnSettingList = [...columnSettingList, ...actionsColumns];
-
-    const tableSettings: TableSettings = { columnSettingList };
-    const actionColumnsIds = actionsColumns.map((col) => col.columnId!);
-
-    return { tableSettings, actionColumnsIds };
-  }
-
   private createStandardColumnSettings(
     matColDef: MatColumnDef,
     position: number,
@@ -195,6 +208,7 @@ export class TableColumnsService {
     const info = infoDictionary?.[matColDef.name];
     const columnId = info?.columnId ?? matColDef.name;
     const visible = info ? !info.isHiddenByDefault : true;
+
     return {
       columnId,
       position,
@@ -236,6 +250,19 @@ export class TableColumnsService {
     };
     this.settings.set({ ...tableSettings, columnSettingList });
     this.hasChangesInternal.set(true);
+  }
+
+  private loadSettings(defaultSettings: DefaultSettings): Observable<TableSettings> {
+    if (!defaultSettings?.entityTableRemoteId) {
+      return of(defaultSettings.tableSettings);
+    }
+    return this._tableApi
+      .getTableSettings(defaultSettings.entityTableRemoteId)
+      .pipe(
+        map((settings) =>
+          this.mergeSettings(settings, defaultSettings.tableSettings, defaultSettings.actionColumnsIds),
+        ),
+      );
   }
 
   private mergeSettings(
