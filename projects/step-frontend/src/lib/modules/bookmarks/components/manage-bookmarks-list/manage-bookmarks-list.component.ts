@@ -16,7 +16,6 @@ import { MatDialog } from '@angular/material/dialog';
   selector: 'step-manage-bookmarks-list-page',
   templateUrl: './manage-bookmarks-list.component.html',
   styleUrls: ['./manage-bookmarks-list.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class ManageBookmarksListComponent implements OnInit {

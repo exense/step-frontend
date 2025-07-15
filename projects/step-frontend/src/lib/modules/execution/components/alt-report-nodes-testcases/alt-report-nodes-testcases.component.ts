@@ -42,6 +42,7 @@ import { AGGREGATED_TREE_WIDGET_STATE } from '../../services/aggregated-report-v
     TablePersistenceStateService,
     tablePersistenceConfigProvider('testCases', STORE_ALL),
   ],
+  standalone: false,
 })
 export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableContentComponent {
   private _executionDialogs = inject(AltExecutionDialogsService);

@@ -8,6 +8,7 @@ import { CaseArtefact } from '../../types/case.artefact';
   templateUrl: './case.component.html',
   styleUrls: ['./case.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class CaseComponent extends BaseArtefactComponent<CaseArtefact> {
   @ViewChild('form')

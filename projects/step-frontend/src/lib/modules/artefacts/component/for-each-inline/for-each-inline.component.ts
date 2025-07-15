@@ -18,6 +18,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ForEachInlineComponent extends BaseInlineArtefactComponent<ForEachArtefact> {
   private _dataSourceFields = inject(DataSourceFieldsService);

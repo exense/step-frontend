@@ -28,6 +28,7 @@ import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs
   host: {
     '[class.no-padding]': 'noPadding()',
   },
+  standalone: false,
 })
 export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _executionState = inject(AltExecutionStateService);

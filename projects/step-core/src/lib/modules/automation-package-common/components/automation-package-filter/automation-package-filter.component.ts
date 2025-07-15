@@ -36,6 +36,7 @@ const DEFAULT_TOOLTIP = 'Filter by package name';
     },
     PopoverOverlayService,
   ],
+  standalone: false,
 })
 export class AutomationPackageFilterComponent
   extends BaseFilterComponent<string, string[]>

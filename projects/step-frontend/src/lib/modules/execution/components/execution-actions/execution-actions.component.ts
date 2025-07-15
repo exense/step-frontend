@@ -18,6 +18,7 @@ export type ExecutionActionsTooltips = Partial<typeof DEFAULT_TOOLTIPS>;
   templateUrl: './execution-actions.component.html',
   styleUrl: './execution-actions.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionActionsComponent {
   /** @Input() **/

@@ -23,6 +23,7 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
       useExisting: forwardRef(() => PlanEditorComponent),
     },
   ],
+  standalone: false,
 })
 export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
   private _destroyRef = inject(DestroyRef);

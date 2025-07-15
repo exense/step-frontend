@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class WeeklyTimeRangeEditorComponent extends BaseEditorComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);

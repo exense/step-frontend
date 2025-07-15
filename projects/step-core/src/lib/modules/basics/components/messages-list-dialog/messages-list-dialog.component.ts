@@ -12,6 +12,7 @@ export type MessagesListDialogResult = boolean | undefined;
   selector: 'step-messages-list-dialog',
   templateUrl: './messages-list-dialog.component.html',
   styleUrls: ['./messages-list-dialog.component.scss'],
+  standalone: false,
 })
 export class MessagesListDialogComponent {
   private _dialogRef = inject<MatDialogRef<MessagesListDialogComponent, MessagesListDialogResult>>(MatDialogRef);

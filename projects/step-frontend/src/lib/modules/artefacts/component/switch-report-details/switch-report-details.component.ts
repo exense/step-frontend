@@ -10,6 +10,7 @@ import { SwitchArtefact } from '../../types/switch.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SwitchReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SwitchArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

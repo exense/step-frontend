@@ -15,7 +15,6 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
       multi: true,
     },
   ],
-  standalone: true,
   imports: [CUSTOM_FORMS_COMMON_IMPORTS, ReactiveFormsModule, FormsModule, NgxMatSelectSearchModule],
   encapsulation: ViewEncapsulation.None,
 })

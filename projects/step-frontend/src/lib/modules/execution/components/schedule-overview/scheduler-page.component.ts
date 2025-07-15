@@ -71,6 +71,7 @@ interface EntityWithKeywordsStats {
       useExisting: SchedulerPageComponent,
     },
   ],
+  standalone: false,
 })
 export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit, DialogParentService {
   private _urlParamsService = inject(DashboardUrlParamsService);

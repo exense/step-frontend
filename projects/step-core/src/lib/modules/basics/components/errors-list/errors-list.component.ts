@@ -6,6 +6,7 @@ import { ValidationErrors } from '@angular/forms';
   templateUrl: './errors-list.component.html',
   styleUrls: ['./errors-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ErrorsListComponent implements OnChanges {
   protected displayErrors: string[] = [];
@@ -37,7 +38,7 @@ export class ErrorsListComponent implements OnChanges {
     keysDictionary = keysDictionary ?? this.keysDictionary ?? {};
 
     this.displayErrors = Object.entries(errors ?? {}).map(
-      ([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue
+      ([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue,
     );
   }
 }

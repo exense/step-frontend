@@ -17,7 +17,6 @@ import { ExportDialogData } from '../../types/export-dialog-data.interface';
   selector: 'step-export-dialog',
   templateUrl: './export-dialog.component.html',
   styleUrls: ['./export-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
 })
 export class ExportDialogComponent {

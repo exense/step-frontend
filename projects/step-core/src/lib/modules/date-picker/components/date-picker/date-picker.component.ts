@@ -13,6 +13,7 @@ import { TimeOption } from '../../types/time-option';
   encapsulation: ViewEncapsulation.None,
   exportAs: 'DatePicker',
   providers: [...STEP_DATE_TIME_FORMAT_PROVIDERS, DateFieldContainerService, PopoverOverlayService],
+  standalone: false,
 })
 export class DatePickerComponent {
   private _popoverOverlay = inject<PopoverOverlayService<DatePickerContentComponent>>(PopoverOverlayService);

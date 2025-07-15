@@ -11,6 +11,7 @@ const STATUSES_PRIORITY: Status[] = [
 
 @Pipe({
   name: 'appliedStatus',
+  standalone: false,
 })
 export class AppliedStatusPipe implements PipeTransform {
   transform(aggregatedStatus: Record<string, number> = {}): Status | undefined {

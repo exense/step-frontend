@@ -8,6 +8,7 @@ import { SelectionCollector } from '../../services/selection-collector/selection
     [selectionCollector]="_selectionCollector"
   ></step-entity-selection>`,
   styleUrls: [],
+  standalone: false,
 })
 export class EntitySelectionDiComponent<KEY, ENTITY> {
   _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector);

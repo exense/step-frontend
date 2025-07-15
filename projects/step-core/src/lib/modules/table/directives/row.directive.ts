@@ -3,6 +3,7 @@ import { RowInfo } from '../types/row-info.interface';
 
 @Directive({
   selector: 'tr[stepRow]',
+  standalone: false,
 })
 export class RowDirective {
   private _elRef = inject<ElementRef<HTMLTableRowElement>>(ElementRef, { self: true });

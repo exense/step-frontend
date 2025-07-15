@@ -21,6 +21,7 @@ import { DatePipe } from '@angular/common';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltExecutionTimeComponent {
   private _datePipe = inject(DatePipe);

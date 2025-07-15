@@ -12,7 +12,6 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 
 @Component({
   selector: 'step-table-parameters',
-  standalone: true,
   imports: [StepCommonModule, ParameterModule],
   templateUrl: './table-parameters.component.html',
   styleUrl: './table-parameters.component.scss',

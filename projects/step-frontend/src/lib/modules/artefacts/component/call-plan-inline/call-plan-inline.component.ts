@@ -17,6 +17,7 @@ import { CallPlanArtefact } from '../../types/call-plan.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CallPlanInlineComponent extends BaseInlineArtefactComponent<CallPlanArtefact> {
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);

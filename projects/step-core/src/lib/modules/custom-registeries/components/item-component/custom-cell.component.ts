@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
   selector: 'step-custom-cell',
   templateUrl: './base-item.component.html',
   styleUrls: [],
+  standalone: false,
 })
 export class CustomCellComponent extends BaseItemComponent<CustomRegistryItem> {
   protected readonly registryType = CustomRegistryType.CUSTOM_CELL;

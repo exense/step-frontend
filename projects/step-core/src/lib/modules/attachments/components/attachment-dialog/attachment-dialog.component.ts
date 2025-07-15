@@ -13,7 +13,6 @@ import { from } from 'rxjs';
 
 @Component({
   selector: 'step-attachment-dialog',
-  standalone: true,
   imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',

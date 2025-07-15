@@ -7,10 +7,8 @@ import {
   inject,
   input,
   OnInit,
-  Signal,
   signal,
   untracked,
-  viewChild,
   WritableSignal,
 } from '@angular/core';
 import {
@@ -43,19 +41,8 @@ interface UrlParams {
   selector: 'step-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
-  standalone: true,
   providers: [DashboardUrlParamsService],
-  imports: [
-    COMMON_IMPORTS,
-    DashboardFilterBarComponent,
-    ChartDashletComponent,
-    ResolutionPickerComponent,
-    TimeRangePickerComponent,
-    TableDashletComponent,
-    DashboardComponent,
-    StandaloneChartComponent,
-    MatProgressSpinner,
-  ],
+  imports: [COMMON_IMPORTS, TimeRangePickerComponent, DashboardComponent],
 })
 export class DashboardPageComponent implements OnInit {
   private _route: ActivatedRoute = inject(ActivatedRoute);

@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
       useExisting: forwardRef(() => BooleanFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class BooleanFilterComponent extends BaseFilterComponent<boolean[]> {
   protected createControl(fb: FormBuilder): FormControl<boolean[]> {

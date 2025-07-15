@@ -8,6 +8,7 @@ import { KeyValue } from '@angular/common';
   templateUrl: './alt-execution-parameters.component.html',
   styleUrl: './alt-execution-parameters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AltExecutionParametersComponent {
   private _screensService = inject(AugmentedScreenService);

@@ -10,7 +10,6 @@ import { ResourceInputComponent } from '../../../resource-input';
   selector: 'step-plan-import-dialog',
   templateUrl: './import-dialog.component.html',
   styleUrls: ['./import-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule, ResourceInputComponent],
 })
 export class ImportDialogComponent {

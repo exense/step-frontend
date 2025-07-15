@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 
 @Directive({
   selector: '[stepAdditionalHeader]',
+  standalone: false,
 })
 export class AdditionalHeaderDirective {
   readonly headerId = v4();

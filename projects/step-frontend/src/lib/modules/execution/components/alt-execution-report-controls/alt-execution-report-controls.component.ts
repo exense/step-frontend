@@ -5,6 +5,7 @@ import { AltExecutionReportPrintService } from '../../services/alt-execution-rep
   selector: 'step-alt-execution-report-controls',
   templateUrl: './alt-execution-report-controls.component.html',
   styleUrl: './alt-execution-report-controls.component.scss',
+  standalone: false,
 })
 export class AltExecutionReportControlsComponent {
   protected _printService = inject(AltExecutionReportPrintService);

@@ -145,13 +145,13 @@ $light-primary-text: var.$white;
     )
   );
 
-  font-family: map-get($mat-typography-config, font-family);
+  font-family: map.get($mat-typography-config, font-family);
   @include mat.core();
   @include mat.all-component-themes($mat-theme-ext);
   @include mat.dialog-typography($mat-typography-config);
   @include mat.card-typography($mat-typography-config);
 
-  $primary-color: map-get($mat-primary-palette, default);
+  $primary-color: map.get($mat-primary-palette, default);
 
   @include step-tabs.tabbar($primary-color);
   @include step-sidebar.sidebar($step-sidebar-config);

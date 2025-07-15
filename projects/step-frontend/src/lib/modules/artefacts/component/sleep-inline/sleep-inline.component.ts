@@ -16,6 +16,7 @@ import { SleepArtefact } from '../../types/sleep.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SleepInlineComponent extends BaseInlineArtefactComponent<SleepArtefact> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

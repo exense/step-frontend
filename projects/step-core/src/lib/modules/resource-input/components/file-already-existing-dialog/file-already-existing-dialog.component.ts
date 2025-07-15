@@ -12,7 +12,6 @@ export interface FileAlreadyExistingDialogData {
   selector: 'step-file-already-existing-dialog',
   templateUrl: './file-already-existing-dialog.component.html',
   styleUrls: ['./file-already-existing-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule, TableModule],
   host: {
     '(keydown.enter)': 'createNewResource()',

@@ -3,6 +3,7 @@ import { Option } from '@exense/step-core';
 
 @Pipe({
   name: 'renderOptions',
+  standalone: false,
 })
 export class RenderOptionsPipe implements PipeTransform {
   transform(options?: Option[]): string {

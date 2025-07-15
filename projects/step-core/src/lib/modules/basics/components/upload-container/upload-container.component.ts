@@ -4,6 +4,7 @@ import { Component, EventEmitter, HostBinding, HostListener, Input, Output } fro
   selector: 'step-upload-container',
   templateUrl: './upload-container.component.html',
   styleUrls: ['./upload-container.component.scss'],
+  standalone: false,
 })
 export class UploadContainerComponent {
   @HostBinding('class.drop-area-active') @Input() dropAreaActive?: boolean;

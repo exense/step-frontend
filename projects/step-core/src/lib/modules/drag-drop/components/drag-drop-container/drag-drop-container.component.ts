@@ -51,7 +51,6 @@ const dragDropGroupContainerFactory = () => {
 
 @Component({
   selector: 'step-drag-drop-container',
-  standalone: true,
   imports: [],
   templateUrl: './drag-drop-container.component.html',
   styleUrl: './drag-drop-container.component.scss',

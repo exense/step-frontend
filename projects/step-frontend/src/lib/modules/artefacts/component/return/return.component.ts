@@ -8,6 +8,7 @@ import { ReturnArtefact } from '../../types/return.artefact';
   templateUrl: './return.component.html',
   styleUrls: ['./return.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ReturnComponent extends BaseArtefactComponent<ReturnArtefact> {
   @ViewChild('form')

@@ -50,7 +50,7 @@
           (change)="toggleOption(option, $event.checked)"
           stepFocusable
           [defaultSpace]="false"
-          (keydownSpace)="toggleOption(option, !option.isSelected, checkbox)"
+          (keydownSpace)="toggleOption(option, !option.isSelected)"
           [stepRecursiveTabIndex]="-1"
         >
           {{ option.value }}

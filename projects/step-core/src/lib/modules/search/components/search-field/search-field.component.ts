@@ -7,7 +7,6 @@ type OnTouch = () => void;
 
 @Component({
   selector: 'step-search-field',
-  standalone: true,
   imports: [StepBasicsModule],
   templateUrl: './search-field.component.html',
   styleUrl: './search-field.component.scss',

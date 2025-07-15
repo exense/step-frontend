@@ -6,7 +6,6 @@ import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
   selector: 'step-ts-filter-bar-execution-item',
   templateUrl: './filter-bar-execution-item.component.html',
   styleUrls: ['./filter-bar-execution-item.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class FilterBarExecutionItemComponent implements AfterViewInit {

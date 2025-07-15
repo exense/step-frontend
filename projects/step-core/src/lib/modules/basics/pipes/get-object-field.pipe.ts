@@ -3,6 +3,7 @@ import { ObjectUtilsService } from '../injectables/object-utils.service';
 
 @Pipe({
   name: 'getObjectField',
+  standalone: false,
 })
 export class GetObjectFieldPipe implements PipeTransform {
   private _objectUtils = inject(ObjectUtilsService);

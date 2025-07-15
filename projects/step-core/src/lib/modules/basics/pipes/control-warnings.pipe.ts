@@ -4,6 +4,7 @@ import { getControlWarningsContainer } from '../types/form-control-warnings-exte
 
 @Pipe({
   name: 'controlWarnings',
+  standalone: false,
 })
 export class ControlWarningsPipe implements PipeTransform {
   transform(

@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { SpecificOperations } from '../../types/specific-operations.enum';
 import { Operation } from '@exense/step-core';
-import { KeyValuePipe, NgForOf, NgIf } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'step-alt-operation',
-  standalone: true,
-  imports: [NgIf, KeyValuePipe, NgForOf],
+  imports: [KeyValuePipe],
   templateUrl: './alt-operation.component.html',
   styleUrl: './alt-operation.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

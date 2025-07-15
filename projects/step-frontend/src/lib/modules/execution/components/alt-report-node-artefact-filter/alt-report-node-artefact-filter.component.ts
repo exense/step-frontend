@@ -11,6 +11,7 @@ const createItem = (key: ArtefactClass, value: string): Item => ({ key, value })
   selector: 'step-alt-report-node-artefact-filter',
   templateUrl: './alt-report-node-artefact-filter.component.html',
   styleUrl: './alt-report-node-artefact-filter.component.scss',
+  standalone: false,
 })
 export class AltReportNodeArtefactFilterComponent {
   private _state = inject(AltReportNodesFilterService);

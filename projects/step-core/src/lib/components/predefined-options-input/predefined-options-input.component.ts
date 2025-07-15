@@ -9,6 +9,7 @@ type OnTouch = () => void;
   selector: 'step-predefined-options-input',
   templateUrl: './predefined-options-input.component.html',
   styleUrls: ['./predefined-options-input.component.scss'],
+  standalone: false,
 })
 export class PredefinedOptionsInputComponent implements ControlValueAccessor {
   @Input() label?: string;

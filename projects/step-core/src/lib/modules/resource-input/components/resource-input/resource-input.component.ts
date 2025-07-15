@@ -19,7 +19,6 @@ type OnTouch = () => void;
   selector: 'step-resource-input',
   templateUrl: './resource-input.component.html',
   styleUrls: ['./resource-input.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
   hostDirectives: [
     {

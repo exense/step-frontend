@@ -20,6 +20,7 @@ import { SchemaField, JsonFieldType } from '../../../json-forms';
   styleUrl: './dynamic-field-complex.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DynamicFieldComplexComponent
   extends DynamicFieldBaseComponent<DynamicComplexValue>

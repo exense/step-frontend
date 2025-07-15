@@ -20,6 +20,7 @@ import { Status } from '../../../_common/shared/status.enum';
   host: {
     '[attr.title]': 'null',
   },
+  standalone: false,
 })
 export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);

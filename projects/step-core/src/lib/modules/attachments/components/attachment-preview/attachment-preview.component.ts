@@ -10,7 +10,6 @@ import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 
 @Component({
   selector: 'step-attachment-preview',
-  standalone: true,
   imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage, AttachmentTypeIconPipe],
   templateUrl: './attachment-preview.component.html',
   styleUrl: './attachment-preview.component.scss',

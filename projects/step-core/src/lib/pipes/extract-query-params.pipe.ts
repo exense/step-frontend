@@ -3,6 +3,7 @@ import { Params } from '@angular/router';
 
 @Pipe({
   name: 'extractQueryParams',
+  standalone: false,
 })
 export class ExtractQueryParamsPipe implements PipeTransform {
   transform(url: string): Params {

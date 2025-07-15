@@ -12,6 +12,7 @@ import { Status } from '../../../../_common/shared/status.enum';
   selector: 'step-scheduler-report-view',
   templateUrl: './scheduler-report-view.component.html',
   styleUrls: ['./scheduler-report-view.component.scss'],
+  standalone: false,
 })
 export class SchedulerReportViewComponent implements OnInit {
   readonly _stateService = inject(SchedulerPageStateService);

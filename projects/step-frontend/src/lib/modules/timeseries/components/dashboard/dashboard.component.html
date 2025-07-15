@@ -25,7 +25,7 @@
       }
     </div>
     <div style="display: flex; flex-direction: row; gap: 2rem; flex-wrap: nowrap">
-      @if (mainEngine?.state?.context) {
+      @if (mainEngine.state.context) {
         <div class="full-width-grow">
           <div class="time-section-container">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
@@ -92,7 +92,7 @@
       }
     </div>
 
-    @if (mainEngine?.state) {
+    @if (mainEngine.state) {
       <div class="dashlet-container">
         @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
           @if (dashlet.type === 'CHART') {

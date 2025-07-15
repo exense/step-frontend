@@ -2,6 +2,7 @@ import { Directive, HostListener, Input } from '@angular/core';
 
 @Directive({
   selector: 'input[stepPreventChars]',
+  standalone: false,
 })
 export class PreventCharsDirective {
   @Input('stepPreventChars') invalidChars?: string[];

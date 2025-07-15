@@ -7,6 +7,7 @@ import { EntityObject } from '../../types/entity-object';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseEntitySelectionTableComponent implements AfterViewInit, CustomComponent, OnDestroy {
   private requireInitialSearch = false;

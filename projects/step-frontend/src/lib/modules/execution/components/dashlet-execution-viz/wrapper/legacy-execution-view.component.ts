@@ -22,6 +22,7 @@ import { AuthService, DashboardsService, DashboardView, Execution, TimeRange } f
   selector: 'step-legacy-execution-view',
   templateUrl: './legacy-execution-view.component.html',
   styleUrls: ['./legacy-execution-view.component.scss'],
+  standalone: false,
 })
 export class LegacyExecutionViewComponent implements OnInit {
   execution = input.required<Execution>();

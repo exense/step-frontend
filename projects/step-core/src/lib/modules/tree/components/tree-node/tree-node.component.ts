@@ -12,7 +12,6 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
   styleUrl: './tree-node.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NgTemplateOutlet, StepIconsModule, StepMaterialModule, TreeNodeNameComponent],
   hostDirectives: [
     {

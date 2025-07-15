@@ -14,7 +14,6 @@ import { NgTemplateOutlet } from '@angular/common';
   styleUrls: ['../tree-node/tree-node.component.scss', './tree-node-draggable.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [DRAG_DROP_EXPORTS, StepIconsModule, StepMaterialModule, TreeNodeNameComponent, NgTemplateOutlet],
   hostDirectives: [
     {

@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
   selector: 'step-report-node',
   templateUrl: './report-node.component.html',
   styleUrls: ['./report-node.component.scss'],
+  standalone: false,
 })
 export class ReportNodeComponent implements OnChanges {
   private _api = inject(ControllerService);

@@ -9,6 +9,7 @@ type DialogRef = MatDialogRef<ProjectSwitchDialogComponent, ProjectSwitchDialogR
   selector: 'step-project-switch-dialog',
   templateUrl: './project-switch-dialog.component.html',
   styleUrls: ['./project-switch-dialog.component.scss'],
+  standalone: false,
 })
 export class ProjectSwitchDialogComponent {
   private _dialogRef = inject<DialogRef>(MatDialogRef);

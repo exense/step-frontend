@@ -8,6 +8,7 @@ import { DataSetArtefact } from '../../types/data-set.artefact';
   templateUrl: './data-set.component.html',
   styleUrls: ['./data-set.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class DataSetComponent extends BaseArtefactComponent<DataSetArtefact> {
   @ViewChild('form')

@@ -9,6 +9,7 @@ import { AutomationPackage } from '../../../../client/step-client-module';
   selector: 'step-automation-package-info',
   templateUrl: './automation-package-info.component.html',
   styleUrls: ['./automation-package-info.component.scss'],
+  standalone: false,
 })
 export class AutomationPackageInfoComponent<T extends AutomationPackageChildEntity>
   implements CustomComponent, OnChanges

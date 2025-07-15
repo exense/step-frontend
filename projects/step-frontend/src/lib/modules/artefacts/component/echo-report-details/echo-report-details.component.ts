@@ -14,6 +14,7 @@ import { EchoReportNode } from '../../types/echo.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class EchoReportDetailsComponent extends BaseReportDetailsComponent<EchoReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

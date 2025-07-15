@@ -30,6 +30,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       useExisting: forwardRef(() => ParameterListComponent),
     },
   ],
+  standalone: false,
 })
 export class ParameterListComponent implements DialogParentService, OnInit {
   private _dialogs = inject(DialogsService);

@@ -11,7 +11,6 @@ import { StepCommonModule } from '../../../_common/step-common.module';
 
 @Component({
   selector: 'step-table-plans',
-  standalone: true,
   imports: [StepCommonModule],
   templateUrl: './table-plans.component.html',
   styleUrl: './table-plans.component.scss',

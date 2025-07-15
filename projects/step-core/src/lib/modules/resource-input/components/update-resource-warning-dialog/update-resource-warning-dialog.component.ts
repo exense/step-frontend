@@ -7,7 +7,6 @@ import { UpdateResourceWarningResultState } from '../../types/update-resource-wa
   selector: 'step-update-resource-warning-dialog',
   templateUrl: './update-resource-warning-dialog.component.html',
   styleUrls: ['./update-resource-warning-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
 })
 export class UpdateResourceWarningDialogComponent implements AfterViewInit {

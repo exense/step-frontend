@@ -8,6 +8,7 @@ import { ForArtefact } from '../../types/for.artefact';
   templateUrl: './for.component.html',
   styleUrls: ['./for.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ForComponent extends BaseArtefactComponent<ForArtefact> {
   @ViewChild('form')

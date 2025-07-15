@@ -17,7 +17,6 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
     },
   ],
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent, StepBasicsModule],
 })
 export class EditableLabelComponent extends EditableComponent<string> {

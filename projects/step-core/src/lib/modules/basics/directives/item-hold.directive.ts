@@ -4,6 +4,7 @@ import { ItemHoldReceiverService } from '../injectables/item-hold-receiver.servi
 @Directive({
   selector: '[stepItemHold]',
   exportAs: 'ItemHold',
+  standalone: false,
 })
 export class ItemHoldDirective implements OnDestroy {
   private _holdReceiver? = inject(ItemHoldReceiverService, { optional: true });

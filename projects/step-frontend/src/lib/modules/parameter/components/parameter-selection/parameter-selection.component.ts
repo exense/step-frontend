@@ -14,6 +14,7 @@ import {
   templateUrl: './parameter-selection.component.html',
   styleUrls: ['./parameter-selection.component.scss'],
   providers: [...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  standalone: false,
 })
 export class ParameterSelectionComponent extends BaseEntitySelectionTableComponent {
   protected _selectionCollector = inject<SelectionCollector<string, Parameter>>(SelectionCollector);

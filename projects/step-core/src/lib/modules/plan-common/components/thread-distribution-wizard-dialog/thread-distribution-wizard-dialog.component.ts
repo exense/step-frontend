@@ -45,7 +45,6 @@ const calculateValues = (value: DistributionFormValue = {}, durationUnits?: KeyV
   selector: 'step-thread-distribution-wizard-dialog',
   templateUrl: './thread-distribution-wizard-dialog.component.html',
   styleUrls: ['./thread-distribution-wizard-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
 })
 export class ThreadDistributionWizardDialogComponent {

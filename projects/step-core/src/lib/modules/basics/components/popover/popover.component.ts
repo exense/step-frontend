@@ -48,6 +48,7 @@ export abstract class PopoverService {
       useExisting: forwardRef(() => PopoverComponent),
     },
   ],
+  standalone: false,
 })
 export class PopoverComponent implements PopoverService, AfterViewInit {
   private _el = inject<ElementRef<HTMLElement>>(ElementRef);

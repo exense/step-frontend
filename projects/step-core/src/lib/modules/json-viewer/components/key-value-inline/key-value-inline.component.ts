@@ -7,6 +7,7 @@ import { BaseViewerComponent } from '../base-viewer/base-viewer.component';
   templateUrl: './key-value-inline.component.html',
   styleUrls: ['./key-value-inline.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class KeyValueInlineComponent extends BaseViewerComponent {
   private _jsonViewerFormatter = inject(JsonViewerFormatterService);

@@ -4,6 +4,7 @@ import { from } from 'rxjs';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class LinkButtonComponent implements OnInit {
   private _router = inject(Router);

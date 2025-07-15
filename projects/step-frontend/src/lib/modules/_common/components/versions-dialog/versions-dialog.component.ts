@@ -11,6 +11,7 @@ enum VersionDialogTabs {
   selector: 'step-versions-dialog',
   templateUrl: './versions-dialog.component.html',
   styleUrls: ['./versions-dialog.component.scss'],
+  standalone: false,
 })
 export class VersionsDialogComponent {
   private _controllerService = inject(ControllerService);

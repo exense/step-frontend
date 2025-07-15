@@ -13,6 +13,7 @@ import {
   selector: 'step-function-type-node-js',
   templateUrl: './function-type-node-js.component.html',
   styleUrls: ['./function-type-node-js.component.scss'],
+  standalone: false,
 })
 export class FunctionTypeNodeJSComponent extends FunctionTypeFormComponent<FunctionTypeNodeJSForm> {
   private _formBuilder = inject(FormBuilder);

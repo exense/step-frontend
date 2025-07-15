@@ -19,6 +19,7 @@ import { KeywordReportNode } from '../../types/keyword.report-node';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CallKeywordInlineComponent extends BaseInlineArtefactComponent<KeywordArtefact, KeywordReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

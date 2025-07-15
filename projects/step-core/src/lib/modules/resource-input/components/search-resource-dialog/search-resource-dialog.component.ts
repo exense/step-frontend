@@ -8,7 +8,6 @@ import { TableModule } from '../../../table/table.module';
   selector: 'step-search-resource-dialog',
   templateUrl: './search-resource-dialog.component.html',
   styleUrls: ['./search-resource-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule, TableModule],
 })
 export class SearchResourceDialogComponent {

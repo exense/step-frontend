@@ -13,6 +13,7 @@ import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
   >
   </step-bulk-selection>`,
   styleUrls: [],
+  standalone: false,
 })
 export class BulkSelectionDiComponent<KEY, ENTITY> {
   _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector, { optional: true })!;

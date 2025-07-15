@@ -23,6 +23,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   host: {
     '[attr.tabindex]': '0',
   },
+  standalone: false,
 })
 export class FocusableDirective implements OnInit, OnDestroy {
   private _destroyRef = inject(DestroyRef);

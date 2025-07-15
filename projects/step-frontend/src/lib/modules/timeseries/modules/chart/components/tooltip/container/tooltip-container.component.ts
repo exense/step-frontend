@@ -3,7 +3,6 @@ import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'step-tooltip-container',
-  standalone: true,
   template: `
     @if (template) {
       <ng-container>

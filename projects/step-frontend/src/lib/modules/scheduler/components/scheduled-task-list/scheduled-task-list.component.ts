@@ -45,6 +45,7 @@ enum ActiveLabels {
       useExisting: forwardRef(() => ScheduledTaskListComponent),
     },
   ],
+  standalone: false,
 })
 export class ScheduledTaskListComponent implements DialogParentService {
   private _auth = inject(AuthService);

@@ -5,6 +5,7 @@ import { CustomComponent } from '../../modules/custom-registeries/shared/custom-
   selector: 'step-html-description-cell',
   template: `<div [innerHTML]="context?.attributes?.['description'] | safeHtml"></div>`,
   styleUrls: [],
+  standalone: false,
 })
 export class HtmlDescriptionCellComponent implements CustomComponent {
   context?: {

@@ -4,6 +4,7 @@ import { CustomCellRegistryService } from '../../custom-registeries/services/cus
 
 @Pipe({
   name: 'customCellComponents',
+  standalone: false,
 })
 export class CustomCellComponentsPipe implements PipeTransform {
   protected _customCells = inject(CustomCellRegistryService);

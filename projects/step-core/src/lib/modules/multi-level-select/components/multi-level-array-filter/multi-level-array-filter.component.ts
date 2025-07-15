@@ -8,7 +8,6 @@ import { MultiLevelArrayItemLabelValueExtractor } from '../../types/multi-level-
 
 @Component({
   selector: 'step-multi-level-array-filter',
-  standalone: true,
   imports: [StepBasicsModule, MultiLevelSelectComponent],
   templateUrl: './multi-level-array-filter.component.html',
   styleUrl: './multi-level-array-filter.component.scss',

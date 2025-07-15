@@ -3,6 +3,7 @@ import { Tab } from '@exense/step-core';
 
 @Pipe({
   name: 'includeTab',
+  standalone: false,
 })
 export class IncludeTabPipe implements PipeTransform {
   transform({ id: tabId }: Tab<string>, activeTabId?: string): boolean {

@@ -21,7 +21,6 @@ const BORDER_WIDTH = 1;
       multi: true,
     },
   ],
-  standalone: true,
   imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent],
   encapsulation: ViewEncapsulation.None,
 })

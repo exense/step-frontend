@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'step-rich-editor-change-status',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './rich-editor-change-status.component.html',
   styleUrl: './rich-editor-change-status.component.scss',

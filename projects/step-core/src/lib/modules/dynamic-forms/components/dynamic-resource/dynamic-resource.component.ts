@@ -8,6 +8,7 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
   templateUrl: './dynamic-resource.component.html',
   styleUrls: ['./dynamic-resource.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DynamicResourceComponent extends DynamicValueBaseComponent<DynamicValueString> {
   readonly type = input.required<string>();

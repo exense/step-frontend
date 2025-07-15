@@ -19,7 +19,6 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   templateUrl: './tree-node-name.component.html',
   styleUrl: './tree-node-name.component.scss',
   encapsulation: ViewEncapsulation.None,
-  standalone: true,
   imports: [StepBasicsModule],
 })
 export class TreeNodeNameComponent {

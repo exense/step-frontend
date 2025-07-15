@@ -10,7 +10,6 @@ import { AttachmentMeta } from '../../../../client/step-client-module';
   selector: 'step-legacy-attachment-preview',
   templateUrl: './legacy-attachment-preview.component.html',
   styleUrls: ['./legacy-attachment-preview.component.scss'],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [StepBasicsModule, AttachmentUrlPipe, AttachmentIsImagePipe, AttachmentShowLabelPipe, AttachmentIsTextPipe],
 })
