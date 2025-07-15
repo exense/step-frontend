@@ -78,7 +78,13 @@ step-attachment-preview {
     }
   }
 
-  &.with-actions {
+  &.force-action-bar {
+    .actions {
+      opacity: 1;
+    }
+  }
+
+  &.with-action-bar {
     &:hover {
       img,
       .file-info {
@@ -97,7 +103,7 @@ step-attachment-preview {
     }
   }
 
-  &:not(.with-actions) {
+  &:not(.with-action-bar):not(.force-action-bar) {
     .actions {
       display: none;
     }

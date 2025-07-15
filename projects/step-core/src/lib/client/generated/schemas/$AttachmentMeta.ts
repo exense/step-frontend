@@ -10,5 +10,9 @@ export const $AttachmentMeta = {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
     },
+    type: {
+      type: 'string',
+      isRequired: true,
+    },
   },
 } as const;

@@ -5,6 +5,5 @@
 export type AttachmentMeta = {
   name?: string;
   id?: string;
-  type?: string;
-  reason?: string;
+  type: string;
 };

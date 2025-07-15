@@ -21,6 +21,8 @@ export class AttachmentUtilsService {
       return AttachmentType.SKIPPED;
     }
 
+    const isStreaming = attachment.type === 'step.attachments.StreamingAttachmentMeta';
+
     const nameParts = (attachment.name ?? '').split('.');
     const extension = nameParts[nameParts.length - 1];
     if (!extension) {
@@ -32,11 +34,11 @@ export class AttachmentUtilsService {
     }
 
     if (this._videoTypes.has(extension as VideoType)) {
-      return AttachmentType.VIDEO;
+      return isStreaming ? AttachmentType.STREAMING_VIDEO : AttachmentType.VIDEO;
     }
 
     if (this._textTypes.has(extension as TextType)) {
-      return AttachmentType.TEXT;
+      return isStreaming ? AttachmentType.STREAMING_TEXT : AttachmentType.TEXT;
     }
 
     return AttachmentType.DEFAULT;
