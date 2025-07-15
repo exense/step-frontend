@@ -144,18 +144,15 @@ import { AltExecutionTreeNodeAddonDirective } from './directives/alt-execution-t
 import { IsEmptyStatusPipe } from './pipes/is-empty-status.pipe';
 import { IsCurrentReportDetailsOpenedPipe } from './pipes/is-current-report-details-opened.pipe';
 import { ToggleRequestWarningDirective } from './directives/toggle-request-warning.directive';
-import { SchedulerPerformanceViewComponent } from './components/schedule-overview/cross-execution-dashboard/performance/scheduler-performance-view.component';
-import { SchedulerReportViewComponent } from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
 import { CrossExecutionDashboardComponent } from './components/schedule-overview/cross-execution-dashboard/cross-execution-dashboard.component';
-import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
 import { PlanPageComponent } from './components/schedule-overview/plan-page/plan-page.component';
 import { ParentElementSizeDirective } from './directives/parent-element-size.directive';
-import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page.component';
-import { SchedulerPerformanceViewComponent } from './components/schedule-overview/performance/scheduler-performance-view.component';
-import { SchedulerReportViewComponent } from './components/schedule-overview/report/scheduler-report-view.component';
+import { AltExecutionTimePopoverAddonDirective } from './components/alt-execution-time/alt-execution-time-popover-addon.directive';
+import { SchedulerPerformanceViewComponent } from './components/schedule-overview/cross-execution-dashboard/performance/scheduler-performance-view.component';
+import { SchedulerReportViewComponent } from './components/schedule-overview/cross-execution-dashboard/report/scheduler-report-view.component';
+import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
-import { AltExecutionTimePopoverAddonDirective } from './components/alt-execution-time/alt-execution-time-popover-addon.directive';
 
 @NgModule({
   declarations: [
