@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  model,
+  OnInit,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { AttachmentType } from '../../types/attachment-type.enum';
@@ -10,11 +19,13 @@ import { RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { from } from 'rxjs';
+import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
+import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
 
 @Component({
   selector: 'step-attachment-dialog',
   standalone: true,
-  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent],
+  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent, StreamingTextComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +43,11 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
+  protected readonly streamingStatus = model<AttachmentStreamStatus | undefined>(undefined);
+  protected readonly isStreamingInProgress = computed(() => {
+    const status = this.streamingStatus();
+    return !!status && status !== 'COMPLETED';
+  });
   protected readonly contentCtrl = this._fb.control('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
   protected readonly AttachmentType = AttachmentType;

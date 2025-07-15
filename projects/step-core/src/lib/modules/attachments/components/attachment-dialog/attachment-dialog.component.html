@@ -13,6 +13,9 @@
         <step-icon name="copy" />
       </button>
     }
+    @if (isStreamingInProgress()) {
+      <mat-spinner [diameter]="25" />
+    }
   </div>
   <div step-modal-window-body>
     @switch (attachmentType) {
@@ -29,11 +32,14 @@
         </div>
       }
       @case (AttachmentType.TEXT) {
-        <step-rich-editor #richEditor [formControl]="contentCtrl" [wrapText]="true" />
+        <step-rich-editor #richEditor [formControl]="contentCtrl" />
+      }
+      @case (AttachmentType.STREAMING_TEXT) {
+        <step-streaming-text [attachment]="_data" [(status)]="streamingStatus" />
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">
-          <p class="max-width-600">{{ _data.reason }}</p>
+          <p class="max-width-600">{{ $any(_data).reason }}</p>
         </div>
       }
       @default {}
@@ -41,7 +47,7 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Close</button>
-    @if (attachmentType !== AttachmentType.SKIPPED) {
+    @if (attachmentType !== AttachmentType.SKIPPED && !isStreamingInProgress()) {
       <button type="button" mat-flat-button color="primary" (click)="download()">Download</button>
     }
   </div>

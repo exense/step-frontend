@@ -3,6 +3,9 @@
     @case (AttachmentType.IMG) {
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
+    @case (AttachmentType.STREAMING_TEXT) {
+      <step-streaming-text [attachment]="attachment()!" [(status)]="streamingStatus" [displayLatestRows]="4" />
+    }
     @default {
       <div class="file-info">
         <step-icon [name]="attachmentType | attachmentTypeIcon" />
@@ -13,7 +16,7 @@
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG,
+    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT,
     skipped: attachmentType() === AttachmentType.SKIPPED
   }"
 >
@@ -21,7 +24,11 @@
 </div>
 
 <div class="actions">
-  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
-    <step-icon name="download" />
-  </button>
+  @if (isStreamingInProgress()) {
+    <mat-spinner [diameter]="15" />
+  } @else {
+    <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
+      <step-icon name="download" />
+    </button>
+  }
 </div>
