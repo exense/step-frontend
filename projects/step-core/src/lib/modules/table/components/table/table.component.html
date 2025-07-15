@@ -15,6 +15,7 @@
     [screen]="screen"
     [entitySubPath]="_tableColumns.entityScreenSubPath"
     [options]="_tableColumns.customColumnOptions"
+    (columnsChange)="handleColumnsChange()"
   />
 }
 <div class="table-container">

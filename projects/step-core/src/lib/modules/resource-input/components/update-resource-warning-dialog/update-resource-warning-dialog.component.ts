@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, HostListener, inject, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { AlertType, ModalWindowComponent } from '../../../../modules/basics/step-basics.module';
-import { UpdateResourceWarningResultState } from '../../shared/update-resource-warning-result-state.enum';
+import { AlertType, ModalWindowComponent, StepBasicsModule } from '../../../../modules/basics/step-basics.module';
+import { UpdateResourceWarningResultState } from '../../types/update-resource-warning-result-state.enum';
 
 @Component({
   selector: 'step-update-resource-warning-dialog',
   templateUrl: './update-resource-warning-dialog.component.html',
   styleUrls: ['./update-resource-warning-dialog.component.scss'],
-  standalone: false,
+  imports: [StepBasicsModule],
 })
 export class UpdateResourceWarningDialogComponent implements AfterViewInit {
   @ViewChild(ModalWindowComponent, { static: true })
@@ -17,6 +17,7 @@ export class UpdateResourceWarningDialogComponent implements AfterViewInit {
     inject<MatDialogRef<UpdateResourceWarningDialogComponent, UpdateResourceWarningResultState>>(MatDialogRef);
 
   protected readonly AlertType = AlertType;
+
   ngAfterViewInit(): void {
     this.modalWindow.focusDialog();
   }

@@ -13,16 +13,14 @@
 } @else {
   <step-resource-input
     [label]="label"
-    [stType]="type"
-    [stDirectory]="directory"
-    [withHelpIcon]="!!tooltip"
+    [resourceType]="type()"
+    [supportsDirectory]="supportsDirectory()"
     [helpIconTooltip]="tooltip"
     [withDynamicSwitch]="true"
-    [stModel]="value"
-    [isInvalid]="!!_ngControl.invalid"
-    [isTouched]="!!_ngControl.touched"
-    [isDisabled]="isDisabled"
-    (stModelChange)="onValueChange($event)"
+    [ngModel]="value"
+    [isParentInvalid]="!!_ngControl.invalid"
+    [disabled]="isDisabled"
+    (ngModelChange)="onValueChange($event)"
     (dynamicSwitch)="toggleDynamicExpression(true)"
     (blur)="onBlur()"
   />

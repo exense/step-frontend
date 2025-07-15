@@ -17,6 +17,7 @@ import {
   OnInit,
   Output,
   QueryList,
+  signal,
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
@@ -142,12 +143,14 @@ export class TableComponent<T>
   private _tableState = inject(TablePersistenceStateService);
   private _sort = inject(MatSort, { optional: true });
   private _destroyRef = inject(DestroyRef);
+  private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
+  private isInitialized: boolean = false;
 
-  searchColumns: SearchColumn[] = [];
+  protected searchColumns: SearchColumn[] = [];
 
   private dataSourceTerminator$?: Subject<void>;
 
@@ -155,29 +158,25 @@ export class TableComponent<T>
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
 
-  /** @Input() **/
-  inProgress = input(false);
+  private usedColumns = new Set<string>();
 
-  tableDataSource?: TableDataSource<T>;
+  readonly inProgress = input(false);
 
-  /** @Input() **/
-  pageSizeInputDisabled = input(false);
+  protected tableDataSource?: TableDataSource<T>;
 
-  /** @Input() **/
-  visibleColumns = input(undefined, {
+  readonly pageSizeInputDisabled = input(false);
+
+  readonly visibleColumns = input(undefined, {
     transform: (source?: string[]) => (!!source ? new Set<string>(source) : undefined),
   });
 
   @Input() defaultSearch?: Record<string, SearchValue>;
 
-  /** @Input() **/
-  filter = input<string | undefined>(undefined);
+  readonly filter = input<string | undefined>(undefined);
 
-  /** @Input() **/
-  tableParams = input<TableParameters | undefined>(undefined);
+  readonly tableParams = input<TableParameters | undefined>(undefined);
 
-  /** @Input() **/
-  noResultsPlaceholder = input<string | undefined>(undefined);
+  readonly noResultsPlaceholder = input<string | undefined>(undefined);
 
   readonly blockGlobalReload = input(false);
 
@@ -208,20 +207,18 @@ export class TableComponent<T>
     return result;
   });
 
-  /** @ContentChild **/
   protected readonly rowsExtension = contentChild(RowsExtensionDirective);
 
-  /**
-   * @ContentChildrent(ColumnDirective)
-   * **/
   private contentColumns = contentChildren(ColumnDirective);
 
-  /**
-   * @ViewChildren(ColumnDirective)
-   * **/
   private viewColumns = viewChildren(ColumnDirective);
 
-  private columns = computed(() => [...this.contentColumns(), ...this.viewColumns()]);
+  private columnsUpdateTrigger = signal(0);
+
+  private columns = computed(() => {
+    const updateTrigger = this.columnsUpdateTrigger();
+    return [...this.contentColumns(), ...this.viewColumns()];
+  });
 
   readonly columnsDictionary = computed(() => {
     const alreadyUsed = new Set<string>();
@@ -259,9 +256,6 @@ export class TableComponent<T>
       .filter((x) => !x.isSearchDisabled);
   });
 
-  /**
-   * @ViewChildren(CustomColumns)
-   * **/
   private customRemoteColumns = viewChild(CustomColumnsComponent);
 
   protected _itemsPerPageService =
@@ -284,8 +278,16 @@ export class TableComponent<T>
     return searchColumnNames.filter((col) => configuredSearchColumnNames.has(col));
   });
 
-  constructor(_columnDefinitions: TableColumnsDefinitionService) {
-    _columnDefinitions.setup(this.contentColumns, this.customRemoteColumns);
+  protected handleColumnsChange(): void {
+    this.columnsUpdateTrigger.update((value) => (value + 1) % 10);
+    setTimeout(() => {
+      if (!this.isInitialized) {
+        return;
+      }
+      this.configureColumns();
+      this.configureSearchColumns();
+      this.addCustomColumnsDefinitionsToRemoteDatasource();
+    });
   }
 
   private search$ = new BehaviorSubject<SearchData>({
@@ -542,6 +544,7 @@ export class TableComponent<T>
       this.setupAdditionalsHeaderGroups();
       this.configureColumns();
       this.configureSearchColumns();
+      this._columnsDefinitions.setup(this.contentColumns, this.customRemoteColumns);
       this._tableColumns.initialize();
 
       if (this.initRequired) {
@@ -549,6 +552,7 @@ export class TableComponent<T>
       }
 
       this.addCustomColumnsDefinitionsToRemoteDatasource();
+      this.isInitialized = true;
     };
 
     const customCols = this.columns()?.filter((col) => col.isCustom) || [];
@@ -579,7 +583,12 @@ export class TableComponent<T>
 
   private configureColumns(): void {
     const allCollDef = this.allCollDef();
-    allCollDef.forEach((col) => this.table!.addColumnDef(col));
+    allCollDef.forEach((col) => {
+      if (!this.usedColumns.has(col.name) && !col.name.startsWith('search-')) {
+        this.usedColumns.add(col.name);
+        this.table!.addColumnDef(col);
+      }
+    });
   }
 
   private configureSearchColumns(): void {

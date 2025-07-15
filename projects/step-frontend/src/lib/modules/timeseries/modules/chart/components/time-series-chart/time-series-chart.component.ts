@@ -1,6 +1,7 @@
 import {
   Component,
   ContentChild,
+  effect,
   ElementRef,
   EmbeddedViewRef,
   EventEmitter,
@@ -10,6 +11,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   TemplateRef,
   ViewChild,
@@ -71,6 +73,12 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
   @Output() zoomReset = new EventEmitter<void>();
   @Output() zoomChange = new EventEmitter<TimeRange>(); // warning! this event will be emitted by all charts synchronized.
   @Output() lockStateChange = new EventEmitter<boolean>();
+  lockState = signal<boolean>(false); // the state does not change when unlocking from a synced chart
+
+  lockEffect = effect(() => {
+    let locked = this.lockState();
+    this.lockStateChange.emit(locked);
+  });
 
   @ContentChild(TooltipContentDirective, { read: TemplateRef }) tooltipTemplate!: TemplateRef<any>;
 
@@ -81,6 +89,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
   // uPlot tooltip plugin will send events here
   tooltipEvents = new EventEmitter<TooltipEvent>();
+  isDisapleyed = false;
 
   constructor(private overlay: Overlay) {
     this.tooltipEvents.subscribe((event) => {
@@ -91,14 +100,21 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
           this.hideTooltip();
           break;
         case 'POSITION_CHANGED':
-          const { x, y, data } = event.payload!;
-          this.showTooltipAt(x, y, this.tooltipTemplate, data);
+          const { x, y, data, over } = event.payload!;
+          this.showTooltipAt(x, y, this.tooltipTemplate, data, over);
+          this.isDisapleyed = true;
           break;
       }
     });
   }
 
-  showTooltipAt(x: number, y: number, template: TemplateRef<any>, data: TooltipContextData) {
+  showTooltipAt(
+    x: number,
+    y: number,
+    template: TemplateRef<any>,
+    data: TooltipContextData,
+    overContainer: HTMLElement,
+  ) {
     if (!template) {
       return;
     }
@@ -122,24 +138,42 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
 
     const positionStrategy = this.overlay
       .position()
-      .flexibleConnectedTo({ x, y })
+      .flexibleConnectedTo(overContainer)
       .withViewportMargin(4)
+      .withPush(false)
       .withPositions([
         {
           originX: 'start',
           originY: 'top',
           overlayX: 'start',
           overlayY: 'top',
-          offsetX: 8, // Horizontal gap (right of cursor)
-          offsetY: 8, // Vertical gap (below cursor)
+          offsetX: x + 8,
+          offsetY: y + 8,
         },
         {
-          originX: 'end',
+          // for right edge overlap
+          originX: 'start',
           originY: 'top',
           overlayX: 'end',
           overlayY: 'top',
-          offsetX: -8, // Horizontal gap (left of cursor)
-          offsetY: 8, // Vertical gap (below cursor)
+          offsetX: x - 8,
+          offsetY: y + 8,
+        },
+        {
+          originX: 'start',
+          originY: 'top',
+          overlayX: 'start',
+          overlayY: 'bottom',
+          offsetX: x + 8,
+          offsetY: y - 8,
+        },
+        {
+          originX: 'start',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'bottom',
+          offsetX: x - 8,
+          offsetY: y - 8,
         },
       ]);
 

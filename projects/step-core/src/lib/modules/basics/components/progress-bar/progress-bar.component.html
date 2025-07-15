@@ -1,2 +1,2 @@
-<mat-progress-bar mode="determinate" [value]="progress$ | async"></mat-progress-bar>
-<div class="progress-bar-percentage">{{ progress$ | async }}%</div>
+<mat-progress-bar mode="determinate" [value]="progress()" />
+<div class="progress-bar-percentage">{{ progress() }}%</div>

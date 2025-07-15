@@ -1,4 +1,4 @@
-import { Component, HostBinding, inject, viewChild } from '@angular/core';
+import { Component, effect, inject, model, viewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionPackageConfigurationDialogData } from '../../types/function-package-configuration-dialog-data.interface';
 import {
@@ -8,14 +8,19 @@ import {
   Keyword,
   ResourceInputBridgeService,
   CustomFormComponent,
+  ResourceInputUtilsService,
 } from '@exense/step-core';
-import { catchError, iif, map, of, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, filter, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-function-package-configuration-dialog',
   templateUrl: './function-package-configuration-dialog.component.html',
   styleUrls: ['./function-package-configuration-dialog.component.scss'],
+  host: {
+    '(keydown.enter)': 'save()',
+  },
   standalone: false,
 })
 export class FunctionPackageConfigurationDialogComponent {
@@ -25,6 +30,7 @@ export class FunctionPackageConfigurationDialogComponent {
   private _matDialogRef = inject<MatDialogRef<FunctionPackageConfigurationDialogData, DialogRouteResult>>(MatDialogRef);
   protected _data = inject<FunctionPackageConfigurationDialogData>(MAT_DIALOG_DATA, { optional: true });
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
+  private _resourceInputUtils = inject(ResourceInputUtilsService);
 
   private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
@@ -32,6 +38,47 @@ export class FunctionPackageConfigurationDialogComponent {
 
   protected functionPackage = this._data?.functionPackage ?? { packageAttributes: {} };
   protected customAttributes = { attributes: this.functionPackage.packageAttributes };
+
+  protected readonly packageLocation = model(this.functionPackage?.packageLocation);
+  protected readonly packageLibrariesLocation = model(this.functionPackage?.packageLibrariesLocation);
+
+  private effectSyncPackageLocation = effect(() => {
+    this.functionPackage.packageLocation = this.packageLocation();
+    // Immediately load preview, if value is valid resource id
+    if (this._resourceInputUtils.isResourceValue(this.functionPackage.packageLocation)) {
+      this.loadPackagePreview();
+    }
+  });
+
+  private effectSyncPackageLibrariesLocation = effect(() => {
+    this.functionPackage.packageLibrariesLocation = this.packageLibrariesLocation();
+    // Immediately load preview, if value is valid resource id
+    if (this._resourceInputUtils.isResourceValue(this.functionPackage.packageLibrariesLocation)) {
+      this.loadPackagePreview();
+    }
+  });
+
+  /**
+   * Debounced version for manual input of absolute resource's location
+   * **/
+  private subscriptionSyncPackageLocationDebounced = toObservable(this.packageLocation)
+    .pipe(
+      filter((value) => !!value && !this._resourceInputUtils.isResourceValue(value)),
+      debounceTime(1000),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this.loadPackagePreview());
+
+  /**
+   * Debounced version for manual input of absolute resource's location
+   * **/
+  private subscriptionSyncPackageLibrariesLocationDebounced = toObservable(this.packageLibrariesLocation)
+    .pipe(
+      filter((value) => !!value && !this._resourceInputUtils.isResourceValue(value)),
+      debounceTime(1000),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this.loadPackagePreview());
 
   protected criteria = this.createTokenSelectionCriteria();
 
@@ -43,8 +90,7 @@ export class FunctionPackageConfigurationDialogComponent {
   protected previewError?: string;
   protected addedFunctions?: Keyword[];
 
-  @HostBinding('keydown.enter')
-  save(): void {
+  protected save(): void {
     if (!this._data?.functionPackage && (!this.functionPackage.packageLocation || !this.isFunctionPackageReady)) {
       return;
     }
@@ -69,16 +115,16 @@ export class FunctionPackageConfigurationDialogComponent {
       .subscribe((result) => this._matDialogRef.close({ isSuccess: !!result }));
   }
 
-  cancel(): void {
+  protected cancel(): void {
     this._resourceInputBridgeService.deleteUploadedResource();
     this._matDialogRef.close();
   }
 
-  addRoutingCriteria(): void {
+  protected addRoutingCriteria(): void {
     this.criteria.push({ key: '', value: '' });
   }
 
-  saveRoutingCriteria(): void {
+  protected saveRoutingCriteria(): void {
     this.functionPackage.tokenSelectionCriteria = this.criteria
       .filter((item) => !!item.key)
       .reduce(
@@ -90,24 +136,24 @@ export class FunctionPackageConfigurationDialogComponent {
       );
   }
 
-  removeRoutingCriteria(criterion: KeyValue<string, string>): void {
+  protected removeRoutingCriteria(criterion: KeyValue<string, string>): void {
     if (this.functionPackage.tokenSelectionCriteria) {
       delete this.functionPackage.tokenSelectionCriteria[criterion.key];
     }
     this.criteria = this.criteria.filter((item) => item !== criterion);
   }
 
-  saveCustomAttributes(customAttributes?: Record<string, unknown>): void {
+  protected saveCustomAttributes(customAttributes?: Record<string, unknown>): void {
     this.customAttributes = customAttributes as FunctionPackageConfigurationDialogComponent['customAttributes'];
     this.functionPackage.packageAttributes = this.customAttributes.attributes;
   }
 
-  handlePackageLocationChange(packageLocation?: string): void {
+  protected handlePackageLocationChange(packageLocation?: string): void {
     this.functionPackage.packageLocation = packageLocation;
     this.loadPackagePreview();
   }
 
-  handlePackageLibrariesLocationChange(packageLibrariesLocation?: string): void {
+  protected handlePackageLibrariesLocationChange(packageLibrariesLocation?: string): void {
     this.functionPackage.packageLibrariesLocation = packageLibrariesLocation;
     this.loadPackagePreview();
   }

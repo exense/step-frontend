@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   inject,
   input,
@@ -11,7 +12,7 @@ import {
 } from '@angular/core';
 import { AggregatedReportViewRequest, AugmentedExecutionsService, ReportNode } from '@exense/step-core';
 import { catchError, combineLatest, finalize, map, of, switchMap } from 'rxjs';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-tree.component';
@@ -37,6 +38,11 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   private _executionDialogs = inject(AltExecutionDialogsService);
 
+  private isRunningExecution = toSignal(
+    this._executionState.execution$.pipe(map((execution) => execution.status === 'RUNNING')),
+    { initialValue: false },
+  );
+
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
   readonly node = input.required<ReportNode>();
@@ -44,7 +50,14 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly autoFocusNode = input(true);
   readonly showDetailsButton = input(false);
 
-  protected showSpinner = signal(false);
+  private isFirstLoad = signal(true);
+  private loadInProgress = signal(false);
+  protected showSpinner = computed(() => {
+    const isFirstLoad = this.isFirstLoad();
+    const isRunningExecution = this.isRunningExecution();
+    const loadInProgress = this.loadInProgress();
+    return (isFirstLoad || !isRunningExecution) && loadInProgress;
+  });
 
   private reportNode$ = toObservable(this.node);
 
@@ -64,7 +77,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     combineLatest([this._executionState.executionId$, this._executionState.timeRange$, this.reportNode$])
       .pipe(
         switchMap(([executionId, range, reportNode]) => {
-          this.showSpinner.set(true);
+          this.loadInProgress.set(true);
           const request: AggregatedReportViewRequest = { range, selectedReportNodeId: reportNode.id };
           return this._executionsApi.getAggregatedReportView(executionId, request).pipe(
             map((response) => {
@@ -78,7 +91,10 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
               };
             }),
             catchError(() => of(undefined)),
-            finalize(() => this.showSpinner.set(false)),
+            finalize(() => {
+              this.isFirstLoad.set(false);
+              this.loadInProgress.set(false);
+            }),
           );
         }),
         takeUntilDestroyed(this._destroyRef),

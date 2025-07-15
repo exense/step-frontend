@@ -8,6 +8,11 @@ step-scheduler-page {
   gap: 2rem;
   padding: 0 1rem;
 
+  step-alt-execution-time-prefix,
+  step-alt-execution-time-suffix {
+    margin-left: 0.6rem;
+  }
+
   .header {
     display: grid;
     grid-template-columns: 1fr auto auto;
@@ -111,26 +116,6 @@ step-scheduler-page {
     }
   }
 
-  @media print {
-    padding: 0 !important;
-    .header {
-      .details-hint,
-      .controls {
-        display: none;
-      }
-    }
-
-    .print-execution-details {
-      margin-bottom: 2rem;
-    }
-
-    .plan-link,
-    .execution-message,
-    .simulate-icon {
-      display: none;
-    }
-  }
-
   .execution-message {
     display: block;
     margin-bottom: 2em;
@@ -150,4 +135,9 @@ step-scheduler-page {
       color: var.$orange;
     }
   }
+}
+
+a.scheduler-execution-link {
+  margin-top: 0.5rem;
+  display: block;
 }

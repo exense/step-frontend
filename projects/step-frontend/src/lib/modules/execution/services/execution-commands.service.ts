@@ -80,6 +80,7 @@ export class ExecutionCommandsService implements OnDestroy {
     const executionsParameters$ = this.buildExecutionParams(false, false);
     return executionsParameters$.pipe(
       map((executionsParameters) => {
+        console.log('EXECUTION PARAMS', executionsParameters);
         const name = executionsParameters.description ?? '';
         return {
           attributes: { name },

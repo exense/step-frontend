@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, input, ViewEncapsulation } from '@angular/core';
 import { DynamicValueString } from '../../../../client/step-client-module';
 import { NgControl } from '@angular/forms';
 import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-base.component';
@@ -11,8 +11,8 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
   standalone: false,
 })
 export class DynamicResourceComponent extends DynamicValueBaseComponent<DynamicValueString> {
-  @Input() type!: string;
-  @Input() directory?: boolean;
+  readonly type = input.required<string>();
+  readonly supportsDirectory = input(false);
 
   constructor(_ngControl: NgControl) {
     super(_ngControl);
