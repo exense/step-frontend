@@ -1,12 +1,12 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { AuthService, TimeRange } from '@exense/step-core';
-import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../timeseries/modules/_common';
-import { SchedulerPageStateService } from '../scheduler-page-state.service';
-import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../../timeseries/modules/_common';
+import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, pairwise } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 @Component({
   selector: 'step-scheduler-performance-view',
@@ -15,7 +15,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 })
 export class SchedulerPerformanceViewComponent implements OnInit {
   private _authService = inject(AuthService);
-  readonly _state = inject(SchedulerPageStateService);
+  readonly _state = inject(CrossExecutionDashboardState);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
@@ -29,7 +29,7 @@ export class SchedulerPerformanceViewComponent implements OnInit {
 
   constructor() {
     this.dashboardId = this._authService.getConf()!.miscParams![TimeSeriesConfig.PARAM_KEY_ANALYTICS_DASHBOARD_ID];
-    this.dashboardFilters = this._state.getDashboardFilters();
+    this.dashboardFilters = [this._state.getDashboardFilter()];
   }
 
   ngOnInit(): void {
