@@ -9,7 +9,7 @@ import {
 } from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
-import { UpdateResourceWarningResultState } from '../shared/update-resource-warning-result-state.enum';
+import { UpdateResourceWarningResultState } from '../types/update-resource-warning-result-state.enum';
 import { DialogsService } from '../../basics/step-basics.module';
 import { IsUsedByDialogService } from '../../is-used-by';
 
@@ -46,9 +46,9 @@ export class ResourceDialogsService {
     this._document.defaultView!.open(url, '_blank');
   }
 
-  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<string | undefined> {
+  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<Resource | undefined> {
     return this._matDialog
-      .open<FileAlreadyExistingDialogComponent, FileAlreadyExistingDialogData, string | undefined>(
+      .open<FileAlreadyExistingDialogComponent, FileAlreadyExistingDialogData, Resource | undefined>(
         FileAlreadyExistingDialogComponent,
         {
           data: {

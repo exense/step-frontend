@@ -13,7 +13,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let resource" class="cell-actions">
-          <button mat-icon-button matTooltip="Use this resource" (click)="selectResource(resource.id)">
+          <button mat-icon-button matTooltip="Use this resource" (click)="selectResource(resource)">
             <step-icon name="plus"></step-icon>
           </button>
         </td>

@@ -1,4 +1,8 @@
-<step-modal-window [title]="title" [showSpinner]="initializingResource" [disableCloseByEsc]="true">
+<step-modal-window
+  [title]="title"
+  [showSpinner]="_resourceInputService.initializingResource()"
+  [disableCloseByEsc]="true"
+>
   <div step-modal-window-body>
     <form [formGroup]="formGroup">
       @if (_resourceConfigurationDialogData.resource) {
@@ -15,29 +19,30 @@
         predefinedOptionsLabel="Types"
       />
 
-      <step-resource-input
-        *ngIf="formGroup.controls.content.enabled; else readonlyContent"
-        #resourceInputControl
-        label="Content"
-        [stType]="formGroup.controls.resourceType.value"
-        [disableServerPath]="true"
-        [withClearButton]="false"
-        [withChooseExistingResourceButton]="false"
-        [stModel]="formGroup.controls.content.value.value"
-        (stModelChange)="onContentChange($event)"
-        (filesChange)="onFilesChange()"
-        (initializingResourceChange)="handleResourceInitialize($event)"
-      />
-      <ng-template #readonlyContent>
+      @if (formGroup.controls.content.enabled) {
+        <step-resource-input
+          label="Content"
+          [resourceType]="formGroup.controls.resourceType.value"
+          [disableServerPath]="true"
+          [withClearButton]="false"
+          [withChooseExistingResourceButton]="false"
+          [ngModel]="formGroup.controls.content.value.value"
+          (ngModelChange)="handleContentChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          (filesChange)="handleFilesChange()"
+        />
+      } @else {
         <step-form-field>
           <step-label>Content</step-label>
           <input type="text" [disabled]="true" [value]="formGroup.controls.content.value.value" />
         </step-form-field>
-      </ng-template>
+      }
     </form>
   </div>
 
   <div step-modal-window-buttons>
-    <button type="button" [disabled]="!!resourceInput?.progress$" (click)="close()" mat-stroked-button>Close</button>
+    <button type="button" [disabled]="!!_resourceInputService.uploadProgress()" (click)="close()" mat-stroked-button>
+      Close
+    </button>
   </div>
 </step-modal-window>

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -7,7 +7,7 @@ import {
   ModalWindowComponent,
   MultipleProjectsService,
   Resource,
-  ResourceInputComponent,
+  ResourceInputService,
   StepCoreModule,
 } from '@exense/step-core';
 import { ResourceConfigurationDialogData } from './resource-configuration-dialog-data.interface';
@@ -24,13 +24,14 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   styleUrls: ['./resource-configuration-dialog.component.scss'],
   imports: [StepCoreModule],
   standalone: true,
+  providers: [ResourceInputService],
 })
 export class ResourceConfigurationDialogComponent implements OnInit {
-  private _cd = inject(ChangeDetectorRef);
   private _formBuilder = inject(FormBuilder);
   private _matDialogRef = inject<MatDialogRef<ResourceConfigurationDialogComponent, DialogRouteResult>>(MatDialogRef);
   private _resourcesService = inject(AugmentedResourcesService);
   private _multipleProjectsService = inject(MultipleProjectsService);
+  protected _resourceInputService = inject(ResourceInputService);
 
   protected _resourceConfigurationDialogData = inject<ResourceConfigurationDialogData>(MAT_DIALOG_DATA);
   protected readonly title = this._resourceConfigurationDialogData?.resource ? 'Edit Resource' : 'New Resource';
@@ -41,16 +42,11 @@ export class ResourceConfigurationDialogComponent implements OnInit {
 
   protected readonly formGroup = resourceConfigurationDialogFormCreate(this._formBuilder);
 
-  @ViewChild(ModalWindowComponent, { static: true })
-  private modalWindow!: ModalWindowComponent;
-
-  @ViewChild('resourceInputControl')
-  protected resourceInput?: ResourceInputComponent;
+  private modalWindow = viewChild(ModalWindowComponent);
 
   protected loading = false;
   protected uploading = false;
   protected contentUpdated = false;
-  protected initializingResource = false;
 
   ngOnInit(): void {
     // Disable automatic closing, switch to manual
@@ -61,13 +57,8 @@ export class ResourceConfigurationDialogComponent implements OnInit {
     this.setFormValue(resource, isReadonly);
   }
 
-  protected handleResourceInitialize(value: boolean): void {
-    this.initializingResource = value;
-    this._cd.detectChanges();
-  }
-
-  protected onContentChange(resourceId: string): void {
-    if (!resourceId.startsWith('resource:')) {
+  protected handleContentChange(resourceId?: string): void {
+    if (!resourceId?.startsWith?.('resource:')) {
       return;
     }
 
@@ -82,13 +73,13 @@ export class ResourceConfigurationDialogComponent implements OnInit {
     });
   }
 
-  protected onFilesChange(): void {
+  protected handleFilesChange(): void {
     this.uploading = true;
   }
 
   @HostListener('window:keyup.esc')
   protected close(): void {
-    if (!!this.resourceInput?.progress$ || !this.modalWindow.isTopDialog()) {
+    if (!!this._resourceInputService?.uploadProgress() || !this.modalWindow()?.isTopDialog?.()) {
       return;
     }
     if (!this.contentUpdated) {
