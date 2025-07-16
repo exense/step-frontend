@@ -25,7 +25,7 @@
           <step-custom-forms [stModel]="params" stScreen="executionParameters" />
         }
       </div>
-      @if (artefact.type === 'TestSet') {
+      @if (artefact.type === 'TestSet' || artefact.type === 'automationPackage') {
         <hr />
         <step-repository-plan-testcase-list
           #testCases
