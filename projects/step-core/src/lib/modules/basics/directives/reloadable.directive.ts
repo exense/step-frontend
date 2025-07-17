@@ -1,4 +1,5 @@
 import { Directive, inject, OnDestroy, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { Reloadable } from '../types/reloadable';
 import { GlobalReloadService } from '../injectables/global-reload.service';
@@ -11,6 +12,7 @@ import { first, map } from 'rxjs';
 export class ReloadableDirective implements OnInit, OnDestroy, Reloadable {
   private _globalReload = inject(GlobalReloadService);
   private _router = inject(Router);
+  private _location = inject(Location);
 
   private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
 
@@ -28,7 +30,7 @@ export class ReloadableDirective implements OnInit, OnDestroy, Reloadable {
       return;
     }
 
-    const url = this._router.url;
+    const url = this._location.path(true);
     this._router.navigateByUrl('/').then(() => {
       setTimeout(() => this._router.navigateByUrl(url), 500);
     });
