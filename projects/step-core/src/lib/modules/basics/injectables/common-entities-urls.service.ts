@@ -52,6 +52,22 @@ export class CommonEntitiesUrlsService {
     return `/scheduler/editor/${id}`;
   }
 
+  schedulerPerformancePageUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+    if (!idOrTask) {
+      return '';
+    }
+    const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
+    return `/scheduler//${id}/performance`;
+  }
+
+  schedulerReportPageUrl(idOrTask?: string | ExecutiontTaskParameters): string {
+    if (!idOrTask) {
+      return '';
+    }
+    const id = typeof idOrTask === 'string' ? idOrTask : idOrTask.id;
+    return `/scheduler/${id}/report`;
+  }
+
   crossExecutionTaskPageUrl(idOrTask?: string | ExecutiontTaskParameters): string {
     if (!idOrTask) {
       return '';
