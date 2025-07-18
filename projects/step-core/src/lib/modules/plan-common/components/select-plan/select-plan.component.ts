@@ -1,6 +1,5 @@
-import { Component, inject, Input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
-import { noop } from 'rxjs';
 import { PlanDialogsService } from '../../injectables/plan-dialogs.service';
 import { Plan } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
@@ -14,38 +13,42 @@ type OnTouch = () => void;
   styleUrls: ['./select-plan.component.scss'],
   standalone: true,
   imports: [StepBasicsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
+export class SelectPlanComponent implements ControlValueAccessor {
   private _planDialogsService = inject(PlanDialogsService);
 
-  @Input() showRequiredMarker?: boolean;
-  @Input() withClearButton?: boolean;
-  @Input() label = 'Plan';
-  @Input() planFilter?: string;
+  readonly showRequiredMarker = input(false);
+  readonly withClearButton = input(false);
+  readonly label = input('Plan');
+  readonly planFilter = input<string | undefined>(undefined);
+  readonly errorsDictionary = input<Record<string, string> | undefined>(undefined);
 
-  private onChange: OnChange = noop;
-  private onTouch: OnTouch = noop;
+  private onChange?: OnChange;
+  private onTouch?: OnTouch;
 
-  protected isDisabled: boolean = false;
-  protected planValue?: Plan;
+  protected readonly isDisabled = signal(false);
+  protected readonly planValue = signal<Plan | undefined>(undefined);
 
-  constructor(readonly _ngControl: NgControl) {
+  protected readonly planName = computed(() => this.planValue()?.attributes?.['name'] ?? '');
+  protected readonly showClearButton = computed(() => {
+    const withClearButton = this.withClearButton();
+    const hasPlanName = !!this.planName();
+    return withClearButton && hasPlanName;
+  });
+
+  constructor(protected readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
   }
 
-  ngOnDestroy(): void {
-    this.onChange = noop;
-    this.onTouch = noop;
-  }
-
   selectPlan(): void {
-    this._planDialogsService.selectPlan(this.planFilter).subscribe({
+    this._planDialogsService.selectPlan(this.planFilter()).subscribe({
       next: (plan) => {
-        this.planValue = plan;
-        this.onChange(this.planValue);
+        this.planValue.set(plan);
+        this.onChange?.(plan);
       },
       complete: () => {
-        this.onTouch();
+        this.onTouch?.();
       },
     });
   }
@@ -59,15 +62,15 @@ export class SelectPlanComponent implements ControlValueAccessor, OnDestroy {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
+    this.isDisabled.set(isDisabled);
   }
 
-  writeValue(obj?: Plan): void {
-    this.planValue = obj;
+  writeValue(plan?: Plan): void {
+    this.planValue.set(plan);
   }
 
   protected clear(): void {
-    this.planValue = undefined;
-    this.onChange(this.planValue);
+    this.planValue.set(undefined);
+    this.onChange?.(undefined);
   }
 }
