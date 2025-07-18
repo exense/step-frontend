@@ -1,20 +1,21 @@
-<ng-template #clearButtonTemplate>
-  <step-suffix *ngIf="withClearButton && planValue?.attributes?.['name']" class="button-suffix">
-    <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()" [disabled]="isDisabled">
-      <step-icon name="x"></step-icon>
-    </button>
-  </step-suffix>
-</ng-template>
-
-<step-form-field
-  [class.ng-invalid]="_ngControl.invalid"
-  [class.ng-touched]="_ngControl.touched"
-  [showRequiredMarker]="showRequiredMarker"
->
-  <step-label *ngIf="label">{{ label }}</step-label>
-  <input type="text" readonly [disabled]="isDisabled" [ngModel]="planValue?.attributes?.['name']" [tabIndex]="-1" />
+<step-form-field [control]="_ngControl.control" [showRequiredMarker]="showRequiredMarker()" #formField="FormField">
+  @if (label(); as label) {
+    <step-label>{{ label }}</step-label>
+  }
+  <input type="text" readonly [disabled]="isDisabled()" [ngModel]="planName()" [tabIndex]="-1" />
   <step-suffix class="button-suffix">
-    <button type="button" mat-stroked-button (click)="selectPlan()" [disabled]="isDisabled">Select</button>
+    <button type="button" mat-stroked-button (click)="selectPlan()" [disabled]="isDisabled()">Select</button>
   </step-suffix>
-  <ng-container *ngTemplateOutlet="clearButtonTemplate"></ng-container>
+  @if (showClearButton()) {
+    <step-suffix class="button-suffix">
+      <button type="button" mat-stroked-button matTooltip="Clear" (click)="clear()" [disabled]="isDisabled()">
+        <step-icon name="x"></step-icon>
+      </button>
+    </step-suffix>
+  }
+  @if (formField.controlErrors(); as errors) {
+    <step-error>
+      <step-errors-list [errors]="errors" [keysDictionary]="errorsDictionary()" />
+    </step-error>
+  }
 </step-form-field>
