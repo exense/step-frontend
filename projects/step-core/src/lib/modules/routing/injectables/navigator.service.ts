@@ -65,8 +65,8 @@ export class NavigatorService {
     this._router.navigate(['/']);
   }
 
-  navigateLogin(skipLocationChange: boolean = true): void {
-    this._router.navigate(['/', 'login'], { skipLocationChange });
+  navigateLogin(queryParams: Params = {}): void {
+    this._router.navigate(['/', 'login'], { queryParams, skipLocationChange: true, queryParamsHandling: 'merge' });
   }
 
   navigateAfterLogin(): void {
