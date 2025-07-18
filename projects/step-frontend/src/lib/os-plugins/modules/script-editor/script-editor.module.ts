@@ -1,5 +1,7 @@
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import {
+  AugmentedKeywordsService,
+  checkEntityGuardFactory,
   FunctionType,
   FunctionTypeRegistryService,
   SimpleOutletComponent,
@@ -12,6 +14,7 @@ import { FunctionTypeScriptComponent } from './components/function-type-script/f
 import './components/function-type-script/function-type-script.component';
 import { canDeactivateFn } from './guards/can-deactivate-function';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
@@ -35,7 +38,26 @@ export class ScriptEditorModule {
         {
           path: ':id',
           component: ScriptEditorComponent,
-          canDeactivate: [canDeactivateFn],
+          canActivate: [
+            checkEntityGuardFactory({
+              entityType: 'keyword',
+              getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
+              getEditorUrl: (id) => `/script-editor/${id}`,
+            }),
+          ],
+          resolve: {
+            keyword: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              return inject(AugmentedKeywordsService).getFunctionByIdCached(id);
+            },
+          },
+          canDeactivate: [
+            canDeactivateFn,
+            () => {
+              inject(AugmentedKeywordsService).cleanupCache();
+              return true;
+            },
+          ],
         },
       ],
     });
