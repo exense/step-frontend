@@ -1,27 +1,29 @@
-@if (showSpinner) {
+@if (showSpinner()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
 }
 
-<h1 data-step-testid="title-modal-window" mat-dialog-title>
-  <section class="header-title">
-    {{ title }}
-    <div #titleContent [class.without-chidlren]="!titleContent.children.length">
-      <ng-content select="[step-modal-window-title]" />
-    </div>
-  </section>
-  <section #subtitle [class.without-chidlren]="!subtitle.children.length">
-    <ng-content select="[step-modal-window-subtitle]" />
-  </section>
-</h1>
+@if (!hideHeaderSection()) {
+  <h1 data-step-testid="title-modal-window" mat-dialog-title>
+    <section class="header-title">
+      {{ title() }}
+      <div #titleContent [class.without-chidlren]="!titleContent.children.length">
+        <ng-content select="[step-modal-window-title]" />
+      </div>
+    </section>
+    <section #subtitle [class.without-chidlren]="!subtitle.children.length">
+      <ng-content select="[step-modal-window-subtitle]" />
+    </section>
+  </h1>
+}
 
 <div mat-dialog-content #dialogContent class="dialog-content">
   <input type="text" class="track-focus" #trackFocus />
   <ng-content select="[step-modal-window-body]" />
 </div>
 
-@if (!hideButtonsSection) {
+@if (!hideButtonsSection()) {
   <div mat-dialog-actions>
     <step-btn-group>
       <section #customButtons [class.without-children]="!customButtons.children.length">

@@ -1,7 +1,7 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { ErrorMessageHandlerService, MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
 
@@ -20,7 +20,6 @@ export const checkEntityGuardFactory =
   (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const _auth = inject(AuthService);
     const _multipleProjects = inject(MultipleProjectsService);
-    const _errorMessageHandler = inject(ErrorMessageHandlerService);
     const _injector = inject(Injector);
     const _router = inject(Router);
     const _defaultPage = inject(DEFAULT_PAGE);
@@ -42,11 +41,17 @@ export const checkEntityGuardFactory =
     }>;
 
     return entity$.pipe(
-      switchMap((entity) => {
-        if (!entity) {
-          _errorMessageHandler.showError(`Entity "${config.entityType}" with id "${id}" doesn't exist`);
+      _multipleProjects.checkLoadErrors(config.entityType, id, state),
+      switchMap((entityOrUrl) => {
+        if (!entityOrUrl) {
           return of(false);
         }
+
+        if (typeof entityOrUrl === 'string') {
+          return of(_router.parseUrl(entityOrUrl));
+        }
+
+        const entity = entityOrUrl;
 
         if (_auth.hasRight('admin-no-multitenancy')) {
           return of(true);

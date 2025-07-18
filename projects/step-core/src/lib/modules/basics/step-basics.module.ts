@@ -74,7 +74,6 @@ import { OverflowTooltipDirective } from './directives/overflow-tooltip.directiv
 import { OverflowIndicatorDirective } from './directives/overflow-indicator.directive';
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
-import { ReloadableDirective } from './directives/reloadable.directive';
 import { ElementSizeDirective } from './directives/element-size.directive';
 
 @NgModule({
@@ -89,7 +88,6 @@ import { ElementSizeDirective } from './directives/element-size.directive';
     OverflowTooltipDirective,
     OverflowIndicatorDirective,
     SelectComponent,
-    ReloadableDirective,
     ElementSizeDirective,
   ],
   declarations: [
@@ -236,7 +234,6 @@ import { ElementSizeDirective } from './directives/element-size.directive';
     OverflowIndicatorDirective,
     TruncateStringPipe,
     StrategyClickDirective,
-    ReloadableDirective,
     ElementSizeDirective,
   ],
 })
@@ -372,7 +369,6 @@ export { SelectComponentSearchCtrlContainer } from './injectables/select-compone
 export * from './injectables/dynamic-values-utils.service';
 export * from './types/reloadable';
 export * from './injectables/global-reload.service';
-export * from './directives/reloadable.directive';
 export * from './types/image-type.enum';
 export * from './types/video-type.enum';
 export * from './types/text-type.enum';

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, inject, input, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
@@ -13,7 +13,7 @@ export abstract class BaseModalWindowComponent<T = any, R = any> implements OnIn
 
   protected _dialogRef = inject<MatDialogRef<T, R>>(MatDialogRef);
 
-  @Input() disableCloseByEsc = false;
+  readonly disableCloseByEsc = input(false);
 
   ngOnInit(): void {
     this._dialogRef.disableClose = true;
@@ -30,7 +30,7 @@ export abstract class BaseModalWindowComponent<T = any, R = any> implements OnIn
 
   @HostListener('window:keyup.esc')
   protected closeByEsc(): void {
-    if (!this.isTopDialog() || this.disableCloseByEsc) {
+    if (!this.isTopDialog() || this.disableCloseByEsc()) {
       return;
     }
     this._dialogRef.close();
