@@ -153,6 +153,7 @@ import { SchedulerReportViewComponent } from './components/schedule-overview/cro
 import { SchedulerPageComponent } from './components/schedule-overview/scheduler-page/scheduler-page.component';
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
+import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 
 @NgModule({
   declarations: [
@@ -216,6 +217,7 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
     AltReportNodeDetailsComponent,
     AltExecutionLaunchDialogComponent,
     AltExecutionTreePartialTabComponent,
+    AltExecutionRepositoryLinkComponent,
     ExecutionDetailsComponent,
     AggregatedTreeNodeComponent,
     AppliedStatusPipe,
@@ -282,6 +284,7 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
     AltExecutionReportComponent,
     AltExecutionTreePartialTabComponent,
     AltExecutionReportControlsComponent,
+    AltExecutionRepositoryLinkComponent,
     AltExecutionAnalyticsComponent,
     AltExecutionTreeComponent,
     AltExecutionTreeTabComponent,
