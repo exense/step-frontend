@@ -6,6 +6,7 @@ import {
   AugmentedResourcesService,
   DynamicSimpleValue,
   DynamicValueString,
+  ResourceInputUtilsService,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe } from 'rxjs';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
@@ -15,6 +16,7 @@ import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/commo
 })
 export class DataSourceFieldsService {
   private _augmentedResourcesService = inject(AugmentedResourcesService);
+  private _resourceUtils = inject(ResourceInputUtilsService);
 
   createDataSourceFields(
     dataSourceType: DataSourceType,
@@ -191,10 +193,10 @@ export class DataSourceFieldsService {
     if (value.dynamic) {
       return of(value);
     }
-    const resourceId = (value.value ?? '').replace('resource:', '');
-    if (!resourceId) {
+    if (!this._resourceUtils.isResourceValue(value?.value)) {
       return of(value?.value ?? '');
     }
+    const resourceId = this._resourceUtils.getResourceId(value.value)!;
     return this._augmentedResourcesService
       .overrideInterceptor(
         pipe(

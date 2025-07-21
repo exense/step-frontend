@@ -1,39 +1,35 @@
-import { Component, DestroyRef, inject, OnInit, Signal, signal, ViewEncapsulation } from '@angular/core';
+import { filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take } from 'rxjs';
+import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
-  DashboardUrlParams,
-  DashboardUrlParamsService,
-} from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  AugmentedSchedulerService,
   AugmentedTimeSeriesService,
   BucketResponse,
-  DialogParentService,
   Execution,
   ExecutionsService,
   ExecutiontTaskParameters,
   FetchBucketsRequest,
-  IS_SMALL_SCREEN,
+  Plan,
   STATUS_COLORS,
-  Tab,
+  TableFetchLocalDataSource,
   TimeRange,
-  TimeUnit,
+  TimeSeriesErrorEntry,
 } from '@exense/step-core';
-import { SCHEDULE_ID } from '../../services/schedule-id.token';
+import { inject, signal, Signal, WritableSignal } from '@angular/core';
+import { ReportNodeSummary } from '../../../shared/report-node-summary';
+import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
+import {
+  FilterBarItem,
+  FilterUtils,
+  OQLBuilder,
+  TimeSeriesConfig,
+  TimeSeriesUtils,
+} from '../../../../timeseries/modules/_common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take } from 'rxjs';
-import { TimeRangePickerSelection } from '../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
-import { SchedulerPageStateService } from './scheduler-page-state.service';
-import { FilterBarItem, FilterBarItemType } from '../../../timeseries/time-series.module';
-import { ReportNodeSummary } from '../../shared/report-node-summary';
-import { VIEW_MODE, ViewMode } from '../../shared/view-mode';
-import { TimeSeriesConfig, TimeSeriesUtils } from '../../../timeseries/modules/_common';
-import { TSChartSeries, TSChartSettings } from '../../../timeseries/modules/chart';
-import { Status } from '../../../_common/shared/status.enum';
+import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
 declare const uPlot: any;
+const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -41,66 +37,27 @@ interface EntityWithKeywordsStats {
   statuses: Record<string, number>;
 }
 
-@Component({
-  selector: 'step-scheduler-page',
-  templateUrl: './scheduler-page.component.html',
-  styleUrls: ['./scheduler-page.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  providers: [
-    DashboardUrlParamsService,
-    {
-      provide: SCHEDULE_ID,
-      useFactory: () => {
-        const _activatedRoute = inject(ActivatedRoute);
-        return () => _activatedRoute.snapshot.params?.['id'] ?? '';
-      },
-    },
-    {
-      provide: SchedulerPageStateService,
-      useExisting: SchedulerPageComponent,
-    },
-    {
-      provide: VIEW_MODE,
-      useFactory: () => {
-        const _activatedRoute = inject(ActivatedRoute);
-        return (_activatedRoute.snapshot.data['mode'] ?? ViewMode.VIEW) as ViewMode;
-      },
-    },
-    {
-      provide: DialogParentService,
-      useExisting: SchedulerPageComponent,
-    },
-  ],
-})
-export class SchedulerPageComponent extends SchedulerPageStateService implements OnInit, DialogParentService {
-  private _urlParamsService = inject(DashboardUrlParamsService);
-  readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);
-  readonly _taskIdFn = inject(SCHEDULE_ID);
-  private _destroyRef = inject(DestroyRef);
-  private _schedulerService = inject(AugmentedSchedulerService);
-  private _timeSeriesService = inject(AugmentedTimeSeriesService);
-  private bars: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
-  private _statusColors = inject(STATUS_COLORS);
-  private _executionService = inject(ExecutionsService);
-  private _router = inject(Router);
-  protected readonly _activatedRoute = inject(ActivatedRoute);
+export type CrossExecutionViewType = 'task' | 'plan';
 
-  readonly taskId = signal(new String(this._taskIdFn()));
+export abstract class CrossExecutionDashboardState {
+  public LAST_EXECUTIONS_TO_DISPLAY = 30;
 
-  protected readonly taskId$ = toObservable(this.taskId);
+  protected _executionService = inject(ExecutionsService);
+  protected _timeSeriesService = inject(AugmentedTimeSeriesService);
+  protected _statusColors = inject(STATUS_COLORS);
+  private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  protected readonly task$ = this.taskId$.pipe(
-    switchMap((id) => this._schedulerService.getExecutionTaskById(id.toString())),
-  );
+  readonly task = signal<ExecutiontTaskParameters | undefined>(undefined);
+  readonly plan = signal<Plan | undefined>(undefined);
 
-  protected readonly task: Signal<ExecutiontTaskParameters | undefined> = toSignal(this.task$);
-
+  // view settings
+  activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
   refreshInterval = signal<number>(0);
-  protected readonly activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
 
-  timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
-    filter((value): value is TimeRangePickerSelection => value != null),
-  );
+  abstract fetchLastExecution(): Observable<Execution>;
+  abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
+  abstract getDashboardFilter(): FilterBarItem;
+  abstract getViewType(): CrossExecutionViewType;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
@@ -109,6 +66,10 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   updateRefreshInterval(interval: number): void {
     this.refreshInterval.set(interval);
   }
+
+  timeRangeSelection$: Observable<TimeRangePickerSelection> = toObservable(this.activeTimeRangeSelection).pipe(
+    filter((value): value is TimeRangePickerSelection => value != null),
+  );
 
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
     map((rangeSelection) => {
@@ -126,22 +87,27 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     shareReplay(1),
   ) as Observable<TimeRange>;
 
-  private readonly fetchLastExecutionTrigger$ = new Subject<void>();
-
   readonly lastExecution$: Observable<{ execution: Execution | null }> = this.fetchLastExecutionTrigger$.pipe(
     startWith(undefined),
-    switchMap(() => this._executionService.getLastExecutionsByTaskId(this._taskIdFn(), 1, undefined, undefined)),
-    map((executions) => ({ execution: executions[0] || null })),
+    switchMap(() => this.fetchLastExecution()),
+    map((ex) => ({ execution: ex })),
     shareReplay(1),
   );
 
+  // charts
+
   readonly summaryData$: Observable<ReportNodeSummary> = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      const oql = new OQLBuilder()
+        .open('and')
+        .append('attributes.metricType = "executions/duration"')
+        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
         numberOfBuckets: 1,
-        oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${this._taskIdFn()}`,
+        oqlFilter: oql,
         groupDimensions: ['result'],
       };
       return this._timeSeriesService.getTimeSeries(request).pipe(
@@ -159,15 +125,19 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     }),
   );
 
-  readonly executionsChartSettings$ = this.timeRange$.pipe(
+  executionsChartSettings$ = this.timeRange$.pipe(
     switchMap((timeRange) => {
-      const taskId = this._taskIdFn();
       const statusAttribute = 'result';
+      const oql = new OQLBuilder()
+        .open('and')
+        .append('attributes.metricType = "executions/duration"')
+        .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
+        .build();
       const request: FetchBucketsRequest = {
         start: timeRange.from,
         end: timeRange.to,
-        numberOfBuckets: 30, // good amount of bars visually
-        oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId}`,
+        numberOfBuckets: 30, // good amount of uplotBarsFn visually
+        oqlFilter: oql,
         groupDimensions: [statusAttribute],
       };
       return this._timeSeriesService.getTimeSeries(request).pipe(
@@ -193,7 +163,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                 this.calculateStackedValue(self, rawValue, seriesIdx, idx),
               stroke: color,
               fill: fill,
-              paths: this.bars,
+              paths: uplotBarsFn,
               points: { show: false },
               show: true,
             };
@@ -216,7 +186,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
             showDefaultLegend: true,
             xAxesSettings: {
               values: xLabels,
-              valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleString(),
+              valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleDateString(),
             },
             cursor: {
               lock: true,
@@ -250,21 +220,15 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   );
 
   readonly lastExecutionsSorted$ = this.timeRange$.pipe(
-    switchMap((timeRange) => {
-      let taskId = this._taskIdFn();
-      return this._executionService
-        .getLastExecutionsByTaskId(taskId, this.LAST_EXECUTIONS_TO_DISPLAY, timeRange.from, timeRange.to)
-        .pipe(
-          map((executions) => {
-            executions.sort((a, b) => a.startTime! - b.startTime!);
-            return executions;
-          }),
-        );
+    switchMap((timeRange) => this.fetchLastExecutions(timeRange)),
+    map((executions) => {
+      executions.sort((a, b) => a.startTime! - b.startTime!);
+      return executions;
     }),
     shareReplay(1),
   );
 
-  readonly keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
+  keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
       return this.timeRange$.pipe(
         take(1),
@@ -322,12 +286,12 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                     labelItems: [status],
                     legendName: status,
                     data: executions.map((item) => executionStats[item.id!]?.statuses[status] || 0),
-                    width: 1,
+                    // width: 1,
                     value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: this.bars,
+                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
@@ -344,7 +308,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     }),
   );
 
-  readonly testCasesChartSettings$ = this.lastExecutionsSorted$.pipe(
+  testCasesChartSettings$ = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
       return this.timeRange$.pipe(
         take(1),
@@ -412,7 +376,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
                       this.calculateStackedValue(self, rawValue, seriesIdx, idx),
                     stroke: color,
                     fill: fill,
-                    paths: this.bars,
+                    paths: uplotBarsFn,
                     points: { show: false },
                     show: true,
                   };
@@ -432,82 +396,11 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
 
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, taskId: this._taskIdFn() } });
+    let filterItem = this.getDashboardFilter();
+    // this is working only with searchEntities for now. extend it if needed
+    const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
   });
-
-  protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
-
-  readonly timeRangeOptions: TimeRangePickerSelection[] = [
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 week', timeInMs: TimeUnit.WEEK } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 2 weeks', timeInMs: TimeUnit.WEEK * 2 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 month', timeInMs: TimeUnit.MONTH } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 months', timeInMs: TimeUnit.MONTH * 3 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 6 months', timeInMs: TimeUnit.MONTH * 6 } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 1 year', timeInMs: TimeUnit.YEAR } },
-    { type: 'RELATIVE', relativeSelection: { label: 'Last 3 years', timeInMs: TimeUnit.YEAR * 3 } },
-  ];
-
-  ngOnInit(): void {
-    const urlParams = this._urlParamsService.collectUrlParams();
-    this.updateTimeAndRefresh(urlParams);
-  }
-
-  dialogSuccessfullyClosed(): void {
-    this.taskId.set(new String(this._taskIdFn()));
-  }
-
-  protected configureSchedule(): void {
-    this._router.navigate([{ outlets: { modal: 'configure' } }], {
-      relativeTo: this._activatedRoute,
-      queryParamsHandling: 'preserve',
-    });
-  }
-
-  getDashboardFilters(): FilterBarItem[] {
-    return [
-      { attributeName: 'taskId', type: FilterBarItemType.TASK, searchEntities: [{ searchValue: this._taskIdFn() }] },
-    ];
-  }
-
-  triggerRefresh() {
-    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
-    this.fetchLastExecutionTrigger$.next();
-  }
-
-  handleRefreshIntervalChange(interval: number) {
-    this.refreshInterval.set(interval);
-  }
-
-  handleTimeRangeChange(selection: TimeRangePickerSelection) {
-    this.activeTimeRangeSelection.set(selection);
-  }
-
-  private updateTimeAndRefresh(urlParams: DashboardUrlParams) {
-    if (urlParams.refreshInterval === undefined) {
-      urlParams.refreshInterval = 0;
-    }
-    this.refreshInterval.set(urlParams.refreshInterval!);
-    if (urlParams.timeRange) {
-      let urlTimeRange = urlParams.timeRange!;
-      // if (urlTimeRange.type === 'RELATIVE') {
-      //   urlTimeRange = this.findRelativeTimeOption(urlTimeRange?.relativeSelection?.timeInMs);
-      // }
-      this.activeTimeRangeSelection.set(urlTimeRange);
-    } else {
-      this.activeTimeRangeSelection.set(this.timeRangeOptions[1]);
-    }
-  }
-
-  // protected readonly task = toSignal(this.task$, { initialValue: undefined });
-
-  private createTab(id: string, label: string, link?: string): Tab<string> {
-    return {
-      id,
-      label,
-      link: [{ outlets: { primary: link ?? id, modal: null, nodeDetails: null } }],
-    };
-  }
 
   private getDefaultBands(count: number): Band[] {
     const bands: Band[] = [];
@@ -520,6 +413,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   private cumulateSeriesData(series: TSChartSeries[]): void {
     series.forEach((s, i) => {
       if (i == 0) {
+        // skip time series
         return;
       }
       s.data.forEach((point, j) => {
@@ -532,12 +426,16 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
   private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
     if (seriesIdx > 1) {
       const valueBelow = self.data[seriesIdx - 1][idx] || 0;
-      return currentValue - valueBelow;
+      const value = currentValue - valueBelow;
+      return value;
     }
     return currentValue;
   }
 
-  private createKeywordsChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
+  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings | null {
+    if (executions.length === 0) {
+      return null;
+    }
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
@@ -546,7 +444,6 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
         incrs: [1],
       },
     ];
-
     return {
       title: '',
       showLegend: false,
@@ -580,10 +477,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
     };
   }
 
-  private createTestCasesChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings | null {
-    if (executions.length === 0) {
-      return null;
-    }
+  private createKeywordsChart(executions: Execution[], series: TSChartSeries[]): TSChartSettings {
     const axes: Axis[] = [
       {
         size: TimeSeriesConfig.CHART_LEGEND_SIZE,
@@ -592,6 +486,7 @@ export class SchedulerPageComponent extends SchedulerPageStateService implements
         incrs: [1],
       },
     ];
+
     return {
       title: '',
       showLegend: false,

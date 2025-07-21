@@ -4,14 +4,14 @@ import { Observable, tap } from 'rxjs';
 import { ImportsService } from '../../../../client/step-client-module';
 import { ImportDialogData } from '../../types/import-dialog-data.interface';
 import { StepBasicsModule, AlertType, DialogsService, DialogRouteResult } from '../../../basics/step-basics.module';
-import { ResourceInputModule } from '../../../resource-input/resource-input.module';
+import { ResourceInputComponent } from '../../../resource-input';
 
 @Component({
   selector: 'step-plan-import-dialog',
   templateUrl: './import-dialog.component.html',
   styleUrls: ['./import-dialog.component.scss'],
   standalone: true,
-  imports: [StepBasicsModule, ResourceInputModule],
+  imports: [StepBasicsModule, ResourceInputComponent],
 })
 export class ImportDialogComponent {
   private _matDialogRef = inject<MatDialogRef<ImportDialogComponent, DialogRouteResult>>(MatDialogRef);
