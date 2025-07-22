@@ -3,6 +3,7 @@ import { AggregatedReportView } from '@exense/step-core';
 
 @Pipe({
   name: 'isAverageDuration',
+  standalone: false,
 })
 export class IsAverageDurationPipe implements PipeTransform {
   transform(value?: AggregatedReportView): boolean {

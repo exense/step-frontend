@@ -10,6 +10,7 @@ import { map } from 'rxjs';
   templateUrl: './alt-report-performance-overview-chart.component.html',
   styleUrl: './alt-report-performance-overview-chart.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltReportPerformanceOverviewChartComponent {
   protected readonly _mode = inject(VIEW_MODE);

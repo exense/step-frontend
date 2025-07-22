@@ -17,6 +17,7 @@ export type AlignLabelAddon = 'separate' | 'near' | 'fill';
     '[class.step-has-warnings]': 'hasWarnings()',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class FormFieldComponent {
   readonly explicitControl = input<AbstractControl | null | undefined>(undefined, { alias: 'control' });

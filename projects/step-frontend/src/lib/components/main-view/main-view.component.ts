@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
   selector: 'step-main-view',
   templateUrl: './main-view.component.html',
   styleUrls: ['./main-view.component.scss'],
+  standalone: false,
 })
 export class MainViewComponent {
   private _viewRegistry = inject(ViewRegistryService);

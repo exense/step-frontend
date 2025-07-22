@@ -10,6 +10,7 @@ import { Execution, ExecutionCustomPanelItemInfo } from '@exense/step-core';
     '[class]': 'className()',
     '[style.--colSpan]': 'colSpan()',
   },
+  standalone: false,
 })
 export class AltPanelComponent {
   /** @Input() **/

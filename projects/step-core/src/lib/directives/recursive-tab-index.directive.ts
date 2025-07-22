@@ -8,6 +8,7 @@ import { breadthFirstSearch } from '../shared';
 
 @Directive({
   selector: '[stepRecursiveTabIndex]',
+  standalone: false,
 })
 export class RecursiveTabIndexDirective implements AfterViewInit {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

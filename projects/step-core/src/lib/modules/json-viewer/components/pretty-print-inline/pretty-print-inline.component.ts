@@ -6,6 +6,7 @@ import { JsonViewerFormatterService } from '../../services/json-viewer-formatter
   selector: 'step-pretty-print-inline',
   templateUrl: './pretty-print-inline.component.html',
   styleUrls: ['./pretty-print-inline.component.scss'],
+  standalone: false,
 })
 export class PrettyPrintInlineComponent extends BaseViewerComponent {
   private _jsonViewerFormatter = inject(JsonViewerFormatterService);

@@ -32,6 +32,7 @@ const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['capt
       useExisting: forwardRef(() => KeywordNameComponent),
     },
   ],
+  standalone: false,
 })
 export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFunction, Keyword> {
   private _keywordApi = inject(AugmentedKeywordsService);

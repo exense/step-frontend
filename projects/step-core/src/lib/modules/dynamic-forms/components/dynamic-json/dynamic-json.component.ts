@@ -9,6 +9,7 @@ import { JsonFieldsSchema } from '../../../json-forms';
   templateUrl: './dynamic-json.component.html',
   styleUrls: ['./dynamic-json.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DynamicJsonComponent extends DynamicValueBaseComponent<DynamicValueString> {
   @Input() primaryFieldsLabel?: string;

@@ -20,6 +20,7 @@ enum TimeRangeType {
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class TimeRangeEditorComponent extends BaseEditorComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);

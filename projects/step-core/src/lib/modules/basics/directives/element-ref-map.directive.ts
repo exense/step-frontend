@@ -2,6 +2,7 @@ import { Directive, ElementRef, inject, Input, OnDestroy, OnInit } from '@angula
 
 @Directive({
   selector: '[stepElementRefMap]',
+  standalone: false,
 })
 export class ElementRefMapDirective implements OnInit, OnDestroy {
   public _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

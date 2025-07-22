@@ -15,6 +15,7 @@ import { ScriptArtefact } from '../../types/script.artefact';
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ScriptInlineComponent extends BaseInlineArtefactComponent<ScriptArtefact> {
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);

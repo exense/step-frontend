@@ -10,6 +10,7 @@ import { RANGE_MONTHS_NAMES } from '../../injectables/ranges.tokens';
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class YearlyDayEditorComponent extends MonthlyDayEditorComponent {
   override readonly _MONTHS = inject(RANGE_MONTHS_NAMES);

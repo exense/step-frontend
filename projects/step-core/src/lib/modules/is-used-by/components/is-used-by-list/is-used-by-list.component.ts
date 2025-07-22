@@ -25,7 +25,6 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
   styleUrls: ['./is-used-by-list.component.scss'],
   imports: [StepBasicsModule, TableModule, PlanLinkComponent, KEYWORDS_COMMON_IMPORTS, EntityModule],
   providers: [ProjectNamePipe],
-  standalone: true,
 })
 export class IsUsedByListComponent implements OnInit {
   private _referencesService = inject(ReferencesService);

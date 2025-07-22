@@ -8,6 +8,7 @@ import { ActivityColDirective } from '../../directives/activity-col.directive';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseColumnContainerComponent implements ColumnContainer, CustomColumnsBaseComponent, OnDestroy {
   private columnsReadyInternal$ = new Subject<boolean>();

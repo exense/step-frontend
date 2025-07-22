@@ -3,6 +3,7 @@ import { ArrayItemLabelValueExtractor } from '../injectables/array-item-label-va
 
 @Pipe({
   name: 'arrayItemLabel',
+  standalone: false,
 })
 export class ArrayItemLabelPipe<T> implements PipeTransform {
   private _extractor = inject(ArrayItemLabelValueExtractor, { optional: true });

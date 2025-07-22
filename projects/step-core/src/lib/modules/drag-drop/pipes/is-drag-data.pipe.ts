@@ -4,7 +4,6 @@ import { map, Observable, of } from 'rxjs';
 
 @Pipe({
   name: 'isDragData',
-  standalone: true,
 })
 export class IsDragDataPipe implements PipeTransform {
   private _dragDataService = inject(DragDataService, { optional: true });

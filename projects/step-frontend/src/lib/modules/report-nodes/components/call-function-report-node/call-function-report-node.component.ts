@@ -11,6 +11,7 @@ import { DOCUMENT } from '@angular/common';
   selector: 'step-call-function-report-node',
   templateUrl: './call-function-report-node.component.html',
   styleUrls: ['./call-function-report-node.component.scss'],
+  standalone: false,
 })
 export class CallFunctionReportNodeComponent implements OnChanges {
   private _executionState = inject(ExecutionStateService, { optional: true });

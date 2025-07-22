@@ -93,6 +93,7 @@ export interface ActionsConfig {
       useExisting: forwardRef(() => PlanEditorBaseComponent),
     },
   ],
+  standalone: false,
 })
 export class PlanEditorBaseComponent
   implements

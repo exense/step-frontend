@@ -6,6 +6,7 @@ import { WizardStepActionsService } from '../../injectables/wizard-step-actions.
   templateUrl: './wizard-step.component.html',
   styleUrls: ['./wizard-step.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class WizardStepComponent {
   private _actions = inject(WizardStepActionsService);

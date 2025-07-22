@@ -14,6 +14,7 @@ type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>
   selector: 'step-screen-input-edit-dialog',
   templateUrl: './screen-input-edit-dialog.component.html',
   styleUrls: ['./screen-input-edit-dialog.component.scss'],
+  standalone: false,
 })
 export class ScreenInputEditDialogComponent {
   private _screenApi = inject(AugmentedScreenService);

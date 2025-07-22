@@ -11,6 +11,7 @@ import { JsonFieldType } from '../../../json-forms';
   styleUrls: ['./dynamic-field.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DynamicFieldComponent extends DynamicFieldBaseComponent<DynamicSimpleValue> {
   readonly DynamicFieldType = JsonFieldType;

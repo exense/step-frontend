@@ -1,10 +1,11 @@
 step-alt-report-widget {
   display: flex;
   flex-direction: column;
+  break-inside: avoid;
+
   @media screen {
     min-height: 44rem;
   }
-  break-inside: avoid;
 
   mat-card-header {
     justify-content: space-between;

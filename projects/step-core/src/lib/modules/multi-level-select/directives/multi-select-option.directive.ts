@@ -8,7 +8,6 @@ const CLASS_CHECKED = 'mat-pseudo-checkbox-checked';
 
 @Directive({
   selector: 'mat-option.step-multi-level-plain-item',
-  standalone: true,
 })
 export class MultiSelectOptionDirective<T extends string | number | symbol> {
   private _state = inject<MultiLevelVisualSelectionService<T>>(MultiLevelVisualSelectionService);

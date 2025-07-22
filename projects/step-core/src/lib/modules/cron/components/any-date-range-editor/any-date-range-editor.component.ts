@@ -15,6 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     class: 'editors-group',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AnyDateRangeEditorComponent extends BaseEditorComponent implements OnInit {
   private _fb = inject(FormBuilder);

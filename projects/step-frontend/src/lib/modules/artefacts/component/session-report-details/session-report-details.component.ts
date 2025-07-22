@@ -16,6 +16,7 @@ import { SessionArtefact } from '../../types/session.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SessionReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<SessionArtefact>> {
   private _dynamicValueUtils = inject(DynamicValuesUtilsService);

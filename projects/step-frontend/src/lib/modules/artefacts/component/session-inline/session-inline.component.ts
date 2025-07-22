@@ -16,6 +16,7 @@ import { SessionArtefact } from '../../types/session.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SessionInlineComponent extends BaseInlineArtefactComponent<SessionArtefact> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

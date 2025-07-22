@@ -16,7 +16,6 @@ import { DragEndType } from '../types/drag-end-type.enum';
 
 @Directive({
   selector: '[stepDropArea]',
-  standalone: true,
 })
 export class DropAreaDirective implements AfterViewInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);

@@ -16,6 +16,7 @@ import { debounceTime, map, Observable, of, switchMap } from 'rxjs';
       useExisting: forwardRef(() => AutomationPackageSearchComponent),
     },
   ],
+  standalone: false,
 })
 export class AutomationPackageSearchComponent
   extends BaseFilterComponent<SearchValue, string>

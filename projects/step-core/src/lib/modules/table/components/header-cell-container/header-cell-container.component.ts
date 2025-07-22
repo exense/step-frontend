@@ -6,5 +6,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
   templateUrl: './header-cell-container.component.html',
   styleUrl: './header-cell-container.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class HeaderCellContainerComponent {}

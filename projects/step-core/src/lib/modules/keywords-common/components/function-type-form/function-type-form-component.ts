@@ -6,6 +6,7 @@ import { FunctionTypeParentFormService } from '../../injectables/function-type-p
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class FunctionTypeFormComponent<T extends FormGroup>
   implements CustomComponent, OnInit, AfterViewInit, OnDestroy

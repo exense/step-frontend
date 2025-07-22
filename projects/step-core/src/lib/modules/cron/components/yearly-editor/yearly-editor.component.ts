@@ -5,5 +5,6 @@ import { MonthlyEditorComponent } from '../monthly-editor/monthly-editor.compone
   selector: 'step-yearly-editor',
   templateUrl: './yearly-editor.component.html',
   styleUrls: ['./yearly-editor.component.scss'],
+  standalone: false,
 })
 export class YearlyEditorComponent extends MonthlyEditorComponent {}

@@ -9,6 +9,7 @@ import { HoursEditorComponent } from '../hours-editor/hours-editor.component';
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class WeeklyEditorComponent extends HoursEditorComponent {
   protected selectedDays: string[] = [];

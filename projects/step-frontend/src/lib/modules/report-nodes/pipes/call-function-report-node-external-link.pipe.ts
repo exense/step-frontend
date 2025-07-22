@@ -3,6 +3,7 @@ import { Measure, ReportNode } from '@exense/step-core';
 
 @Pipe({
   name: 'callFunctionReportNodeExternalLink',
+  standalone: false,
 })
 export class CallFunctionReportNodeExternalLinkPipe implements PipeTransform {
   transform(measure: Measure, node: ReportNode): string {

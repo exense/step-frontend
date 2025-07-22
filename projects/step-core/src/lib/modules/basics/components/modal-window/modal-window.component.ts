@@ -5,6 +5,7 @@ import { BaseModalWindowComponent } from './base-modal-window.component';
   selector: 'step-modal-window',
   templateUrl: './modal-window.component.html',
   styleUrls: ['./modal-window.component.scss'],
+  standalone: false,
 })
 export class ModalWindowComponent extends BaseModalWindowComponent {
   /* @ViewChild() */

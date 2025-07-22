@@ -22,6 +22,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
       useExisting: forwardRef(() => ScreenConfigurationListComponent),
     },
   ],
+  standalone: false,
 })
 export class ScreenConfigurationListComponent implements DialogParentService, OnInit {
   private _destroyRef = inject(DestroyRef);

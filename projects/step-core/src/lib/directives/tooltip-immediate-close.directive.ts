@@ -3,6 +3,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 
 @Directive({
   selector: '[matTooltip]',
+  standalone: false,
 })
 export class TooltipImmediateCloseDirective {
   private tooltip = inject(MatTooltip, { optional: true });

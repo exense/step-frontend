@@ -74,7 +74,6 @@ const LOCAL_REPOSITORY_ID = 'local';
   selector: 'step-scheduled-task-edit-dialog',
   templateUrl: './edit-scheduler-task-dialog.component.html',
   styleUrls: ['./edit-scheduler-task-dialog.component.scss'],
-  standalone: true,
   imports: [
     SCHEDULER_COMMON_IMPORTS,
     CustomFormWrapperComponent,

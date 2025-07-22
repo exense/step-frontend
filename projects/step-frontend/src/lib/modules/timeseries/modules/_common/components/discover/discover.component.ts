@@ -14,7 +14,6 @@ export interface DiscoverDialogData {
   selector: 'step-ts-discover',
   templateUrl: './discover.component.html',
   styleUrls: ['./discover.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS, DiscoverAttributeStatsComponent],
 })
 export class DiscoverComponent implements OnInit {

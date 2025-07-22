@@ -16,6 +16,7 @@ import { ThemeRegisterService } from '../../services/theme-register.service';
   styles: [],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ThemeComponent implements AfterViewInit {
   private _view = inject(ViewContainerRef);

@@ -9,6 +9,7 @@ export interface ExtraOption<T> extends KeyValue<T, string> {
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-select-extra-options',
+  standalone: false,
 })
 export class SelectExtraOptionsDirective<T> {
   private matOptions = contentChildren(MatOption<T>);

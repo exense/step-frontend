@@ -7,6 +7,7 @@ import { RANGE_MINUTES, RANGE_SECONDS } from '../../injectables/ranges.tokens';
   templateUrl: './minutes-editor.component.html',
   styleUrls: ['./minutes-editor.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class MinutesEditorComponent extends BaseEditorComponent {
   readonly _MINUTES = inject(RANGE_MINUTES);

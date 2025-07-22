@@ -4,7 +4,7 @@
 
 @mixin token-status($status) {
   &.token-status-#{$status} {
-    background: map-get(var.$tokenstates, $status);
+    background: map.get(var.$tokenstates, $status);
   }
 }
 

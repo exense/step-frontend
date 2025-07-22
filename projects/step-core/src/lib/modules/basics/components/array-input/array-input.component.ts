@@ -33,6 +33,7 @@ type OnTouch = () => void;
     },
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ArrayInputComponent<T = unknown> implements ControlValueAccessor, OnChanges, OnDestroy {
   private _fb = inject(FormBuilder).nonNullable;

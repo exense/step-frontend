@@ -8,6 +8,7 @@ import { map } from 'rxjs';
   selector: 'step-execution-legacy-switcher',
   templateUrl: './execution-legacy-switcher.component.html',
   styleUrl: './execution-legacy-switcher.component.scss',
+  standalone: false,
 })
 export class ExecutionLegacySwitcherComponent {
   /** @Input() **/

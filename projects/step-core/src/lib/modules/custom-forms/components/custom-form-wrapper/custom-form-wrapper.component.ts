@@ -10,7 +10,6 @@ type OnTouch = () => void;
   selector: 'step-custom-form-wrapper',
   templateUrl: './custom-form-wrapper.component.html',
   styleUrls: ['./custom-form-wrapper.component.scss'],
-  standalone: true,
   imports: [CustomFormComponent],
 })
 export class CustomFormWrapperComponent implements ControlValueAccessor {

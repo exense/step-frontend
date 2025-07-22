@@ -8,6 +8,7 @@ import { DynamicValueBaseComponent } from '../dynamic-value-base/dynamic-value-b
   templateUrl: './dynamic-checkbox.component.html',
   styleUrls: ['./dynamic-checkbox.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DynamicCheckboxComponent extends DynamicValueBaseComponent<DynamicValueBoolean> {
   constructor(_ngControl: NgControl) {

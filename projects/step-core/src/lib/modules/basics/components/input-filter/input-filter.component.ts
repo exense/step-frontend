@@ -13,6 +13,7 @@ import { BaseFilterComponent } from '../base-filter/base-filter.component';
       useExisting: forwardRef(() => InputFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class InputFilterComponent extends BaseFilterComponent<string> implements OnChanges {
   @Input() externalSearchValue?: string;

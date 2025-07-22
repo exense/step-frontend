@@ -16,6 +16,7 @@ import { ReturnArtefact } from '../../types/return.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ReturnInlineComponent extends BaseInlineArtefactComponent<ReturnArtefact> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

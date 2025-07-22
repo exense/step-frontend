@@ -30,6 +30,7 @@ import { Tab } from '../../../tabs';
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DatePickerContentComponent {
   /** @Input() **/

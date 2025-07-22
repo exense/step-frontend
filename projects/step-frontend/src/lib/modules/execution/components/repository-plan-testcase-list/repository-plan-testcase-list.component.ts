@@ -29,6 +29,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
       registrationStrategy: RegistrationStrategy.MANUAL,
     }),
   ],
+  standalone: false,
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit {
   private _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);

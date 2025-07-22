@@ -3,7 +3,6 @@ import { CommonEntitiesUrlsService, Resource } from '@exense/step-core';
 
 @Pipe({
   name: 'resourceUrl',
-  standalone: true,
 })
 export class ResourceUrlPipe implements PipeTransform {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);

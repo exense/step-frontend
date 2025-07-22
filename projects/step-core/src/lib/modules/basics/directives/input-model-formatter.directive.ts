@@ -24,6 +24,7 @@ type OnTouch = () => void;
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class InputModelFormatterDirective implements ControlValueAccessor, OnDestroy {
   @Input('stepModelFormatter') formatter = DEFAULT_MODEL_FORMATTER;

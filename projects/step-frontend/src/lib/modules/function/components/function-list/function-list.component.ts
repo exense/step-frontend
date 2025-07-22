@@ -37,6 +37,7 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
       useExisting: forwardRef(() => FunctionListComponent),
     },
   ],
+  standalone: false,
 })
 export class FunctionListComponent implements DialogParentService {
   private _functionApiService = inject(AugmentedKeywordsService);

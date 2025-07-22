@@ -3,7 +3,9 @@ import { ChangeDetectorRef, DestroyRef, Directive, inject, OnDestroy, OnInit, ou
 import { distinctUntilChanged, map, Observable, startWith, Subject } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 
-@Directive({})
+@Directive({
+  standalone: false,
+})
 export abstract class BaseFilterComponent<T, CV = T> implements OnInit, OnDestroy {
   protected _cd = inject(ChangeDetectorRef);
   protected _formBuilder = inject(FormBuilder);

@@ -11,6 +11,7 @@ import { EntityMeta } from '../../types/entity-meta';
   selector: 'step-select-entity-of-type',
   templateUrl: './select-entity-of-type.component.html',
   styleUrls: ['./select-entity-of-type.component.scss'],
+  standalone: false,
 })
 export class SelectEntityOfTypeComponent implements OnDestroy {
   private _entityRegistry = inject(EntityRegistry);

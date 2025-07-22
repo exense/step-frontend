@@ -35,6 +35,7 @@ interface ExecutionItem {
   styleUrls: ['./executions-chart-tooltip.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionsChartTooltipComponent {
   private _changeDetectorRef = inject(ChangeDetectorRef);

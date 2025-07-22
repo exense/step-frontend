@@ -10,7 +10,6 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   templateUrl: './function-link.component.html',
   styleUrls: ['./function-link.component.scss'],
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class FunctionLinkComponent extends BaseFunctionLinkComponent implements CustomComponent {
   private _router = inject(Router);

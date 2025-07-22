@@ -21,7 +21,6 @@ import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.modul
   selector: 'step-auto-shrank-list',
   templateUrl: './auto-shrank-list.component.html',
   styleUrl: './auto-shrank-list.component.scss',
-  standalone: true,
   imports: [AutoShrankItemDirective, StepBasicsModule],
   providers: [
     {

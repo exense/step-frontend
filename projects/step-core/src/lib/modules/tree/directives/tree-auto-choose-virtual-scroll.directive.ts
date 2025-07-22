@@ -3,7 +3,6 @@ import { TreeVirtualScrollDirective } from './tree-virtual-scroll.directive';
 
 @Directive({
   selector: '[stepTreeAutoChooseVirtualScroll]',
-  standalone: true,
   hostDirectives: [
     {
       directive: TreeVirtualScrollDirective,

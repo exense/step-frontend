@@ -30,6 +30,7 @@ import { DynamicValuesUtilsService } from '../../../basics/step-basics.module';
   selector: 'step-dynamic-field-object-editor',
   templateUrl: './dynamic-field-object-editor.component.html',
   styleUrls: ['./dynamic-field-object-editor.component.scss'],
+  standalone: false,
 })
 export class DynamicFieldObjectEditorComponent implements OnChanges, OnDestroy {
   private _fb = inject(FormBuilder);

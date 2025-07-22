@@ -42,6 +42,7 @@ interface EntityWithKeywordsStats {
       useClass: PlanPageStateService,
     },
   ],
+  standalone: false,
 })
 export class PlanPageComponent implements OnInit {
   _state = inject(CrossExecutionDashboardState);

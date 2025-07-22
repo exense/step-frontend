@@ -27,6 +27,7 @@ const CRON_EDITOR_TAB_LABELS: Record<CronEditorTab, string> = {
   templateUrl: './cron-editor.component.html',
   styleUrls: ['./cron-editor.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class CronEditorComponent {
   private _dialogRef = inject<DialogRef>(MatDialogRef);

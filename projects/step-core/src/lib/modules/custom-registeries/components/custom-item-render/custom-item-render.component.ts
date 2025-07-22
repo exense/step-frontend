@@ -15,6 +15,7 @@ import { CustomComponent } from '../../shared/custom-component';
   selector: 'step-custom-item-render',
   templateUrl: './custom-item-render.component.html',
   styleUrls: ['./custom-item-render.component.scss'],
+  standalone: false,
 })
 export class CustomItemRenderComponent implements OnChanges, AfterViewInit {
   @Input() component?: Type<CustomComponent>;

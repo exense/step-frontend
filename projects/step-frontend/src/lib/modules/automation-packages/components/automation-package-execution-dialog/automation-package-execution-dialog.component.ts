@@ -22,7 +22,6 @@ interface AutomationPackageExecutionDialogData {
   selector: 'step-automation-package-execution-dialog',
   templateUrl: './automation-package-execution-dialog.component.html',
   styleUrl: './automation-package-execution-dialog.component.scss',
-  standalone: true,
   imports: [StepCoreModule],
 })
 export class AutomationPackageExecutionDialogComponent implements OnInit {

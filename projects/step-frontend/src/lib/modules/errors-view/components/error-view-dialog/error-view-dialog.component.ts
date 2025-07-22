@@ -5,7 +5,6 @@ import { UniqueErrorsPipe } from '../../pipes/unique-errors.pipe';
 
 @Component({
   selector: 'step-error-view-dialog',
-  standalone: true,
   imports: [StepCoreModule, UniqueErrorsPipe],
   templateUrl: './error-view-dialog.component.html',
   styleUrl: './error-view-dialog.component.scss',

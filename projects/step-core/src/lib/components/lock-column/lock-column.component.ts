@@ -6,6 +6,7 @@ import { ColumnContainer } from '../../modules/table/types/column-container';
   selector: 'step-lock-column',
   templateUrl: './lock-column.component.html',
   styleUrls: ['./lock-column.component.scss'],
+  standalone: false,
 })
 export class LockColumnComponent implements CustomComponent, AfterViewInit {
   private _entityColumnContainer = inject(ColumnContainer);

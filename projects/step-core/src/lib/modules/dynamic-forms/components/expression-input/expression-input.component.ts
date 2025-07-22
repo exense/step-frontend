@@ -10,6 +10,7 @@ type OnTouch = () => void;
   templateUrl: './expression-input.component.html',
   styleUrls: ['./expression-input.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExpressionInputComponent implements ControlValueAccessor {
   @Input() label?: string;

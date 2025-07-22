@@ -91,6 +91,7 @@ interface RefreshParams {
     ),
     TreeStateService,
   ],
+  standalone: false,
 })
 export class ExecutionProgressComponent
   implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy

@@ -3,7 +3,6 @@ import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'step-artefact-inline-details-header',
-  standalone: true,
   imports: [NgTemplateOutlet],
   templateUrl: './artefact-inline-details-header.component.html',
   styleUrl: './artefact-inline-details-header.component.scss',

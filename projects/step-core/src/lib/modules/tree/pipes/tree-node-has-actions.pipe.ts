@@ -4,7 +4,6 @@ import { TreeNode } from '../types/tree-node';
 
 @Pipe({
   name: 'treeNodeHasActions',
-  standalone: true,
 })
 export class TreeNodeHasActionsPipe implements PipeTransform {
   private _treeActions? = inject(TreeActionsService, { optional: true });

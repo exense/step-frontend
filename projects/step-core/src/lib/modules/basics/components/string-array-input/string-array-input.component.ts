@@ -11,6 +11,7 @@ type OnTouch = () => void;
   templateUrl: './string-array-input.component.html',
   styleUrls: ['./string-array-input.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class StringArrayInputComponent implements OnInit, ControlValueAccessor {
   @Input() label?: string;

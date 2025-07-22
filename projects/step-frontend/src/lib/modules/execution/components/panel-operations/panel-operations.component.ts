@@ -6,6 +6,7 @@ import { Panels } from '../../shared/panels.enum';
   selector: 'step-panel-operations',
   templateUrl: './panel-operations.component.html',
   styleUrls: ['./panel-operations.component.scss'],
+  standalone: false,
 })
 export class PanelOperationsComponent {
   readonly Panels = Panels;

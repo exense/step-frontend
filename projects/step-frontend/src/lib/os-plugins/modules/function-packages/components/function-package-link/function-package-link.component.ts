@@ -6,6 +6,7 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
   selector: 'step-function-package-link',
   templateUrl: './function-package-link.component.html',
   styleUrls: ['./function-package-link.component.scss'],
+  standalone: false,
 })
 export class FunctionPackageLinkComponent implements CustomComponent {
   private _api = inject(KeywordPackagesService);

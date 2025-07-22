@@ -5,6 +5,7 @@ import { AbstractArtefact, ReportNode } from '../../../client/step-client-module
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseInlineArtefactComponent<
   A extends AbstractArtefact,

@@ -29,6 +29,7 @@ const UNITS_ORDER: UsedDurationUnit[] = ['milliseconds', 'seconds', 'minutes', '
 
 @Pipe({
   name: 'duration',
+  standalone: false,
 })
 export class DurationPipe implements PipeTransform {
   transform(

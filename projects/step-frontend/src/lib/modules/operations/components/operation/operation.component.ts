@@ -7,6 +7,7 @@ import { SpecificOperations } from '../../types/specific-operations.enum';
   selector: 'step-operation',
   templateUrl: './operation.component.html',
   styleUrls: ['./operation.component.scss'],
+  standalone: false,
 })
 export class OperationComponent implements OnChanges {
   readonly SpecificOperations = SpecificOperations;

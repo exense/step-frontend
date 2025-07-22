@@ -29,6 +29,7 @@ const MESSAGE_ADD_AT_MULTIPLE_NODES =
   selector: 'step-plan-common-tree-editor-form',
   templateUrl: './plan-common-tree-editor-form.component.html',
   styleUrl: './plan-common-tree-editor-form.component.scss',
+  standalone: false,
 })
 export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanEditorStrategy, OnInit, OnDestroy {
   private _planEditor = inject(PlanEditorService);

@@ -13,6 +13,7 @@ import { CaseArtefact } from '../../types/case.artefact';
   host: {
     class: 'execution-report-node-inline-details',
   },
+  standalone: false,
 })
 export class CaseInlineComponent extends BaseInlineArtefactComponent<CaseArtefact> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

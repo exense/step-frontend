@@ -5,6 +5,7 @@ import { MatMenu } from '@angular/material/menu';
   selector: 'step-description-hint',
   templateUrl: './description-hint.component.html',
   styleUrls: ['./description-hint.component.scss'],
+  standalone: false,
 })
 export class DescriptionHintComponent {
   toggleActive = false;

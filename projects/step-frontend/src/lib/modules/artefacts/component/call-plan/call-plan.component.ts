@@ -18,6 +18,7 @@ import { CallPlanArtefact } from '../../types/call-plan.artefact';
   templateUrl: './call-plan.component.html',
   styleUrls: ['./call-plan.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class CallPlanComponent extends BaseArtefactComponent<CallPlanArtefact> {
   private _planApi = inject(AugmentedPlansService);

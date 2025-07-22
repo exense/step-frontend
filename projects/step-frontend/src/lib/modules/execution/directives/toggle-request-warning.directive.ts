@@ -7,7 +7,6 @@ import { map } from 'rxjs';
 @Directive({
   selector: 'step-autorefresh-toggle[requestWarning]',
   exportAs: 'StepRequestWarning',
-  standalone: true,
   hostDirectives: [
     {
       directive: StandaloneMatTooltipDirective,

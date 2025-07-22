@@ -21,6 +21,7 @@ import { AltExecutionStateService } from '../../../execution/services/alt-execut
   host: {
     class: 'execution-report-node-details',
   },
+  standalone: false,
 })
 export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponent<KeywordReportNode> {
   private _controllerService = inject(AugmentedControllerService);

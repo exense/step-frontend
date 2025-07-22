@@ -4,7 +4,6 @@ import { ATTACHMENTS_EXPORTS } from '../../../attachments';
 
 @Component({
   selector: 'step-report-details-attachments',
-  standalone: true,
   imports: [ATTACHMENTS_EXPORTS],
   templateUrl: './report-details-attachments.component.html',
   styleUrl: './report-details-attachments.component.scss',

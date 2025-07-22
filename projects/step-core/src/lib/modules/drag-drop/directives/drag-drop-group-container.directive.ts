@@ -4,7 +4,6 @@ import { DRAG_DROP_GROUP_CONTAINERS } from '../injectables/drag-drop-group-conta
 
 @Directive({
   selector: '[stepDragDropGroupContainer]',
-  standalone: true,
   providers: [
     DragDropGroupContainerService,
     {

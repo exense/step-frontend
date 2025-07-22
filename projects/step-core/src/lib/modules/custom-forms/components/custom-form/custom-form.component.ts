@@ -42,7 +42,6 @@ interface CustomFormInputsSchema {
   selector: 'step-custom-forms',
   templateUrl: './custom-form.component.html',
   styleUrls: ['./custom-form.component.scss'],
-  standalone: true,
   imports: [
     CUSTOM_FORMS_COMMON_IMPORTS,
     StandardCustomFormInputComponent,

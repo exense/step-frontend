@@ -8,6 +8,7 @@ import { IfArtefact } from '../../types/if.artefact';
   templateUrl: './if.component.html',
   styleUrls: ['./if.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class IfComponent extends BaseArtefactComponent<IfArtefact> {
   @ViewChild('form')

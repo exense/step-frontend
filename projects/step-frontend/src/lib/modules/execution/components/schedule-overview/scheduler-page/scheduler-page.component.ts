@@ -20,6 +20,7 @@ interface EntityWithKeywordsStats {
   templateUrl: './scheduler-page.component.html',
   styleUrls: ['./scheduler-page.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
   providers: [
     DashboardUrlParamsService,
     {

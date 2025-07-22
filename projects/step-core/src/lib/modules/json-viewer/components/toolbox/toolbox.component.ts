@@ -6,6 +6,7 @@ import { ViewerFormat } from '../../shared/viewer-format.enum';
   templateUrl: './toolbox.component.html',
   styleUrls: ['./toolbox.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ToolboxComponent {
   readonly ViewerFormat = ViewerFormat;

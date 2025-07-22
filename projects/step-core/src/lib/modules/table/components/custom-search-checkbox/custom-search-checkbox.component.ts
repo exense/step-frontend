@@ -7,6 +7,7 @@ import { ColInputExt } from '../../types/col-input-ext';
   selector: 'step-custom-search-checkbox',
   templateUrl: './custom-search-checkbox.component.html',
   styleUrls: [],
+  standalone: false,
 })
 export class CustomSearchCheckboxComponent implements CustomComponent {
   protected _filterConditionsFactory = inject(FilterConditionFactoryService);

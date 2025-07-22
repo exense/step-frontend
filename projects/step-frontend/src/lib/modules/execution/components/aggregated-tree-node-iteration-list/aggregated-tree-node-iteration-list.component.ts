@@ -56,6 +56,7 @@ const PAGE_SIZE = 25;
     TablePersistenceStateService,
     tablePersistenceConfigProvider('aggregatedIterationList', STORE_ALL),
   ],
+  standalone: false,
 })
 export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, ItemsPerPageService {
   private _fb = inject(FormBuilder).nonNullable;

@@ -6,6 +6,7 @@ import { Operation, SystemService } from '@exense/step-core';
   selector: 'step-current-operations',
   templateUrl: './current-operations.component.html',
   styleUrls: ['./current-operations.component.css'],
+  standalone: false,
 })
 export class CurrentOperationsComponent implements OnChanges {
   private showAllInternal: boolean = false;

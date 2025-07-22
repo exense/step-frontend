@@ -12,6 +12,7 @@ const { createDynamicValueString } = dynamicValueFactory();
   templateUrl: './assert-performance.component.html',
   styleUrls: ['./assert-performance.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class AssertPerformanceComponent extends BaseArtefactComponent<AssertPerformanceArtefact> {
   protected readonly _lists = inject(AssertPerformanceListService);
