@@ -1,4 +1,14 @@
-import { Component, DestroyRef, HostListener, inject, model, OnInit, signal, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  model,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl } from '@angular/forms';
 import {
@@ -48,6 +58,7 @@ export interface EditSchedulerTaskDialogConfig {
   disableUser?: boolean;
   hideUser?: boolean;
   plan?: Plan;
+  forbiddenPlanError?: string;
 }
 
 export interface EditSchedulerTaskDialogData {
@@ -71,8 +82,11 @@ const LOCAL_REPOSITORY_ID = 'local';
     LIST_SELECTION_EXPORTS,
     HasRightPipe,
   ],
+  host: {
+    '(keydown.enter)': 'save()',
+  },
 })
-export class EditSchedulerTaskDialogComponent implements OnInit {
+export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   readonly EXCLUSION_HELP_MESSAGE =
     'Optionally provide CRON expression(s) for excluding time ranges. (Example: for a schedule set to run every 5 minutes, you can exclude the execution on weekends with “* * * ? * SAT-SUN” )';
 
@@ -85,6 +99,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
   private _jsonFieldUtils = inject(JsonFieldUtilsService);
   private _repositoryParamsSchemas = inject(RepositoryParametersSchemasService);
   private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA).taskAndConfig;
+  private _cd = inject(ChangeDetectorRef);
 
   private config = this._dialogData.config;
 
@@ -123,8 +138,11 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     this.initializeTask();
   }
 
-  @HostListener('keydown.enter')
-  save(): void {
+  ngAfterViewInit(): void {
+    this.addCustomErrors();
+  }
+
+  protected save(): void {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
       return;
@@ -142,7 +160,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
       });
   }
 
-  configureCronExpression(): void {
+  protected configureCronExpression(): void {
     this._cron.configureExpression().subscribe((expression) => {
       if (expression) {
         this.taskForm.controls.cron.setValue(expression);
@@ -150,15 +168,15 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     });
   }
 
-  addCronExclusion(): void {
+  protected addCronExclusion(): void {
     this.taskForm.controls.cronExclusions.push(taskCronExclusionFormCreate(this._fb));
   }
 
-  removeExclusion(index: number) {
+  protected removeExclusion(index: number) {
     this.taskForm.controls.cronExclusions.removeAt(index);
   }
 
-  configureCronExpressionForExclusion(exclusionForm: TaskCronExclusionForm): void {
+  protected configureCronExpressionForExclusion(exclusionForm: TaskCronExclusionForm): void {
     this._cron
       .configureExpression(CronEditorTab.TIME_RANGE, CronEditorTab.WEEKLY_TIME_RANGE, CronEditorTab.ANY_DAY_TIME_RANGE)
       .subscribe((expression) => {
@@ -186,6 +204,20 @@ export class EditSchedulerTaskDialogComponent implements OnInit {
     );
     this.taskForm.markAsUntouched();
     this.taskForm.markAsPristine();
+  }
+
+  private addCustomErrors(): void {
+    const forbidden = this.config?.forbiddenPlanError;
+    if (!forbidden) {
+      return;
+    }
+    // FormGroup directive will invoke `updateValueAndValidity` when new form object will be assigned
+    // it will erase all custom errors.
+    // Zero timeout has been added, to put error after FormGroup's `updateValueAndValidity` invocation
+    setTimeout(() => {
+      this.taskForm.controls.plan.setErrors({ forbidden });
+      this.taskForm.controls.plan.markAsTouched();
+    }, 0);
   }
 
   private createTestCasesStream() {

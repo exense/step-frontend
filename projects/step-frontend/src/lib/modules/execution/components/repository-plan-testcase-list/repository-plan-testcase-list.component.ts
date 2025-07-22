@@ -15,6 +15,7 @@ import {
 import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { catchError } from 'rxjs/operators';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -155,6 +156,10 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
       tap(() => this._selectionCollector.clear()),
       tap((items) => this._selectionCollector.registerPossibleSelectionManually(items)),
+      catchError((err) => {
+        // error is handled in interceptor but let's return an empty array to satisfy Angular lifecycle hook
+        return of([]);
+      }),
     );
   }
 }

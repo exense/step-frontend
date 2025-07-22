@@ -16,16 +16,7 @@
             <step-alt-execution-repository [repositoryParams]="repositoryParams" />
           }
         }
-        @if (!execution?.executionParameters?.['isolatedExecution'] && !!execution?.planId) {
-          <a
-            class="plan-link"
-            routerLink="/plans/editor/{{ execution.planId }}"
-            matTooltip="Navigate to plan"
-            matTooltipPosition="right"
-          >
-            <step-icon name="external-link" />
-          </a>
-        }
+        <step-alt-execution-repository-link [execution]="execution" />
       </h3>
     </div>
     <div class="sub-title">

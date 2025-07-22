@@ -1,12 +1,12 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { SchedulerPageStateService } from '../scheduler-page-state.service';
 import { TimeRange } from '@exense/step-core';
-import { DashboardUrlParamsService } from '../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
+import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, pairwise, scan, take } from 'rxjs';
-import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
+import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
-import { Status } from '../../../../_common/shared/status.enum';
+import { Status } from '../../../../../_common/shared/status.enum';
+import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -15,12 +15,12 @@ import { Status } from '../../../../_common/shared/status.enum';
   standalone: false,
 })
 export class SchedulerReportViewComponent implements OnInit {
-  readonly _stateService = inject(SchedulerPageStateService);
+  readonly _state = inject(CrossExecutionDashboardState);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
 
-  private updateUrlRefreshInterval = toObservable(this._stateService.refreshInterval)
+  private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(
       scan(
         (acc, interval) => {
@@ -35,7 +35,7 @@ export class SchedulerReportViewComponent implements OnInit {
       this._urlParamsService.updateRefreshInterval(range, isFirst);
     });
 
-  private updateUrlTimeRange = this._stateService.timeRangeSelection$
+  private updateUrlTimeRange = this._state.timeRangeSelection$
     .pipe(
       scan(
         (acc, range) => {
@@ -59,20 +59,18 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   handleMainChartZoom(timeRange: TimeRange) {
-    this._stateService.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
+    this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
       const base = chartSettings.xAxesSettings.values[0];
       const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];
       const snappedFrom = base + Math.ceil((timeRange.from - base) / interval) * interval;
       const snappedTo = base + Math.ceil((timeRange.to - base) / interval) * interval;
-      console.log('ORIGINAL', new Date(timeRange.from).toLocaleString(), new Date(timeRange.to).toLocaleString());
-      console.log('SNAPPED', new Date(snappedFrom).toLocaleString(), new Date(snappedTo).toLocaleString());
       timeRange = { from: Math.round(snappedFrom), to: Math.round(snappedTo) };
-      this._stateService.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
+      this._state.updateTimeRangeSelection({ type: 'ABSOLUTE', absoluteSelection: timeRange });
     });
   }
 
   protected readonly availableErrorTypes = toSignal(
-    this._stateService.errorsDataSource.allData$.pipe(
+    this._state.errorsDataSource.allData$.pipe(
       map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
       map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
     ),
@@ -95,9 +93,9 @@ export class SchedulerReportViewComponent implements OnInit {
         // analytics tab is handling events itself
         let urlParams = this._urlParamsService.collectUrlParams();
         if (urlParams.timeRange) {
-          this._stateService.updateTimeRangeSelection(urlParams.timeRange);
+          this._state.updateTimeRangeSelection(urlParams.timeRange);
         }
-        this._stateService.updateRefreshInterval(urlParams.refreshInterval || 0);
+        this._state.updateRefreshInterval(urlParams.refreshInterval || 0);
       });
   }
 }

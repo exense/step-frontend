@@ -1,8 +1,16 @@
 import { inject, Injectable } from '@angular/core';
-import { AugmentedPlansService, ExecutiontTaskParameters } from '../../../client/step-client-module';
+import {
+  AugmentedPlansService,
+  ExecutiontTaskParameters,
+  ForbiddenResponse,
+  httpOverrideForbiddenResponse,
+  Plan,
+} from '../../../client/step-client-module';
 import { EditSchedulerTaskDialogData } from '../components/edit-scheduler-task-dialog/edit-scheduler-task-dialog.component';
 import { AuthService } from '../../auth';
 import { map, Observable, of } from 'rxjs';
+
+type TaskAndConfig = EditSchedulerTaskDialogData['taskAndConfig'];
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +19,7 @@ export class EditSchedulerTaskDialogUtilsService {
   private _auth = inject(AuthService);
   private _planApi = inject(AugmentedPlansService);
 
-  prepareTaskAndConfig(task: ExecutiontTaskParameters): Observable<EditSchedulerTaskDialogData['taskAndConfig']> {
+  prepareTaskAndConfig(task: ExecutiontTaskParameters): Observable<TaskAndConfig> {
     let hideUser = false;
     let disableUser = false;
     if (!this._auth.isAuthenticated()) {
@@ -47,12 +55,33 @@ export class EditSchedulerTaskDialogUtilsService {
       return of({ task, config: { hideUser, disableUser } });
     }
 
-    return this._planApi.getPlanById(planId).pipe(
-      map((plan) => ({
-        task,
-        // TODO: Fill disablePlan flag, when it will be clarified how to fill it
-        config: { hideUser, disableUser, plan },
-      })),
-    );
+    return this._planApi
+      .overrideInterceptor(httpOverrideForbiddenResponse())
+      .getPlanById(planId)
+      .pipe(
+        map((planOrForbidden: Plan | ForbiddenResponse) => {
+          const forbidden = (planOrForbidden as ForbiddenResponse).forbidden;
+          if (!!forbidden) {
+            return {
+              plan: {
+                attributes: {
+                  name: 'Can not access to selected plan',
+                },
+              } as Partial<Plan>,
+              forbiddenPlanError: forbidden,
+            };
+          } else {
+            return { plan: planOrForbidden as Plan, forbiddenPlanError: undefined };
+          }
+        }),
+        map(
+          ({ plan, forbiddenPlanError }) =>
+            ({
+              task,
+              // TODO: Fill disablePlan flag, when it will be clarified how to fill it
+              config: { hideUser, disableUser, plan, forbiddenPlanError },
+            }) as TaskAndConfig,
+        ),
+      );
   }
 }

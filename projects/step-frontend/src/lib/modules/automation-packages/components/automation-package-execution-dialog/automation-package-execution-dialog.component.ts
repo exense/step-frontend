@@ -38,7 +38,7 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
 
   protected readonly executionConfigForm = this._fb.group({
     wrapIntoTestSet: this._fb.control(false),
-    numberOfThreads: this._fb.control(1, [Validators.min(1)]),
+    numberOfThreads: this._fb.control(1, [Validators.min(0)]),
     includedNames: this._fb.control<string[]>([]),
     excludedNames: this._fb.control<string[]>([]),
     includedCategories: this._fb.control<string[]>([]),

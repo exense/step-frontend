@@ -9,10 +9,12 @@ import {
   Signal,
   ViewEncapsulation,
 } from '@angular/core';
-import { TooltipContextData } from '../../../../timeseries/modules/chart/injectables/tooltip-context-data';
+import { TooltipContextData } from '../../../../../timeseries/modules/chart/injectables/tooltip-context-data';
 import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
-import { TSChartSeries } from '../../../../timeseries/modules/chart';
+import { TSChartSeries } from '../../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
+import { FilterUtils, OQLBuilder } from '../../../../../timeseries/modules/_common';
+import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 interface TransformedSeries {
   label: string;
@@ -39,15 +41,11 @@ export class ExecutionsChartTooltipComponent {
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _executionService = inject(ExecutionsService);
   private _timeSeriesService = inject(AugmentedTimeSeriesService);
+  readonly _state = inject(CrossExecutionDashboardState);
 
   reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
-  readonly taskId = input.required({
-    transform: (value: string | String) => value.toString(),
-  });
-
-  readonly EXECUTIONS_LIST_LIMIT = 10;
 
   selectedSeries?: TransformedSeries;
   selectedSeriesExecutions: ExecutionItem[] = [];
@@ -87,16 +85,24 @@ export class ExecutionsChartTooltipComponent {
   fetchExecutionsForSelectedItem(item: TransformedSeries, callback?: () => void) {
     const data = this.data()!;
     const bucketInterval = data.xValues[1] - data.xValues[0];
-    const taskId = this.taskId();
     const limit = 10;
+
+    // const statusAttribute = this._state.getViewType() === 'task' ? 'result' : 'rnStatus';
+
+    const oql = new OQLBuilder()
+      .open('and')
+      .append('attributes.metricType = "executions/duration"')
+      .append(FilterUtils.filtersToOQL([this._state.getDashboardFilter()], 'attributes'))
+      .append(`attributes.result = ${item.label}`)
+      .build();
 
     const request: FetchBucketsRequest = {
       start: item.timestamp,
       end: item.timestamp + bucketInterval,
       numberOfBuckets: 1,
-      oqlFilter: `attributes.metricType = \"executions/duration\" and attributes.taskId = ${taskId} and attributes.result = ${item.label}`,
+      oqlFilter: oql,
       groupDimensions: ['eId'],
-      maxNumberOfSeries: 10,
+      maxNumberOfSeries: limit,
     };
     this._timeSeriesService
       .getTimeSeries(request)
@@ -111,17 +117,13 @@ export class ExecutionsChartTooltipComponent {
         }),
       )
       .subscribe((executions) => {
-        this.selectedSeriesExecutions = executions
-          .filter((ex) => {
-            return ex.result === item.label;
-          })
-          .map((execution) => {
-            return {
-              id: execution.id!,
-              name: execution.description!,
-              timestamp: new Date(execution.startTime!).toLocaleString(),
-            };
-          });
+        this.selectedSeriesExecutions = executions.map((execution) => {
+          return {
+            id: execution.id!,
+            name: execution.description!,
+            timestamp: new Date(execution.startTime!).toLocaleString(),
+          };
+        });
         this.executionsListTruncated = executions.length >= limit;
         this._changeDetectorRef.detectChanges();
         callback?.();
