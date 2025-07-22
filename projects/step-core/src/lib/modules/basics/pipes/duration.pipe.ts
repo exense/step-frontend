@@ -1,10 +1,31 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DateTime, Duration } from 'luxon';
+import { DateTime, Duration, DurationObjectUnits } from 'luxon';
 
 export interface DurationPipeParams {
   displayFull?: boolean;
   shortenMs?: boolean;
 }
+
+type UsedDurationTypeObject = Omit<DurationObjectUnits, 'quarters' | 'weeks'>;
+type UsedDurationUnit = keyof UsedDurationTypeObject;
+
+interface DatePart {
+  unit: UsedDurationUnit;
+  value: number;
+  displayValue: string;
+}
+
+const SUFFIXES: Record<UsedDurationUnit, string> = {
+  years: 'y',
+  months: 'mo',
+  days: 'd',
+  hours: 'h',
+  minutes: 'm',
+  seconds: 's',
+  milliseconds: 'ms',
+};
+
+const UNITS_ORDER: UsedDurationUnit[] = ['milliseconds', 'seconds', 'minutes', 'hours', 'days', 'months', 'years'];
 
 @Pipe({
   name: 'duration',
@@ -25,23 +46,21 @@ export class DurationPipe implements PipeTransform {
 
     const startMs = start !== undefined ? this.getMs(start)! : 0;
     const duration = Duration.fromMillis(endMs - startMs).rescale();
-    const year = this.addSuffix(duration.get('years'), 'y');
-    const month = this.addSuffix(duration.get('months'), 'mo');
-    const day = this.addSuffix(duration.get('days'), 'd');
-    const hour = this.addSuffix(duration.get('hours'), 'h');
-    const minute = this.addSuffix(duration.get('minutes'), 'm');
-    const second = this.addSuffix(duration.get('seconds'), 's');
 
-    const ms = duration.get('millisecond');
+    const parts = UNITS_ORDER.reduce(
+      (res, unit) => {
+        res[unit] = this.createDatePart(duration, unit);
+        return res;
+      },
+      {} as Record<UsedDurationUnit, DatePart>,
+    );
 
-    let partsToDisplay = [year, month, day, hour, minute, second];
+    let partsToDisplay = [parts.years, parts.months, parts.days, parts.hours, parts.minutes, parts.seconds];
     if (!shortenMs) {
-      const milliseconds = this.addSuffix(ms, 'ms');
-      partsToDisplay.push(milliseconds);
+      partsToDisplay.push(parts.milliseconds);
     }
-    partsToDisplay = partsToDisplay.filter((item) => !!item);
-
-    if (partsToDisplay.length === 0 && ms > 0) {
+    partsToDisplay = partsToDisplay.filter((item) => !!item.value);
+    if (partsToDisplay.length === 0 && parts.milliseconds.value > 0) {
       return '< 1s';
     }
 
@@ -49,14 +68,22 @@ export class DurationPipe implements PipeTransform {
       partsToDisplay = partsToDisplay.slice(0, 2);
     }
 
-    return partsToDisplay.join(' ');
+    if (partsToDisplay.length === 1) {
+      const unitIndex = UNITS_ORDER.indexOf(partsToDisplay[0].unit);
+      const lowerNeighbourUnit = UNITS_ORDER[unitIndex - 1];
+      if (!!lowerNeighbourUnit) {
+        partsToDisplay.push(parts[lowerNeighbourUnit]);
+      }
+    }
+
+    return partsToDisplay.map((item) => item.displayValue).join(' ');
   }
 
-  private addSuffix(num: number, suffix: string): string {
-    if (num <= 0) {
-      return '';
-    }
-    return `${num}${suffix}`;
+  private createDatePart(duration: Duration, unit: UsedDurationUnit): DatePart {
+    const value = duration.get(unit);
+    const suffix = SUFFIXES[unit];
+    const displayValue = `${value}${suffix}`;
+    return { unit, value, displayValue };
   }
 
   private getMs(value?: number | Date | DateTime): number | undefined {
