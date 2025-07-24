@@ -27,7 +27,7 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
         return pipe(
           tap((entity) => {
             if (!entity) {
-              _errorMessageHandler.showError(`Entity "${entityType}" with id "${entityId}" doesn't exist`);
+              _errorMessageHandler.showError(`The ${entityType} with id "${entityId}" doesn't exist`);
             }
           }),
         );

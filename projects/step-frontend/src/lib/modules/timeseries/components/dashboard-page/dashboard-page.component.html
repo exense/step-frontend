@@ -39,9 +39,9 @@
   </div>
 </div>
 
-@if (timeRange() && dashboardId() && !isLoading()) {
+@if (timeRange() && dashboard()?.id && !isLoading()) {
   <step-timeseries-dashboard
-    [id]="dashboardId()!"
+    [id]="dashboard()!.id!"
     [timeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"

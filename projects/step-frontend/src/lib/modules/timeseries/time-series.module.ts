@@ -1,5 +1,8 @@
 import { inject, NgModule } from '@angular/core';
 import {
+  AugmentedDashboardsService,
+  AugmentedTimeSeriesService,
+  checkEntityGuardFactory,
   DashboardsService,
   dialogRoute,
   EntityRegistry,
@@ -80,6 +83,11 @@ export class TimeSeriesModule {
         {
           path: ':id',
           canActivate: [
+            checkEntityGuardFactory({
+              entityType: 'dashboard',
+              getEntity: (id) => inject(AugmentedDashboardsService).getDashboardById(id),
+              getEditorUrl: (id) => `/dashboards/${id}`,
+            }),
             (route: ActivatedRouteSnapshot) => {
               const _dashboardService = inject(DashboardsService);
               const _router = inject(Router);
@@ -100,6 +108,12 @@ export class TimeSeriesModule {
               );
             },
           ],
+          resolve: {
+            dashboard: (route: ActivatedRouteSnapshot) => {
+              const id = route.params['id'];
+              return inject(AugmentedDashboardsService).getDashboardById(id);
+            },
+          },
           component: DashboardPageComponent,
         },
       ],
