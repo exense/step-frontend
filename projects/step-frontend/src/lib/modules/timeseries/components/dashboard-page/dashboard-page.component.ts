@@ -104,10 +104,6 @@ export class DashboardPageComponent implements OnInit {
     }
   });
 
-  log = effect(() => {
-    console.log('routeDashboard', this.dashboardFromRoute());
-  });
-
   dashboardFetchEffect = effect(() => {
     const dashboard = this.dashboard();
     const activeTimeRangeSelection = this.activeTimeRangeSelection();
