@@ -30,7 +30,7 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { filter, map, of, pairwise, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { AuthService, DashboardsService, DashboardView, TimeRange } from '@exense/step-core';
+import { AuthService, DashboardsService, DashboardView, ReloadableDirective, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 interface UrlParams {
@@ -44,6 +44,7 @@ interface UrlParams {
   styleUrls: ['./dashboard-page.component.scss'],
   standalone: true,
   providers: [DashboardUrlParamsService],
+  hostDirectives: [ReloadableDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     COMMON_IMPORTS,
@@ -69,26 +70,22 @@ export class DashboardPageComponent implements OnInit {
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
-  // Dashboard ID can be provided through route or as input
-  readonly dashboardId = input<string | null>(null, { alias: 'dashboardId' });
-
-  // Signal from route data (resolver)
-  private readonly routeDashboard = toSignal(
-    this._activatedRoute.data.pipe(map((data) => data['dashboard'] as DashboardView)),
-    { initialValue: null },
-  );
-
-  // Computed signal that maps dashboardId signal to an observable, then converts that to a signal
-  private readonly dashboardFromService = toSignal(
-    toObservable(this.dashboardId).pipe(
+  // Dashboard ID can be provided through route or as component input
+  readonly dashboardFromInputId = input<string | null>(null, { alias: 'dashboardId' });
+  private readonly dashboardFromInput = toSignal(
+    toObservable(this.dashboardFromInputId).pipe(
       switchMap((id) => (id ? this._dashboardService.getDashboardById(id) : of(undefined))),
     ),
     { initialValue: undefined },
   );
 
-  // Final unified dashboard signal: prefer dashboardById, else fallback to route-resolved one
+  private readonly dashboardFromRoute = toSignal(
+    this._activatedRoute.data.pipe(map((data) => data['dashboard'] as DashboardView)),
+    { initialValue: null },
+  );
+
   readonly dashboard = computed(() => {
-    return this.dashboardFromService() ?? this.routeDashboard();
+    return this.dashboardFromInput() ?? this.dashboardFromRoute();
   });
 
   showRefreshToggle = input<boolean>(true);
@@ -105,6 +102,10 @@ export class DashboardPageComponent implements OnInit {
     } else {
       return undefined;
     }
+  });
+
+  log = effect(() => {
+    console.log('routeDashboard', this.dashboardFromRoute());
   });
 
   dashboardFetchEffect = effect(() => {
