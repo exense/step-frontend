@@ -1,12 +1,12 @@
 <mat-card appearance="outlined">
   <mat-card-header>
     <mat-card-title>
-      <div>Script Editor - Keyword: {{ keyword?.attributes?.['name'] }}</div>
+      <div>Script Editor - Keyword: {{ keywordName() }}</div>
       <step-rich-editor-change-status [changeStatus]="changeStatus()" />
     </mat-card-title>
     <section class="editor-buttons">
       <step-rich-editor-settings-bar
-        [predefinedMode]="syntaxMode"
+        [predefinedMode]="syntaxMode()"
         [showSaveBtn]="!!('kw-write' | hasRight | async)"
         saveBtnTooltip="Save this keyword"
         (save)="save()"
@@ -26,13 +26,8 @@
     </section>
   </mat-card-header>
   <mat-card-content>
-    @if (syntaxMode) {
-      <step-rich-editor
-        [ngModel]="keywordScript"
-        (ngModelChange)="handleScriptChange($event)"
-        [disabled]="!('kw-write' | hasRight | async)"
-        [syntaxMode]="syntaxMode"
-      />
+    @if (syntaxMode(); as mode) {
+      <step-rich-editor [(ngModel)]="keywordScript" [disabled]="!('kw-write' | hasRight | async)" [syntaxMode]="mode" />
     }
   </mat-card-content>
 </mat-card>
