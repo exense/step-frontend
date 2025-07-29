@@ -31,21 +31,22 @@
 </div>
 
 <div class="settings-container">
-  <div class="edit-buttons" *ngIf="editMode">
-    <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
-      <step-icon name="chevron-left"></step-icon>
-    </button>
-    <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
-      <step-icon name="chevron-right"></step-icon>
-    </button>
-    <button mat-icon-button matTooltip="Edit settings" (click)="openChartSettings()">
-      <step-icon name="edit"></step-icon>
-    </button>
-    <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
-      <step-icon name="x"></step-icon>
-    </button>
-  </div>
-  @if (!editMode) {
+  @if (editMode) {
+    <div class="edit-buttons">
+      <button mat-icon-button matTooltip="Shift left" (click)="shiftLeft.emit()">
+        <step-icon name="chevron-left"></step-icon>
+      </button>
+      <button mat-icon-button matTooltip="Shift right" (click)="shiftRight.emit()">
+        <step-icon name="chevron-right"></step-icon>
+      </button>
+      <button mat-icon-button matTooltip="Edit settings" (click)="openChartSettings()">
+        <step-icon name="edit"></step-icon>
+      </button>
+      <button mat-icon-button matTooltip="Remove chart" (click)="remove.emit()">
+        <step-icon name="x"></step-icon>
+      </button>
+    </div>
+  } @else {
     <button mat-icon-button matTooltip="Show chart filters" [matMenuTriggerFor]="oqlMenu">
       <step-icon name="filter"></step-icon>
     </button>

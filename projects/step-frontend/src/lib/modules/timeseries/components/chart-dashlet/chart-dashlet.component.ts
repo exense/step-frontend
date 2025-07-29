@@ -82,7 +82,6 @@ const resolutionLabels: Record<string, string> = {
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
-  protected _cd = inject(ChangeDetectorRef);
 
   readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per second', unitKey: 's' },
@@ -98,6 +97,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
+  protected _cd = inject(ChangeDetectorRef);
 
   @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
@@ -141,7 +141,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const cItem = changes['item'];
     if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
       this.prepareState(cItem.currentValue);
-      this.refresh(true).subscribe();
+      this.refresh(true).subscribe(() => {
+        this._cd.markForCheck();
+      });
     }
   }
 
@@ -209,7 +211,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;
     this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
-    this.refresh(true).subscribe();
+    this.refresh(true).subscribe(() => {
+      this._cd.markForCheck();
+    });
   }
 
   switchRateUnit(unit: RateUnit) {
@@ -231,7 +235,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
-    this.refresh(true).subscribe();
+    this.refresh(true).subscribe(() => {
+      this._cd.markForCheck();
+    });
   }
 
   handleLockStateChange(locked: boolean) {
