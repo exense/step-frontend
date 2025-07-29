@@ -329,7 +329,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
             if (secondaryAxesData[j] == undefined) {
               secondaryAxesData[j] = bucketValue;
             } else if (bucketValue) {
-              secondaryAxesData[j]! += bucketValue;
+              secondaryAxesData[j] = secondaryAxesData[j]! + bucketValue;
             }
           }
         });
