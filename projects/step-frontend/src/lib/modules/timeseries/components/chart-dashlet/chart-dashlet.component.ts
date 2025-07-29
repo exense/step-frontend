@@ -1,12 +1,11 @@
 import {
+  ChangeDetectorRef,
   Component,
-  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
   output,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,13 +17,11 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
-  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -85,6 +82,7 @@ const resolutionLabels: Record<string, string> = {
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
   private readonly barsFunction = uPlot.paths.bars; // this is a function from uplot which allows to draw bars instead of straight lines
+  protected _cd = inject(ChangeDetectorRef);
 
   readonly RATE_UNITS: RateUnit[] = [
     { menuLabel: 'Per second', unitKey: 's' },
@@ -253,7 +251,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (updatedItem) {
       Object.assign(this.item, updatedItem);
       this.prepareState(this.item);
-      this.refresh(true).subscribe();
+      this.refresh(true).subscribe(() => {
+        this._cd.markForCheck();
+      });
     }
   }
 
