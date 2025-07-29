@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   COMMON_IMPORTS,
   ResolutionPickerComponent,
@@ -12,9 +12,6 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { AuthService } from '@exense/step-core';
 import { DashboardViewSettingsBtnLocation } from '../dashboard/dashboard-view-settings-btn-location';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
-import { NavigationStart, Router } from '@angular/router';
 import { DashboardPageComponent } from '../dashboard-page/dashboard-page.component';
 
 /**
