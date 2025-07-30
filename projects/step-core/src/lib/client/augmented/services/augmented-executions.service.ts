@@ -19,6 +19,7 @@ import { CompareCondition } from '../../../modules/basics/types/compare-conditio
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { SearchValue } from '../../../modules/table/shared/search-value';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedExecutionsService extends ExecutionsService implements HttpOverrideResponseInterceptor {
@@ -49,15 +50,21 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
     return this;
   }
 
-  getExecutionsTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
-      description: 'description',
-      executionTime: 'startTime',
-      startTime: 'startTime',
-      endTime: 'endTime',
-      user: 'executionParameters.userID',
-      status: ['status', 'result'],
-    });
+  getExecutionsTableDataSource(
+    hiddenFilters?: Record<string, string | string[] | SearchValue>,
+  ): StepDataSource<Execution> {
+    return this._dataSourceFactory.createDataSource(
+      AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      {
+        description: 'description',
+        executionTime: 'startTime',
+        startTime: 'startTime',
+        endTime: 'endTime',
+        user: 'executionParameters.userID',
+        status: ['status', 'result'],
+      },
+      hiddenFilters,
+    );
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {

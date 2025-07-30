@@ -84,6 +84,7 @@ export class TablePersistenceUrlStateService extends TablePersistenceStateServic
   }
 
   override getSearch(): Record<string, SearchValue> {
+    console.log('GET SEARCH');
     if (!this.canStoreSearch) {
       return {};
     }

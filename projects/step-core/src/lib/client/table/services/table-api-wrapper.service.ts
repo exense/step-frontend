@@ -43,6 +43,7 @@ export class TableApiWrapperService {
   }
 
   requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
+    console.log('request table');
     return this._tables.request(tableId, tableRequest) as Observable<TableResponseGeneric<T>>;
   }
 

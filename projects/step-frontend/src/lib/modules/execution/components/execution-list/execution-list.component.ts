@@ -1,14 +1,19 @@
-import { Component, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, effect, inject, input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   ArrayFilterComponent,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
+  DateRange,
+  Execution,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  RangeFilterComponent,
   REQUEST_FILTERS_INTERCEPTORS,
+  SearchValue,
   selectionCollectionProvider,
+  StepDataSource,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
@@ -17,6 +22,7 @@ import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.modu
 import { BehaviorSubject, of, switchMap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-execution-list',
@@ -39,22 +45,42 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
   ],
   encapsulation: ViewEncapsulation.None,
 })
-export class ExecutionListComponent implements OnDestroy {
+export class ExecutionListComponent implements OnInit, OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
-  readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
+  dataSource: StepDataSource<Execution> | undefined;
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
     switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
-  autoRefreshDisabled: boolean = false;
+  autoRefresh = input<boolean>(true);
+  hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
+  defaultDateRange = input<DateRange>();
+
+  autoRefreshInputEffect = effect(() => {
+    const enabled = this.autoRefresh();
+    this.autoRefreshDisabledState = !enabled;
+  });
+
+  customFn = () => {
+    return this._filterConditionFactory.dateRangeFilterCondition({ start: undefined, end: DateTime.now() });
+  };
+
+  autoRefreshDisabledState: boolean = false;
 
   @ViewChild('statusFilter')
   private statusFilter?: ArrayFilterComponent;
+
+  @ViewChild('executionTimeFilter')
+  executionTimeFilter?: RangeFilterComponent;
+
+  ngOnInit(): void {
+    this.dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource(this.hiddenFilters());
+  }
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
@@ -62,15 +88,16 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   changeType(selectionType: BulkSelectionType): void {
-    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
-
-    if (this.autoRefreshDisabled) {
-      this.dataSource.skipOngoingRequest();
+    if (this.autoRefresh()) {
+      this.autoRefreshDisabledState = selectionType !== BulkSelectionType.NONE;
+      if (this.autoRefreshDisabledState) {
+        this.dataSource!.skipOngoingRequest();
+      }
     }
   }
 
   refreshTable(): void {
-    this.dataSource.reload({ hideProgress: true });
+    this.dataSource!.reload({ hideProgress: true });
     this.reloadRunningExecutionsCount$.next();
   }
 

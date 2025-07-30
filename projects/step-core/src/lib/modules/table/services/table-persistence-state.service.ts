@@ -92,6 +92,7 @@ export class TablePersistenceStateService implements OnDestroy {
     if (!jsonString) {
       return {};
     }
+    console.log(jsonString);
     const json = JSON.parse(jsonString);
     return Object.entries(json).reduce(
       (res, [key, value]) => {

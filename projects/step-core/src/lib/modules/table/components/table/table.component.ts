@@ -358,6 +358,7 @@ export class TableComponent<T>
     }).pipe(
       map(({ pageWithTimeStamp, searchWithTimeStamp }) => {
         const { search, resetPagination } = searchWithTimeStamp.value;
+        console.log('search', search);
         let page = pageWithTimeStamp.value;
         // Change has been triggered, by search. In that case reset page to first one
         const isRestToFirstPage = searchWithTimeStamp.timestamp > pageWithTimeStamp.timestamp;
@@ -497,6 +498,7 @@ export class TableComponent<T>
     regexOrResetPagination: boolean = true,
     resetPaginationParam: boolean = true,
   ): void {
+    console.log('ON SEARCH');
     const search = { ...this.search$.value.search };
     let searchCol: SearchValue;
     let regex: boolean;
@@ -520,11 +522,13 @@ export class TableComponent<T>
   }
 
   getSearchValue$(column: string): Observable<SearchValue | undefined> {
+    console.log('getsearchvalue');
     return this.search$.pipe(map((value) => value.search[column]));
   }
 
   getTableFilterRequest(): TableRequestData | undefined {
     const [search, filter, params] = [this.search$.value.search, this.filter(), this.tableParams()];
+    console.log('requesting filter', filter);
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
