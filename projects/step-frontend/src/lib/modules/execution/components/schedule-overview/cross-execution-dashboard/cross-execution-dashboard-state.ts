@@ -8,6 +8,7 @@ import {
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
+  SearchValue,
   STATUS_COLORS,
   TableFetchLocalDataSource,
   TimeRange,
@@ -57,6 +58,7 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): FilterBarItem;
+  abstract readonly executionsTableFilter: Record<string, string | string[] | SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {

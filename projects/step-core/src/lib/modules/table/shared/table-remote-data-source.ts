@@ -249,6 +249,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(options?: TableGetDataOptions): void;
   getTableData(req: TableRequestInternal): void;
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
+    console.log('GET TABLE DATA');
     if (reqOrOptions instanceof TableRequestInternal) {
       const req = convertTableRequest(reqOrOptions as TableRequestInternal);
       this._request$.next({ request: req });
@@ -284,6 +285,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions) {
+    console.log('RELOAD');
     let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;

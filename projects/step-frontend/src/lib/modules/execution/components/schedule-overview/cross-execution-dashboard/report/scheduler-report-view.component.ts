@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { TimeRange } from '@exense/step-core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { DateRange, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, pairwise, scan, take } from 'rxjs';
@@ -7,6 +7,8 @@ import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_com
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
+import { ExecutionListComponent } from '../../../execution-list/execution-list.component';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -18,6 +20,20 @@ export class SchedulerReportViewComponent implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
+
+  @ViewChild('executionList') executionList!: ExecutionListComponent;
+
+  luxonDateRange = toSignal(
+    this._state.timeRange$.pipe(
+      map(
+        ({ from, to }) =>
+          ({
+            start: DateTime.fromMillis(from),
+            end: DateTime.fromMillis(to),
+          }) as DateRange,
+      ),
+    ),
+  );
 
   private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(

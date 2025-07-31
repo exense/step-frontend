@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, input, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { debounceTime, map, Observable } from 'rxjs';
 import { BaseFilterComponent } from '../../../basics/step-basics.module';
@@ -27,7 +27,7 @@ export class RangeFilterComponent extends BaseFilterComponent<DateRange | undefi
   protected createControlChangeStream(control: FormControl<DateRange>): Observable<DateRange> {
     return control.valueChanges.pipe(
       debounceTime(200),
-      map((value) => value ?? undefined)
+      map((value) => value ?? undefined),
     );
   }
 

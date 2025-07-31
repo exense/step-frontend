@@ -6,11 +6,15 @@ import {
   CrossExecutionDashboardState,
   CrossExecutionViewType,
 } from '../cross-execution-dashboard/cross-execution-dashboard-state';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, SearchValue, TimeRange } from '@exense/step-core';
 
 @Injectable()
 export class SchedulerPageStateService extends CrossExecutionDashboardState {
   readonly _taskIdFn = inject(SCHEDULE_ID);
+
+  readonly executionsTableFilter: Record<string, string | string[] | SearchValue> = {
+    executionTaskID: this._taskIdFn(),
+  };
 
   getViewType(): CrossExecutionViewType {
     return 'task';
