@@ -1,15 +1,4 @@
-import {
-  Component,
-  computed,
-  EventEmitter,
-  HostBinding,
-  inject,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  signal,
-} from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { AugmentedScreenService, Input as StInput, ScreenInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
@@ -49,6 +38,10 @@ interface CustomFormInputsSchema {
     DynamicLabelCustomFormInputComponent,
     CustomFormInputModelPipe,
   ],
+  host: {
+    '[class.editable-label-mode]': 'stEditableLabelMode()',
+    '[class.inline]': `stInline()`,
+  },
 })
 export class CustomFormComponent implements OnInit, OnDestroy {
   private _screensService = inject(AugmentedScreenService);
@@ -65,17 +58,17 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   readonly changeInProgress$ = merge(this.changeStart$, this.changeEnd$).pipe(distinctUntilChanged());
   readonly changeInProgress = toSignal(this.changeInProgress$, { initialValue: false });
 
-  @HostBinding('class.editable-label-mode') @Input() stEditableLabelMode = false;
-  @Input() stScreen!: string;
-  @Input() stModel!: Record<string, unknown>;
-  @Input() stDisabled: boolean = false;
-  @HostBinding('class.inline') @Input() stInline: boolean = false;
-  @Input() stExcludeFields: string[] = [];
-  @Input() stIncludeFieldsOnly?: string[];
-  @Input() required: boolean = false;
+  readonly stEditableLabelMode = input(false);
+  readonly stInline = input(false);
+  readonly stDisabled = input(false);
+  readonly required = input(false);
+  readonly stScreen = input.required<string>();
+  readonly stModel = input.required<Record<string, unknown>>();
+  readonly stExcludeFields = input<string[]>([]);
+  readonly stIncludeFieldsOnly = input<string[] | undefined>();
 
-  @Output() stModelChange = new EventEmitter<Record<string, unknown>>();
-  @Output() customInputTouch = new EventEmitter<void>();
+  readonly stModelChange = output<Record<string, unknown>>();
+  readonly customInputTouch = output<void>();
 
   private activeExpressionInputsKeys = new Set<string>();
   private orderedIds = signal<string[]>([]);
@@ -108,7 +101,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this._screenDataMeta.checkMetaInformationAboutScreenInRoute(this.stScreen, this._activatedRoute);
+    this._screenDataMeta.checkMetaInformationAboutScreenInRoute(this.stScreen(), this._activatedRoute);
     this.initializeFields();
   }
 
@@ -185,7 +178,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   private initializeFields(): void {
     this._screensService
-      .getScreenInputsByScreenIdWithCache(this.stScreen)
+      .getScreenInputsByScreenIdWithCache(this.stScreen())
       .pipe(
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         tap((screenInputs) => this.setDefaultValues(screenInputs)),
@@ -209,10 +202,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
 
   private setupValueChange(): void {
     this.valueChangeDebounced$.pipe(filter((valueChange) => !!valueChange)).subscribe((valueChange) => {
-      this._objectUtils.setObjectFieldValue(this.stModel, valueChange!.inputId, valueChange!.value);
-      this.stModelChange.emit({
-        ...this.stModel,
-      });
+      const changedModel = this._objectUtils.setObjectFieldValue(
+        this.stModel(),
+        valueChange!.inputId,
+        valueChange!.value,
+      );
+      this.stModelChange.emit(changedModel);
     });
   }
 
@@ -223,12 +218,14 @@ export class CustomFormComponent implements OnInit, OnDestroy {
           if (!valueChange) {
             return;
           }
-          this._objectUtils.setObjectFieldValue(this.stModel, valueChange!.inputId, valueChange!.value);
-          this.stModelChange.emit({
-            ...this.stModel,
-          });
+          const changedModel = this._objectUtils.setObjectFieldValue(
+            this.stModel(),
+            valueChange!.inputId,
+            valueChange!.value,
+          );
+          this.stModelChange.emit(changedModel);
         }),
-        switchMap(() => this._screensService.getScreenInputsForScreenPost(this.stScreen, this.stModel)),
+        switchMap(() => this._screensService.getScreenInputsForScreenPost(this.stScreen(), this.stModel())),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
@@ -239,26 +236,31 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   }
 
   private setDefaultValues(screenInputs: ScreenInput[]): void {
-    let valueHasBeenChanged = false;
-    screenInputs
+    const inputs = screenInputs
       .map((item) => item.input as StInput)
-      .filter((input) => !!input && this._objectUtils.getObjectFieldValue(this.stModel, input.id!) === undefined)
-      .forEach((input: StInput) => {
-        const defaultValue = input.type === 'CHECKBOX' ? input.defaultValue ?? false : input.defaultValue;
-        if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
-          this._objectUtils.setObjectFieldValue(this.stModel, input.id!, defaultValue);
-          valueHasBeenChanged = true;
-        }
-      });
+      .filter((input) => !!input && this._objectUtils.getObjectFieldValue(this.stModel(), input.id!) === undefined);
+
+    let valueHasBeenChanged = false;
+    let model = this.stModel();
+    for (let item of inputs) {
+      const defaultValue = item.type === 'CHECKBOX' ? item.defaultValue ?? false : item.defaultValue;
+      if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
+        model = this._objectUtils.setObjectFieldValue(model, item.id!, defaultValue);
+        valueHasBeenChanged = true;
+      }
+    }
+
     if (valueHasBeenChanged) {
-      this.stModelChange.emit(this.stModel);
+      this.stModelChange.emit(model);
     }
   }
 
   private filterScreenInputs(screenInputs: ScreenInput[]): ScreenInput[] {
-    let result = screenInputs.filter((item) => !!item.input && !this.stExcludeFields.includes(item.input.id!));
-    if (this.stIncludeFieldsOnly) {
-      result = result.filter((item) => this.stIncludeFieldsOnly!.includes(item.input!.id!));
+    const excludeFields = new Set(this.stExcludeFields());
+    let result = screenInputs.filter((item) => !!item.input && !excludeFields.has(item.input.id!));
+    if (this.stIncludeFieldsOnly()) {
+      const includeFields = new Set(this.stIncludeFieldsOnly()!);
+      result = result.filter((item) => includeFields.has(item.input!.id!));
     }
     return result;
   }

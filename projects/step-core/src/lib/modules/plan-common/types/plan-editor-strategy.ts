@@ -1,13 +1,13 @@
-import { Observable } from 'rxjs';
 import { AbstractArtefact } from '../../../client/step-client-module';
 import { PlanContext } from './plan-context.interface';
+import { Signal } from '@angular/core';
 
 export abstract class PlanEditorStrategy {
-  abstract hasRedo$: Observable<boolean>;
-  abstract hasUndo$: Observable<boolean>;
+  abstract hasRedo: Signal<boolean>;
+  abstract hasUndo: Signal<boolean>;
 
-  abstract readonly planContext?: PlanContext;
-  abstract readonly planContext$: Observable<PlanContext | undefined>;
+  abstract readonly planContext: Signal<PlanContext | undefined>;
+  abstract handlePlanContextChange(planContext?: PlanContext): void;
 
   abstract addControl(artefactTypeId: string): void;
   abstract addKeywords(keywordIds: string[]): void;
@@ -19,7 +19,6 @@ export abstract class PlanEditorStrategy {
 
   abstract discardAll(): void;
 
-  abstract handlePlanChange(): void;
   abstract moveOut(node?: AbstractArtefact): void;
   abstract moveUp(node?: AbstractArtefact): void;
   abstract moveDown(node?: AbstractArtefact): void;

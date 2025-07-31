@@ -9,8 +9,8 @@
       [stDisabled]="!('plan-write' | hasRight | async)"
       [stInline]="true"
       [stEditableLabelMode]="true"
-      [stModel]="(_planEditorService.plan$ | async)!"
-      (stModelChange)="_planEditorService.handlePlanChange()"
+      [stModel]="_planEditorService.plan()"
+      (stModelChange)="handlePlanChange($any($event))"
     />
   </step-plan-editor-attributes>
 </step-plan-editor-base>

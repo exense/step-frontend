@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core';
 import {
   ArtefactInfo as ArtefactInfoInternal,
   ArtefactService,
@@ -25,6 +16,7 @@ import { ExecutionCommandsContext } from '../../shared/execution-commands-contex
 import { ExecutionCommandsService } from '../../services/execution-commands.service';
 import { catchError, finalize, map, of } from 'rxjs';
 import { RepositoryPlanTestcaseListComponent } from '../repository-plan-testcase-list/repository-plan-testcase-list.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface AltExecutionLaunchDialogData {
   title?: string;
@@ -57,6 +49,7 @@ interface ArtefactInfo extends ArtefactInfoInternal {
     },
     ExecutionCommandsService,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltExecutionLaunchDialogComponent
   extends ExecutionCommandsDirective
@@ -79,17 +72,25 @@ export class AltExecutionLaunchDialogComponent
   protected error = signal<string | undefined>(undefined);
   protected artefact = signal<ArtefactInfo | undefined>(undefined);
   protected testcases = signal<IncludeTestcases | undefined>(undefined);
-  protected parameters = computed(() => {
-    const executionParameters = this.executionParameters() ?? {};
-    const contextParameters = this._data?.parameters ?? {};
-    return {
-      ...executionParameters,
-      ...contextParameters,
-    };
-  });
 
   ngAfterViewInit(): void {
     this.loadArtefact();
+  }
+
+  override setupExecutionParameters(): void {
+    this.executionParameters$
+      .pipe(
+        map((executionParameters) => executionParameters ?? {}),
+        map((executionParameters) => {
+          const contextParameters = this._data?.parameters ?? {};
+          return {
+            ...executionParameters,
+            ...contextParameters,
+          };
+        }),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((executionParameters) => this.executionParameters.set(executionParameters));
   }
 
   override getIncludedTestcases(): IncludeTestcases | null | undefined {
@@ -102,10 +103,6 @@ export class AltExecutionLaunchDialogComponent
 
   override getRepositoryObjectRef(): RepositoryObjectReference | undefined {
     return this.repoRef;
-  }
-
-  override getExecutionParameters(): Record<string, string> | undefined {
-    return this.parameters();
   }
 
   override getIsExecutionIsolated(): boolean {

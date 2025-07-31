@@ -74,7 +74,7 @@ export class PlanEditorActionsComponent {
       return;
     }
 
-    if (this._interactiveSession.executionParameters) {
+    if (this._interactiveSession.hasExecutionParameters()) {
       this.interactiveSessionTrigger!.openMenu();
       return;
     }

@@ -111,10 +111,11 @@
 <mat-menu #interactiveSessionMenu="matMenu" class="execution-menu">
   <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
-      @if (_interactiveSession.executionParameters) {
+      @if (_interactiveSession.hasExecutionParameters()) {
         <step-custom-forms
           #interactiveSessionCustomForm
-          [stModel]="_interactiveSession.executionParameters"
+          [stModel]="_interactiveSession.executionParameters()!"
+          (stModelChange)="_interactiveSession.executionParameters.set($event)"
           stScreen="executionParameters"
         />
       }

@@ -16,7 +16,13 @@ export class ObjectUtilsService {
     }, object) as R;
   }
 
-  setObjectFieldValue<T extends object, V>(object: T, fieldPath: string, value: V): void {
+  setObjectFieldValue<T extends object, V>(object: T, fieldPath: string, value: V): T {
+    if (typeof object !== 'object' || object === null || object === undefined) {
+      return object;
+    }
+
+    const result = { ...object };
+
     const pathParts = fieldPath.split('.');
 
     pathParts.reduce((res: Record<string, unknown> | unknown, fieldName: string, index) => {
@@ -28,6 +34,8 @@ export class ObjectUtilsService {
       container[fieldName] = index < pathParts.length - 1 ? container[fieldName] ?? {} : value;
 
       return container[fieldName];
-    }, object);
+    }, result);
+
+    return result;
   }
 }
