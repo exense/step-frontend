@@ -36,11 +36,9 @@ import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
-import { ResourceInputModule } from './modules/resource-input/resource-input.module';
 import { FunctionActionsService } from './modules/keywords-common';
 import { FunctionActionsImplService } from './services/function-actions-impl.service';
 import { UserSettingsButtonComponent } from './components/user-settings-button/user-settings-button.component';
-import { ResourceInputWrapperComponent } from './components/resource-input-wrapper/resource-input-wrapper.component';
 import { WizardModule } from './modules/wizard/wizards.module';
 import { SimpleOutletComponent } from './components/simple-outlet/simple-outlet.component';
 import { CronModule } from './modules/cron/cron.module';
@@ -58,7 +56,6 @@ import { IMPORT_EXPORT_EXPORTS } from './modules/import-export';
 import { AUTH_EXPORTS } from './modules/auth';
 import { DRAG_DROP_EXPORTS } from './modules/drag-drop';
 import { BOOKMARKS_EXPORTS } from './modules/bookmarks';
-import { DashboardNavigationParamsPipe } from './pipes/dashboard-navigation-params.pipe';
 import { EXECUTION_COMMON_EXPORTS } from './modules/execution-common';
 import { RICH_EDITOR_EXPORTS } from './modules/rich-editor';
 import { MULTI_LEVEL_SELECT_EXPORTS } from './modules/multi-level-select';
@@ -76,6 +73,7 @@ import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
 import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
+import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
 
 @NgModule({
   declarations: [
@@ -98,12 +96,10 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     WaitingArtefactsAdvancedComponent,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     SimpleOutletComponent,
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
-    DashboardNavigationParamsPipe,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
   ],
@@ -121,7 +117,7 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     AngularSplitModule,
     DynamicFormsModule,
     JsonViewerModule,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     WizardModule,
@@ -184,11 +180,10 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     PredefinedOptionsInputComponent,
     LockColumnContainerComponent,
     WaitingArtefactsAdvancedComponent,
-    ResourceInputModule,
+    RESOURCE_INPUT_IMPORTS,
     KEYWORDS_COMMON_IMPORTS,
     AutomationPackageCommonModule,
     UserSettingsButtonComponent,
-    ResourceInputWrapperComponent,
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
@@ -202,7 +197,6 @@ import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
     DRAG_DROP_EXPORTS,
     BOOKMARKS_EXPORTS,
     EXECUTION_COMMON_EXPORTS,
-    DashboardNavigationParamsPipe,
     RICH_EDITOR_EXPORTS,
     MULTI_LEVEL_SELECT_EXPORTS,
     TestIdDirective,
@@ -269,7 +263,6 @@ export * from './components/link-button/link-button.component';
 export * from './components/user-settings-button/user-settings-button.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
-export * from './components/resource-input-wrapper/resource-input-wrapper.component';
 export * from './directives/caps-lock.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
@@ -294,7 +287,7 @@ export * from './modules/tree';
 export * from './modules/repository-parameters';
 export * from './modules/json-viewer/json-viewer.module';
 export * from './modules/json-viewer-ext';
-export * from './modules/resource-input/resource-input.module';
+export * from './modules/resource-input';
 export * from './modules/keywords-common';
 export * from './modules/wizard/wizards.module';
 export * from './modules/automation-package-common/automation-package-common.module';
@@ -342,7 +335,6 @@ export * from './services/keyword-executor.service';
 export * from './modules/artefacts-common/components/report-node-icon/report-node-icon.component';
 export * from './modules/drag-drop';
 export * from './modules/list-selection';
-export * from './pipes/dashboard-navigation-params.pipe';
 export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
@@ -351,3 +343,4 @@ export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';
+export * from './shared/no-access-entity-error';

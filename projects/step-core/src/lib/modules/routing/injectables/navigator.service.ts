@@ -3,7 +3,7 @@ import { DEFAULT_PAGE } from './default-page.token';
 import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
-import { filter, from, map, Observable, shareReplay, startWith, switchMap, tap, timer } from 'rxjs';
+import { filter, first, from, map, Observable, shareReplay, startWith, switchMap, tap, timer } from 'rxjs';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
 import { MenuEntry } from '../types/menu-entry';
 
@@ -32,6 +32,8 @@ export class NavigatorService {
     map(() => this._router.url),
     shareReplay(1),
   );
+
+  private navigationEnd$ = this._router.events.pipe(map((event) => event instanceof NavigationEnd));
 
   isViewIdActive(view: MenuEntry | DisplayMenuEntry): Observable<boolean> {
     const viewLink = `/${view.id}`;
@@ -65,8 +67,8 @@ export class NavigatorService {
     this._router.navigate(['/']);
   }
 
-  navigateLogin(skipLocationChange: boolean = true): void {
-    this._router.navigate(['/', 'login'], { skipLocationChange });
+  navigateLogin(queryParams: Params = {}): void {
+    this._router.navigate(['/', 'login'], { queryParams, skipLocationChange: true, queryParamsHandling: 'merge' });
   }
 
   navigateAfterLogin(): void {
@@ -87,6 +89,16 @@ export class NavigatorService {
   cleanupActivateView(): boolean {
     this.forcedActivatedViewId = undefined;
     return true;
+  }
+
+  reloadCurrentRoute(): void {
+    if (this._router.getCurrentNavigation()) {
+      this.navigationEnd$.pipe(first()).subscribe(() => this.reloadCurrentRoute());
+      return;
+    }
+
+    const url = this._location.path(true);
+    this._router.navigateByUrl('/in-progress', { state: { goTo: url } });
   }
 
   private navigateInternal(link: string, isOpenInSeparateTab?: boolean): void {
