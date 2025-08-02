@@ -1,12 +1,14 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { TimeRange } from '@exense/step-core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Tab, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, pairwise, scan, take } from 'rxjs';
+import { combineLatest, filter, map, pairwise, scan, take } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
+
+export type ReportNodesChartType = 'keywords' | 'testcases';
 
 @Component({
   selector: 'step-scheduler-report-view',
@@ -18,6 +20,29 @@ export class SchedulerReportViewComponent implements OnInit {
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
+
+  readonly reportNodesChartType = signal<ReportNodesChartType | undefined>(undefined);
+
+  readonly primaryChartTypes: Tab<ReportNodesChartType>[] = [
+    {
+      id: 'testcases',
+      label: 'Test Cases',
+    },
+    {
+      id: 'keywords',
+      label: 'Keywords',
+    },
+  ];
+
+  switchReportNodesChart(type: ReportNodesChartType) {
+    this.reportNodesChartType.set(type);
+  }
+
+  readonly byExecutionChartTitle = computed(() => {
+    const label =
+      this.reportNodesChartType() === 'keywords' ? 'Keywords calls by execution' : 'Test cases by execution';
+    return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY})`;
+  });
 
   private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(
@@ -51,6 +76,10 @@ export class SchedulerReportViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribeToBackEvents();
+
+    this._state.testCasesChartSettings$.pipe(take(1)).subscribe(({ hasData }) => {
+      this.reportNodesChartType.set(hasData ? 'testcases' : 'keywords');
+    });
   }
 
   jumpToExecution(eId: string) {
