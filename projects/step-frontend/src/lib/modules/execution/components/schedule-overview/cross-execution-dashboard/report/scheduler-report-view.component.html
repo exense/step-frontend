@@ -30,15 +30,7 @@
     </step-alt-report-widget>
   </div>
   <div class="row">
-    <step-alt-report-widget
-      class="flex-grow-1"
-      [title]="
-        (reportNodesChartType() === 'keywords' ? 'Keywords calls by execution' : 'Test cases by execution') +
-        ' (last ' +
-        _state.LAST_EXECUTIONS_TO_DISPLAY +
-        ')'
-      "
-    >
+    <step-alt-report-widget class="flex-grow-1" [title]="byExecutionChartTitle()">
       <step-alt-report-widget-content class="widget-content">
         <div class="chart-actions-container">
           <step-tabs

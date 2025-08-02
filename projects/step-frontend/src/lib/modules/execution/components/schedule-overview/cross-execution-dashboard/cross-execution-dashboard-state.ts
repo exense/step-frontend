@@ -339,11 +339,8 @@ export abstract class CrossExecutionDashboardState {
                     allStatuses.add('PASSED');
                   }
                   timeSeriesResponse.matrixKeys.forEach((attributes, i) => {
-                    // const nodeName = attributes['name'];
-                    // let artefactHash = attributes['artefactHash'];
                     const executionId = attributes['executionId'];
                     const status = attributes['status'];
-                    // const nodeUniqueId = nodeName + artefactHash;
 
                     allStatuses.add(status);
                     let executionEntry: EntityWithKeywordsStats = {

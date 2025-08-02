@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Tab, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -37,6 +37,12 @@ export class SchedulerReportViewComponent implements OnInit {
   switchReportNodesChart(type: ReportNodesChartType) {
     this.reportNodesChartType.set(type);
   }
+
+  readonly byExecutionChartTitle = computed(() => {
+    const label =
+      this.reportNodesChartType() === 'keywords' ? 'Keywords calls by execution' : 'Test cases by execution';
+    return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY})`;
+  });
 
   private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)
     .pipe(
