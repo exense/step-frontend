@@ -1,7 +1,5 @@
 @if (displayParametersForm()) {
-  @if (executionParameters(); as params) {
-    <step-custom-forms [stModel]="params" stScreen="executionParameters" />
-  }
+  <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
   <step-execution-actions
     [execution]="execution()"
     [isExecutionIsolated]="isExecutionIsolated()"
@@ -25,12 +23,10 @@
     (copyLink)="copyExecutionServiceAsCurlToClipboard()"
   >
     <step-execution-actions-execute-content>
-      @if (executionParameters(); as params) {
-        <section class="execution-params-popover">
-          <step-custom-forms [stModel]="params" stScreen="executionParameters" />
-          <button type="button" mat-flat-button color="primary" (click)="execute(false)">Execute</button>
-        </section>
-      }
+      <section class="execution-params-popover">
+        <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
+        <button type="button" mat-flat-button color="primary" (click)="execute(false)">Execute</button>
+      </section>
     </step-execution-actions-execute-content>
   </step-execution-actions>
 }

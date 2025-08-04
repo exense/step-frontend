@@ -1,8 +1,19 @@
-import { AfterViewInit, Component, ElementRef, inject, input, OnDestroy, OnInit, viewChild } from '@angular/core';
-import { BehaviorSubject, forkJoin, map, Subject } from 'rxjs';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { forkJoin, map } from 'rxjs';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
-import { PlansService, KeywordsService, AbstractArtefact, Plan } from '../../../../client/step-client-module';
+import { PlansService, KeywordsService, AbstractArtefact } from '../../../../client/step-client-module';
 import { DialogsService } from '../../../basics/step-basics.module';
 import { AceMode } from '../../../rich-editor';
 import { TreeStateService } from '../../../tree';
@@ -39,19 +50,13 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
 
   readonly mode = input.required<AceMode>();
 
-  /** @ViewChild('editor', { static: false }) **/
   private editorElement = viewChild<ElementRef<HTMLDivElement>>('editor');
 
   private editor?: ace.Ace.Editor;
 
-  private planChange$ = new Subject<Plan>();
-  private planContextInternal$ = new BehaviorSubject<PlanContext | undefined>(undefined);
+  private planContextInternal = signal<PlanContext | undefined>(undefined);
 
-  get planContext(): PlanContext | undefined {
-    return this.planContextInternal$.value;
-  }
-
-  readonly planContext$ = this.planContextInternal$.asObservable();
+  readonly planContext = this.planContextInternal.asReadonly();
 
   private updateEditorWithoutSave = false;
 
@@ -94,8 +99,9 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
         enableLiveAutocompletion: false,
       });
     }
-    if (this.planContext) {
-      const plan = this.planContext.plan;
+    const planContext = this.planContext();
+    if (planContext) {
+      const plan = planContext.plan;
       this.updateEditorWithoutSave = true;
       this.editor.setValue((plan as any).source, 1);
       this.updateEditorWithoutSave = false;
@@ -177,7 +183,7 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
       this.editor.setValue((planContext.plan as any).source, 1);
       this.updateEditorWithoutSave = false;
     }
-    this.planContextInternal$.next(planContext);
+    this.planContextInternal.set(planContext);
     const root = planContext.plan.root;
     if (root) {
       const selectedId = selectedArtefactId || root.id!;
@@ -193,12 +199,10 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
     this._planEditorService.removeStrategy();
     this.editor!.getSession().off('change', this.parseCallback);
     this.editor!.destroy();
-    this.planChange$.complete();
-    this.planContextInternal$.complete();
   }
 
-  handlePlanChange(): void {
-    this.planContextInternal$.next(this.planContextInternal$.value);
+  handlePlanContextChange(planContext?: PlanContext): void {
+    this.planContextInternal.set(planContext);
     this.parseCallback();
   }
 
@@ -240,12 +244,19 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
     }
   }
 
-  hasRedo$ = this.planContextInternal$.pipe(map(() => this.editor?.getSession()?.getUndoManager()?.hasRedo() ?? false));
-  hasUndo$ = this.planContextInternal$.pipe(map(() => this.editor?.getSession()?.getUndoManager()?.hasUndo() ?? false));
+  readonly hasRedo = computed(() => {
+    const planContextInternal = this.planContextInternal();
+    return this.editor?.getSession()?.getUndoManager()?.hasRedo() ?? false;
+  });
+
+  readonly hasUndo = computed(() => {
+    const planContextInternal = this.planContextInternal();
+    return this.editor?.getSession()?.getUndoManager()?.hasUndo() ?? false;
+  });
 
   private parse(): void {
     const value = this.editor!.getValue();
-    const plan = this.planContext?.plan;
+    const plan = this.planContext()?.plan;
     (plan as any)!.source = value;
     this._planApi.compilePlan(plan).subscribe((completionResult) => {
       this.editor!.getSession().clearAnnotations();
@@ -262,7 +273,7 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
         );
         this.editor!.getSession().setAnnotations(annotations);
       } else {
-        const context = this.planContext!;
+        const context = this.planContext()!;
         context.plan = completionResult.plan!;
         this._planContextApi.savePlan(context).subscribe((updatedContext) => {
           this.init(updatedContext, undefined, false);

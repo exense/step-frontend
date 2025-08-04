@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, model, OnInit, signal } from '@angular/core';
 import {
   AugmentedScreenService,
   AutomationPackage,
@@ -46,12 +46,15 @@ export class AutomationPackageExecutionDialogComponent implements OnInit {
     excludedCategories: this._fb.control<string[]>([]),
   });
 
-  protected readonly executionParameters = toSignal(
-    this._screenTemplates.getDefaultParametersByScreenId('executionParameters'),
-    { initialValue: undefined },
-  );
+  protected readonly hasParameters = signal(false);
+  protected readonly executionParameters = model<Record<string, string>>({});
 
   ngOnInit(): void {
+    this._screenTemplates.getDefaultParametersByScreenId('executionParameters').subscribe((parameters) => {
+      this.hasParameters.set(!!parameters);
+      this.executionParameters.set(parameters);
+    });
+
     this.setupExecutionConfigFormBehavior();
   }
 
