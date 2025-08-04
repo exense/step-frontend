@@ -343,3 +343,4 @@ export * from './modules/auto-srhank-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';
+export * from './shared/no-access-entity-error';

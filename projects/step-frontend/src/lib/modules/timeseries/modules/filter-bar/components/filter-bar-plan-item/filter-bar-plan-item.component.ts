@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input } from '@angular/core';
 import { DateFormat, EntityDialogsService, Plan } from '@exense/step-core';
 import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
 
@@ -13,6 +13,7 @@ export class FilterBarPlanItemComponent {
   @Input() values!: EntitySearchValue[];
 
   private _entityDialogs = inject(EntityDialogsService);
+  protected _cd = inject(ChangeDetectorRef);
 
   showPicker() {
     this._entityDialogs.selectEntityOfType('plans').subscribe((result) => {
@@ -29,6 +30,7 @@ export class FilterBarPlanItemComponent {
       }
     }
     this.values.push({ searchValue: id, entity: plan });
+    this._cd.markForCheck();
   }
 
   removeSearchValue(index: number) {

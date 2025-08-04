@@ -1,12 +1,11 @@
 import {
+  ChangeDetectorRef,
   Component,
-  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
   output,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,13 +17,11 @@ import {
   MarkerType,
   MetricAggregation,
   MetricAttribute,
-  TimeRange,
   TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import {
   COMMON_IMPORTS,
-  FilterUtils,
   TimeSeriesConfig,
   TimeSeriesContext,
   TimeSeriesEntityService,
@@ -99,6 +96,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private _matDialog = inject(MatDialog);
   private _uPlotUtils = inject(UPlotUtilsService);
+  protected _cd = inject(ChangeDetectorRef);
 
   @ViewChild('settingsMenuTrigger') settingsMenuTrigger?: MatMenuTrigger;
   @ViewChild('chart') chart!: TimeSeriesChartComponent;
@@ -142,7 +140,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     const cItem = changes['item'];
     if (cItem?.previousValue !== cItem?.currentValue && !cItem?.firstChange) {
       this.prepareState(cItem.currentValue);
-      this.refresh(true).subscribe();
+      this.refresh(true).subscribe(() => {
+        this._cd.markForCheck();
+      });
     }
   }
 
@@ -210,7 +210,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   switchAggregate(aggregate: ChartAggregation, params?: AggregateParams) {
     this.selectedAggregate = aggregate;
     this.item.chartSettings!.primaryAxes.aggregation = { type: aggregate, params: params };
-    this.refresh(true).subscribe();
+    this.refresh(true).subscribe(() => {
+      this._cd.markForCheck();
+    });
   }
 
   switchRateUnit(unit: RateUnit) {
@@ -232,7 +234,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   toggleGroupingAttribute(attribute: MetricAttributeSelection) {
     attribute.selected = !attribute.selected;
-    this.refresh(true).subscribe();
+    this.refresh(true).subscribe(() => {
+      this._cd.markForCheck();
+    });
   }
 
   handleLockStateChange(locked: boolean) {
@@ -252,7 +256,9 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
     if (updatedItem) {
       Object.assign(this.item, updatedItem);
       this.prepareState(this.item);
-      this.refresh(true).subscribe();
+      this.refresh(true).subscribe(() => {
+        this._cd.markForCheck();
+      });
     }
   }
 
@@ -322,7 +328,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
             if (secondaryAxesData[j] == undefined) {
               secondaryAxesData[j] = bucketValue;
             } else if (bucketValue) {
-              secondaryAxesData[j]! += bucketValue;
+              secondaryAxesData[j] = secondaryAxesData[j]! + bucketValue;
             }
           }
         });

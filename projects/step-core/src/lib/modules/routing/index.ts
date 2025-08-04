@@ -14,3 +14,4 @@ export * from './types/menu-entry';
 export * from './types/sub-router-config.interface';
 export * from './types/access-permission';
 export * from './guards/sequence-can-activate.guard';
+export * from './directives/reloadable.directive';

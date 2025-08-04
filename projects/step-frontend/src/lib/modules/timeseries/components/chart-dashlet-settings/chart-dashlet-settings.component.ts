@@ -1,11 +1,5 @@
 import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import {
-  DashboardItem,
-  ErrorMessageHandlerService,
-  MetricAttribute,
-  MetricType,
-  TimeSeriesService,
-} from '@exense/step-core';
+import { DashboardItem, ErrorMessageHandlerService, MetricAttribute } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import {
@@ -18,7 +12,6 @@ import {
 import { FilterBarItemComponent } from '../../modules/filter-bar';
 import { ChartAggregation } from '../../modules/_common/types/chart-aggregation';
 import { MatMenuTrigger } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AggregateParams,
   TimeseriesAggregatePickerComponent,

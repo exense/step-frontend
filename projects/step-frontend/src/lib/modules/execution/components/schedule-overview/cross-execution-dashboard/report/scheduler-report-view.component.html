@@ -30,41 +30,36 @@
     </step-alt-report-widget>
   </div>
   <div class="row">
-    <step-alt-report-widget
-      class="flex-grow-1"
-      [title]="'Keywords calls by execution (last ' + _state.LAST_EXECUTIONS_TO_DISPLAY + ')'"
-    >
+    <step-alt-report-widget class="flex-grow-1" [title]="byExecutionChartTitle()">
       <step-alt-report-widget-content class="widget-content">
-        @if (_state.keywordsChartSettings$ | async; as settings) {
-          <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
-            <ng-template tooltipContent let-data>
-              <div class="ts-tooltip">
-                <div
-                  class="link-item"
-                  (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
-                  title="See Execution"
-                >
-                  <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
-                  <span class="link-icon"></span>
+        <div class="chart-actions-container">
+          <step-tabs
+            [tabs]="primaryChartTypes"
+            [shrink]="true"
+            [activeTabId]="reportNodesChartType()"
+            (activeTabIdChange)="switchReportNodesChart($event)"
+          />
+        </div>
+        @if (reportNodesChartType() === 'keywords') {
+          @if (_state.keywordsChartSettings$ | async; as settings) {
+            <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
+              <ng-template tooltipContent let-data>
+                <div class="ts-tooltip">
+                  <div
+                    class="link-item"
+                    (click)="jumpToExecution(settings.lastExecutions[data.idx!].id!)"
+                    title="See Execution"
+                  >
+                    <span>{{ settings.lastExecutions[data.idx!].description || 'Unnamed' }}</span>
+                    <span class="link-icon"></span>
+                  </div>
                 </div>
-              </div>
-            </ng-template>
-          </step-timeseries-chart>
-        } @else {
-          <ng-container *ngTemplateOutlet="loadingSpinner" />
-        }
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  </div>
-  @if (_state.testCasesChartSettings$ | async; as testCasesData) {
-    @if (testCasesData.chartSettings) {
-      <div class="row">
-        <step-alt-report-widget
-          class="flex-grow-1"
-          [title]="'Test cases by execution (last ' + _state.LAST_EXECUTIONS_TO_DISPLAY + ')'"
-        >
-          <step-alt-report-widget-content class="widget-content">
-            <step-timeseries-chart [settings]="testCasesData.chartSettings!" [height]="350">
+              </ng-template>
+            </step-timeseries-chart>
+          }
+        } @else if (reportNodesChartType() === 'testcases') {
+          @if (_state.testCasesChartSettings$ | async; as testCasesData) {
+            <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
               <ng-template tooltipContent let-data>
                 <div class="ts-tooltip">
                   <div
@@ -78,11 +73,13 @@
                 </div>
               </ng-template>
             </step-timeseries-chart>
-          </step-alt-report-widget-content>
-        </step-alt-report-widget>
-      </div>
-    }
-  }
+          }
+        } @else {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
   <div class="row">
     <div class="row">
       <step-alt-report-widget class="flex-grow-1" title="Errors">

@@ -30,6 +30,7 @@ import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './modules/automation-packages';
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
+import { InProgressComponent } from './components/in-progress/in-progress.component';
 
 Settings.defaultLocale = 'en';
 
@@ -61,6 +62,7 @@ const MODULES_INITIALIZERS = [
     ArtefactsModule,
     ...RESOURCE_IMPORTS,
     BookmarksModule,
+    InProgressComponent,
     RouterModule.forRoot(APP_ROUTES, { useHash: true }),
   ],
   exports: [RootComponent],

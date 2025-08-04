@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, Input, viewChild } from '@angular/core';
+import { Component, ElementRef, input, viewChild } from '@angular/core';
 import { BaseModalWindowComponent } from './base-modal-window.component';
 
 @Component({
@@ -6,25 +6,24 @@ import { BaseModalWindowComponent } from './base-modal-window.component';
   templateUrl: './modal-window.component.html',
   styleUrls: ['./modal-window.component.scss'],
   standalone: false,
-})
-export class ModalWindowComponent extends BaseModalWindowComponent {
-  /* @ViewChild() */
-  private trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
-
-  /* @ViewChild() */
-  private dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
-
   /**
    * This component has an input "title" which also works as assignment
    * of native html title attribute.
    * It might cause some negative effects, when modal title appears on hover.
    * This binding was added to negate this negative effect.
    */
-  @HostBinding('attr.title') private nativeTitle = null;
+  host: {
+    '[attr.title]': 'null',
+  },
+})
+export class ModalWindowComponent extends BaseModalWindowComponent {
+  private trackFocus = viewChild('trackFocus', { read: ElementRef<HTMLInputElement> });
+  private dialogContent = viewChild('dialogContent', { read: ElementRef<HTMLElement> });
 
-  @Input() showSpinner?: boolean;
-  @Input() title = '';
-  @Input() hideButtonsSection = false;
+  readonly showSpinner = input<boolean | unknown>(false);
+  readonly title = input('');
+  readonly hideButtonsSection = input(false);
+  readonly hideHeaderSection = input(false);
 
   override focusDialog() {
     this.trackFocus()?.nativeElement?.focus();

@@ -6,6 +6,7 @@ import { map, take } from 'rxjs';
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { Location } from '@angular/common';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { InProgressComponent } from './components/in-progress/in-progress.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -21,7 +22,22 @@ export const APP_ROUTES: Routes = [
       {
         path: '',
         component: MainViewComponent,
-        children: [],
+        children: [
+          {
+            path: 'in-progress',
+            component: InProgressComponent,
+            canActivate: [
+              () => {
+                const _router = inject(Router);
+                const goTo = _router.getCurrentNavigation()?.extras?.state?.['goTo'] as string | undefined;
+                return !!goTo;
+              },
+            ],
+            resolve: {
+              goTo: () => inject(Router).getCurrentNavigation()?.extras?.state?.['goTo'],
+            },
+          },
+        ],
         canActivate: [
           authGuard,
           (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
