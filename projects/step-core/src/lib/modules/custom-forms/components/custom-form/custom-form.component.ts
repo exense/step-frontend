@@ -214,9 +214,9 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private setupVisibilityUpdate(): void {
     this.valueChangeDebounced$
       .pipe(
-        tap((valueChange) => {
+        map((valueChange) => {
           if (!valueChange) {
-            return;
+            return undefined;
           }
           const changedModel = this._objectUtils.setObjectFieldValue(
             this.stModel(),
@@ -224,8 +224,11 @@ export class CustomFormComponent implements OnInit, OnDestroy {
             valueChange!.value,
           );
           this.stModelChange.emit(changedModel);
+          return changedModel;
         }),
-        switchMap(() => this._screensService.getScreenInputsForScreenPost(this.stScreen(), this.stModel())),
+        switchMap((changedModel) =>
+          this._screensService.getScreenInputsForScreenPost(this.stScreen(), changedModel ?? this.stModel()),
+        ),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         map((screenInputs) =>
           this.determineCustomFormInputVisibilityFlags(this.activeExpressionInputsKeys, screenInputs),
