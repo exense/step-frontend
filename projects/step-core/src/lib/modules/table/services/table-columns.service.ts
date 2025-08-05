@@ -57,7 +57,6 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     const contentColumns = this._columnsDefinition.contentColumns() ?? [];
     const remoteColumnsDefinitions = this._columnsDefinition.customRemoteColumns?.()?.displayColumns() ?? [];
 
-
     const infoDictionary = contentColumns
       .reduce((res, col) => [...res, ...col.columnInfos], [] as ColumnInfo[])
       .reduce(
@@ -75,7 +74,6 @@ export class TableColumnsService implements Reloadable, OnDestroy {
     let columnSettingList = mainColumnsDefinitions
       .reduce((res, col) => [...res, ...col.columnDefinitions], [] as MatColumnDef[])
       .map((col, i) => this.createStandardColumnSettings(col, i, infoDictionary));
-
 
     const remoteColumns = remoteColumnsDefinitions.map((screenInput, i) =>
       this.createScreenInputColumnSettings(screenInput, columnSettingList.length + i),

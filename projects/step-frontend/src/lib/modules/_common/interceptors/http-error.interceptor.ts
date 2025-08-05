@@ -8,33 +8,33 @@ import {
   HttpResponse,
   HttpStatusCode,
 } from '@angular/common/http';
-import { Observable, of, tap, throwError } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ConnectionError } from '../shared/connection-error';
 import { HttpErrorLoggerService } from '../injectables/http-error-logger.service';
-import { ErrorMessageHandlerService, NavigatorService } from '@exense/step-core';
+import {
+  ErrorMessageHandlerService,
+  NoAccessEntityError,
+  FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT,
+} from '@exense/step-core';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
   private _errorLogger = inject(HttpErrorLoggerService);
-  private _navigator = inject(NavigatorService);
 
   private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
     this._errorLogger.log('Network Error', error);
 
-    if (error.status === 401 && skip401) {
+    if (error.status === HttpStatusCode.Unauthorized && skip401) {
       return throwError(() => error);
     }
 
     if (
-      error.status === 403 &&
-      error.error?.errorMessage === "You're not allowed to access this object from within this context"
+      error.status === HttpStatusCode.Forbidden &&
+      error.error?.errorMessage === FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT
     ) {
-      this.showError(error.error.errorMessage);
-      this._navigator.navigateToHome({ forceClientUrl: true });
-      this.showError(error.error?.errorMessage);
-      return of(false);
+      return throwError(() => new NoAccessEntityError(error));
     }
 
     const { parsedError, logMessages } = this.parseHttpError(error);

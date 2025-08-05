@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, input, Input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, input, Input } from '@angular/core';
 import { DateFormat, EntityDialogsService, Execution } from '@exense/step-core';
 import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
 
@@ -15,6 +15,7 @@ export class FilterBarExecutionItemComponent implements AfterViewInit {
   showDialogOnInit = input<boolean | undefined>(false);
 
   private _entityDialogs = inject(EntityDialogsService);
+  protected _cd = inject(ChangeDetectorRef);
 
   ngAfterViewInit(): void {
     if (this.showDialogOnInit()) {
@@ -41,6 +42,7 @@ export class FilterBarExecutionItemComponent implements AfterViewInit {
       }
     }
     this.values.push({ searchValue: executionId, entity: execution });
+    this._cd.markForCheck();
   }
 
   removeSearchValue(index: number) {

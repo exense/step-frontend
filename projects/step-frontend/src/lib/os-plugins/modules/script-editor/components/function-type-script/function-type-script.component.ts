@@ -7,7 +7,7 @@ import {
   ScriptLanguage,
   ArrayItemLabelValueExtractor,
 } from '@exense/step-core';
-import { FunctionScript } from './function-script.interface';
+import { FunctionScript } from '../../types/function-script.interface';
 import {
   FunctionTypeScriptForm,
   functionTypeScriptFormCreate,

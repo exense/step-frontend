@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   computed,
@@ -7,10 +8,8 @@ import {
   inject,
   input,
   OnInit,
-  Signal,
   signal,
   untracked,
-  viewChild,
   WritableSignal,
 } from '@angular/core';
 import {
@@ -28,10 +27,10 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Observable, pairwise, shareReplay, switchMap, take } from 'rxjs';
+import { filter, map, of, pairwise, switchMap } from 'rxjs';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
-import { AuthService, DashboardsService, DashboardView, TimeRange } from '@exense/step-core';
+import { AuthService, DashboardsService, DashboardView, ReloadableDirective, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
 
 interface UrlParams {
@@ -45,6 +44,8 @@ interface UrlParams {
   styleUrls: ['./dashboard-page.component.scss'],
   standalone: true,
   providers: [DashboardUrlParamsService],
+  hostDirectives: [ReloadableDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     COMMON_IMPORTS,
     DashboardFilterBarComponent,
@@ -58,38 +59,37 @@ interface UrlParams {
   ],
 })
 export class DashboardPageComponent implements OnInit {
-  private _route: ActivatedRoute = inject(ActivatedRoute);
   private _router: Router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   private _changeDetectorRef = inject(ChangeDetectorRef);
   private _dashboardService = inject(DashboardsService);
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
-
-  private dashboardIdUrl$ = this._route.paramMap.pipe(map((params) => params.get('id')));
-  private dashboardIdUrl = toSignal(this.dashboardIdUrl$);
+  private _activatedRoute = inject(ActivatedRoute);
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
 
-  // for component's consumers input attribute will be dashboardId
-  readonly dashboardIdInput = input('', { alias: 'dashboardId' });
+  // Dashboard ID can be provided through route or as component input
+  readonly dashboardFromInputId = input<string | null>(null, { alias: 'dashboardId' });
+  private readonly dashboardFromInput = toSignal(
+    toObservable(this.dashboardFromInputId).pipe(
+      switchMap((id) => (id ? this._dashboardService.getDashboardById(id) : of(undefined))),
+    ),
+    { initialValue: undefined },
+  );
+
+  private readonly dashboardFromRoute = toSignal(
+    this._activatedRoute.data.pipe(map((data) => data['dashboard'] as DashboardView)),
+    { initialValue: null },
+  );
+
+  readonly dashboard = computed(() => {
+    return this.dashboardFromInput() ?? this.dashboardFromRoute();
+  });
 
   showRefreshToggle = input<boolean>(true);
   refreshInterval = signal<number>(0);
-
-  protected readonly dashboardId = computed(() => {
-    const idInput = this.dashboardIdInput();
-    const idUrl = this.dashboardIdUrl();
-    return idInput || idUrl;
-  });
-
-  protected readonly dashboard = toSignal(
-    toObservable(this.dashboardId).pipe(
-      filter((id): id is string => !!id),
-      switchMap((id) => this._dashboardService.getDashboardById(id)),
-    ),
-  );
 
   hasWritePermission = this._authService.hasRight('dashboard-write');
 
@@ -126,9 +126,10 @@ export class DashboardPageComponent implements OnInit {
       this.activeTimeRangeSelection.set(urlParams.timeRange);
     }
     this.refreshInterval.set(urlParams.refreshInterval || 0);
-    if (!this.dashboardId()) {
+    if (!this.dashboard()) {
       throw new Error('Dashboard id not present');
     }
+
     this.subscribeToUrlNavigation();
   }
 

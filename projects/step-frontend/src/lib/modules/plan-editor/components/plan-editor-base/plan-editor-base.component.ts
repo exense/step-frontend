@@ -204,7 +204,7 @@ export class PlanEditorBaseComponent
       return;
     }
     this._planEditorApi
-      .exportPlan(this.currentPlanId, `${this._planEditService.planContext!.entity!.attributes!['name']}.sta`)
+      .exportPlan(this.currentPlanId, `${this._planEditService.planContext()!.entity!.attributes!['name']}.sta`)
       .subscribe();
   }
 
@@ -213,7 +213,7 @@ export class PlanEditorBaseComponent
       return;
     }
 
-    const name = this._planEditService.planContext!.entity!.attributes!['name'];
+    const name = this._planEditService.planContext()!.entity!.attributes!['name'];
 
     this._dialogsService
       .enterValue('Clone plan as', `${name}_Copy`)
@@ -263,7 +263,7 @@ export class PlanEditorBaseComponent
 
     if (isPlan) {
       this._planEditorApi
-        .lookupPlan(this._planEditService.planContext!.id!, artefact!.id!)
+        .lookupPlan(this._planEditService.planContext()!.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -393,7 +393,7 @@ export class PlanEditorBaseComponent
       .pipe(
         takeUntilDestroyed(this._destroyRef),
         map((item) => {
-          const context = this._planEditService.planContext;
+          const context = this._planEditService.planContext();
           return { item, context };
         }),
         filter(({ item, context }) => !!item && !!context),

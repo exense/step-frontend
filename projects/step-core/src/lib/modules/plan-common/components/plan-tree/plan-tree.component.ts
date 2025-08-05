@@ -269,7 +269,10 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   handlePlanChange() {
     // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
     // a plan change
-    setTimeout(() => this._planEditService.handlePlanChange(), 200);
+    setTimeout(() => {
+      const ctx = this._planEditService.planContext();
+      this._planEditService.handlePlanContextChange(!ctx ? undefined : { ...ctx });
+    }, 200);
   }
 
   handleTreeSizeChange(size: number): void {
