@@ -7,7 +7,6 @@ import { JsonNode } from '../../types/json-node';
 
 @Component({
   selector: 'step-json-view-expanded',
-  standalone: true,
   templateUrl: './json-view-expanded.component.html',
   styleUrl: './json-view-expanded.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

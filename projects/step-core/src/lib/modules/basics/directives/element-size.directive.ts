@@ -8,7 +8,6 @@ const debounceSignal = (value: WritableSignal<number>, dueTime: number = 300, in
 
 @Directive({
   selector: '[stepElementSize]',
-  standalone: true,
   providers: [
     {
       provide: ElementSizeService,

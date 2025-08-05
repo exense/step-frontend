@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[stepTrapFocus]',
+  standalone: false,
 })
 export class TrapFocusDirective implements AfterContentInit {
   private _destroyRef = inject(DestroyRef);

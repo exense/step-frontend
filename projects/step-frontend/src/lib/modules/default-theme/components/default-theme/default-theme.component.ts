@@ -6,5 +6,6 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/
   styleUrls: ['./default-theme.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DefaultThemeComponent {}

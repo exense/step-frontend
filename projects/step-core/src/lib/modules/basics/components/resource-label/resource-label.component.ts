@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
   selector: 'step-resource-label',
   templateUrl: './resource-label.component.html',
   styleUrls: ['./resource-label.component.scss'],
+  standalone: false,
 })
 export class ResourceLabelComponent implements OnChanges {
   private _api = inject(AugmentedResourcesService);

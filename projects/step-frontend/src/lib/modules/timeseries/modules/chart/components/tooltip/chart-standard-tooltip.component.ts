@@ -2,11 +2,10 @@ import { Component, computed, inject, input } from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig } from '../../../_common';
 import { TooltipContextData } from '../../injectables/tooltip-context-data';
 import { TooltipRowEntry } from '../../types/tooltip-row-entry';
-import { Execution, ExecutionsService, FetchBucketsRequest, MarkerType, TimeSeriesService } from '@exense/step-core';
+import { Execution, ExecutionsService, MarkerType } from '@exense/step-core';
 import { SeriesStroke } from '../../../_common/types/time-series/series-stroke';
 import { NgTemplateOutlet } from '@angular/common';
 import { TsTooltipOptions } from '../../types/ts-tooltip-options';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TooltipExecutionsMenuComponent } from './executions-menu/tooltip-executions-menu.component';
@@ -19,11 +18,9 @@ import { defer, Observable, of, switchMap } from 'rxjs';
   selector: 'step-chart-standard-tooltip',
   templateUrl: './chart-standard-tooltip.component.html',
   styleUrls: ['./chart-standard-tooltip.component.scss'],
-  standalone: true,
   imports: [
     COMMON_IMPORTS,
     NgTemplateOutlet,
-    MatProgressSpinner,
     MatMenuTrigger,
     MatTooltip,
     MatMenu,

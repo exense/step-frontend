@@ -6,6 +6,7 @@ import { ArtefactService } from '@exense/step-core';
   templateUrl: './plan-artefact-list.component.html',
   styleUrls: ['./plan-artefact-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class PlanArtefactListComponent {
   readonly availableArtefacts$ = inject(ArtefactService).availableArtefacts$;

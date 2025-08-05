@@ -13,6 +13,7 @@ type OnTouch = () => void;
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class DynamicValueBaseComponent<D extends DynamicValueBase<T>, T = ValueType<D>>
   implements ControlValueAccessor

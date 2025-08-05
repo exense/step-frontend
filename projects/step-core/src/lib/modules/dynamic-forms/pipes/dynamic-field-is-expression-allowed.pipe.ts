@@ -5,7 +5,6 @@ const DENIED_FIELD_TYPES = [JsonFieldType.NUMBER, JsonFieldType.BOOLEAN, JsonFie
 
 @Pipe({
   name: 'dynamicFieldIsExpressionEditorAllowed',
-  standalone: true,
 })
 export class DynamicFieldIsExpressionEditorAllowedPipe implements PipeTransform {
   transform(fieldType: JsonFieldType): boolean {

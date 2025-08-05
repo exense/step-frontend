@@ -6,6 +6,7 @@ import { SpecialLinksService } from '../../services/special-links.service';
   selector: 'step-user-settings-button',
   template: `<step-icon name="settings" /> User Settings`,
   styleUrls: ['./user-settings-button.component.scss'],
+  standalone: false,
 })
 export class UserSettingsButtonComponent extends LinkButtonComponent {
   private _specialLinks = inject(SpecialLinksService);

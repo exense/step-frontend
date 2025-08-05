@@ -4,6 +4,7 @@ import { map, Observable, of } from 'rxjs';
 
 @Pipe({
   name: 'isSelected',
+  standalone: false,
 })
 export class IsSelectedPipe implements PipeTransform {
   private _selectionCollector = inject(SelectionCollector, { optional: true });

@@ -6,7 +6,6 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
   selector: 'step-tooltip-executions-menu',
   templateUrl: './tooltip-executions-menu.component.html',
   styleUrls: ['./tooltip-executions-menu.component.scss'],
-  standalone: true,
   imports: [MatProgressSpinner],
 })
 export class TooltipExecutionsMenuComponent {

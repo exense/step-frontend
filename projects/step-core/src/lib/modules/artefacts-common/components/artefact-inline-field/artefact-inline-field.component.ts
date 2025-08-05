@@ -22,7 +22,6 @@ const GAP = 1;
   templateUrl: './artefact-inline-field.component.html',
   styleUrl: './artefact-inline-field.component.scss',
   imports: [StepBasicsModule],
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {

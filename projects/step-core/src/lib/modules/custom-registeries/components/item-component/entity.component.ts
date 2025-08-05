@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core';
   selector: 'step-entity',
   templateUrl: './base-item.component.html',
   styleUrls: [],
+  standalone: false,
 })
 export class EntityComponent extends BaseItemComponent<EntityItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.ENTITY;

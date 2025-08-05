@@ -31,6 +31,7 @@ type FieldAccessor = Mutable<Pick<EntityMenuItemDirective, 'isVisible$' | 'isDis
 @Directive({
   selector: '[stepEntityMenuItem]',
   exportAs: 'EntityMenuItem',
+  standalone: false,
 })
 export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestroy {
   private _auth = inject(AuthService);

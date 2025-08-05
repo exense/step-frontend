@@ -8,6 +8,7 @@ import { RetryIfFailsArtefact } from '../../types/retry-if-fails.artefact';
   templateUrl: './retry-if-fails.component.html',
   styleUrls: ['./retry-if-fails.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class RetryIfFailsComponent extends BaseArtefactComponent<RetryIfFailsArtefact> {
   @ViewChild('form')

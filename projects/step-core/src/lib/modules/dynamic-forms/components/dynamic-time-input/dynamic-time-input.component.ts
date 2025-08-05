@@ -8,6 +8,7 @@ import { TimeUnit, TimeUnitDictionary } from '../../../basics/step-basics.module
   selector: 'step-dynamic-time-input',
   templateUrl: './dynamic-time-input.component.html',
   styleUrls: ['./dynamic-time-input.component.scss'],
+  standalone: false,
 })
 export class DynamicTimeInputComponent extends DynamicValueBaseComponent<DynamicValueInteger> {
   @Input() allowedMeasures: TimeUnit[] = [

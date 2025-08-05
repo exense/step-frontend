@@ -2,7 +2,6 @@ import { Directive, effect, ElementRef, inject, input, InputSignal, Renderer2 } 
 
 @Directive({
   selector: '[stepTestId]',
-  standalone: true,
 })
 export class TestIdDirective {
   stepTestId: InputSignal<string | undefined> = input<string | undefined>();

@@ -5,6 +5,7 @@ import { CustomComponent } from '@exense/step-core';
   selector: 'step-upload-package-btn',
   templateUrl: './upload-package-btn.component.html',
   styleUrls: ['./upload-package-btn.component.scss'],
+  standalone: false,
 })
 export class UploadPackageBtnComponent implements CustomComponent {
   context?: any;

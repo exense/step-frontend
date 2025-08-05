@@ -24,7 +24,6 @@ import { Execution, ExecutiontTaskParameters, Plan } from '@exense/step-core';
   selector: 'step-ts-filter-bar-item',
   templateUrl: './filter-bar-item.component.html',
   styleUrls: ['./filter-bar-item.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS, FilterBarPlanItemComponent, FilterBarTaskItemComponent, FilterBarExecutionItemComponent],
 })
 export class FilterBarItemComponent implements OnInit, OnChanges, AfterViewInit {
@@ -93,15 +92,8 @@ export class FilterBarItemComponent implements OnInit, OnChanges, AfterViewInit 
     this.freeTextValues.splice(index, 1);
   }
 
-  toggleOption(option: { value: string; isSelected?: boolean }, checked: boolean, checkbox?: MatCheckbox) {
+  toggleOption(option: { value: string; isSelected?: boolean }, checked: boolean) {
     option.isSelected = checked;
-
-    if (checkbox) {
-      checkbox.ripple.launch({
-        centered: true,
-      });
-    }
-
     this.formattedValue = this.getFormattedValue(this.item);
     this.filterChange.emit(this.item);
     this.changesApplied = true;

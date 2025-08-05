@@ -5,6 +5,7 @@ import { AgentsModalComponent } from '../execution-agent-modal/execution-agent-m
 @Component({
   selector: 'step-agents-cell',
   templateUrl: './execution-agent-cell.component.html',
+  standalone: false,
 })
 export class AgentsCellComponent {
   readonly agents = input('');

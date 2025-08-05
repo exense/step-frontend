@@ -3,7 +3,6 @@ import { Execution } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'executionName',
-  standalone: true,
 })
 export class ExecutionNamePipe implements PipeTransform {
   transform(execution: Execution): string {

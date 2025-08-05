@@ -20,7 +20,6 @@ import { DoughnutChartTotalTemplateDirective } from '../../directives/doughnut-c
   templateUrl: './doughnut-chart.component.html',
   styleUrls: ['./doughnut-chart.component.scss'],
   imports: [StepCommonModule],
-  standalone: true,
 })
 export class DoughnutChartComponent implements OnDestroy {
   readonly settings = input.required<DoughnutChartSettings>();

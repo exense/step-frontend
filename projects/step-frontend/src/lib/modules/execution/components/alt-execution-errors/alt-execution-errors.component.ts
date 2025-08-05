@@ -6,6 +6,7 @@ import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.m
   selector: 'step-alt-execution-errors',
   templateUrl: './alt-execution-errors.component.html',
   styleUrl: './alt-execution-errors.component.scss',
+  standalone: false,
 })
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);

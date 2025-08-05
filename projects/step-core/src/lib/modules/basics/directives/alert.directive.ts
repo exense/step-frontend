@@ -3,6 +3,7 @@ import { AlertType } from '../types/alert-type.enum';
 
 @Directive({
   selector: 'step-alert',
+  standalone: false,
 })
 export class AlertDirective {
   @HostBinding('attr.role')

@@ -15,6 +15,7 @@ import { DateRange } from '../../../date-picker/date-picker.module';
     },
   ],
   exportAs: 'stepRangeFilter',
+  standalone: false,
 })
 export class RangeFilterComponent extends BaseFilterComponent<DateRange | undefined> {
   @Input() label?: string;
@@ -27,7 +28,7 @@ export class RangeFilterComponent extends BaseFilterComponent<DateRange | undefi
   protected createControlChangeStream(control: FormControl<DateRange>): Observable<DateRange> {
     return control.valueChanges.pipe(
       debounceTime(200),
-      map((value) => value ?? undefined)
+      map((value) => value ?? undefined),
     );
   }
 

@@ -33,6 +33,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
     },
   ],
   hostDirectives: [ElementSizeDirective],
+  standalone: false,
 })
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);

@@ -5,7 +5,6 @@ import { NavigatorService } from '../injectables/navigator.service';
 
 @Directive({
   selector: '[stepReloadable]',
-  standalone: true,
 })
 export class ReloadableDirective implements OnInit, OnDestroy, Reloadable {
   private _globalReload = inject(GlobalReloadService);

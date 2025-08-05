@@ -6,6 +6,7 @@ import { DOCUMENT } from '@angular/common';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseReportDetailsComponent<R extends ReportNode> implements CustomComponent {
   protected _formatter = inject(JsonViewerFormatterService);

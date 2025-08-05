@@ -30,7 +30,6 @@ const CAP_ICON_SPACE = 20;
   templateUrl: './artefact-inline-field-list.component.html',
   styleUrl: './artefact-inline-field-list.component.scss',
   imports: [StepBasicsModule, ArtefactInlineFieldComponent],
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })

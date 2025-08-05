@@ -55,7 +55,6 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
       useExisting: forwardRef(() => PlanTreeComponent),
     },
   ],
-  standalone: true,
 })
 export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   private _destroyRef = inject(DestroyRef);

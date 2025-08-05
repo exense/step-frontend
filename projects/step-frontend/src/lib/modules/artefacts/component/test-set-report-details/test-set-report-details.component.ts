@@ -15,6 +15,7 @@ import { TestSetArtefact } from '../../types/test-set.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class TestSetReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<TestSetArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

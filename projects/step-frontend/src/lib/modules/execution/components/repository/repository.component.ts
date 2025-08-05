@@ -23,6 +23,7 @@ import { SchedulerInvokerService } from '../../services/scheduler-invoker.servic
       useExisting: forwardRef(() => RepositoryComponent),
     },
   ],
+  standalone: false,
 })
 export class RepositoryComponent implements OnInit, SchedulerInvokerService {
   private _dialog = inject(MatDialog);

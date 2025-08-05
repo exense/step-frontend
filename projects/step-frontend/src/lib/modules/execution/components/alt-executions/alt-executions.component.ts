@@ -26,6 +26,7 @@ const MAX_OPENED_EXECUTIONS = 5;
       useExisting: AltExecutionsComponent,
     },
   ],
+  standalone: false,
 })
 export class AltExecutionsComponent implements OnInit, ExecutionTabManagerService {
   private _destroyRef = inject(DestroyRef);

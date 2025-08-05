@@ -50,6 +50,7 @@ interface ArtefactInfo extends ArtefactInfoInternal {
     ExecutionCommandsService,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AltExecutionLaunchDialogComponent
   extends ExecutionCommandsDirective

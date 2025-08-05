@@ -8,6 +8,7 @@ import { CheckArtefact } from '../../types/check.artefact';
   templateUrl: './check.component.html',
   styleUrls: ['./check.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class CheckComponent extends BaseArtefactComponent<CheckArtefact> {
   @ViewChild('form')

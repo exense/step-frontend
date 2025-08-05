@@ -26,6 +26,7 @@ const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
       useExisting: forwardRef(() => PlanNameComponent),
     },
   ],
+  standalone: false,
 })
 export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, Plan> {
   private _plansApi = inject(AugmentedPlansService);

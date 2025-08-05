@@ -12,6 +12,7 @@ import { DynamicValuesUtilsService } from '../../../basics/step-basics.module';
   selector: 'step-dynamic-field-array-editor',
   templateUrl: './dynamic-field-array-editor.component.html',
   styleUrl: './dynamic-field-array-editor.component.scss',
+  standalone: false,
 })
 export class DynamicFieldArrayEditorComponent implements OnDestroy {
   private _fb = inject(FormBuilder);

@@ -14,6 +14,7 @@ export type ReportNodesChartType = 'keywords' | 'testcases';
   selector: 'step-scheduler-report-view',
   templateUrl: './scheduler-report-view.component.html',
   styleUrls: ['./scheduler-report-view.component.scss'],
+  standalone: false,
 })
 export class SchedulerReportViewComponent implements OnInit {
   readonly _state = inject(CrossExecutionDashboardState);

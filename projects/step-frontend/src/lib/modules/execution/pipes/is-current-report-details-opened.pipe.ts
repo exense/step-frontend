@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 @Pipe({
   name: 'isCurrentReportDetailsOpened',
+  standalone: false,
 })
 export class IsCurrentReportDetailsOpenedPipe implements PipeTransform {
   private _router = inject(Router);

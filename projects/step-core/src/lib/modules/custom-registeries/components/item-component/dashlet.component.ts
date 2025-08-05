@@ -8,6 +8,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   templateUrl: './base-item.component.html',
   styleUrls: ['./plan-type.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DashletComponent extends BaseItemComponent<CustomRegistryItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.DASHLET;

@@ -7,6 +7,7 @@ import { MarkerType } from '../../types/marker-type.enum';
   styleUrl: './marker.component.scss',
   encapsulation: ViewEncapsulation.None, // timeseries charts need it
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class MarkerComponent {
   readonly MarkerType = MarkerType;

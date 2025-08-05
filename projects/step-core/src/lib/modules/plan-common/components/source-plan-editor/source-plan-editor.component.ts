@@ -36,7 +36,6 @@ const PLAN_SIZE = 'DUAL_PLAN_SIZE';
   templateUrl: './source-plan-editor.component.html',
   styleUrls: ['./source-plan-editor.component.scss'],
   imports: [StepMaterialModule, SPLIT_EXPORTS, PlanTreeComponent],
-  standalone: true,
 })
 export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrategy, OnInit, OnDestroy {
   private _sourceEditorAutocomplete = inject(SourceEditorAutocompleteService, { optional: true });

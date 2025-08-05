@@ -9,11 +9,9 @@ import {
   FetchBucketsRequest,
   Plan,
   STATUS_COLORS,
-  TableFetchLocalDataSource,
   TimeRange,
-  TimeSeriesErrorEntry,
 } from '@exense/step-core';
-import { inject, signal, Signal, WritableSignal } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
 import {
@@ -23,7 +21,7 @@ import {
   TimeSeriesConfig,
   TimeSeriesUtils,
 } from '../../../../timeseries/modules/_common';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;

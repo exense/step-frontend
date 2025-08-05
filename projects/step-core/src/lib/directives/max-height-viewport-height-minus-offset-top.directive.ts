@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[stepMaxHeightViewportHeightMinusOffsetTop]',
+  standalone: false,
 })
 export class MaxHeightViewportHeightMinusOffsetTopDirective implements AfterViewInit {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

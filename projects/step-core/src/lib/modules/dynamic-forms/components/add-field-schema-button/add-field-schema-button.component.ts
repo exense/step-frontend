@@ -16,6 +16,7 @@ import {
   selector: 'step-add-field-schema-button',
   templateUrl: './add-field-schema-button.component.html',
   styleUrls: ['./add-field-schema-button.component.scss'],
+  standalone: false,
 })
 export class AddFieldSchemaButtonComponent {
   private _ngControl = inject(NgControl, { optional: true });

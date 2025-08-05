@@ -10,6 +10,7 @@ import { ScriptArtefact } from '../../types/script.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ScriptReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<ScriptArtefact>> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

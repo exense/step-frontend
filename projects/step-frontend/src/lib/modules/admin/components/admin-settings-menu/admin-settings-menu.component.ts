@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './admin-settings-menu.component.html',
   styleUrl: './admin-settings-menu.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AdminSettingsMenuComponent {
   private _auth = inject(AuthService);

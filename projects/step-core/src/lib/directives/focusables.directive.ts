@@ -10,6 +10,7 @@ import { FocusableDirective } from './focusable.directive';
 @Directive({
   selector: '[stepFocusables]',
   exportAs: 'stepFocusables',
+  standalone: false,
 })
 export class FocusablesDirective implements AfterContentInit {
   @Input() focusIndex: number = 0;

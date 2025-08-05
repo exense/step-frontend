@@ -6,6 +6,7 @@ import { DateFormat } from '@exense/step-core';
   templateUrl: './duration-description.component.html',
   styleUrl: './duration-description.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DurationDescriptionComponent {
   readonly startTime = input<number | undefined>(undefined);
