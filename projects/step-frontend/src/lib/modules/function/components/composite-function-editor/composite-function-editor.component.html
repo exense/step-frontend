@@ -14,8 +14,8 @@
       [stDisabled]="!('kw-write' | hasRight | async)"
       [stInline]="true"
       [stEditableLabelMode]="true"
-      [stModel]="(actualKeyword$ | async)!"
-      (stModelChange)="_planEditorService.handlePlanChange()"
+      [stModel]="actualKeyword()"
+      (stModelChange)="handleKeywordChange($any($event))"
     />
   </step-plan-editor-attributes>
 </step-plan-editor-base>

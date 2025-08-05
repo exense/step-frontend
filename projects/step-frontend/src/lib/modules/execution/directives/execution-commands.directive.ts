@@ -1,4 +1,4 @@
-import { computed, Directive, inject, input, output } from '@angular/core';
+import { computed, DestroyRef, Directive, inject, input, model, OnInit, output, signal } from '@angular/core';
 import { ExecutionCommandsContext } from '../shared/execution-commands-context.interface';
 import {
   AugmentedScreenService,
@@ -9,7 +9,7 @@ import {
   RepositoryObjectReference,
 } from '@exense/step-core';
 import { ExecutionActionsTooltips } from '../components/execution-actions/execution-actions.component';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { of, switchMap } from 'rxjs';
 import { ExecutionCommandsService } from '../services/execution-commands.service';
 
@@ -19,38 +19,21 @@ import { ExecutionCommandsService } from '../services/execution-commands.service
   providers: [ExecutionCommandsService],
   standalone: false,
 })
-export class ExecutionCommandsDirective implements ExecutionCommandsContext {
+export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsContext {
   private _screenTemplates = inject(AugmentedScreenService);
   protected _commands = inject(ExecutionCommandsService).useContext(this);
+  protected _destroyRef = inject(DestroyRef);
 
-  /** @Input **/
   readonly description = input<string | undefined>(undefined);
-
-  /** @Input **/
   readonly repositoryObjectRef = input<RepositoryObjectReference | undefined>(undefined);
-
-  /** @Input **/
   readonly isolateExecution = input<boolean | undefined>(undefined);
-
-  /** @Input **/
   readonly includedTestcases = input<IncludeTestcases | null | undefined>(undefined);
-
-  /** @Input **/
   readonly execution = input<Execution | undefined>(undefined);
-
-  /** @Input **/
   readonly displayParametersForm = input(true);
-
-  /** @Input **/
   readonly tooltips = input<ExecutionActionsTooltips | undefined>(undefined);
 
-  /** @Output **/
   readonly commandInvoke = output<void>();
-
-  /** @Output **/
   readonly refresh = output<void>();
-
-  /** @Output **/
   readonly scheduleTask = output<ExecutiontTaskParameters>();
 
   getCustomForms(): CustomFormComponent | undefined {
@@ -75,7 +58,9 @@ export class ExecutionCommandsDirective implements ExecutionCommandsContext {
     return this.isExecutionIsolated();
   }
 
-  private executionParameters$ = toObservable(this.execution).pipe(
+  protected executionParameters = model<Record<string, string>>({});
+
+  protected executionParameters$ = toObservable(this.execution).pipe(
     switchMap((execution) => {
       if (!execution) {
         return this._screenTemplates.getDefaultParametersByScreenId('executionParameters');
@@ -85,13 +70,15 @@ export class ExecutionCommandsDirective implements ExecutionCommandsContext {
     }),
   );
 
-  protected executionParameters = toSignal(this.executionParameters$);
-
   protected isExecutionIsolated = computed(() => {
     const isolateExecution = this.isolateExecution();
     const execution = this.execution();
     return isolateExecution ? true : execution?.executionParameters?.isolatedExecution || false;
   });
+
+  ngOnInit(): void {
+    this.setupExecutionParameters();
+  }
 
   execute(simulate: boolean): void {
     this._commands.execute(simulate);
@@ -122,5 +109,11 @@ export class ExecutionCommandsDirective implements ExecutionCommandsContext {
   copyExecutionServiceAsCurlToClipboard(): void {
     this._commands.copyExecutionServiceAsCurlToClipboard();
     this.commandInvoke.emit();
+  }
+
+  protected setupExecutionParameters(): void {
+    this.executionParameters$
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((executionParameters) => this.executionParameters.set(executionParameters ?? {}));
   }
 }

@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { computed, effect, EffectRef, inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { PlanEditorStrategy } from '../types/plan-editor-strategy';
-import { BehaviorSubject, map, Subject, takeUntil } from 'rxjs';
-import { AbstractArtefact, Plan } from '../../../client/step-client-module';
+import { Subject } from 'rxjs';
+import { AbstractArtefact } from '../../../client/step-client-module';
 import { PlanContext } from '../types/plan-context.interface';
 
 @Injectable({
@@ -9,58 +9,62 @@ import { PlanContext } from '../types/plan-context.interface';
 })
 export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   private strategyChangedInternal$ = new Subject<void>();
-  private strategyTerminator$?: Subject<void>;
+  private _injector = inject(Injector);
 
   private planContextInit?: PlanContext;
   private selectedArtefactIdInit?: string;
 
   private strategy?: PlanEditorStrategy;
 
-  private planContextInternal$ = new BehaviorSubject<PlanContext | undefined>(undefined);
-  private hasRedoInternal$ = new BehaviorSubject(false);
-  private hasUndoInternal$ = new BehaviorSubject(false);
+  private strategySyncEffects: EffectRef[] = [];
 
-  readonly hasRedo$ = this.hasRedoInternal$.asObservable();
-  readonly hasUndo$ = this.hasUndoInternal$.asObservable();
+  private planContextInternal = signal<PlanContext | undefined>(undefined);
+  private hasRedoInternal = signal(false);
+  private hasUndoInternal = signal(false);
 
-  readonly planContext$ = this.planContextInternal$.asObservable();
+  readonly hasRedo = this.hasRedoInternal.asReadonly();
+  readonly hasUndo = this.hasUndoInternal.asReadonly();
 
-  readonly plan$ = this.planContext$.pipe(map((context) => context?.plan));
+  readonly planContext = this.planContextInternal.asReadonly();
+
+  readonly plan = computed(() => this.planContextInternal()?.plan ?? {});
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
-
-  get planContext(): PlanContext | undefined {
-    return this.strategy?.planContext;
-  }
-
-  get plan(): Plan | undefined {
-    return this.strategy?.planContext?.plan;
-  }
 
   ngOnDestroy(): void {
     this.strategyChangedInternal$.complete();
     this.terminateStrategySubscriptions();
-    this.hasUndoInternal$.complete();
-    this.hasRedoInternal$.complete();
-    this.planContextInternal$.complete();
   }
 
   useStrategy(strategy: PlanEditorStrategy): void {
     this.terminateStrategySubscriptions();
-    this.strategyTerminator$ = new Subject<void>();
     this.strategy = strategy;
 
-    strategy.hasUndo$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
-      next: (value) => this.hasUndoInternal$.next(value),
-    });
+    const effectUndo = effect(
+      () => {
+        const hasUndo = this.strategy!.hasUndo();
+        this.hasUndoInternal.set(hasUndo);
+      },
+      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+    );
 
-    strategy.hasRedo$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
-      next: (value) => this.hasRedoInternal$.next(value),
-    });
+    const effectRedo = effect(
+      () => {
+        const hasRedo = this.strategy!.hasRedo();
+        this.hasRedoInternal.set(hasRedo);
+      },
+      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+    );
 
-    strategy.planContext$.pipe(takeUntil(this.strategyTerminator$)).subscribe({
-      next: (value) => this.planContextInternal$.next(value),
-    });
+    const effectPlanContext = effect(
+      () => {
+        const planContext = this.strategy!.planContext();
+        this.planContextInternal.set(planContext);
+      },
+      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+    );
+
+    this.strategySyncEffects.push(effectUndo, effectRedo, effectPlanContext);
 
     if (this.planContextInit) {
       this.strategy.init(this.planContextInit, this.selectedArtefactIdInit);
@@ -74,9 +78,9 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.terminateStrategySubscriptions();
     this.strategy = undefined;
     this.strategyChangedInternal$.next();
-    this.hasUndoInternal$.next(false);
-    this.hasRedoInternal$.next(false);
-    this.planContextInternal$.next(undefined);
+    this.hasUndoInternal.set(false);
+    this.hasRedoInternal.set(false);
+    this.planContextInternal.set(undefined);
   }
 
   addControl(artefactTypeId: string): void {
@@ -127,11 +131,11 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategy.moveInPrevSibling(node);
   }
 
-  handlePlanChange(): void {
+  handlePlanContextChange(planContext?: PlanContext): void {
     if (!this.strategy) {
       return;
     }
-    this.strategy.handlePlanChange();
+    this.strategy.handlePlanContextChange(planContext);
   }
 
   addPlans(planIds: string[]): void {
@@ -221,8 +225,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   }
 
   terminateStrategySubscriptions(): void {
-    this.strategyTerminator$?.next();
-    this.strategyTerminator$?.complete();
-    this.strategyTerminator$ = undefined;
+    this.strategySyncEffects.forEach((effectRef) => effectRef.destroy());
+    this.strategySyncEffects = [];
   }
 }

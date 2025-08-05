@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { Keyword, Plan, PlanContext, PlanContextApiService, PlanEditorService } from '@exense/step-core';
 import { CompositeKeywordPlanContextApiService } from '../../injectables/composite-keyword-plan-context-api.service';
 import { ActivatedRoute } from '@angular/router';
@@ -32,13 +32,21 @@ export class CompositeFunctionEditorComponent implements OnInit {
     map((keyword) => !!keyword?.customFields?.['functionPackageId']),
   );
 
-  readonly actualKeyword$ = this._planEditorService.planContext$.pipe(
-    map((context) => context?.entity as unknown as Keyword),
-  );
+  protected readonly actualKeyword = computed(() => {
+    return this._planEditorService.planContext()?.entity as unknown as Keyword;
+  });
 
   ngOnInit(): void {
     this._planEditorService.strategyChanged$
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this._cd.detectChanges());
+  }
+
+  handleKeywordChange(keyword: Keyword): void {
+    const ctx = this._planEditorService.planContext();
+    if (!ctx) {
+      return;
+    }
+    this._planEditorService.handlePlanContextChange({ ...ctx, entity: keyword });
   }
 }

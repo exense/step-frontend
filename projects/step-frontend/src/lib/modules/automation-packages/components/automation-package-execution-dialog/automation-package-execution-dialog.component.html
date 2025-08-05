@@ -1,7 +1,7 @@
 <step-modal-window [title]="title">
   <div step-modal-window-body>
-    @if (executionParameters(); as params) {
-      <step-custom-forms [stModel]="params" stScreen="executionParameters" />
+    @if (hasParameters()) {
+      <step-custom-forms [(stModel)]="executionParameters" stScreen="executionParameters" />
     }
     <ng-container [formGroup]="executionConfigForm">
       <step-form-field alignLabelAddon="near">

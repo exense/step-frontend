@@ -1,4 +1,4 @@
-import { Component, Input, viewChild } from '@angular/core';
+import { Component, input, signal, viewChild } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { CustomFormComponent } from '../custom-form/custom-form.component';
 import { Observable } from 'rxjs';
@@ -13,12 +13,12 @@ type OnTouch = () => void;
   imports: [CustomFormComponent],
 })
 export class CustomFormWrapperComponent implements ControlValueAccessor {
-  @Input() stEditableLabelMode = false;
-  @Input() stScreen!: string;
-  @Input() stInline: boolean = false;
-  @Input() stExcludeFields: string[] = [];
-  @Input() stIncludeFieldsOnly?: string[];
-  @Input() showRequiredMarker: boolean = false;
+  readonly stEditableLabelMode = input(false);
+  readonly stScreen = input.required<string>();
+  readonly stInline = input(false);
+  readonly stExcludeFields = input<string[]>([]);
+  readonly stIncludeFieldsOnly = input<string[] | undefined>(undefined);
+  readonly showRequiredMarker = input(false);
 
   private customForm = viewChild(CustomFormComponent);
 
@@ -26,7 +26,7 @@ export class CustomFormWrapperComponent implements ControlValueAccessor {
   private onTouch?: OnTouch;
 
   protected value: Record<string, unknown> = {};
-  protected isDisabled: boolean = false;
+  protected isDisabled = signal(false);
 
   constructor(readonly _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
@@ -44,8 +44,8 @@ export class CustomFormWrapperComponent implements ControlValueAccessor {
     this.onTouch = onTouch;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
   }
 
   readyToProceed(): Observable<void> {
