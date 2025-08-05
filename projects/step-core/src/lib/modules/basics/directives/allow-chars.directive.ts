@@ -4,6 +4,7 @@ const NON_SYSTEM_KEYS = /^[a-z0-9?!.,-?*]$/i;
 
 @Directive({
   selector: 'input[stepAllowChars]',
+  standalone: false,
 })
 export class AllowCharsDirective {
   @Input('stepAllowChars') allowedChars?: string[];

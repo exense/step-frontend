@@ -12,6 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       multi: true,
     },
   ],
+  standalone: false,
 })
 export class PasswordComponent implements ControlValueAccessor {
   placeholder = input<string>('Enter password');

@@ -4,7 +4,6 @@ import { AttachmentIsTextPipe } from './attachment-is-text.pipe';
 
 @Pipe({
   name: 'attachmentShowLabel',
-  standalone: true,
 })
 export class AttachmentShowLabelPipe implements PipeTransform {
   transform(attachment?: AttachmentMeta): boolean {

@@ -8,6 +8,7 @@ import { SessionArtefact } from '../../types/session.artefact';
   templateUrl: './session.component.html',
   styleUrls: ['./session.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SessionComponent extends BaseArtefactComponent<SessionArtefact> {
   @ViewChild('form')

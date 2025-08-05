@@ -8,6 +8,7 @@ import { ExportArtefact } from '../../types/export.artefact';
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ExportComponent extends BaseArtefactComponent<ExportArtefact> {
   @ViewChild('form')

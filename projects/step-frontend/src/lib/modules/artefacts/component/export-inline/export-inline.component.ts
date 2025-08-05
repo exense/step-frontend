@@ -15,6 +15,7 @@ import { ExportArtefact } from '../../types/export.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ExportInlineComponent extends BaseInlineArtefactComponent<ExportArtefact> {
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);

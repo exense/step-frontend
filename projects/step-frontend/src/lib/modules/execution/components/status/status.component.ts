@@ -6,6 +6,7 @@ import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@a
   styleUrls: ['./status.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class StatusComponent {
   /** @Input() **/

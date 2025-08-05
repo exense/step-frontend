@@ -16,6 +16,7 @@ import { RetryIfFailsReportNode } from '../../types/retry-if-fails.report-node';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class RetryIfFailsInlineComponent extends BaseInlineArtefactComponent<
   RetryIfFailsArtefact,

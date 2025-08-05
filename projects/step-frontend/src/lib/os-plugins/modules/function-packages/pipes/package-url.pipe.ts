@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 @Pipe({
   name: 'packageUrl',
+  standalone: false,
 })
 export class PackageUrlPipe implements PipeTransform {
   private _router = inject(Router);

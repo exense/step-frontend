@@ -7,6 +7,7 @@ import { JsonViewerFormatterService } from '../../services/json-viewer-formatter
   templateUrl: './pretty-print.component.html',
   styleUrls: ['./pretty-print.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class PrettyPrintComponent extends BaseViewerComponent {
   private _jsonViewerFormatter = inject(JsonViewerFormatterService);

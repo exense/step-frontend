@@ -15,6 +15,7 @@ import { arrayToRegex, regexToArray } from '../../types/string-array-regex';
       useExisting: forwardRef(() => ArrayFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class ArrayFilterComponent<T = unknown> extends BaseFilterComponent<string, unknown> {
   readonly items = input<T[] | ReadonlyArray<T>>([]);

@@ -33,6 +33,7 @@ import { FunctionScript } from '../../types/function-script.interface';
   templateUrl: './script-editor.component.html',
   styleUrls: ['./script-editor.component.scss'],
   hostDirectives: [ReloadableDirective],
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScriptEditorComponent implements AfterViewInit, DeactivateComponentDataInterface {

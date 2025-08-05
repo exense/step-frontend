@@ -39,7 +39,6 @@ import { NgClass } from '@angular/common';
     StepMaterialModule,
     NgClass,
   ],
-  standalone: true,
 })
 export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit, OnDestroy {
   private _artefactsService = inject(ArtefactService);

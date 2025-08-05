@@ -7,6 +7,7 @@ import { NgForm } from '@angular/forms';
   templateUrl: './assertion-plan.component.html',
   styleUrls: ['./assertion-plan.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class AssertionPlanComponent extends BaseArtefactComponent<AbstractArtefact> {
   @ViewChild('form')

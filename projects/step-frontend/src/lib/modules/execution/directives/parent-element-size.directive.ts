@@ -4,7 +4,6 @@ import { ElementSizeService } from '@exense/step-core';
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-artefact-inline-details[parentElementSize]',
-  standalone: true,
   providers: [
     {
       provide: ElementSizeService,

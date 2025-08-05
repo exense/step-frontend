@@ -13,6 +13,7 @@ import {
   templateUrl: './cross-execution-dashboard.component.html',
   styleUrls: ['./cross-execution-dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class CrossExecutionDashboardComponent implements OnInit {
   readonly _isSmallScreen$ = inject(IS_SMALL_SCREEN);

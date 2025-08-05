@@ -17,6 +17,7 @@ import { ExecutionCommandsService } from '../services/execution-commands.service
   selector: '[stepExecutionCommands]',
   exportAs: 'StepExecutionCommands',
   providers: [ExecutionCommandsService],
+  standalone: false,
 })
 export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsContext {
   private _screenTemplates = inject(AugmentedScreenService);

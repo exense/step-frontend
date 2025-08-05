@@ -5,5 +5,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
   templateUrl: './btn-group.component.html',
   styleUrls: ['./btn-group.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class BtnGroupComponent {}

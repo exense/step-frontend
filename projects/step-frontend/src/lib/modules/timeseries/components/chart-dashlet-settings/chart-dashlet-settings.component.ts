@@ -26,7 +26,6 @@ export interface ChartDashletSettingsData {
   selector: 'step-chart-dashlet-settings',
   templateUrl: './chart-dashlet-settings.component.html',
   styleUrls: ['./chart-dashlet-settings.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS, FilterBarItemComponent, TimeseriesAggregatePickerComponent],
 })
 export class ChartDashletSettingsComponent implements OnInit {

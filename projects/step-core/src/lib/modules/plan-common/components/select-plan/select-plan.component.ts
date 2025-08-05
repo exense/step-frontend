@@ -11,7 +11,6 @@ type OnTouch = () => void;
   selector: 'step-select-plan',
   templateUrl: './select-plan.component.html',
   styleUrls: ['./select-plan.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

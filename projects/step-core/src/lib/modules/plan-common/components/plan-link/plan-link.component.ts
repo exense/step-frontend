@@ -11,7 +11,6 @@ import { PlanUrlPipe } from '../../pipes/plan-url.pipe';
   templateUrl: './plan-link.component.html',
   styleUrls: ['./plan-link.component.scss'],
   imports: [StepBasicsModule, PlanUrlPipe],
-  standalone: true,
 })
 export class PlanLinkComponent implements CustomComponent {
   private _customColumnOptions = inject(CustomColumnOptions, { optional: true });

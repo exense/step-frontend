@@ -55,6 +55,7 @@ type FieldAccessor = Mutable<Pick<WizardContextConnectorDirective, 'stepForm' | 
       deps: [WIZARD_STEP_LOCAL_CONTEXT],
     },
   ],
+  standalone: false,
 })
 export class WizardContextConnectorDirective implements WizardStepLocalContext, WizardStepActionsService, OnChanges {
   private _globalContext = inject(WIZARD_GLOBAL_CONTEXT);

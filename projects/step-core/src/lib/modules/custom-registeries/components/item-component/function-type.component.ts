@@ -7,6 +7,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   selector: 'step-function-type',
   templateUrl: './base-item.component.html',
   styleUrls: [],
+  standalone: false,
 })
 export class FunctionTypeComponent extends BaseItemComponent<CustomRegistryItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.FUNCTION_TYPE;

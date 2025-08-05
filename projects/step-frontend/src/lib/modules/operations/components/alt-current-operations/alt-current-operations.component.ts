@@ -5,7 +5,6 @@ import { MatIconButton } from '@angular/material/button';
 
 @Component({
   selector: 'step-alt-current-operations',
-  standalone: true,
   imports: [AltOperationComponent, MatIconButton, StepIconsModule],
   templateUrl: './alt-current-operations.component.html',
   styleUrl: './alt-current-operations.component.scss',

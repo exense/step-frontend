@@ -44,6 +44,7 @@ import { GlobalReloadService } from '../../../basics/injectables/global-reload.s
       useExisting: forwardRef(() => CustomColumnsComponent),
     },
   ],
+  standalone: false,
 })
 export class CustomColumnsComponent
   implements

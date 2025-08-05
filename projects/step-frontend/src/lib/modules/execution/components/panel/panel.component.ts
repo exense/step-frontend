@@ -11,6 +11,7 @@ type FieldAccessor = Mutable<Pick<PanelComponent, 'panel$'>>;
   selector: 'step-panel',
   templateUrl: './panel.component.html',
   styleUrls: ['./panel.component.scss'],
+  standalone: false,
 })
 export class PanelComponent implements OnChanges {
   private _executionPanels = inject(SingleExecutionPanelsService);

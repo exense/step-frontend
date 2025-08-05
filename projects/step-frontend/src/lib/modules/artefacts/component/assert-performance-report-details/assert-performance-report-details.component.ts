@@ -11,6 +11,7 @@ import { AssertPerformanceListService } from '../../injectables/assert-performan
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AssertPerformanceReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<AssertPerformanceArtefact>

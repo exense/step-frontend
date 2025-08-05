@@ -45,6 +45,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
     },
   ],
   hostDirectives: [ElementSizeDirective],
+  standalone: false,
 })
 export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);

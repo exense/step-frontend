@@ -11,6 +11,7 @@ import { AceMode, RichEditorDialogService } from '../../../rich-editor';
   templateUrl: './dynamic-textfield.component.html',
   styleUrl: './dynamic-textfield.component.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class DynamicTextfieldComponent
   extends DynamicValueBaseComponent<DynamicValueString | DynamicValueInteger>

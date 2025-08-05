@@ -1,7 +1,6 @@
 import {
   Component,
   computed,
-  effect,
   EventEmitter,
   inject,
   input,
@@ -9,7 +8,6 @@ import {
   model,
   OnInit,
   Output,
-  untracked,
   ViewChild,
   signal,
 } from '@angular/core';
@@ -19,13 +17,7 @@ import { TimeSeriesUtils } from '../../../_common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DateTime } from 'luxon';
 import { COMMON_IMPORTS } from '../../types/common-imports.constant';
-import {
-  TIME_UNIT_DICTIONARY,
-  TIME_UNIT_LABELS,
-  TimeConvertersFactoryService,
-  TimeRange,
-  TimeUnit,
-} from '@exense/step-core';
+import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit } from '@exense/step-core';
 
 /**
  * When dealing with relative/full selection, this component should not know anything about dates, therefore no date calculations are needed.
@@ -35,7 +27,6 @@ import {
   selector: 'step-time-range-picker',
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeRangePickerComponent implements OnInit {

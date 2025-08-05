@@ -30,6 +30,7 @@ import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
   selector: 'step-execution-step',
   templateUrl: './execution-step.component.html',
   styleUrls: ['./execution-step.component.scss'],
+  standalone: false,
 })
 export class ExecutionStepComponent implements OnChanges, OnDestroy {
   private panelService = inject(SingleExecutionPanelsService);

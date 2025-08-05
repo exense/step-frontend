@@ -3,6 +3,7 @@ import { SingleExecutionPanelsService } from '../services/single-execution-panel
 
 @Pipe({
   name: 'panelId',
+  standalone: false,
 })
 export class PanelIdPipe implements PipeTransform {
   private _panels = inject(SingleExecutionPanelsService);

@@ -15,6 +15,7 @@ import { SequenceArtefact } from '../../types/sequence.artefact';
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SequenceInlineComponent extends BaseInlineArtefactComponent<SequenceArtefact> {
   private _artefactInlineItemUtils = inject(ArtefactInlineItemUtilsService);

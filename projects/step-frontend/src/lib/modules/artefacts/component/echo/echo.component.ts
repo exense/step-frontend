@@ -8,6 +8,7 @@ import { EchoArtefact } from '../../types/echo.artefact';
   templateUrl: './echo.component.html',
   styleUrls: ['./echo.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class EchoComponent extends BaseArtefactComponent<EchoArtefact> {
   @ViewChild('form')

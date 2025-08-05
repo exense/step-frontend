@@ -14,6 +14,7 @@ import { AssertReportNode } from '../../types/assert.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AssertReportDetailsComponent extends BaseReportDetailsComponent<AssertReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

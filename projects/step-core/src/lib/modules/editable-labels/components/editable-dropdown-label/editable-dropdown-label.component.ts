@@ -13,7 +13,6 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { EditableComponent } from '../editable-component/editable.component';
 import { EDITABLE_LABELS_COMMON_IMPORTS } from '../../types/editable-labels-common-imports.constant';
-import { EditableActionsComponent } from '../editable-actions/editable-actions.component';
 import { EditableListItemTemplateDirective } from '../../directives/editable-list-item-template.directive';
 
 type ItemTemplateRef<T> = TemplateRef<{ $implicit: T }>;
@@ -29,8 +28,7 @@ type ItemTemplateRef<T> = TemplateRef<{ $implicit: T }>;
       multi: true,
     },
   ],
-  standalone: true,
-  imports: [...EDITABLE_LABELS_COMMON_IMPORTS, EditableActionsComponent],
+  imports: [...EDITABLE_LABELS_COMMON_IMPORTS],
 })
 export class EditableDropdownLabelComponent<T> extends EditableComponent<T> {
   @Input() items!: T[];

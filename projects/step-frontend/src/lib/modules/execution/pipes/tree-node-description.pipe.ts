@@ -3,6 +3,7 @@ import { BREAK_LINE, DEFAULT_DECORATION_INDEX } from '@exense/step-core';
 
 @Pipe({
   name: 'treeNodeDescription',
+  standalone: false,
 })
 export class TreeNodeDescriptionPipe implements PipeTransform {
   transform(value?: string): string {

@@ -28,7 +28,6 @@ type OnTouch = () => void;
 
 @Component({
   selector: 'step-rich-editor',
-  standalone: true,
   imports: [StepBasicsModule],
   templateUrl: './rich-editor.component.html',
   styleUrl: './rich-editor.component.scss',

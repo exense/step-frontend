@@ -5,6 +5,7 @@ import { ControlDropInfo } from '../types/control-drop-info.interface';
 
 @Pipe({
   name: 'artefactDropInfo',
+  standalone: false,
 })
 export class ArtefactDropInfoPipe implements PipeTransform {
   private _controlDropInfoFactory = inject(ControlDropInfoFactoryService);

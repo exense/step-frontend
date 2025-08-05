@@ -8,7 +8,6 @@ const dropAreaIdFactory = () => {
 
 @Directive({
   selector: ':not([stepDragDropGroupContainer])[stepDropAreaId]',
-  standalone: true,
   providers: [
     {
       provide: DROP_AREA_ID,
@@ -20,7 +19,6 @@ export class DropAreaIdDirective {}
 
 @Directive({
   selector: '[stepDragDropGroupContainer][stepDropAreaId]',
-  standalone: true,
   providers: [
     {
       provide: GROUP_DROP_AREA_ID,

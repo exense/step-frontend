@@ -8,6 +8,7 @@ import { SequenceArtefact } from '../../types/sequence.artefact';
   templateUrl: './sequence.component.html',
   styleUrls: ['./sequence.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class SequenceComponent extends BaseArtefactComponent<SequenceArtefact> {
   @ViewChild('form')

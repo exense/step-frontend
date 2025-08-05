@@ -24,7 +24,6 @@ import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
 
 @Component({
   selector: 'step-attachment-dialog',
-  standalone: true,
   imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent, StreamingTextComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',

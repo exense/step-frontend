@@ -4,7 +4,6 @@ const CLEAR_INTERNAL_VALUE = Symbol('Clear value');
 
 @Directive({
   selector: '[stepSelectClearValue]',
-  standalone: true,
 })
 export class SelectClearValueDirective {
   readonly useClear = input(true);

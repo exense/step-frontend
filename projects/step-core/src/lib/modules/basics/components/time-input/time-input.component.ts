@@ -8,6 +8,7 @@ import { TimeConvertersFactoryService } from '../../injectables/time-converters-
   templateUrl: './base-time-converter.component.html',
   styleUrls: ['./base-time-converter.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class TimeInputComponent extends BaseTimeConverterComponent {
   protected override timeConverter = inject(TimeConvertersFactoryService).timeConverter();

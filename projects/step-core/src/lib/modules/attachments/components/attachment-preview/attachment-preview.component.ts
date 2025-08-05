@@ -12,7 +12,6 @@ import { StreamingTextComponent } from '../streaming-text/streaming-text.compone
 
 @Component({
   selector: 'step-attachment-preview',
-  standalone: true,
   imports: [AttachmentUrlPipe, StepBasicsModule, NgOptimizedImage, AttachmentTypeIconPipe, StreamingTextComponent],
   templateUrl: './attachment-preview.component.html',
   styleUrl: './attachment-preview.component.scss',
