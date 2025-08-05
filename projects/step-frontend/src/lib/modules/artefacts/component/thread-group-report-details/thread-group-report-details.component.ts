@@ -10,6 +10,7 @@ import { ThreadGroupReportNode } from '../../types/thread-group.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ThreadGroupReportDetailsComponent extends BaseReportDetailsComponent<ThreadGroupReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

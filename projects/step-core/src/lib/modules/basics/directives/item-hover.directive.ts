@@ -3,6 +3,7 @@ import { ItemHoverReceiverService } from '../injectables/item-hover-receiver.ser
 
 @Directive({
   selector: '[stepItemHover]',
+  standalone: false,
 })
 export class ItemHoverDirective implements OnDestroy {
   private _hoverReceiver? = inject(ItemHoverReceiverService, { optional: true });

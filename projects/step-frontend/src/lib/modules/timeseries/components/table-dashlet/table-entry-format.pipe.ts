@@ -4,7 +4,6 @@ import { TimeSeriesConfig } from '../../modules/_common';
 
 @Pipe({
   name: 'tableEntryFormat',
-  standalone: true,
 })
 export class TableEntryFormatPipe implements PipeTransform {
   transform(entry: TableEntry, ...args: any[]): any {

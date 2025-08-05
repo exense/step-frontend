@@ -6,6 +6,7 @@ import { Panels } from '../../shared/panels.enum';
   selector: 'step-panel-execution-details',
   templateUrl: './panel-execution-details.component.html',
   styleUrls: ['./panel-execution-details.component.scss'],
+  standalone: false,
 })
 export class PanelExecutionDetailsComponent {
   readonly _state = inject(ExecutionStateService);

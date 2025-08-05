@@ -8,7 +8,6 @@ import { LinkDisplayType } from '../../../basics/step-basics.module';
   selector: 'step-scheduler-task-link',
   templateUrl: './scheduler-task-link.component.html',
   styleUrls: ['./scheduler-task-link.component.scss'],
-  standalone: true,
   imports: [SCHEDULER_COMMON_IMPORTS],
 })
 export class SchedulerTaskLinkComponent implements CustomComponent {

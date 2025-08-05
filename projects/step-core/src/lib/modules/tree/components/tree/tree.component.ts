@@ -49,7 +49,6 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
       useExisting: forwardRef(() => TreeComponent),
     },
   ],
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
   imports: [StepMaterialModule, TreeNodeComponent, TreeNodeActionsPipe, AsyncPipe, NgTemplateOutlet, OriginalNodePipe],
 })

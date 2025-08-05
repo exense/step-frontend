@@ -4,7 +4,6 @@ import { CommonEntitiesUrlsService } from '../../basics/step-basics.module';
 
 @Pipe({
   name: 'planUrl',
-  standalone: true,
 })
 export class PlanUrlPipe implements PipeTransform {
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);

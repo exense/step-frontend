@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, viewChild, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -23,7 +23,6 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   templateUrl: './resource-configuration-dialog.component.html',
   styleUrls: ['./resource-configuration-dialog.component.scss'],
   imports: [StepCoreModule],
-  standalone: true,
   providers: [ResourceInputService],
 })
 export class ResourceConfigurationDialogComponent implements OnInit {

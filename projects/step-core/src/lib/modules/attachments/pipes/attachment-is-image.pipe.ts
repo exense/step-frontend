@@ -3,7 +3,6 @@ import { AttachmentMeta } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'attachmentIsImage',
-  standalone: true,
 })
 export class AttachmentIsImagePipe implements PipeTransform {
   transform(attachment?: AttachmentMeta): boolean {

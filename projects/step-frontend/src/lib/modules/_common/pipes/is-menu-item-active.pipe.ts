@@ -5,6 +5,7 @@ import { DisplayMenuEntry } from '../types/display-menu-entry.type';
 
 @Pipe({
   name: 'isMenuItemActive',
+  standalone: false,
 })
 export class IsMenuItemActivePipe implements PipeTransform {
   private _navigator = inject(NavigatorService);

@@ -21,6 +21,7 @@ import { debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
       useExisting: forwardRef(() => FunctionPackageSearchComponent),
     },
   ],
+  standalone: false,
 })
 export class FunctionPackageSearchComponent
   extends BaseFilterComponent<SearchValue, string>

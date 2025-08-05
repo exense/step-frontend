@@ -10,6 +10,7 @@ type OnTouch = () => void;
   selector: 'step-json-raw-editor',
   templateUrl: './json-raw-editor.component.html',
   styleUrls: ['./json-raw-editor.component.scss'],
+  standalone: false,
 })
 export class JsonRawEditorComponent implements ControlValueAccessor, OnInit {
   private _destroyRef = inject(DestroyRef);

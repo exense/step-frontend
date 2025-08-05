@@ -14,6 +14,7 @@ import { WhileReportNode } from '../../types/while.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class WhileReportDetailsComponent extends BaseReportDetailsComponent<WhileReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

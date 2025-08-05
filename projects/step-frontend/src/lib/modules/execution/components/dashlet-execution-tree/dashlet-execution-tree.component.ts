@@ -6,6 +6,7 @@ import { Panels } from '../../shared/panels.enum';
   selector: 'step-dashlet-execution-tree',
   templateUrl: './dashlet-execution-tree.component.html',
   styleUrls: ['./dashlet-execution-tree.component.scss'],
+  standalone: false,
 })
 export class DashletExecutionTreeComponent implements CustomComponent {
   context?: any;

@@ -4,7 +4,6 @@ import { TreeStateService } from '../services/tree-state.service';
 
 @Pipe({
   name: 'originalNode',
-  standalone: true,
 })
 export class OriginalNodePipe implements PipeTransform {
   private _treeState = inject(TreeStateService, { optional: true });

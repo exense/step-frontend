@@ -14,6 +14,7 @@ import { ThreadGroupArtefact } from '../../types/thread-group.artefact';
   templateUrl: './thread-group.component.html',
   styleUrls: ['./thread-group.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class ThreadGroupComponent extends BaseArtefactComponent<ThreadGroupArtefact> {
   private _matDialog = inject(MatDialog);

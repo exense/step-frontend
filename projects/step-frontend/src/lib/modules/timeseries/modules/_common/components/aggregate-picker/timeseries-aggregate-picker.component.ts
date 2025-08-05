@@ -18,7 +18,6 @@ export interface AggregateParams {
   selector: 'step-timeseries-aggregate-picker',
   templateUrl: './timeseries-aggregate-picker.component.html',
   styleUrls: ['./timeseries-aggregate-picker.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class TimeseriesAggregatePickerComponent implements OnChanges {

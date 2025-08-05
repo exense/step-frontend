@@ -18,6 +18,7 @@ import { map, of, switchMap } from 'rxjs';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class DataSetReportDetailsComponent extends BaseReportDetailsComponent<ReportNodeWithArtefact<DataSetArtefact>> {
   private _dataSourceFields = inject(DataSourceFieldsService);

@@ -10,6 +10,7 @@ import { RANGE_MONTHLY_DAYS, RANGE_MONTHS_NUMBERS } from '../../injectables/rang
     class: 'editor-content',
   },
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class MonthlyDayEditorComponent extends HoursEditorComponent {
   readonly _MONTHS = inject(RANGE_MONTHS_NUMBERS);

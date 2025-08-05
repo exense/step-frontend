@@ -10,6 +10,7 @@ import { ExecutionCommandsDirective } from '../../directives/execution-commands.
   styleUrls: ['./execution-commands.component.scss'],
   providers: [ExecutionCommandsService],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionCommandsComponent extends ExecutionCommandsDirective implements ExecutionCommandsContext {
   /** @ViewChild() **/

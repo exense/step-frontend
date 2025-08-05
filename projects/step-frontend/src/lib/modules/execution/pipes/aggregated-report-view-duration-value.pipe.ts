@@ -3,6 +3,7 @@ import { AggregatedReportView } from '@exense/step-core';
 
 @Pipe({
   name: 'aggregatedReportViewDurationValue',
+  standalone: false,
 })
 export class AggregatedReportViewDurationValuePipe implements PipeTransform {
   transform(value?: AggregatedReportView): number | undefined {

@@ -9,5 +9,6 @@ import { AbstractArtefact, BaseInlineArtefactComponent } from '@exense/step-core
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class EmptyInlineComponent extends BaseInlineArtefactComponent<AbstractArtefact> {}

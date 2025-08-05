@@ -4,6 +4,7 @@ import { MatMenuPanel, MatMenuTrigger } from '@angular/material/menu';
 @Directive({
   selector: `[stepTriggerPopover]`,
   exportAs: 'stepTriggerPopover',
+  standalone: false,
 })
 export class TriggerPopoverDirective extends MatMenuTrigger {
   override _handleClick(event: MouseEvent): void {}

@@ -9,6 +9,7 @@ import { from } from 'rxjs';
   selector: 'step-plan-source',
   templateUrl: './plan-source-dialog.component.html',
   styleUrls: ['./plan-source-dialog.component.scss'],
+  standalone: false,
 })
 export class PlanSourceDialogComponent {
   private _snackBar = inject(MatSnackBar);

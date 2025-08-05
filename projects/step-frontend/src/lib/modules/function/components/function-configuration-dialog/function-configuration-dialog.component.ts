@@ -47,6 +47,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       useExisting: forwardRef(() => FunctionConfigurationDialogComponent),
     },
   ],
+  standalone: false,
 })
 export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {
   private _functionConfigurationDialogData = inject<FunctionConfigurationDialogData>(MAT_DIALOG_DATA);

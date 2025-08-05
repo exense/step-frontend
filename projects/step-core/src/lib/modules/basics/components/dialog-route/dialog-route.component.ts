@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'step-dialog-route',
   templateUrl: './dialog-route.component.html',
   styleUrls: ['./dialog-route.component.scss'],
+  standalone: false,
 })
 export class DialogRouteComponent implements OnInit, OnDestroy {
   private _matDialog = inject(MatDialog);

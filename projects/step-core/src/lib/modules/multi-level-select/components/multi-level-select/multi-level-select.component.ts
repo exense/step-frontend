@@ -48,7 +48,6 @@ type OnTouch = () => void;
       useExisting: forwardRef(() => MultiLevelSelectComponent),
     },
   ],
-  standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

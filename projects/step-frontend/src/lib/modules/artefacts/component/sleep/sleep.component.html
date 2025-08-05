@@ -1,12 +1,12 @@
 <form #form="ngForm">
-  @if (!context.artefact!.unit?.dynamic) {
+  @if (!context.artefact!.unit.dynamic) {
     <step-dynamic-time-input
       label="Duration"
       [(ngModel)]="context.artefact!.duration"
       [disabled]="context.readonly"
       name="duration"
     />
-    @if (context.artefact!.duration.dynamic && context.artefact!.unit?.value) {
+    @if (context.artefact!.duration.dynamic && context.artefact!.unit.value) {
       <step-dynamic-textfield label="Unit" [(ngModel)]="context.artefact!.unit" [disabled]="true" name="unit" />
     }
   } @else {

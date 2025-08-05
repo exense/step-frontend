@@ -6,6 +6,7 @@ import { ValidationErrors } from '@angular/forms';
   templateUrl: './errors-list.component.html',
   styleUrls: ['./errors-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorsListComponent {

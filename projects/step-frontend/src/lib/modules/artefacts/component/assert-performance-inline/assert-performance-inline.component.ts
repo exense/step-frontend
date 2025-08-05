@@ -15,6 +15,7 @@ import { AssertPerformanceListService } from '../../injectables/assert-performan
     class: 'execution-report-node-inline-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AssertPerformanceInlineComponent extends BaseInlineArtefactComponent<AssertPerformanceArtefact> {
   private _lists = inject(AssertPerformanceListService);

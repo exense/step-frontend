@@ -141,6 +141,7 @@ interface RefreshParams {
     },
     AggregatedTreeDataLoaderService,
   ],
+  standalone: false,
 })
 export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
   private _urlParamsService = inject(DashboardUrlParamsService);

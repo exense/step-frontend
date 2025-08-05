@@ -8,6 +8,7 @@ import { CustomRegistryItem } from '../../shared/custom-registry-item';
   templateUrl: './base-item.component.html',
   styleUrls: ['./plan-type.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class ExecutionCustomPanelComponent extends BaseItemComponent<CustomRegistryItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.EXECUTION_CUSTOM_PANEL;

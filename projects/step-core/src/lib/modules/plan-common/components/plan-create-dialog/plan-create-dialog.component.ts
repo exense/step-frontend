@@ -30,7 +30,6 @@ const TABS = new InjectionToken<Tab<string>[]>('Plan creation tabs', {
   selector: 'step-plan-create-dialog',
   templateUrl: './plan-create-dialog.component.html',
   styleUrls: ['./plan-create-dialog.component.scss'],
-  standalone: true,
   imports: [StepBasicsModule, CustomFormComponent, NgxMatSelectSearchModule, TabsComponent, RichEditorComponent],
   host: {
     '(keydown.enter)': 'handleKeyEnter()',

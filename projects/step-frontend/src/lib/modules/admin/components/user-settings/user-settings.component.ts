@@ -51,6 +51,7 @@ const kvPairArrayToPreferences = (values?: KeyValue<string, string>[]): Preferen
   templateUrl: './user-settings.component.html',
   styleUrls: ['./user-settings.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class UserSettingsComponent implements OnInit, OnChanges, OnDestroy {
   private _userApi = inject(UserService);

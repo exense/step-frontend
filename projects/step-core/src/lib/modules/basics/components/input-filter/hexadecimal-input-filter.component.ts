@@ -15,6 +15,7 @@ const HEXADECIMAL_REGEXP = /^[0-9a-f]{24}$/;
       useExisting: forwardRef(() => HexadecimalInputFilterComponent),
     },
   ],
+  standalone: false,
 })
 export class HexadecimalInputFilterComponent extends InputFilterComponent {
   protected override createControl(fb: FormBuilder): FormControl<string> {

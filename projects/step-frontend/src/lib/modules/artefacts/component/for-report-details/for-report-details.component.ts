@@ -14,6 +14,7 @@ import { ForReportNode } from '../../types/for.report-node';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ForReportDetailsComponent extends BaseReportDetailsComponent<ForReportNode> {
   private _artefactInlineUtils = inject(ArtefactInlineItemUtilsService);

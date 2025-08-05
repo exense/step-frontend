@@ -3,6 +3,7 @@ import { ElementRefMapDirective } from './element-ref-map.directive';
 
 @Directive({
   selector: '[widthExpanders]',
+  standalone: false,
 })
 export class WidthExpandersDirective implements OnInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

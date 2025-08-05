@@ -18,7 +18,6 @@ import { FunctionTypeRegistryService, ItemInfo } from '../../../custom-registeri
     },
   ],
   imports: [StepBasicsModule],
-  standalone: true,
 })
 export class FunctionTypeFilterComponent
   extends ArrayFilterComponent<ItemInfo>

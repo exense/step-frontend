@@ -11,6 +11,7 @@ const TRAILING_ZERO_PATTERN = /\.0+$|(\.[0-9]*[1-9])0+$/;
 
 @Pipe({
   name: 'bigNumber',
+  standalone: false,
 })
 export class BigNumberPipe implements PipeTransform {
   transform(value: number | null | undefined): string {

@@ -12,23 +12,12 @@ import {
   untracked,
   WritableSignal,
 } from '@angular/core';
-import {
-  COMMON_IMPORTS,
-  ResolutionPickerComponent,
-  TimeSeriesConfig,
-  TimeSeriesContext,
-  TimeSeriesUtils,
-} from '../../modules/_common';
-import { DashboardFilterBarComponent } from '../../modules/filter-bar';
-import { ChartDashletComponent } from '../chart-dashlet/chart-dashlet.component';
-import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
+import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../modules/_common';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
-import { StandaloneChartComponent } from '../standalone-chart/standalone-chart.component';
 import { TimeRangePickerComponent } from '../../modules/_common/components/time-range-picker/time-range-picker.component';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, of, pairwise, switchMap } from 'rxjs';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { TimeRangePickerSelection } from '../../modules/_common/types/time-selection/time-range-picker-selection';
 import { AuthService, DashboardsService, DashboardView, ReloadableDirective, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../modules/_common/injectables/dashboard-url-params.service';
@@ -42,21 +31,10 @@ interface UrlParams {
   selector: 'step-dashboard-page',
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.scss'],
-  standalone: true,
   providers: [DashboardUrlParamsService],
   hostDirectives: [ReloadableDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    COMMON_IMPORTS,
-    DashboardFilterBarComponent,
-    ChartDashletComponent,
-    ResolutionPickerComponent,
-    TimeRangePickerComponent,
-    TableDashletComponent,
-    DashboardComponent,
-    StandaloneChartComponent,
-    MatProgressSpinner,
-  ],
+  imports: [COMMON_IMPORTS, TimeRangePickerComponent, DashboardComponent],
 })
 export class DashboardPageComponent implements OnInit {
   private _router: Router = inject(Router);

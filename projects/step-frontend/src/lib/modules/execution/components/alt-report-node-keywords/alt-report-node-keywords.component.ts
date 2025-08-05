@@ -45,6 +45,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
     tablePersistenceConfigProvider('keywords', STORE_ALL),
   ],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableContentComponent {
   private _screenApiService = inject(AugmentedScreenService);

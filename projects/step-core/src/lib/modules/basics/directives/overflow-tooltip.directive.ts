@@ -4,7 +4,6 @@ import { OverflowIndicatorDirective } from './overflow-indicator.directive';
 
 @Directive({
   selector: '[matTooltip]',
-  standalone: true,
   exportAs: 'matTooltip',
   host: {
     class: 'mat-mdc-tooltip-trigger',
@@ -14,7 +13,6 @@ export class StandaloneMatTooltipDirective extends MatTooltip {}
 
 @Directive({
   selector: '[stepOverflowTooltip]',
-  standalone: true,
   hostDirectives: [
     {
       directive: StandaloneMatTooltipDirective,

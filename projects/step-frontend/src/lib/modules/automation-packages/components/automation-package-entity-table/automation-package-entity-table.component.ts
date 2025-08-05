@@ -3,7 +3,6 @@ import { CustomRegistryService, CustomRegistryType, StepCoreModule } from '@exen
 
 @Component({
   selector: 'step-automation-package-entity-table',
-  standalone: true,
   imports: [StepCoreModule],
   templateUrl: './automation-package-entity-table.component.html',
   styleUrl: './automation-package-entity-table.component.scss',

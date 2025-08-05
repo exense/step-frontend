@@ -9,6 +9,7 @@ const SUFFIXES: KeyValue<string, number>[] = [
 
 @Pipe({
   name: 'shortenNumber',
+  standalone: false,
 })
 export class ShortenNumberPipe implements PipeTransform {
   transform(value?: number | null, defaultSuffix = ''): string {

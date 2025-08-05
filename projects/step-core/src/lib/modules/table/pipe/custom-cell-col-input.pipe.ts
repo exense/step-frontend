@@ -4,6 +4,7 @@ import { Input as ColInput } from '../../../client/step-client-module';
 
 @Pipe({
   name: 'customCellColInput',
+  standalone: false,
 })
 export class CustomCellColInputPipe implements PipeTransform {
   transform(colInput: ColInput, entitySubPath?: string): ColInputExt {

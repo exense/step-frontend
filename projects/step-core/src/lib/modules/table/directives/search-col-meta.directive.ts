@@ -11,6 +11,7 @@ import { SearchColumnAccessor } from '../shared/search-column-accessor';
       useExisting: forwardRef(() => SearchColMetaDirective),
     },
   ],
+  standalone: false,
 })
 export class SearchColMetaDirective extends SearchColBase implements SearchColumnAccessor {
   @Input('stepSearchColMeta') meta?: SearchColumn;

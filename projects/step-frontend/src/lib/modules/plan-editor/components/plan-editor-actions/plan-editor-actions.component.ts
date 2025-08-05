@@ -15,6 +15,7 @@ import { of } from 'rxjs';
   templateUrl: './plan-editor-actions.component.html',
   styleUrls: ['./plan-editor-actions.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class PlanEditorActionsComponent {
   protected _interactiveSession = inject(InteractiveSessionService);

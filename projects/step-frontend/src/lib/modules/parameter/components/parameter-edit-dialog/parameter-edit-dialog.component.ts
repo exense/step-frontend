@@ -35,6 +35,7 @@ interface ParameterEditDialogData {
       transition('hidden <=> visible', animate('300ms ease-in-out')),
     ]),
   ],
+  standalone: false,
 })
 export class ParameterEditDialogComponent implements OnInit {
   private form = viewChild('parameterForm', { read: NgForm });

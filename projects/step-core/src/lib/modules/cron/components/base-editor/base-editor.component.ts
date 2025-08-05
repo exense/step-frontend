@@ -3,6 +3,7 @@ import { trackByRange } from '../../injectables/ranges.tokens';
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseEditorComponent implements AfterViewInit, OnChanges {
   @Input() isActive = true;

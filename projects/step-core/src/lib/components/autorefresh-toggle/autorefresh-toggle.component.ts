@@ -27,6 +27,7 @@ interface AutorefreshPreset {
   templateUrl: './autorefresh-toggle.component.html',
   styleUrls: ['./autorefresh-toggle.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class AutorefreshToggleComponent implements OnInit, OnChanges, OnDestroy {
   private terminator$?: Subject<void>;

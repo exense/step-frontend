@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'statusIcon',
+  standalone: false,
 })
 export class StatusIconPipe implements PipeTransform {
   transform(status?: string): string {

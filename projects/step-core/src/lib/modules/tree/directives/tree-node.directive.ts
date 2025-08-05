@@ -10,7 +10,6 @@ const ICON_COLLAPSED = 'chevron-right';
 
 @Directive({
   selector: '[stepTreeNode]',
-  standalone: true,
   host: {
     '[class]': 'containerClasses()',
     '[style.--level]': 'level()',

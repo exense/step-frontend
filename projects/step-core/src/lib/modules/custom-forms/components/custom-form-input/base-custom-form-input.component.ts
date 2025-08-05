@@ -16,6 +16,7 @@ export type OnTouch = () => void;
 
 @Component({
   template: '',
+  standalone: false,
 })
 export abstract class BaseCustomFormInputComponent implements ControlValueAccessor {
   private _screensService = inject(ScreensService);

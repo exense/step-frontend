@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'flatObjectStringFormat',
+  standalone: false,
 })
 export class FlatObjectStringFormatPipe implements PipeTransform {
   static format(obj: any): string {

@@ -6,6 +6,7 @@ import { Time } from '../../types/time';
   templateUrl: './range-time-picker.component.html',
   styleUrls: ['./range-time-picker.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class RangeTimePickerComponent {
   @Input() startTime?: Time;

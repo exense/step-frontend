@@ -5,7 +5,6 @@ import { ScheduledTaskUrlService } from '../injectables/scheduled-task-url.servi
 
 @Pipe({
   name: 'taskUrl',
-  standalone: true,
 })
 export class TaskUrlPipe implements PipeTransform {
   private _scheduledTaskUrl = inject(ScheduledTaskUrlService, { optional: true });

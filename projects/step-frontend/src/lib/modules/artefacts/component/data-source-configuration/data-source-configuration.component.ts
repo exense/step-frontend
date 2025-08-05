@@ -22,6 +22,7 @@ const createDataSourceTypeItem = (key: DataSourceType, value: string): DataSourc
   templateUrl: './data-source-configuration.component.html',
   styleUrls: ['./data-source-configuration.component.scss'],
   providers: [ArtefactFormChangeHelperService],
+  standalone: false,
 })
 export class DataSourceConfigurationComponent
   extends BaseArtefactComponent<DataSourceConfigurationArtefact>

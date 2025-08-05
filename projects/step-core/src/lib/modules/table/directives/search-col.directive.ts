@@ -13,6 +13,7 @@ import { SearchColumnAccessor } from '../shared/search-column-accessor';
       useExisting: forwardRef(() => SearchColDirective),
     },
   ],
+  standalone: false,
 })
 export class SearchColDirective extends SearchColBase implements SearchColumnAccessor {
   private _matColumnDef = inject(MatColumnDef, { self: true });

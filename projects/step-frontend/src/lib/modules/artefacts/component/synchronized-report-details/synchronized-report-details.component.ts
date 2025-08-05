@@ -15,6 +15,7 @@ import { Synchronized } from '../../types/synchronized.artefact';
     class: 'execution-report-node-details',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SynchronizedReportDetailsComponent extends BaseReportDetailsComponent<
   ReportNodeWithArtefact<Synchronized>

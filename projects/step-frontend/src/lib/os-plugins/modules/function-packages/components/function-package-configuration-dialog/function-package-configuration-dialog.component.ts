@@ -21,6 +21,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
   host: {
     '(keydown.enter)': 'save()',
   },
+  standalone: false,
 })
 export class FunctionPackageConfigurationDialogComponent {
   readonly AlertType = AlertType;

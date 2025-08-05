@@ -6,7 +6,6 @@ import { COMMON_IMPORTS, EntitySearchValue } from '../../../_common';
   selector: 'step-ts-filter-bar-plan-item',
   templateUrl: './filter-bar-plan-item.component.html',
   styleUrls: ['./filter-bar-plan-item.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
 })
 export class FilterBarPlanItemComponent {

@@ -19,7 +19,6 @@ import { Params } from '@angular/router';
   selector: 'step-dashboard-list',
   templateUrl: './dashboard-list.component.html',
   styleUrls: ['./dashboard-list.component.scss'],
-  standalone: true,
   imports: [COMMON_IMPORTS],
   providers: [
     tableColumnsConfigProvider({

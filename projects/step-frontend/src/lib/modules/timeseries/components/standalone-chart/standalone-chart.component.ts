@@ -1,26 +1,14 @@
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
-import {
-  COMMON_IMPORTS,
   FilterBarItem,
   FilterBarItemType,
   FilterUtils,
-  OQLBuilder,
   TimeseriesColorsPool,
   TimeSeriesConfig,
   TimeSeriesUtils,
   UPlotUtilsService,
 } from '../../modules/_common';
-import { ChartSkeletonComponent, TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
+import { TimeSeriesChartComponent, TSChartSeries, TSChartSettings } from '../../modules/chart';
 import {
   BucketResponse,
   FetchBucketsRequest,
@@ -39,8 +27,7 @@ declare const uPlot: any;
   selector: 'step-standalone-dashlet',
   templateUrl: './standalone-chart.component.html',
   styleUrls: ['./standalone-chart.component.scss'],
-  standalone: true,
-  imports: [COMMON_IMPORTS, ChartSkeletonComponent, TimeSeriesChartComponent],
+  imports: [TimeSeriesChartComponent],
 })
 export class StandaloneChartComponent implements OnChanges {
   private readonly barsFunction = uPlot.paths.bars;

@@ -5,7 +5,6 @@ import { ExecutionViewModeService } from '../services/execution-view-mode.servic
 
 @Pipe({
   name: 'executionUrl',
-  standalone: true,
 })
 export class ExecutionUrlPipe implements PipeTransform {
   private _executionViewMode = inject(ExecutionViewModeService);
