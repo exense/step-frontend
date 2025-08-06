@@ -1,4 +1,4 @@
-import { Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { TableColumnsService } from '../../services/table-columns.service';
 import { TableColumnsDictionaryService } from '../../services/table-columns-dictionary.service';
 import { ColumnInfo } from '../../types/column-info';
@@ -17,6 +17,8 @@ interface Column extends Omit<ColumnInfo, 'canHide'> {
 export class ColumnSettingsComponent {
   private _tableColumnsDictionary = inject(TableColumnsDictionaryService);
   readonly _tableColumns = inject(TableColumnsService);
+
+  allowSaving = input<boolean>(true);
 
   readonly columns = computed(() => {
     const visibleColumns = new Set(this._tableColumns.visibleColumns());
