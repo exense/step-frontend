@@ -66,38 +66,3 @@
   <step-tabs [tabs]="tabs" [userRouteLinks]="true" />
   <router-outlet />
 </section>
-
-<ng-template #taskHeader let-task>
-  <h3 data-step-testid>
-    <entity-icon entityName="tasks" [entity]="task"></entity-icon>
-
-    <div>{{ task?.attributes?.['name'] || 'Task name not found' }}</div>
-    @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
-      <a
-        class="plan-link"
-        [routerLink]="['/plans/editor', lastExecution.planId]"
-        matTooltip="Navigate to plan"
-        matTooltipPosition="right"
-      >
-        <step-icon name="external-link" />
-      </a>
-    }
-  </h3>
-</ng-template>
-
-<ng-template #planHeader let-plan>
-  <h3 data-step-testid>
-    <entity-icon entityName="plans" [entity]="plan"></entity-icon>
-
-    @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
-      <a
-        class="plan-link"
-        [routerLink]="['/plans/editor', lastExecution.planId]"
-        matTooltip="Navigate to plan"
-        matTooltipPosition="right"
-      >
-        <step-icon name="external-link" />
-      </a>
-    }
-  </h3>
-</ng-template>
