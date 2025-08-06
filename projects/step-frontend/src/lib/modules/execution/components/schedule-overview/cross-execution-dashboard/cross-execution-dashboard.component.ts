@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { CrossExecutionDashboardState } from './cross-execution-dashboard-state';
 import { IS_SMALL_SCREEN, Tab, TimeUnit } from '@exense/step-core';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
@@ -23,6 +23,29 @@ export class CrossExecutionDashboardComponent implements OnInit {
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
   protected tabs: Tab<string>[] = [this.createTab('report', 'Report'), this.createTab('performance', 'Performance')];
+
+  viewTitle = computed(() => {
+    if (this._state.viewType() === 'task') {
+      let task = this._state.task();
+      if (task === undefined) {
+        return 'Loading...';
+      } else if (task === null) {
+        return 'Task name (deleted)';
+      } else {
+        return task?.attributes?.['name'];
+      }
+    } else {
+      // plan
+      const plan = this._state.plan();
+      if (plan === undefined) {
+        return 'Loading...';
+      } else if (plan === null) {
+        return 'Plan name (deleted)';
+      } else {
+        return plan.attributes?.['name'];
+      }
+    }
+  });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = [
     { type: 'RELATIVE', relativeSelection: { label: 'Last 1 day', timeInMs: TimeUnit.DAY } },

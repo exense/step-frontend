@@ -50,7 +50,13 @@ export class SchedulerPageComponent implements OnInit {
 
   ngOnInit(): void {
     this._schedulerService.getExecutionTaskById(this._taskIdFn()).subscribe((task) => {
-      this.state.task.set(task);
+      console.log('task loaded', task);
+      if (task === undefined) {
+        // the task was not found
+        this.state.task.set(null);
+      } else {
+        this.state.task.set(task);
+      }
     });
   }
 }

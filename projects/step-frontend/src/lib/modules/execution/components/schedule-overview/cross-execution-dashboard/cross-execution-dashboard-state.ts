@@ -11,7 +11,7 @@ import {
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
-import { inject, signal } from '@angular/core';
+import { computed, inject, signal, Signal, WritableSignal } from '@angular/core';
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
 import {
@@ -25,6 +25,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
+import { transform } from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 declare const uPlot: any;
 const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
@@ -45,8 +46,8 @@ export abstract class CrossExecutionDashboardState {
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  readonly task = signal<ExecutiontTaskParameters | undefined>(undefined);
-  readonly plan = signal<Plan | undefined>(undefined);
+  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
+  readonly plan = signal<Plan | null | undefined>(undefined);
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -55,7 +56,7 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): FilterBarItem;
-  abstract getViewType(): CrossExecutionViewType;
+  abstract readonly viewType: Signal<CrossExecutionViewType>;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
