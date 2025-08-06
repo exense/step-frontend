@@ -2,7 +2,7 @@ import { Component, computed, contentChild, input, ViewEncapsulation } from '@an
 import { AbstractControl, NgControl, StatusChangeEvent, TouchedChangeEvent } from '@angular/forms';
 import { getControlWarningsContainer } from '../../types/form-control-warnings-extension';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, switchMap } from 'rxjs';
+import { filter, map, startWith, switchMap, tap } from 'rxjs';
 
 export type AlignLabelAddon = 'separate' | 'near' | 'fill';
 
@@ -33,15 +33,23 @@ export class FormFieldComponent {
   private control$ = toObservable(this.control);
   private isInvalid$ = this.control$.pipe(
     filter((control) => !!control),
-    switchMap((control) => control.events),
-    filter((event) => event instanceof StatusChangeEvent),
-    map((event) => event.status === 'INVALID'),
+    switchMap((control) => {
+      return control.events.pipe(
+        filter((event) => event instanceof StatusChangeEvent),
+        map((event) => event.status === 'INVALID'),
+        startWith(control.invalid),
+      );
+    }),
   );
   private isTouched$ = this.control$.pipe(
     filter((control) => !!control),
-    switchMap((control) => control.events),
-    filter((event) => event instanceof TouchedChangeEvent),
-    map((event) => event.touched),
+    switchMap((control) => {
+      return control.events.pipe(
+        filter((event) => event instanceof TouchedChangeEvent),
+        map((event) => event.touched),
+        startWith(control.touched),
+      );
+    }),
   );
 
   protected readonly isInvalid = toSignal(this.isInvalid$, {

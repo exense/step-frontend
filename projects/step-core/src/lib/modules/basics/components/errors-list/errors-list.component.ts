@@ -15,6 +15,8 @@ export class ErrorsListComponent {
   protected readonly displayErrors = computed(() => {
     const errors = this.errors() ?? {};
     const keysDictionary = this.keysDictionary() ?? {};
-    return Object.entries(errors ?? {}).map(([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue);
+    return Object.entries(errors ?? {})
+      .map(([errorKey, errorValue]) => keysDictionary![errorKey] ?? errorValue)
+      .filter((error) => typeof error === 'string');
   });
 }
