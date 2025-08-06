@@ -1,6 +1,6 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
   <div class="title">
-    <h3 data-step-testid>
+    <h3 data-step-testid="task-or-plan-title">
       @if (_state.task(); as task) {
         <entity-icon entityName="tasks" [entity]="task"></entity-icon>
       }
