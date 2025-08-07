@@ -1,5 +1,5 @@
 import { map, Observable } from 'rxjs';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, Signal } from '@angular/core';
 import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/modules/_common';
 import {
   CrossExecutionDashboardState,
@@ -11,6 +11,7 @@ import { PLAN_ID } from '../../../services/plan-id.token';
 @Injectable()
 export class PlanPageStateService extends CrossExecutionDashboardState {
   readonly _planIdFn = inject(PLAN_ID);
+  viewType: Signal<CrossExecutionViewType> = signal('plan');
 
   getViewType(): CrossExecutionViewType {
     return 'plan';
