@@ -16,6 +16,10 @@ export const $StreamingAttachmentMeta = {
           type: 'number',
           format: 'int64',
         },
+        currentNumberOfLines: {
+          type: 'number',
+          format: 'int64',
+        },
         status: {
           type: 'Enum',
         },

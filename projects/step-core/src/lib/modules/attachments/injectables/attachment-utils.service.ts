@@ -65,4 +65,12 @@ export class AttachmentUtilsService {
     }
     this._resourceService.downloadResource(attachment.id!, attachment.name!);
   }
+
+  getAttachmentStreamingUrl(attachmentOrId?: string | AttachmentMeta): string | undefined {
+    if (!attachmentOrId) {
+      return undefined;
+    }
+    const id = typeof attachmentOrId === 'string' ? attachmentOrId : attachmentOrId.id;
+    return `/streaming/download/${id}`;
+  }
 }

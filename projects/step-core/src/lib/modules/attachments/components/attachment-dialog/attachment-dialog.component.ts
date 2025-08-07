@@ -20,7 +20,6 @@ import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { from } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
-import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
 
 @Component({
   selector: 'step-attachment-dialog',
@@ -42,11 +41,24 @@ export class AttachmentDialogComponent implements OnInit {
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
-  protected readonly streamingStatus = model<AttachmentStreamStatus | undefined>(undefined);
+  private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
+
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this.streamingStatus();
+    const status = this.streamingText()?.status?.();
     return !!status && status !== 'COMPLETED';
   });
+
+  protected readonly frameMessage = computed(() => {
+    const streamingText = this.streamingText();
+    const isFrameApplied = streamingText?.isFrameApplied?.();
+    const startLineIndex = streamingText?.startLineIndex?.();
+    const endLineIndex = streamingText?.endLineIndex?.();
+    if (!isFrameApplied) {
+      return undefined;
+    }
+    return `Large file: rendering line: ${(startLineIndex ?? 0) + 1} - ${(endLineIndex ?? 0) + 1}`;
+  });
+
   protected readonly contentCtrl = this._fb.control('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
   protected readonly AttachmentType = AttachmentType;

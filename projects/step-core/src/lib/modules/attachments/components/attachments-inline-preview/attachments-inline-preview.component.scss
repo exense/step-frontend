@@ -1,0 +1,15 @@
+step-attachments-inline-preview {
+  span.skipped {
+    text-decoration: line-through;
+  }
+
+  .attachment-name-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  p.reason {
+    max-width: 35rem;
+  }
+}

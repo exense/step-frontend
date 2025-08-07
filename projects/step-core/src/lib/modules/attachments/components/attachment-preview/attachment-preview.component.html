@@ -4,7 +4,7 @@
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
     @case (AttachmentType.STREAMING_TEXT) {
-      <step-streaming-text [attachment]="attachment()!" [(status)]="streamingStatus" [displayLatestRows]="4" />
+      <step-streaming-text #streamingText [attachment]="attachment()!" [displayLatestRows]="4" />
     }
     @default {
       <div class="file-info">

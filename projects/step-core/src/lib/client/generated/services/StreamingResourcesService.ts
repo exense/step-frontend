@@ -43,4 +43,25 @@ export class StreamingResourcesService {
       },
     });
   }
+
+  /**
+   * @param id
+   * @param startIndex
+   * @param count
+   * @returns string default response
+   * @throws ApiError
+   */
+  public getLines(id: string, startIndex?: number, count?: number): Observable<Array<string>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/streaming-resources/{id}/lines',
+      path: {
+        id: id,
+      },
+      query: {
+        startIndex: startIndex,
+        count: count,
+      },
+    });
+  }
 }

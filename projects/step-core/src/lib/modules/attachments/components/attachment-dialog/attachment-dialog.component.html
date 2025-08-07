@@ -13,8 +13,15 @@
         <step-icon name="copy" />
       </button>
     }
-    @if (isStreamingInProgress()) {
-      <mat-spinner [diameter]="25" />
+    @if (attachmentType === AttachmentType.STREAMING_TEXT) {
+      <section class="streaming-info">
+        @if (isStreamingInProgress()) {
+          <mat-spinner [diameter]="25" />
+        }
+        @if (frameMessage(); as message) {
+          <div>{{ message }}</div>
+        }
+      </section>
     }
   </div>
   <div step-modal-window-body>
@@ -35,7 +42,7 @@
         <step-rich-editor #richEditor [formControl]="contentCtrl" />
       }
       @case (AttachmentType.STREAMING_TEXT) {
-        <step-streaming-text [attachment]="_data" [(status)]="streamingStatus" />
+        <step-streaming-text #streamingText [attachment]="_data" [linesFrame]="50" />
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">

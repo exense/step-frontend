@@ -1,9 +1,10 @@
 import { StreamingAttachmentMeta } from '../../../client/step-client-module';
 
 export interface WsResourceStatusChange {
-  '@': 'StatusChange';
+  '@': 'StatusChanged';
   resourceStatus: {
     transferStatus: Required<StreamingAttachmentMeta>['status'];
+    numberOfLines: number;
     currentSize: number;
   };
 }

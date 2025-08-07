@@ -1,1 +1,8 @@
-<step-rich-editor #richEditor [ngModel]="text()" [disabled]="true" [rowNumbers]="!useRowsLimit()" />
+<step-rich-editor
+  #richEditor
+  [ngModel]="text()"
+  [disabled]="true"
+  [firstLineNumber]="firstLineNumber()"
+  [rowNumbers]="!displayLatestRowsOnly()"
+  (verticalScroll)="handleVerticalScroll($event)"
+/>

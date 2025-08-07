@@ -6,6 +6,7 @@ import {
   forwardRef,
   input,
   OnDestroy,
+  output,
   signal,
   viewChild,
   ViewEncapsulation,
@@ -22,9 +23,16 @@ import 'ace-builds/src-min-noconflict/mode-java.js';
 import 'ace-builds/src-min-noconflict/mode-yaml.js';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
 import { AceMode } from '../../types/ace-mode.enum';
+import { debounceTime, map, Subject } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type OnChange = (value?: string) => void;
 type OnTouch = () => void;
+
+export interface RichEditorVerticalScroll {
+  firstRow: number;
+  lastRow: number;
+}
 
 @Component({
   selector: 'step-rich-editor',
@@ -47,12 +55,27 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
   readonly syntaxMode = input<AceMode | string>('');
   readonly wrapText = input(false, { transform: (value?: boolean) => !!value });
   readonly rowNumbers = input(true, { transform: (value?: boolean) => !!value });
+  readonly firstLineNumber = input(1);
+  readonly verticalScroll = output<RichEditorVerticalScroll>();
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
   private editorElement = viewChild('editor', { read: ElementRef<HTMLDivElement> });
   private editor?: ace.Ace.Editor;
+  private scrollTopChange$ = new Subject<number>();
+  private scrollTopChangeSubscription = this.scrollTopChange$
+    .pipe(
+      debounceTime(300),
+      map(() => {
+        const firstLineNumber = this.firstLineNumber();
+        const firstRow = firstLineNumber + (this.editor?.getFirstVisibleRow?.() ?? 0);
+        const lastRow = firstLineNumber + (this.editor?.getLastVisibleRow?.() ?? 0);
+        return { firstRow, lastRow } as RichEditorVerticalScroll;
+      }),
+      takeUntilDestroyed(),
+    )
+    .subscribe((event) => this.verticalScroll.emit(event));
 
   private initialValue: string = '';
 
@@ -60,13 +83,24 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
 
   private handleChanges = () => this.onChange?.(this.editor?.getValue() ?? '');
   private handleBlur = () => this.onTouch?.();
+  private handleScrollTopChange = (scrollTop: number) => this.scrollTopChange$.next(scrollTop);
 
-  private effectSyntaxModeChange = effect(() => this.editor?.session?.setMode?.(this.syntaxMode() ?? ''));
-  private effectWrapTextChange = effect(() => this.editor?.setOption?.('wrap', this.wrapText()));
+  private effectSyntaxModeChange = effect(() => {
+    const syntaxMode = this.syntaxMode() ?? '';
+    this.editor?.session?.setMode?.(syntaxMode);
+  });
+  private effectWrapTextChange = effect(() => {
+    const wrapText = this.wrapText();
+    this.editor?.setOption?.('wrap', wrapText);
+  });
   private effectRowNumbersChange = effect(() => {
     const showNumbers = this.rowNumbers();
     this.editor?.setOption?.('showLineNumbers', showNumbers);
     this.editor?.setOption?.('showGutter', showNumbers);
+  });
+  private effectFirstLineNumberChange = effect(() => {
+    const firstLineNumber = this.firstLineNumber();
+    this.editor?.setOption?.('firstLineNumber', firstLineNumber);
   });
 
   writeValue(value: string): void {
@@ -111,14 +145,19 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     const showNumbers = this.rowNumbers();
     this.editor.setOption('showLineNumbers', showNumbers);
     this.editor.setOption('showGutter', showNumbers);
+    const firstLineNumber = this.firstLineNumber();
+    this.editor.setOption('firstLineNumber', firstLineNumber);
     this.editor.on('change', this.handleChanges);
     this.editor.on('blur', this.handleBlur);
+    this.editor.session.on('changeScrollTop', this.handleScrollTopChange);
   }
 
   ngOnDestroy(): void {
     this.editor?.off('change', this.handleChanges);
     this.editor?.off('blur', this.handleBlur);
+    this.editor?.session?.off?.('changeScrollTop', this.handleScrollTopChange);
     this.editor?.destroy();
+    this.scrollTopChange$.complete();
   }
 
   focusOnText(): void {
@@ -142,5 +181,16 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     this.editor?.navigateFileEnd?.();
     const lastRow = this.editor?.getCursorPosition?.()?.row ?? 0;
     this.editor?.scrollToRow?.(lastRow);
+  }
+
+  scrollToRowUpEdge(row: number): void {
+    this.editor?.scrollToRow?.(row);
+  }
+
+  scrollToRowBottomEdge(row: number): void {
+    const firstVisibleRow = this.editor?.getFirstVisibleRow?.() ?? 0;
+    const lastVisibleRow = this.editor?.getLastVisibleRow?.() ?? 0;
+    const displayedLines = lastVisibleRow - firstVisibleRow - 1;
+    this.editor?.scrollToRow?.(row - displayedLines);
   }
 }

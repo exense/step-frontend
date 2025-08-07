@@ -1,10 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { InlineArtefactContext } from '../../types/artefact-types';
-import { AbstractArtefact, AttachmentMeta } from '../../../../client/step-client-module';
-import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
+import { AbstractArtefact } from '../../../../client/step-client-module';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ATTACHMENTS_EXPORTS } from '../../../attachments';
-import { AttachmentDialogsService } from '../../../attachments/injectables/attachment-dialogs.service';
-import { AttachmentType } from '../../../attachments/types/attachment-type.enum';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
@@ -18,8 +16,6 @@ import { AttachmentType } from '../../../attachments/types/attachment-type.enum'
   },
 })
 export class ArtefactInlineAdditionalInfoComponent {
-  private _attachmentDialogs = inject(AttachmentDialogsService);
-
   readonly context = input<InlineArtefactContext<AbstractArtefact>>();
 
   protected readonly attachmentMetas = computed(() => {
@@ -39,14 +35,4 @@ export class ArtefactInlineAdditionalInfoComponent {
     const error = this.error();
     return hasAttachments || !!error;
   });
-
-  protected open(attachment: AttachmentMeta, $event: MouseEvent): void {
-    $event.preventDefault();
-    $event.stopPropagation();
-    $event.stopImmediatePropagation();
-    this._attachmentDialogs.showDetails(attachment);
-  }
-
-  protected readonly PopoverMode = PopoverMode;
-  protected readonly AttachmentType = AttachmentType;
 }

@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { AttachmentMeta, SkippedAttachmentMeta } from '../../../../client/step-client-module';
@@ -7,7 +16,6 @@ import { AttachmentUtilsService } from '../../injectables/attachment-utils.servi
 import { NgOptimizedImage } from '@angular/common';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
 import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
-import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 
 @Component({
@@ -29,13 +37,14 @@ export class AttachmentPreviewComponent {
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _attachmentDialogs = inject(AttachmentDialogsService);
 
+  private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
+
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
-  protected readonly streamingStatus = model<AttachmentStreamStatus | undefined>(undefined);
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this.streamingStatus();
+    const status = this.streamingText()?.status?.();
     return !!status && status !== 'COMPLETED';
   });
 
