@@ -8,6 +8,7 @@ import {
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
+  SearchValue,
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
@@ -55,6 +56,7 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): FilterBarItem;
+  abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {

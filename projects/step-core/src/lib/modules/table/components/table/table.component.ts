@@ -157,6 +157,8 @@ export class TableComponent<T>
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
+  staticFilters = input<Record<string, SearchValue> | undefined>();
+  staticFilters$ = toObservable(this.staticFilters);
 
   private usedColumns = new Set<string>();
 
@@ -370,11 +372,12 @@ export class TableComponent<T>
       }),
     );
 
-    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$])
+    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([{ page, search }, sort, filter, params]) => {
+      .subscribe(([{ page, search }, sort, filter, params, staticFilters]) => {
         this._tableState.saveState(search, page, sort);
-        tableDataSource.getTableData({ page, sort, search, filter, params });
+        const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
+        tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params });
       });
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {

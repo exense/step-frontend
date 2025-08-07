@@ -81,16 +81,24 @@
     </step-alt-report-widget>
   </div>
   <div class="row">
-    <div class="row">
-      <step-alt-report-widget class="flex-grow-1" title="Errors">
-        <step-alt-report-widget-content class="widget-content">
-          <step-alt-execution-errors
-            [dataSource]="_state.errorsDataSource"
-            [statusFilterItems]="availableErrorTypes()"
+    <step-alt-report-widget class="flex-grow-1" title="Errors">
+      <step-alt-report-widget-content class="widget-content">
+        <step-alt-execution-errors [dataSource]="_state.errorsDataSource" [statusFilterItems]="availableErrorTypes()" />
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <step-alt-report-widget class="flex-grow-1" title="Executions">
+      <step-alt-report-widget-content class="widget-content">
+        @if (luxonDateRange(); as dateRange) {
+          <step-cross-execution-executions-table
+            [defaultDateRange]="dateRange!"
+            #executionList
+            [hiddenFilters]="_state.executionsTableFilter"
           />
-        </step-alt-report-widget-content>
-      </step-alt-report-widget>
-    </div>
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
   </div>
 </section>
 

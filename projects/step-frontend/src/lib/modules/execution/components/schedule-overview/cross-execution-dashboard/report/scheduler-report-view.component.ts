@@ -1,5 +1,5 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { Tab, TimeRange } from '@exense/step-core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { DateRange, Tab, TimeRange } from '@exense/step-core';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, filter, map, pairwise, scan, take } from 'rxjs';
@@ -7,6 +7,8 @@ import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_com
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Status } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
+import { ExecutionListComponent } from '../../../execution-list/execution-list.component';
+import { DateTime } from 'luxon';
 
 export type ReportNodesChartType = 'keywords' | 'testcases';
 
@@ -34,6 +36,20 @@ export class SchedulerReportViewComponent implements OnInit {
       label: 'Keywords',
     },
   ];
+
+  @ViewChild('executionList') executionList!: ExecutionListComponent;
+
+  luxonDateRange = toSignal(
+    this._state.timeRange$.pipe(
+      map(
+        ({ from, to }) =>
+          ({
+            start: DateTime.fromMillis(from),
+            end: DateTime.fromMillis(to),
+          }) as DateRange,
+      ),
+    ),
+  );
 
   switchReportNodesChart(type: ReportNodesChartType) {
     this.reportNodesChartType.set(type);
