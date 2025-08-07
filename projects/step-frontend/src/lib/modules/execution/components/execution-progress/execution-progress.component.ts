@@ -1,4 +1,4 @@
-import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   AlertType,
   ArtefactNodeSource,
@@ -92,6 +92,7 @@ interface RefreshParams {
     TreeStateService,
   ],
   standalone: false,
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionProgressComponent
   implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
