@@ -17,6 +17,7 @@ import { REPORT_NODE_DETAILS_QUERY_PARAMS } from './report-node-details-query-pa
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { MatDialog } from '@angular/material/dialog';
 import { AgentsModalComponent } from '../components/execution-agent-modal/execution-agent-modal.component';
+import { NODE_DETAILS_RELATIVE_PARENT } from './node-details-relative-parent.token';
 
 export interface OpenIterationsParams {
   aggregatedNodeId: string;
@@ -40,6 +41,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   private _executionId = inject(EXECUTION_ID);
   private _queryParamsNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
   private _matDialog = inject(MatDialog);
+  private _nodeDetailsRelativeParent = inject(NODE_DETAILS_RELATIVE_PARENT, { optional: true }) ?? this._activatedRoute;
 
   openIterations(params: OpenIterationsParams): void;
   openIterations(node: AggregatedTreeNode, restParams: PartialOpenIterationsParams): void;
@@ -125,15 +127,8 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
   }
 
   private openNodeDetails(detailsId: string, queryParams: Params): void {
-    let relativeTo: ActivatedRoute;
-    if (this._router.url.includes('node-details')) {
-      relativeTo = this._activatedRoute.parent!.parent!;
-    } else {
-      relativeTo = this._activatedRoute;
-    }
-
     this._router.navigate([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
-      relativeTo,
+      relativeTo: this._nodeDetailsRelativeParent,
       queryParams,
       queryParamsHandling: 'merge',
     });
