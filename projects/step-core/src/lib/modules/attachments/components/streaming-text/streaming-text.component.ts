@@ -25,7 +25,7 @@ import {
 } from '../../../../client/step-client-module';
 import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
 import { distinctUntilChanged, map, Subject } from 'rxjs';
-import { AttachmentUtilsService } from '@exense/step-core';
+import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 
 enum Direction {
   UP,
