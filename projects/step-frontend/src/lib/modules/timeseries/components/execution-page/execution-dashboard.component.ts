@@ -1,5 +1,4 @@
 import {
-  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -29,14 +28,14 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, Observable, pairwise } from 'rxjs';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'step-execution-dashboard',
   templateUrl: './execution-dashboard.component.html',
   styleUrls: ['./execution-dashboard.component.scss'],
   imports: [COMMON_IMPORTS, DashboardComponent],
+  standalone: true,
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();
@@ -49,7 +48,6 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
   @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
 
   private _authService = inject(AuthService);
-  private _changeDetectorRef = inject(ChangeDetectorRef);
   protected _executionViewModeService = inject(ExecutionViewModeService);
   protected executionMode?: Observable<ExecutionViewMode>;
 
@@ -65,8 +63,6 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
   private _asyncTaskService = inject(AsyncTasksService);
 
   private _destroyRef = inject(DestroyRef);
-
-  private _router = inject(Router);
 
   ngOnInit(): void {
     if (!this.execution) {
@@ -97,30 +93,10 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
         this.executionHasToBeBuilt = true;
       }
     });
-    // this.subscribeToUrlNavigation();
   }
 
   public getSelectedTimeRange() {
     return this.dashboard.getSelectedTimeRange();
-  }
-
-  private subscribeToUrlNavigation() {
-    // subscribe to back and forward events
-    this._router.events
-      .pipe(
-        takeUntilDestroyed(this._destroyRef),
-        filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd),
-        pairwise(),
-        filter(
-          ([prev, curr]) =>
-            prev instanceof NavigationStart && curr instanceof NavigationEnd && prev.navigationTrigger === 'popstate',
-        ),
-      )
-      .subscribe(() => {
-        this.isInitialized = false;
-        this._changeDetectorRef.detectChanges();
-        this.isInitialized = true;
-      });
   }
 
   getExecutionRange(execution: Execution): Partial<TimeRange> {
