@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { ArtefactService } from '../../injectables/artefact.service';
 import { AggregatedReportView, ReportNode } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { chooseStatusWithMostPriority } from '../../types/choose-status-with-most-priority';
 
 type Node = ReportNode | AggregatedReportView;
 
@@ -32,6 +33,20 @@ export class ReportNodeIconComponent {
     return (node as ReportNode)?.resolvedArtefact ?? (node as AggregatedReportView)?.artefact ?? undefined;
   });
 
+  private reportNodeStatus = computed(() => {
+    const node = this.node() as ReportNode;
+    return node?.status;
+  });
+
+  private aggregatedReportViewStatus = computed(() => {
+    const node = this.node() as AggregatedReportView;
+    if (!node?.countByStatus) {
+      return undefined;
+    }
+    const statuses = Object.keys(node?.countByStatus ?? {});
+    return chooseStatusWithMostPriority(...statuses);
+  });
+
   protected readonly icon = computed(() => {
     const artefact = this.artefact();
     if (!artefact) {
@@ -50,10 +65,15 @@ export class ReportNodeIconComponent {
 
   protected readonly statusClass = computed(() => {
     const node = this.node() as ReportNode;
+    const reportNodeStatus = this.reportNodeStatus();
+    const aggregatedStatus = this.aggregatedReportViewStatus();
     const highlightStatus = this.highlightStatus();
-    if (!node?.status || !highlightStatus) {
+
+    const status = reportNodeStatus ?? aggregatedStatus;
+
+    if (!status || !highlightStatus) {
       return undefined;
     }
-    return `step-node-status-${node.status}`;
+    return `step-node-status-${status}`;
   });
 }

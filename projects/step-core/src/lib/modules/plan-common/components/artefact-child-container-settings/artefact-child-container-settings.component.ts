@@ -1,16 +1,13 @@
 import { Component, input, model, output } from '@angular/core';
 import { ChildrenBlock, DynamicValueBoolean } from '../../../../client/generated';
-import { StepMaterialModule } from '../../../step-material/step-material.module';
-import { StepIconsModule } from '../../../step-icons/step-icons.module';
-import { DynamicFormsModule } from '../../../dynamic-forms/dynamic-forms.module';
-import { FormsModule } from '@angular/forms';
 import { ArtefactNodeSource } from '../../types/artefact-node-source.enum';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-artefact-child-container-settings',
   templateUrl: './artefact-child-container-settings.component.html',
   styleUrl: './artefact-child-container-settings.component.scss',
-  imports: [StepMaterialModule, StepIconsModule, DynamicFormsModule, FormsModule],
+  imports: [StepBasicsModule],
 })
 export class ArtefactChildContainerSettingsComponent {
   readonly name = input<string>();

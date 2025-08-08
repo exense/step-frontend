@@ -33,6 +33,7 @@ export * from './injectables/artefact-inline-items-builder.service';
 export * from './directives/artefact-inline-field-list-prefix.directive';
 export * from './directives/artefact-inline-details-header.directive';
 export * from './components/artefact-inline-details-header/artefact-inline-details-header.component';
+export * from './types/choose-status-with-most-priority';
 
 export const ARTEFACTS_COMMON_EXPORTS = [
   ArtefactInlineDetailsComponent,

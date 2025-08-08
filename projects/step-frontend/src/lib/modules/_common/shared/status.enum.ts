@@ -66,13 +66,3 @@ export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
   Status.NORUN,
   Status.RUNNING,
 ];
-
-export const chooseStatusWithMostPriority = (...statues: Status[]): Status | undefined => {
-  const statusSet = new Set(statues);
-  for (const status of REPORT_NODE_STATUS) {
-    if (statusSet.has(status)) {
-      return status;
-    }
-  }
-  return statues[0];
-};

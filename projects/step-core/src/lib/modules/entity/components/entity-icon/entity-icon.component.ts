@@ -5,6 +5,7 @@ import { EntityRegistry } from '../../injectables/entity-registry';
 
 import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
 import { ArtefactService } from '../../../artefacts-common/injectables/artefact.service';
+import { StatusIconClassDirective } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'entity-icon', // eslint-disable-line @angular-eslint/component-selector
@@ -13,16 +14,20 @@ import { ArtefactService } from '../../../artefacts-common/injectables/artefact.
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  hostDirectives: [
+    {
+      directive: StatusIconClassDirective,
+      inputs: ['status', 'iconMode', 'classPrefix'],
+    },
+  ],
 })
 export class EntityIconComponent {
   private _entityTypeResolver = inject(EntityTypeResolver);
   private _entityRegistry = inject(EntityRegistry);
   private _artefactService = inject(ArtefactService);
+  private _statusIconClass = inject(StatusIconClassDirective, { self: true });
 
-  /** @Input() **/
   readonly entityName = input<string>();
-
-  /** @Input() **/
   readonly entity = input.required<Entity>();
 
   protected readonly iconInfo = computed(() => {
@@ -42,4 +47,6 @@ export class EntityIconComponent {
 
     return { icon: iconOverride?.icon ?? entityType?.icon ?? '', tooltip: iconOverride?.tooltip ?? '' };
   });
+
+  protected readonly className = computed(() => this._statusIconClass.className());
 }

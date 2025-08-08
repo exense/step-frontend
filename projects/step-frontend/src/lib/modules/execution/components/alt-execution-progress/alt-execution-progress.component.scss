@@ -64,6 +64,10 @@ step-alt-execution-progress {
         gap: 0.5rem;
         font-size: 2rem;
 
+        step-status {
+          line-height: 1;
+        }
+
         div {
           text-overflow: ellipsis;
           overflow: hidden;

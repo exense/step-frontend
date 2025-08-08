@@ -231,15 +231,15 @@
   }
 }
 
-@mixin special-selection-item {
+@mixin special-selection-item($percent: 50%, $width: 15rem) {
   content: ' ';
   position: absolute;
   display: block;
-  background: linear-gradient(to right, var.$light-blue-gray 50%, var.$transparent);
+  background: linear-gradient(to right, var.$light-blue-gray $percent, var.$transparent);
   top: 0;
   bottom: 0;
   left: 100%;
-  width: 15rem;
+  width: $width;
 }
 
 @mixin status-icon {

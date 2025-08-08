@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
 :host {
   display: flex;
@@ -10,6 +11,16 @@
 step-table {
   --mat-table-row-item-container-height: 3rem;
   flex: 1;
+
+  td {
+    padding-top: 0 !important;
+    &:nth-child(1) {
+      padding-right: 0 !important;
+    }
+    &:nth-child(2) {
+      padding-left: 0 !important;
+    }
+  }
 }
 
 .actions {
@@ -23,6 +34,21 @@ step-table {
 
 .operations {
   width: 100%;
+  & > .half-gradient {
+    display: flex;
+    align-items: center;
+    & > div {
+      position: relative;
+      height: 3rem;
+      width: 0;
+      &:after {
+        @include common.special-selection-item;
+      }
+    }
+    step-alt-current-operations {
+      z-index: 3;
+    }
+  }
 }
 
 .name {
@@ -31,8 +57,15 @@ step-table {
     display: flex;
     gap: 1rem;
     align-items: center;
-    padding: 1rem;
     cursor: pointer;
+    position: relative;
+
+    background: var.$light-blue-gray;
+    border-top-left-radius: 4rem;
+    border-bottom-left-radius: 4rem;
+    padding-left: 1rem;
+    min-height: 3rem;
+    padding-right: 1rem;
 
     .details-trigger span {
       font-weight: 500;
@@ -54,6 +87,7 @@ step-table {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
   }
 }
 

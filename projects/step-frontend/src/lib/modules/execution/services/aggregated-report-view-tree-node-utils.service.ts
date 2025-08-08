@@ -3,12 +3,13 @@ import {
   AggregatedReportView,
   ArtefactNodeSource,
   ArtefactService,
+  chooseStatusWithMostPriority,
   TreeNode,
   TreeNodeUtilsService,
 } from '@exense/step-core';
 import { AggregatedTreeNode, AggregatedTreeNodeType } from '../shared/aggregated-tree-node';
 import { v5 } from 'uuid';
-import { chooseStatusWithMostPriority, Status } from '../../_common/shared/status.enum';
+import { Status } from '../../_common/shared/status.enum';
 
 const HASH_NAMESPACE = 'e9903ee9-1674-45a6-a044-62702dfe0865';
 

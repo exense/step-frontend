@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: false,
 })
 export class StatusIconPipe implements PipeTransform {
-  transform(status?: string): string {
+  transform(status: string | null | undefined): string {
     switch (status) {
       case 'PASSED':
       case 'ENDED':
@@ -13,8 +13,8 @@ export class StatusIconPipe implements PipeTransform {
       case 'FAILED':
       case 'TECHNICAL_ERROR':
       case 'IMPORT_ERROR':
-      case 'ABORTING':
         return 'x-square';
+      case 'ABORTING':
       case 'INITIALIZING':
       case 'IMPORTING':
       case 'EXPORTING':
