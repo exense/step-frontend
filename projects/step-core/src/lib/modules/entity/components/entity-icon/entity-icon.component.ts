@@ -4,7 +4,7 @@ import { Entity } from '../../types/entity';
 import { EntityRegistry } from '../../injectables/entity-registry';
 
 import { AugmentedPlansService, Plan } from '../../../../client/step-client-module';
-import { ArtefactService } from '../../../artefacts-common';
+import { ArtefactService } from '../../../artefacts-common/injectables/artefact.service';
 import { StatusIconClassDirective } from '../../../basics/step-basics.module';
 
 @Component({
