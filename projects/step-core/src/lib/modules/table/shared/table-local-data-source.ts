@@ -23,7 +23,10 @@ import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-con
 import { Mutable } from '../../basics/step-basics.module';
 
 type FieldAccessor = Mutable<
-  Pick<TableLocalDataSource<any>, 'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$'>
+  Pick<
+    TableLocalDataSource<any>,
+    'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$'
+  >
 >;
 
 interface Request {
@@ -49,6 +52,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
   readonly total$!: Observable<number>;
   readonly allData$!: Observable<T[]>;
+  readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
   readonly totalFiltered$!: Observable<number>;
   readonly forceNavigateToFirstPage$!: Observable<unknown>;
@@ -75,21 +79,23 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
             totalFiltered,
             data: [],
             allData: [],
+            allFiltered: [],
           };
         }
 
         total = src.length;
 
-        let data = this.applySearch(src, req.search);
-        totalFiltered = data.length;
+        const allFiltered = this.applySearch(src, req.search);
+        totalFiltered = allFiltered.length;
 
-        data = this.applySort(data, req.sort);
+        let data = this.applySort(allFiltered, req.sort);
         data = this.applyPage(data, req.page);
 
         return {
           data,
           allData: src,
           total,
+          allFiltered,
           totalFiltered,
         };
       }),
@@ -101,6 +107,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     self.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
     self.data$ = requestResult$.pipe(map((r) => r.data));
     self.allData$ = requestResult$.pipe(map((r) => r.allData));
+    self.allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
     self.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
       map(([data, totalFiltered]) => {
         const recordsInPage = (data || []).length;

@@ -1,11 +1,7 @@
 <mat-label [ngSwitch]="selectionType">
   <ng-container *ngSwitchCase="BulkSelectionType.NONE"> No items selected </ng-container>
-  <ng-container *ngSwitchCase="BulkSelectionType.ALL">
-    All items selected. <a href="#" (click)="clearSelection(); (false)">Clear selection</a>
-  </ng-container>
-  <ng-container *ngSwitchCase="BulkSelectionType.FILTERED">
-    Filtered items selected. <a href="#" (click)="clearSelection(); (false)">Clear selection</a>
-  </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.ALL"> All items selected. </ng-container>
+  <ng-container *ngSwitchCase="BulkSelectionType.FILTERED"> Filtered items selected. </ng-container>
   <ng-container *ngSwitchDefault>
     <ng-template #all>
       <a href="#" (click)="selectAll(); (false)">all</a>

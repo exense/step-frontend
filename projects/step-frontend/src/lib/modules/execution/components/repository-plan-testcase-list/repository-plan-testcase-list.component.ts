@@ -1,9 +1,9 @@
 import { Component, computed, effect, inject, input, model, OnInit, output, untracked } from '@angular/core';
 import {
+  AutoDeselectStrategy,
   BulkSelectionType,
   ControllerService,
   IncludeTestcases,
-  RegistrationStrategy,
   RepositoryObjectReference,
   selectionCollectionProvider,
   SelectionCollector,
@@ -12,10 +12,9 @@ import {
   TableLocalDataSourceConfig,
   TestRunStatus,
 } from '@exense/step-core';
-import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
+import { filter, map, Observable, of, switchMap, take, timer, catchError } from 'rxjs';
 import { Status } from '../../../_common/step-common.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError } from 'rxjs/operators';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -23,12 +22,7 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   selector: 'step-repository-plan-testcase-list',
   templateUrl: './repository-plan-testcase-list.component.html',
   styleUrls: ['./repository-plan-testcase-list.component.scss'],
-  providers: [
-    ...selectionCollectionProvider<string, TestRunStatus>({
-      selectionKeyProperty: 'id',
-      registrationStrategy: RegistrationStrategy.MANUAL,
-    }),
-  ],
+  providers: [...selectionCollectionProvider<string, TestRunStatus>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit {
   private _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);
@@ -44,7 +38,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   });
   readonly selectionType = model(BulkSelectionType.NONE);
 
-  /** @Output **/
   readonly includedTestCasesChange = output<IncludeTestcases>();
 
   protected readonly dataSource = computed(() => {
@@ -55,8 +48,21 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     return this.createListDataSource(testCases);
   });
 
-  private allData$ = toObservable(this.dataSource).pipe(switchMap((dataSource) => dataSource.allData$));
+  private dataSource$ = toObservable(this.dataSource);
+
+  private allData$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.allData$));
   private allData = toSignal(this.allData$, { initialValue: [] });
+
+  private allFiltered$ = this.dataSource$.pipe(switchMap((dataSource) => dataSource.allFiltered$));
+  private allFiltered = toSignal(this.allFiltered$, { initialValue: [] });
+
+  private effectFilterChange = effect(
+    () => {
+      const allFilters = this.allFiltered();
+      this.selectionCollector.clear();
+    },
+    { allowSignalWrites: true },
+  );
 
   protected statusItems = computed(() => {
     const testRunStatusList = this.allData();
@@ -71,7 +77,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
 
   private effectEmitTestCases = effect(() => {
     const includedTestCases = this.includedTestCases();
-    console.log('INCLUDED TEST CASE CHANGE', includedTestCases);
     this.includedTestCasesChange.emit(includedTestCases);
   });
 
@@ -79,11 +84,26 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     const repoRef = this.repoRef();
     const selectedItems = this.selectedItems();
     const selectionType = this.selectionType();
+    const allData = untracked(() => this.allData());
+    const allFiltered = untracked(() => this.allFiltered());
 
     let by: IncludeTestcases['by'] = repoRef?.repositoryID === 'local' ? 'id' : 'name';
     by = selectionType === BulkSelectionType.ALL ? 'all' : by;
 
-    const list = selectedItems.map((item) => (by === 'name' ? item.testplanName : item.id));
+    let items: TestRunStatus[] = [];
+    switch (selectionType) {
+      case BulkSelectionType.ALL:
+        items = allData;
+        break;
+      case BulkSelectionType.FILTERED:
+        items = allFiltered;
+        break;
+      default:
+        items = selectedItems;
+        break;
+    }
+
+    const list = items.map((item) => (by === 'name' ? item.testplanName : item.id));
     return { by, list } as IncludeTestcases;
   });
 
@@ -102,13 +122,14 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       .pipe(
         filter((items) => !!items.length),
         take(1),
+        switchMap(() => timer(500)),
       )
-      .subscribe((_) => this.selectionType.set(BulkSelectionType.ALL));
+      .subscribe((ems) => {
+        this.selectionType.set(BulkSelectionType.ALL);
+      });
   }
 
   private createListDataSource(items: TestRunStatus[]): TableLocalDataSource<TestRunStatus> {
-    this._selectionCollector.clear();
-    this._selectionCollector.registerPossibleSelectionManually(items);
     return new TableLocalDataSource(items, this.createDataSourceConfig());
   }
 
@@ -153,8 +174,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
         });
       }),
       map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
-      tap(() => this._selectionCollector.clear()),
-      tap((items) => this._selectionCollector.registerPossibleSelectionManually(items)),
       catchError((err) => {
         // error is handled in interceptor but let's return an empty array to satisfy Angular lifecycle hook
         return of([]);
