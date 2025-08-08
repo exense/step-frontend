@@ -30,9 +30,16 @@
     <ng-container matColumnDef="operations">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="operations" mat-cell *matCellDef="let element">
-        @if (element.currentOperations; as operations) {
-          <step-alt-current-operations [currentOperations]="operations" [(showAll)]="showAllOperations" />
-        }
+        <section class="half-gradient">
+          <div></div>
+          @if (element.currentOperations; as operations) {
+            <step-alt-current-operations
+              style="z-index: 3"
+              [currentOperations]="operations"
+              [(showAll)]="showAllOperations"
+            />
+          }
+        </section>
       </td>
     </ng-container>
     <ng-container matColumnDef="actions">

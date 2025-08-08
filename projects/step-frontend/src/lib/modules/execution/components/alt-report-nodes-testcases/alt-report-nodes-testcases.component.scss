@@ -14,6 +14,12 @@ step-table {
 
   td {
     padding-top: 0 !important;
+    &:nth-child(1) {
+      padding-right: 0 !important;
+    }
+    &:nth-child(2) {
+      padding-left: 0 !important;
+    }
   }
 }
 
@@ -28,6 +34,21 @@ step-table {
 
 .operations {
   width: 100%;
+  & > .half-gradient {
+    display: flex;
+    align-items: center;
+    & > div {
+      position: relative;
+      height: 3rem;
+      width: 0;
+      &:after {
+        @include common.special-selection-item;
+      }
+    }
+    step-alt-current-operations {
+      z-index: 3;
+    }
+  }
 }
 
 .name {
@@ -44,14 +65,10 @@ step-table {
     border-bottom-left-radius: 4rem;
     padding-left: 1rem;
     min-height: 3rem;
-    margin-right: 2rem;
+    padding-right: 1rem;
 
     .details-trigger span {
       font-weight: 500;
-    }
-
-    &:after {
-      @include common.special-selection-item(5%, 2rem);
     }
   }
 }
