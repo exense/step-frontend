@@ -1,12 +1,16 @@
 <step-alt-report-node-list title="Test Cases" [mode]="_mode">
-  <step-table #table [dataSource]="(dataSource$ | async)!" class="paddingless-all-sides no-border hide-header">
+  <step-table
+    #table
+    [dataSource]="(dataSource$ | async)!"
+    class="paddingless no-border hide-header no-highlight special-selection"
+  >
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="name" mat-cell *matCellDef="let element">
         <section (click)="showIterations(element)">
-          <div class="details-trigger larger-view">
-            <div>
-              <step-report-node-icon [node]="element" [highlightStatus]="false" [roundBox]="true" />
+          <div class="details-trigger">
+            <div class="smaller-view shift-rows">
+              <step-report-node-icon [node]="element" />
               <step-aggregated-status
                 [hasDescendantInvocations]="element.hasDescendantInvocations"
                 [countByStatus]="element.countByStatus"

@@ -9,9 +9,17 @@
 }
 
 step-status {
-  .status-PROVISIONING step-icon,
-  .status-RUNNING step-icon {
-    animation: rotate-icon 4s linear infinite;
+  .status-ABORTING,
+  .status-INITIALIZING,
+  .status-IMPORTING,
+  .status-EXPORTING,
+  .status-RUNNING,
+  .status-ESTIMATING,
+  .status-PROVISIONING,
+  .status-DEPROVISIONING {
+    step-icon {
+      animation: rotate-icon 4s linear infinite;
+    }
   }
 
   @keyframes rotate-icon {
