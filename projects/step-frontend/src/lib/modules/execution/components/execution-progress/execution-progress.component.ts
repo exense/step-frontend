@@ -1,7 +1,6 @@
 import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   AlertType,
-  ArtefactNodeSource,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   ControllerService,

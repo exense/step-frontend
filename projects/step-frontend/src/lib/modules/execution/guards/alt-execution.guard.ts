@@ -15,7 +15,7 @@ export const altExecutionGuard: CanActivateFn = (route, state) => {
   if (executionIndex !== -1 && executionIndex + 1 < urlSegments.length) {
     executionId = urlSegments[executionIndex + 1];
   } else {
-    console.error('Execution ID not found');
+    console.error('Execution ID not found (beta)', state.url);
     return true;
   }
 

@@ -305,6 +305,8 @@ import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-
   ],
 })
 export class ExecutionModule {
+  private static _alreadyRegistered = false;
+
   constructor(
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
@@ -312,14 +314,19 @@ export class ExecutionModule {
     private _infoBanner: InfoBannerService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
-    _bulkOperationsRegistry.register();
-    this.registerEntities();
-    this.registerDashlets();
-    this.registerRoutes();
-    this.registerInfoBanners();
+    if (!ExecutionModule._alreadyRegistered) {
+      _bulkOperationsRegistry.register();
+      this.registerEntities();
+      this.registerDashlets();
+      this.registerRoutes();
+      this.registerInfoBanners();
+      ExecutionModule._alreadyRegistered = true;
+    }
   }
 
   private registerEntities(): void {
+    console.log('registerEntities');
+
     this._entityRegistry.register('executions', 'Execution', {
       icon: 'rocket',
       component: ExecutionSelectionTableComponent,
@@ -349,9 +356,7 @@ export class ExecutionModule {
       'executionTree',
       'tree',
       1,
-      function () {
-        return true;
-      },
+      () => true,
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -360,9 +365,7 @@ export class ExecutionModule {
       'executionViz',
       'viz',
       2,
-      function () {
-        return true;
-      },
+      () => true,
     );
 
     this._viewRegistry.registerDashletAdvanced(
@@ -371,9 +374,7 @@ export class ExecutionModule {
       'executionError',
       'errors',
       3,
-      function () {
-        return true;
-      },
+      () => true,
     );
   }
 

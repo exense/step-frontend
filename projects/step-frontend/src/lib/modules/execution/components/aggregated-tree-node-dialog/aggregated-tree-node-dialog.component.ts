@@ -1,14 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnInit,
-  signal,
-  ViewEncapsulation,
-  effect,
-  untracked,
-  OnDestroy,
-} from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewEncapsulation, effect, untracked } from '@angular/core';
 import { ArtefactService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -17,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AggregatedTreeNodeDialogHooksService } from '../../services/aggregated-tree-node-dialog-hooks.service';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { DOCUMENT } from '@angular/common';
+import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNode?: AggregatedTreeNode;
@@ -32,8 +23,14 @@ export interface AggregatedTreeNodeDialogData {
   templateUrl: './aggregated-tree-node-dialog.component.html',
   styleUrl: './aggregated-tree-node-dialog.component.scss',
   encapsulation: ViewEncapsulation.None,
-  providers: [AltExecutionDialogsService],
   standalone: false,
+  providers: [
+    {
+      provide: NODE_DETAILS_RELATIVE_PARENT,
+      useFactory: () => inject(ActivatedRoute).parent!.parent!,
+    },
+    AltExecutionDialogsService,
+  ],
 })
 export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);
