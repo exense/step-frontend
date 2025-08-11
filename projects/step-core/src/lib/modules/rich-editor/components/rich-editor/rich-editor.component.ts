@@ -55,6 +55,7 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
   readonly syntaxMode = input<AceMode | string>('');
   readonly wrapText = input(false, { transform: (value?: boolean) => !!value });
   readonly rowNumbers = input(true, { transform: (value?: boolean) => !!value });
+  readonly fontSize = input(12);
   readonly firstLineNumber = input(1);
   readonly verticalScroll = output<RichEditorVerticalScroll>();
 
@@ -102,6 +103,10 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     const firstLineNumber = this.firstLineNumber();
     this.editor?.setOption?.('firstLineNumber', firstLineNumber);
   });
+  private effectFontSizeChange = effect(() => {
+    const fontSize = this.fontSize();
+    this.editor?.setOption?.('fontSize', fontSize);
+  });
 
   writeValue(value: string): void {
     if (this.editor) {
@@ -147,6 +152,7 @@ export class RichEditorComponent implements AfterViewInit, OnDestroy, ControlVal
     this.editor.setOption('showGutter', showNumbers);
     const firstLineNumber = this.firstLineNumber();
     this.editor.setOption('firstLineNumber', firstLineNumber);
+    this.editor.setOption('fontSize', this.fontSize());
     this.editor.on('change', this.handleChanges);
     this.editor.on('blur', this.handleBlur);
     this.editor.session.on('changeScrollTop', this.handleScrollTopChange);

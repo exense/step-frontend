@@ -15,11 +15,23 @@
     }
     @if (attachmentType === AttachmentType.STREAMING_TEXT) {
       <section class="streaming-info">
-        @if (isStreamingInProgress()) {
+        @if (isStreamingInProgress() || areLinesRequestInProgress()) {
           <mat-spinner [diameter]="25" />
         }
         @if (frameMessage(); as message) {
           <div>{{ message }}</div>
+        }
+        @if (isStreamingInProgress()) {
+          <button
+            type="button"
+            mat-icon-button
+            [color]="scrollDownOnRefresh() ? 'primary' : 'default'"
+            (click)="toggleScrollDownOnRefresh()"
+            matTooltip="Scroll down on refresh"
+            matTooltipPosition="below"
+          >
+            <step-icon name="arrow-down" />
+          </button>
         }
       </section>
     }
@@ -42,7 +54,12 @@
         <step-rich-editor #richEditor [formControl]="contentCtrl" />
       }
       @case (AttachmentType.STREAMING_TEXT) {
-        <step-streaming-text #streamingText [attachment]="_data" [linesFrame]="50" />
+        <step-streaming-text
+          #streamingText
+          [attachment]="_data"
+          [linesFrame]="50"
+          [(scrollDownOnRefresh)]="scrollDownOnRefresh"
+        />
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">

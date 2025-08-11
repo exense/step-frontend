@@ -5,8 +5,13 @@ step-streaming-text {
   }
 
   &.hide-cursor {
-    step-rich-editor .ace_cursor-layer {
-      display: none !important;
+    step-rich-editor {
+      & > div {
+        pointer-events: none;
+      }
+      .ace_cursor-layer {
+        display: none !important;
+      }
     }
   }
 }

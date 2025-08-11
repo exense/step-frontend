@@ -9,12 +9,13 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { WsResourceStatusChange } from '../../types/ws-resource-status-change';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { IndicatorStateFactoryService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { RichEditorVerticalScroll, RichEditorComponent } from '../../../rich-editor';
 import {
   AttachmentMeta,
@@ -32,6 +33,8 @@ enum Direction {
   DOWN,
 }
 
+const MIN_LINES = 50;
+
 @Component({
   selector: 'step-streaming-text',
   standalone: true,
@@ -47,6 +50,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _wsFactory = inject(WsFactoryService);
   private _destroyRef = inject(DestroyRef);
+  private _indicatorStateFactory = inject(IndicatorStateFactoryService);
   private wsChannel?: WsChannel<RequestLines, WsResourceStatusChange | ResponseLines>;
   private requests$ = new Subject<Omit<RequestLines, '@'>>();
 
@@ -58,8 +62,23 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   readonly status = this.statusInternal.asReadonly();
 
+  private areLinesRequestedIndicator = this._indicatorStateFactory.createIndicatorState(500);
+  readonly areLinesRequested = this.areLinesRequestedIndicator.isVisible;
+
   readonly displayLatestRows = input<number | undefined>(undefined);
   readonly linesFrame = input<number>(Infinity);
+  readonly fontSize = input(12);
+
+  readonly scrollDownOnRefresh = model(true);
+
+  private appliedScrollDownOnRefresh = computed(() => {
+    const scrollDownOnRefresh = this.scrollDownOnRefresh();
+    const status = this.status();
+    if (status !== 'COMPLETED') {
+      return scrollDownOnRefresh;
+    }
+    return true;
+  });
 
   private frameStart = signal(0);
   private frameEnd = signal(0);
@@ -72,7 +91,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   private direction = Direction.DOWN;
 
-  readonly startLineIndex = computed(() => {
+  private startLineIndex = computed(() => {
     const frameStart = this.frameStart();
     const linesFrame = this.linesFrame();
 
@@ -83,22 +102,33 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     return Math.max(frameStart - linesFrame, 0);
   });
 
-  readonly endLineIndex = computed(() => {
+  private endLineIndex = computed(() => {
     const frameEnd = this.frameEnd();
     const linesFrame = this.linesFrame();
-    const total = this.totalLines();
+    const total = untracked(() => this.totalLines());
 
     if (linesFrame === Infinity) {
-      return total;
+      return total - 1;
     }
 
-    return Math.min(frameEnd + linesFrame, total);
+    return Math.min(frameEnd + linesFrame, total) - 1;
+  });
+
+  readonly frameInfo = computed(() => {
+    const startLineIndex = this.startLineIndex();
+    const endLineIndex = this.endLineIndex();
+    const totalLines = this.totalLines();
+    return {
+      startLineIndex,
+      endLineIndex,
+      totalLines,
+    };
   });
 
   private effectGetLines = effect(() => {
     const startingLineIndex = this.startLineIndex();
     const endLineIndex = this.endLineIndex();
-    const linesCount = endLineIndex - startingLineIndex;
+    const linesCount = endLineIndex - startingLineIndex + 1;
     this.requests$.next({ startingLineIndex, linesCount });
   });
 
@@ -139,29 +169,41 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     const startLindeIndex = this.startLineIndex();
     const endLineIndex = this.endLineIndex();
     const total = this.totalLines();
+    const appliedScrollDownOnRefresh = this.appliedScrollDownOnRefresh();
     if (linesFrame === Infinity) {
       return;
     }
-    if (verticalScroll.firstRow < frameStart && frameStart - verticalScroll.firstRow + 1 >= linesFrame) {
+    if (verticalScroll.firstRow < frameStart || verticalScroll.firstRow) {
       this.direction = Direction.UP;
+    }
+
+    if (
+      verticalScroll.firstRow < frameStart &&
+      (frameStart - verticalScroll.firstRow + 1 >= linesFrame || !appliedScrollDownOnRefresh)
+    ) {
       this.frameStart.set(verticalScroll.firstRow - 1);
       this.frameEnd.set(verticalScroll.firstRow - 1 + linesFrame);
       return;
     }
     if (verticalScroll.firstRow === 1 && startLindeIndex > 0) {
-      this.direction = Direction.UP;
       this.frameStart.set(verticalScroll.firstRow - 1);
       this.frameEnd.set(verticalScroll.firstRow - 1 + linesFrame);
       return;
     }
-    if (verticalScroll.lastRow > frameEnd && verticalScroll.lastRow - frameEnd + 1 >= linesFrame) {
+
+    if (verticalScroll.lastRow > frameEnd || verticalScroll.lastRow === total - 1) {
       this.direction = Direction.DOWN;
+    }
+
+    if (
+      verticalScroll.lastRow > frameEnd &&
+      (verticalScroll.lastRow - frameEnd + 1 >= linesFrame || !appliedScrollDownOnRefresh)
+    ) {
       this.frameStart.set(verticalScroll.lastRow - 1 - linesFrame);
       this.frameEnd.set(verticalScroll.lastRow - 1);
       return;
     }
     if (verticalScroll.lastRow === total - 1 && endLineIndex < total - 1) {
-      this.direction = Direction.DOWN;
       this.frameStart.set(total - 1 - linesFrame);
       this.frameEnd.set(total - 1);
     }
@@ -173,7 +215,10 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
         distinctUntilChanged((a, b) => a.startingLineIndex === b.startingLineIndex && a.linesCount === b.linesCount),
         map((request) => ({ ...request, '@': 'RequestLines' }) as RequestLines),
       )
-      .subscribe((request) => this.wsChannel?.send(request));
+      .subscribe((request) => {
+        this.areLinesRequestedIndicator.show();
+        this.wsChannel?.send(request);
+      });
   }
 
   private closeChannel(): void {
@@ -182,9 +227,16 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   }
 
   private proceedLinesResponse(lines: string[]): void {
+    this.areLinesRequestedIndicator.hide();
     const displayLatestRows = this.displayLatestRows();
     if (displayLatestRows !== undefined) {
       lines = lines.slice(-displayLatestRows);
+    }
+    // Remove line separator from the last line to prevent extra row rendering
+    let lastLine = lines[lines.length - 1];
+    if (lastLine.endsWith('\n')) {
+      lastLine = lastLine.slice(0, lastLine.length - 1);
+      lines[lines.length - 1] = lastLine;
     }
     this.text.set(lines.join(''));
     // zero timeout to be sure that text was rendered
@@ -228,15 +280,22 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
       }
 
       this.totalLines.set(totalLines);
-      this.direction = Direction.DOWN;
       const linesFrame = this.linesFrame();
+
+      let newFrameStart = 0;
+      let newFrameEnd = totalLines;
+
       if (linesFrame !== Infinity) {
-        this.frameEnd.set(totalLines);
-        this.frameStart.set(totalLines - linesFrame);
-      } else {
-        this.frameStart.set(0);
-        this.frameEnd.set(totalLines);
+        newFrameStart = totalLines - linesFrame;
       }
+
+      if (this.frameEnd() >= MIN_LINES && !this.appliedScrollDownOnRefresh()) {
+        return;
+      }
+
+      this.frameStart.set(newFrameStart);
+      this.frameEnd.set(newFrameEnd);
+      this.direction = Direction.DOWN;
     });
   }
 }

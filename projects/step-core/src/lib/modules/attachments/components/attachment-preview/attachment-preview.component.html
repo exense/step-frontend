@@ -4,7 +4,7 @@
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
     @case (AttachmentType.STREAMING_TEXT) {
-      <step-streaming-text #streamingText [attachment]="attachment()!" [displayLatestRows]="4" />
+      <step-streaming-text #streamingText [attachment]="attachment()!" [displayLatestRows]="6" [fontSize]="8" />
     }
     @default {
       <div class="file-info">
@@ -27,8 +27,10 @@
   @if (isStreamingInProgress()) {
     <mat-spinner [diameter]="15" />
   } @else {
-    <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
-      <step-icon name="download" />
-    </button>
+    <step-btn-group class="with-round-corners">
+      <button type="button" mat-flat-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
+        <step-icon name="download" />
+      </button>
+    </step-btn-group>
   }
 </div>

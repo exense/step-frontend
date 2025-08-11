@@ -48,16 +48,21 @@ export class AttachmentDialogComponent implements OnInit {
     return !!status && status !== 'COMPLETED';
   });
 
+  protected readonly areLinesRequestInProgress = computed(() => {
+    return this.streamingText()?.areLinesRequested?.();
+  });
+
   protected readonly frameMessage = computed(() => {
     const streamingText = this.streamingText();
     const isFrameApplied = streamingText?.isFrameApplied?.();
-    const startLineIndex = streamingText?.startLineIndex?.();
-    const endLineIndex = streamingText?.endLineIndex?.();
+    const frameInfo = streamingText?.frameInfo?.();
     if (!isFrameApplied) {
       return undefined;
     }
-    return `Large file: rendering line: ${(startLineIndex ?? 0) + 1} - ${(endLineIndex ?? 0) + 1}`;
+    return `Displaying line ${(frameInfo?.startLineIndex ?? 0) + 1} - ${(frameInfo?.endLineIndex ?? 0) + 1} of ${frameInfo?.totalLines ?? 0}`;
   });
+
+  protected readonly scrollDownOnRefresh = model(true);
 
   protected readonly contentCtrl = this._fb.control('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
@@ -69,6 +74,10 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected download(): void {
     this._attachmentUtils.downloadAttachment(this._data);
+  }
+
+  protected toggleScrollDownOnRefresh(): void {
+    this.scrollDownOnRefresh.update((value) => !value);
   }
 
   private initializeContent(): void {

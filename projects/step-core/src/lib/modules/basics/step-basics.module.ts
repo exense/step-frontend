@@ -380,3 +380,4 @@ export * from './injectables/click-strategy.token';
 export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
+export * from './injectables/indicator-state-factory.service';
