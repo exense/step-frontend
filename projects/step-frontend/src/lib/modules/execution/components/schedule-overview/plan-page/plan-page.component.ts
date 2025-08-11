@@ -51,6 +51,8 @@ export class PlanPageComponent implements OnInit {
   private _planService = inject(AugmentedPlansService);
 
   ngOnInit(): void {
-    this._planService.getPlanById(this._planIdFn()).subscribe((plan) => this._state.plan.set(plan));
+    this._planService.getPlanById(this._planIdFn()).subscribe((plan) => {
+      this._state.plan.set(plan ? plan : null);
+    });
   }
 }
