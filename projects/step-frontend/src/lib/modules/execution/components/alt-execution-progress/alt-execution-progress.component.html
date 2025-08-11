@@ -8,7 +8,12 @@
             [entity]="plan"
             [matTooltip]="$any(plan).root._class"
             matTooltipPosition="below"
+            [status]="displayStatus$ | async"
+            [iconMode]="true"
           />
+        }
+        @if (displayStatus$ | async; as status) {
+          <step-status [status]="status" [iconMode]="true" />
         }
         <div>{{ execution | executionName }}</div>
         @if (execution.executionParameters?.repositoryObject; as repositoryParams) {
@@ -25,9 +30,6 @@
         [endTime]="execution.endTime"
         [isRunning]="execution.status === 'RUNNING'"
       />
-      @if (displayStatus$ | async; as status) {
-        <step-status [status]="status" [iconMode]="true" />
-      }
       <div class="user" matTooltip="User that triggered the execution">{{ execution.executionParameters?.userID }}</div>
       @if (resolvedParameters$ | async; as resolvedParams) {
         <step-popover
