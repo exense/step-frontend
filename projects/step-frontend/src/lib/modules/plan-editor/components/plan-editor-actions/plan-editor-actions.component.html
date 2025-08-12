@@ -68,8 +68,8 @@
 <step-btn-group class="with-borders">
   <button
     type="button"
-    mat-icon-button
-    [color]="isInteractiveSessionActive ? 'primary' : 'default'"
+    mat-stroked-button
+    [class.activeMode]="isInteractiveSessionActive"
     (click)="toggleInteractiveSession()"
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
     matTooltipPosition="below"
