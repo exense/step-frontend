@@ -755,6 +755,11 @@ export class ExecutionModule {
                       },
                       resolvedPartialPath: () =>
                         inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
+                      reportNodeId: (route: ActivatedRouteSnapshot) => {
+                        const detailsId = route.params['detailsId'];
+                        return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
+                      },
+                      /*
                       reportNode: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
                         const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
@@ -769,6 +774,7 @@ export class ExecutionModule {
                         }
                         return _controllerService.getReportNode(reportNodeId);
                       },
+*/
                       searchStatus: (route: ActivatedRouteSnapshot) => {
                         const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                         return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;

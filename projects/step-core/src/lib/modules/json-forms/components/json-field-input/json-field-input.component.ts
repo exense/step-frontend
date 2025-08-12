@@ -57,13 +57,10 @@ export class JsonFieldInputComponent implements ControlValueAccessor {
   protected isDisabled = signal(false);
   protected forceFocus = signal(false);
 
-  private effLabelChange = effect(
-    () => {
-      const inputLabel = this.label();
-      this.labelModel.set(inputLabel);
-    },
-    { allowSignalWrites: true },
-  );
+  private effLabelChange = effect(() => {
+    const inputLabel = this.label();
+    this.labelModel.set(inputLabel);
+  });
 
   protected displayEnumExtraValue = computed(() => {
     const fieldType = this.fieldType();

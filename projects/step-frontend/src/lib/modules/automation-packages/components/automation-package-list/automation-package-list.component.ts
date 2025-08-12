@@ -52,16 +52,13 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
   private automationPackageFileName?: string;
   private table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
-  private effectTableChange = effect(
-    () => {
-      const table = this.table();
-      if (table && this.automationPackageFileName) {
-        table?.onSearch('fileName', this.automationPackageFileName);
-        this.automationPackageFileName = undefined;
-      }
-    },
-    { allowSignalWrites: true },
-  );
+  private effectTableChange = effect(() => {
+    const table = this.table();
+    if (table && this.automationPackageFileName) {
+      table?.onSearch('fileName', this.automationPackageFileName);
+      this.automationPackageFileName = undefined;
+    }
+  });
 
   readonly returnParentUrl = this._actions.rootUrl;
 

@@ -45,7 +45,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
         const hasUndo = this.strategy!.hasUndo();
         this.hasUndoInternal.set(hasUndo);
       },
-      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+      { manualCleanup: true, injector: this._injector },
     );
 
     const effectRedo = effect(
@@ -53,7 +53,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
         const hasRedo = this.strategy!.hasRedo();
         this.hasRedoInternal.set(hasRedo);
       },
-      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+      { manualCleanup: true, injector: this._injector },
     );
 
     const effectPlanContext = effect(
@@ -61,7 +61,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
         const planContext = this.strategy!.planContext();
         this.planContextInternal.set(planContext);
       },
-      { allowSignalWrites: true, manualCleanup: true, injector: this._injector },
+      { manualCleanup: true, injector: this._injector },
     );
 
     this.strategySyncEffects.push(effectUndo, effectRedo, effectPlanContext);

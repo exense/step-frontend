@@ -66,13 +66,10 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
 
   protected isAfterSave = signal(false);
 
-  private effectResetAfterSaveFlag = effect(
-    () => {
-      const script = this.keywordScript();
-      this.isAfterSave.set(false);
-    },
-    { allowSignalWrites: true },
-  );
+  private effectResetAfterSaveFlag = effect(() => {
+    const script = this.keywordScript();
+    this.isAfterSave.set(false);
+  });
 
   protected readonly changeStatus = computed<RichEditorChangeStatus>(() => {
     const isAfterSave = this.isAfterSave();
