@@ -67,6 +67,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   providers: [DashboardUrlParamsService],
+  standalone: true,
   imports: [
     COMMON_IMPORTS,
     DashboardFilterBarComponent,

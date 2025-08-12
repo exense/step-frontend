@@ -12,7 +12,7 @@ import {
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
-import { inject, signal } from '@angular/core';
+import { computed, inject, signal, Signal, WritableSignal } from '@angular/core';
 import { ReportNodeSummary } from '../../../shared/report-node-summary';
 import { TSChartSeries, TSChartSettings } from '../../../../timeseries/modules/chart';
 import {
@@ -46,8 +46,8 @@ export abstract class CrossExecutionDashboardState {
   protected _statusColors = inject(STATUS_COLORS);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
-  readonly task = signal<ExecutiontTaskParameters | undefined>(undefined);
-  readonly plan = signal<Plan | undefined>(undefined);
+  readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
+  readonly plan = signal<Plan | null | undefined>(undefined);
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -56,6 +56,7 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecution(): Observable<Execution>;
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): FilterBarItem;
+  abstract readonly viewType: Signal<CrossExecutionViewType>;
   abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
 

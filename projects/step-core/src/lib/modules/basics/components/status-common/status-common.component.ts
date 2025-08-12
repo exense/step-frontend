@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, ViewEncapsulation } from '@angular/core';
+import { StatusIconClassDirective } from '../../directives/status-icon-class.directive';
 
 @Component({
   selector: 'step-status-common',
@@ -7,22 +8,17 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
+  hostDirectives: [
+    {
+      directive: StatusIconClassDirective,
+      inputs: ['status', 'iconMode', 'classPrefix'],
+    },
+  ],
 })
 export class StatusCommonComponent {
-  /** @Input() **/
-  readonly status = input<string | undefined>(undefined);
+  private _statusIconClassDirective = inject(StatusIconClassDirective, { self: true });
 
-  /** @Input() **/
-  readonly classPrefix = input<string>('step');
-
-  /** @Input() **/
-  readonly iconMode = input(false);
-
-  protected readonly className = computed(() => {
-    const prefix = this.classPrefix();
-    const iconMode = this.iconMode();
-    const status = this.status();
-
-    return [prefix, iconMode ? 'icon' : '', status].filter((part) => !!part).join('-');
-  });
+  protected readonly status = computed(() => this._statusIconClassDirective.status());
+  protected readonly iconMode = computed(() => this._statusIconClassDirective.iconMode());
+  protected readonly className = computed(() => this._statusIconClassDirective.className());
 }
