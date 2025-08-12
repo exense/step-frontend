@@ -8,6 +8,7 @@ import {
   ExecutiontTaskParameters,
   FetchBucketsRequest,
   Plan,
+  SearchValue,
   STATUS_COLORS,
   TimeRange,
 } from '@exense/step-core';
@@ -25,7 +26,6 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
 import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
-import { transform } from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 declare const uPlot: any;
 const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
@@ -57,6 +57,8 @@ export abstract class CrossExecutionDashboardState {
   abstract fetchLastExecutions(range: TimeRange): Observable<Execution[]>;
   abstract getDashboardFilter(): FilterBarItem;
   abstract readonly viewType: Signal<CrossExecutionViewType>;
+  abstract readonly executionsTableFilter: Record<string, SearchValue>;
+  abstract getViewType(): CrossExecutionViewType;
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
