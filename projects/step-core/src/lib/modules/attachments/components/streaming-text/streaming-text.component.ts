@@ -9,12 +9,11 @@ import {
   OnDestroy,
   OnInit,
   signal,
-  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { WsResourceStatusChange } from '../../types/ws-resource-status-change';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { IndicatorStateFactoryService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { RichEditorVerticalScroll, RichEditorComponent } from '../../../rich-editor';
 import {
@@ -25,7 +24,7 @@ import {
   WsFactoryService,
 } from '../../../../client/step-client-module';
 import { AttachmentStreamStatus } from '../../types/attachment-stream-status';
-import { distinctUntilChanged, map, Subject } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 
 enum Direction {
@@ -33,7 +32,22 @@ enum Direction {
   DOWN,
 }
 
-const MIN_LINES = 50;
+enum FrameChangeCause {
+  INIT,
+  PROGRESS,
+  SCROLL,
+}
+
+interface FrameIndex {
+  value: number;
+  causedBy: FrameChangeCause;
+}
+
+interface FrameRequest {
+  start: number;
+  end: number;
+  causedBy: FrameChangeCause;
+}
 
 @Component({
   selector: 'step-streaming-text',
@@ -52,7 +66,6 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private _destroyRef = inject(DestroyRef);
   private _indicatorStateFactory = inject(IndicatorStateFactoryService);
   private wsChannel?: WsChannel<RequestLines, WsResourceStatusChange | ResponseLines>;
-  private requests$ = new Subject<Omit<RequestLines, '@'>>();
 
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
 
@@ -65,23 +78,14 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private areLinesRequestedIndicator = this._indicatorStateFactory.createIndicatorState(500);
   readonly areLinesRequested = this.areLinesRequestedIndicator.isVisible;
 
+  private frameRequest = signal<FrameRequest>({ start: 0, end: 0, causedBy: FrameChangeCause.INIT });
+  private frameRequest$ = toObservable(this.frameRequest);
+
   readonly displayLatestRows = input<number | undefined>(undefined);
   readonly linesFrame = input<number>(Infinity);
   readonly fontSize = input(12);
 
   readonly scrollDownOnRefresh = model(true);
-
-  private appliedScrollDownOnRefresh = computed(() => {
-    const scrollDownOnRefresh = this.scrollDownOnRefresh();
-    const status = this.status();
-    if (status !== 'COMPLETED') {
-      return scrollDownOnRefresh;
-    }
-    return true;
-  });
-
-  private frameStart = signal(0);
-  private frameEnd = signal(0);
 
   readonly isFrameApplied = computed(() => {
     const linesFrame = this.linesFrame();
@@ -91,48 +95,14 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   private direction = Direction.DOWN;
 
-  private startLineIndex = computed(() => {
-    const frameStart = this.frameStart();
-    const linesFrame = this.linesFrame();
-
-    if (linesFrame === Infinity) {
-      return frameStart;
-    }
-
-    return Math.max(frameStart - linesFrame, 0);
+  private frameInfoInternal = signal<{ startLineIndex: number; endLineIndex: number; totalLines: number }>({
+    startLineIndex: 0,
+    endLineIndex: 0,
+    totalLines: 0,
   });
+  readonly frameInfo = this.frameInfoInternal.asReadonly();
 
-  private endLineIndex = computed(() => {
-    const frameEnd = this.frameEnd();
-    const linesFrame = this.linesFrame();
-    const total = untracked(() => this.totalLines());
-
-    if (linesFrame === Infinity) {
-      return total - 1;
-    }
-
-    return Math.min(frameEnd + linesFrame, total) - 1;
-  });
-
-  readonly frameInfo = computed(() => {
-    const startLineIndex = this.startLineIndex();
-    const endLineIndex = this.endLineIndex();
-    const totalLines = this.totalLines();
-    return {
-      startLineIndex,
-      endLineIndex,
-      totalLines,
-    };
-  });
-
-  private effectGetLines = effect(() => {
-    const startingLineIndex = this.startLineIndex();
-    const endLineIndex = this.endLineIndex();
-    const linesCount = endLineIndex - startingLineIndex + 1;
-    this.requests$.next({ startingLineIndex, linesCount });
-  });
-
-  protected readonly firstLineNumber = computed(() => this.startLineIndex() + 1);
+  protected readonly firstLineNumber = signal(1); //computed(() => this.startLineIndex().value + 1);
   protected readonly displayLatestRowsOnly = computed(() => this.displayLatestRows() !== undefined);
 
   readonly attachment = input.required<AttachmentMeta>();
@@ -140,6 +110,11 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   private attachmentUrl = computed(() => {
     const attachment = this.attachment();
     return this._attachmentUtils.getAttachmentStreamingUrl(attachment);
+  });
+
+  private effectSyncTotal = effect(() => {
+    const totalLines = this.totalLines();
+    this.frameInfoInternal.update((value) => ({ ...value, totalLines }));
   });
 
   private effectCreateSocket = effect(() => {
@@ -151,7 +126,9 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     this.createChannel(url);
   });
 
-  protected readonly text = signal('');
+  private lines = signal<string[]>([]);
+  private linesCount = computed(() => this.lines().length);
+  protected readonly text = computed(() => this.lines().join(''));
 
   ngOnInit(): void {
     this.setupRequestsStream();
@@ -159,61 +136,79 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.closeChannel();
-    this.requests$.complete();
   }
 
   protected handleVerticalScroll(verticalScroll: RichEditorVerticalScroll): void {
     const linesFrame = this.linesFrame();
-    const frameStart = this.frameStart();
-    const frameEnd = this.frameEnd();
-    const startLindeIndex = this.startLineIndex();
-    const endLineIndex = this.endLineIndex();
+    const frame = this.frameRequest();
     const total = this.totalLines();
-    const appliedScrollDownOnRefresh = this.appliedScrollDownOnRefresh();
+    const startLindeIndex = this.calcStartLineIndex(frame, linesFrame);
+    const endLineIndex = this.calcEndLineIndex(frame, linesFrame, total);
+    const { start: frameStart, end: frameEnd } = frame;
+
     if (linesFrame === Infinity) {
       return;
     }
-    if (verticalScroll.firstRow < frameStart || verticalScroll.firstRow) {
+
+    const causedBy = FrameChangeCause.SCROLL;
+
+    if (verticalScroll.firstRow < frameStart && frameStart - verticalScroll.firstRow + 1 >= linesFrame) {
       this.direction = Direction.UP;
-    }
-
-    if (
-      verticalScroll.firstRow < frameStart &&
-      (frameStart - verticalScroll.firstRow + 1 >= linesFrame || !appliedScrollDownOnRefresh)
-    ) {
-      this.frameStart.set(verticalScroll.firstRow - 1);
-      this.frameEnd.set(verticalScroll.firstRow - 1 + linesFrame);
-      return;
-    }
-    if (verticalScroll.firstRow === 1 && startLindeIndex > 0) {
-      this.frameStart.set(verticalScroll.firstRow - 1);
-      this.frameEnd.set(verticalScroll.firstRow - 1 + linesFrame);
+      const start = verticalScroll.firstRow - 1;
+      const end = verticalScroll.firstRow - 1 + linesFrame;
+      this.frameRequest.set({ start, end, causedBy });
       return;
     }
 
-    if (verticalScroll.lastRow > frameEnd || verticalScroll.lastRow === total - 1) {
+    if ((verticalScroll.firstRow === 1 || verticalScroll.firstRow <= startLindeIndex) && startLindeIndex > 0) {
+      this.direction = Direction.UP;
+      const start = verticalScroll.firstRow - 1;
+      const end = verticalScroll.firstRow - 1 + linesFrame;
+      this.frameRequest.set({ start, end, causedBy });
+      return;
+    }
+
+    if (verticalScroll.lastRow > frameEnd && verticalScroll.lastRow - frameEnd + 1 >= linesFrame) {
       this.direction = Direction.DOWN;
-    }
-
-    if (
-      verticalScroll.lastRow > frameEnd &&
-      (verticalScroll.lastRow - frameEnd + 1 >= linesFrame || !appliedScrollDownOnRefresh)
-    ) {
-      this.frameStart.set(verticalScroll.lastRow - 1 - linesFrame);
-      this.frameEnd.set(verticalScroll.lastRow - 1);
+      const start = verticalScroll.lastRow - 1 - linesFrame;
+      const end = verticalScroll.lastRow - 1;
+      this.frameRequest.set({ start, end, causedBy });
       return;
     }
-    if (verticalScroll.lastRow === total - 1 && endLineIndex < total - 1) {
-      this.frameStart.set(total - 1 - linesFrame);
-      this.frameEnd.set(total - 1);
+
+    if ((verticalScroll.lastRow === total - 1 || verticalScroll.lastRow >= endLineIndex) && endLineIndex < total - 1) {
+      this.direction = Direction.DOWN;
+      const start = total - 1 - linesFrame;
+      const end = total - 1;
+      this.frameRequest.set({ start, end, causedBy });
+      return;
     }
   }
 
   private setupRequestsStream(): void {
-    this.requests$
+    this.frameRequest$
       .pipe(
-        distinctUntilChanged((a, b) => a.startingLineIndex === b.startingLineIndex && a.linesCount === b.linesCount),
-        map((request) => ({ ...request, '@': 'RequestLines' }) as RequestLines),
+        map((frame) => {
+          const linesFrame = this.linesFrame();
+          const total = this.totalLines();
+          const startingLineIndex = this.calcStartLineIndex(frame, linesFrame);
+          const endLineIndex = this.calcEndLineIndex(frame, linesFrame, total);
+          const linesCount = endLineIndex - startingLineIndex + 1;
+          return { startingLineIndex, linesCount, causedBy: frame.causedBy };
+        }),
+        filter((request) => {
+          const isScrollDownOnRefresh = this.scrollDownOnRefresh();
+          const linesCount = this.linesCount();
+          if (request.startingLineIndex === 0 && linesCount < request.linesCount) {
+            return true;
+          }
+          return !(request.causedBy === FrameChangeCause.PROGRESS && !isScrollDownOnRefresh);
+        }),
+        map(
+          ({ startingLineIndex, linesCount }) =>
+            ({ startingLineIndex, linesCount, '@': 'RequestLines' }) as RequestLines,
+        ),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((request) => {
         this.areLinesRequestedIndicator.show();
@@ -238,7 +233,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
       lastLine = lastLine.slice(0, lastLine.length - 1);
       lines[lines.length - 1] = lastLine;
     }
-    this.text.set(lines.join(''));
+    this.lines.set(lines);
     // zero timeout to be sure that text was rendered
     setTimeout(() => {
       this.afterTextUpdate();
@@ -249,13 +244,26 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
     if (clearSelection) {
       this.richEditor()?.clearSelection?.();
     }
+    const frame = this.frameRequest();
+    const linesFrame = this.linesFrame();
+    const total = this.totalLines();
+    const isAutoScrollApplied = this.scrollDownOnRefresh();
 
-    if (this.direction === Direction.UP) {
-      const row = this.frameStart() - this.startLineIndex();
-      this.richEditor()?.scrollToRowUpEdge?.(row);
-    } else {
-      const row = this.frameEnd() - this.startLineIndex();
-      this.richEditor()?.scrollToRowBottomEdge?.(row);
+    const startLineIndex = this.calcStartLineIndex(frame, linesFrame);
+    const endLineIndex = this.calcEndLineIndex(frame, linesFrame, total);
+
+    this.firstLineNumber.set(startLineIndex + 1);
+
+    this.frameInfoInternal.update((value) => ({ ...value, startLineIndex, endLineIndex }));
+
+    if (frame.causedBy === FrameChangeCause.SCROLL || isAutoScrollApplied) {
+      if (this.direction === Direction.UP) {
+        const row = frame.start - startLineIndex;
+        this.richEditor()?.scrollToRowUpEdge?.(row);
+      } else {
+        const row = frame.end - startLineIndex;
+        this.richEditor()?.scrollToRowBottomEdge?.(row);
+      }
     }
   }
 
@@ -289,13 +297,23 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
         newFrameStart = totalLines - linesFrame;
       }
 
-      if (this.frameEnd() >= MIN_LINES && !this.appliedScrollDownOnRefresh()) {
-        return;
-      }
-
-      this.frameStart.set(newFrameStart);
-      this.frameEnd.set(newFrameEnd);
+      this.frameRequest.set({ start: newFrameStart, end: newFrameEnd, causedBy: FrameChangeCause.PROGRESS });
       this.direction = Direction.DOWN;
     });
+  }
+
+  private calcStartLineIndex({ start }: FrameRequest, linesFrame: number): number {
+    if (linesFrame === Infinity) {
+      return start;
+    }
+    return Math.max(start - linesFrame, 0);
+  }
+
+  private calcEndLineIndex({ end }: FrameRequest, linesFrame: number, total: number): number {
+    if (linesFrame === Infinity) {
+      return total - 1;
+    }
+
+    return Math.min(end + linesFrame, total) - 1;
   }
 }
