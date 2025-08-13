@@ -53,7 +53,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   protected readonly _keywordsState = inject(AltKeywordNodesStateService);
   protected readonly _testCasesState = inject(AltTestCasesNodesStateService);
 
-  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => !!testCases?.length));
+  protected readonly hasTestCases$ = this._state.testCases$.pipe(map((testCases) => (testCases?.length ?? 0) > 1));
 
   protected readonly layoutStructureInitialized$ = this._state.testCases$.pipe(map((testCases) => true));
 
