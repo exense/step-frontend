@@ -24,8 +24,20 @@
   }
   @if (useShowAll()) {
     <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isAllVisible.set($event)">
-      <button type="button" class="more" mat-button [color]="isAllVisible() ? 'primary' : 'default'">
-        <div>show all (+x)</div>
+      <button
+        type="button"
+        class="more"
+        mat-button
+        [color]="isAllVisible() ? 'primary' : 'default'"
+        [matTooltip]="allTooltip()"
+        matTooltipPosition="below"
+      >
+        @if (hasHiddenItems()) {
+          <div>show all (+{{ hiddenItems().length }})</div>
+        } @else {
+          <div>show all</div>
+        }
+        <step-icon name="chevron-down" />
       </button>
       <step-popover-content>
         <div class="auto-shrank-all-items">
@@ -40,7 +52,7 @@
     </step-popover>
   } @else if (hasHiddenItems()) {
     <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
-      <button type="button" class="more" mat-button>
+      <button type="button" class="more" mat-button [matTooltip]="allTooltip()" matTooltipPosition="below">
         <div>more</div>
         <step-icon name="chevron-down" />
       </button>

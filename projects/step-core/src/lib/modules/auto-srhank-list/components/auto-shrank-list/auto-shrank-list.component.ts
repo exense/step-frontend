@@ -47,6 +47,7 @@ export class AutoShrankListComponent implements ItemWidthRegisterService<KeyValu
   readonly items = input<KeyValue<string, string>[]>([]);
   readonly useShowAll = input(false);
   readonly allTitle = input('All items');
+  readonly allTooltip = input('');
   readonly emptySearchPatterns = input<string | string[] | undefined>(undefined);
 
   private itemWidthKeys = computed(() => this.items().map((item) => this.widthKey(item)));
