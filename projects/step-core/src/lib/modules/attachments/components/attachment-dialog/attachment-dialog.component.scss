@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-attachment-dialog {
   .dialog-content {
     padding-bottom: 0 !important;
@@ -22,6 +24,21 @@ step-attachment-dialog {
     gap: 1rem;
     div {
       font-size: 1.2rem;
+    }
+  }
+
+  button.rounded-icon-button {
+    padding: 0;
+    min-width: 36px;
+    border-radius: 2rem;
+
+    &.active {
+      background: var.$blue-10;
+      border: none;
+
+      step-icon {
+        color: var.$dark-blue;
+      }
     }
   }
 

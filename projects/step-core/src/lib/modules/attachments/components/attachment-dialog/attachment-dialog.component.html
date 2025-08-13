@@ -24,8 +24,9 @@
         @if (isStreamingInProgress()) {
           <button
             type="button"
-            mat-icon-button
-            [color]="scrollDownOnRefresh() ? 'primary' : 'default'"
+            mat-stroked-button
+            class="rounded-icon-button"
+            [class.active]="scrollDownOnRefresh()"
             (click)="toggleScrollDownOnRefresh()"
             matTooltip="Scroll down on refresh"
             matTooltipPosition="below"
