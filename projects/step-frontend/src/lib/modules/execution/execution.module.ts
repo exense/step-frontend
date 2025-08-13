@@ -154,6 +154,7 @@ import { SchedulerPageComponent } from './components/schedule-overview/scheduler
 import { AltExecutionTimePrefixDirective } from './components/alt-execution-time/alt-execution-time-prefix.directive';
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
+import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 
 @NgModule({
   declarations: [
@@ -247,6 +248,7 @@ import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-
     CrossExecutionDashboardComponent,
     SchedulerPageComponent,
     PlanPageComponent,
+    CrossExecutionExecutionTableComponent,
   ],
   imports: [
     StepCommonModule,

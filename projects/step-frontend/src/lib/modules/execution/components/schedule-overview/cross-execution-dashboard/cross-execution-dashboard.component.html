@@ -1,28 +1,16 @@
 <section class="header" [class.small-screen]="!!(_isSmallScreen$ | async)">
   <div class="title">
-    @if (_state.task(); as task) {
-      <h3 data-step-testid>
+    <h3 data-step-testid="task-or-plan-title">
+      @if (_state.task(); as task) {
         <entity-icon entityName="tasks" [entity]="task"></entity-icon>
-
-        <div>{{ task.attributes?.['name'] }}</div>
-        @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
-          <a
-            class="plan-link"
-            [routerLink]="['/plans/editor', lastExecution.planId]"
-            matTooltip="Navigate to plan"
-            matTooltipPosition="right"
-          >
-            <step-icon name="external-link" />
-          </a>
-        }
-      </h3>
-    }
-    @if (_state.plan(); as plan) {
-      <h3 data-step-testid>
+      }
+      @if (_state.plan(); as plan) {
         <entity-icon entityName="plans" [entity]="plan"></entity-icon>
+      }
 
-        <div>{{ plan.attributes?.['name'] }}</div>
-        @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
+      <div>{{ viewTitle() }}</div>
+      @if ((_state.lastExecution$ | async)?.execution; as lastExecution) {
+        @if (_state.plan() !== null) {
           <a
             class="plan-link"
             [routerLink]="['/plans/editor', lastExecution.planId]"
@@ -32,8 +20,8 @@
             <step-icon name="external-link" />
           </a>
         }
-      </h3>
-    }
+      }
+    </h3>
   </div>
   <div class="sub-title">
     @if (_state.lastExecution$ | async; as lastExecutionResponse) {

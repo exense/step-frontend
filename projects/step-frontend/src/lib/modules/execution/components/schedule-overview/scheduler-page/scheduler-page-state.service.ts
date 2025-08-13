@@ -1,16 +1,21 @@
 import { map, Observable } from 'rxjs';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, Signal } from '@angular/core';
 import { SCHEDULE_ID } from '../../../services/schedule-id.token';
 import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/modules/_common';
 import {
   CrossExecutionDashboardState,
   CrossExecutionViewType,
 } from '../cross-execution-dashboard/cross-execution-dashboard-state';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, SearchValue, TimeRange } from '@exense/step-core';
 
 @Injectable()
 export class SchedulerPageStateService extends CrossExecutionDashboardState {
   readonly _taskIdFn = inject(SCHEDULE_ID);
+  viewType: Signal<CrossExecutionViewType> = signal('task');
+
+  readonly executionsTableFilter: Record<string, SearchValue> = {
+    executionTaskID: this._taskIdFn(),
+  };
 
   getViewType(): CrossExecutionViewType {
     return 'task';

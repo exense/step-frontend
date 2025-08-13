@@ -7,7 +7,7 @@
 >
   <step-icon name="more-vertical" />
 </button>
-@if (_tableColumns.hasChanges()) {
+@if (allowSaving() && _tableColumns.hasChanges()) {
   <step-dashlet itemKey="columnSettingsSave" />
 }
 <mat-menu #menu>

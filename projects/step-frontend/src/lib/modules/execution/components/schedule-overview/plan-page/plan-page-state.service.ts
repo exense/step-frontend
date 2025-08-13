@@ -1,16 +1,19 @@
 import { map, Observable } from 'rxjs';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal, Signal } from '@angular/core';
 import { FilterBarItem, FilterBarItemType } from '../../../../timeseries/modules/_common';
 import {
   CrossExecutionDashboardState,
   CrossExecutionViewType,
 } from '../cross-execution-dashboard/cross-execution-dashboard-state';
-import { Execution, TimeRange } from '@exense/step-core';
+import { Execution, SearchValue, TimeRange } from '@exense/step-core';
 import { PLAN_ID } from '../../../services/plan-id.token';
 
 @Injectable()
 export class PlanPageStateService extends CrossExecutionDashboardState {
   readonly _planIdFn = inject(PLAN_ID);
+  viewType: Signal<CrossExecutionViewType> = signal('plan');
+
+  readonly executionsTableFilter: Record<string, SearchValue> = { planId: this._planIdFn() };
 
   getViewType(): CrossExecutionViewType {
     return 'plan';

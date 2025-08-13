@@ -75,6 +75,7 @@ import { OverflowIndicatorDirective } from './directives/overflow-indicator.dire
 import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ElementSizeDirective } from './directives/element-size.directive';
+import { StatusIconClassDirective } from './directives/status-icon-class.directive';
 
 @NgModule({
   imports: [
@@ -89,6 +90,7 @@ import { ElementSizeDirective } from './directives/element-size.directive';
     OverflowIndicatorDirective,
     SelectComponent,
     ElementSizeDirective,
+    StatusIconClassDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -235,6 +237,7 @@ import { ElementSizeDirective } from './directives/element-size.directive';
     TruncateStringPipe,
     StrategyClickDirective,
     ElementSizeDirective,
+    StatusIconClassDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -381,3 +384,4 @@ export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
 export * from './injectables/indicator-state-factory.service';
+export * from './directives/status-icon-class.directive';
