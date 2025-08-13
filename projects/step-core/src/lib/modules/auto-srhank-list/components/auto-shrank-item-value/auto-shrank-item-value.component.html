@@ -1,0 +1,7 @@
+@if (item().value; as value) {
+  {{ value }}
+} @else {
+  @if (emptyValueTemplate(); as templateRef) {
+    <ng-container *ngTemplateOutlet="templateRef" />
+  }
+}

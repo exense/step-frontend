@@ -2,7 +2,7 @@
   @for (item of items(); track item.key) {
     <div [stepAutoShrankItem]="item" class="item">
       <strong>{{ item.key }}</strong>
-      <span>{{ item.value }}</span>
+      <step-auto-shrank-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
     </div>
   }
 </section>
@@ -11,20 +11,36 @@
     <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
       <div class="item">
         <strong>{{ item.key }}</strong>
-        <span>{{ item.value }}</span>
+        <step-auto-shrank-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
       </div>
       <step-popover-content>
         <div class="popover-item">
           <strong>{{ item.key }}</strong
           >&nbsp;
-          <span>{{ item.value }}</span>
+          <step-auto-shrank-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
         </div>
       </step-popover-content>
     </step-popover>
   }
-  @if (hasHiddenItems()) {
+  @if (useShowAll()) {
+    <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isAllVisible.set($event)">
+      <button type="button" class="more" mat-button [color]="isAllVisible() ? 'primary' : 'default'">
+        <div>show all (+x)</div>
+      </button>
+      <step-popover-content>
+        <div class="auto-shrank-all-items">
+          <strong>{{ allTitle() }}</strong>
+          <step-auto-shrank-all-items
+            [items]="items()"
+            [emptyValueTemplate]="emptyValueTemplate()"
+            [emptySearchPatterns]="emptySearchPatterns()"
+          />
+        </div>
+      </step-popover-content>
+    </step-popover>
+  } @else if (hasHiddenItems()) {
     <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isHiddenVisible.set($event)">
-      <button type="button" class="more" mat-button [color]="isHiddenVisible() ? 'primary' : 'default'">
+      <button type="button" class="more" mat-button>
         <div>more</div>
         <step-icon name="chevron-down" />
       </button>
@@ -33,13 +49,13 @@
           <step-popover yPosition="below" [mode]="PopoverMode.BOTH">
             <div class="auto-shrank-popover-item">
               <strong>{{ item.key }}</strong>
-              <span>{{ item.value }}</span>
+              <step-auto-shrank-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
             </div>
             <step-popover-content>
               <div class="popover-item">
                 <strong>{{ item.key }}</strong
                 >&nbsp;
-                <span>{{ item.value }}</span>
+                <step-auto-shrank-item-value [item]="item" [emptyValueTemplate]="emptyValueTemplate()" />
               </div>
             </step-popover-content>
           </step-popover>

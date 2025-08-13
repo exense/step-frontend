@@ -1,1 +1,8 @@
-<step-auto-shrank-list [items]="parametersList()" />
+<step-auto-shrank-list
+  [items]="parametersList()"
+  [useShowAll]="true"
+  allTitle="Execution parameters"
+  emptySearchPatterns="empty"
+>
+  <span class="empty" *stepAutoShrankEmptyValueTemplate>&lt;empty&gt;</span>
+</step-auto-shrank-list>
