@@ -11,15 +11,16 @@ import {
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { ArtefactService, ArtefactType } from '../../../artefacts-common/injectables/artefact.service';
+import { ArtefactService, ArtefactType } from '../../../artefacts-common';
 import { ArtefactContext } from '../../types/artefact-context';
 import { AbstractArtefact, DynamicValueString } from '../../../../client/step-client-module';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ArtefactFormChangeHelperService } from '../../injectables/artefact-form-change-helper.service';
 import { BehaviorSubject } from 'rxjs';
 import { EDITABLE_LABELS_EXPORTS } from '../../../editable-labels';
 import { CustomRegistriesModule } from '../../../custom-registeries/custom-registries.module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { DynamicFormsModule } from '../../../dynamic-forms/dynamic-forms.module';
 
 @Component({
   selector: 'step-artefact-details',
@@ -27,7 +28,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   styleUrl: './artefact-details.component.scss',
   providers: [ArtefactFormChangeHelperService],
   encapsulation: ViewEncapsulation.None,
-  imports: [StepBasicsModule, EDITABLE_LABELS_EXPORTS, CustomRegistriesModule],
+  imports: [StepBasicsModule, EDITABLE_LABELS_EXPORTS, CustomRegistriesModule, FormsModule, DynamicFormsModule],
 })
 export class ArtefactDetailsComponent implements OnChanges, ArtefactContext, AfterViewInit, OnDestroy {
   private _artefactsService = inject(ArtefactService);
