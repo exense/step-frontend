@@ -53,6 +53,10 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     if (testCases === undefined) {
       return this.createRepoRefDataSource();
     }
+    untracked(() => {
+      this._selectionCollector.clear();
+      this._selectionCollector.registerPossibleSelectionManually(testCases);
+    });
     return this.createListDataSource(testCases);
   });
 
@@ -72,7 +76,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
 
   private effectEmitTestCases = effect(() => {
     const includedTestCases = this.includedTestCases();
-    console.log('INCLUDED TEST CASE CHANGE', includedTestCases);
     this.includedTestCasesChange.emit(includedTestCases);
   });
 
@@ -108,8 +111,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   }
 
   private createListDataSource(items: TestRunStatus[]): TableLocalDataSource<TestRunStatus> {
-    this._selectionCollector.clear();
-    this._selectionCollector.registerPossibleSelectionManually(items);
     return new TableLocalDataSource(items, this.createDataSourceConfig());
   }
 

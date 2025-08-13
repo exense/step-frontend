@@ -21,7 +21,7 @@ export class TableColumnsDefinitionService {
         const contentCols = contentColumnsExternal();
         this.contentColumnsInternal.set(contentCols);
       },
-      { injector: this._injector, allowSignalWrites: true },
+      { injector: this._injector },
     );
 
     effect(
@@ -29,7 +29,7 @@ export class TableColumnsDefinitionService {
         const remoteCols = customRemoteColumnsExternal();
         this.customRemoteColumnsInternal.set(remoteCols);
       },
-      { injector: this._injector, allowSignalWrites: true },
+      { injector: this._injector },
     );
   }
 }

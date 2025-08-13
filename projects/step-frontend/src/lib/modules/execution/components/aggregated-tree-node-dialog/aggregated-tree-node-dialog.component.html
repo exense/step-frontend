@@ -1,7 +1,7 @@
 <step-modal-window>
   <div class="tree-node-modal-header" step-modal-window-title>
     @if (selectedReportNode(); as reportNode) {
-      @if (hasBackButton) {
+      @if (hasBackButton()) {
         <button type="button" mat-icon-button (click)="navigateBack()" matTooltip="Back" matTooltipPosition="below">
           <step-icon name="arrow-left" />
         </button>
@@ -35,7 +35,7 @@
     }
   </div>
   <div step-modal-window-body>
-    @if (hasData) {
+    @if (hasData()) {
       @if (selectedReportNode(); as reportNode) {
         <step-alt-report-node-details
           [node]="reportNode"

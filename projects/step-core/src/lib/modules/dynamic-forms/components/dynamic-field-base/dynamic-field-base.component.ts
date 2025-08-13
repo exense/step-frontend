@@ -38,13 +38,10 @@ export abstract class DynamicFieldBaseComponent<T extends DynamicValue> implemen
 
   protected labelModel = model<string | undefined>();
 
-  private effSyncLabel = effect(
-    () => {
-      const inputLabel = this.label();
-      this.labelModel.set(inputLabel);
-    },
-    { allowSignalWrites: true },
-  );
+  private effSyncLabel = effect(() => {
+    const inputLabel = this.label();
+    this.labelModel.set(inputLabel);
+  });
 
   /** @Input() **/
   readonly fieldType = input(JsonFieldType.STRING);
