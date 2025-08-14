@@ -69,14 +69,11 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private selectedSearchResultItemInternal = signal<string | undefined>(undefined);
   readonly selectedSearchResult = this.selectedSearchResultItemInternal.asReadonly();
 
-  private searchResultChangeEffect = effect(
-    () => {
-      const searchResult = this.searchResult();
-      const firstItem = searchResult.length > 0 ? searchResult[0] : undefined;
-      this.selectedSearchResultItemInternal.set(firstItem);
-    },
-    { allowSignalWrites: true },
-  );
+  private searchResultChangeEffect = effect(() => {
+    const searchResult = this.searchResult();
+    const firstItem = searchResult.length > 0 ? searchResult[0] : undefined;
+    this.selectedSearchResultItemInternal.set(firstItem);
+  });
 
   override init(root: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);

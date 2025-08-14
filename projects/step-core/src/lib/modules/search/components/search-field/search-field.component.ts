@@ -45,14 +45,11 @@ export class SearchFieldComponent implements ControlValueAccessor {
     return `${searchIndex + 1} / ${total}`;
   });
 
-  private effectResetSearch = effect(
-    () => {
-      const value = this.value();
-      const total = this.total();
-      this.searchIndex.set(0);
-    },
-    { allowSignalWrites: true },
-  );
+  private effectResetSearch = effect(() => {
+    const value = this.value();
+    const total = this.total();
+    this.searchIndex.set(0);
+  });
 
   constructor(public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;
