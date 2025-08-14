@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ReportNode } from '../../../../client/step-client-module';
+import { JsonViewExpandedComponent } from '../../../json-viewer-ext';
 
 @Component({
   selector: 'step-report-details-error',
-  imports: [StepBasicsModule],
+  imports: [StepBasicsModule, JsonViewExpandedComponent],
   templateUrl: './report-details-error.component.html',
   styleUrl: './report-details-error.component.scss',
   host: {

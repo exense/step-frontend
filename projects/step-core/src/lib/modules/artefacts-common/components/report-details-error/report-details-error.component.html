@@ -1,5 +1,10 @@
 <step-icon name="alert-triangle" />
-<div class="error-text">
-  {{ message() }}
-  {{ hasAttachments() ? '. Check the attachments for more details.' : '' }}
-</div>
+@if (!message()) {
+  <div class="error-text">
+    {{ hasAttachments() ? 'Check attachments for more details.' : '' }}
+  </div>
+} @else {
+  <section class="json-container">
+    <step-json-view-expanded [data]="{ '': message() }" />
+  </section>
+}
