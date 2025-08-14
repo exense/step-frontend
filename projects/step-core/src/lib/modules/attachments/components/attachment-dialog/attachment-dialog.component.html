@@ -18,6 +18,15 @@
         @if (isStreamingInProgress() || areLinesRequestInProgress()) {
           <mat-spinner [diameter]="25" />
         }
+        @if (isStreamingFailed()) {
+          <step-alert
+            class="incomplete"
+            type="warning"
+            matTooltip="The attachment stream ended unexpectedly before it could complete."
+            matTooltipPosition="below"
+            >File incomplete</step-alert
+          >
+        }
         @if (frameMessage(); as message) {
           <div>{{ message }}</div>
         }
@@ -73,7 +82,7 @@
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Close</button>
-    @if (attachmentType !== AttachmentType.SKIPPED && !isStreamingInProgress()) {
+    @if (attachmentType !== AttachmentType.SKIPPED && !isStreamingInProgress() && !isStreamingFailed()) {
       <button type="button" mat-flat-button color="primary" (click)="download()">Download</button>
     }
   </div>

@@ -43,9 +43,16 @@ export class AttachmentDialogComponent implements OnInit {
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
   private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
 
+  private streamingStatus = computed(() => this.streamingText()?.status?.());
+
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this.streamingText()?.status?.();
-    return !!status && status !== 'COMPLETED';
+    const status = this.streamingStatus();
+    return !!status && status !== 'COMPLETED' && status !== 'FAILED';
+  });
+
+  protected readonly isStreamingFailed = computed(() => {
+    const status = this.streamingStatus();
+    return status === 'FAILED';
   });
 
   protected readonly areLinesRequestInProgress = computed(() => {
