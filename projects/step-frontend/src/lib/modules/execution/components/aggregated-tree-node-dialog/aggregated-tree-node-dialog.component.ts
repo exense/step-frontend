@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, ViewEncapsulation, effect, untracked } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewEncapsulation, effect, untracked } from '@angular/core';
 import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
@@ -35,11 +35,13 @@ export interface AggregatedTreeNodeDialogData {
     },
     AltExecutionDialogsService,
   ],
+  host: {
+    '[class.is-report]': '!!selectedReportNode()',
+  },
 })
 export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _artefactTypes = inject(ArtefactService);
   private _doc = inject(DOCUMENT);
   protected _dialogsService = inject(AltExecutionDialogsService);
   private _router = inject(Router);
@@ -89,18 +91,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
       return;
     }
     untracked(() => this._hooks?.reportNodeOpened(selectedReportNode));
-  });
-
-  protected readonly reportNodeArtefactClass = computed(() => {
-    return this.selectedReportNode()?.resolvedArtefact?._class;
-  });
-
-  protected readonly reportNodeIcon = computed(() => {
-    const artefactClass = this.reportNodeArtefactClass();
-    if (!artefactClass) {
-      return undefined;
-    }
-    return this._artefactTypes.getArtefactType(artefactClass)?.icon ?? this._artefactTypes.defaultIcon;
   });
 
   protected readonly endTime = computed(() => {
