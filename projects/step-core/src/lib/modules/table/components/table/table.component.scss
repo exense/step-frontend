@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-table {
   height: 100%;
   display: flex;
@@ -67,8 +69,72 @@ step-table {
     ::ng-deep step-btn-group {
       opacity: 0.5;
     }
+
     &:hover ::ng-deep step-btn-group {
       opacity: 1;
+    }
+  }
+
+  &.use-skeleton-placeholder {
+    .table-container table > tbody {
+      & > tr.no-data-row > td,
+      & > tr.content-row > td {
+        position: relative;
+
+        &::after {
+          content: ' ';
+          display: block;
+          position: absolute;
+          margin: 0.5rem;
+          border-radius: 0.5rem;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: var.$gray-50;
+        }
+
+        &::before {
+          content: ' ';
+          display: block;
+          position: absolute;
+          margin: 0.5rem;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 0.5rem;
+          background: linear-gradient(
+            90deg,
+            rgba(var.$black, 0) 0%,
+            rgba(var.$black, 0.2) 50%,
+            rgba(var.$black, 0) 100%
+          );
+          background-size: 200% 100%;
+          background-position: 100% 50%;
+          z-index: 1;
+          animation: skeleton-progress 1.5s infinite;
+        }
+      }
+    }
+
+    &:not(.in-progress) .table-container table > tbody {
+      & > tr.no-data-row > td,
+      & > tr.content-row > td {
+        &::after {
+          animation: skeleton-opacity 0.5s ease-out;
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        &:before {
+          animation:
+            skeleton-progress 1.5s infinite,
+            skeleton-opacity 0.5s ease-out;
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
     }
   }
 }
@@ -78,5 +144,26 @@ step-table {
     .table-container {
       overflow: hidden;
     }
+  }
+}
+
+@keyframes skeleton-progress {
+  to {
+    background-position: -100% 50%;
+  }
+}
+
+@keyframes skeleton-opacity {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  99% {
+    opacity: 0;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
   }
 }

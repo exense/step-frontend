@@ -1,4 +1,4 @@
-@if ((tableDataSource?.inProgress$ | async) || inProgress()) {
+@if (!useSkeletonPlaceholder() && inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
@@ -46,7 +46,7 @@
       [stepRow]="row"
       [class.row-highlight]="row === highlightedItem"
     ></tr>
-    <tr class="mat-mdc-row" *matNoDataRow>
+    <tr class="mat-mdc-row no-data-row" *matNoDataRow>
       <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
         @if ((tableDataSource?.total$ | async) === 0) {
           {{ noResultsPlaceholder() || 'No data available in table' }}
