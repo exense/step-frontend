@@ -3,6 +3,7 @@ import {
   EventEmitter,
   inject,
   Injector,
+  input,
   Input,
   OnChanges,
   Output,
@@ -46,6 +47,8 @@ export class BulkOperationsComponent<KEY, ENTITY> implements OnChanges {
   @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
 
   @Input() entity?: string;
+
+  readonly dontUseFilterLabel = input(false);
 
   readonly isOperationsDisabled$ = (this._selectionCollector?.selected$ || of([])).pipe(
     map((selected) => selected.length === 0),

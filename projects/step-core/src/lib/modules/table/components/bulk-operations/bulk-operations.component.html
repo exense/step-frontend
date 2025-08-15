@@ -17,5 +17,9 @@
     <step-icon [name]="operation.icon"></step-icon>
   </button>
 </div>
-<step-bulk-selection-label [(selectionType)]="selectionType" [selectionCollector]="_selectionCollector!">
+<step-bulk-selection-label
+  [(selectionType)]="selectionType"
+  [selectionCollector]="_selectionCollector!"
+  [dontUseFilterLabel]="dontUseFilterLabel()"
+>
 </step-bulk-selection-label>
