@@ -14,7 +14,7 @@
       <a href="#" (click)="selectFiltered(); (false)">all filtered</a>
     </ng-template>
     Selected {{ selectionCollector?.length$ | async }} element(s), do you want to select
-    <ng-container *ngIf="hasFilter$ | async; then filtered; else all"> </ng-container>
+    <ng-container *ngIf="useFilterLabel(); then filtered; else all"> </ng-container>
     instead?
   </ng-container>
 </mat-label>
