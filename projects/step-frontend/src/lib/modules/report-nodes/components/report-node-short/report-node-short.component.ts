@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
   TrackByFunction,
+  ViewEncapsulation,
 } from '@angular/core';
 import { ArtefactService, ControllerService, Mutable, ReportNode, ViewerFormat } from '@exense/step-core';
 import { ReportNodeCommonsService } from '../../services/report-node-commons.service';
@@ -30,6 +31,10 @@ type FieldsAccessor = Mutable<Pick<ReportNodeShortComponent, 'headerText' | 'rep
   templateUrl: './report-node-short.component.html',
   styleUrls: ['./report-node-short.component.scss'],
   standalone: false,
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    class: 'execution-report-node-inline-details',
+  },
 })
 export class ReportNodeShortComponent implements OnChanges {
   private _artefactTypes = inject(ArtefactService);

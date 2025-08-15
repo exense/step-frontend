@@ -1,39 +1,46 @@
-as-split {
-  height: calc(100vh - 7rem);
-}
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
-.split-area-content {
-  padding: 0.2rem 1.5rem;
-}
+step-execution-progress {
+  as-split {
+    height: calc(100vh - 7rem);
+  }
 
-.tab-panel {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
+  .split-area-content {
+    padding: 0.2rem 1.5rem;
+  }
 
-.small-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  .tab-panel {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
 
-.small-screen {
-  width: fit-content;
-}
+  .small-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-.agent-provisioning-status {
-  display: grid;
-  grid-template-columns: 15rem auto;
-  column-gap: 1rem;
-  row-gap: 1rem;
-  align-items: center;
-}
+  .small-screen {
+    width: fit-content;
+  }
 
-step-autorefresh-toggle {
-  margin-top: 0.5rem;
-}
+  .agent-provisioning-status {
+    display: grid;
+    grid-template-columns: 15rem auto;
+    column-gap: 1rem;
+    row-gap: 1rem;
+    align-items: center;
+  }
 
-.execution-message {
-  display: block;
+  step-autorefresh-toggle {
+    margin-top: 0.5rem;
+  }
+
+  .execution-message {
+    display: block;
+  }
+
+  @include common.execution-report-node-inline-details;
+  @include common.highlight-inline-item;
 }
