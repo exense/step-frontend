@@ -2,20 +2,25 @@
   <div class="tree-node-modal-header" step-modal-window-title>
     @if (selectedReportNode(); as reportNode) {
       @if (hasBackButton) {
-        <button type="button" mat-icon-button (click)="navigateBack()" matTooltip="Back" matTooltipPosition="below">
+        <button
+          type="button"
+          mat-icon-button
+          (click)="navigateBack()"
+          matTooltip="Back"
+          matTooltipPosition="below"
+          tabindex="-1"
+        >
           <step-icon name="arrow-left" />
         </button>
       }
-      @if (reportNodeIcon(); as icon) {
-        <step-icon class="artefact-icon" [name]="icon" />
-      }
+      <step-report-node-icon class="artefact-icon" [node]="reportNode" />
+      <step-status [status]="reportNode.status" [iconMode]="true" />
       <span>{{ reportNode.name }}</span>
       <step-alt-execution-time
         [startTime]="reportNode.executionTime"
         [duration]="reportNode.duration"
         [timeOnly]="true"
       />
-      <step-status [status]="reportNode.status" [iconMode]="true" />
       <div class="btn-show-details-container">
         <button
           type="button"
@@ -35,7 +40,7 @@
     }
   </div>
   <div step-modal-window-body>
-    @if (hasData) {
+    @if (hasData()) {
       @if (selectedReportNode(); as reportNode) {
         <step-alt-report-node-details
           [node]="reportNode"

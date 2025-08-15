@@ -41,13 +41,10 @@ export class RichEditorSettingsBarComponent {
 
   protected selectedMode = model(AceMode.TEXT);
 
-  private effectAllowedModesReady = effect(
-    () => {
-      const initialMode = this.displayModes()[0]?.key ?? AceMode.TEXT;
-      this.selectedMode.set(initialMode);
-    },
-    { allowSignalWrites: true },
-  );
+  private effectAllowedModesReady = effect(() => {
+    const initialMode = this.displayModes()[0]?.key ?? AceMode.TEXT;
+    this.selectedMode.set(initialMode);
+  });
 
   private effectModeChanged = effect(() => this.modeChanged.emit(this.selectedMode()));
 }

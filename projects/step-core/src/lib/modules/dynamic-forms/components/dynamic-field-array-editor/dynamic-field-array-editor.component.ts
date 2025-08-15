@@ -61,20 +61,17 @@ export class DynamicFieldArrayEditorComponent implements OnDestroy {
 
   private effDisable = effect(() => this.enableDisableForm(this.isDisabled()));
 
-  private effHandleChanges = effect(
-    () => {
-      const schema = this.schema();
-      const value = this.value();
+  private effHandleChanges = effect(() => {
+    const schema = this.schema();
+    const value = this.value();
 
-      const schemaChanged = JSON.stringify(schema) !== this.schemaJson;
-      if (schemaChanged) {
-        this.buildForm(schema, value);
-      } else if (value && !this.areDynamicFieldArraysEqual(value, this.lastFormValue)) {
-        this.assignValueToForm(value);
-      }
-    },
-    { allowSignalWrites: true },
-  );
+    const schemaChanged = JSON.stringify(schema) !== this.schemaJson;
+    if (schemaChanged) {
+      this.buildForm(schema, value);
+    } else if (value && !this.areDynamicFieldArraysEqual(value, this.lastFormValue)) {
+      this.assignValueToForm(value);
+    }
+  });
 
   private areDynamicFieldArraysEqual(a?: DynamicFieldArrayValue, b?: DynamicFieldArrayValue): boolean {
     return this._utils.areArraysEqual(a, b, (valueA, valueB) => {

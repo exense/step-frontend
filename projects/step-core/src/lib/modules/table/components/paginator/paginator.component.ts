@@ -18,15 +18,12 @@ export class PaginatorComponent {
 
   protected areOptionsEditable = computed(() => this.pageSizeOptions().length > 1);
 
-  protected effectSetSizeOptions = effect(
-    () => {
-      const options = this.pageSizeOptions();
-      if (!this.pageSize()) {
-        this.pageSize.set(options[0] ?? 0);
-      }
-    },
-    { allowSignalWrites: true },
-  );
+  protected effectSetSizeOptions = effect(() => {
+    const options = this.pageSizeOptions();
+    if (!this.pageSize()) {
+      this.pageSize.set(options[0] ?? 0);
+    }
+  });
 
   lengthInput = input(0, {
     alias: 'length',
@@ -34,12 +31,9 @@ export class PaginatorComponent {
   });
 
   // Synchronize input with signal value
-  private effectLengthInput = effect(
-    () => {
-      this.length.set(this.lengthInput());
-    },
-    { allowSignalWrites: true },
-  );
+  private effectLengthInput = effect(() => {
+    this.length.set(this.lengthInput());
+  });
 
   isPageDisabled = input(false, {
     alias: 'disabled',

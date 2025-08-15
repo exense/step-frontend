@@ -1,5 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { AugmentedScreenService } from '@exense/step-core';
+import {
+  AugmentedScreenService,
+  STORE_ALL,
+  TableMemoryStorageService,
+  tablePersistenceConfigProvider,
+  TablePersistenceStateService,
+  TableStorageService,
+} from '@exense/step-core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { KeyValue } from '@angular/common';
 
@@ -9,6 +16,14 @@ import { KeyValue } from '@angular/common';
   styleUrl: './alt-execution-parameters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
+  providers: [
+    {
+      provide: TableStorageService,
+      useClass: TableMemoryStorageService,
+    },
+    TablePersistenceStateService,
+    tablePersistenceConfigProvider('executionParametersList', STORE_ALL),
+  ],
 })
 export class AltExecutionParametersComponent {
   private _screensService = inject(AugmentedScreenService);
@@ -17,28 +32,29 @@ export class AltExecutionParametersComponent {
     this._screensService.getScreenInputsByScreenIdWithCache('executionParameters'),
     { initialValue: [] },
   );
-  private executionParametersNames = computed(() =>
-    this.executionParametersInfo().reduce(
-      (res, item) => {
-        res[item.input!.id!] = item.input!.label!;
-        return res;
-      },
-      {} as Record<string, string>,
-    ),
-  );
 
-  /** @Input() **/
   readonly executionParameters = input<Record<string, string> | undefined>(undefined);
 
   protected readonly parametersList = computed(() => {
     const parameters = this.executionParameters() ?? {};
-    const names = this.executionParametersNames();
+    const parametersInfo = this.executionParametersInfo();
 
-    let result: KeyValue<string, string>[] = [];
-    result = Object.entries(parameters).reduce((res, [id, value]) => {
-      const key = names[id] ?? id;
-      return res.concat({ key, value });
-    }, result);
+    const result = parametersInfo
+      .reduce(
+        (res, screenInput) => {
+          const id = screenInput.input!.id!;
+          const label = screenInput.input!.label!;
+          if (!parameters.hasOwnProperty(id)) {
+            return res.concat(undefined);
+          }
+          const key = label ?? id;
+          const value = parameters[id];
+          return res.concat({ key, value });
+        },
+        [] as (KeyValue<string, string> | undefined)[],
+      )
+      .filter((item) => !!item) as KeyValue<string, string>[];
+
     return result;
   });
 }

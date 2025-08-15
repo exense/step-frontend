@@ -61,20 +61,17 @@ export class JsonFieldGroupComponent implements ControlValueAccessor, OnDestroy 
 
   private effIsDisabled = effect(() => this.enableDisableForm(this.isDisabled()));
 
-  private effHandleChanges = effect(
-    () => {
-      const schema = this.schema();
-      const value = this.groupValue();
+  private effHandleChanges = effect(() => {
+    const schema = this.schema();
+    const value = this.groupValue();
 
-      const schemaChanged = JSON.stringify(schema) !== this.schemaJson;
-      if (schemaChanged) {
-        this.buildForm(schema, value);
-      } else if (value && !this._jsonFieldUtils.areObjectsEqual(value, this.lastFormValue)) {
-        this.assignValueToForm(value);
-      }
-    },
-    { allowSignalWrites: true },
-  );
+    const schemaChanged = JSON.stringify(schema) !== this.schemaJson;
+    if (schemaChanged) {
+      this.buildForm(schema, value);
+    } else if (value && !this._jsonFieldUtils.areObjectsEqual(value, this.lastFormValue)) {
+      this.assignValueToForm(value);
+    }
+  });
 
   ngOnDestroy(): void {
     this.destroyForm();

@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal, ViewEncapsulation, effect, untracked } from '@angular/core';
-import { ArtefactService, ReportNode } from '@exense/step-core';
+import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { Status } from '../../../_common/shared/status.enum';
@@ -8,11 +8,15 @@ import { AggregatedTreeNodeDialogHooksService } from '../../services/aggregated-
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { DOCUMENT } from '@angular/common';
 import { NODE_DETAILS_RELATIVE_PARENT } from '../../services/node-details-relative-parent.token';
+import { AltExecutionStateService } from '../../services/alt-execution-state.service';
+import { AltReportNodeDetailsStateService } from '../../services/alt-report-node-details-state.service';
+import { map, of, switchMap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export interface AggregatedTreeNodeDialogData {
   aggregatedNode?: AggregatedTreeNode;
   resolvedPartialPath?: string;
-  reportNode?: ReportNode;
+  reportNodeId?: string;
   searchStatus?: Status;
   searchStatusCount?: number;
   reportNodeChildren: ReportNode[];
@@ -31,24 +35,55 @@ export interface AggregatedTreeNodeDialogData {
     },
     AltExecutionDialogsService,
   ],
+  host: {
+    '[class.is-report]': '!!selectedReportNode()',
+  },
 })
 export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _data = inject<AggregatedTreeNodeDialogData>(MAT_DIALOG_DATA);
   private _dialogRef = inject(MatDialogRef);
-  private _artefactTypes = inject(ArtefactService);
   private _doc = inject(DOCUMENT);
   protected _dialogsService = inject(AltExecutionDialogsService);
   private _router = inject(Router);
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
+
+  private _executionState = inject(AltExecutionStateService);
+  private _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
+  private _controllerService = inject(AugmentedControllerService);
+
   protected readonly _activatedRoute = inject(ActivatedRoute);
 
-  protected readonly selectedReportNode = signal(this._data.reportNode);
+  private isInitialLoad = true;
+
+  private reportNode$ = this._executionState.timeRange$.pipe(
+    map(() => this._data.reportNodeId),
+    switchMap((reportNodeId) => {
+      if (!reportNodeId) {
+        this.isInitialLoad = false;
+        return of(undefined);
+      }
+
+      if (this.isInitialLoad) {
+        const reportNode = this._reportNodeDetailsState.getReportNode(reportNodeId);
+        this.isInitialLoad = false;
+        return of(reportNode);
+      }
+
+      this.isInitialLoad = false;
+      return this._controllerService.getReportNode(reportNodeId);
+    }),
+  );
+
+  protected readonly selectedReportNode = toSignal(this.reportNode$);
   protected readonly aggregatedNode = this._data.aggregatedNode;
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;
   protected readonly initialSearchStatusCount = this._data.searchStatusCount;
-  protected readonly hasData = !!this._data.aggregatedNode || !!this._data.reportNode;
-  protected readonly hasBackButton = !!this._data.reportNode;
+  protected readonly hasData = computed(() => {
+    const reportNode = this.selectedReportNode();
+    return !!this._data.aggregatedNode || !!reportNode;
+  });
+  protected readonly hasBackButton = computed(() => !!this.selectedReportNode());
 
   private effectNotifyReportNodeOpen = effect(() => {
     const selectedReportNode = this.selectedReportNode();
@@ -56,18 +91,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
       return;
     }
     untracked(() => this._hooks?.reportNodeOpened(selectedReportNode));
-  });
-
-  protected readonly reportNodeArtefactClass = computed(() => {
-    return this.selectedReportNode()?.resolvedArtefact?._class;
-  });
-
-  protected readonly reportNodeIcon = computed(() => {
-    const artefactClass = this.reportNodeArtefactClass();
-    if (!artefactClass) {
-      return undefined;
-    }
-    return this._artefactTypes.getArtefactType(artefactClass)?.icon ?? this._artefactTypes.defaultIcon;
   });
 
   protected readonly endTime = computed(() => {

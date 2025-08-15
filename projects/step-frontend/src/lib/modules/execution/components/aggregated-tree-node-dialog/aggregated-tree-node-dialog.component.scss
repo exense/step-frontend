@@ -2,7 +2,7 @@ step-aggregated-tree-node-dialog {
   .tree-node-modal-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
 
     step-status,
     button {
@@ -10,7 +10,7 @@ step-aggregated-tree-node-dialog {
     }
 
     .artefact-icon {
-      line-height: 2rem;
+      line-height: 1rem;
     }
 
     step-status {
@@ -30,6 +30,12 @@ step-aggregated-tree-node-dialog {
         font-size: 1.4rem;
         height: 100%;
       }
+    }
+  }
+
+  &.is-report {
+    step-modal-window h1.mat-mdc-dialog-title {
+      padding-left: 0.9rem !important;
     }
   }
 }

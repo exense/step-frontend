@@ -131,13 +131,10 @@ export class AggregatedTreeNodeIterationListComponent implements AfterViewInit, 
 
   protected readonly statusesCtrl = this._fb.control<Status[]>([]);
 
-  private effectSyncStatus = effect(
-    () => {
-      const initialStatus = this.initialStatus();
-      this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
-    },
-    { allowSignalWrites: true },
-  );
+  private effectSyncStatus = effect(() => {
+    const initialStatus = this.initialStatus();
+    this.statusesCtrl.setValue(initialStatus ? [initialStatus] : []);
+  });
 
   private statusCtrlValue = toSignal(this.statusesCtrl.valueChanges, {
     initialValue: this.statusesCtrl.value,

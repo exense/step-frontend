@@ -8,7 +8,6 @@ export class AutoShrankItemDirective<T> implements AfterViewInit {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _itemWidthRegister = inject<ItemWidthRegisterService<T>>(ItemWidthRegisterService);
 
-  /** @Input() **/
   readonly item = input.required<T>({ alias: 'stepAutoShrankItem' });
 
   ngAfterViewInit(): void {
