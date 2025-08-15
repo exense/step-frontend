@@ -84,6 +84,10 @@ interface SearchData {
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.in-progress]': 'inProgress()',
+    '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
+  },
   providers: [
     {
       provide: TableSearch,
@@ -162,7 +166,16 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly inProgress = input(false);
+  readonly useSkeletonPlaceholder = input(false);
+
+  readonly inProgressExternal = input(false, { alias: 'inProgress' });
+  private inProgressDataSource = signal(false);
+
+  protected readonly inProgress = computed(() => {
+    const inProgressExternal = this.inProgressExternal();
+    const inProgressDataSource = this.inProgressDataSource();
+    return inProgressExternal || inProgressDataSource;
+  });
 
   protected tableDataSource?: TableDataSource<T>;
 
@@ -327,6 +340,7 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
+    this.inProgressDataSource.set(false);
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -382,6 +396,10 @@ export class TableComponent<T>
 
     tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
+    });
+
+    tableDataSource.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+      this.inProgressDataSource.set(inProgress);
     });
   }
 
