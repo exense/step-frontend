@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  contentChild,
   ElementRef,
   forwardRef,
   inject,
@@ -16,12 +17,15 @@ import { KeyValue } from '@angular/common';
 import { ItemWidthRegisterService } from '../../injectables/item-width-register.service';
 import { AutoShrankItemDirective } from '../../directives/auto-shrank-item.directive';
 import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
+import { AutoShrankEmptyValueTemplateDirective } from '../../directives/auto-shrank-empty-value-template.directive';
+import { AutoShrankItemValueComponent } from '../auto-shrank-item-value/auto-shrank-item-value.component';
+import { AutoShrankAllItemsComponent } from '../auto-shrank-all-items/auto-shrank-all-items.component';
 
 @Component({
   selector: 'step-auto-shrank-list',
   templateUrl: './auto-shrank-list.component.html',
   styleUrl: './auto-shrank-list.component.scss',
-  imports: [AutoShrankItemDirective, StepBasicsModule],
+  imports: [AutoShrankItemDirective, StepBasicsModule, AutoShrankItemValueComponent, AutoShrankAllItemsComponent],
   providers: [
     {
       provide: ItemWidthRegisterService,
@@ -37,8 +41,14 @@ export class AutoShrankListComponent implements ItemWidthRegisterService<KeyValu
   private observer?: ResizeObserver;
   private itemWidths = new Map<string, number>();
 
-  /** @Input() **/
+  private autoShrinkEmptyValueTemplate = contentChild(AutoShrankEmptyValueTemplateDirective);
+  protected readonly emptyValueTemplate = computed(() => this.autoShrinkEmptyValueTemplate()?.templateRef);
+
   readonly items = input<KeyValue<string, string>[]>([]);
+  readonly useShowAll = input(false);
+  readonly allTitle = input('All items');
+  readonly allTooltip = input('');
+  readonly emptySearchPatterns = input<string | string[] | undefined>(undefined);
 
   private itemWidthKeys = computed(() => this.items().map((item) => this.widthKey(item)));
 
@@ -58,6 +68,7 @@ export class AutoShrankListComponent implements ItemWidthRegisterService<KeyValu
 
   protected hasHiddenItems = computed(() => this.hiddenItems().length > 0);
   protected isHiddenVisible = signal(false);
+  protected isAllVisible = signal(false);
 
   constructor() {
     // recalculate visible items, after rendering and items' change
