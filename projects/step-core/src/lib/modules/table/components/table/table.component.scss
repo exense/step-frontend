@@ -85,7 +85,7 @@ step-table {
           content: ' ';
           display: block;
           position: absolute;
-          margin: 0.5rem;
+          margin: 1.5rem 0.8rem;
           border-radius: 0.5rem;
           top: 0;
           left: 0;
@@ -98,7 +98,7 @@ step-table {
           content: ' ';
           display: block;
           position: absolute;
-          margin: 0.5rem;
+          margin: 1.5rem 0.8rem;
           top: 0;
           left: 0;
           right: 0;
@@ -114,6 +114,10 @@ step-table {
           background-position: 100% 50%;
           z-index: 1;
           animation: skeleton-progress 1.5s infinite;
+        }
+
+        & > * {
+          opacity: 0;
         }
       }
     }
@@ -133,6 +137,10 @@ step-table {
             skeleton-opacity 0.5s ease-out;
           opacity: 0;
           visibility: hidden;
+        }
+        & > * {
+          opacity: 1;
+          animation: content-fade-out 0.8s ease-out;
         }
       }
     }
@@ -165,5 +173,14 @@ step-table {
   100% {
     opacity: 0;
     visibility: hidden;
+  }
+}
+
+@keyframes content-fade-out {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
