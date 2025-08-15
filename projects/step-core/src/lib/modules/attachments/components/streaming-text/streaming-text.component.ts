@@ -283,7 +283,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
 
       const { transferStatus, numberOfLines: totalLines } = response.resourceStatus;
       this.statusInternal.set(transferStatus);
-      if (transferStatus === 'FAILED') {
+      if (transferStatus === 'FAILED' && totalLines === 0) {
         this.areLinesRequestedIndicator.hide();
         return;
       }
