@@ -3,9 +3,9 @@ import {
   BehaviorSubject,
   catchError,
   debounceTime,
-  exhaustMap,
   filter,
   map,
+  mergeMap,
   Observable,
   of,
   shareReplay,
@@ -27,6 +27,8 @@ import {
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
 import { FilterCondition } from './filter-condition';
+import { computed, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 export class TableRequestInternal {
   columns: string[];
@@ -118,8 +120,9 @@ interface RequestContainer extends StepDataSourceReloadOptions {
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
-  private _inProgress$ = new BehaviorSubject<boolean>(false);
-  readonly inProgress$ = this._inProgress$.asObservable();
+  private runningRequestCount = signal(0);
+  private inProgress = computed(() => this.runningRequestCount() > 0);
+  readonly inProgress$ = toObservable(this.inProgress);
   private isSharable = false;
   private isSkipOngoingRequest?: boolean;
   private _request$ = new BehaviorSubject<RequestContainer | undefined>(undefined);
@@ -134,26 +137,36 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
       // Don't show progress bar, when immediateHideProgress flag is passed
       // or hideProgress is passed and there is no in progress current operation
-      let inProgress = true;
-      if (!!x?.immediateHideProgress || (!!x?.hideProgress && !this._inProgress$.value)) {
-        inProgress = false;
+      let inProgressTriggered = false;
+      if (!!x?.immediateHideProgress) {
+        this.runningRequestCount.set(0);
+      } else if (!x?.hideProgress) {
+        this.runningRequestCount.update((value) => value + 1);
+        inProgressTriggered = true;
       }
 
-      return { request, inProgress };
+      return { request, inProgressTriggered };
     }),
-    tap((x) => {
-      this._inProgress$.next(x.inProgress);
-    }),
-    exhaustMap((x) =>
-      this._rest.requestTable<T>(this.tableId, x.request).pipe(
+    mergeMap(({ request, inProgressTriggered }) => {
+      return this._rest.requestTable<T>(this.tableId, request).pipe(
+        map((response) => ({ response, inProgressTriggered })),
         catchError((err) => {
-          return of(null);
+          return of({ response: null, inProgressTriggered });
         }),
-      ),
-    ),
-    tap(() => {
-      this._inProgress$.next(false);
+      );
     }),
+    tap(({ inProgressTriggered }) => {
+      // set in progress to false, only it was triggered to true by current request
+      if (!inProgressTriggered) {
+        return;
+      }
+      this.runningRequestCount.update((value) => {
+        let res = value - 1;
+        res = res < 0 ? 0 : res;
+        return res;
+      });
+    }),
+    map((x) => x.response),
     startWith(null),
     shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
@@ -213,7 +226,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   destroy(): void {
     this._request$.complete();
-    this._inProgress$.complete();
     this._terminator$.next();
     this._terminator$.complete();
   }
