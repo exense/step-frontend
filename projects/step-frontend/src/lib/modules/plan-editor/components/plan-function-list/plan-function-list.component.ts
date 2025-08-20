@@ -1,14 +1,10 @@
-import { Component, computed, inject, model, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedKeywordsService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   EntitySelectionState,
   entitySelectionStateProvider,
   Keyword,
-  Plan,
-  selectionCollectionProvider,
-  SelectionCollector,
   SelectionList,
   TableApiWrapperService,
   tableColumnsConfigProvider,

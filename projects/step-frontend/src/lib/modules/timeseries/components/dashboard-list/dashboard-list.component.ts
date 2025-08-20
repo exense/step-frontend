@@ -1,13 +1,10 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedDashboardsService,
-  AutoDeselectStrategy,
   DashboardView,
   DialogParentService,
   DialogsService,
   entitySelectionStateProvider,
-  Plan,
-  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,

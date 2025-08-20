@@ -1,13 +1,11 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedResourcesService,
-  AutoDeselectStrategy,
   DialogParentService,
   entitySelectionStateProvider,
   Resource,
   ResourceDialogsService,
   ResourceInputBridgeService,
-  selectionCollectionProvider,
   StepCoreModule,
   STORE_ALL,
   tableColumnsConfigProvider,

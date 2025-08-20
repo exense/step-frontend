@@ -1,5 +1,5 @@
 import { Signal } from '@angular/core';
-import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
+import { BulkSelectionType } from '../../types/bulk-selection-type.enum';
 import { EntitySelectionStateImpl } from './entity-selection-state-impl';
 
 export enum UpdateSelectionMode {
@@ -24,4 +24,5 @@ export abstract class EntitySelectionState<KEY, ENTITY> {
 export abstract class EntitySelectionStateUpdatable<KEY, ENTITY> extends EntitySelectionState<KEY, ENTITY> {
   abstract updateSelection(params: UpdateSelectionParamsKeys<KEY>): void;
   abstract updateSelection(params: UpdateSelectionParamsEntities<ENTITY>): void;
+  abstract getSelectionKey(entity: ENTITY): KEY;
 }

@@ -1,8 +1,6 @@
 import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import {
-  AutoDeselectStrategy,
   Parameter,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   DialogParentService,

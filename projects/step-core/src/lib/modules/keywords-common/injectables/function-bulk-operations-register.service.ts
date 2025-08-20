@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { AugmentedKeywordsService } from '../../../client/step-client-module';
 import { BulkOperationType } from '../../basics/types/bulk-operation-type.enum';
-import { EntityBulkOperationsRegistryService } from '../../entities-selection/entities-selection.module';
+import { EntityBulkOperationsRegistryService } from '../../entities-selection';
 
 @Injectable({
   providedIn: 'root',

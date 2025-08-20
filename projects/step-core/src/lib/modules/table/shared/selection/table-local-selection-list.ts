@@ -1,12 +1,8 @@
 import { TableSelectionList } from './table-selection-list';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { computed, effect, untracked } from '@angular/core';
+import { effect, untracked } from '@angular/core';
 import { TableLocalDataSource } from '../table-local-data-source';
-import {
-  BulkSelectionType,
-  EntitySelectionStateUpdatable,
-  UpdateSelectionMode,
-} from '../../../entities-selection/entities-selection.module';
+import { BulkSelectionType, UpdateSelectionMode } from '../../../entities-selection';
 
 export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocalDataSource<T>> {
   private pageData = toSignal(this.datasource.data$, { initialValue: [] });
@@ -71,6 +67,22 @@ export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocal
     }
 
     this._entitySelectionState.updateSelection({ entities: [item], selectionType, mode: UpdateSelectionMode.UPDATE });
+  }
+
+  /**
+   * Iterates over selected items, which are exists in collector.
+   * Check the predicate and returns the map with entity's id and predicate result.
+   * Method's result is approximate, because collector might not contain all information about every selected item
+   * **/
+  checkCurrentSelectionState(predicate: (item: T) => boolean): Map<unknown, boolean> | undefined {
+    const data = this.allData();
+    return data
+      .filter((entity) => this._entitySelectionState.isSelectedByKey(entity))
+      .reduce((result, entity) => {
+        const key = this._entitySelectionState.getSelectionKey(entity);
+        result.set(key, predicate(entity));
+        return result;
+      }, new Map<unknown, boolean>());
   }
 
   private handleSelectionChange(selectionType: BulkSelectionType): void {

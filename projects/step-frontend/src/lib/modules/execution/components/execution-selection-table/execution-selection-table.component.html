@@ -8,7 +8,7 @@
 >
   <ng-container *stepAdditionalHeader>
     @if (multipleSelection) {
-      <step-bulk-ops />
+      <step-bulk-operations />
     }
   </ng-container>
 
@@ -16,7 +16,7 @@
     <ng-container matColumnDef="bulkSelection" *ngIf="multipleSelection">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
-        <step-entity-selection-di [entity]="element"></step-entity-selection-di>
+        <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
   }

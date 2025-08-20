@@ -1,8 +1,6 @@
-import { Component, forwardRef, inject, OnInit, signal } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
-  AutoDeselectStrategy,
   ExecutiontTaskParameters,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   ArrayItemLabelValueExtractor,

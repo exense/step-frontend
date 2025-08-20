@@ -56,7 +56,7 @@ import { AdditionalHeaderDirective } from '../../directives/additional-header.di
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageDefaultService } from '../../services/items-per-page-default.service';
-import { HasFilter } from '../../../entities-selection/services/has-filter';
+import { HasFilter } from '../../../entities-selection/injectables/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
@@ -74,7 +74,7 @@ import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.m
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
-import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection/entities-selection.module';
+import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
 import { TableRemoteSelectionList } from '../../shared/selection/table-remote-selection-list';
 import { TableLocalSelectionList } from '../../shared/selection/table-local-selection-list';
@@ -683,7 +683,11 @@ export class TableComponent<T>
   }
 
   selectIds<K>(keys: K[]): void {
-    this.tableSelectionList?.selectIds(keys);
+    this.tableSelectionList?.selectIds?.(keys);
+  }
+
+  checkCurrentSelectionState<K>(predicate: (item: T) => boolean): Map<K, boolean> | undefined {
+    return this.tableSelectionList?.checkCurrentSelectionState?.(predicate) as Map<K, boolean> | undefined;
   }
 
   /** Selection list methods end **/

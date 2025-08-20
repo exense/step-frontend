@@ -1,9 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, inject } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage } from '../../../../client/step-client-module';
-import {
-  entitySelectionStateProvider,
-  EntitySelectionStateUpdatable,
-} from '../../../entities-selection/entities-selection.module';
+import { entitySelectionStateProvider, EntitySelectionStateUpdatable } from '../../../entities-selection';
 import {
   tablePersistenceConfigProvider,
   tableColumnsConfigProvider,

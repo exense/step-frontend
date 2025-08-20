@@ -1,13 +1,10 @@
-import { Component, computed, inject, model, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedPlansService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   EntitySelectionState,
   entitySelectionStateProvider,
   Plan,
-  selectionCollectionProvider,
-  SelectionCollector,
   SelectionList,
   TableApiWrapperService,
   tableColumnsConfigProvider,

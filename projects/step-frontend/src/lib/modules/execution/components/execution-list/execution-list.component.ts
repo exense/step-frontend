@@ -2,7 +2,6 @@ import { Component, effect, inject, OnDestroy, ViewChild, ViewEncapsulation } fr
 import {
   ArrayFilterComponent,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
   EntitySelectionState,
@@ -10,7 +9,6 @@ import {
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
-  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,

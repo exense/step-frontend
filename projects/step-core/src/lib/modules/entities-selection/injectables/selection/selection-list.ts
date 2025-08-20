@@ -7,4 +7,5 @@ export abstract class SelectionList<KEY, ENTITY> {
   abstract deselect(item: ENTITY): void;
   abstract toggleSelection(item: ENTITY): void;
   abstract selectIds(keys: KEY[]): void;
+  abstract checkCurrentSelectionState(predicate: (item: ENTITY) => boolean): Map<KEY, boolean> | undefined;
 }

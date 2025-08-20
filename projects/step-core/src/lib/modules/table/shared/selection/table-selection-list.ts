@@ -4,7 +4,7 @@ import {
   HasFilter,
   SelectionList,
   UpdateSelectionMode,
-} from '../../../entities-selection/entities-selection.module';
+} from '../../../entities-selection';
 import { TableDataSource } from '../table-data-source';
 import { effect, inject, untracked } from '@angular/core';
 

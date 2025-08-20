@@ -3,10 +3,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { KeyValue } from '@angular/common';
 import {
   BulkSelectionType,
-  EntitiesSelectionModule,
+  ENTITIES_SELECTION_EXPORTS,
   entitySelectionStateProvider,
   EntitySelectionStateUpdatable,
-} from '../../../entities-selection/entities-selection.module';
+} from '../../../entities-selection';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableColumnsConfig, TableModule, TablePersistenceConfig } from '../../../table/table.module';
 import { skip, Subject, takeUntil } from 'rxjs';
@@ -26,7 +26,7 @@ export enum SelectAll {
   templateUrl: './list-select.component.html',
   styleUrl: './list-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StepBasicsModule, TableModule, EntitiesSelectionModule],
+  imports: [StepBasicsModule, TableModule, ENTITIES_SELECTION_EXPORTS],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

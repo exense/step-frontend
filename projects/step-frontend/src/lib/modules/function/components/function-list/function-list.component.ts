@@ -1,9 +1,7 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedKeywordsService,
-  AutoDeselectStrategy,
   Keyword,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,

@@ -1,8 +1,5 @@
 import { Directive } from '@angular/core';
-import {
-  EntitySelectionState,
-  EntitySelectionStateUpdatable,
-} from '../../entities-selection/entities-selection.module';
+import { EntitySelectionState, EntitySelectionStateUpdatable } from '../../entities-selection';
 
 @Directive({
   selector: 'step-table[noSelectionState]',

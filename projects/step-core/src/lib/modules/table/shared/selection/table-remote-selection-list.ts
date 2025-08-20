@@ -1,6 +1,6 @@
 import { TableRemoteDataSource } from '../table-remote-data-source';
 import { TableSelectionList } from './table-selection-list';
-import { BulkSelectionType, UpdateSelectionMode } from '../../../entities-selection/entities-selection.module';
+import { BulkSelectionType, UpdateSelectionMode } from '../../../entities-selection';
 import { effect, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -65,6 +65,22 @@ export class TableRemoteSelectionList<T> extends TableSelectionList<T, TableRemo
       selectionType: BulkSelectionType.INDIVIDUAL,
       mode: UpdateSelectionMode.UPDATE,
     });
+  }
+
+  /**
+   * Iterates over selected items, which are exists in collector.
+   * Check the predicate and returns the map with entity's id and predicate result.
+   * Method's result is approximate, because collector might not contain all information about every selected item
+   * **/
+  checkCurrentSelectionState(predicate: (item: T) => boolean): Map<unknown, boolean> | undefined {
+    const data = this.pageData();
+    return data
+      .filter((entity) => this._entitySelectionState.isSelectedByKey(entity))
+      .reduce((result, entity) => {
+        const key = this._entitySelectionState.getSelectionKey(entity);
+        result.set(key, predicate(entity));
+        return result;
+      }, new Map<unknown, boolean>());
   }
 
   private handleSelectionChange(selectionType: BulkSelectionType): void {
