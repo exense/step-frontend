@@ -1,7 +1,6 @@
 <step-drag-drop-container>
   <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
-    <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functionPackage">
-    </step-bulk-operations>
+    <step-bulk-ops *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functionPackage" />
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
       <step-btn-group>
         <a

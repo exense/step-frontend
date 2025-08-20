@@ -3,6 +3,7 @@ import {
   AugmentedResourcesService,
   AutoDeselectStrategy,
   DialogParentService,
+  entitySelectionStateProvider,
   Resource,
   ResourceDialogsService,
   ResourceInputBridgeService,
@@ -24,7 +25,7 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
       entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
     }),
     tablePersistenceConfigProvider('resourceList', STORE_ALL),
-    ...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, Resource>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => ResourcesListComponent),

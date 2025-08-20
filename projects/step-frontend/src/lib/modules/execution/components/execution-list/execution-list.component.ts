@@ -1,10 +1,12 @@
-import { Component, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   ArrayFilterComponent,
   AugmentedExecutionsService,
   AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
+  EntitySelectionState,
+  entitySelectionStateProvider,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
@@ -29,7 +31,7 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: REQUEST_FILTERS_INTERCEPTORS,
       useClass: ExecutionListFilterInterceptorService,
@@ -45,6 +47,7 @@ export class ExecutionListComponent implements OnDestroy {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
+  private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
@@ -54,20 +57,21 @@ export class ExecutionListComponent implements OnDestroy {
 
   autoRefreshDisabled: boolean = false;
 
+  private effectSelectionTypeChanged = effect(() => {
+    const selectionType = this._selectionState.selectionType();
+    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
+
+    if (this.autoRefreshDisabled) {
+      this.dataSource.skipOngoingRequest();
+    }
+  });
+
   @ViewChild('statusFilter')
   private statusFilter?: ArrayFilterComponent;
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
     this._timeSeriesEntityService.clearCache();
-  }
-
-  changeType(selectionType: BulkSelectionType): void {
-    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
-
-    if (this.autoRefreshDisabled) {
-      this.dataSource.skipOngoingRequest();
-    }
   }
 
   refreshTable(): void {

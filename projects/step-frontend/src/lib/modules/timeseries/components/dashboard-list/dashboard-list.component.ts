@@ -5,6 +5,7 @@ import {
   DashboardView,
   DialogParentService,
   DialogsService,
+  entitySelectionStateProvider,
   Plan,
   selectionCollectionProvider,
   STORE_ALL,
@@ -25,7 +26,7 @@ import { Params } from '@angular/router';
       entityTableRemoteId: AugmentedDashboardsService.TABLE_ID,
     }),
     tablePersistenceConfigProvider('analyticsDashboard', STORE_ALL),
-    ...selectionCollectionProvider<string, DashboardView>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, DashboardView>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => DashboardListComponent),

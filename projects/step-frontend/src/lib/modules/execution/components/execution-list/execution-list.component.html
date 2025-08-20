@@ -7,11 +7,10 @@
     matSortDirection="desc"
     [matSortDisableClear]="true"
   >
-    <step-bulk-operations
+    <step-bulk-ops
       data-step-testid="execution-bulk-operations"
       *stepAdditionalHeader="'btngroup-bulk-new'"
       entity="executions"
-      (selectionTypeChange)="changeType($event)"
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>

@@ -1,11 +1,14 @@
-import { Component, inject, model, output, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, model, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedPlansService,
   AutoDeselectStrategy,
   BulkSelectionType,
+  EntitySelectionState,
+  entitySelectionStateProvider,
   Plan,
   selectionCollectionProvider,
   SelectionCollector,
+  SelectionList,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
@@ -18,7 +21,7 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
   styleUrls: ['./plan-otherplan-list.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [
-    ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.KEEP_SELECTION),
+    ...entitySelectionStateProvider<string, Plan>('id'),
     tableColumnsConfigProvider({
       entityTableRemoteId: 'planEditorOtherPlanTable',
       entityScreenId: 'plan',
@@ -29,33 +32,37 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
   standalone: false,
 })
 export class PlanOtherplanListComponent {
-  private _selectionCollector = inject<SelectionCollector<string, Plan>>(SelectionCollector);
+  private _selectionState = inject<EntitySelectionState<string, Plan>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
 
-  readonly dataSource = inject(AugmentedPlansService).getPlansTableDataSource() as TableRemoteDataSource<Plan>;
+  protected readonly dataSource = inject(
+    AugmentedPlansService,
+  ).getPlansTableDataSource() as TableRemoteDataSource<Plan>;
 
-  readonly hasSelection$ = this._selectionCollector.length$.pipe(map((length) => length > 0));
+  private selectionList = viewChild('selectionList', { read: SelectionList<string, Plan> });
+
+  protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
 
   readonly addPlans = output<string[]>();
-
-  protected selectionType = model<BulkSelectionType>(BulkSelectionType.NONE);
 
   protected addPlan(id: string): void {
     this.addPlans.emit([id]);
   }
 
   protected addAllPlans(): void {
-    of(this.selectionType())
+    of(this._selectionState.selectionType())
       .pipe(
         switchMap((selectionType) => {
           const isGetFromRemote =
             selectionType === BulkSelectionType.ALL || selectionType === BulkSelectionType.FILTERED;
-          return isGetFromRemote ? this.requestPlanIdsWithoutPagination() : of([...this._selectionCollector.selected]);
+          return isGetFromRemote
+            ? this.requestPlanIdsWithoutPagination()
+            : of(Array.from(this._selectionState.selectedKeys()));
         }),
         filter((ids) => !!ids.length),
       )
       .subscribe((ids) => {
-        this._selectionCollector.clear();
+        this.selectionList()?.clearSelection?.();
         this.addPlans.emit(ids);
       });
   }

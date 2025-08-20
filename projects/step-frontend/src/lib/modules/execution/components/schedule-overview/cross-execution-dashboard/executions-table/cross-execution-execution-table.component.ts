@@ -15,6 +15,7 @@ import {
   AutoDeselectStrategy,
   DateFormat,
   DateRange,
+  entitySelectionStateProvider,
   Execution,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
@@ -46,7 +47,7 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
       storeSort: false,
       storeSearch: false,
     }),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: REQUEST_FILTERS_INTERCEPTORS,
       useClass: ExecutionListFilterInterceptorService,

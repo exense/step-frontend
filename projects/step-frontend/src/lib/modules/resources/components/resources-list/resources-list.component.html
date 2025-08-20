@@ -7,10 +7,7 @@
     [matSortDisableClear]="true"
     filter="not(resourceType=attachment)"
   >
-    <step-bulk-operations
-      *stepAdditionalHeader="'btngroup-bulk-import-create'"
-      entity="resources"
-    ></step-bulk-operations>
+    <step-bulk-ops *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="resources" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a

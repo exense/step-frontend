@@ -15,6 +15,7 @@ import {
   DialogsService,
   tableColumnsConfigProvider,
   AlertType,
+  entitySelectionStateProvider,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -39,7 +40,7 @@ enum ActiveLabels {
       entityScreenSubPath: 'executionsParameters.customParameters',
     }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => ScheduledTaskListComponent),
