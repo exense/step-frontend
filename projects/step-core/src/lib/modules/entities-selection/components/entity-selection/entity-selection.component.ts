@@ -3,6 +3,7 @@ import { SelectionCollector } from '../../services/selection-collector/selection
 import { map, Subject, takeUntil } from 'rxjs';
 import { EntitySelectionState } from '../../services/selection/entity-selection-state';
 import { SelectionList } from '../../services/selection/selection-list';
+import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 
 @Component({
   selector: 'step-entity-selection',

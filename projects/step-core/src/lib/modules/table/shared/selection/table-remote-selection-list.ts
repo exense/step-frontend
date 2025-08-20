@@ -1,56 +1,55 @@
 import { TableRemoteDataSource } from '../table-remote-data-source';
 import { TableSelectionList } from './table-selection-list';
-import {
-  BulkSelectionType,
-  EntitySelectionStateUpdatable,
-  UpdateSelectionMode,
-} from '../../../entities-selection/entities-selection.module';
-import { effect } from '@angular/core';
+import { BulkSelectionType, UpdateSelectionMode } from '../../../entities-selection/entities-selection.module';
+import { effect, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 export class TableRemoteSelectionList<T> extends TableSelectionList<T, TableRemoteDataSource<T>> {
-  constructor(datasource: TableRemoteDataSource<T>, entitySelectionState: EntitySelectionStateUpdatable<unknown, T>) {
-    super(datasource, entitySelectionState);
-  }
-
   private pageData = toSignal(this.datasource.data$, { initialValue: [] });
 
   private effectCleanupOnDataChange = effect(
     () => {
       const data = this.pageData();
-      this.clearSelection();
+      const selectionType = untracked(() => this._entitySelectionState.selectionType());
+      if (selectionType === BulkSelectionType.FILTERED || selectionType === BulkSelectionType.ALL) {
+        this._entitySelectionState.updateSelection({ entities: data, mode: UpdateSelectionMode.UPDATE });
+      }
     },
     { manualCleanup: true },
   );
 
   private effectHandleSelectionTypeChange = effect(
     () => {
-      const selectionType = this.entitySelectionState.selectionType();
+      const selectionType = this._entitySelectionState.selectionType();
       this.handleSelectionChange(selectionType);
     },
     { manualCleanup: true },
   );
 
-  destroy(): void {
-    this.effectCleanupOnDataChange.destroy();
+  constructor(datasource: TableRemoteDataSource<T>) {
+    super(datasource);
+  }
+
+  override destroy(): void {
+    super.destroy();
     this.effectHandleSelectionTypeChange.destroy();
   }
 
   clearSelection(): void {
     const keys = [] as unknown[];
     const selectionType = BulkSelectionType.NONE;
-    this.entitySelectionState.updateSelection({ keys, selectionType });
+    this._entitySelectionState.updateSelection({ keys, selectionType });
   }
 
   deselect(item: T): void {
-    if (!this.entitySelectionState.isSelected(item)) {
+    if (!this._entitySelectionState.isSelected(item)) {
       return;
     }
-    if (this.entitySelectionState.selectedSize() === 1) {
+    if (this._entitySelectionState.selectedSize() === 1) {
       this.clearSelection();
       return;
     }
-    this.entitySelectionState.updateSelection({
+    this._entitySelectionState.updateSelection({
       entities: [item],
       selectionType: BulkSelectionType.INDIVIDUAL,
       mode: UpdateSelectionMode.REMOVE,
@@ -58,10 +57,10 @@ export class TableRemoteSelectionList<T> extends TableSelectionList<T, TableRemo
   }
 
   select(item: T): void {
-    if (this.entitySelectionState.isSelected(item)) {
+    if (this._entitySelectionState.isSelected(item)) {
       return;
     }
-    this.entitySelectionState.updateSelection({
+    this._entitySelectionState.updateSelection({
       entities: [item],
       selectionType: BulkSelectionType.INDIVIDUAL,
       mode: UpdateSelectionMode.UPDATE,
@@ -76,8 +75,8 @@ export class TableRemoteSelectionList<T> extends TableSelectionList<T, TableRemo
       case BulkSelectionType.ALL:
       case BulkSelectionType.FILTERED:
       case BulkSelectionType.VISIBLE:
-        const entities = this.pageData();
-        this.entitySelectionState.updateSelection({ entities });
+        const entities = untracked(() => this.pageData());
+        this._entitySelectionState.updateSelection({ entities });
         break;
       default:
         break;

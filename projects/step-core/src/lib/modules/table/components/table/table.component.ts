@@ -368,16 +368,10 @@ export class TableComponent<T>
     if (this._selectionState) {
       if (tableDataSource instanceof TableRemoteDataSource) {
         this.tableSelectionList =
-          runInInjectionContext(
-            this._injector,
-            () => new TableRemoteSelectionList(tableDataSource, this._selectionState!),
-          ) || undefined;
+          runInInjectionContext(this._injector, () => new TableRemoteSelectionList(tableDataSource)) || undefined;
       } else if (tableDataSource instanceof TableLocalDataSource) {
         this.tableSelectionList =
-          runInInjectionContext(
-            this._injector,
-            () => new TableLocalSelectionList(tableDataSource, this._selectionState!),
-          ) || undefined;
+          runInInjectionContext(this._injector, () => new TableLocalSelectionList(tableDataSource)) || undefined;
       }
     }
 

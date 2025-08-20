@@ -14,6 +14,7 @@ import {
   Operation,
   PrivateViewPluginService,
   RegistrationStrategy,
+  ReloadableDirective,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
   selectionCollectionProvider,

@@ -9,66 +9,42 @@ import {
 } from '../../../entities-selection/entities-selection.module';
 
 export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocalDataSource<T>> {
-  constructor(datasource: TableLocalDataSource<T>, entitySelectionState: EntitySelectionStateUpdatable<unknown, T>) {
-    super(datasource, entitySelectionState);
-  }
-
   private pageData = toSignal(this.datasource.data$, { initialValue: [] });
   private filteredData = toSignal(this.datasource.allFiltered$, { initialValue: [] });
   private allData = toSignal(this.datasource.allData$, { initialValue: [] });
 
-  private hasFilter = computed(() => {
-    const allData = this.allData();
-    const filteredData = this.filteredData();
-    return allData.length !== filteredData.length;
-  });
-
-  private effectFilterChange = effect(
-    () => {
-      const hasFilter = this.hasFilter();
-      const currentSelectionType = untracked(() => this.entitySelectionState.selectionType());
-
-      if (hasFilter) {
-        if (currentSelectionType === BulkSelectionType.ALL) {
-          this.selectFiltered();
-        }
-      } else {
-        if (currentSelectionType === BulkSelectionType.FILTERED) {
-          this.selectAll();
-        }
-      }
-    },
-    { manualCleanup: true },
-  );
-
   private effectHandleSelectionTypeChange = effect(
     () => {
-      const selectionType = this.entitySelectionState.selectionType();
+      const selectionType = this._entitySelectionState.selectionType();
       this.handleSelectionChange(selectionType);
     },
     { manualCleanup: true },
   );
 
-  destroy(): void {
-    this.effectFilterChange.destroy();
+  constructor(datasource: TableLocalDataSource<T>) {
+    super(datasource);
+  }
+
+  override destroy(): void {
+    super.destroy();
     this.effectHandleSelectionTypeChange.destroy();
   }
 
   clearSelection(): void {
     const keys = [] as unknown[];
     const selectionType = BulkSelectionType.NONE;
-    this.entitySelectionState.updateSelection({ keys, selectionType });
+    this._entitySelectionState.updateSelection({ keys, selectionType });
   }
 
   deselect(item: T): void {
-    if (!this.entitySelectionState.isSelected(item)) {
+    if (!this._entitySelectionState.isSelected(item)) {
       return;
     }
-    if (this.entitySelectionState.selectedSize() === 1) {
+    if (this._entitySelectionState.selectedSize() === 1) {
       this.clearSelection();
       return;
     }
-    this.entitySelectionState.updateSelection({
+    this._entitySelectionState.updateSelection({
       entities: [item],
       selectionType: BulkSelectionType.INDIVIDUAL,
       mode: UpdateSelectionMode.REMOVE,
@@ -76,11 +52,11 @@ export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocal
   }
 
   select(item: T): void {
-    if (this.entitySelectionState.isSelected(item)) {
+    if (this._entitySelectionState.isSelected(item)) {
       return;
     }
 
-    const currentSize = this.entitySelectionState.selectedSize();
+    const currentSize = this._entitySelectionState.selectedSize();
     let selectionType = BulkSelectionType.INDIVIDUAL;
 
     if (currentSize + 1 === this.allData().length) {
@@ -90,11 +66,11 @@ export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocal
     }
 
     if (selectionType !== BulkSelectionType.INDIVIDUAL) {
-      this.entitySelectionState.updateSelection({ selectionType });
+      this._entitySelectionState.updateSelection({ selectionType });
       return;
     }
 
-    this.entitySelectionState.updateSelection({ entities: [item], selectionType, mode: UpdateSelectionMode.UPDATE });
+    this._entitySelectionState.updateSelection({ entities: [item], selectionType, mode: UpdateSelectionMode.UPDATE });
   }
 
   private handleSelectionChange(selectionType: BulkSelectionType): void {
@@ -103,13 +79,16 @@ export class TableLocalSelectionList<T> extends TableSelectionList<T, TableLocal
         this.clearSelection();
         break;
       case BulkSelectionType.ALL:
-        this.entitySelectionState.updateSelection({ entities: this.allData() });
+        const allData = untracked(() => this.allData());
+        this._entitySelectionState.updateSelection({ entities: allData });
         break;
       case BulkSelectionType.FILTERED:
-        this.entitySelectionState.updateSelection({ entities: this.filteredData() });
+        const filtered = untracked(() => this.filteredData());
+        this._entitySelectionState.updateSelection({ entities: filtered });
         break;
       case BulkSelectionType.VISIBLE:
-        this.entitySelectionState.updateSelection({ entities: this.pageData() });
+        const paged = untracked(() => this.pageData());
+        this._entitySelectionState.updateSelection({ entities: paged });
         break;
       default:
         break;

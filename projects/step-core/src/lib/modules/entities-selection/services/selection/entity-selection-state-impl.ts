@@ -4,7 +4,7 @@ import {
   UpdateSelectionParamsEntities,
   UpdateSelectionParamsKeys,
 } from './entity-selection-state';
-import { computed, Injectable, OnDestroy, signal } from '@angular/core';
+import { computed, Injectable, OnDestroy, signal, untracked } from '@angular/core';
 import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
 
 @Injectable()
