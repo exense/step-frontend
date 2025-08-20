@@ -7,6 +7,8 @@ import { BulkSelectionDiComponent } from './components/bulk-selection/bulk-selec
 import { EntitySelectionDiComponent } from './components/entity-selection/entity-selection-di.component';
 import { BulkSelectionLabelComponent } from './components/bulk-selection-label/bulk-selection-label.component';
 import { IsSelectedPipe } from './pipes/is-selected.pipe';
+import { BulkSelLabelComponent } from './components/bulk-sel-label/bulk-sel-label.component';
+import { BulkSelComponent } from './components/bulk-sel/bulk-sel.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +19,7 @@ import { IsSelectedPipe } from './pipes/is-selected.pipe';
     BulkSelectionLabelComponent,
     IsSelectedPipe,
   ],
-  imports: [CommonModule, StepMaterialModule],
+  imports: [CommonModule, StepMaterialModule, BulkSelLabelComponent, BulkSelComponent],
   exports: [
     EntitySelectionComponent,
     EntitySelectionDiComponent,
@@ -25,6 +27,8 @@ import { IsSelectedPipe } from './pipes/is-selected.pipe';
     BulkSelectionDiComponent,
     BulkSelectionLabelComponent,
     IsSelectedPipe,
+    BulkSelLabelComponent,
+    BulkSelComponent,
   ],
 })
 export class EntitiesSelectionModule {}
@@ -52,3 +56,10 @@ export {
 } from './shared/entity-bulk-operation-info.interface';
 export * from './shared/bulk-operation-perform.strategy';
 export * from './pipes/is-selected.pipe';
+
+export * from './services/selection/selection-list';
+export * from './services/selection/entity-selection-state';
+export * from './services/selection/entity-selection-state-impl';
+export * from './services/selection/entity-selection-state.provider';
+export * from './components/bulk-sel/bulk-sel.component';
+export * from './components/bulk-sel-label/bulk-sel-label.component';

@@ -1,9 +1,8 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, computed, inject, Input, OnChanges, OnDestroy, signal, SimpleChanges } from '@angular/core';
 import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { map, Observable, of } from 'rxjs';
-import { Mutable } from '../../../basics/step-basics.module';
-
-type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelected$'>>;
+import { map, Subject, takeUntil } from 'rxjs';
+import { EntitySelectionState } from '../../services/selection/entity-selection-state';
+import { SelectionList } from '../../services/selection/selection-list';
 
 @Component({
   selector: 'step-entity-selection',
@@ -12,22 +11,44 @@ type FieldAccessor = Mutable<Pick<EntitySelectionComponent<any, any>, 'isSelecte
   standalone: false,
 })
 export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
+  private _selectionState = inject<EntitySelectionState<KEY, ENTITY>>(EntitySelectionState, { optional: true });
+  private _selectionList = inject<SelectionList<KEY, ENTITY>>(SelectionList, { optional: true });
+
+  private collectorTerminator$?: Subject<void>;
+
   @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
   @Input() entity?: ENTITY;
 
-  readonly isSelected$: Observable<boolean> = of(false);
+  private entitySignal = signal<ENTITY | undefined>(undefined);
+  private isSelectedFromCollector = signal(false);
+  private isSelectedFromState = computed(() => {
+    const keys = this._selectionState?.selectedKeys?.();
+    const entity = this.entitySignal();
+    return !entity ? undefined : this._selectionState?.isSelected?.(entity);
+  });
+
+  readonly isSelected = computed(() => {
+    const isSelectedFromCollector = this.isSelectedFromCollector();
+    const isSelectedFromState = this.isSelectedFromState();
+    return isSelectedFromCollector || isSelectedFromState;
+  });
 
   toggle(): void {
-    if (!this.selectionCollector || !this.entity) {
+    if (!this.entity) {
       return;
     }
-    this.selectionCollector!.toggleSelection(this.entity!);
+    if (this.selectionCollector) {
+      this.selectionCollector.toggleSelection(this.entity);
+      return;
+    }
+    this._selectionList?.toggleSelection?.(this.entity);
   }
 
   ngOnDestroy(): void {
     if (this.entity && this.selectionCollector) {
       this.selectionCollector.unregisterPossibleSelection(this.entity);
     }
+    this.terminateCollector();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -49,7 +70,14 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestr
     this.setupStreams(entity, selectionCollector);
   }
 
+  private terminateCollector(): void {
+    this.collectorTerminator$?.next?.();
+    this.collectorTerminator$?.complete?.();
+    this.collectorTerminator$ = undefined;
+  }
+
   private onEntityChange(currentValue?: ENTITY, previousValue?: ENTITY): void {
+    this.entitySignal.set(currentValue);
     if (!this.selectionCollector) {
       return;
     }
@@ -84,8 +112,13 @@ export class EntitySelectionComponent<KEY, ENTITY> implements OnChanges, OnDestr
       return;
     }
 
-    (this as FieldAccessor).isSelected$ = selectionCollector!.selected$.pipe(
-      map(() => selectionCollector!.isSelected(entity!)),
-    );
+    this.terminateCollector();
+    this.collectorTerminator$ = new Subject();
+    selectionCollector!.selected$
+      .pipe(
+        map(() => selectionCollector!.isSelected(entity!)),
+        takeUntil(this.collectorTerminator$),
+      )
+      .subscribe((isSelected) => this.isSelectedFromCollector.set(isSelected));
   }
 }

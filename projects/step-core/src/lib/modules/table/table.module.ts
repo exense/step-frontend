@@ -46,6 +46,7 @@ import { SettingsInsideActionColDirective } from './directives/settings-inside-a
 import { RowsExtensionDirective } from './directives/rows-extension.directive';
 import { RowDirective } from './directives/row.directive';
 import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
+import { BulkOpsComponent } from './components/bulk-ops/bulk-ops.component';
 
 @NgModule({
   imports: [
@@ -59,6 +60,7 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     DatePickerModule,
     AUTH_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BulkOpsComponent,
   ],
   declarations: [
     TableComponent,
@@ -115,6 +117,7 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     ColumnSettingsSaveDashletComponent,
     SettingsInsideActionColDirective,
     RowsExtensionDirective,
+    BulkOpsComponent,
   ],
   providers: [
     TitleCasePipe,
@@ -198,3 +201,4 @@ export * from './services/table-persistence-url-state.service';
 export * from './types/row-info.interface';
 export * from './services/table-memory-storage.service';
 export * from './services/table-local-storage.service';
+export * from './components/bulk-ops/bulk-ops.component';

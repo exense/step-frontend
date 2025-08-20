@@ -1,0 +1,16 @@
+<step-bulk-sel [showLabel]="false" />
+<div>
+  @for (operation of entityOperations(); track operation.type) {
+    <button
+      type="button"
+      mat-icon-button
+      [class]="operation.type"
+      (click)="invoke(operation)"
+      [matTooltip]="operation.label!"
+      [disabled]="(operation.permission && !(operation.permission | hasRight | async)) || isOperationsDisabled()"
+    >
+      <step-icon [name]="operation.icon" />
+    </button>
+  }
+</div>
+<step-bulk-sel-label />

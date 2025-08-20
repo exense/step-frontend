@@ -1,0 +1,22 @@
+<mat-label>
+  @switch (selectionType()) {
+    @case (BulkSelectionType.NONE) {
+      <span>No items selected</span>
+    }
+    @case (BulkSelectionType.ALL) {
+      <span>All items selected</span>
+    }
+    @case (BulkSelectionType.FILTERED) {
+      <span>Filtered items selected</span>
+    }
+    @default {
+      <span>Selected {{ size() }} elements(s), do you want to select </span>
+      @if (!_hasFilter?.hasFilter?.()) {
+        <a href="#" (click)="selectAll(); (false)">all</a>
+      } @else {
+        <a href="#" (click)="selectFiltered(); (false)">all filtered</a>
+      }
+      <span> instead?</span>
+    }
+  }
+</mat-label>

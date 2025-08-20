@@ -11,6 +11,6 @@ import { SelectionCollector } from '../../services/selection-collector/selection
   standalone: false,
 })
 export class EntitySelectionDiComponent<KEY, ENTITY> {
-  _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector);
+  _selectionCollector = inject<SelectionCollector<KEY, ENTITY>>(SelectionCollector, { optional: true }) || undefined;
   @Input() entity?: ENTITY;
 }
