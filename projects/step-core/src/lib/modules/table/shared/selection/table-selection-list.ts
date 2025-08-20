@@ -17,14 +17,8 @@ export abstract class TableSelectionList<T, D extends TableDataSource<T>> extend
       const hasFilter = this._hasFilter.hasFilter();
       const currentSelectionType = untracked(() => this._entitySelectionState.selectionType());
 
-      if (hasFilter) {
-        if (currentSelectionType === BulkSelectionType.ALL) {
-          this.selectFiltered();
-        }
-      } else {
-        if (currentSelectionType === BulkSelectionType.FILTERED) {
-          this.selectAll();
-        }
+      if (!hasFilter && currentSelectionType === BulkSelectionType.FILTERED) {
+        this.selectAll();
       }
     },
     { manualCleanup: true },

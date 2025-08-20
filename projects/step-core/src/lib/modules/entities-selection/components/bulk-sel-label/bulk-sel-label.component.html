@@ -5,16 +5,23 @@
     }
     @case (BulkSelectionType.ALL) {
       <span>All items selected</span>
+      @if (_hasFilter?.hasFilter?.()) {
+        <span>. </span>
+        <a href="#" (click)="selectFiltered(); (false)">Select all filtered</a>
+        <span> instead</span>
+      }
     }
     @case (BulkSelectionType.FILTERED) {
       <span>Filtered items selected</span>
     }
     @default {
-      <span>Selected {{ size() }} elements(s), do you want to select </span>
+      <span>Selected {{ size() }} elements(s), do you want to </span>
       @if (!_hasFilter?.hasFilter?.()) {
-        <a href="#" (click)="selectAll(); (false)">all</a>
+        <a href="#" (click)="selectAll(); (false)">select all</a>
       } @else {
-        <a href="#" (click)="selectFiltered(); (false)">all filtered</a>
+        <a href="#" (click)="selectAll(); (false)">select all</a>
+        <span> or </span>
+        <a href="#" (click)="selectFiltered(); (false)">select all filtered</a>
       }
       <span> instead?</span>
     }
