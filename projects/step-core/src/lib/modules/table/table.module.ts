@@ -47,6 +47,7 @@ import { RowsExtensionDirective } from './directives/rows-extension.directive';
 import { RowDirective } from './directives/row.directive';
 import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
 import { BulkOpsComponent } from './components/bulk-ops/bulk-ops.component';
+import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
 
 @NgModule({
   imports: [
@@ -61,6 +62,7 @@ import { BulkOpsComponent } from './components/bulk-ops/bulk-ops.component';
     AUTH_EXPORTS,
     DRAG_DROP_EXPORTS,
     BulkOpsComponent,
+    TableWithoutSelectionStateDirective,
   ],
   declarations: [
     TableComponent,
@@ -118,6 +120,7 @@ import { BulkOpsComponent } from './components/bulk-ops/bulk-ops.component';
     SettingsInsideActionColDirective,
     RowsExtensionDirective,
     BulkOpsComponent,
+    TableWithoutSelectionStateDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -202,3 +205,4 @@ export * from './types/row-info.interface';
 export * from './services/table-memory-storage.service';
 export * from './services/table-local-storage.service';
 export * from './components/bulk-ops/bulk-ops.component';
+export * from './directives/table-without-selection-state.directive';
