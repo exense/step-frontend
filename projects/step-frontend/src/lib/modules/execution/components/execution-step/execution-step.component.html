@@ -17,12 +17,12 @@
       [dataSource]="testCasesDataSource"
     >
       <ng-container *stepAdditionalHeader>
-        <step-bulk-operations [(selectionType)]="selectionType"></step-bulk-operations>
+        <step-bulk-operations />
       </ng-container>
       <ng-container matColumnDef="selection">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <step-entity-selection-di [entity]="element"> </step-entity-selection-di>
+          <step-entity-selection [entity]="element" />
         </td>
       </ng-container>
       <ng-container matColumnDef="name" stepSearchCol>
@@ -80,7 +80,7 @@
     </step-keyword-calls>
   </step-panel>
   <step-panel [panelType]="Panels.PARAMETERS">
-    <step-table [dataSource]="parameters">
+    <step-table [dataSource]="parameters" noSelectionState>
       <ng-container matColumnDef="key" stepSearchCol>
         <th mat-header-cell *matHeaderCellDef>Key</th>
         <td mat-cell *matCellDef="let element">{{ element.key }}</td>

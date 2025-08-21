@@ -13,8 +13,7 @@ import {
 } from '../custom-registeries/custom-registries.module';
 import { CustomCellComponentsPipe } from './pipe/custom-cell-components.pipe';
 import { AdditionalHeaderDirective } from './directives/additional-header.directive';
-import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
-import { BulkOperationPerformStrategy, EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
+import { BulkOperationPerformStrategy, ENTITIES_SELECTION_EXPORTS } from '../entities-selection';
 import { AsyncOperationsModule } from '../async-operations/async-operations.module';
 import { CustomSearchCellComponentsPipe } from './pipe/custom-search-cell-components.pipe';
 import { StepBasicsModule } from '../basics/step-basics.module';
@@ -46,12 +45,14 @@ import { SettingsInsideActionColDirective } from './directives/settings-inside-a
 import { RowsExtensionDirective } from './directives/rows-extension.directive';
 import { RowDirective } from './directives/row.directive';
 import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
+import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
+import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
 
 @NgModule({
   imports: [
     CommonModule,
     StepMaterialModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
     CustomRegistriesModule,
     AsyncOperationsModule,
     EDITABLE_LABELS_EXPORTS,
@@ -59,6 +60,8 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     DatePickerModule,
     AUTH_EXPORTS,
     DRAG_DROP_EXPORTS,
+    BulkOperationsComponent,
+    TableWithoutSelectionStateDirective,
   ],
   declarations: [
     TableComponent,
@@ -69,7 +72,6 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     ColumnDirective,
     CustomCellComponentsPipe,
     AdditionalHeaderDirective,
-    BulkOperationsComponent,
     CustomSearchCellComponentsPipe,
     SearchColMetaDirective,
     FilterConnectDirective,
@@ -99,7 +101,6 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     CustomColumnsComponent,
     ColumnDirective,
     AdditionalHeaderDirective,
-    BulkOperationsComponent,
     FilterConnectDirective,
     CustomSearchDropdownComponent,
     CustomSearchCheckboxComponent,
@@ -115,6 +116,8 @@ import { TablePaginatorAddonDirective } from './directives/table-paginator-addon
     ColumnSettingsSaveDashletComponent,
     SettingsInsideActionColDirective,
     RowsExtensionDirective,
+    BulkOperationsComponent,
+    TableWithoutSelectionStateDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -176,7 +179,6 @@ export * from './directives/settings-inside-action-col.directive';
 export * from './directives/table-paginator-addon.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
-export * from './components/bulk-operations/bulk-operations.component';
 export * from './shared/filter-condition';
 export * from './shared/table-local-data-source-config';
 export * from './shared/search-column.interface';
@@ -198,3 +200,5 @@ export * from './services/table-persistence-url-state.service';
 export * from './types/row-info.interface';
 export * from './services/table-memory-storage.service';
 export * from './services/table-local-storage.service';
+export * from './components/bulk-operations/bulk-operations.component';
+export * from './directives/table-without-selection-state.directive';

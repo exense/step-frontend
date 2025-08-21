@@ -10,11 +10,7 @@ import {
   AsyncOperationDialogResult,
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
-import {
-  BulkOperationConfig,
-  BulkOperationPerformStrategy,
-  BulkSelectionType,
-} from '../../entities-selection/entities-selection.module';
+import { BulkOperationConfig, BulkOperationPerformStrategy, BulkSelectionType } from '../../entities-selection';
 import { TableBulkOperationRequest, TableParameters, AsyncTaskStatus } from '../../../client/step-client-module';
 
 const formatMessageWithDeleteWarning = (

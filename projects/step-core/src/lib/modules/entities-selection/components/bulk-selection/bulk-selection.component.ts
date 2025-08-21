@@ -1,153 +1,63 @@
-import {
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
-import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
-import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { filter, Subject, takeUntil } from 'rxjs';
-import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions } from '@angular/material/checkbox';
-import { RegistrationStrategy } from '../../shared/registration.strategy';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { EntitySelectionState } from '../../injectables/selection/entity-selection-state';
+import { SelectionList } from '../../injectables/selection/selection-list';
+import { BulkSelectionType } from '../../types/bulk-selection-type.enum';
+import { BulkSelectionLabelComponent } from '../bulk-selection-label/bulk-selection-label.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'step-bulk-selection',
+  imports: [StepBasicsModule, BulkSelectionLabelComponent],
   templateUrl: './bulk-selection.component.html',
-  styleUrls: ['./bulk-selection.component.scss'],
-  providers: [
-    {
-      provide: MAT_CHECKBOX_DEFAULT_OPTIONS,
-      useValue: {
-        clickAction: 'noop',
-      } as MatCheckboxDefaultOptions,
-    },
-  ],
-  standalone: false,
+  styleUrl: './bulk-selection.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BulkSelectionComponent<KEY, ENTITY> implements OnChanges, OnDestroy {
-  private terminator$?: Subject<void>;
+export class BulkSelectionComponent<KEY, ENTITY> {
+  private _selectionState = inject<EntitySelectionState<KEY, ENTITY>>(EntitySelectionState);
+  private _selectionList = inject<SelectionList<KEY, ENTITY>>(SelectionList);
 
-  @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
-  @Input() showLabel: boolean = true;
-  @Input() selectionType: BulkSelectionType = BulkSelectionType.NONE;
-  @Input() isDisabled: boolean = false;
-  @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
+  private checkbox = viewChild('checkBox', { read: MatCheckbox });
 
-  protected isChecked: boolean = false;
-  protected isIntermediate: boolean = false;
+  readonly showLabel = input(true);
+  readonly isDisabled = input(false);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cSelectionCollector = changes['selectionCollector'];
-    if (cSelectionCollector?.previousValue !== cSelectionCollector?.currentValue || cSelectionCollector?.firstChange) {
-      this.setupCollector(cSelectionCollector?.currentValue);
+  private isChecked = computed(() => {
+    const selectionType = this._selectionState.selectionType();
+    return selectionType === BulkSelectionType.ALL;
+  });
+
+  private isIntermediate = computed(() => {
+    const selectionType = this._selectionState.selectionType();
+    const size = this._selectionState.selectedSize();
+    if (selectionType === BulkSelectionType.ALL || selectionType === BulkSelectionType.NONE) {
+      return false;
     }
-    const cSelectionType = changes['selectionType'];
-    if (cSelectionType?.previousValue !== cSelectionCollector?.currentValue) {
-      this.changeType(cSelectionType?.currentValue || BulkSelectionType.NONE);
-    }
-  }
+    return size > 0;
+  });
 
-  ngOnDestroy(): void {
-    this.terminate();
-  }
-
-  handleCheckboxChange(): void {
-    this.changeType(this.selectionType !== BulkSelectionType.NONE ? BulkSelectionType.NONE : BulkSelectionType.VISIBLE);
-  }
-
-  changeType(selectionType: BulkSelectionType): void {
-    this.selectionType = selectionType;
-
-    if (this.selectionCollector) {
-      switch (selectionType) {
-        case BulkSelectionType.ALL:
-        case BulkSelectionType.FILTERED:
-        case BulkSelectionType.VISIBLE:
-          this.selectionCollector.selectPossibleItems();
-          if (this.selectionCollector.registrationStrategy === RegistrationStrategy.MANUAL) {
-            // In case of manual registration, it's assumed that registered possible items, are the whole list
-            selectionType = BulkSelectionType.ALL;
-          }
-          break;
-        case BulkSelectionType.NONE:
-          this.selectionCollector.clear();
-          break;
-        default:
-          break;
-      }
-    }
-
-    this.selectionType = selectionType;
-    this.selectionTypeChange.emit(selectionType);
-
-    switch (selectionType) {
-      case BulkSelectionType.ALL:
-        this.isChecked = true;
-        this.isIntermediate = false;
-        break;
-      case BulkSelectionType.NONE:
-        this.isChecked = false;
-        this.isIntermediate = false;
-        break;
-      default:
-        this.isChecked = false;
-        this.isIntermediate = !!this.selectionCollector?.length;
-        break;
-    }
-  }
-
-  @HostListener('click', ['$event'])
-  onHostClick(event: MouseEvent): void {
-    // required to prevent sort invocation, in case if component is places inside mat-sort-header
-    event.stopPropagation();
-  }
-
-  private setupCollector(selectionCollector?: SelectionCollector<KEY, ENTITY>): void {
-    this.terminate();
-    selectionCollector = selectionCollector || this.selectionCollector;
-    if (!selectionCollector) {
+  private effectSyncCheckboxState = effect(() => {
+    const checkbox = this.checkbox();
+    const isChecked = this.isChecked();
+    const isIntermediate = this.isIntermediate();
+    if (!checkbox) {
       return;
     }
-    this.terminator$ = new Subject<void>();
-
-    // update individual
-    selectionCollector.selected$
-      .pipe(
-        filter(
-          (selected) =>
-            (selected.length > 0 && selected.length < selectionCollector!.possibleLength) || selected.length === 1,
-        ),
-        takeUntil(this.terminator$),
-      )
-      .subscribe(() => {
-        if (!selectionCollector?.isSelectingPossible() && this.selectionType !== BulkSelectionType.INDIVIDUAL) {
-          this.changeType(BulkSelectionType.INDIVIDUAL);
-        }
-      });
-
-    // update empty
-    selectionCollector.selected$
-      .pipe(
-        filter((selected) => selected.length === 0),
-        takeUntil(this.terminator$),
-      )
-      .subscribe(() => {
-        if (this.selectionType !== BulkSelectionType.NONE) {
-          this.changeType(BulkSelectionType.NONE);
-        }
-      });
-  }
-
-  private terminate(): void {
-    if (!this.terminator$) {
-      return;
+    if (isIntermediate) {
+      checkbox.checked = false;
+      checkbox.indeterminate = true;
+    } else {
+      checkbox.checked = isChecked;
+      checkbox.indeterminate = false;
     }
-    this.terminator$.next();
-    this.terminator$.complete();
-    this.terminator$ = undefined;
+  });
+
+  protected handleCheckboxChange(): void {
+    const selectionType = this._selectionState.selectionType();
+    if (selectionType === BulkSelectionType.NONE) {
+      this._selectionList.selectVisible();
+    } else {
+      this._selectionList.clearSelection();
+    }
   }
 }

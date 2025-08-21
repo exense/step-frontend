@@ -1,12 +1,9 @@
 import { Component, inject, viewChild } from '@angular/core';
 import {
   AugmentedResourcesService,
-  AutoDeselectStrategy,
   BaseEntitySelectionTableComponent,
-  FunctionPackage,
+  entitySelectionStateProvider,
   Resource,
-  selectionCollectionProvider,
-  SelectionCollector,
   StepCoreModule,
   TableComponent,
 } from '@exense/step-core';
@@ -16,15 +13,9 @@ import {
   templateUrl: './resource-selection.component.html',
   styleUrls: ['./resource-selection.component.scss'],
   imports: [StepCoreModule],
-  providers: [...selectionCollectionProvider<string, Resource>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...entitySelectionStateProvider<string, Resource>('id')],
 })
 export class ResourceSelectionComponent extends BaseEntitySelectionTableComponent {
-  private tableRef = viewChild('tableRef', { read: TableComponent<Resource> });
-
-  protected get _tableRef(): TableComponent<Resource> | undefined {
-    return this.tableRef();
-  }
-
-  protected _selectionCollector = inject<SelectionCollector<string, FunctionPackage>>(SelectionCollector);
+  protected tableRef = viewChild('tableRef', { read: TableComponent<Resource> });
   readonly _dataSource = inject(AugmentedResourcesService).createSelectionDataSource();
 }

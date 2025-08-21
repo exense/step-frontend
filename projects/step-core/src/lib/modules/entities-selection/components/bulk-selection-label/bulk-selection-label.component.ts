@@ -1,42 +1,41 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { of } from 'rxjs';
-import { SelectionCollector } from '../../services/selection-collector/selection-collector';
-import { BulkSelectionType } from '../../shared/bulk-selection-type.enum';
-import { HasFilter } from '../../services/has-filter';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { EntitySelectionState } from '../../injectables/selection/entity-selection-state';
+import { SelectionList } from '../../injectables/selection/selection-list';
+import { BulkSelectionType } from '../../types/bulk-selection-type.enum';
+import { HasFilter } from '../../injectables/has-filter';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-bulk-selection-label',
   templateUrl: './bulk-selection-label.component.html',
-  styleUrls: ['./bulk-selection-label.component.scss'],
-  standalone: false,
+  styleUrl: './bulk-selection-label.component.scss',
+  imports: [StepBasicsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BulkSelectionLabelComponent<KEY, ENTITY> {
-  readonly hasFilter$ = inject(HasFilter, { optional: true })?.hasFilter$ ?? of(false);
+  private _selectionState = inject<EntitySelectionState<KEY, ENTITY>>(EntitySelectionState);
+  private _selectionList = inject<SelectionList<KEY, ENTITY>>(SelectionList);
 
-  readonly BulkSelectionType = BulkSelectionType;
-  @Input() selectionCollector?: SelectionCollector<KEY, ENTITY>;
-  @Input() selectionType?: BulkSelectionType;
-  @Output() selectionTypeChange = new EventEmitter<BulkSelectionType>();
-  @Input() isDisabled = false;
+  protected readonly _hasFilter = inject(HasFilter, { optional: true });
 
-  clearSelection(): void {
-    if (this.isDisabled) {
+  protected readonly selectionType = this._selectionState.selectionType;
+  protected readonly size = this._selectionState.selectedSize;
+
+  protected readonly BulkSelectionType = BulkSelectionType;
+
+  readonly isDisabled = input(false);
+
+  protected selectAll(): void {
+    if (this.isDisabled()) {
       return;
     }
-    this.selectionTypeChange.emit(BulkSelectionType.NONE);
+    this._selectionList.selectAll();
   }
 
-  selectAll(): void {
-    if (this.isDisabled) {
+  protected selectFiltered(): void {
+    if (this.isDisabled()) {
       return;
     }
-    this.selectionTypeChange.emit(BulkSelectionType.ALL);
-  }
-
-  selectFiltered(): void {
-    if (this.isDisabled) {
-      return;
-    }
-    this.selectionTypeChange.emit(BulkSelectionType.FILTERED);
+    this._selectionList.selectFiltered();
   }
 }

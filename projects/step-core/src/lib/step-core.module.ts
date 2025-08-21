@@ -26,7 +26,7 @@ import {
   CustomRegistriesModule,
 } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
-import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
+import { ENTITIES_SELECTION_EXPORTS } from './modules/entities-selection';
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
@@ -111,7 +111,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     TableModule,
     StepBasicsModule,
     EntityModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
     StepGeneratedClientModule,
     CustomRegistriesModule,
     AngularSplitModule,
@@ -157,7 +157,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     TableModule,
     StepBasicsModule,
     EntityModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
     StepGeneratedClientModule,
     CustomRegistriesModule,
     TooltipImmediateCloseDirective,
@@ -277,7 +277,7 @@ export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
 export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './modules/json-forms';
-export * from './modules/entities-selection/entities-selection.module';
+export * from './modules/entities-selection';
 export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';

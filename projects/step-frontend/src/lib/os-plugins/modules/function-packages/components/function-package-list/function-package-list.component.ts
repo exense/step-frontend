@@ -1,10 +1,9 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
-  AutoDeselectStrategy,
   DialogParentService,
+  entitySelectionStateProvider,
   FunctionPackage,
-  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
@@ -20,7 +19,7 @@ import { FunctionPackageActionsService } from '../../injectables/function-packag
       entityTableRemoteId: AugmentedKeywordPackagesService.FUNCTION_PACKAGE_TABLE_ID,
     }),
     tablePersistenceConfigProvider('functionPackageList', STORE_ALL),
-    ...selectionCollectionProvider<string, FunctionPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, FunctionPackage>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => FunctionPackageListComponent),

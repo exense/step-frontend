@@ -1,7 +1,7 @@
 <step-icon
   name="filter"
   (click)="showPopover()"
-  [matBadge]="selectedIds.length || null"
+  [matBadge]="selectedIds?.length || null"
   matBadgeColor="primary"
   matBadgeSize="small"
   [matTooltip]="(tooltipText$ | async) ?? ''"

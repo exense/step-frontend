@@ -5,7 +5,7 @@ import {
   EntityBulkOperation,
   EntityBulkOperationInfo,
   EntityBulkOperationRegisterInfo,
-} from '../shared/entity-bulk-operation-info.interface';
+} from '../types/entity-bulk-operation-info.interface';
 
 const convert = ({
   operationType: type,

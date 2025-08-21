@@ -1,4 +1,4 @@
-import { Component, ElementRef, forwardRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import {
   map,
@@ -36,6 +36,7 @@ const DEFAULT_TOOLTIP = 'Filter by package name';
     },
     PopoverOverlayService,
   ],
+  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class AutomationPackageFilterComponent
@@ -82,9 +83,10 @@ export class AutomationPackageFilterComponent
     this.popoverStreamsTerminator$ = new Subject<void>();
 
     component.select(this.filterControl.value as string[]);
-    component.selected$
-      .pipe(takeUntil(this.popoverStreamsTerminator$))
-      .subscribe((selectedIds) => (this.selectedIds = selectedIds as string[]));
+    component.selected$.pipe(takeUntil(this.popoverStreamsTerminator$)).subscribe((selectedIds) => {
+      this.selectedIds = selectedIds as string[];
+      this._cd.detectChanges();
+    });
     component.cleared.subscribe(() => this._popoverOverlay.close());
 
     this._popoverOverlay

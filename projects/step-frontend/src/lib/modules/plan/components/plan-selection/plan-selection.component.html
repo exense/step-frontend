@@ -7,15 +7,19 @@
   [filter]="context?.tableFilter"
 >
   <ng-container *stepAdditionalHeader>
-    <step-bulk-operations *ngIf="multipleSelection"></step-bulk-operations>
+    @if (multipleSelection) {
+      <step-bulk-operations />
+    }
   </ng-container>
 
-  <ng-container matColumnDef="bulkSelection" *ngIf="multipleSelection">
-    <th mat-header-cell *matHeaderCellDef></th>
-    <td mat-cell *matCellDef="let element">
-      <step-entity-selection-di [entity]="element"></step-entity-selection-di>
-    </td>
-  </ng-container>
+  @if (multipleSelection) {
+    <ng-container matColumnDef="bulkSelection">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <step-entity-selection [entity]="element" />
+      </td>
+    </ng-container>
+  }
 
   <step-entity-column-container entityName="plans"></step-entity-column-container>
   <step-custom-columns screen="plan" [options]="['noEditorLink', 'noDescriptionHint']"> </step-custom-columns>

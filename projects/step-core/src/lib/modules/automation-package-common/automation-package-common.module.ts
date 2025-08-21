@@ -14,7 +14,7 @@ import { AutomationPackageInfoComponent } from './components/automation-package-
 import { AutomationPackageSearchComponent } from './components/automation-package-search/automation-package-search.component';
 import { AutomationPackageRefIconComponent } from './components/automation-package-ref-icon/automation-package-ref-icon.component';
 import { AutomationPackageFilterPopoverComponent } from './components/automation-package-filter-popover/automation-package-filter-popover.component';
-import { EntitiesSelectionModule } from '../entities-selection/entities-selection.module';
+import { ENTITIES_SELECTION_EXPORTS } from '../entities-selection';
 import { AutomationPackageFilterComponent } from './components/automation-package-filter/automation-package-filter.component';
 
 @NgModule({
@@ -34,7 +34,7 @@ import { AutomationPackageFilterComponent } from './components/automation-packag
     CustomRegistriesModule,
     TableModule,
     EntityModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
   ],
   exports: [
     AutomationPackageInfoComponent,
@@ -46,7 +46,7 @@ import { AutomationPackageFilterComponent } from './components/automation-packag
 export class AutomationPackageCommonModule {
   constructor(
     private _cellsRegistry: CustomCellRegistryService,
-    private _searchCellsRegistry: CustomSearchCellRegistryService
+    private _searchCellsRegistry: CustomSearchCellRegistryService,
   ) {
     this.registerCells();
     this.registerSearchCells();

@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, Signal } from '@angular/core';
 import { TableComponent } from '../../../table/table.module';
 import { CustomComponent } from '../../../custom-registeries/custom-registries.module';
-import { SelectionCollector } from '../../../entities-selection/entities-selection.module';
 import { SelectEntityContext } from '../../types/select-entity-context.interface';
 import { EntityObject } from '../../types/entity-object';
 
@@ -13,8 +12,7 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
   private requireInitialSearch = false;
 
   protected multipleSelection?: boolean;
-  protected abstract _tableRef?: TableComponent<any>;
-  protected abstract _selectionCollector?: SelectionCollector<string, any>;
+  protected abstract tableRef: Signal<TableComponent<any> | undefined>;
   private contextInternal?: SelectEntityContext;
   set context(value: SelectEntityContext | undefined) {
     this.cleanupContext();
@@ -48,7 +46,7 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
     }
     this.multipleSelection = this.contextInternal.multipleSelection;
 
-    if (this._tableRef) {
+    if (!!this.tableRef()) {
       this.initialSearch();
     } else {
       this.requireInitialSearch = true;
@@ -67,6 +65,6 @@ export abstract class BaseEntitySelectionTableComponent implements AfterViewInit
     if (!sourceId) {
       return;
     }
-    this._tableRef!.onSearch('attributes.project', sourceId);
+    this.tableRef()!.onSearch('attributes.project', sourceId);
   }
 }

@@ -154,8 +154,7 @@ export class AltExecutionLaunchDialogComponent
       return;
     }
     setTimeout(() => {
-      testCases.selectionCollector.clear();
-      testCases.selectionCollector.selectById(...selection!.list!);
+      testCases.reselect(selection.list);
     }, 500);
   });
 }

@@ -29,13 +29,11 @@ import {
 } from 'rxjs';
 import {
   AggregatedReportView,
-  AggregatedReport,
   AlertType,
   AugmentedControllerService,
   AugmentedExecutionsService,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
-  AutoDeselectStrategy,
   DateUtilsService,
   Execution,
   ExecutionCloseHandleService,

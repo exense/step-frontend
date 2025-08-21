@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 import {
   BulkSelectionType,
+  EntitySelectionStateUpdatable,
   Execution,
   ExecutionSummaryDto,
   ReportNode,
-  SelectionCollector,
   TableLocalDataSource,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
@@ -25,6 +25,7 @@ import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
 import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-execution-step',
@@ -34,14 +35,14 @@ import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 })
 export class ExecutionStepComponent implements OnChanges, OnDestroy {
   private panelService = inject(SingleExecutionPanelsService);
-  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _testCaseSelectionState =
+    inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
 
   private selectionTerminator$?: Subject<void>;
+  private selected$ = toObservable(this._testCaseSelectionState.selectedKeys).pipe(map((keys) => Array.from(keys)));
 
   protected keywordParameters$?: Observable<KeywordParameters>;
   readonly statusOptions = REPORT_NODE_STATUS;
-
-  selectionType: BulkSelectionType = BulkSelectionType.NONE;
 
   @Input() executionId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -113,7 +114,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     this.selectionTerminator$ = new Subject<void>();
 
-    this.keywordParameters$ = this._testCasesSelection!.selected$.pipe(
+    this.keywordParameters$ = this.selected$.pipe(
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: executionId,
@@ -148,14 +149,13 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   private determineSelectionType(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases ?? [];
-    const selected = this._testCasesSelection.selected ?? [];
-    if (testCases.length > 0 && testCases.length === selected.length) {
+    if (testCases.length > 0 && testCases.length === this._testCaseSelectionState.selectedSize()) {
       const isAllIncluded = testCases.reduce(
-        (result, testCase) => result && selected!.includes(testCase.artefactID!),
+        (result, testCase) => result && this._testCaseSelectionState.isSelected(testCase),
         true,
       );
       if (isAllIncluded) {
-        this.selectionType = BulkSelectionType.ALL;
+        this._testCaseSelectionState.updateSelection({ selectionType: BulkSelectionType.ALL });
       }
     }
   }

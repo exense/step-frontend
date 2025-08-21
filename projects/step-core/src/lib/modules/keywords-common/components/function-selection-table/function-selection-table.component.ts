@@ -1,10 +1,5 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import {
-  AutoDeselectStrategy,
-  EntitiesSelectionModule,
-  selectionCollectionProvider,
-  SelectionCollector,
-} from '../../../entities-selection/entities-selection.module';
+import { Component, inject, viewChild } from '@angular/core';
+import { ENTITIES_SELECTION_EXPORTS, entitySelectionStateProvider } from '../../../entities-selection';
 import { BaseEntitySelectionTableComponent } from '../../../entity/entity.module';
 import { TableComponent, TableModule } from '../../../table/table.module';
 import { AugmentedKeywordsService, Keyword } from '../../../../client/step-client-module';
@@ -14,14 +9,11 @@ import { DateFormat, StepBasicsModule } from '../../../basics/step-basics.module
   selector: 'step-function-selection-table',
   templateUrl: './function-selection-table.component.html',
   styleUrls: ['./function-selection-table.component.scss'],
-  providers: [...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
-  imports: [TableModule, StepBasicsModule, EntitiesSelectionModule],
+  providers: [...entitySelectionStateProvider<string, Keyword>('id')],
+  imports: [TableModule, StepBasicsModule, ENTITIES_SELECTION_EXPORTS],
 })
 export class FunctionSelectionTableComponent extends BaseEntitySelectionTableComponent {
-  protected _selectionCollector = inject<SelectionCollector<string, Keyword>>(SelectionCollector);
-
-  @ViewChild('tableRef', { read: TableComponent })
-  protected _tableRef?: TableComponent<Keyword>;
-  protected dataSource = inject(AugmentedKeywordsService).getKeywordSelectionTableDataSource();
+  protected tableRef = viewChild('tableRef', { read: TableComponent<Keyword> });
+  protected _dataSource = inject(AugmentedKeywordsService).getKeywordSelectionTableDataSource();
   readonly DateFormat = DateFormat;
 }

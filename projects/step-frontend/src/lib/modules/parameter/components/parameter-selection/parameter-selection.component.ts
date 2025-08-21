@@ -1,11 +1,9 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import {
   AugmentedParametersService,
-  AutoDeselectStrategy,
   BaseEntitySelectionTableComponent,
+  entitySelectionStateProvider,
   Parameter,
-  selectionCollectionProvider,
-  SelectionCollector,
   TableComponent,
 } from '@exense/step-core';
 
@@ -13,12 +11,10 @@ import {
   selector: 'step-parameter-selection',
   templateUrl: './parameter-selection.component.html',
   styleUrls: ['./parameter-selection.component.scss'],
-  providers: [...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...entitySelectionStateProvider<string, Parameter>('id')],
   standalone: false,
 })
 export class ParameterSelectionComponent extends BaseEntitySelectionTableComponent {
-  protected _selectionCollector = inject<SelectionCollector<string, Parameter>>(SelectionCollector);
-  @ViewChild('tableRef', { read: TableComponent })
-  protected _tableRef?: TableComponent<Parameter>;
+  protected tableRef = viewChild('tableRef', { read: TableComponent<Parameter> });
   readonly _dataSource = inject(AugmentedParametersService).createSelectionDataSource();
 }
