@@ -14,7 +14,6 @@ import { KeywordCallsComponent } from './components/keyword-calls/keyword-calls.
 import { ReportNodesModule } from '../report-nodes/report-nodes.module';
 import {
   AugmentedExecutionsService,
-  AugmentedControllerService,
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
@@ -28,7 +27,6 @@ import {
   ViewRegistryService,
   DialogParentService,
   TreeStateService,
-  InfoBannerService,
   sequenceCanActivateGuards,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
@@ -98,7 +96,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, filter, first, map, of, switchMap, take } from 'rxjs';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -313,7 +311,6 @@ export class ExecutionModule {
     private _entityRegistry: EntityRegistry,
     private _dashletRegistry: DashletRegistryService,
     private _viewRegistry: ViewRegistryService,
-    private _infoBanner: InfoBannerService,
     _bulkOperationsRegistry: ExecutionBulkOperationsRegisterService,
   ) {
     if (!ExecutionModule._alreadyRegistered) {

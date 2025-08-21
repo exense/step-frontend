@@ -22,6 +22,7 @@ import {
   TreeNodeUtilsService,
   TreeStateService,
   ViewRegistryService,
+  ReloadableDirective,
 } from '@exense/step-core';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-item';
@@ -90,6 +91,7 @@ interface RefreshParams {
     ),
     TreeStateService,
   ],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
   encapsulation: ViewEncapsulation.None,
 })
