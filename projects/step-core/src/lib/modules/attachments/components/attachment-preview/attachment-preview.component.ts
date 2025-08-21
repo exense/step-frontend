@@ -50,11 +50,6 @@ export class AttachmentPreviewComponent {
     return !!status && status !== 'COMPLETED' && status !== 'FAILED';
   });
 
-  protected readonly isStreamingFailed = computed(() => {
-    const status = this.streamingStatus();
-    return status === 'FAILED';
-  });
-
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;
   protected readonly attachmentTooltip = computed(() => {

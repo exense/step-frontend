@@ -26,16 +26,10 @@
 <div class="actions">
   @if (isStreamingInProgress()) {
     <mat-spinner [diameter]="15" />
-  } @else if (attachmentType() !== AttachmentType.SKIPPED && !isStreamingFailed()) {
+  } @else if (attachmentType() !== AttachmentType.SKIPPED) {
     <step-btn-group class="with-round-corners">
       <button type="button" mat-flat-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
         <step-icon name="download" />
-      </button>
-    </step-btn-group>
-  } @else if (isStreamingFailed()) {
-    <step-btn-group class="with-round-corners">
-      <button type="button" mat-flat-button matTooltip="File incomplete" matTooltipPosition="below">
-        <step-icon name="alert-triangle" />
       </button>
     </step-btn-group>
   }
