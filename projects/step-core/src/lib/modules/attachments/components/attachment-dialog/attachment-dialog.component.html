@@ -65,12 +65,14 @@
         <step-rich-editor #richEditor [formControl]="contentCtrl" />
       }
       @case (AttachmentType.STREAMING_TEXT) {
-        <step-streaming-text
-          #streamingText
-          [attachment]="_data"
-          [linesFrame]="1000"
-          [(scrollDownOnRefresh)]="scrollDownOnRefresh"
-        />
+        @if (streamingAttachmentLineChunkSize(); as lineChunkSize) {
+          <step-streaming-text
+            #streamingText
+            [attachment]="_data"
+            [linesFrame]="lineChunkSize"
+            [(scrollDownOnRefresh)]="scrollDownOnRefresh"
+          />
+        }
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">

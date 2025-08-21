@@ -43,9 +43,16 @@ export class AttachmentPreviewComponent {
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
+  private streamingStatus = computed(() => this.streamingText()?.status?.());
+
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this.streamingText()?.status?.();
+    const status = this.streamingStatus();
     return !!status && status !== 'COMPLETED' && status !== 'FAILED';
+  });
+
+  protected readonly isStreamingFailed = computed(() => {
+    const status = this.streamingStatus();
+    return status === 'FAILED';
   });
 
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
