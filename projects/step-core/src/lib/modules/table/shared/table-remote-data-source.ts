@@ -3,6 +3,7 @@ import {
   BehaviorSubject,
   catchError,
   debounceTime,
+  exhaustMap,
   filter,
   map,
   mergeMap,
@@ -132,7 +133,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }),
     filter((x) => !!x),
     debounceTime(500),
-    map((x: RequestContainer) => {
+    exhaustMap((x) => {
       const request = x!.request;
 
       // Don't show progress bar, when immediateHideProgress flag is passed
@@ -145,28 +146,25 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         inProgressTriggered = true;
       }
 
-      return { request, inProgressTriggered };
-    }),
-    mergeMap(({ request, inProgressTriggered }) => {
       return this._rest.requestTable<T>(this.tableId, request).pipe(
         map((response) => ({ response, inProgressTriggered })),
         catchError((err) => {
           return of({ response: null, inProgressTriggered });
         }),
+        tap(({ inProgressTriggered }) => {
+          // set in progress to false, only it was triggered to true by current request
+          if (!inProgressTriggered) {
+            return;
+          }
+          this.runningRequestCount.update((value) => {
+            let res = value - 1;
+            res = res < 0 ? 0 : res;
+            return res;
+          });
+        }),
+        map((x) => x.response),
       );
     }),
-    tap(({ inProgressTriggered }) => {
-      // set in progress to false, only it was triggered to true by current request
-      if (!inProgressTriggered) {
-        return;
-      }
-      this.runningRequestCount.update((value) => {
-        let res = value - 1;
-        res = res < 0 ? 0 : res;
-        return res;
-      });
-    }),
-    map((x) => x.response),
     startWith(null),
     shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
