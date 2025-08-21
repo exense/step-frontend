@@ -20,6 +20,7 @@ import {
   SystemService,
   TreeNodeUtilsService,
   TreeStateService,
+  UpdateSelectionMode,
   ViewRegistryService,
 } from '@exense/step-core';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
@@ -319,7 +320,7 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect, true);
   }
 
-  private determineDefaultSelection(testCases?: ReportNode[]): void {
+  private determineDefaultSelection(updateSelection: UpdateSelection, testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases;
     if (!testCases || !this.execution) {
       return;
@@ -339,8 +340,13 @@ export class ExecutionProgressComponent
       }
     });
 
-    console.log('DETERMINE DEFAULT');
-    this._testCasesSelectionState.updateSelection({ entities: selectedTestCases });
+    let selectionType: BulkSelectionType | undefined = undefined;
+    if (selectedTestCases.length > 0) {
+      selectionType =
+        selectedTestCases.length === testCases.length ? BulkSelectionType.ALL : BulkSelectionType.INDIVIDUAL;
+    }
+    const mode = updateSelection === UpdateSelection.ONLY_NEW ? UpdateSelectionMode.UPDATE : UpdateSelectionMode.RESET;
+    this._testCasesSelectionState.updateSelection({ entities: selectedTestCases, mode, selectionType });
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
@@ -353,7 +359,7 @@ export class ExecutionProgressComponent
     const { updateSelection } = this.prepareRefreshParams(params);
     const execution = this.execution!;
     if (updateSelection !== UpdateSelection.NONE) {
-      this.determineDefaultSelection();
+      this.determineDefaultSelection(updateSelection ?? UpdateSelection.ALL);
     }
   }
 
@@ -412,7 +418,10 @@ export class ExecutionProgressComponent
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
         if (updateSelection !== UpdateSelection.NONE) {
-          this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
+          this.determineDefaultSelection(
+            updateSelection ?? UpdateSelection.ALL,
+            updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
+          );
         }
       });
   }
