@@ -46,22 +46,29 @@
             <step-icon name="sliders" />
           </button>
           <step-popover-content>
-            <div class="execution-resolved-params">
-              <strong class="resolved-params-header">Resolved parameters</strong>
+            <div class="execution-popover-table">
+              <strong>Resolved parameters</strong>
               <step-alt-execution-resolved-parameters [parameters]="resolvedParams" />
             </div>
           </step-popover-content>
         </step-popover>
       }
-      <button
-        type="button"
-        mat-icon-button
-        color="default"
-        (click)="_dialogs.openAgentsModal(execution?.agentsInvolved || '', execution?.description || 'Unknown plan')"
-        matTooltip="Show agents"
-      >
-        <step-icon name="agent" />
-      </button>
+      <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isAgentsVisible.set($event)">
+        <button
+          type="button"
+          mat-icon-button
+          [color]="isAgentsVisible() ? 'primary' : 'default'"
+          matTooltip="Show agents"
+        >
+          <step-icon name="agent" />
+        </button>
+        <step-popover-content>
+          <div class="execution-popover-table">
+            <strong>Agents</strong>
+            <step-execution-agents-list [agents]="execution?.agentsInvolved" />
+          </div>
+        </step-popover-content>
+      </step-popover>
       @if (execution?.executionParameters?.mode === 'SIMULATION') {
         <step-icon class="simulate-icon" name="check-circle" matTooltip="Simulated" matTooltipPosition="right" />
       }
