@@ -26,11 +26,33 @@
   }
 }
 
+@mixin round-corners($radius) {
+  border-radius: $radius;
+
+  .mat-mdc-button-base,
+  .mat-mdc-outlined-button {
+    border-radius: 0;
+
+    &:not(:last-of-type):first-of-type {
+      border-radius: $radius 0 0 $radius;
+    }
+
+    &:not(:first-of-type):last-of-type {
+      border-radius: 0 $radius $radius 0;
+    }
+
+    &:only-of-type {
+      border-radius: $radius;
+    }
+  }
+}
+
 step-btn-group {
   display: inline-flex;
 
   &.without-borders,
   &.with-round-borders,
+  &.with-round-corners,
   &.with-borders {
     .mat-mdc-button-base,
     .mat-mdc-outlined-button {
@@ -60,5 +82,8 @@ step-btn-group {
   }
   &.with-round-borders {
     @include round-borders(1.6rem);
+  }
+  &.with-round-corners {
+    @include round-corners(1.6rem);
   }
 }

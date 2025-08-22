@@ -7,6 +7,7 @@ import { uploadWithProgress } from '../shared/pipe-operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { downloadFile } from '../shared/download-file';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService implements HttpOverrideResponseInterceptor {
@@ -114,17 +115,7 @@ export class AugmentedResourcesService extends ResourcesService implements HttpO
 
   downloadResource(resourceId: string, fileName: string) {
     const url = this.getDownloadResourceUrl(resourceId);
-    fetch(url, { method: 'get' })
-      .then((res) => res.blob())
-      .then((res) => {
-        const aElement = document.createElement('a');
-        aElement.setAttribute('download', fileName);
-        const href = URL.createObjectURL(res);
-        aElement.href = href;
-        aElement.setAttribute('target', '_blank');
-        aElement.click();
-        URL.revokeObjectURL(href);
-      });
+    downloadFile(url, fileName);
   }
 
   getResourceCached(id: string): Observable<Resource> {
