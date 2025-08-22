@@ -550,8 +550,8 @@ $menu-sub-item-height: 3.2rem;
 
         &:not(.visible-when-collapsed) {
           left: 5.6rem;
-          margin: var(--scrollOffset, 0) 0 0 0;
         }
+        margin: var(--scrollOffset, 0) 0 0 0;
 
         &::after {
           @include overlay(map.get($config, selection-color));
