@@ -1,5 +1,5 @@
 import { DestroyRef, inject, Injectable, OnDestroy, signal } from '@angular/core';
-import { BehaviorSubject, finalize, forkJoin, map, Observable, of, pipe, switchMap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, pipe, switchMap, tap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { ResourceConfig } from '../types/resource-config';
@@ -129,6 +129,14 @@ export class ResourceInputService implements OnDestroy {
             }),
           );
         }
+      }),
+      switchMap((resource) => {
+        if (!resource || resource.resourceName === file.name) {
+          return of(resource);
+        }
+
+        resource.resourceName = file.name;
+        return this._augmentedResourcesService.saveResource(resource);
       }),
     );
   }

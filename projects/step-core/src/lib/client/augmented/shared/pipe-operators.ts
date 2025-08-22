@@ -22,8 +22,8 @@ const calculateProgressPercentage = (httpProgressEvent: HttpProgressEvent) => {
   return httpProgressEvent.total ? Math.round((100 * httpProgressEvent.loaded) / httpProgressEvent.total) : 0;
 };
 
-const decodeArrayBuffer = (arrayBuffer: ArrayBuffer) =>
-  String.fromCharCode.apply(null, Array.from(new Uint8Array(arrayBuffer)));
+const decoder = new TextDecoder('UTF-8');
+const decodeArrayBuffer = (arrayBuffer: ArrayBuffer) => decoder.decode(arrayBuffer);
 
 export const bulkRequest = <T>(
   request: (ids: string[]) => Observable<T[]>,
@@ -31,7 +31,7 @@ export const bulkRequest = <T>(
     startDue?: number;
     intervalDuration?: number;
     getItemId?: (item: T) => string;
-  }
+  },
 ): OperatorFunction<string | undefined, Map<string, T>> => {
   const defaultParams = {
     startDue: 500,
@@ -52,7 +52,7 @@ export const bulkRequest = <T>(
       items.forEach((item) => result.set(getItemId(item), item));
       return result;
     }, new Map<string, T>()),
-    shareReplay(1)
+    shareReplay(1),
   );
 };
 
@@ -68,12 +68,12 @@ export const uploadWithProgress: UnaryFunction<
   const stream$ = source$.pipe(
     filter((httpEvent) => EVENT_TYPES.includes(httpEvent.type)),
     shareReplay(1),
-    takeUntil(terminator$)
+    takeUntil(terminator$),
   );
 
   const [uploadProgress$, uploadResponse$] = partition(
     stream$,
-    (httpEvent) => httpEvent.type === HttpEventType.UploadProgress
+    (httpEvent) => httpEvent.type === HttpEventType.UploadProgress,
   );
 
   const progress$ = uploadProgress$.pipe(map((event) => calculateProgressPercentage(event as HttpProgressEvent)));
@@ -84,7 +84,7 @@ export const uploadWithProgress: UnaryFunction<
     finalize(() => {
       terminator$.next();
       terminator$.complete();
-    })
+    }),
   );
 
   return { progress$, response$ };
