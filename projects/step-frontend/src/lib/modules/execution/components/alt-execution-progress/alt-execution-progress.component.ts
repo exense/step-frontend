@@ -250,6 +250,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
   protected isResolvedParametersVisible = signal(false);
+  protected isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),
