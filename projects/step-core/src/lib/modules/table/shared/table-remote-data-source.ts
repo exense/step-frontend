@@ -3,15 +3,14 @@ import {
   BehaviorSubject,
   catchError,
   debounceTime,
-  exhaustMap,
   filter,
   map,
-  mergeMap,
   Observable,
   of,
   shareReplay,
   startWith,
   Subject,
+  switchMap,
   takeUntil,
   tap,
 } from 'rxjs';
@@ -121,8 +120,7 @@ interface RequestContainer extends StepDataSourceReloadOptions {
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
-  private runningRequestCount = signal(0);
-  private inProgress = computed(() => this.runningRequestCount() > 0);
+  private inProgress = signal(false);
   readonly inProgress$ = toObservable(this.inProgress);
   private isSharable = false;
   private isSkipOngoingRequest?: boolean;
@@ -133,43 +131,36 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     }),
     filter((x) => !!x),
     debounceTime(500),
-    exhaustMap((x) => {
-      const request = x!.request;
-
-      // Don't show progress bar, when immediateHideProgress flag is passed
-      // or hideProgress is passed and there is no in progress current operation
-      let inProgressTriggered = false;
-      if (!!x?.immediateHideProgress) {
-        this.runningRequestCount.set(0);
-      } else if (!x?.hideProgress) {
-        this.runningRequestCount.update((value) => value + 1);
-        inProgressTriggered = true;
+    switchMap((x) => {
+      if (!x.isForce && this.requestRef$) {
+        return this.requestRef$;
       }
 
-      return this._rest.requestTable<T>(this.tableId, request).pipe(
-        map((response) => ({ response, inProgressTriggered })),
-        catchError((err) => {
-          return of({ response: null, inProgressTriggered });
-        }),
-        tap(({ inProgressTriggered }) => {
-          // set in progress to false, only it was triggered to true by current request
-          if (!inProgressTriggered) {
-            return;
+      if (x.immediateHideProgress) {
+        this.inProgress.set(false);
+      }
+
+      const isProgressTriggered = !x.hideProgress;
+      if (isProgressTriggered) {
+        this.inProgress.set(true);
+      }
+
+      this.requestRef$ = this.doRequest(x).pipe(
+        tap(() => {
+          if (isProgressTriggered) {
+            this.inProgress.set(false);
           }
-          this.runningRequestCount.update((value) => {
-            let res = value - 1;
-            res = res < 0 ? 0 : res;
-            return res;
-          });
+          this.requestRef$ = undefined;
         }),
-        map((x) => x.response),
       );
+
+      return this.requestRef$;
     }),
     startWith(null),
     shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
     takeUntil(this._terminator$),
-  ) as Observable<TableResponseGeneric<T> | null>;
+  );
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
   readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
@@ -228,6 +219,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._terminator$.complete();
   }
 
+  private requestRef$?: Observable<TableResponseGeneric<T> | null>;
+
+  private doRequest({ request }: RequestContainer): Observable<TableResponseGeneric<T> | null> {
+    return this._rest.requestTable<T>(this.tableId, request).pipe(catchError((err) => of(null)));
+  }
+
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {
     if (Object.keys(this.filters).length > 0) {
       search = { ...(search || {}), ...this.filters };
@@ -261,7 +258,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
     if (reqOrOptions instanceof TableRequestInternal) {
       const req = convertTableRequest(reqOrOptions as TableRequestInternal);
-      this._request$.next({ request: req });
+      this._request$.next({ request: req, isForce: true });
       return;
     }
 
@@ -297,6 +294,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     let val = this._request$.value ?? { request: convertTableRequest({} as TableRequestInternal) };
     val.hideProgress = reloadOptions?.hideProgress;
     val.immediateHideProgress = reloadOptions?.immediateHideProgress;
+    val.isForce = reloadOptions?.isForce;
     this._request$.next(val);
   }
 
