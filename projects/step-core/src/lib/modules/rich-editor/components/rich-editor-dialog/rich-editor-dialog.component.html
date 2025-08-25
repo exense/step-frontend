@@ -2,15 +2,17 @@
   <div class="rich-header" step-modal-window-title>
     <section>
       <div>{{ _data.title }}</div>
+    </section>
+    <section class="rich-settings">
       @if (!_data.isReadOnly) {
         <step-rich-editor-change-status [changeStatus]="changeStatus" />
       }
+      <step-rich-editor-settings-bar
+        [allowedModes]="_data.allowedModes"
+        [predefinedMode]="_data.predefinedMode"
+        (modeChanged)="selectedMode = $event"
+      />
     </section>
-    <step-rich-editor-settings-bar
-      [allowedModes]="_data.allowedModes"
-      [predefinedMode]="_data.predefinedMode"
-      (modeChanged)="selectedMode = $event"
-    />
   </div>
   <div step-modal-window-body>
     <step-rich-editor #richEditor [formControl]="textControl" [syntaxMode]="selectedMode" [wrapText]="_data.wrapText" />

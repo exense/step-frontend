@@ -22,10 +22,7 @@ export class RichEditorSettingsBarComponent {
   readonly allowedModes = input<AceMode[] | undefined>(undefined);
   readonly predefinedMode = input<AceMode | undefined>(undefined);
   readonly showAutoFormatBtn = input(false);
-  readonly showSaveBtn = input(false);
-  readonly saveBtnTooltip = input('Save');
   readonly modeChanged = output<AceMode>();
-  readonly save = output();
   readonly autoFormat = output();
 
   protected displayModes = computed<KeyValue<AceMode, string>[]>(() => {

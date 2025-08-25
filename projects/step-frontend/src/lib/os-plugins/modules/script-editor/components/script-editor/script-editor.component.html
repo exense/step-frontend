@@ -2,15 +2,15 @@
   <mat-card-header>
     <mat-card-title>
       <div>Script Editor - Keyword: {{ keywordName() }}</div>
-      <step-rich-editor-change-status [changeStatus]="changeStatus()" />
     </mat-card-title>
     <section class="editor-buttons">
-      <step-rich-editor-settings-bar
-        [predefinedMode]="syntaxMode()"
+      <step-rich-editor-change-status
+        [changeStatus]="changeStatus()"
         [showSaveBtn]="!!('kw-write' | hasRight | async)"
         saveBtnTooltip="Save this keyword"
         (save)="save()"
       />
+      <step-rich-editor-settings-bar [predefinedMode]="syntaxMode()" />
       <step-btn-group class="with-borders">
         <button
           type="button"

@@ -1,17 +1,4 @@
 <step-form-field>
-  @if (showSaveBtn()) {
-    <step-prefix class="button-prefix">
-      <button
-        type="button"
-        mat-stroked-button
-        (click)="save.emit()"
-        [matTooltip]="saveBtnTooltip()"
-        matTooltipPosition="below"
-      >
-        <step-icon name="save" />
-      </button>
-    </step-prefix>
-  }
   @if (showAutoFormatBtn()) {
     <step-prefix class="button-prefix">
       <button type="button" mat-stroked-button (click)="autoFormat.emit()" [disabled]="displayModes().length <= 1">
