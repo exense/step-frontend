@@ -14,7 +14,7 @@ import {
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { BehaviorSubject, exhaustMap, of } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 
@@ -49,7 +49,7 @@ export class ExecutionListComponent implements OnDestroy {
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
-    switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
+    exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
   autoRefreshDisabled: boolean = false;

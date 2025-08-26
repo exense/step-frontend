@@ -27,7 +27,7 @@ import {
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
 import { FilterCondition } from './filter-condition';
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 export class TableRequestInternal {
@@ -124,6 +124,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   readonly inProgress$ = toObservable(this.inProgress);
   private isSharable = false;
   private isSkipOngoingRequest?: boolean;
+  private currentRequestTerminator$?: Subject<void>;
+  private requestRef$?: Observable<TableResponseGeneric<T> | null>;
   private _request$ = new BehaviorSubject<RequestContainer | undefined>(undefined);
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     tap((x) => {
@@ -133,6 +135,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     debounceTime(500),
     switchMap((x) => {
       if (!x.isForce && this.requestRef$) {
+        // return the current request
         return this.requestRef$;
       }
 
@@ -145,6 +148,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
         this.inProgress.set(true);
       }
 
+      this.terminateCurrentRequest();
+      this.currentRequestTerminator$ = new Subject();
       this.requestRef$ = this.doRequest(x).pipe(
         tap(() => {
           if (isProgressTriggered) {
@@ -152,12 +157,18 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
           }
           this.requestRef$ = undefined;
         }),
+        takeUntil(this.currentRequestTerminator$),
+        // 1. shareReplay is required, when the current requires is returning
+        // without shareReplay the new api call will be initiated
+        // 2. currentRequestTerminator$ is required to stop the current request explicitly
+        // when the new one is created
         shareReplay(1),
       );
 
       return this.requestRef$;
     }),
     startWith(null),
+    shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
     takeUntil(this._terminator$),
   );
@@ -217,9 +228,15 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this._request$.complete();
     this._terminator$.next();
     this._terminator$.complete();
+    this.terminateCurrentRequest();
   }
 
-  private requestRef$?: Observable<TableResponseGeneric<T> | null>;
+  private terminateCurrentRequest(): void {
+    this.currentRequestTerminator$?.next?.();
+    this.currentRequestTerminator$?.complete?.();
+    this.currentRequestTerminator$ = undefined;
+    this.requestRef$ = undefined;
+  }
 
   private doRequest({ request }: RequestContainer): Observable<TableResponseGeneric<T> | null> {
     return this._rest.requestTable<T>(this.tableId, request).pipe(catchError((err) => of(null)));
