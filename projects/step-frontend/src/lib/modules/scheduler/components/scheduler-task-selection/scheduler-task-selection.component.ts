@@ -1,11 +1,9 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import {
   AugmentedSchedulerService,
-  AutoDeselectStrategy,
   BaseEntitySelectionTableComponent,
+  entitySelectionStateProvider,
   ExecutiontTaskParameters,
-  selectionCollectionProvider,
-  SelectionCollector,
   TableComponent,
 } from '@exense/step-core';
 
@@ -13,14 +11,10 @@ import {
   selector: 'step-scheduler-task-selection',
   templateUrl: './scheduler-task-selection.component.html',
   styleUrls: ['./scheduler-task-selection.component.scss'],
-  providers: [
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
-  ],
+  providers: [...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id')],
   standalone: false,
 })
 export class SchedulerTaskSelectionComponent extends BaseEntitySelectionTableComponent {
-  @ViewChild('tableRef', { read: TableComponent })
-  protected _tableRef?: TableComponent<ExecutiontTaskParameters>;
-  protected _selectionCollector = inject<SelectionCollector<string, ExecutiontTaskParameters>>(SelectionCollector);
+  protected tableRef = viewChild('tableRef', { read: TableComponent<ExecutiontTaskParameters> });
   readonly _dataSource = inject(AugmentedSchedulerService).createDataSource();
 }

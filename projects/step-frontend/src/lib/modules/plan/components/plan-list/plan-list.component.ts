@@ -1,12 +1,11 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedPlansService,
-  AutoDeselectStrategy,
   DialogParentService,
   DialogsService,
   Plan,
   IsUsedByDialogService,
-  selectionCollectionProvider,
+  entitySelectionStateProvider,
   STORE_ALL,
   tablePersistenceConfigProvider,
   tableColumnsConfigProvider,
@@ -28,7 +27,7 @@ import { Router } from '@angular/router';
       entityScreenDefaultVisibleFields: ['attributes.name'],
     }),
     tablePersistenceConfigProvider('planList', STORE_ALL),
-    ...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, Plan>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => PlanListComponent),
