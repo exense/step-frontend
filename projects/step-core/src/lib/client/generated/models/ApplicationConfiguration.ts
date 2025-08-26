@@ -17,5 +17,4 @@ export type ApplicationConfiguration = {
   defaultUrl?: string;
   title?: string;
   forceLegacyReporting?: boolean;
-  contextRoot?: string;
 };
