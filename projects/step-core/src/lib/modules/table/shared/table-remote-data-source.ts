@@ -27,7 +27,7 @@ import {
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
 import { FilterCondition } from './filter-condition';
-import { computed, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 export class TableRequestInternal {
@@ -152,12 +152,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
           }
           this.requestRef$ = undefined;
         }),
+        shareReplay(1),
       );
 
       return this.requestRef$;
     }),
     startWith(null),
-    shareReplay(1),
     filter(() => !this.isSkipOngoingRequest),
     takeUntil(this._terminator$),
   );
