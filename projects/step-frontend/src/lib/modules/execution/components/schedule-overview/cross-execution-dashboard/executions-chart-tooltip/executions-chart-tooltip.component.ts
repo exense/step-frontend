@@ -13,7 +13,7 @@ import { TooltipContextData } from '../../../../../timeseries/modules/chart/inje
 import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
 import { TSChartSeries } from '../../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
-import { FilterUtils, OQLBuilder } from '../../../../../timeseries/modules/_common';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 interface TransformedSeries {
@@ -57,8 +57,15 @@ export class ExecutionsChartTooltipComponent {
     this.executionsListTruncated = false;
     this.selectedSeries = undefined;
     const transformedSeries: TransformedSeries[] = [];
+    if (!contextData) {
+      return [];
+    }
+    contextData.series = contextData.series.filter((s) => s.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY);
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;
+      if (series.scale === TimeSeriesConfig.SECONDARY_AXES_KEY) {
+        continue;
+      }
       let value =
         i === 0
           ? series.data[contextData?.idx!] || 0

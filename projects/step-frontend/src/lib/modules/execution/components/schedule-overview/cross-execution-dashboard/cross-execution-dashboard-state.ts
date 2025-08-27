@@ -1,4 +1,16 @@
-import { combineLatest, filter, map, Observable, of, shareReplay, startWith, Subject, switchMap, take } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  skip,
+  startWith,
+  Subject,
+  switchMap,
+  take,
+} from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
   AugmentedTimeSeriesService,
@@ -21,6 +33,7 @@ import {
   OQLBuilder,
   TimeSeriesConfig,
   TimeSeriesUtils,
+  UPlotUtilsService,
 } from '../../../../timeseries/modules/_common';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Status } from '../../../../_common/shared/status.enum';
@@ -28,7 +41,7 @@ import { Axis, Band } from 'uplot';
 import PathBuilder = uPlot.Series.Points.PathBuilder;
 
 declare const uPlot: any;
-const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 1 });
+const uplotBarsFn: PathBuilder = uPlot.paths.bars({ size: [0.6, 100], align: 0 });
 
 interface EntityWithKeywordsStats {
   entity: string;
@@ -44,6 +57,7 @@ export abstract class CrossExecutionDashboardState {
   protected _executionService = inject(ExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
+  private _uPlotUtils = inject(UPlotUtilsService);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
@@ -144,15 +158,25 @@ export abstract class CrossExecutionDashboardState {
       return this._timeSeriesService.getTimeSeries(request).pipe(
         map((response) => {
           const xLabels = TimeSeriesUtils.createTimeLabels(response.start, response.end, response.interval);
+          const responseTimeData: (number | undefined | null)[] = [];
           let series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
             const seriesKey: string = response.matrixKeys[i][statusAttribute];
             const seriesData: (number | undefined | null)[] = [];
             seriesBuckets.forEach((b, i) => {
               let value = b?.count || 0;
               seriesData[i] = value;
+              if (b) {
+                const existingResponseTime = responseTimeData[i] || 0;
+                // const updatedValue = existingResponseTime + (b.sum / b.count);
+                const updatedValue = Math.random() * 10000;
+                responseTimeData[i] = updatedValue;
+              } else {
+                responseTimeData[i] = responseTimeData[i] || 0;
+              }
             });
+
             let color = this._statusColors[seriesKey as Status];
-            const fill = color + 'cc';
+            const fill = color + '99';
             const s: TSChartSeries = {
               id: seriesKey,
               scale: 'y',
@@ -161,7 +185,7 @@ export abstract class CrossExecutionDashboardState {
               data: seriesData,
               width: 1,
               value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
-                this.calculateStackedValue(self, rawValue, seriesIdx, idx),
+                this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
               stroke: color,
               fill: fill,
               paths: uplotBarsFn,
@@ -172,6 +196,18 @@ export abstract class CrossExecutionDashboardState {
           });
           this.cumulateSeriesData(series); // used for stacked bar
 
+          const responseTimeSeries: TSChartSeries = {
+            scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+            labelItems: ['Response Time (AVG)'],
+            id: 'total',
+            // strokeConfig: { color: '', type: MarkerType.SQUARE },
+            data: responseTimeData,
+            value: (x, v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v),
+            stroke: '#272727',
+            paths: uPlot.paths.spline(),
+            points: { show: false },
+          };
+
           const axes: Axis[] = [
             {
               size: TimeSeriesConfig.CHART_LEGEND_SIZE,
@@ -179,6 +215,14 @@ export abstract class CrossExecutionDashboardState {
               values: (u, vals) => {
                 return vals.map((v: any) => v);
               },
+            },
+            {
+              scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+              side: 1,
+              values: (u, vals) => {
+                return vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v));
+              },
+              grid: { show: false },
             },
           ];
           return {
@@ -190,16 +234,10 @@ export abstract class CrossExecutionDashboardState {
               valueFormatFn: (self, rawValue: number, seriesIdx) => new Date(rawValue).toLocaleDateString(),
             },
             cursor: {
-              lock: true,
-              dataIdx: (self: uPlot, seriesIdx: number, closestIdx: number, xValue: number) => {
-                let timeItems = self.data[0];
-                const closestValue = timeItems[closestIdx];
-                if (closestValue <= xValue) {
-                  return closestIdx;
-                } else {
-                  return closestIdx - 1;
-                }
+              points: {
+                size: (u, seriesIdx) => (seriesIdx > series.length ? 0 : 7), // don't show marker for response-time series
               },
+              lock: true,
             },
             scales: {
               y: {
@@ -208,12 +246,12 @@ export abstract class CrossExecutionDashboardState {
                 },
               },
             },
-            series: series,
+            series: [...series, responseTimeSeries],
             tooltipOptions: {
               enabled: true,
             },
             axes: axes,
-            bands: this.getDefaultBands(series.length),
+            bands: this.getDefaultBands(series.length, 1),
           } as TSChartSettings;
         }),
       );
@@ -404,10 +442,10 @@ export abstract class CrossExecutionDashboardState {
     this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
   });
 
-  private getDefaultBands(count: number): Band[] {
+  private getDefaultBands(count: number, skipSeries = 0): Band[] {
     const bands: Band[] = [];
     for (let i = count; i > 1; i--) {
-      bands.push({ series: [i, i - 1] });
+      bands.push({ series: [i + skipSeries, i - 1 + skipSeries] });
     }
     return bands;
   }
@@ -425,8 +463,14 @@ export abstract class CrossExecutionDashboardState {
     });
   }
 
-  private calculateStackedValue(self: uPlot, currentValue: number, seriesIdx: number, idx: number): number {
-    if (seriesIdx > 1) {
+  private calculateStackedValue(
+    self: uPlot,
+    currentValue: number,
+    seriesIdx: number,
+    idx: number,
+    skipSeries = 0,
+  ): number {
+    if (seriesIdx > 1 + skipSeries) {
       const valueBelow = self.data[seriesIdx - 1][idx] || 0;
       const value = currentValue - valueBelow;
       return value;
