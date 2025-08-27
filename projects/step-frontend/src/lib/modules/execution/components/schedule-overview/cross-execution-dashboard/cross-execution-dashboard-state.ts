@@ -203,7 +203,7 @@ export abstract class CrossExecutionDashboardState {
             // strokeConfig: { color: '', type: MarkerType.SQUARE },
             data: responseTimeData,
             value: (x, v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v),
-            stroke: '#272727',
+            stroke: '#0082cb',
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
