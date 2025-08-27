@@ -92,6 +92,8 @@ export class FunctionModule {
                       entityType: 'keyword',
                       getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
                       getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordConfigurerUrl(id),
+                      getListUrl: () => inject(CommonEntitiesUrlsService).keywordListUrl(),
+                      isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchKeywordConfigurerUrl(url),
                     }),
                   ],
                   resolve: {
@@ -176,7 +178,9 @@ export class FunctionModule {
             checkEntityGuardFactory({
               entityType: 'keyword',
               getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
-              getEditorUrl: (id) => `/composites/editor/${id}`,
+              getEditorUrl: (id) => inject(CommonEntitiesUrlsService).keywordCompositeEditorUrl(id),
+              getListUrl: () => inject(CommonEntitiesUrlsService).keywordListUrl(),
+              isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchKeywordCompositesUrl(url),
             }),
           ],
           resolve: {

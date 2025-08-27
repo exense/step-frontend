@@ -11,11 +11,15 @@ export const editScheduledTaskRoute = ({
   path,
   getEditorUrl,
   idExtractor,
+  getListUrl,
+  isMatchEditorUrl,
   outlet,
 }: {
   path: string;
   getEditorUrl: CheckProjectGuardConfig['getEditorUrl'];
   idExtractor?: CheckProjectGuardConfig['idExtractor'];
+  getListUrl?: CheckProjectGuardConfig['getListUrl'];
+  isMatchEditorUrl?: CheckProjectGuardConfig['isMatchEditorUrl'];
   outlet?: string;
 }): Route =>
   dialogRoute({
@@ -32,6 +36,8 @@ export const editScheduledTaskRoute = ({
           return task;
         },
         getEditorUrl,
+        getListUrl,
+        isMatchEditorUrl,
       }),
     ],
     resolve: {

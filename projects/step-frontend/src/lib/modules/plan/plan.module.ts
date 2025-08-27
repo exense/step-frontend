@@ -166,6 +166,8 @@ export class PlanModule {
                       };
                   return editLinkParams;
                 },
+                isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchPlanEditorUrl(url),
+                getListUrl: () => inject(CommonEntitiesUrlsService).planListUrl(),
               }),
             ],
             resolve: {

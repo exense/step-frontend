@@ -12,6 +12,14 @@ export enum SwitchStatus {
   RUNNING,
 }
 
+export interface CheckLoadErrorsConfig {
+  entityType: string;
+  entityId: string;
+  routerState?: RouterStateSnapshot;
+  getListUrl?: () => string;
+  isMatchEditorUrl?: (url: string) => boolean;
+}
+
 export interface MultipleProjectsStrategy {
   readonly currentSwitchStatus: SwitchStatus;
   currentProject(): Project | undefined;
@@ -19,8 +27,6 @@ export interface MultipleProjectsStrategy {
   switchToProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): void;
   getEntityProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;
   checkLoadErrors<T extends { attributes?: Record<string, string> }>(
-    entityType: string,
-    entityId: string,
-    routerState?: RouterStateSnapshot,
+    config: CheckLoadErrorsConfig,
   ): UnaryFunction<Observable<T>, Observable<T | string | undefined>>;
 }

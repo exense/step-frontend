@@ -2,6 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordsService,
   checkEntityGuardFactory,
+  CommonEntitiesUrlsService,
   FunctionType,
   FunctionTypeRegistryService,
   SimpleOutletComponent,
@@ -43,6 +44,8 @@ export class ScriptEditorModule {
               entityType: 'keyword',
               getEntity: (id) => inject(AugmentedKeywordsService).getFunctionByIdCached(id),
               getEditorUrl: (id) => `/script-editor/${id}`,
+              getListUrl: () => inject(CommonEntitiesUrlsService).keywordListUrl(),
+              isMatchEditorUrl: (url) => url.includes('/script-editor'),
             }),
           ],
           resolve: {
