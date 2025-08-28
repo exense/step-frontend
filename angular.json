@@ -56,19 +56,14 @@
                 "output": "/images"
               },
               {
-                "glob": "**/*!(*.html)",
-                "input": "node_modules/playwright-core/lib/vite/traceViewer",
-                "output": "/"
-              },
-              {
-                "glob": "**/*.html",
+                "glob": "**/*",
                 "input": "node_modules/playwright-core/lib/vite/traceViewer",
                 "output": "/trace-viewer"
               },
               {
                 "glob": "trace-report-example.zip",
                 "input": "/",
-                "output": "/assets"
+                "output": "/trace-report-example"
               },
               {
                 "glob": "worker-javascript.js",
