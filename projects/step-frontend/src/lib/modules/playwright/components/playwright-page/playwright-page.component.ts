@@ -1,6 +1,6 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
-import { DOCUMENT } from '@angular/common';
+import { APP_HOST } from '@exense/step-core';
 
 @Component({
   selector: 'step-playwright-page',
@@ -10,19 +10,14 @@ import { DOCUMENT } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlaywrightPageComponent {
-  private _doc = inject(DOCUMENT);
+  private _appHost = inject(APP_HOST);
   protected readonly reportExampleUrl = signal('');
 
   constructor() {
     afterNextRender(() => {
       setTimeout(() => {
-        this.reportExampleUrl.set(`${this.appHost}/trace-report-example/trace-report-example.zip`);
+        this.reportExampleUrl.set(`${this._appHost}/trace-report-example/trace-report-example.zip`);
       }, 5000);
     });
-  }
-
-  private get appHost(): string {
-    const { location } = this._doc.defaultView as Window;
-    return `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
   }
 }

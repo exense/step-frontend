@@ -201,8 +201,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
   }
 
   private createMenuItemsTree(menuItems: MenuEntry[]): DisplayMenuEntry[] {
-    console.log('MENU ITEMS', menuItems);
-
     const weightCompare = (a: MenuEntry, b: MenuEntry) => {
       if (!a.weight) {
         return 1;
@@ -242,8 +240,6 @@ export class SidebarComponent implements AfterViewInit, OnDestroy {
       findChildren(parent);
       parent.children?.forEach((child) => findChildren(child));
     });
-
-    console.log('MENU ITEMS TREE', result);
 
     return result;
   }
