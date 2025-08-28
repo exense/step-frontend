@@ -11,6 +11,7 @@
         </step-alt-report-widget>
       }
     </div>
+
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
@@ -25,6 +26,15 @@
           </step-timeseries-chart>
         } @else {
           <ng-container *ngTemplateOutlet="loadingSpinner" />
+        }
+      </step-alt-report-widget-content>
+    </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <step-alt-report-widget class="flex-grow-1" title="Heatmap">
+      <step-alt-report-widget-content class="widget-content">
+        @if (luxonDateRange(); as dateRange) {
+          <step-cross-execution-heatmap [defaultDateRange]="dateRange!" #heatmap />
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>

@@ -154,6 +154,7 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
 
 @NgModule({
   declarations: [
@@ -249,6 +250,7 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    CrossExecutionHeatmapComponent,
   ],
   imports: [
     StepCommonModule,
