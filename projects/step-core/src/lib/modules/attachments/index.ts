@@ -32,6 +32,7 @@ export * from './components/streaming-attachment-indicator/streaming-attachment-
 export * from './components/attachments-inline-preview/attachments-inline-preview.component';
 export * from './types/attachment-type.enum';
 export * from './injectables/attachment-dialogs.service';
+export * from './directives/streaming-attachment-status.directive';
 
 export const ATTACHMENTS_EXPORTS = [
   AttachmentIsImagePipe,
