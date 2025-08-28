@@ -1,11 +1,9 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import {
   AugmentedPlansService,
-  AutoDeselectStrategy,
   BaseEntitySelectionTableComponent,
+  entitySelectionStateProvider,
   Plan,
-  selectionCollectionProvider,
-  SelectionCollector,
   TableComponent,
 } from '@exense/step-core';
 
@@ -13,12 +11,10 @@ import {
   selector: 'step-plan-selection',
   templateUrl: './plan-selection.component.html',
   styleUrls: ['./plan-selection.component.scss'],
-  providers: [...selectionCollectionProvider<string, Plan>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER)],
+  providers: [...entitySelectionStateProvider<string, Plan>('id')],
   standalone: false,
 })
 export class PlanSelectionComponent extends BaseEntitySelectionTableComponent {
-  protected _selectionCollector = inject<SelectionCollector<string, Plan>>(SelectionCollector);
-  @ViewChild('tableRef', { read: TableComponent })
-  protected _tableRef?: TableComponent<Plan>;
+  protected tableRef = viewChild('tableRef', { read: TableComponent<Plan> });
   readonly _dataSource = inject(AugmentedPlansService).createSelectionDataSource();
 }

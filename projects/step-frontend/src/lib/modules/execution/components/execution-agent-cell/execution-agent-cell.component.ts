@@ -8,18 +8,20 @@ import { AgentsModalComponent } from '../execution-agent-modal/execution-agent-m
   standalone: false,
 })
 export class AgentsCellComponent {
-  readonly agents = input('');
+  private _dialog = inject(MatDialog);
+
+  readonly agentsString = input('', { alias: 'agents' });
   readonly description = input('Agents');
 
-  protected agentsArray = computed(() => (this.agents() ?? '').split(' ').filter((agent) => agent.trim() !== ''));
+  private agents = computed(() => (this.agentsString() ?? '').split(' ').filter((agent) => agent.trim() !== ''));
 
-  private _dialog = inject(MatDialog);
+  protected agentsCount = computed(() => this.agents().length);
 
   protected openModal(event: Event) {
     event.preventDefault();
     this._dialog.open(AgentsModalComponent, {
       data: {
-        agents: this.agentsArray(),
+        agents: this.agents(),
         description: this.description(),
       },
     });

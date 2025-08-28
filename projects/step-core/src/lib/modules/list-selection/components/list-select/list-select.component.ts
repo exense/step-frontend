@@ -1,25 +1,16 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  forwardRef,
-  inject,
-  input,
-  OnDestroy,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, inject, input, OnDestroy, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { KeyValue } from '@angular/common';
 import {
   BulkSelectionType,
-  EntitiesSelectionModule,
-  RegistrationStrategy,
-  selectionCollectionProvider,
-  SelectionCollector,
-} from '../../../entities-selection/entities-selection.module';
+  ENTITIES_SELECTION_EXPORTS,
+  entitySelectionStateProvider,
+  EntitySelectionStateUpdatable,
+} from '../../../entities-selection';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableColumnsConfig, TableModule, TablePersistenceConfig } from '../../../table/table.module';
 import { skip, Subject, takeUntil } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 type OnChange = <T>(value?: T[]) => void;
 type OnTouch = () => void;
@@ -35,7 +26,7 @@ export enum SelectAll {
   templateUrl: './list-select.component.html',
   styleUrl: './list-select.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StepBasicsModule, TableModule, EntitiesSelectionModule],
+  imports: [StepBasicsModule, TableModule, ENTITIES_SELECTION_EXPORTS],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -50,37 +41,21 @@ export enum SelectAll {
       provide: TablePersistenceConfig,
       useValue: null,
     },
-    ...selectionCollectionProvider<unknown, KeyValue<unknown, string>>({
-      selectionKeyProperty: 'key',
-      registrationStrategy: RegistrationStrategy.MANUAL,
-    }),
+    ...entitySelectionStateProvider<unknown, KeyValue<unknown, string>>('key'),
   ],
 })
 export class ListSelectComponent<T> implements ControlValueAccessor, OnDestroy {
-  protected readonly _selectionCollector = inject(SelectionCollector);
+  private _selectionState =
+    inject<EntitySelectionStateUpdatable<unknown, KeyValue<unknown, string>>>(EntitySelectionStateUpdatable);
   private updateTerminator$?: Subject<void>;
+  private selected$ = toObservable(this._selectionState.selectedKeys);
 
   private onChange?: OnChange;
   private onTouch?: OnTouch;
 
-  protected bulkSelection = BulkSelectionType.INDIVIDUAL;
-
   protected isDisabled = signal(false);
-
-  /**
-   * @Input()
-   * **/
   readonly selectAll = input(SelectAll.NONE);
-
-  /**
-   * @Input()
-   * **/
   readonly items = input<KeyValue<T, string>[]>([]);
-
-  protected effectRegisterItems = effect(() => {
-    const items = this.items();
-    this._selectionCollector.registerPossibleSelectionManually(items);
-  });
 
   writeValue(value?: T[]): void {
     this.assignModel(value);
@@ -105,20 +80,21 @@ export class ListSelectComponent<T> implements ControlValueAccessor, OnDestroy {
   private assignModel(value?: T[]): void {
     this.terminateUpdateSubscription();
     if (this.selectAll() !== SelectAll.EMPTY_LIST_WHEN_ALL_SELECTED) {
-      const selection = value ?? [];
-      this.bulkSelection = this.determineSelection(selection);
-      this._selectionCollector.selectById(...selection);
+      const keys = value ?? [];
+      const selectionType = this.determineSelection(keys);
+      this._selectionState.updateSelection({ keys, selectionType });
       this.setupUpdateSubscription();
       return;
     }
 
     if (!value) {
-      const selection = this.items().map((item) => item.key);
-      this.bulkSelection = this.determineSelection(selection);
-      this._selectionCollector.selectById(...selection);
+      const keys = this.items().map((item) => item.key);
+      const selectionType = this.determineSelection(keys);
+      this._selectionState.updateSelection({ keys, selectionType });
     } else {
-      this.bulkSelection = this.determineSelection(value);
-      this._selectionCollector.selectById(...value);
+      const keys = value;
+      const selectionType = this.determineSelection(keys);
+      this._selectionState.updateSelection({ keys, selectionType });
     }
     this.setupUpdateSubscription();
   }
@@ -139,8 +115,8 @@ export class ListSelectComponent<T> implements ControlValueAccessor, OnDestroy {
   private setupUpdateSubscription(): void {
     this.terminateUpdateSubscription();
     this.updateTerminator$ = new Subject<void>();
-    this._selectionCollector.selected$.pipe(skip(1), takeUntil(this.updateTerminator$)).subscribe((value) => {
-      this.emitModelChange(value as T[]);
+    this.selected$.pipe(skip(1), takeUntil(this.updateTerminator$)).subscribe((value) => {
+      this.emitModelChange(Array.from(value) as T[]);
       this.onTouch?.();
     });
   }

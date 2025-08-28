@@ -1,17 +1,22 @@
 <step-table
+  #tableRef
   [dataSource]="_dataSource"
   matSort
   matSortActive="scope"
   matSortDirection="asc"
   [matSortDisableClear]="true"
 >
-  <step-bulk-operations *stepAdditionalHeader />
+  <ng-container *stepAdditionalHeader>
+    @if (multipleSelection) {
+      <step-bulk-operations />
+    }
+  </ng-container>
 
   @if (multipleSelection) {
     <ng-container matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
-        <step-entity-selection-di [entity]="element" />
+        <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
   }
