@@ -56,6 +56,11 @@
                 "output": "/images"
               },
               {
+                "glob": "**/*",
+                "input": "node_modules/playwright-core/lib/vite/traceViewer",
+                "output": "/trace-viewer"
+              },
+              {
                 "glob": "worker-javascript.js",
                 "input": "node_modules/ace-builds/src-min-noconflict",
                 "output": "/"

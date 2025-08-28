@@ -31,6 +31,7 @@ import { AUTOMATION_PACKAGE_IMPORTS, AUTOMATION_PACKAGE_INITIALIZER } from './mo
 import { ERRORS_VIEW_IMPORTS, ERRORS_VIEW_INITIALIZER } from './modules/errors-view';
 import { RESOURCE_IMPORTS, RESOURCES_INITIALIZER } from './modules/resources';
 import { InProgressComponent } from './components/in-progress/in-progress.component';
+import { PLAYWRIGHT_INITIALIZER } from './modules/playwright';
 
 Settings.defaultLocale = 'en';
 
@@ -39,6 +40,7 @@ const MODULES_INITIALIZERS = [
   AUTOMATION_PACKAGE_INITIALIZER,
   ERRORS_VIEW_INITIALIZER,
   RESOURCES_INITIALIZER,
+  PLAYWRIGHT_INITIALIZER,
 ];
 
 @NgModule({
