@@ -61,11 +61,6 @@
                 "output": "/trace-viewer"
               },
               {
-                "glob": "trace-report-example.zip",
-                "input": "/",
-                "output": "/trace-report-example"
-              },
-              {
                 "glob": "worker-javascript.js",
                 "input": "node_modules/ace-builds/src-min-noconflict",
                 "output": "/"

@@ -16,7 +16,7 @@ export class PlaywrightPageComponent {
   constructor() {
     afterNextRender(() => {
       setTimeout(() => {
-        this.reportExampleUrl.set(`${this._appHost}/trace-report-example/trace-report-example.zip`);
+        this.reportExampleUrl.set(`${this._appHost}/assets/trace-report-example.zip`);
       }, 5000);
     });
   }

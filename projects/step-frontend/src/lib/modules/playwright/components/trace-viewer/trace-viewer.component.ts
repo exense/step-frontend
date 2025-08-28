@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { DomSanitizer } from '@angular/platform-browser';
 import { APP_HOST } from '@exense/step-core';
 
-const TRACE_VIEWER_PATH = '/trace-viewer';
-
 @Component({
   selector: 'step-trace-viewer',
   imports: [],
