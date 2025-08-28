@@ -8,7 +8,7 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
   selector: 'step-function-link-editor',
   templateUrl: './function-link.component.html',
   styleUrls: ['./function-link.component.scss'],
-  imports: [StepBasicsModule]
+  imports: [StepBasicsModule],
 })
 export class FunctionLinkEditorComponent extends BaseFunctionLinkComponent implements CustomComponent {
   @Output() edit = new EventEmitter<void>();
