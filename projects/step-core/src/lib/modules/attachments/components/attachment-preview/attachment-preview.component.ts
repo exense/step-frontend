@@ -1,22 +1,14 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  input,
-  model,
-  viewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
-import { AttachmentMeta, SkippedAttachmentMeta } from '../../../../client/step-client-module';
+import { SkippedAttachmentMeta } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { AttachmentUtilsService } from '../../injectables/attachment-utils.service';
 import { NgOptimizedImage } from '@angular/common';
 import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.service';
 import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
+import { StreamingAttachmentStatusDirective } from '../../directives/streaming-attachment-status.directive';
 
 @Component({
   selector: 'step-attachment-preview',
@@ -29,26 +21,31 @@ import { StreamingTextComponent } from '../streaming-text/streaming-text.compone
     '[class.with-action-bar]': 'showDownload() && attachmentType() !== AttachmentType.SKIPPED',
     '[class.force-action-bar]': 'isStreamingInProgress()',
     '[class.with-border]': 'withBorder()',
+    '[class.has-pointer]': 'canOpenDetails()',
     '(click)': 'open()',
     '[matTooltip]': 'attachmentTooltip()',
   },
+  hostDirectives: [
+    {
+      directive: StreamingAttachmentStatusDirective,
+      inputs: ['attachment'],
+    },
+  ],
 })
 export class AttachmentPreviewComponent {
   private _attachmentUtils = inject(AttachmentUtilsService);
   private _attachmentDialogs = inject(AttachmentDialogsService);
+  private _streamingStatus = inject(StreamingAttachmentStatusDirective, { self: true });
 
-  private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
-
-  readonly attachment = input<AttachmentMeta | undefined>(undefined);
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
-  private streamingStatus = computed(() => this.streamingText()?.status?.());
-
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this.streamingStatus();
+    const status = this._streamingStatus.status();
     return !!status && status !== 'COMPLETED' && status !== 'FAILED';
   });
+
+  protected readonly attachment = computed(() => this._streamingStatus.attachment());
 
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;
@@ -61,7 +58,15 @@ export class AttachmentPreviewComponent {
     return attachment.reason;
   });
 
+  protected readonly canOpenDetails = computed(() => {
+    const attachmentType = this.attachmentType()!;
+    return attachmentType !== AttachmentType.STREAMING_BINARY;
+  });
+
   protected open(): void {
+    if (!this.canOpenDetails()) {
+      return;
+    }
     this._attachmentDialogs.showDetails(this.attachment()!);
   }
 

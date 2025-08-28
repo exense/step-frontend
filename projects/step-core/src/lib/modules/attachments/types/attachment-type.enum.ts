@@ -5,5 +5,5 @@ export enum AttachmentType {
   VIDEO,
   SKIPPED,
   STREAMING_TEXT,
-  STREAMING_VIDEO,
+  STREAMING_BINARY,
 }

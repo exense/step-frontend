@@ -6,8 +6,11 @@ step-attachment-preview {
   width: 15rem;
   height: 7rem;
   position: relative;
-  cursor: pointer;
   overflow: hidden;
+
+  &.has-pointer {
+    cursor: pointer;
+  }
 
   &.large {
     width: 45rem;

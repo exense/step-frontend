@@ -4,15 +4,23 @@
       <step-icon name="paperclip" matTooltip="Attachments" />
       @for (att of attachments; track att.id) {
         <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER" [withBorder]="true">
-          @if ((att | attachmentType) !== AttachmentType.SKIPPED) {
-            <div class="attachment-name-container">
-              <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
-              @if ((att | attachmentType) === AttachmentType.STREAMING_TEXT) {
-                <step-streaming-attachment-indicator [attachmentOrId]="att" />
-              }
-            </div>
-          } @else {
-            <span class="highlight-inline-item skipped">{{ att.name }}</span>
+          @if (att | attachmentType; as attachmentType) {
+            @if (attachmentType !== AttachmentType.SKIPPED) {
+              <div class="attachment-name-container">
+                @if (attachmentType === AttachmentType.STREAMING_BINARY) {
+                  <span>{{ att.name }}</span>
+                } @else {
+                  <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
+                }
+                @if (
+                  attachmentType === AttachmentType.STREAMING_TEXT || attachmentType === AttachmentType.STREAMING_BINARY
+                ) {
+                  <step-streaming-attachment-indicator [attachment]="att" />
+                }
+              </div>
+            } @else {
+              <span class="highlight-inline-item skipped">{{ att.name }}</span>
+            }
           }
           <step-popover-content>
             @switch (att | attachmentType) {
