@@ -3,6 +3,7 @@ import {
   BehaviorSubject,
   catchError,
   debounceTime,
+  distinctUntilChanged,
   filter,
   map,
   Observable,
@@ -120,8 +121,8 @@ interface RequestContainer extends StepDataSourceReloadOptions {
 
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
-  private inProgress = signal(false);
-  readonly inProgress$ = toObservable(this.inProgress);
+  private inProgressInternal$ = new BehaviorSubject<boolean>(false);
+  readonly inProgress$ = this.inProgressInternal$.pipe(distinctUntilChanged());
   private isSharable = false;
   private isSkipOngoingRequest?: boolean;
   private currentRequestTerminator$?: Subject<void>;
@@ -140,12 +141,12 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       }
 
       if (x.immediateHideProgress) {
-        this.inProgress.set(false);
+        this.inProgressInternal$.next(false);
       }
 
       const isProgressTriggered = !x.hideProgress;
       if (isProgressTriggered) {
-        this.inProgress.set(true);
+        this.inProgressInternal$.next(true);
       }
 
       this.terminateCurrentRequest();
@@ -153,7 +154,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       this.requestRef$ = this.doRequest(x).pipe(
         tap(() => {
           if (isProgressTriggered) {
-            this.inProgress.set(false);
+            this.inProgressInternal$.next(false);
           }
           this.requestRef$ = undefined;
         }),
@@ -174,7 +175,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   );
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
-  readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal || 0));
+  readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal ?? null));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
   readonly forceNavigateToFirstPage$ = this._response$.pipe(
     map((r) => {
@@ -225,6 +226,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   destroy(): void {
+    this.inProgressInternal$.complete();
     this._request$.complete();
     this._terminator$.next();
     this._terminator$.complete();

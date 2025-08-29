@@ -86,6 +86,12 @@ interface SearchData {
   resetPagination: boolean;
 }
 
+enum EmptyState {
+  INITIAL,
+  NO_DATA,
+  NO_MATCHING_RECORDS,
+}
+
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
@@ -93,6 +99,7 @@ interface SearchData {
   encapsulation: ViewEncapsulation.None,
   host: {
     '[class.in-progress]': 'inProgress()',
+    '[class.initial-load]': 'emptyState() === EmptyState.INITIAL',
     '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
   },
   providers: [
@@ -180,10 +187,24 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly useSkeletonPlaceholder = input(false);
+  readonly useSkeletonPlaceholder = input(true);
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
+  private total = signal<number | null>(null);
+
+  protected readonly EmptyState = EmptyState;
+  protected readonly emptyState = computed(() => {
+    const total = this.total();
+    if (total === null) {
+      return EmptyState.INITIAL;
+    }
+    if (total === 0) {
+      return EmptyState.NO_DATA;
+    }
+
+    return EmptyState.NO_MATCHING_RECORDS;
+  });
 
   protected readonly inProgress = computed(() => {
     const inProgressExternal = this.inProgressExternal();
@@ -426,8 +447,12 @@ export class TableComponent<T>
       this.page!.firstPage();
     });
 
-    tableDataSource.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+    tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
       this.inProgressDataSource.set(inProgress);
+    });
+
+    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.total.set(total);
     });
   }
 
