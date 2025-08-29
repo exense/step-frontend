@@ -21,7 +21,7 @@ export interface TableGetDataOptions extends TableFilterOptions {
 
 export interface TableDataSource<T> extends StepDataSource<T> {
   readonly inProgress$: Observable<boolean>;
-  readonly total$: Observable<number>;
+  readonly total$: Observable<number | null>;
   readonly totalFiltered$: Observable<number>;
   readonly forceNavigateToFirstPage$: Observable<unknown>;
   getTableData(options?: TableGetDataOptions): void;
