@@ -15,7 +15,7 @@ export class TraceViewerComponent {
 
   readonly reportUrl = input('');
 
-  private traceViewerPath = `${this._appHost}/trace-viewer`;
+  private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
   protected readonly traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
