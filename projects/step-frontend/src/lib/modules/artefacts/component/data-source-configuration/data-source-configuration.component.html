@@ -26,6 +26,12 @@
           [disabled]="context.readonly"
           name="worksheet"
         />
+        <step-dynamic-textfield
+          label="Password"
+          [(ngModel)]="context.artefact!.dataSource!.password"
+          [disabled]="context.readonly"
+          name="password"
+        />
         <step-dynamic-checkbox
           label="Headers"
           [(ngModel)]="context.artefact!.dataSource!.headers"

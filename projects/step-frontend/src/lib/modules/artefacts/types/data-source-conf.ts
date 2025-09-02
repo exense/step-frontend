@@ -25,4 +25,6 @@ export interface DataSourceConf extends DataPoolConfiguration {
   json: DynamicValueString;
 
   folder: DynamicValueString;
+
+  protectedDataSource: DynamicValueBoolean;
 }

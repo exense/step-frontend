@@ -8,6 +8,15 @@
     name="forWrite"
   >
   </step-dynamic-checkbox>
+  <step-dynamic-checkbox
+    *ngIf="context.artefact!.dataSource"
+    label="Protect data source"
+    [(ngModel)]="context.artefact!.dataSource!.protectedDataSource"
+    [disabled]="context.readonly"
+    name="protectedDataSource"
+  >
+  </step-dynamic-checkbox>
+
   <step-dynamic-textfield
     label="Iterator handle"
     [(ngModel)]="context.artefact!.item"
