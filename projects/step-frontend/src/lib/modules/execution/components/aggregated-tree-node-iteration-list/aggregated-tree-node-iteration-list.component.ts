@@ -9,6 +9,7 @@ import {
   output,
   Renderer2,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
