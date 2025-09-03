@@ -94,6 +94,8 @@ export class SchedulerModule {
                 editScheduledTaskRoute({
                   path: ':id',
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
+                  getListUrl: () => inject(CommonEntitiesUrlsService).schedulerListUrl(),
+                  isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchSchedulerTaskEditorUrl(url),
                 }),
               ],
             },

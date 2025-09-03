@@ -3,6 +3,7 @@ import {
   AugmentedDashboardsService,
   AugmentedTimeSeriesService,
   checkEntityGuardFactory,
+  CommonEntitiesUrlsService,
   DashboardsService,
   dialogRoute,
   EntityRegistry,
@@ -86,7 +87,9 @@ export class TimeSeriesModule {
             checkEntityGuardFactory({
               entityType: 'dashboard',
               getEntity: (id) => inject(AugmentedDashboardsService).getDashboardById(id),
-              getEditorUrl: (id) => `/dashboards/${id}`,
+              getEditorUrl: (id) => inject(CommonEntitiesUrlsService).dashboardUrl(id),
+              getListUrl: () => inject(CommonEntitiesUrlsService).dashboardListUrl(),
+              isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchDashboardUrl(url),
             }),
             (route: ActivatedRouteSnapshot) => {
               const _dashboardService = inject(DashboardsService);
