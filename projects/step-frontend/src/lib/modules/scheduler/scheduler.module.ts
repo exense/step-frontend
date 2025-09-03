@@ -99,16 +99,22 @@ export class SchedulerModule {
                 }),
               ],
             },
-            dialogRoute({
+            {
               path: 'import',
-              dialogComponent: ImportDialogComponent,
-              data: {
-                title: 'Schedule import',
-                entity: 'tasks',
-                overwrite: false,
-                importAll: false,
-              },
-            }),
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'task',
+                  dialogComponent: ImportDialogComponent,
+                  data: {
+                    title: 'Schedule import',
+                    entity: 'tasks',
+                    overwrite: false,
+                    importAll: false,
+                  },
+                }),
+              ],
+            },
             {
               path: 'export',
               component: SimpleOutletComponent,
