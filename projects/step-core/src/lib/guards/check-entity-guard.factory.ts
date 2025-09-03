@@ -1,7 +1,7 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { CheckLoadErrorsConfig, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
 
@@ -11,6 +11,8 @@ export interface CheckProjectGuardConfig {
   entityType: string;
   idParameterName?: string;
   idExtractor?: (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => string;
+  getListUrl?: () => string;
+  isMatchEditorUrl?: (url: string) => boolean;
   getEditorUrl: (id: string, route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => EntityEditLink;
   getEntity: (id: string) => Observable<unknown>;
 }
@@ -40,8 +42,26 @@ export const checkEntityGuardFactory =
       attributes?: Record<string, string>;
     }>;
 
+    let isMatchEditorUrl: CheckLoadErrorsConfig['isMatchEditorUrl'] = undefined;
+    if (config.isMatchEditorUrl) {
+      isMatchEditorUrl = (url) => runInInjectionContext(_injector, () => config.isMatchEditorUrl!(url));
+    }
+
+    let getListUrl: CheckLoadErrorsConfig['getListUrl'] = undefined;
+    if (config.getListUrl) {
+      getListUrl = () => runInInjectionContext(_injector, () => config.getListUrl!());
+    }
+
+    const loadErrorsConfig: CheckLoadErrorsConfig = {
+      entityType: config.entityType,
+      entityId: id,
+      routerState: state,
+      isMatchEditorUrl,
+      getListUrl,
+    };
+
     return entity$.pipe(
-      _multipleProjects.checkLoadErrors(config.entityType, id, state),
+      _multipleProjects.checkLoadErrors(loadErrorsConfig),
       switchMap((entityOrUrl) => {
         if (!entityOrUrl) {
           return of(false);

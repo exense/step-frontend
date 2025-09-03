@@ -10,6 +10,7 @@ import {
   EventEmitter,
   forwardRef,
   inject,
+  Injector,
   input,
   Input,
   OnChanges,
@@ -17,6 +18,7 @@ import {
   OnInit,
   Output,
   QueryList,
+  runInInjectionContext,
   signal,
   SimpleChanges,
   TemplateRef,
@@ -32,6 +34,7 @@ import {
   map,
   Observable,
   of,
+  shareReplay,
   startWith,
   Subject,
   switchMap,
@@ -53,7 +56,7 @@ import { AdditionalHeaderDirective } from '../../directives/additional-header.di
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageDefaultService } from '../../services/items-per-page-default.service';
-import { HasFilter } from '../../../entities-selection/services/has-filter';
+import { HasFilter } from '../../../entities-selection/injectables/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
@@ -71,6 +74,10 @@ import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.m
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
+import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
+import { TableSelectionList } from '../../shared/selection/table-selection-list';
+import { TableRemoteSelectionList } from '../../shared/selection/table-remote-selection-list';
+import { TableLocalSelectionList } from '../../shared/selection/table-local-selection-list';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -79,11 +86,22 @@ interface SearchData {
   resetPagination: boolean;
 }
 
+enum EmptyState {
+  INITIAL,
+  NO_DATA,
+  NO_MATCHING_RECORDS,
+}
+
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.in-progress]': 'inProgress()',
+    '[class.initial-load]': 'emptyState() === EmptyState.INITIAL',
+    '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
+  },
   providers: [
     {
       provide: TableSearch,
@@ -123,6 +141,10 @@ interface SearchData {
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
+    {
+      provide: SelectionList,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
   standalone: false,
 })
@@ -137,7 +159,8 @@ export class TableComponent<T>
     TableReload,
     HasFilter,
     TableHighlightItemContainer,
-    TableColumnsDictionaryService
+    TableColumnsDictionaryService,
+    SelectionList<unknown, T>
 {
   private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
@@ -145,6 +168,8 @@ export class TableComponent<T>
   private _destroyRef = inject(DestroyRef);
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
+  private _selectionState = inject(EntitySelectionStateUpdatable, { optional: true });
+  private _injector = inject(Injector);
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
@@ -162,9 +187,33 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly inProgress = input(false);
+  readonly useSkeletonPlaceholder = input(true);
+
+  readonly inProgressExternal = input(false, { alias: 'inProgress' });
+  private inProgressDataSource = signal(false);
+  private total = signal<number | null>(null);
+
+  protected readonly EmptyState = EmptyState;
+  protected readonly emptyState = computed(() => {
+    const total = this.total();
+    if (total === null) {
+      return EmptyState.INITIAL;
+    }
+    if (total === 0) {
+      return EmptyState.NO_DATA;
+    }
+
+    return EmptyState.NO_MATCHING_RECORDS;
+  });
+
+  protected readonly inProgress = computed(() => {
+    const inProgressExternal = this.inProgressExternal();
+    const inProgressDataSource = this.inProgressDataSource();
+    return inProgressExternal || inProgressDataSource;
+  });
 
   protected tableDataSource?: TableDataSource<T>;
+  private tableSelectionList?: TableSelectionList<T, TableDataSource<T>>;
 
   readonly pageSizeInputDisabled = input(false);
 
@@ -320,6 +369,7 @@ export class TableComponent<T>
       return hasFilter;
     }),
   );
+  readonly hasFilter = toSignal(this.hasFilter$, { initialValue: false });
 
   highlightedItem?: unknown;
 
@@ -327,6 +377,9 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
+    this.inProgressDataSource.set(false);
+    this.tableSelectionList?.destroy?.();
+    this.tableSelectionList = undefined;
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -346,6 +399,16 @@ export class TableComponent<T>
     }
 
     this.tableDataSource = tableDataSource;
+
+    if (this._selectionState) {
+      if (tableDataSource instanceof TableRemoteDataSource) {
+        this.tableSelectionList =
+          runInInjectionContext(this._injector, () => new TableRemoteSelectionList(tableDataSource)) || undefined;
+      } else if (tableDataSource instanceof TableLocalDataSource) {
+        this.tableSelectionList =
+          runInInjectionContext(this._injector, () => new TableLocalSelectionList(tableDataSource)) || undefined;
+      }
+    }
 
     if (!this.page) {
       this.initRequired = true;
@@ -380,8 +443,16 @@ export class TableComponent<T>
         tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params });
       });
 
-    tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
+    tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
+    });
+
+    tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+      this.inProgressDataSource.set(inProgress);
+    });
+
+    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.total.set(total);
     });
   }
 
@@ -623,4 +694,44 @@ export class TableComponent<T>
     }
     this.tableDataSource.exportAsCSV(fields, this.tableParams());
   }
+
+  /** Selection list methods begin **/
+
+  clearSelection(): void {
+    this.tableSelectionList?.clearSelection?.();
+  }
+
+  deselect(item: T): void {
+    this.tableSelectionList?.deselect?.(item);
+  }
+
+  select(item: T): void {
+    this.tableSelectionList?.select?.(item);
+  }
+
+  selectAll(): void {
+    this.tableSelectionList?.selectAll?.();
+  }
+
+  selectFiltered(): void {
+    this.tableSelectionList?.selectFiltered?.();
+  }
+
+  selectVisible(): void {
+    this.tableSelectionList?.selectVisible?.();
+  }
+
+  toggleSelection(item: T): void {
+    this.tableSelectionList?.toggleSelection?.(item);
+  }
+
+  selectIds<K>(keys: K[]): void {
+    this.tableSelectionList?.selectIds?.(keys);
+  }
+
+  checkCurrentSelectionState<K>(predicate: (item: T) => boolean): Map<K, boolean> | undefined {
+    return this.tableSelectionList?.checkCurrentSelectionState?.(predicate) as Map<K, boolean> | undefined;
+  }
+
+  /** Selection list methods end **/
 }
