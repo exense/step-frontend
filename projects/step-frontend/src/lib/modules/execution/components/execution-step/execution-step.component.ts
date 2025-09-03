@@ -18,7 +18,6 @@ import {
   ReportNode,
   SelectionList,
   StepDataSource,
-  TableComponent,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -56,7 +55,6 @@ export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestr
   @Input() executionViewServices?: ExecutionViewServices;
   @Input() keywordSearch?: string;
 
-  //@Input() testCases?: ReportNode[];
   @Input() testCasesDataSource?: StepDataSource<ReportNode>;
 
   @Output() drilldownTestCase = new EventEmitter<string>();
@@ -98,11 +96,6 @@ export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestr
     if (cExecutionId?.currentValue !== cExecutionId?.previousValue || cExecutionId?.firstChange) {
       this.setupSelectionChanges(cExecutionId?.currentValue);
     }
-
-    //const cTestCases = changes['testCases'];
-    //if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
-    //  this.determineSelectionType(cTestCases?.currentValue);
-    //}
   }
 
   ngAfterViewInit(): void {
