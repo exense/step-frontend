@@ -22,7 +22,7 @@ step-auto-shrank-list {
     align-items: center;
 
     & > strong,
-    & > span {
+    & > step-auto-shrank-item-value {
       display: block;
       white-space: nowrap;
       max-width: 15rem;
@@ -45,11 +45,17 @@ step-auto-shrank-list {
   align-items: center;
 
   & > strong,
-  & > span {
+  & > step-auto-shrank-item-value {
     display: block;
     white-space: nowrap;
     max-width: 15rem;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+.auto-shrank-all-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

@@ -1,8 +1,6 @@
 import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core';
 import {
-  AutoDeselectStrategy,
   Parameter,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   DialogParentService,
@@ -10,6 +8,7 @@ import {
   AugmentedParametersService,
   FilterConditionFactoryService,
   tableColumnsConfigProvider,
+  entitySelectionStateProvider,
 } from '@exense/step-core';
 import { filter, switchMap } from 'rxjs';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
@@ -24,7 +23,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       entityTableRemoteId: AugmentedParametersService.PARAMETERS_TABLE_ID,
     }),
     tablePersistenceConfigProvider('parametersList', STORE_ALL),
-    ...selectionCollectionProvider<string, Parameter>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, Parameter>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => ParameterListComponent),

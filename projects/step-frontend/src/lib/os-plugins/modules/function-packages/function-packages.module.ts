@@ -2,6 +2,7 @@ import { inject, NgModule } from '@angular/core';
 import {
   AugmentedKeywordPackagesService,
   checkEntityGuardFactory,
+  CheckProjectGuardConfig,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
   DashletRegistryService,
@@ -74,7 +75,10 @@ export class FunctionPackagesModule {
   }
 
   private registerViews(): void {
-    const functionPackageEditor = (mainPath: string, editorUrl: string): Route => ({
+    const functionPackageEditor = (
+      mainPath: string,
+      projectGuardConfig: CheckProjectGuardConfig /* editorUrl: string*/,
+    ): Route => ({
       path: mainPath,
       component: SimpleOutletComponent,
       children: [
@@ -85,13 +89,7 @@ export class FunctionPackagesModule {
         dialogRoute({
           path: ':id',
           dialogComponent: FunctionPackageConfigurationDialogComponent,
-          canActivate: [
-            checkEntityGuardFactory({
-              entityType: 'keyword package',
-              getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
-              getEditorUrl: (id) => `${editorUrl}/${id}`,
-            }),
-          ],
+          canActivate: [checkEntityGuardFactory(projectGuardConfig)],
           resolve: {
             functionPackage: (route: ActivatedRouteSnapshot) => {
               return inject(AugmentedKeywordPackagesService).getFunctionPackageCached(route.params['id']);
@@ -110,12 +108,26 @@ export class FunctionPackagesModule {
     this._viewRegistry.registerRoute({
       path: 'function-packages',
       component: FunctionPackageListComponent,
-      children: [functionPackageEditor('editor', '/function-packages/editor')],
+      children: [
+        functionPackageEditor('editor', {
+          entityType: 'keyword package',
+          getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
+          getEditorUrl: (id) => `/function-packages/editor/${id}`,
+          getListUrl: () => '/function-packages',
+          isMatchEditorUrl: (url) => url.includes('/function-packages/editor'),
+        }),
+      ],
     });
 
     const keywordsRoute = this._quickAccessRoutes.getRoute('keywords');
     keywordsRoute?.children?.push?.(
-      functionPackageEditor('function-package-editor', '/functions/function-package-editor'),
+      functionPackageEditor('function-package-editor', {
+        entityType: 'keyword package',
+        getEntity: (id) => inject(AugmentedKeywordPackagesService).getFunctionPackageCached(id),
+        getEditorUrl: (id) => `/functions/function-package-editor/${id}`,
+        getListUrl: () => '/functions',
+        isMatchEditorUrl: (url) => url.includes('/functions/function-package-editor'),
+      }),
     );
   }
 

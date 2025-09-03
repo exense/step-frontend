@@ -9,7 +9,6 @@ import {
   TablePersistenceStateService,
   TableStorageService,
   TableMemoryStorageService,
-  TableDataSource,
   TableLocalDataSource,
 } from '@exense/step-core';
 

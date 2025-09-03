@@ -1,7 +1,7 @@
 import { EnvironmentInjector, inject, Injectable, Injector } from '@angular/core';
 import { Observable, of, tap } from 'rxjs';
-import { BulkOperationPerformStrategy } from '../shared/bulk-operation-perform.strategy';
-import { BulkOperationConfig } from '../shared/bulk-operation-config.interface';
+import { BulkOperationPerformStrategy } from '../types/bulk-operation-perform.strategy';
+import { BulkOperationConfig } from '../types/bulk-operation-config.interface';
 import { AsyncOperationDialogResult } from '../../async-operations/shared/async-operation-dialog-result';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class BulkOperationInvokerService {
 
   invokeOperation<KEY>(
     config: BulkOperationConfig<KEY>,
-    parentInjector?: Injector
+    parentInjector?: Injector,
   ): Observable<AsyncOperationDialogResult | undefined> {
     parentInjector = parentInjector ?? this._rootInjector;
 
@@ -46,7 +46,7 @@ export class BulkOperationInvokerService {
         if (injector) {
           injector.destroy();
         }
-      })
+      }),
     );
   }
 }

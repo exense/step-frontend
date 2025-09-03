@@ -1,12 +1,16 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MultipleProjectsStrategy, Project, SwitchStatus } from '../types/multiple-projects-strategy';
+import {
+  CheckLoadErrorsConfig,
+  MultipleProjectsStrategy,
+  Project,
+  SwitchStatus,
+} from '../types/multiple-projects-strategy';
 import { ProjectSwitchDialogComponent } from '../components/project-switch-dialog/project-switch-dialog.component';
 import { ProjectSwitchDialogData } from '../types/project-switch-dialog-data.interface';
 import { ProjectSwitchDialogResult } from '../types/project-switch-dialog-result.enum';
 import { filter, map, Observable, of, pipe, tap, UnaryFunction } from 'rxjs';
 import { ErrorMessageHandlerService } from './error-message-handler.service';
-import { RouterStateSnapshot } from '@angular/router';
 
 const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default multiple project strategy', {
   providedIn: 'root',
@@ -20,10 +24,10 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
       currentProject: () => undefined,
       getEntityProject: <T extends { attributes?: Record<string, string> }>(entity: T) => undefined,
       switchToProject: (project: Project, navigationParams?: { url: string; search: Record<string, any> }) => {},
-      checkLoadErrors<T extends { attributes?: Record<string, string> }>(
-        entityType: string,
-        entityId: string,
-      ): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
+      checkLoadErrors<T extends { attributes?: Record<string, string> }>({
+        entityType,
+        entityId,
+      }: CheckLoadErrorsConfig): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
         return pipe(
           tap((entity) => {
             if (!entity) {
@@ -121,12 +125,8 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     T extends {
       attributes?: Record<string, string>;
     },
-  >(
-    entityType: string,
-    entityId: string,
-    state?: RouterStateSnapshot,
-  ): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
-    return this.strategy.checkLoadErrors(entityType, entityId, state);
+  >(config: CheckLoadErrorsConfig): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
+    return this.strategy.checkLoadErrors(config);
   }
 
   useStrategy(strategy: MultipleProjectsStrategy): void {
