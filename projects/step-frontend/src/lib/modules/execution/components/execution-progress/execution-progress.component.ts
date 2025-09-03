@@ -350,13 +350,14 @@ export class ExecutionProgressComponent
           return true;
       }
     });
-
-    if (selectedTestCases.length === testCases.length) {
-      this.selectionList?.selectAll?.();
-    } else {
-      const ids = selectedTestCases.map((item) => item.artefactID) as string[];
-      this.selectionList?.selectIds?.(ids);
-    }
+    setTimeout(() => {
+      if (selectedTestCases.length === testCases.length) {
+        this.selectionList?.selectAll?.();
+      } else {
+        const ids = selectedTestCases.map((item) => item.artefactID) as string[];
+        this.selectionList?.selectIds?.(ids);
+      }
+    }, 250);
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
@@ -482,7 +483,6 @@ export class ExecutionProgressComponent
   }
 
   private setupTestCasesDataSource(testCases?: ReportNode[]): void {
-    console.log('SETUP TEST CASED DS', testCases);
     testCases = testCases ?? [];
     this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
       testCases,
