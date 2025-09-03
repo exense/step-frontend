@@ -6,12 +6,8 @@ input[type='text'] {
 
 @mixin status-button($color) {
   input[type='text'] {
-    border-color: $color !important;
     background-color: $color;
     color: var.$white;
-  }
-  step-suffix {
-    border-color: $color !important;
   }
 }
 
