@@ -124,6 +124,7 @@ export class ExecutionProgressComponent
 
   execution?: Execution;
   testCases?: ReportNode[];
+  selectedTestCases?: ReportNode[];
   testCasesDataSource?: TableDataSource<ReportNode>;
   keywordSearch?: string;
 
@@ -331,13 +332,11 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect, true);
   }
 
-  private determineDefaultSelection(testCases?: ReportNode[], updateSelection?: UpdateSelection): void {
+  private determineDefaultSelection(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases;
     if (!testCases || testCases.length === 0 || !this.execution) {
       return;
     }
-
-    console.log('testCases', testCases);
 
     const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
@@ -353,18 +352,34 @@ export class ExecutionProgressComponent
           return true;
       }
     });
-    console.log('selectedTestCases', selectedTestCases);
+
+    this.testCases = this.mergeReportNodes(this.testCases || [], testCases || []);
+    this.selectedTestCases = this.mergeReportNodes(this.selectedTestCases || [], selectedTestCases || []);
 
     setTimeout(() => {
-      console.log('setTimeout testCases', testCases);
-      console.log('setTimeout selectedTestCases', selectedTestCases);
-      if (selectedTestCases.length === testCases.length && updateSelection !== UpdateSelection.ONLY_NEW) {
+      if (this.selectedTestCases?.length === this.testCases?.length) {
         this.selectionList?.selectAll?.();
       } else {
-        const ids = selectedTestCases.map((item) => item.artefactID) as string[];
+        const ids = !!this.selectedTestCases ? (this.selectedTestCases.map((item) => item.artefactID) as string[]) : [];
         this.selectionList?.selectIds?.(ids);
       }
     }, 250);
+  }
+
+  private mergeReportNodes(testcases1: ReportNode[], testcases2: ReportNode[]): ReportNode[] {
+    const existingIds = new Set(testcases1.map((node) => node.artefactID));
+    const merged = [...testcases1];
+
+    for (const node of testcases2) {
+      if (!node.artefactID || !existingIds.has(node.artefactID)) {
+        merged.push(node);
+        if (node.artefactID) {
+          existingIds.add(node.artefactID);
+        }
+      }
+    }
+
+    return merged;
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
@@ -438,7 +453,7 @@ export class ExecutionProgressComponent
         this.setupTestCasesDataSource(reportNodes);
         if (updateSelection !== UpdateSelection.NONE) {
           const testCases = updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes;
-          this.determineDefaultSelection(testCases, updateSelection);
+          this.determineDefaultSelection(testCases);
         }
       });
   }
