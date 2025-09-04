@@ -5,6 +5,6 @@
   </div>
 } @else {
   <section class="json-container">
-    <step-json-view-expanded [data]="{ '': message() }" matTooltip="Click to view full error" />
+    <step-json-view-expanded [displayLines]="8" [data]="{ '': message() }" matTooltip="Click to view full error" />
   </section>
 }

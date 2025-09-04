@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ReportNode } from '../../../../client/step-client-module';
 import { JsonViewExpandedComponent } from '../../../json-viewer-ext';
+import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
 
 @Component({
   selector: 'step-report-details-error',
-  imports: [StepBasicsModule, JsonViewExpandedComponent],
+  imports: [StepBasicsModule, JsonViewExpandedComponent, ClampFadeDirective],
   templateUrl: './report-details-error.component.html',
   styleUrl: './report-details-error.component.scss',
   host: {
