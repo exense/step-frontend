@@ -333,9 +333,12 @@ export class ExecutionProgressComponent
 
   private determineDefaultSelection(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases;
-    if (!testCases || !this.execution) {
+    if (!testCases || testCases.length === 0 || !this.execution) {
       return;
     }
+
+    console.log('testCases', testCases);
+
     const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
       if (!artefactFilter) {
@@ -350,10 +353,11 @@ export class ExecutionProgressComponent
           return true;
       }
     });
+    console.log('selectedTestCases', selectedTestCases);
+
     setTimeout(() => {
-      if (testCases.length === 0) {
-        return;
-      }
+      console.log('setTimeout testCases', testCases);
+      console.log('setTimeout selectedTestCases', selectedTestCases);
       if (selectedTestCases.length === testCases.length) {
         this.selectionList?.selectAll?.();
       } else {
