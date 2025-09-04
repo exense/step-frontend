@@ -46,7 +46,7 @@
     <ng-container data-step-testid="parameters-bulk-selection" matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
       <td mat-cell *matCellDef="let element">
-        <step-entity-selection-di [entity]="element" />
+        <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
     <step-entity-column-container data-step-testid="parameters-entity-col" entityName="parameters" />

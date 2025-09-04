@@ -153,6 +153,7 @@ import { AltExecutionTimePrefixDirective } from './components/alt-execution-time
 import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time/alt-execution-time-suffix.directive';
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
+import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 
 @NgModule({
   declarations: [
@@ -247,6 +248,7 @@ import { CrossExecutionExecutionTableComponent } from './components/schedule-ove
     SchedulerPageComponent,
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
+    ExecutionAgentsListComponent,
   ],
   imports: [
     StepCommonModule,
@@ -295,6 +297,7 @@ import { CrossExecutionExecutionTableComponent } from './components/schedule-ove
     ExecutionLegacySwitcherComponent,
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
+    ExecutionAgentsListComponent,
   ],
   providers: [
     {
@@ -431,6 +434,8 @@ export class ExecutionModule {
                   idExtractor: (route) => route.url[0].path,
                   getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).legacyExecutionUrl(id),
+                  isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
+                  getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
                 }),
                 altExecutionGuard,
               ]),
@@ -525,6 +530,8 @@ export class ExecutionModule {
                 entityType: 'execution',
                 getEntity: (id) => inject(AugmentedExecutionsService).getExecutionByIdCached(id),
                 getEditorUrl: (id) => inject(CommonEntitiesUrlsService).executionUrl(id),
+                isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchExecutionUrl(url),
+                getListUrl: () => inject(CommonEntitiesUrlsService).executionList(),
               }),
               altExecutionGuard,
             ]),

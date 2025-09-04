@@ -1,20 +1,20 @@
-import { Component, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   ArrayFilterComponent,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
+  EntitySelectionState,
+  entitySelectionStateProvider,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
-  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { BehaviorSubject, exhaustMap, of } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
 
@@ -29,7 +29,7 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: REQUEST_FILTERS_INTERCEPTORS,
       useClass: ExecutionListFilterInterceptorService,
@@ -45,14 +45,24 @@ export class ExecutionListComponent implements OnDestroy {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
+  private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
-    switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
+    exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
   autoRefreshDisabled: boolean = false;
+
+  private effectSelectionTypeChanged = effect(() => {
+    const selectionType = this._selectionState.selectionType();
+    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
+
+    if (this.autoRefreshDisabled) {
+      this.dataSource.skipOngoingRequest();
+    }
+  });
 
   @ViewChild('statusFilter')
   private statusFilter?: ArrayFilterComponent;
@@ -62,16 +72,8 @@ export class ExecutionListComponent implements OnDestroy {
     this._timeSeriesEntityService.clearCache();
   }
 
-  changeType(selectionType: BulkSelectionType): void {
-    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
-
-    if (this.autoRefreshDisabled) {
-      this.dataSource.skipOngoingRequest();
-    }
-  }
-
   refreshTable(): void {
-    this.dataSource.reload({ hideProgress: true });
+    this.dataSource.reload({ hideProgress: true, isForce: false });
     this.reloadRunningExecutionsCount$.next();
   }
 

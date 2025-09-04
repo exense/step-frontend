@@ -1,10 +1,9 @@
 import { Component, effect, forwardRef, inject, OnInit, viewChild } from '@angular/core';
 import {
   AugmentedAutomationPackagesService,
-  AutoDeselectStrategy,
   AutomationPackage,
   DialogParentService,
-  selectionCollectionProvider,
+  entitySelectionStateProvider,
   StepCoreModule,
   STORE_ALL,
   tableColumnsConfigProvider,
@@ -28,7 +27,7 @@ import { ExecutionModule } from '../../../execution/execution.module';
       entityTableRemoteId: AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID,
     }),
     tablePersistenceConfigProvider('automationPackagesList', STORE_ALL),
-    selectionCollectionProvider<string, AutomationPackage>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, AutomationPackage>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => AutomationPackageListComponent),

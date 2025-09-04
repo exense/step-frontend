@@ -94,19 +94,27 @@ export class SchedulerModule {
                 editScheduledTaskRoute({
                   path: ':id',
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).schedulerTaskEditorUrl(id),
+                  getListUrl: () => inject(CommonEntitiesUrlsService).schedulerListUrl(),
+                  isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchSchedulerTaskEditorUrl(url),
                 }),
               ],
             },
-            dialogRoute({
+            {
               path: 'import',
-              dialogComponent: ImportDialogComponent,
-              data: {
-                title: 'Schedule import',
-                entity: 'tasks',
-                overwrite: false,
-                importAll: false,
-              },
-            }),
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'task',
+                  dialogComponent: ImportDialogComponent,
+                  data: {
+                    title: 'Schedule import',
+                    entity: 'tasks',
+                    overwrite: false,
+                    importAll: false,
+                  },
+                }),
+              ],
+            },
             {
               path: 'export',
               component: SimpleOutletComponent,
