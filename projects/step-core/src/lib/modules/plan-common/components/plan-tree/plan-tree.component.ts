@@ -297,10 +297,8 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     const [internalDrag$, externalDrag$] = partition(dragData$, (dragData) => typeof dragData === 'string');
 
     (internalDrag$ as Observable<string>).subscribe((dragItemId) => {
-      this.candidatesForDropInsert = this._treeState.selectedNodeIds();
-      if (!this.candidatesForDropInsert.includes(dragItemId)) {
-        this.candidatesForDropInsert.push(dragItemId);
-      }
+      const draggingIds = [...this._treeState.selectedNodeIds(), dragItemId];
+      this.candidatesForDropInsert = this._treeState.findSubtreeRootsAmongIds(draggingIds);
     });
 
     externalDrag$.subscribe(() => {
