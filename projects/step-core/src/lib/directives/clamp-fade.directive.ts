@@ -53,7 +53,7 @@ export class ClampFadeDirective implements AfterViewInit, OnDestroy {
     this.renderer.setStyle(element, 'position', 'relative');
     this.renderer.setStyle(element, '-webkit-line-clamp', String(this.lines()));
 
-    this.renderer.setStyle(element, 'white-space', 'normal');
+    this.renderer.setStyle(element, 'white-space', 'break-spaces');
     this.renderer.setStyle(element, 'word-break', 'break-word');
     this.renderer.setStyle(element, 'overflow-wrap', 'anywhere');
     this.renderer.setStyle(element, 'min-width', '0');
