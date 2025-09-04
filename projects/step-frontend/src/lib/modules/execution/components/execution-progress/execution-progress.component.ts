@@ -351,6 +351,9 @@ export class ExecutionProgressComponent
       }
     });
     setTimeout(() => {
+      if (testCases.length === 0) {
+        return;
+      }
       if (selectedTestCases.length === testCases.length) {
         this.selectionList?.selectAll?.();
       } else {
