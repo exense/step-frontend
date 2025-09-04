@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   inject,
@@ -7,15 +8,16 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import {
-  BulkSelectionType,
   EntitySelectionStateUpdatable,
   Execution,
   ExecutionSummaryDto,
   ReportNode,
-  TableLocalDataSource,
+  SelectionList,
+  StepDataSource,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -26,6 +28,7 @@ import { SingleExecutionPanelsService } from '../../services/single-execution-pa
 import { MatSort, Sort } from '@angular/material/sort';
 import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { ExecutionStateService } from '../../services/execution-state.service';
 
 @Component({
   selector: 'step-execution-step',
@@ -33,7 +36,8 @@ import { toObservable } from '@angular/core/rxjs-interop';
   styleUrls: ['./execution-step.component.scss'],
   standalone: false,
 })
-export class ExecutionStepComponent implements OnChanges, OnDestroy {
+export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestroy {
+  protected readonly _state = inject(ExecutionStateService);
   private panelService = inject(SingleExecutionPanelsService);
   private _testCaseSelectionState =
     inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
@@ -51,7 +55,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   @Input() executionViewServices?: ExecutionViewServices;
   @Input() keywordSearch?: string;
 
-  @Input() testCases?: ReportNode[];
+  @Input() testCasesDataSource?: StepDataSource<ReportNode>;
 
   @Output() drilldownTestCase = new EventEmitter<string>();
 
@@ -63,7 +67,9 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   readonly Panels = Panels;
 
-  protected testCasesDataSource?: TableLocalDataSource<ReportNode>;
+  private testCasesSelection = viewChild('testCasesSelection', {
+    read: SelectionList<ReportNode, StepDataSource<ReportNode>>,
+  });
 
   handleTestCaseSort(sort: Sort): void {
     if (sort.active === 'name' && sort.direction === '') {
@@ -90,16 +96,15 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     if (cExecutionId?.currentValue !== cExecutionId?.previousValue || cExecutionId?.firstChange) {
       this.setupSelectionChanges(cExecutionId?.currentValue);
     }
+  }
 
-    const cTestCases = changes['testCases'];
-    if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
-      this.setupTestCasesDataSource(cTestCases?.currentValue);
-      this.determineSelectionType(cTestCases?.currentValue);
-    }
+  ngAfterViewInit(): void {
+    this._state.setupTableSelectionList(this.testCasesSelection()!);
   }
 
   ngOnDestroy(): void {
     this.terminateSelectionChanges();
+    this._state.setupTableSelectionList(undefined);
   }
 
   private terminateSelectionChanges(): void {
@@ -136,27 +141,5 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
       return;
     }
     this.executionViewServices.showTestCase(nodeId);
-  }
-
-  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
-    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
-      testCases ?? [],
-      TableLocalDataSource.configBuilder<ReportNode>()
-        .addSearchStringRegexPredicate('status', (item) => item.status)
-        .build(),
-    );
-  }
-
-  private determineSelectionType(testCases?: ReportNode[]): void {
-    testCases = testCases ?? this.testCases ?? [];
-    if (testCases.length > 0 && testCases.length === this._testCaseSelectionState.selectedSize()) {
-      const isAllIncluded = testCases.reduce(
-        (result, testCase) => result && this._testCaseSelectionState.isSelected(testCase),
-        true,
-      );
-      if (isAllIncluded) {
-        this._testCaseSelectionState.updateSelection({ selectionType: BulkSelectionType.ALL });
-      }
-    }
   }
 }

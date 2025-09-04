@@ -10,7 +10,6 @@ import {
   EventEmitter,
   forwardRef,
   inject,
-  Injector,
   input,
   Input,
   OnChanges,
@@ -18,7 +17,6 @@ import {
   OnInit,
   Output,
   QueryList,
-  runInInjectionContext,
   signal,
   SimpleChanges,
   TemplateRef,
@@ -34,7 +32,6 @@ import {
   map,
   Observable,
   of,
-  shareReplay,
   startWith,
   Subject,
   switchMap,
@@ -76,8 +73,7 @@ import { RowsExtensionDirective } from '../../directives/rows-extension.directiv
 import { RowDirective } from '../../directives/row.directive';
 import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
-import { TableRemoteSelectionList } from '../../shared/selection/table-remote-selection-list';
-import { TableLocalSelectionList } from '../../shared/selection/table-local-selection-list';
+import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -141,6 +137,7 @@ enum EmptyState {
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
+    TableSelectionListFactoryService,
     {
       provide: SelectionList,
       useExisting: forwardRef(() => TableComponent),
@@ -169,7 +166,7 @@ export class TableComponent<T>
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
   private _selectionState = inject(EntitySelectionStateUpdatable, { optional: true });
-  private _injector = inject(Injector);
+  private _tableSelectionListFactory = inject(TableSelectionListFactoryService);
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
@@ -401,13 +398,7 @@ export class TableComponent<T>
     this.tableDataSource = tableDataSource;
 
     if (this._selectionState) {
-      if (tableDataSource instanceof TableRemoteDataSource) {
-        this.tableSelectionList =
-          runInInjectionContext(this._injector, () => new TableRemoteSelectionList(tableDataSource)) || undefined;
-      } else if (tableDataSource instanceof TableLocalDataSource) {
-        this.tableSelectionList =
-          runInInjectionContext(this._injector, () => new TableLocalSelectionList(tableDataSource)) || undefined;
-      }
+      this.tableSelectionList = this._tableSelectionListFactory.create(tableDataSource);
     }
 
     if (!this.page) {

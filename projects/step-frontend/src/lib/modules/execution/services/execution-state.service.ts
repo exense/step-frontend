@@ -1,4 +1,11 @@
-import { Execution, ExecutionSummaryDto, Operation, ReportNode } from '@exense/step-core';
+import {
+  Execution,
+  ExecutionSummaryDto,
+  Operation,
+  ReportNode,
+  SelectionList,
+  StepDataSource,
+} from '@exense/step-core';
 import { ErrorDistributionStatus } from '../shared/error-distribution-status.enum';
 import { ExecutionErrorMessageItem } from '../shared/execution-error-message-item';
 import { ExecutionErrorCodeItem } from '../shared/execution-error-code-item';
@@ -10,6 +17,8 @@ export abstract class ExecutionStateService extends ExecutionViewServices {
   abstract progress?: ExecutionSummaryDto;
   abstract execution?: Execution;
   abstract testCases?: ReportNode[];
+  abstract testCasesDataSource?: StepDataSource<ReportNode>;
+  abstract setupTableSelectionList(list?: SelectionList<string, ReportNode>): void;
   abstract keywordSearch?: string;
   abstract drillDownTestCase(id: string): void;
   abstract searchStepByError(error: string): void;

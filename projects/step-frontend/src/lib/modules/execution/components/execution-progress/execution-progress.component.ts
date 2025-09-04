@@ -15,14 +15,16 @@ import {
   IS_SMALL_SCREEN,
   Operation,
   PrivateViewPluginService,
+  ReloadableDirective,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
+  SelectionList,
   SystemService,
+  TableDataSource,
+  TableLocalDataSource,
   TreeNodeUtilsService,
   TreeStateService,
-  UpdateSelectionMode,
   ViewRegistryService,
-  ReloadableDirective,
 } from '@exense/step-core';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { ExecutionErrorMessageItem } from '../../shared/execution-error-message-item';
@@ -122,6 +124,8 @@ export class ExecutionProgressComponent
 
   execution?: Execution;
   testCases?: ReportNode[];
+  selectedTestCases?: ReportNode[];
+  testCasesDataSource?: TableDataSource<ReportNode>;
   keywordSearch?: string;
 
   readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
@@ -136,9 +140,15 @@ export class ExecutionProgressComponent
 
   showAutoRefreshButton = false;
 
+  private selectionList?: SelectionList<string, ReportNode>;
+
   private selected$ = toObservable(this._testCasesSelectionState.selectedKeys).pipe(
     map((selectedKeys) => Array.from(selectedKeys)),
   );
+
+  setupTableSelectionList(list?: SelectionList<string, ReportNode>): void {
+    this.selectionList = list;
+  }
 
   readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(
     map((ids) => {
@@ -322,11 +332,12 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect, true);
   }
 
-  private determineDefaultSelection(updateSelection: UpdateSelection, testCases?: ReportNode[]): void {
+  private determineDefaultSelection(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases;
-    if (!testCases || !this.execution) {
+    if (!testCases || testCases.length === 0 || !this.execution) {
       return;
     }
+
     const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
       if (!artefactFilter) {
@@ -342,13 +353,33 @@ export class ExecutionProgressComponent
       }
     });
 
-    let selectionType: BulkSelectionType | undefined = undefined;
-    if (selectedTestCases.length > 0) {
-      selectionType =
-        selectedTestCases.length === testCases.length ? BulkSelectionType.ALL : BulkSelectionType.INDIVIDUAL;
+    this.testCases = this.mergeReportNodes(this.testCases || [], testCases || []);
+    this.selectedTestCases = this.mergeReportNodes(this.selectedTestCases || [], selectedTestCases || []);
+
+    setTimeout(() => {
+      if (this.selectedTestCases?.length === this.testCases?.length) {
+        this.selectionList?.selectAll?.();
+      } else {
+        const ids = !!this.selectedTestCases ? (this.selectedTestCases.map((item) => item.artefactID) as string[]) : [];
+        this.selectionList?.selectIds?.(ids);
+      }
+    }, 250);
+  }
+
+  private mergeReportNodes(testcases1: ReportNode[], testcases2: ReportNode[]): ReportNode[] {
+    const existingIds = new Set(testcases1.map((node) => node.artefactID));
+    const merged = [...testcases1];
+
+    for (const node of testcases2) {
+      if (!node.artefactID || !existingIds.has(node.artefactID)) {
+        merged.push(node);
+        if (node.artefactID) {
+          existingIds.add(node.artefactID);
+        }
+      }
     }
-    const mode = updateSelection === UpdateSelection.ONLY_NEW ? UpdateSelectionMode.UPDATE : UpdateSelectionMode.RESET;
-    this._testCasesSelectionState.updateSelection({ entities: selectedTestCases, mode, selectionType });
+
+    return merged;
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
@@ -361,7 +392,7 @@ export class ExecutionProgressComponent
     const { updateSelection } = this.prepareRefreshParams(params);
     const execution = this.execution!;
     if (updateSelection !== UpdateSelection.NONE) {
-      this.determineDefaultSelection(updateSelection ?? UpdateSelection.ALL);
+      this.determineDefaultSelection();
     }
   }
 
@@ -419,11 +450,10 @@ export class ExecutionProgressComponent
         const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
+        this.setupTestCasesDataSource(reportNodes);
         if (updateSelection !== UpdateSelection.NONE) {
-          this.determineDefaultSelection(
-            updateSelection ?? UpdateSelection.ALL,
-            updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes,
-          );
+          const testCases = updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes;
+          this.determineDefaultSelection(testCases);
         }
       });
   }
@@ -471,6 +501,25 @@ export class ExecutionProgressComponent
     const element = this._document.querySelector(`#${panelId}`);
     if (element) {
       element.scrollIntoView();
+    }
+  }
+
+  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
+    testCases = testCases ?? [];
+    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
+      testCases,
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .build(),
+    );
+    if (testCases.length > 0 && testCases.length === this._testCasesSelectionState.selectedSize()) {
+      const isAllIncluded = testCases.reduce(
+        (result, testCase) => result && this._testCasesSelectionState.isSelected(testCase),
+        true,
+      );
+      if (isAllIncluded) {
+        this.selectionList?.selectAll?.();
+      }
     }
   }
 }

@@ -9,6 +9,6 @@ import { ExecutionStateService } from '../../services/execution-state.service';
   standalone: false,
 })
 export class DashletExecutionStepComponent implements CustomComponent {
-  _state = inject(ExecutionStateService);
+  protected readonly _state = inject(ExecutionStateService);
   context?: any;
 }
