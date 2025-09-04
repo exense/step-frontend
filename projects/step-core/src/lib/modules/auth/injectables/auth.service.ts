@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
@@ -8,15 +8,12 @@ import { AdditionalRightRuleService } from './additional-right-rule.service';
 import {
   AppConfigContainerService,
   GlobalReloadService,
-  Mutable,
   Reloadable,
   SESSION_STORAGE,
 } from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
 import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
-
-type FieldAccessor = Mutable<Pick<AuthService, 'isOidc'>>;
 
 const OIDC_ENDPOINT_PARAM = 'startOidcEndPoint';
 
@@ -47,7 +44,8 @@ export class AuthService implements OnDestroy, Reloadable {
 
   readonly isAuthenticated$ = this.context$.pipe(map((context) => !!context?.userID && context?.userID !== ANONYMOUS));
 
-  readonly isOidc: boolean = false;
+  private isOidcInternal = signal(false);
+  readonly isOidc = this.isOidcInternal.asReadonly();
 
   readonly initialize$ = this._privateApplicationApi.getApplicationConfiguration().pipe(
     tap((conf) => {
@@ -56,7 +54,8 @@ export class AuthService implements OnDestroy, Reloadable {
         this._document.title = conf.title;
       }
       const startOidcEndpoint = conf?.miscParams?.[OIDC_ENDPOINT_PARAM] || undefined;
-      (this as FieldAccessor).isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+      const isOidc = !!startOidcEndpoint && !!conf?.noLoginMask && !!conf.authentication;
+      this.isOidcInternal.set(isOidc);
     }),
     switchMap(() => this.getSession()),
     map(() => this._serviceContext?.conf?.debug || false),
@@ -125,7 +124,7 @@ export class AuthService implements OnDestroy, Reloadable {
   }
 
   checkOidc(): void {
-    if (this.isOidc) {
+    if (this.isOidc()) {
       this.redirectToOidc();
       return;
     }
