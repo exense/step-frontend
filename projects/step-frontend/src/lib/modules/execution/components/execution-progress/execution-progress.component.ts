@@ -331,7 +331,7 @@ export class ExecutionProgressComponent
     this.selectTab(tabToSelect, true);
   }
 
-  private determineDefaultSelection(testCases?: ReportNode[]): void {
+  private determineDefaultSelection(testCases?: ReportNode[], updateSelection?: UpdateSelection): void {
     testCases = testCases ?? this.testCases;
     if (!testCases || testCases.length === 0 || !this.execution) {
       return;
@@ -358,7 +358,7 @@ export class ExecutionProgressComponent
     setTimeout(() => {
       console.log('setTimeout testCases', testCases);
       console.log('setTimeout selectedTestCases', selectedTestCases);
-      if (selectedTestCases.length === testCases.length) {
+      if (selectedTestCases.length === testCases.length && updateSelection !== UpdateSelection.ONLY_NEW) {
         this.selectionList?.selectAll?.();
       } else {
         const ids = selectedTestCases.map((item) => item.artefactID) as string[];
@@ -438,7 +438,7 @@ export class ExecutionProgressComponent
         this.setupTestCasesDataSource(reportNodes);
         if (updateSelection !== UpdateSelection.NONE) {
           const testCases = updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes;
-          this.determineDefaultSelection(testCases);
+          this.determineDefaultSelection(testCases, updateSelection);
         }
       });
   }
