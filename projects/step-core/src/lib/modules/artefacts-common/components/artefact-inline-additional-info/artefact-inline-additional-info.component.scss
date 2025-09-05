@@ -10,9 +10,3 @@ p.reason {
   white-space: pre-line;
 }
 
-.truncate-lines-5 {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-  overflow: hidden;
-}
