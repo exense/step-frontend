@@ -5,10 +5,11 @@ import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.modul
 import { ATTACHMENTS_EXPORTS } from '../../../attachments';
 import { AttachmentDialogsService } from '../../../attachments/injectables/attachment-dialogs.service';
 import { AttachmentType } from '../../../attachments/types/attachment-type.enum';
+import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
-  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS],
+  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS, ClampFadeDirective],
   templateUrl: './artefact-inline-additional-info.component.html',
   styleUrl: './artefact-inline-additional-info.component.scss',
   encapsulation: ViewEncapsulation.None,

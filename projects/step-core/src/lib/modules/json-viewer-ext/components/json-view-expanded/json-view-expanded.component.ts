@@ -4,13 +4,14 @@ import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { JsonParserIconDictionaryConfig } from '../../types/json-parser-icon-dictionary';
 import { AceMode, RichEditorDialogService } from '../../../rich-editor';
 import { JsonNode } from '../../types/json-node';
+import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
 
 @Component({
   selector: 'step-json-view-expanded',
   templateUrl: './json-view-expanded.component.html',
   styleUrl: './json-view-expanded.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [StepBasicsModule],
+  imports: [StepBasicsModule, ClampFadeDirective],
   host: {
     '[class.collapsable]': 'hasCollapseButton()',
   },
@@ -19,20 +20,12 @@ export class JsonViewExpandedComponent {
   private _jsonParser = inject(JsonParserService);
   private _richEditorDialog = inject(RichEditorDialogService);
 
-  /** @Input() **/
   readonly data = input.required<Record<string, unknown>>();
-
-  /** @Input() **/
   readonly iconsDictionary = input<JsonParserIconDictionaryConfig | undefined>(undefined);
-
-  /** @Input() **/
   readonly limit = input<number | undefined>(undefined);
-
-  /** @Input() **/
   readonly labelExpand = input('Expand');
-
-  /** @Input() **/
   readonly labelCollapse = input('Collapse');
+  readonly displayLines = input<number | null>(null);
 
   private jsonParsed = computed(() => {
     const iconsDictionary = this.iconsDictionary();
