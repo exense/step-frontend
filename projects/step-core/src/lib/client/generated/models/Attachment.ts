@@ -4,6 +4,7 @@
 
 export type Attachment = {
   name?: string;
+  mimeType?: string;
   description?: string;
   hexContent?: string;
   isDirectory?: boolean;

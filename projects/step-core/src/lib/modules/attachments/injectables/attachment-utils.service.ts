@@ -27,6 +27,11 @@ export class AttachmentUtilsService {
       return AttachmentType.DEFAULT;
     }
 
+    // todo This is temporary check. Mime-Type should be used instead
+    if ((attachment.name ?? '').toLowerCase().endsWith('trace.zip')) {
+      return AttachmentType.TRACE;
+    }
+
     if (this._imageTypes.has(extension as ImageType)) {
       return AttachmentType.IMG;
     }
@@ -52,6 +57,8 @@ export class AttachmentUtilsService {
         return 'film';
       case AttachmentType.SKIPPED:
         return 'alert-circle';
+      case AttachmentType.TRACE:
+        return 'archive';
       default:
         return 'paperclip';
     }

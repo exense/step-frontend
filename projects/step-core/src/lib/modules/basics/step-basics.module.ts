@@ -384,3 +384,4 @@ export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
 export * from './directives/status-icon-class.directive';
+export * from './injectables/app-host.token';

@@ -67,7 +67,8 @@
     "uuid": "8.3.2",
     "chart.js": "4.4.3",
     "chartjs-plugin-datalabels": "2.2.0",
-    "zone.js": "0.15.1"
+    "zone.js": "0.15.1",
+    "playwright-core": "1.55.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.14",

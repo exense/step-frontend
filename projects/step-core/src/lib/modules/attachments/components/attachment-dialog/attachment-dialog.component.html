@@ -33,8 +33,13 @@
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">
-          <p class="max-width-600">{{ _data.reason }}</p>
+          <p class="max-width-600">{{ $any(_data).reason }}</p>
         </div>
+      }
+      @case (AttachmentType.TRACE) {
+        @if (_data | attachmentUrl; as traceUrl) {
+          <step-trace-viewer [reportUrl]="traceUrl" />
+        }
       }
       @default {}
     }
