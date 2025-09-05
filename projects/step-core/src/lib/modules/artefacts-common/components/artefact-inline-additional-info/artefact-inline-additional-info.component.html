@@ -23,7 +23,7 @@
                   }
                   @case (AttachmentType.SKIPPED) {
                     <div class="default-attachment-popover-view">
-                      <p class="reason">{{ att.reason }}</p>
+                      <p class="reason">{{ $any(att).reason }}</p>
                     </div>
                   }
                   @default {

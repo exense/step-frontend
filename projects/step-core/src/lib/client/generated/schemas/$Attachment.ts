@@ -6,6 +6,9 @@ export const $Attachment = {
     name: {
       type: 'string',
     },
+    mimeType: {
+      type: 'string',
+    },
     description: {
       type: 'string',
     },
