@@ -10,10 +10,11 @@ import { RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { from } from 'rxjs';
+import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 @Component({
   selector: 'step-attachment-dialog',
-  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent],
+  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent, TraceViewerComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

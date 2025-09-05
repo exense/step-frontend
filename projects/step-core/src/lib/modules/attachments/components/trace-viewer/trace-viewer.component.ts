@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { APP_HOST } from '@exense/step-core';
+import { APP_HOST } from '../../../basics/step-basics.module';
 
 @Component({
   selector: 'step-trace-viewer',
