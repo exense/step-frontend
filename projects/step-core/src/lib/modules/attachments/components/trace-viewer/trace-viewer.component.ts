@@ -17,7 +17,7 @@ export class TraceViewerComponent {
 
   readonly reportUrl = input('');
 
-  private traceViewerPath = this.createTraceViewerPath();
+  private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
   protected readonly traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
@@ -35,13 +35,5 @@ export class TraceViewerComponent {
       return url;
     }
     return [this._ngLocation.normalize(this._appHost), this._ngLocation.normalize(url)].join('/');
-  }
-
-  private createTraceViewerPath(): string {
-    let result = `${this._appHost}/trace-viewer`;
-    if (!this._appHost.includes('localhost')) {
-      result += '/';
-    }
-    return result;
   }
 }
