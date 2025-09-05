@@ -11,9 +11,9 @@
   <step-dynamic-checkbox
     *ngIf="context.artefact!.dataSource"
     label="Protect data source"
-    [(ngModel)]="context.artefact!.dataSource!.protectedDataSource"
+    [(ngModel)]="context.artefact!.dataSource!.protect"
     [disabled]="context.readonly"
-    name="protectedDataSource"
+    name="protect"
   >
   </step-dynamic-checkbox>
 
