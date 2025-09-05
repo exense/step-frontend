@@ -1,14 +1,15 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-:host {
+step-rich-editor {
   display: grid;
   width: 100%;
   min-height: 20rem;
+
+  & > div {
+    height: 100%;
+  }
+
   &.is-disabled > div {
     background: var.$gray-100;
   }
-}
-
-div {
-  height: 100%;
 }

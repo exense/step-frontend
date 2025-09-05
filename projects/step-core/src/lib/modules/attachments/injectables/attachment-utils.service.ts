@@ -1,13 +1,18 @@
 import { inject, Injectable } from '@angular/core';
-import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
+import { AttachmentMeta, AugmentedResourcesService, StreamingAttachmentMeta } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
 import { IMAGE_TYPES, ImageType, TEXT_TYPES, TextType, VIDEO_TYPES, VideoType } from '../../basics/step-basics.module';
+import { AugmentedStreamingResourcesService } from '../../../client/augmented/services/augmented-streaming-resources.service';
+
+const SKIPPED_ATTACHMENT_META = 'step.attachments.SkippedAttachmentMeta';
+const STREAMING_ATTACHMENT_META = 'step.attachments.StreamingAttachmentMeta';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AttachmentUtilsService {
   private _resourceService = inject(AugmentedResourcesService);
+  private _streamingResourceService = inject(AugmentedStreamingResourcesService);
   private _imageTypes = inject(IMAGE_TYPES);
   private _textTypes = inject(TEXT_TYPES);
   private _videoTypes = inject(VIDEO_TYPES);
@@ -17,8 +22,16 @@ export class AttachmentUtilsService {
       return AttachmentType.SKIPPED;
     }
 
-    if (attachment.type === 'step.attachments.SkippedAttachmentMeta') {
+    if (attachment.type === SKIPPED_ATTACHMENT_META) {
       return AttachmentType.SKIPPED;
+    }
+
+    const isStreaming = attachment.type === STREAMING_ATTACHMENT_META;
+    if (isStreaming) {
+      const streamingMeta = attachment as StreamingAttachmentMeta;
+      if (streamingMeta.currentNumberOfLines === null || streamingMeta.currentNumberOfLines === undefined) {
+        return AttachmentType.STREAMING_BINARY;
+      }
     }
 
     const nameParts = (attachment.name ?? '').split('.');
@@ -36,7 +49,7 @@ export class AttachmentUtilsService {
     }
 
     if (this._textTypes.has(extension as TextType)) {
-      return AttachmentType.TEXT;
+      return isStreaming ? AttachmentType.STREAMING_TEXT : AttachmentType.TEXT;
     }
 
     return AttachmentType.DEFAULT;
@@ -52,6 +65,8 @@ export class AttachmentUtilsService {
         return 'film';
       case AttachmentType.SKIPPED:
         return 'alert-circle';
+      case AttachmentType.STREAMING_BINARY:
+        return 'binary-file';
       default:
         return 'paperclip';
     }
@@ -61,6 +76,18 @@ export class AttachmentUtilsService {
     if (!attachment) {
       return;
     }
-    this._resourceService.downloadResource(attachment.id!, attachment.name!);
+    if (attachment.type === STREAMING_ATTACHMENT_META) {
+      this._streamingResourceService.downloadResource(attachment.id!, attachment.name!);
+    } else {
+      this._resourceService.downloadResource(attachment.id!, attachment.name!);
+    }
+  }
+
+  getAttachmentStreamingUrl(attachmentOrId?: string | AttachmentMeta): string | undefined {
+    if (!attachmentOrId) {
+      return undefined;
+    }
+    const id = typeof attachmentOrId === 'string' ? attachmentOrId : attachmentOrId.id;
+    return `/streaming/download/${id}`;
   }
 }

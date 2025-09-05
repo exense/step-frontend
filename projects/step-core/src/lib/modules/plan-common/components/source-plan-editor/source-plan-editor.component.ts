@@ -78,9 +78,15 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
     this.editor.getSession().setUseWorker(false);
     if (this._sourceEditorAutocomplete) {
       this.editor.setOptions({
-        enableBasisAutocompletion: [
+        enableBasicAutocompletion: [
           {
-            getCompletions: (editor: any, session: any, pos: number, prefix: string, callback: Function) => {
+            getCompletions: (
+              editor: ace.Editor,
+              session: ace.EditSession,
+              position: ace.Ace.Point,
+              prefix: string,
+              callback: ace.Ace.CompleterCallback,
+            ) => {
               this._sourceEditorAutocomplete!.autocomplete(prefix).subscribe((parsingResult) => {
                 callback(
                   null,

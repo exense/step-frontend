@@ -1,0 +1,17 @@
+step-streaming-text {
+  step-rich-editor {
+    height: 100%;
+    width: 100%;
+  }
+
+  &.hide-cursor {
+    step-rich-editor {
+      & > div {
+        pointer-events: none;
+      }
+      .ace_cursor-layer {
+        display: none !important;
+      }
+    }
+  }
+}
