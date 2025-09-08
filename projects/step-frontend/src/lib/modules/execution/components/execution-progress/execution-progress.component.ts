@@ -44,6 +44,7 @@ import { ExecutionTabManagerService } from '../../services/execution-tab-manager
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { ReportNodeExt } from '../../shared/report-node-ext';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -505,7 +506,13 @@ export class ExecutionProgressComponent
   }
 
   private setupTestCasesDataSource(testCases?: ReportNode[]): void {
-    testCases = testCases ?? [];
+    testCases = (testCases ?? []).map(
+      (item) =>
+        ({
+          ...item,
+          idObjectValue: new String(item.id),
+        }) as ReportNodeExt,
+    );
     this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
       testCases,
       TableLocalDataSource.configBuilder<ReportNode>()
