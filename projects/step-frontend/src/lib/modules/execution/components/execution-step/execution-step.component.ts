@@ -25,6 +25,7 @@ import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
 import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
+import { ReportNodeExt } from '../../shared/report-node-ext';
 
 @Component({
   selector: 'step-execution-step',
@@ -137,9 +138,16 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   }
 
   private setupTestCasesDataSource(testCases?: ReportNode[]): void {
-    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
-      testCases ?? [],
-      TableLocalDataSource.configBuilder<ReportNode>()
+    const data = (testCases ?? []).map(
+      (item) =>
+        ({
+          ...item,
+          idObjectValue: new String(item.id),
+        }) as ReportNodeExt,
+    );
+    this.testCasesDataSource = new TableLocalDataSource<ReportNodeExt>(
+      data,
+      TableLocalDataSource.configBuilder<ReportNodeExt>()
         .addSearchStringRegexPredicate('status', (item) => item.status)
         .build(),
     );
