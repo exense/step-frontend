@@ -1,19 +1,22 @@
-<span
+<step-form-field
   [ngClass]="{
     'status-no-changes': changeStatus() === RichEditorChangeStatus.NO_CHANGES,
     'status-pending-changes': changeStatus() === RichEditorChangeStatus.PENDING_CHANGES,
     'status-saved': changeStatus() === RichEditorChangeStatus.SAVED
   }"
 >
-  @switch (changeStatus()) {
-    @case (RichEditorChangeStatus.NO_CHANGES) {
-      No changes
-    }
-    @case (RichEditorChangeStatus.PENDING_CHANGES) {
-      Pending changes
-    }
-    @case (RichEditorChangeStatus.SAVED) {
-      Saved
-    }
+  <input type="text" readonly [ngModel]="statusText()" />
+  @if (showSaveBtn()) {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        (click)="save.emit()"
+        [matTooltip]="saveBtnTooltip()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="save" />
+      </button>
+    </step-suffix>
   }
-</span>
+</step-form-field>
