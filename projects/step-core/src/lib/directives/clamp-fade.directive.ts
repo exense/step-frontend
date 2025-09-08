@@ -17,8 +17,8 @@ const FADE_HEIGHT_PX = 24;
   standalone: true,
 })
 export class ClampFadeDirective implements AfterViewInit, OnDestroy {
-  lines = input(5);
-  fadeBackground = input<string | undefined>();
+  readonly lines = input(5);
+  readonly fadeBackground = input<string | undefined>();
 
   @HostBinding('attr.data-step-clamp-fade') private attribute = '';
 
