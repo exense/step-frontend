@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { APP_HOST } from '../../../basics/step-basics.module';
-import { Location } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 
 @Component({
   selector: 'step-trace-viewer',
@@ -11,6 +11,7 @@ import { Location } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TraceViewerComponent {
+  private _doc = inject(DOCUMENT);
   private _appHost = inject(APP_HOST);
   private _ngLocation = inject(Location);
   private _sanitizer = inject(DomSanitizer);
@@ -19,13 +20,23 @@ export class TraceViewerComponent {
 
   private traceViewerPath = `${this._appHost}/trace-viewer/`;
 
-  protected readonly traceViewerUrl = computed(() => {
+  private traceViewerUrl = computed(() => {
     const reportUrl = this.reportUrl();
     const finalUrl = !reportUrl
       ? this.traceViewerPath
       : `${this.traceViewerPath}?trace=${this.prepareReportUrl(reportUrl)}`;
-    return this._sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+    return finalUrl;
   });
+
+  protected readonly iframeTraceViewerUrl = computed(() => {
+    const url = this.traceViewerUrl();
+    return this._sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
+
+  openInSeparateTab(): void {
+    const url = this.traceViewerUrl();
+    this._doc.defaultView!.open(url, '_blank');
+  }
 
   private prepareReportUrl(url: string): string {
     if (!url) {

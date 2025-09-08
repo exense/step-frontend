@@ -14,14 +14,14 @@ export class AttachmentDialogsService {
 
   showDetails(data: AttachmentMeta): void {
     const type = this._attachmentUtils.determineAttachmentType(data);
-    const isLarge = type === AttachmentType.TRACE;
+    const isTrace = type === AttachmentType.TRACE;
     this._matDialog.open(AttachmentDialogComponent, {
       data,
-      width: isLarge ? '95vw' : '80vw',
-      maxWidth: isLarge ? '95vw' : '80vw',
-      height: isLarge ? '90vh' : 'auto',
-      maxHeight: isLarge ? '90vh' : 'auto',
-      panelClass: isLarge ? 'large' : undefined,
+      width: isTrace ? '95vw' : '80vw',
+      maxWidth: isTrace ? '95vw' : '80vw',
+      height: isTrace ? '90vh' : 'auto',
+      maxHeight: isTrace ? '90vh' : 'auto',
+      panelClass: isTrace ? 'trace' : undefined,
     });
   }
 }

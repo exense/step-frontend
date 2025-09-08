@@ -56,13 +56,19 @@ step-attachment-dialog {
   }
 }
 
-.mat-mdc-dialog-panel.large {
+.mat-mdc-dialog-panel.trace {
   step-attachment-dialog {
+    step-modal-window {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     div.dialog-content {
-      height: 75vh;
+      flex: 1;
       max-height: unset;
       div[step-modal-window-body] {
-        height: 74vh;
+        height: 99%;
       }
     }
   }
