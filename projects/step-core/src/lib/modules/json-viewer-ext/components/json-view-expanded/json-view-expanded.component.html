@@ -17,9 +17,15 @@
       </div>
     }
     @if (node.value?.toString(); as value) {
-      <div class="value-container">
-        {{ value }}
-      </div>
+      @if (displayLines() !== null) {
+        <div class="value-container" stepClampFade [lines]="displayLines()!">
+          {{ value }}
+        </div>
+      } @else {
+        <div class="value-container">
+          {{ value }}
+        </div>
+      }
     }
   </div>
 }
