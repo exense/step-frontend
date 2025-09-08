@@ -1,7 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
-import { IMAGE_TYPES, ImageType, TEXT_TYPES, TextType, VIDEO_TYPES, VideoType } from '../../basics/step-basics.module';
+import {
+  IMAGE_TYPES,
+  ImageType,
+  SpecialMimeType,
+  TEXT_TYPES,
+  TextType,
+  VIDEO_TYPES,
+  VideoType,
+} from '../../basics/step-basics.module';
 
 @Injectable({
   providedIn: 'root',
@@ -21,15 +29,14 @@ export class AttachmentUtilsService {
       return AttachmentType.SKIPPED;
     }
 
+    if (attachment.mimeType === SpecialMimeType.PLAYWRIGHT_TRACE) {
+      return AttachmentType.TRACE;
+    }
+
     const nameParts = (attachment.name ?? '').split('.');
     const extension = nameParts[nameParts.length - 1];
     if (!extension) {
       return AttachmentType.DEFAULT;
-    }
-
-    // todo This is temporary check. Mime-Type should be used instead
-    if ((attachment.name ?? '').toLowerCase().endsWith('trace.zip')) {
-      return AttachmentType.TRACE;
     }
 
     if (this._imageTypes.has(extension as ImageType)) {
