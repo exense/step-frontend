@@ -70,8 +70,8 @@ export class ClampFadeDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
-    this.mutationObserver?.disconnect();
+    this.resizeObserver?.disconnect?.();
+    this.mutationObserver?.disconnect?.();
     this.removeOverlay();
   }
 
