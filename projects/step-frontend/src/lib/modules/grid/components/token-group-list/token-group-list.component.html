@@ -20,6 +20,7 @@
   [dataSource]="searchableTokenGroupRequest"
   matSort
   [matSortDisableClear]="true"
+  [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
 >
   <ng-container data-step-testid="token-group-key" matColumnDef="key" stepSearchCol>
     <th mat-header-cell *matHeaderCellDef>Key</th>

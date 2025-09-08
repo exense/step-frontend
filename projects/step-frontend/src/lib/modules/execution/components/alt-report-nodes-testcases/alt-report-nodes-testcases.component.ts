@@ -9,6 +9,7 @@ import {
   TableSearch,
   TableStorageService,
   TableMemoryStorageService,
+  TableIndicatorMode,
 } from '@exense/step-core';
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltTestCasesNodesStateService } from '../../services/alt-test-cases-nodes-state.service';
@@ -83,4 +84,6 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       nodeStatusCount: count,
     });
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

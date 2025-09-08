@@ -202,3 +202,4 @@ export * from './services/table-memory-storage.service';
 export * from './services/table-local-storage.service';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './directives/table-without-selection-state.directive';
+export * from './types/table-indicator-mode.enum';

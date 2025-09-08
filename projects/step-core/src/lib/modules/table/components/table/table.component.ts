@@ -12,6 +12,7 @@ import {
   inject,
   input,
   Input,
+  linkedSignal,
   OnChanges,
   OnDestroy,
   OnInit,
@@ -48,7 +49,7 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableRequestData, TableParameters, StepDataSource } from '../../../../client/step-client-module';
+import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
@@ -74,6 +75,7 @@ import { RowDirective } from '../../directives/row.directive';
 import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
 import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
+import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -184,7 +186,7 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly useSkeletonPlaceholder = input(true);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
@@ -201,6 +203,26 @@ export class TableComponent<T>
     }
 
     return EmptyState.NO_MATCHING_RECORDS;
+  });
+
+  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
+  });
+
+  protected readonly useSpinner = computed(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode === TableIndicatorMode.SPINNER;
+  });
+
+  private effectResetSkeletonPlaceholderOnInitialLoad = effect(() => {
+    const indicatorMode = this.indicatorMode();
+    const emptyState = this.emptyState();
+    if (indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD && emptyState !== EmptyState.INITIAL) {
+      setTimeout(() => {
+        this.useSkeletonPlaceholder.set(false);
+      }, 500);
+    }
   });
 
   protected readonly inProgress = computed(() => {
