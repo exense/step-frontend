@@ -18,6 +18,7 @@
     (columnsChange)="handleColumnsChange()"
   />
 }
+<step-columns-placeholders />
 <div class="table-container">
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
     @for (searchCol of searchColumns; track searchCol.colName) {

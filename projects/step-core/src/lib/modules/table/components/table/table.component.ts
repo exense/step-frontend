@@ -22,6 +22,7 @@ import {
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
+  untracked,
   viewChild,
   ViewChild,
   viewChildren,
@@ -76,6 +77,7 @@ import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
 import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
 import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
+import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -191,11 +193,13 @@ export class TableComponent<T>
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
   private total = signal<number | null>(null);
+  private isTableReadyToRenderColumns = signal(false);
 
   protected readonly EmptyState = EmptyState;
   protected readonly emptyState = computed(() => {
     const total = this.total();
-    if (total === null) {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    if (total === null || !isColumnsInitialized) {
       return EmptyState.INITIAL;
     }
     if (total === 0) {
@@ -283,6 +287,12 @@ export class TableComponent<T>
 
   private viewColumns = viewChildren(ColumnDirective);
 
+  private columnsPlaceholder = viewChild(ColumnsPlaceholdersComponent);
+  private columnsPlaceholderIds = computed(() => {
+    const cols = this.columnsPlaceholder()?.colDef?.() ?? [];
+    return cols.map((col) => col.name);
+  });
+
   private columnsUpdateTrigger = signal(0);
 
   private columns = computed(() => {
@@ -334,8 +344,16 @@ export class TableComponent<T>
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
 
   readonly displayColumns = computed(() => {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
+    const isTableReady = this.isTableReadyToRenderColumns();
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
     const visibleColumnsByInput = this.visibleColumns();
+
+    if (!isColumnsInitialized) {
+      return isTableReady ? columnPlaceholderIds : [];
+    }
+
     if (!visibleColumnsByInput) {
       return visibleColumnsByConfig;
     }
@@ -669,6 +687,14 @@ export class TableComponent<T>
   }
 
   private configureColumns(): void {
+    const columnsPlaceholder = this.columnsPlaceholder()?.colDef?.() ?? [];
+    columnsPlaceholder.forEach((col) => {
+      if (!this.usedColumns.has(col.name)) {
+        this.usedColumns.add(col.name);
+        this.table!.addColumnDef(col);
+      }
+    });
+
     const allCollDef = this.allCollDef();
     allCollDef.forEach((col) => {
       if (!this.usedColumns.has(col.name) && !col.name.startsWith('search-')) {
@@ -676,6 +702,7 @@ export class TableComponent<T>
         this.table!.addColumnDef(col);
       }
     });
+    this.isTableReadyToRenderColumns.set(true);
   }
 
   private configureSearchColumns(): void {

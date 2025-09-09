@@ -22,6 +22,7 @@ import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 import { Mutable } from '../../basics/step-basics.module';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { RequestContainer } from '../types/request-container';
 
 type FieldAccessor = Mutable<
   Pick<
@@ -44,14 +45,14 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   private _terminator$ = new Subject<void>();
-  private _source$!: Observable<T[]>;
+  private _source$!: Observable<T[] | undefined>;
 
-  private _request$ = new BehaviorSubject<Request>({});
+  private _request$ = new BehaviorSubject<RequestContainer<Request>>({});
   private isSharable = false;
 
   readonly inProgress$: Observable<boolean> = of(false);
 
-  readonly total$!: Observable<number>;
+  readonly total$!: Observable<number | null>;
   readonly allData$!: Observable<T[]>;
   readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
@@ -65,16 +66,22 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     this.setupStreams(source, _config);
   }
 
-  protected setupStreams(source: T[] | Observable<T[]>, config: TableLocalDataSourceConfig<T>): void {
-    const source$ = source instanceof Array ? of(source) : source;
+  protected setupStreams(
+    source: T[] | undefined | Observable<T[] | undefined>,
+    config: TableLocalDataSourceConfig<T>,
+  ): void {
+    const source$ = source instanceof Array || source === undefined ? of(source as T[] | undefined) : source;
     this._source$ = source$.pipe(takeUntil(this._terminator$));
 
-    const requestResult$ = combineLatest([this._source$, this._request$]).pipe(
+    const requestResult$ = combineLatest([
+      this._source$,
+      this._request$.pipe(map(({ request }) => request ?? {})),
+    ]).pipe(
       map(([src, req]) => {
-        let total = 0;
+        let total: number | null = null;
         let totalFiltered = 0;
 
-        if (!req?.page && !req.search && !req.sort) {
+        if ((!req?.page && !req.search && !req.sort) || !src) {
           return {
             total,
             totalFiltered,
@@ -241,15 +248,19 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   }
 
   getTableData(options?: TableGetDataOptions): void {
-    const request = { ...this._request$.value };
+    const request = { ...(this._request$.value.request ?? {}) };
     request.page = options?.page || request.page;
     request.sort = options?.sort || request.sort;
     request.search = options?.search || request.search;
-    this._request$.next(request);
+    this._request$.next({ request, isForce: true });
   }
 
   reload(reloadOptions?: StepDataSourceReloadOptions): void {
-    this._request$.next(this._request$.value);
+    const value = { ...(this._request$.value ?? {}) };
+    value.hideProgress = reloadOptions?.hideProgress;
+    value.immediateHideProgress = reloadOptions?.immediateHideProgress;
+    value.isForce = reloadOptions?.isForce;
+    this._request$.next(value);
   }
 
   getFilterRequest(options?: TableFilterOptions): TableRequestData | undefined {

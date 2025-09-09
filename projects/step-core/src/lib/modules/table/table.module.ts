@@ -47,6 +47,7 @@ import { RowDirective } from './directives/row.directive';
 import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
 import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
+import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/columns-placeholders.component';
 
 @NgModule({
   imports: [
@@ -92,6 +93,7 @@ import { TableWithoutSelectionStateDirective } from './directives/table-without-
     SettingsInsideActionColDirective,
     RowDirective,
     RowsExtensionDirective,
+    ColumnsPlaceholdersComponent,
   ],
   exports: [
     TableComponent,
@@ -203,3 +205,4 @@ export * from './services/table-local-storage.service';
 export * from './components/bulk-operations/bulk-operations.component';
 export * from './directives/table-without-selection-state.directive';
 export * from './types/table-indicator-mode.enum';
+export * from './components/columns-placeholders/columns-placeholders.component';
