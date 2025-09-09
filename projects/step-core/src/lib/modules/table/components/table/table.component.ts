@@ -98,8 +98,7 @@ enum EmptyState {
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.in-progress]': 'inProgress()',
-    '[class.initial-load]': 'emptyState() === EmptyState.INITIAL',
+    '[class.in-progress]': 'applyInProgressClass()',
     '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
   },
   providers: [
@@ -233,6 +232,12 @@ export class TableComponent<T>
     const inProgressExternal = this.inProgressExternal();
     const inProgressDataSource = this.inProgressDataSource();
     return inProgressExternal || inProgressDataSource;
+  });
+
+  protected readonly applyInProgressClass = computed(() => {
+    const inProgress = this.inProgress();
+    const emptyState = this.emptyState();
+    return inProgress || emptyState === EmptyState.INITIAL;
   });
 
   protected tableDataSource?: TableDataSource<T>;
