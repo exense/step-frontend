@@ -16,6 +16,7 @@ import {
   ErrorMessageHandlerService,
   NoAccessEntityError,
   FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT,
+  ENTITY_ACCESS_DENIED_CODE,
 } from '@exense/step-core';
 
 @Injectable()
@@ -32,7 +33,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     if (
       error.status === HttpStatusCode.Forbidden &&
-      error.error?.errorMessage === FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT
+      (error.error?.errorMessage === FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT ||
+        error.error?.errorName === ENTITY_ACCESS_DENIED_CODE)
     ) {
       return throwError(() => new NoAccessEntityError(error));
     }
