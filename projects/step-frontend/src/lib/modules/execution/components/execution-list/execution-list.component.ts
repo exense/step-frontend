@@ -81,7 +81,7 @@ export class ExecutionListComponent implements OnDestroy {
   private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
 
   protected readonly isErrorFilterApplied = computed(() => {
-    const statusFilterValue = this.statusFilterValue();
+    const statusFilterValue = this.statusFilterValue() ?? [];
     return (
       statusFilterValue.length === this.errorStatusesSet.size &&
       statusFilterValue.every((status) => this.errorStatusesSet.has(status))
