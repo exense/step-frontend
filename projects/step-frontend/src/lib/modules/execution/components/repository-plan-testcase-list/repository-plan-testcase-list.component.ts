@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, OnInit, output, untracked, viewChild } from '@angular/core';
 import {
+  ArrayFilterComponent,
   BulkSelectionType,
   ControllerService,
   EntitySelectionState,
@@ -12,10 +13,11 @@ import {
   TableLocalDataSourceConfig,
   TestRunStatus,
 } from '@exense/step-core';
-import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
-import { Status } from '../../../_common/step-common.module';
+import { filter, map, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
+import { ERROR_STATUSES, Status } from '../../../_common/step-common.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -54,6 +56,39 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   protected statusItems = computed(() => {
     const testRunStatusList = this.allData();
     return testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique);
+  });
+
+  private allErrorStatusesSet = new Set(ERROR_STATUSES);
+
+  private errorStatuses = computed(() => {
+    const statusItems = this.statusItems();
+    return statusItems.filter((item) => this.allErrorStatusesSet.has(item));
+  });
+
+  protected readonly hasErrorStatuses = computed(() => this.errorStatuses().length > 0);
+
+  private statusFilter = viewChild('statusFilter', { read: ArrayFilterComponent });
+  private statusFilter$ = toObservable(this.statusFilter);
+  private statusFilterValue$ = this.statusFilter$.pipe(
+    switchMap((statusFilter) => {
+      if (!statusFilter) {
+        return of([] as Status[]);
+      }
+      const ctrl = statusFilter.filterControl as FormControl<Status[]>;
+      return ctrl.valueChanges.pipe(startWith(ctrl.value));
+    }),
+  );
+  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+
+  protected readonly isErrorFilterApplied = computed(() => {
+    const statusFilterValue = this.statusFilterValue() ?? [];
+    const errorStatuses = this.errorStatuses() ?? [];
+    const errorStatusesSet = new Set(errorStatuses);
+    return (
+      errorStatusesSet.size > 0 &&
+      statusFilterValue.length === errorStatusesSet.size &&
+      statusFilterValue.every((status) => errorStatusesSet.has(status))
+    );
   });
 
   private selectedItems = computed(() => {
@@ -100,6 +135,15 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
 
   reselect(idsToSelect: string[]): void {
     this.listSelect()?.selectIds(idsToSelect);
+  }
+
+  protected toggleErrorFilter(): void {
+    if (this.isErrorFilterApplied()) {
+      this.statusFilter()?.filterControl?.setValue?.([]);
+      return;
+    }
+    const errorStatuses = this.errorStatuses();
+    this.statusFilter()?.filterControl?.setValue?.(errorStatuses);
   }
 
   private createListDataSource(items: TestRunStatus[]): TableLocalDataSource<TestRunStatus> {

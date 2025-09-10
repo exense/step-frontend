@@ -12,8 +12,21 @@
     <td mat-cell *matCellDef="let element">{{ element.testplanName }}</td>
   </ng-container>
 
-  <ng-container matColumnDef="status" stepSearchCol #searchStatus="SearchCol">
-    <step-array-filter *stepSearchCellDef [items]="statusItems()" (filterChange)="searchStatus.search($event, true)">
+  <ng-container matColumnDef="status" stepSearchCol>
+    <step-array-filter *stepSearchCellDef #statusFilter [items]="statusItems()" stepFilterConnect>
+      @if (hasErrorStatuses()) {
+        <button
+          *stepFilterAddon
+          type="button"
+          mat-flat-button
+          [color]="isErrorFilterApplied() ? 'primary' : undefined"
+          [matTooltip]="isErrorFilterApplied() ? 'Clear' : 'Filter for all error statuses'"
+          matTooltipPosition="below"
+          (click)="toggleErrorFilter()"
+        >
+          <step-icon name="filter-errors" />
+        </button>
+      }
     </step-array-filter>
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let element">

@@ -1,6 +1,5 @@
-import { Component, effect, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, viewChild, ViewEncapsulation } from '@angular/core';
 import {
-  ArrayFilterComponent,
   AugmentedExecutionsService,
   BulkSelectionType,
   DateFormat,
@@ -8,15 +7,18 @@ import {
   entitySelectionStateProvider,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  MultiLevelArrayFilterComponent,
   REQUEST_FILTERS_INTERCEPTORS,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, exhaustMap, of } from 'rxjs';
+import { ERROR_STATUSES, EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
+import { BehaviorSubject, exhaustMap, of, startWith, switchMap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'step-execution-list',
@@ -64,8 +66,27 @@ export class ExecutionListComponent implements OnDestroy {
     }
   });
 
-  @ViewChild('statusFilter')
-  private statusFilter?: ArrayFilterComponent;
+  private errorStatusesSet = new Set(ERROR_STATUSES);
+  private statusFilter = viewChild('statusFilter', { read: MultiLevelArrayFilterComponent });
+  private statusFilter$ = toObservable(this.statusFilter);
+  private statusFilterValue$ = this.statusFilter$.pipe(
+    switchMap((statusFilter) => {
+      if (!statusFilter) {
+        return of([] as Status[]);
+      }
+      const ctrl = statusFilter.filterControl as FormControl<Status[]>;
+      return ctrl.valueChanges.pipe(startWith(ctrl.value));
+    }),
+  );
+  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+
+  protected readonly isErrorFilterApplied = computed(() => {
+    const statusFilterValue = this.statusFilterValue();
+    return (
+      statusFilterValue.length === this.errorStatusesSet.size &&
+      statusFilterValue.every((status) => this.errorStatusesSet.has(status))
+    );
+  });
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
@@ -78,6 +99,14 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   handleRunningStatusClick(): void {
-    this.statusFilter?.filterControl.setValue([Status.RUNNING]);
+    this.statusFilter()?.filterControl?.setValue?.([Status.RUNNING]);
+  }
+
+  protected toggleErrorFilter(): void {
+    if (this.isErrorFilterApplied()) {
+      this.statusFilter()?.filterControl?.setValue?.([]);
+      return;
+    }
+    this.statusFilter()?.filterControl?.setValue?.([...ERROR_STATUSES]);
   }
 }

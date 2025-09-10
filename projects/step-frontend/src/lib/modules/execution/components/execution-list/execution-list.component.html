@@ -111,7 +111,19 @@
         stepFilterConnect
         [createConditionFn]="_filterConditionFactory.arrayFilterCondition"
         [items]="(statusItemsTree$ | async)!"
-      />
+      >
+        <button
+          *stepFilterAddon
+          type="button"
+          mat-flat-button
+          [color]="isErrorFilterApplied() ? 'primary' : undefined"
+          [matTooltip]="isErrorFilterApplied() ? 'Clear' : 'Filter for all error statuses'"
+          matTooltipPosition="below"
+          (click)="toggleErrorFilter()"
+        >
+          <step-icon name="filter-errors" />
+        </button>
+      </step-multi-level-array-filter>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>
           <step-execution-running-status-header
