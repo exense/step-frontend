@@ -5,11 +5,13 @@
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
     @if (_data.targetProject) {
-      <button type="button" mat-stroked-button (click)="openInCurrent()">Open in current project</button>
+      @if (_data.allowToOpenInCurrentProject) {
+        <button type="button" mat-stroked-button (click)="openInCurrent()">Open in current project</button>
+      }
       <button type="button" mat-flat-button color="primary" (click)="openInTarget()">
         Open in project "{{ _data.targetProject!.name }}"
       </button>
-    } @else {
+    } @else if (_data.allowToOpenInCurrentProject) {
       <button type="button" mat-flat-button color="primary" (click)="openInCurrent()">Open in current project</button>
     }
   </div>

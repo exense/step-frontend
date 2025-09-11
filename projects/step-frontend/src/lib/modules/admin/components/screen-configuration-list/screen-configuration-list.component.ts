@@ -103,7 +103,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
     }
 
     this._multipleProjectList
-      .confirmEntityEditInASeparateProject(screen, url, 'screen input')
+      .confirmEntityEditInASeparateProject({ entity: screen, entityEditLink: url, entityType: 'screen input' })
       .subscribe((continueEdit) => {
         if (continueEdit) {
           this._router.navigateByUrl(url);

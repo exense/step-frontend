@@ -2,6 +2,7 @@ import { inject, Injectable, InjectionToken } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   CheckLoadErrorsConfig,
+  EntityEditLink,
   MultipleProjectsStrategy,
   Project,
   SwitchStatus,
@@ -22,7 +23,7 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
       },
       availableProjects: () => [],
       currentProject: () => undefined,
-      getEntityProject: <T extends { attributes?: Record<string, string> }>(entity: T) => undefined,
+      getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
       switchToProject: (project: Project, navigationParams?: { url: string; search: Record<string, any> }) => {},
       checkLoadErrors<T extends { attributes?: Record<string, string> }>({
         entityType,
@@ -64,8 +65,15 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     return this.availableProjects().find((project) => project.projectId === id);
   }
 
-  getEntityProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined {
-    return this.strategy.getEntityProject(entity);
+  getProject(projectId: string): Project | undefined;
+  getProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;
+  getProject<T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string): Project | undefined {
+    if (typeof entityOrProjectId === 'string') {
+      const projectId = entityOrProjectId as string;
+      return this.strategy.getProject(projectId);
+    }
+    const entity = entityOrProjectId as T;
+    return this.strategy.getProject(entity);
   }
 
   isEntityBelongsToCurrentProject<T extends { attributes?: Record<string, string> }>(entity: T): boolean {
@@ -78,16 +86,28 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     this.strategy.switchToProject(project, navigationParams);
   }
 
-  confirmEntityEditInASeparateProject<T extends { attributes?: Record<string, string> }>(
-    entity: T,
-    entityEditLink: string | { url: string; search?: Record<string, any> },
-    entityType: string = 'entity',
-  ): Observable<boolean> {
+  confirmEntityEditInASeparateProject<T extends { attributes?: Record<string, string> }>(params: {
+    entity?: T;
+    targetProjectId?: string;
+    entityEditLink: EntityEditLink;
+    entityType?: string;
+    allowToOpenInCurrentProject?: boolean;
+  }): Observable<boolean> {
     if (this.currentSwitchStatus === SwitchStatus.RUNNING) {
       return of(true);
     }
 
-    const targetProject = this.getEntityProject(entity);
+    const { entity, targetProjectId, entityEditLink } = params;
+    let { entityType, allowToOpenInCurrentProject } = params;
+    entityType = entityType ?? 'entity';
+    allowToOpenInCurrentProject = allowToOpenInCurrentProject ?? true;
+
+    let targetProject: Project | undefined = undefined;
+    if (!!entity) {
+      targetProject = this.getProject(entity);
+    } else if (!!targetProjectId) {
+      targetProject = this.getProjectById(targetProjectId);
+    }
 
     const title = !!targetProject ? 'Switch to another project' : `Open ${entityType} in current project`;
 
@@ -103,6 +123,7 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
             title,
             message,
             targetProject,
+            allowToOpenInCurrentProject,
           },
           width: '80rem',
         },
