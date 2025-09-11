@@ -1,11 +1,9 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { CheckLoadErrorsConfig, MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { CheckLoadErrorsConfig, EntityEditLink, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
-
-type EntityEditLink = Parameters<MultipleProjectsService['confirmEntityEditInASeparateProject']>[1];
 
 export interface CheckProjectGuardConfig {
   entityType: string;
@@ -82,7 +80,11 @@ export const checkEntityGuardFactory =
         }
 
         const entityEditLink = runInInjectionContext(_injector, () => config.getEditorUrl(id, route, state));
-        return _multipleProjects.confirmEntityEditInASeparateProject(entity, entityEditLink, config.entityType);
+        return _multipleProjects.confirmEntityEditInASeparateProject({
+          entity,
+          entityEditLink,
+          entityType: config.entityType,
+        });
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];

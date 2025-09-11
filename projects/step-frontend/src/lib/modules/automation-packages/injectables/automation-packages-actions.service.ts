@@ -55,7 +55,7 @@ export class AutomationPackagesActionsService {
     }
 
     this._multipleProjects
-      .confirmEntityEditInASeparateProject(automationPackage, url, ENTITY_ID)
+      .confirmEntityEditInASeparateProject({ entity: automationPackage, entityEditLink: url, entityType: ENTITY_ID })
       .subscribe((continueEdit) => {
         if (continueEdit) {
           this._router.navigateByUrl(url);
