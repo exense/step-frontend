@@ -65,7 +65,7 @@ export class AttachmentUtilsService {
       case AttachmentType.SKIPPED:
         return 'alert-circle';
       case AttachmentType.TRACE:
-        return 'archive';
+        return 'playwright';
       default:
         return 'paperclip';
     }
