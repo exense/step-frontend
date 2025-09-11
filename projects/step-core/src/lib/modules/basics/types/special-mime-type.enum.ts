@@ -1,3 +1,3 @@
 export enum SpecialMimeType {
-  PLAYWRIGHT_TRACE = 'application/vnd.microsoft.playwright-trace+zip',
+  PLAYWRIGHT_TRACE = 'application/vnd.step.playwright-trace+zip',
 }
