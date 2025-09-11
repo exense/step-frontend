@@ -1,7 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
-import { IMAGE_TYPES, ImageType, TEXT_TYPES, TextType, VIDEO_TYPES, VideoType } from '../../basics/step-basics.module';
+import {
+  IMAGE_TYPES,
+  ImageType,
+  SpecialMimeType,
+  TEXT_TYPES,
+  TextType,
+  VIDEO_TYPES,
+  VideoType,
+} from '../../basics/step-basics.module';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +27,10 @@ export class AttachmentUtilsService {
 
     if (attachment.type === 'step.attachments.SkippedAttachmentMeta') {
       return AttachmentType.SKIPPED;
+    }
+
+    if (attachment.mimeType === SpecialMimeType.PLAYWRIGHT_TRACE) {
+      return AttachmentType.TRACE;
     }
 
     const nameParts = (attachment.name ?? '').split('.');
@@ -52,6 +64,8 @@ export class AttachmentUtilsService {
         return 'film';
       case AttachmentType.SKIPPED:
         return 'alert-circle';
+      case AttachmentType.TRACE:
+        return 'playwright';
       default:
         return 'paperclip';
     }

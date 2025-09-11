@@ -48,6 +48,9 @@ export const $ApplicationConfiguration = {
     title: {
       type: 'string',
     },
+    contextRoot: {
+      type: 'string',
+    },
     forceLegacyReporting: {
       type: 'boolean',
     },
