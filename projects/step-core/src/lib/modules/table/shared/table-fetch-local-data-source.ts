@@ -106,7 +106,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
         this.requestRef$ = this.retrieveData(request).pipe(
           tap(() => {
             if (isProgressTriggered) {
-              inProgressInternal$.next(true);
+              inProgressInternal$.next(false);
             }
             this.requestRef$ = undefined;
           }),
