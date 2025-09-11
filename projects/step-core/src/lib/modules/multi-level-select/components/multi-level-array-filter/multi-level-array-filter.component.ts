@@ -1,5 +1,5 @@
-import { Component, computed, forwardRef, input } from '@angular/core';
-import { BaseFilterComponent, StepBasicsModule } from '../../../basics/step-basics.module';
+import { Component, computed, contentChild, forwardRef, input } from '@angular/core';
+import { BaseFilterComponent, FilterAddonDirective, StepBasicsModule } from '../../../basics/step-basics.module';
 import { MultiLevelSelectComponent } from '../multi-level-select/multi-level-select.component';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { map, Observable } from 'rxjs';
@@ -23,6 +23,10 @@ export class MultiLevelArrayFilterComponent<T extends string | number | symbol> 
   T[]
 > {
   readonly items = input<MultiLevelItem<T>[]>([]);
+
+  private filterAddon = contentChild(FilterAddonDirective);
+
+  protected readonly tplFilterAddon = computed(() => this.filterAddon()?._templateRef);
 
   protected readonly extractor: MultiLevelArrayItemLabelValueExtractor<MultiLevelItem<T>, T> = {
     getValue: (item: MultiLevelItem<T>) => item.key,

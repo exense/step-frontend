@@ -210,6 +210,13 @@
           border-color: $primary-color;
         }
 
+        & > step-suffix,
+        & > step-prefix {
+          &:has(button[mat-flat-button].mat-primary) {
+            border: hidden;
+          }
+        }
+
         & > step-suffix.icon-suffix,
         & > step-prefix.icon-prefix {
           step-icon {

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   DestroyRef,
@@ -54,6 +55,7 @@ type OnTouch = () => void;
 export class MultiLevelSelectComponent<Item = unknown, Value extends string | number | symbol = string>
   implements ControlValueAccessor, MultiLevelVisualSelectionService<Value>, OnInit
 {
+  private _cd = inject(ChangeDetectorRef);
   private onChange?: OnChange<Value>;
   private onTouch?: OnTouch;
   private readonly _defaultExtractor = inject<MultiLevelArrayItemLabelValueExtractor<Item, Value>>(
@@ -142,6 +144,7 @@ export class MultiLevelSelectComponent<Item = unknown, Value extends string | nu
     }
     this.selectedItems = selectedItems;
     this.createVisualStateFromModel();
+    this._cd.markForCheck();
   }
 
   registerOnChange(fn: OnChange<Value>): void {
