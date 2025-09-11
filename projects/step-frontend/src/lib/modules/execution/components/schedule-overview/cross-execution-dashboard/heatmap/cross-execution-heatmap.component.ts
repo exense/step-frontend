@@ -2,6 +2,7 @@ import { Component, computed, inject, input, OnDestroy, OnInit, signal, ViewEnca
 import {
   AugmentedExecutionsService,
   BucketResponse,
+  COLORS,
   DateFormat,
   DateRange,
   entitySelectionStateProvider,
@@ -11,30 +12,27 @@ import {
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
   SearchValue,
-  StepDataSource,
   Tab,
   tableColumnsConfigProvider,
-  TableLocalDataSource,
   tablePersistenceConfigProvider,
   TimeSeriesService,
 } from '@exense/step-core';
 import { BehaviorSubject, map, Observable, of, switchMap, take } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
 import { FilterUtils, OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
-import { EXECUTION_STATUS_TREE, Status } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { ReportNodesChartType } from '../report/scheduler-report-view.component';
-import { ReportNodeSummary } from '../../../../shared/report-node-summary';
-
-interface HeatMapRow {
-  label: string; // test case or keyword
-  values: { color: string; link?: string }[];
-}
+import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatMapRow } from './heatmap.component';
+import { HeatmapColorUtils } from './heatmap-color-utils';
 
 interface ItemWithExecutionsStatuses {
-  key: string;
-  // execution - status - count
-  statusesByExecutions: Record<string, Record<string, number>>;
+  key: string; // keyword or testcase
+  statusesByExecutions: Record<string, Record<string, number>>; // execution - status - count
+}
+
+interface HeatmapData {
+  columns: HeatmapColumn[];
+  rows: HeatMapRow[];
 }
 
 export type HeatMapChartType = 'keywords' | 'testcases';
@@ -62,17 +60,13 @@ export type HeatMapChartType = 'keywords' | 'testcases';
     },
     FilterConditionFactoryService,
   ],
-  encapsulation: ViewEncapsulation.None,
   standalone: false,
 })
 export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   private reloadRunningExecutionsCount$ = new BehaviorSubject<void>(undefined);
   readonly _state = inject(CrossExecutionDashboardState);
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
-  readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
-  readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
-  dataSource: StepDataSource<ItemWithExecutionsStatuses> | undefined;
   readonly DateFormat = DateFormat;
   private _timeSeriesService = inject(TimeSeriesService);
 
@@ -90,13 +84,35 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     },
   ];
 
+  readonly legendColors: HeatMapColor[] = [
+    { hex: '#01a990', label: 'Passed' },
+    { hex: '#ff595b', label: 'Failed' },
+    { hex: '#000000', label: 'Technical Error' },
+    { hex: COLORS.NORUN, label: 'Skipped/No run' },
+    { hex: '#e1cc01', label: 'Interrupted' },
+  ];
+
+  STATUS_COLORS: Record<string, string> = {
+    VETOED: '#000000',
+    TECHNICAL_ERROR: '#000000',
+    IMPORT_ERROR: '#000000',
+    FAILED: '#ff595b',
+    INTERRUPTED: '#e1cc01',
+    PASSED: '#01a990',
+    SKIPPED: COLORS.NORUN,
+    NORUN: COLORS.NORUN,
+    UNKNOWN: '#cccccc',
+  };
+
+  FALLBACK_COLOR = COLORS.NORUN;
+
   readonly heatmapType = signal<HeatMapChartType | undefined>(undefined);
 
   switchType(newType: HeatMapChartType) {
     this.heatmapType.set(newType);
   }
 
-  readonly tableData$: Observable<ItemWithExecutionsStatuses[]> = this._state.lastExecutionsSorted$.pipe(
+  readonly heatMapData$: Observable<HeatmapData> = this._state.lastExecutionsSorted$.pipe(
     switchMap((executions) =>
       this._state.timeRange$.pipe(
         take(1),
@@ -170,20 +186,80 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
             }),
           );
         }),
+        map((items) => this.convertToTableData(executions, items)),
       ),
     ),
   );
+
+  convertToTableData(executions: Execution[], timeseriesItems: ItemWithExecutionsStatuses[]): HeatmapData {
+    console.log(timeseriesItems);
+    const executionsByIds: Record<string, Execution> = {};
+    const columns: HeatmapColumn[] = [];
+    executions.forEach((e) => {
+      executionsByIds[e.id!] = e;
+      columns.push({ id: e.id!, label: this.formatExecutionHeader(e.startTime!) });
+    });
+
+    //@ts-ignore
+    const rows: HeatMapRow[] = timeseriesItems.map<HeatMapRow>((item) => {
+      const values: Record<string, HeatMapCell> = {};
+
+      for (const exec of executions) {
+        const execId = exec.id!;
+        const statusCounts = item.statusesByExecutions?.[execId] || {};
+        const statuses = Object.keys(statusCounts);
+        let total = 0;
+        for (const st of statuses) total += statusCounts[st] || 0;
+
+        if (!total) {
+          values[execId] = { color: this.FALLBACK_COLOR, timestamp: exec.startTime!, statusesCount: {} };
+          continue;
+        }
+
+        let r = 0,
+          g = 0,
+          b = 0;
+        for (const st of statuses) {
+          const count = statusCounts[st] || 0;
+          if (!count) continue;
+          // @ts-ignore
+          const colorHex = this.STATUS_COLORS[st] || this.STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
+          const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
+          const w = count / total;
+          r += cr * w;
+          g += cg * w;
+          b += cb * w;
+        }
+        values[execId] = {
+          color: HeatmapColorUtils.rgbToHex(r, g, b),
+          timestamp: exec.startTime!,
+          statusesCount: statusCounts,
+        };
+      }
+
+      return { label: item.key, cells: values };
+    });
+    return {
+      columns: columns,
+      rows: rows,
+    };
+  }
 
   ngOnInit(): void {
     this._state.testCasesChartSettings$.pipe(take(1)).subscribe(({ hasData }) => {
       this.heatmapType.set(hasData ? 'testcases' : 'keywords');
     });
-    this.tableData$.subscribe((data) => {
-      const heatmapData = data.map((item) => {
-        return { item: item.key };
-      });
-      this.dataSource = new TableLocalDataSource(data);
-    });
+    // this.tableData$.subscribe((data) => {
+    //   if (!this.dataSource) {
+    //     this.dataSource = new TableLocalDataSource([]);
+    //   }
+    // });
+  }
+
+  formatExecutionHeader(ms: number) {
+    const d = new Date(ms);
+    const pad = (n: any) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   ngOnDestroy(): void {

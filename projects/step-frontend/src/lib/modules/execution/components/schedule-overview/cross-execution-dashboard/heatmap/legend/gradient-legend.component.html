@@ -1,0 +1,23 @@
+<div class="legend">
+  <div
+    class="bar"
+    [style.height.px]="barHeight"
+    [style.background]="gradientCss"
+    role="img"
+    aria-label="Legend gradient"
+  ></div>
+
+  <div class="markers" *ngIf="computed.length > 0">
+    <div
+      class="marker"
+      *ngFor="let s of computed; let i = index; let last = last"
+      [style.left.%]="s.posPct"
+      [class.first]="i === 0"
+      [class.last]="last"
+      [attr.aria-label]="s.label"
+      role="note"
+    >
+      <span class="label">{{ s.label }}</span>
+    </div>
+  </div>
+</div>

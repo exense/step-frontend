@@ -1,5 +1,16 @@
-.chart-actions-container {
-  position: absolute;
-  right: 2rem;
-  top: 1rem;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 2rem;
+
+  .chart-actions-container {
+    position: absolute;
+    right: 2rem;
+    top: 1rem;
+  }
+
+  .table-container {
+    margin: 1rem 0;
+  }
 }

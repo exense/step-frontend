@@ -2,24 +2,8 @@
   <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
 </div>
 
-<step-table
-  data-step-testid="heatmap"
-  [dataSource]="dataSource"
-  matSort
-  matSortActive="name"
-  matSortDirection="desc"
-  [matSortDisableClear]="true"
->
-  <ng-container matColumnDef="name" stepSearchCol>
-    <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let element">{{ element.key }}</td>
-  </ng-container>
-  @for (execution of _state.lastExecutionsSorted$ | async; track execution.id) {
-    <ng-container [matColumnDef]="execution.id!">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        {{ execution.id }}
-      </th>
-      <td mat-cell *matCellDef="let element">-</td>
-    </ng-container>
+<div class="table-container">
+  @if (heatMapData$ | async; as heatmapData) {
+    <step-heatmap [rows]="heatmapData.rows" [columns]="heatmapData.columns" [legendColors]="legendColors" />
   }
-</step-table>
+</div>

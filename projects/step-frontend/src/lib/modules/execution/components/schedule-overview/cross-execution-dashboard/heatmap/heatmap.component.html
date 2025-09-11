@@ -1,0 +1,79 @@
+<div class="scroll-x">
+  <table class="heatmap-table" role="grid" style="border-collapse: collapse; width: 100%">
+    <thead>
+      <tr>
+        <th class="label-header-container sticky-col" [style.max-width.px]="labelColWidth()" style="min-width: 100px">
+          <div>Name</div>
+          <div>
+            <input [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" />
+          </div>
+        </th>
+
+        @for (col of columns(); track col.label) {
+          <th
+            scope="col"
+            class="heatmap-col-header"
+            style="top: 0; background: #fff"
+            [style.width.px]="cellSize()"
+            [style.max-width.px]="cellSize()"
+          >
+            {{ col.label || col.id }}
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of filteredRows(); track row.label) {
+        <tr>
+          <td
+            class="sticky-col"
+            style="text-align: left; padding: 6px; min-width: 100px"
+            [style.max-width.px]="labelColWidth()"
+            [style.height.px]="rowHeight()"
+          >
+            {{ row.label }}
+          </td>
+
+          @for (col of columns(); track col.label) {
+            <td
+              class="heatmap-cell"
+              [style.width.px]="cellSize()"
+              [style.min-width.px]="cellSize()"
+              [style.max-width.px]="cellSize()"
+              [style.height.px]="rowHeight()"
+              [style.background-color]="row.cells?.[col.id]?.color || emptyColor"
+              tabindex="0"
+              [attr.aria-label]="(col.label || col.id) + ' for ' + row.label"
+              (click)="onCellClick(row, col)"
+              (keydown.enter)="onCellClick(row, col)"
+            >
+              <step-popover [noPadding]="true">
+                <div style="width: 100%; height: 100%; visibility: hidden">.</div>
+                <step-popover-content>
+                  <step-status-distribution-tooltip
+                    [statuses]="row.cells![col.id].statusesCount"
+                    [timestamp]="row.cells?.[col.id]?.timestamp"
+                  />
+                </step-popover-content>
+              </step-popover>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+  @if (filteredRows().length === 0) {
+    <div class="no-data">No data</div>
+  }
+</div>
+
+<div class="footer-section">
+  <div style="flex-grow: 1">
+    <step-heatmap-gradient-legend [gradientStops]="legendColors()" [barHeight]="16" density="comfortable">
+    </step-heatmap-gradient-legend>
+  </div>
+  <div>
+    <step-paginator [length]="filteredRows().length" [pageSizeOptions]="[10, 25, 50]" />
+  </div>
+</div>

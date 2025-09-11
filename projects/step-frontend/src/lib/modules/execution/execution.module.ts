@@ -155,6 +155,12 @@ import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import { DatePipe } from '@angular/common';
+import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import { FormsModule } from '@angular/forms';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 
 @NgModule({
   declarations: [
@@ -251,6 +257,10 @@ import { CrossExecutionHeatmapComponent } from './components/schedule-overview/c
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
     CrossExecutionHeatmapComponent,
+    GradientLegendComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    HeatmapComponent,
   ],
   imports: [
     StepCommonModule,
@@ -269,6 +279,8 @@ import { CrossExecutionHeatmapComponent } from './components/schedule-overview/c
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    DatePipe,
+    FormsModule,
   ],
   exports: [
     ExecutionListComponent,
