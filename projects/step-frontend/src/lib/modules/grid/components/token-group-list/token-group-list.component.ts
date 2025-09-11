@@ -3,6 +3,7 @@ import {
   GridService,
   STORE_ALL,
   TableFetchLocalDataSource,
+  TableIndicatorMode,
   tablePersistenceConfigProvider,
   TokenGroupCapacity,
 } from '@exense/step-core';
@@ -49,4 +50,6 @@ export class TokenGroupListComponent {
     }
     return checkedKeyList;
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

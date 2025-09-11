@@ -12,6 +12,7 @@ import {
   inject,
   input,
   Input,
+  linkedSignal,
   OnChanges,
   OnDestroy,
   OnInit,
@@ -21,6 +22,7 @@ import {
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
+  untracked,
   viewChild,
   ViewChild,
   viewChildren,
@@ -48,7 +50,7 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableRequestData, TableParameters, StepDataSource } from '../../../../client/step-client-module';
+import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
@@ -74,6 +76,8 @@ import { RowDirective } from '../../directives/row.directive';
 import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
 import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
+import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
+import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -94,8 +98,7 @@ enum EmptyState {
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.in-progress]': 'inProgress()',
-    '[class.initial-load]': 'emptyState() === EmptyState.INITIAL',
+    '[class.in-progress]': 'applyInProgressClass()',
     '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
   },
   providers: [
@@ -184,16 +187,18 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly useSkeletonPlaceholder = input(true);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
   private total = signal<number | null>(null);
+  private isTableReadyToRenderColumns = signal(false);
 
   protected readonly EmptyState = EmptyState;
   protected readonly emptyState = computed(() => {
     const total = this.total();
-    if (total === null) {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    if (total === null || !isColumnsInitialized) {
       return EmptyState.INITIAL;
     }
     if (total === 0) {
@@ -203,10 +208,36 @@ export class TableComponent<T>
     return EmptyState.NO_MATCHING_RECORDS;
   });
 
+  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
+  });
+
+  protected readonly useSpinner = computed(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode === TableIndicatorMode.SPINNER;
+  });
+
+  private effectResetSkeletonPlaceholderOnInitialLoad = effect(() => {
+    const indicatorMode = this.indicatorMode();
+    const emptyState = this.emptyState();
+    if (indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD && emptyState !== EmptyState.INITIAL) {
+      setTimeout(() => {
+        this.useSkeletonPlaceholder.set(false);
+      }, 500);
+    }
+  });
+
   protected readonly inProgress = computed(() => {
     const inProgressExternal = this.inProgressExternal();
     const inProgressDataSource = this.inProgressDataSource();
     return inProgressExternal || inProgressDataSource;
+  });
+
+  protected readonly applyInProgressClass = computed(() => {
+    const inProgress = this.inProgress();
+    const emptyState = this.emptyState();
+    return inProgress || emptyState === EmptyState.INITIAL;
   });
 
   protected tableDataSource?: TableDataSource<T>;
@@ -261,6 +292,12 @@ export class TableComponent<T>
 
   private viewColumns = viewChildren(ColumnDirective);
 
+  private columnsPlaceholder = viewChild(ColumnsPlaceholdersComponent);
+  private columnsPlaceholderIds = computed(() => {
+    const cols = this.columnsPlaceholder()?.colDef?.() ?? [];
+    return cols.map((col) => col.name);
+  });
+
   private columnsUpdateTrigger = signal(0);
 
   private columns = computed(() => {
@@ -312,8 +349,16 @@ export class TableComponent<T>
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
 
   readonly displayColumns = computed(() => {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
+    const isTableReady = this.isTableReadyToRenderColumns();
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
     const visibleColumnsByInput = this.visibleColumns();
+
+    if (!isColumnsInitialized) {
+      return isTableReady ? columnPlaceholderIds : [];
+    }
+
     if (!visibleColumnsByInput) {
       return visibleColumnsByConfig;
     }
@@ -647,6 +692,14 @@ export class TableComponent<T>
   }
 
   private configureColumns(): void {
+    const columnsPlaceholder = this.columnsPlaceholder()?.colDef?.() ?? [];
+    columnsPlaceholder.forEach((col) => {
+      if (!this.usedColumns.has(col.name)) {
+        this.usedColumns.add(col.name);
+        this.table!.addColumnDef(col);
+      }
+    });
+
     const allCollDef = this.allCollDef();
     allCollDef.forEach((col) => {
       if (!this.usedColumns.has(col.name) && !col.name.startsWith('search-')) {
@@ -654,6 +707,7 @@ export class TableComponent<T>
         this.table!.addColumnDef(col);
       }
     });
+    this.isTableReadyToRenderColumns.set(true);
   }
 
   private configureSearchColumns(): void {

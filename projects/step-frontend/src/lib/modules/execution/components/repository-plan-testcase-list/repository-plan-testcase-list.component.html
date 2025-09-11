@@ -1,4 +1,11 @@
-<step-table #listSelect [dataSource]="dataSource()" matSort [matSortDisableClear]="true" [blockGlobalReload]="true">
+<step-table
+  #listSelect
+  [dataSource]="dataSource()"
+  [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
+  matSort
+  [matSortDisableClear]="true"
+  [blockGlobalReload]="true"
+>
   <step-bulk-operations *stepAdditionalHeader />
 
   <ng-container matColumnDef="bulkSelection">

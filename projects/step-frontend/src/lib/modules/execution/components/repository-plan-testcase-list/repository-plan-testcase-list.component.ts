@@ -9,6 +9,7 @@ import {
   RepositoryObjectReference,
   SelectionList,
   TableFetchLocalDataSource,
+  TableIndicatorMode,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
   TestRunStatus,
@@ -164,7 +165,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       .build();
   }
 
-  private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[]> {
+  private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[] | undefined> {
     return of(repoRef).pipe(
       switchMap((repoRef) => {
         if (!repoRef) {
@@ -190,7 +191,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
           repositoryParameters: { planid: repoRef?.repositoryParameters?.['planid'] },
         });
       }),
-      map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
+      map((testSetStatusOverview) => testSetStatusOverview?.runs),
       tap(() => this.listSelect()?.clearSelection?.()),
       catchError((err) => {
         // error is handled in interceptor but let's return an empty array to satisfy Angular lifecycle hook
@@ -198,4 +199,6 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       }),
     );
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

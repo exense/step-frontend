@@ -28,8 +28,7 @@ import {
 import { TableDataSource, TableFilterOptions, TableGetDataOptions } from './table-data-source';
 import { SearchValue } from './search-value';
 import { FilterCondition } from './filter-condition';
-import { computed, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { RequestContainer } from '../types/request-container';
 
 export class TableRequestInternal {
   columns: string[];
@@ -115,10 +114,6 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
   return result;
 };
 
-interface RequestContainer extends StepDataSourceReloadOptions {
-  request: TableRequestData;
-}
-
 export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private _terminator$ = new Subject<void>();
   private inProgressInternal$ = new BehaviorSubject<boolean>(false);
@@ -127,7 +122,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   private isSkipOngoingRequest?: boolean;
   private currentRequestTerminator$?: Subject<void>;
   private requestRef$?: Observable<TableResponseGeneric<T> | null>;
-  private _request$ = new BehaviorSubject<RequestContainer | undefined>(undefined);
+  private _request$ = new BehaviorSubject<RequestContainer<TableRequestData> | undefined>(undefined);
   private _response$: Observable<TableResponseGeneric<T> | null> = this._request$.pipe(
     tap((x) => {
       this.isSkipOngoingRequest = false;
@@ -240,8 +235,8 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     this.requestRef$ = undefined;
   }
 
-  private doRequest({ request }: RequestContainer): Observable<TableResponseGeneric<T> | null> {
-    return this._rest.requestTable<T>(this.tableId, request).pipe(catchError((err) => of(null)));
+  private doRequest({ request }: RequestContainer<TableRequestData>): Observable<TableResponseGeneric<T> | null> {
+    return this._rest.requestTable<T>(this.tableId, request!).pipe(catchError((err) => of(null)));
   }
 
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {
