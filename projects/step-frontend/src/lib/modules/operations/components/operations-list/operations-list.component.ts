@@ -4,6 +4,7 @@ import {
   STORE_ALL,
   SystemService,
   TableFetchLocalDataSource,
+  TableIndicatorMode,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../operations.module';
@@ -59,4 +60,6 @@ export class OperationsListComponent {
   private getOperation(operationDetails: OperationDetails): string | undefined {
     return operationDetails.operation?.name;
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

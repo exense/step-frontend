@@ -4,6 +4,7 @@ import {
   GridService,
   STORE_ALL,
   TableFetchLocalDataSource,
+  TableIndicatorMode,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { TokenTypeComponent } from '../token-type/token-type.component';
@@ -49,4 +50,6 @@ export class AgentListComponent {
       this.loadTable();
     });
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }
