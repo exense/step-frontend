@@ -77,6 +77,7 @@ import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ElementSizeDirective } from './directives/element-size.directive';
 import { StatusIconClassDirective } from './directives/status-icon-class.directive';
 import { DescriptionDirective } from './directives/description.directive';
+import { FilterAddonDirective } from './directives/filter-addon.directive';
 
 @NgModule({
   imports: [
@@ -92,6 +93,7 @@ import { DescriptionDirective } from './directives/description.directive';
     SelectComponent,
     ElementSizeDirective,
     StatusIconClassDirective,
+    FilterAddonDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -241,6 +243,7 @@ import { DescriptionDirective } from './directives/description.directive';
     StrategyClickDirective,
     ElementSizeDirective,
     StatusIconClassDirective,
+    FilterAddonDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -388,3 +391,4 @@ export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
 export * from './directives/status-icon-class.directive';
+export * from './directives/filter-addon.directive';

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .icon-filters-errors {
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <polygon class="icon-filters-errors" points="20.17 3 2.94 3 9.83 11.15 9.83 16.79 13.28 18.51 13.28 11.15 20.17 3"/>
+  <line class="icon-filters-errors" x1="18.62" y1="12" x2="18.62" y2="16"/>
+  <line class="icon-filters-errors" x1="18.62" y1="20" x2="18.63" y2="20"/>
+</svg>

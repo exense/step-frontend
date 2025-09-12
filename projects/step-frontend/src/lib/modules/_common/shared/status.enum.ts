@@ -66,3 +66,10 @@ export const REPORT_NODE_STATUS: ReadonlyArray<Status> = [
   Status.NORUN,
   Status.RUNNING,
 ];
+
+export const ERROR_STATUSES: ReadonlyArray<Status> = [
+  Status.VETOED,
+  Status.TECHNICAL_ERROR,
+  Status.FAILED,
+  Status.IMPORT_ERROR,
+];

@@ -6,6 +6,7 @@ import {
   FilterConditionFactoryService,
   AugmentedScreenService,
   AugmentedControllerService,
+  TableIndicatorMode,
 } from '@exense/step-core';
 import { map, Observable, of } from 'rxjs';
 import { KeywordParameters } from '../../shared/keyword-parameters';
@@ -73,4 +74,6 @@ export class KeywordCallsComponent implements OnInit {
   toggleRowDetails(id: string): void {
     this.rowDetailsVisibilityFlags[id] = !this.rowDetailsVisibilityFlags[id];
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

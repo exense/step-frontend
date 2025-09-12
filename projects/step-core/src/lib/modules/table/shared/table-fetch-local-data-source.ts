@@ -1,5 +1,5 @@
 import { TableLocalDataSource } from './table-local-data-source';
-import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, shareReplay, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { Mutable } from '../../basics/step-basics.module';
 import { StepDataSourceReloadOptions } from '../../../client/table/shared/step-data-source';
@@ -20,10 +20,13 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   private reload$?: BehaviorSubject<ReloadOptions<R> | undefined>;
   private pendingReload?: ReloadOptions<R>;
 
+  private currentRequestTerminator$?: Subject<void>;
+  private requestRef$?: Observable<T[] | undefined>;
+
   override readonly inProgress$ = of(false);
 
   constructor(
-    private retrieveData: (request?: R) => Observable<T[]>,
+    private retrieveData: (request?: R) => Observable<T[] | undefined>,
     config: TableLocalDataSourceConfig<T> = {},
     initialReloadOptions?: ReloadOptions<R>,
   ) {
@@ -43,6 +46,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     this.inProgressInternal$?.complete();
     this.reload$?.complete();
     (this.retrieveData as unknown) = undefined;
+    this.terminateCurrentRequest();
   }
 
   protected override setupStreams(ignoredArrayFromConstructor: T[] | Observable<T[]>, config: TableFetchConfig<T, R>) {
@@ -70,23 +74,48 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     });
   }
 
+  private terminateCurrentRequest(): void {
+    this.currentRequestTerminator$?.next?.();
+    this.currentRequestTerminator$?.complete?.();
+    this.currentRequestTerminator$ = undefined;
+    this.requestRef$ = undefined;
+  }
+
   private createDataStream(
     reload$: BehaviorSubject<ReloadOptions<R> | undefined>,
     inProgressInternal$: BehaviorSubject<boolean>,
-  ): Observable<T[]> {
+  ): Observable<T[] | undefined> {
     return reload$.pipe(
       map((reloadOptions) => reloadOptions || {}),
-      tap(({ immediateHideProgress, hideProgress }) => {
-        // Don't show progress bar, when immediateHideProgress flag is passed
-        // or hideProgress is passed and there is no in progress current operation
-        let inProgress = true;
-        if (!!immediateHideProgress || (!!hideProgress && !inProgressInternal$.value)) {
-          inProgress = false;
+      switchMap(({ immediateHideProgress, hideProgress, isForce, request }) => {
+        if (!isForce && this.requestRef$) {
+          return this.requestRef$;
         }
-        inProgressInternal$.next(inProgress);
+
+        const isProgressTriggered = !hideProgress && !immediateHideProgress;
+        if (isProgressTriggered) {
+          inProgressInternal$.next(true);
+        }
+
+        if (immediateHideProgress) {
+          inProgressInternal$.next(false);
+        }
+
+        this.terminateCurrentRequest();
+        this.currentRequestTerminator$ = new Subject();
+        this.requestRef$ = this.retrieveData(request).pipe(
+          tap(() => {
+            if (isProgressTriggered) {
+              inProgressInternal$.next(false);
+            }
+            this.requestRef$ = undefined;
+          }),
+          takeUntil(this.currentRequestTerminator$),
+          shareReplay(1),
+        );
+
+        return this.requestRef$;
       }),
-      switchMap(({ request }) => this.retrieveData(request)),
-      tap(() => inProgressInternal$.next(false)),
     );
   }
 }
