@@ -23,7 +23,19 @@
       [(searchIndex)]="pageIndex"
       [total]="foundItems()"
       [hint]="_treeSearchDescription"
-    />
+      [disableNavButtonsWithControl]="false"
+    >
+      <ng-container *stepSearchFieldAddon>
+        <button
+          type="button"
+          mat-flat-button
+          [color]="searchForErrorsOnly() ? 'primary' : undefined"
+          (click)="toggleErrorSearch()"
+        >
+          <step-icon name="filter-errors" />
+        </button>
+      </ng-container>
+    </step-search-field>
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
     <step-alt-execution-tree
