@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChild,
+  effect,
+  input,
+  model,
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { SearchFieldAddonDirective } from '../../directives/search-field-addon.directive';
 
 type OnChange = (value: string) => void;
 type OnTouch = () => void;
@@ -23,10 +33,17 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly total = input.required<number>();
 
   readonly hint = input('');
-  readonly hintIcon = input('alert-triangle');
+
+  readonly disableNavButtonsWithControl = input(true);
+
+  private areNavButtonsDisabled = computed(() => {
+    const isDisabled = this.isDisabled();
+    const disableNavButtonsWithControl = this.disableNavButtonsWithControl();
+    return disableNavButtonsWithControl ? isDisabled : false;
+  });
 
   protected readonly areButtonsActive = computed(() => {
-    const isDisabled = this.isDisabled();
+    const isDisabled = this.areNavButtonsDisabled();
     const value = (this.value() ?? '').trim();
     const total = this.total();
     if (isDisabled) {
@@ -50,6 +67,9 @@ export class SearchFieldComponent implements ControlValueAccessor {
     const total = this.total();
     this.searchIndex.set(0);
   });
+
+  private fieldAddon = contentChild(SearchFieldAddonDirective);
+  protected readonly tplFieldAddon = computed(() => this.fieldAddon()?._templateRef);
 
   constructor(public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;

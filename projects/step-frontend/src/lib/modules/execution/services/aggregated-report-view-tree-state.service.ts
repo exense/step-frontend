@@ -13,6 +13,7 @@ import {
   AggregatedReport,
   AggregatedReportView,
   ArtefactService,
+  TreeFlatNode,
   TreeStateInitOptions,
   TreeStateService,
 } from '@exense/step-core';
@@ -21,8 +22,11 @@ import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
+import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
 export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
+
+const ERROR_STATUSES_SEARCH_VALUE = ERROR_STATUSES.join(' | ');
 
 @Injectable()
 export class AggregatedReportViewTreeStateService extends TreeStateService<AggregatedReportView, AggregatedTreeNode> {
@@ -31,15 +35,18 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private _fb = inject(FormBuilder);
   private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
 
-  private searchIndex = new SearchIndex();
+  private querySearchIndex = new SearchIndex();
+  private errorsSearchIndex = new SearchIndex();
   private artefactsNodeIdIndex = new Map<string, string[]>();
 
   private effectBuildSearchIndex = effect(() => {
     const rootNode = this.rootNode();
-    this.searchIndex.clear();
+    this.querySearchIndex.clear();
+    this.errorsSearchIndex.clear();
     this.artefactsNodeIdIndex.clear();
     if (rootNode) {
-      this.buildSearchIndex(rootNode);
+      this.buildQuerySearchIndex(rootNode);
+      this.buildErrorStatusesSearchIndex(rootNode);
       this.buildArtefactsNodeIdIndex(rootNode);
     }
   });
@@ -47,12 +54,23 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private resolvedPartialPathInternal = signal<string | undefined>(undefined);
   readonly resolvedPartialPath = this.resolvedPartialPathInternal.asReadonly();
 
+  private searchForErrorsOnlyInternal = signal(false);
+  readonly searchForErrorsOnly = this.searchForErrorsOnlyInternal.asReadonly();
+
   readonly searchCtrl = this._fb.nonNullable.control('');
 
   private searchResultSet$ = this.searchCtrl.valueChanges.pipe(
     startWith(this.searchCtrl.value),
     debounceTime(300),
-    map((query) => this.searchIndex.search(query)),
+    map((searchValue) => {
+      if (searchValue === ERROR_STATUSES_SEARCH_VALUE) {
+        // Search by Status.FAILED will return all possible errors, because
+        // the index has been build in such way. It was done for optimization.
+        return this.errorsSearchIndex.search(Status.FAILED);
+      } else {
+        return this.querySearchIndex.search(searchValue);
+      }
+    }),
   );
 
   private searchResultSet = toSignal(this.searchResultSet$);
@@ -75,9 +93,50 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.selectedSearchResultItemInternal.set(firstItem);
   });
 
+  private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
+  readonly errorLeafs = computed(() => {
+    const { tree } = this.treeData();
+    const errorLeafsSet = this.errorsLeafsSet();
+    if (!errorLeafsSet?.size) {
+      return undefined;
+    }
+    return tree.map((node) => node.id).filter((nodeId) => errorLeafsSet.has(nodeId));
+  });
+
+  private errorLeafsChangeEffect = effect(() => {
+    const errorLeafs = this.errorLeafs();
+    if (!errorLeafs?.length) {
+      return;
+    }
+    this.selectedSearchResultItemInternal.set(errorLeafs[0]);
+  });
+
+  private toggleErrorSearchEffect = effect(() => {
+    const searchErrorsOnly = this.searchForErrorsOnly();
+    if (searchErrorsOnly) {
+      this.searchCtrl.setValue(ERROR_STATUSES_SEARCH_VALUE);
+      this.searchCtrl.disable();
+    } else if (this.searchCtrl.disabled) {
+      this.searchCtrl.setValue('');
+      this.searchCtrl.enable();
+      this.errorsLeafsSet.set(undefined);
+    }
+  });
+
   override init(root: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
+  }
+
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    this.querySearchIndex.clear();
+    this.errorsSearchIndex.clear();
+    this.artefactsNodeIdIndex.clear();
+  }
+
+  toggleErrorSearch(): void {
+    this.searchForErrorsOnlyInternal.update((value) => !value);
   }
 
   findNodesByArtefactId(artefactId?: string): AggregatedTreeNode[] {
@@ -94,6 +153,44 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     const item = this.searchResult()[index];
     this.selectedSearchResultItemInternal.set(item);
     return item;
+  }
+
+  pickErrorLeafByIndex(index: number): string | undefined {
+    const errorLeafs = this.errorLeafs();
+    if (!errorLeafs) {
+      return undefined;
+    }
+    const item = errorLeafs[index];
+    this.selectedSearchResultItemInternal.set(item);
+    return item;
+  }
+
+  findErrorLeafs(nodeId: string): void {
+    const node = this.findNodeById(nodeId);
+    if (!node) {
+      this.errorsLeafsSet.set(undefined);
+      return;
+    }
+    const errorStatusesSet = new Set(ERROR_STATUSES);
+    const nodeErrorStatuses = this._utils.getNodeStatuses(node).filter((status) => errorStatusesSet.has(status));
+
+    if (!nodeErrorStatuses.length) {
+      this.errorsLeafsSet.set(undefined);
+      return;
+    }
+
+    const errorLeafs = this.getSubTree(nodeId)
+      .map((node) => this.findNodeById(node.id))
+      .filter((node) => !!node && !node.children?.length && this._utils.nodeHasStatuses(node, nodeErrorStatuses));
+
+    console.log('ERROR LEAFS', errorLeafs);
+
+    if (!errorLeafs.length) {
+      this.errorsLeafsSet.set(undefined);
+      return;
+    }
+
+    this.errorsLeafsSet.set(new Set(errorLeafs.map((x) => x!.id!)));
   }
 
   getNodeIdsByArtefactId(artefactId: string): string[] {
@@ -113,7 +210,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     (item.children ?? []).forEach((child) => this.buildArtefactsNodeIdIndex(child as AggregatedTreeNode));
   }
 
-  private buildSearchIndex(item: AggregatedTreeNode, patentId?: string): void {
+  private buildQuerySearchIndex(item: AggregatedTreeNode, parentId?: string): void {
     const artefact = item.originalArtefact;
     if (!artefact?._class) {
       return;
@@ -147,16 +244,32 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     searchValues.push(artefact?.attributes?.['name'] ?? '');
 
-    const nodeId = this._utils.getUniqueId(artefact.id!, patentId);
-    this.searchIndex.register(nodeId, searchValues);
+    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
+    this.querySearchIndex.register(nodeId, searchValues);
 
-    (item.children ?? []).forEach((child) => this.buildSearchIndex(child as AggregatedTreeNode, nodeId));
+    (item.children ?? []).forEach((child) => this.buildQuerySearchIndex(child as AggregatedTreeNode, nodeId));
+  }
+
+  private buildErrorStatusesSearchIndex(item: AggregatedTreeNode, parentId?: string): void {
+    const artefact = item.originalArtefact;
+    if (!artefact?._class) {
+      return;
+    }
+    const nodeId = this._utils.getUniqueId(artefact.id!, parentId);
+
+    // As we perform search over all error statuses at once, we use only one status as search condition
+    const hasErrorStatuses = this._utils.nodeHasStatuses(item, ERROR_STATUSES);
+    if (hasErrorStatuses) {
+      this.errorsSearchIndex.register(nodeId, [Status.FAILED]);
+    }
+    (item.children ?? []).forEach((child) => this.buildErrorStatusesSearchIndex(child as AggregatedTreeNode, nodeId));
   }
 }
 
 class SearchIndex {
   private emptySet = new Set<string>();
   private index = new Map<string, Set<string>>();
+  private searchResultCache = new Map<string, ReadonlySet<string>>();
 
   register(item: string, searchValues: string[]): void {
     searchValues.forEach((searchValue) => {
@@ -166,12 +279,16 @@ class SearchIndex {
       }
       this.index.get(searchValue)!.add(item);
     });
+    this.searchResultCache.clear();
   }
 
   search(query: string): ReadonlySet<string> {
     query = (query ?? '').trim().toLowerCase();
     if (!query) {
       return this.emptySet;
+    }
+    if (this.searchResultCache.has(query)) {
+      return this.searchResultCache.get(query)!;
     }
     let result = new Set<string>();
     this.index.forEach((items, searchValue) => {
@@ -180,11 +297,13 @@ class SearchIndex {
         result = result.union(items);
       }
     });
+    this.searchResultCache.set(query, result);
     return result;
   }
 
   clear(): void {
     this.index.clear();
+    this.searchResultCache.clear();
   }
 }
 
