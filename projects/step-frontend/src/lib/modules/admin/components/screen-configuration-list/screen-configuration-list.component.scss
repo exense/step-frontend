@@ -30,10 +30,18 @@
     margin-left: 1rem;
   }
 
+  step-form-field {
+    flex-direction: initial;
+  }
+
   .description {
+    border-radius: 0.8rem;
     margin-right: auto;
-    flex: 1 1 auto;
-    padding-right: 1rem;
-    color: var.$gray-500;
+    color: white;
+    background-color: gray;
+
+    p {
+      margin: 0.8rem 1.5rem;
+    }
   }
 }
