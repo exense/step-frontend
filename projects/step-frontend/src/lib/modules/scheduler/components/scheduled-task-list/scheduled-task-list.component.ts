@@ -1,8 +1,6 @@
-import { Component, forwardRef, inject, OnInit, signal } from '@angular/core';
+import { Component, forwardRef, inject } from '@angular/core';
 import {
-  AutoDeselectStrategy,
   ExecutiontTaskParameters,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   ArrayItemLabelValueExtractor,
@@ -15,6 +13,7 @@ import {
   DialogsService,
   tableColumnsConfigProvider,
   AlertType,
+  entitySelectionStateProvider,
 } from '@exense/step-core';
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
@@ -39,7 +38,7 @@ enum ActiveLabels {
       entityScreenSubPath: 'executionsParameters.customParameters',
     }),
     tablePersistenceConfigProvider('scheduledTaskList', STORE_ALL),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: DialogParentService,
       useExisting: forwardRef(() => ScheduledTaskListComponent),

@@ -1,4 +1,4 @@
-@if ((tableDataSource?.inProgress$ | async) || inProgress()) {
+@if (useSpinner() && inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>
@@ -18,6 +18,7 @@
     (columnsChange)="handleColumnsChange()"
   />
 }
+<step-columns-placeholders />
 <div class="table-container">
   <table mat-table [dataSource]="tableDataSource!" [trackBy]="trackBy">
     @for (searchCol of searchColumns; track searchCol.colName) {
@@ -46,14 +47,22 @@
       [stepRow]="row"
       [class.row-highlight]="row === highlightedItem"
     ></tr>
-    <tr class="mat-mdc-row" *matNoDataRow>
-      <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
-        @if ((tableDataSource?.total$ | async) === 0) {
-          {{ noResultsPlaceholder() || 'No data available in table' }}
-        } @else {
-          No matching records found
+    <tr class="mat-mdc-row no-data-row" *matNoDataRow>
+      @switch (emptyState()) {
+        @case (EmptyState.INITIAL) {
+          @for (col of displayColumns(); track col) {
+            <td class="mat-mdc-cell no-data"></td>
+          }
         }
-      </td>
+        @case (EmptyState.NO_DATA) {
+          <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
+            {{ noResultsPlaceholder() || 'No data available in table' }}
+          </td>
+        }
+        @case (EmptyState.NO_MATCHING_RECORDS) {
+          <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">No matching records found</td>
+        }
+      }
     </tr>
   </table>
 </div>

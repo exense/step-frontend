@@ -1,22 +1,24 @@
-import { Component, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, viewChild, ViewEncapsulation } from '@angular/core';
 import {
-  ArrayFilterComponent,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   BulkSelectionType,
   DateFormat,
+  EntitySelectionState,
+  entitySelectionStateProvider,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
+  MultiLevelArrayFilterComponent,
   REQUEST_FILTERS_INTERCEPTORS,
-  selectionCollectionProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
-import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { ERROR_STATUSES, EXECUTION_STATUS_TREE, Status } from '../../../_common/step-common.module';
+import { BehaviorSubject, exhaustMap, of, startWith, switchMap } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'step-execution-list',
@@ -29,7 +31,7 @@ import { TimeSeriesEntityService } from '../../../timeseries/modules/_common';
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('executionList', STORE_ALL),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: REQUEST_FILTERS_INTERCEPTORS,
       useClass: ExecutionListFilterInterceptorService,
@@ -45,37 +47,66 @@ export class ExecutionListComponent implements OnDestroy {
   readonly _filterConditionFactory = inject(FilterConditionFactoryService);
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
+  private _selectionState = inject<EntitySelectionState<string, ExecutiontTaskParameters>>(EntitySelectionState);
   readonly dataSource = this._augmentedExecutionsService.getExecutionsTableDataSource();
   readonly DateFormat = DateFormat;
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
   readonly runningExecutionsCount$ = this.reloadRunningExecutionsCount$.pipe(
-    switchMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
+    exhaustMap(() => this._augmentedExecutionsService.countExecutionsByStatus(Status.RUNNING)),
   );
 
   autoRefreshDisabled: boolean = false;
 
-  @ViewChild('statusFilter')
-  private statusFilter?: ArrayFilterComponent;
+  private effectSelectionTypeChanged = effect(() => {
+    const selectionType = this._selectionState.selectionType();
+    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
+
+    if (this.autoRefreshDisabled) {
+      this.dataSource.skipOngoingRequest();
+    }
+  });
+
+  private errorStatusesSet = new Set(ERROR_STATUSES);
+  private statusFilter = viewChild('statusFilter', { read: MultiLevelArrayFilterComponent });
+  private statusFilter$ = toObservable(this.statusFilter);
+  private statusFilterValue$ = this.statusFilter$.pipe(
+    switchMap((statusFilter) => {
+      if (!statusFilter) {
+        return of([] as Status[]);
+      }
+      const ctrl = statusFilter.filterControl as FormControl<Status[]>;
+      return ctrl.valueChanges.pipe(startWith(ctrl.value));
+    }),
+  );
+  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+
+  protected readonly isErrorFilterApplied = computed(() => {
+    const statusFilterValue = this.statusFilterValue() ?? [];
+    return (
+      statusFilterValue.length === this.errorStatusesSet.size &&
+      statusFilterValue.every((status) => this.errorStatusesSet.has(status))
+    );
+  });
 
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
     this._timeSeriesEntityService.clearCache();
   }
 
-  changeType(selectionType: BulkSelectionType): void {
-    this.autoRefreshDisabled = selectionType !== BulkSelectionType.NONE;
-
-    if (this.autoRefreshDisabled) {
-      this.dataSource.skipOngoingRequest();
-    }
-  }
-
   refreshTable(): void {
-    this.dataSource.reload({ hideProgress: true });
+    this.dataSource.reload({ hideProgress: true, isForce: false });
     this.reloadRunningExecutionsCount$.next();
   }
 
   handleRunningStatusClick(): void {
-    this.statusFilter?.filterControl.setValue([Status.RUNNING]);
+    this.statusFilter()?.filterControl?.setValue?.([Status.RUNNING]);
+  }
+
+  protected toggleErrorFilter(): void {
+    if (this.isErrorFilterApplied()) {
+      this.statusFilter()?.filterControl?.setValue?.([]);
+      return;
+    }
+    this.statusFilter()?.filterControl?.setValue?.([...ERROR_STATUSES]);
   }
 }

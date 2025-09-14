@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
-import { Keyword, Plan, PlanContext, PlanContextApiService, PlanEditorService } from '@exense/step-core';
+import { Keyword, PlanContext, PlanContextApiService, PlanEditorService, ReloadableDirective } from '@exense/step-core';
 import { CompositeKeywordPlanContextApiService } from '../../injectables/composite-keyword-plan-context-api.service';
 import { ActivatedRoute } from '@angular/router';
 import { map, tap } from 'rxjs';
@@ -9,6 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: 'step-composite-function-editor',
   templateUrl: './composite-function-editor.component.html',
   styleUrls: ['./composite-function-editor.component.scss'],
+  hostDirectives: [ReloadableDirective],
   providers: [
     {
       provide: PlanContextApiService,

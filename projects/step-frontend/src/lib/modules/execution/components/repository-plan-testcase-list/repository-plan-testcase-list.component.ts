@@ -1,21 +1,24 @@
-import { Component, computed, effect, inject, input, model, OnInit, output, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, OnInit, output, untracked, viewChild } from '@angular/core';
 import {
+  ArrayFilterComponent,
   BulkSelectionType,
   ControllerService,
+  EntitySelectionState,
+  entitySelectionStateProvider,
   IncludeTestcases,
-  RegistrationStrategy,
   RepositoryObjectReference,
-  selectionCollectionProvider,
-  SelectionCollector,
+  SelectionList,
   TableFetchLocalDataSource,
+  TableIndicatorMode,
   TableLocalDataSource,
   TableLocalDataSourceConfig,
   TestRunStatus,
 } from '@exense/step-core';
-import { filter, map, Observable, of, switchMap, take, tap } from 'rxjs';
-import { Status } from '../../../_common/step-common.module';
+import { filter, map, Observable, of, startWith, switchMap, take, tap } from 'rxjs';
+import { ERROR_STATUSES, Status } from '../../../_common/step-common.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
 
 const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === index;
 
@@ -23,29 +26,18 @@ const unique = <T>(item: T, index: number, self: T[]) => self.indexOf(item) === 
   selector: 'step-repository-plan-testcase-list',
   templateUrl: './repository-plan-testcase-list.component.html',
   styleUrls: ['./repository-plan-testcase-list.component.scss'],
-  providers: [
-    ...selectionCollectionProvider<string, TestRunStatus>({
-      selectionKeyProperty: 'id',
-      registrationStrategy: RegistrationStrategy.MANUAL,
-    }),
-  ],
+  providers: [...entitySelectionStateProvider<string, TestRunStatus>('id')],
   standalone: false,
 })
 export class RepositoryPlanTestcaseListComponent implements OnInit {
-  private _selectionCollector = inject<SelectionCollector<string, TestRunStatus>>(SelectionCollector);
-  readonly selectionCollector = this._selectionCollector;
+  private _selectionState = inject<EntitySelectionState<string, TestRunStatus>>(EntitySelectionState);
+  private listSelect = viewChild('listSelect', { read: SelectionList<string, TestRunStatus> });
 
   private _controllerService = inject(ControllerService);
 
   readonly repoRef = input<RepositoryObjectReference | undefined>(undefined);
   readonly explicitTestCases = input<TestRunStatus[] | undefined>(undefined);
 
-  private selected = toSignal(this._selectionCollector.selected$.pipe(map((selected) => new Set(selected))), {
-    initialValue: new Set<string>(),
-  });
-  readonly selectionType = model(BulkSelectionType.NONE);
-
-  /** @Output **/
   readonly includedTestCasesChange = output<IncludeTestcases>();
 
   protected readonly dataSource = computed(() => {
@@ -54,8 +46,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       return this.createRepoRefDataSource();
     }
     untracked(() => {
-      this._selectionCollector.clear();
-      this._selectionCollector.registerPossibleSelectionManually(testCases);
+      this.listSelect()?.clearSelection?.();
     });
     return this.createListDataSource(testCases);
   });
@@ -68,10 +59,43 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
     return testRunStatusList.map((testRunStatus) => testRunStatus.status as Status).filter(unique);
   });
 
+  private allErrorStatusesSet = new Set(ERROR_STATUSES);
+
+  private errorStatuses = computed(() => {
+    const statusItems = this.statusItems();
+    return statusItems.filter((item) => this.allErrorStatusesSet.has(item));
+  });
+
+  protected readonly hasErrorStatuses = computed(() => this.errorStatuses().length > 0);
+
+  private statusFilter = viewChild('statusFilter', { read: ArrayFilterComponent });
+  private statusFilter$ = toObservable(this.statusFilter);
+  private statusFilterValue$ = this.statusFilter$.pipe(
+    switchMap((statusFilter) => {
+      if (!statusFilter) {
+        return of([] as Status[]);
+      }
+      const ctrl = statusFilter.filterControl as FormControl<Status[]>;
+      return ctrl.valueChanges.pipe(startWith(ctrl.value));
+    }),
+  );
+  private statusFilterValue = toSignal(this.statusFilterValue$, { initialValue: [] });
+
+  protected readonly isErrorFilterApplied = computed(() => {
+    const statusFilterValue = this.statusFilterValue() ?? [];
+    const errorStatuses = this.errorStatuses() ?? [];
+    const errorStatusesSet = new Set(errorStatuses);
+    return (
+      errorStatusesSet.size > 0 &&
+      statusFilterValue.length === errorStatusesSet.size &&
+      statusFilterValue.every((status) => errorStatusesSet.has(status))
+    );
+  });
+
   private selectedItems = computed(() => {
     const allData = this.allData();
-    const selected = this.selected();
-    return allData.filter((item) => selected.has(item.id!));
+    const selected = this._selectionState.selectedKeys();
+    return allData.filter((item) => this._selectionState.isSelected(item));
   });
 
   private effectEmitTestCases = effect(() => {
@@ -82,7 +106,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   readonly includedTestCases = computed(() => {
     const repoRef = this.repoRef();
     const selectedItems = this.selectedItems();
-    const selectionType = this.selectionType();
+    const selectionType = this._selectionState.selectionType();
 
     let by: IncludeTestcases['by'] = repoRef?.repositoryID === 'local' ? 'id' : 'name';
     by = selectionType === BulkSelectionType.ALL ? 'all' : by;
@@ -107,7 +131,20 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
         filter((items) => !!items.length),
         take(1),
       )
-      .subscribe((_) => this.selectionType.set(BulkSelectionType.ALL));
+      .subscribe((_) => this.listSelect()?.selectAll?.());
+  }
+
+  reselect(idsToSelect: string[]): void {
+    this.listSelect()?.selectIds(idsToSelect);
+  }
+
+  protected toggleErrorFilter(): void {
+    if (this.isErrorFilterApplied()) {
+      this.statusFilter()?.filterControl?.setValue?.([]);
+      return;
+    }
+    const errorStatuses = this.errorStatuses();
+    this.statusFilter()?.filterControl?.setValue?.(errorStatuses);
   }
 
   private createListDataSource(items: TestRunStatus[]): TableLocalDataSource<TestRunStatus> {
@@ -128,7 +165,7 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
       .build();
   }
 
-  private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[]> {
+  private getTestRuns(repoRef?: RepositoryObjectReference): Observable<TestRunStatus[] | undefined> {
     return of(repoRef).pipe(
       switchMap((repoRef) => {
         if (!repoRef) {
@@ -154,13 +191,14 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
           repositoryParameters: { planid: repoRef?.repositoryParameters?.['planid'] },
         });
       }),
-      map((testSetStatusOverview) => testSetStatusOverview?.runs || []),
-      tap(() => this._selectionCollector.clear()),
-      tap((items) => this._selectionCollector.registerPossibleSelectionManually(items)),
+      map((testSetStatusOverview) => testSetStatusOverview?.runs),
+      tap(() => this.listSelect()?.clearSelection?.()),
       catchError((err) => {
         // error is handled in interceptor but let's return an empty array to satisfy Angular lifecycle hook
         return of([]);
       }),
     );
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }
