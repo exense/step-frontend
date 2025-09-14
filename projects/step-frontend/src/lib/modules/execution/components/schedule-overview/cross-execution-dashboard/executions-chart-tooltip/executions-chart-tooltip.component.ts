@@ -46,12 +46,14 @@ export class ExecutionsChartTooltipComponent {
   reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
+  readonly scaleKey = input.required<string>();
 
   selectedSeries?: TransformedSeries;
   selectedSeriesExecutions: ExecutionItem[] = [];
   executionsListTruncated: boolean = false;
 
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
+    console.log('transofrmed data');
     const contextData = this.data();
     this.selectedSeriesExecutions = [];
     this.executionsListTruncated = false;
@@ -60,12 +62,10 @@ export class ExecutionsChartTooltipComponent {
     if (!contextData) {
       return [];
     }
-    contextData.series = contextData.series.filter((s) => s.scale !== TimeSeriesConfig.SECONDARY_AXES_KEY);
+    contextData.series = contextData.series.filter((s) => s.scale === this.scaleKey());
+    console.log(contextData.series, this.scaleKey);
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;
-      if (series.scale === TimeSeriesConfig.SECONDARY_AXES_KEY) {
-        continue;
-      }
       let value =
         i === 0
           ? series.data[contextData?.idx!] || 0

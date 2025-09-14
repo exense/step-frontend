@@ -162,14 +162,12 @@ export abstract class CrossExecutionDashboardState {
           let series: TSChartSeries[] = response.matrix.map((seriesBuckets: BucketResponse[], i: number) => {
             const seriesKey: string = response.matrixKeys[i][statusAttribute];
             const seriesData: (number | undefined | null)[] = [];
-            seriesBuckets.forEach((b, i) => {
-              let value = b?.count || 0;
+            seriesBuckets.forEach((bucket, i) => {
+              let value = bucket?.count || 0;
               seriesData[i] = value;
-              if (b) {
-                const existingResponseTime = responseTimeData[i] || 0;
-                // const updatedValue = existingResponseTime + (b.sum / b.count);
-                const updatedValue = Math.random() * 10000;
-                responseTimeData[i] = updatedValue;
+              if (bucket) {
+                const responseTime = bucket.sum / bucket.count;
+                responseTimeData[i] = responseTime;
               } else {
                 responseTimeData[i] = responseTimeData[i] || 0;
               }
@@ -179,7 +177,7 @@ export abstract class CrossExecutionDashboardState {
             const fill = color + '99';
             const s: TSChartSeries = {
               id: seriesKey,
-              scale: 'y',
+              scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
               labelItems: [seriesKey],
               legendName: seriesKey,
               data: seriesData,
@@ -195,34 +193,33 @@ export abstract class CrossExecutionDashboardState {
             return s;
           });
           this.cumulateSeriesData(series); // used for stacked bar
-
           const responseTimeSeries: TSChartSeries = {
-            scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+            scale: 'y',
             labelItems: ['Response Time (AVG)'],
-            id: 'total',
-            // strokeConfig: { color: '', type: MarkerType.SQUARE },
+            id: 'response-time',
             data: responseTimeData,
-            value: (x, v: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v),
+            value: (x, value: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(value),
             stroke: '#0082cb',
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
+          console.log(responseTimeData);
 
           const axes: Axis[] = [
             {
-              size: TimeSeriesConfig.CHART_LEGEND_SIZE,
               scale: 'y',
-              values: (u, vals) => {
-                return vals.map((v: any) => v);
-              },
-            },
-            {
-              scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
-              side: 1,
               values: (u, vals) => {
                 return vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v));
               },
               grid: { show: false },
+            },
+            {
+              size: TimeSeriesConfig.CHART_LEGEND_SIZE,
+              side: 1,
+              scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
+              values: (u, values) => {
+                return values.map((v: any) => v);
+              },
             },
           ];
           return {
@@ -240,7 +237,8 @@ export abstract class CrossExecutionDashboardState {
               lock: true,
             },
             scales: {
-              y: {
+              x: {},
+              z: {
                 range: (self: uPlot, initMin: number, initMax: number, scaleKey: string) => {
                   return [0, initMax];
                 },
@@ -251,7 +249,7 @@ export abstract class CrossExecutionDashboardState {
               enabled: true,
             },
             axes: axes,
-            bands: this.getDefaultBands(series.length, 1),
+            bands: this.getDefaultBands(series.length, 0),
           } as TSChartSettings;
         }),
       );
