@@ -21,6 +21,10 @@ export class StatusDistributionTooltipComponent {
   link = input<string>();
   linkLabel = input<string>();
 
+  constructor() {
+    console.log('IT WAS CONSTUCTED');
+  }
+
   distribution: Signal<StatusDistribution[]> = computed(() => {
     let totalCount = 0;
     const statuses = this.statuses();

@@ -17,13 +17,24 @@ import {
   tablePersistenceConfigProvider,
   TimeSeriesService,
 } from '@exense/step-core';
-import { BehaviorSubject, map, Observable, of, switchMap, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  of,
+  switchMap,
+  take,
+} from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
 import { FilterUtils, OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { ReportNodesChartType } from '../report/scheduler-report-view.component';
 import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatMapRow } from './heatmap.component';
 import { HeatmapColorUtils } from './heatmap-color-utils';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 interface ItemWithExecutionsStatuses {
   key: string; // keyword or testcase
@@ -108,87 +119,84 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
   readonly heatmapType = signal<HeatMapChartType | undefined>(undefined);
 
+  private readonly heatmapType$ = toObservable(this.heatmapType).pipe(
+    filter((t): t is HeatMapChartType => !!t),
+    distinctUntilChanged(),
+  );
+
   switchType(newType: HeatMapChartType) {
     this.heatmapType.set(newType);
   }
 
-  readonly heatMapData$: Observable<HeatmapData> = this._state.lastExecutionsSorted$.pipe(
-    switchMap((executions) =>
-      this._state.timeRange$.pipe(
-        take(1),
-        switchMap((timeRange) => {
-          const executionIdAttribute = 'eId';
-          const statusAttribute = 'rnStatus';
-          const nameAttribute = 'name'; // item key (e.g., keyword)
+  readonly heatMapData$ = combineLatest([
+    this._state.lastExecutionsSorted$,
+    this._state.timeRange$,
+    this.heatmapType$,
+  ]).pipe(
+    switchMap(([executions, timeRange, heatmapType]) => {
+      const isKeywordsHeatmap = heatmapType === 'keywords';
 
-          // Build the executions filter (or a no-op if none)
-          const execClause =
-            executions.length > 0
-              ? `(${executions.map((e) => `attributes.${executionIdAttribute} = "${e.id!}"`).join(' or ')})`
-              : '(1 = 1)';
+      const executionIdAttribute = 'eId';
+      const statusAttribute = 'rnStatus';
+      const attributesType = isKeywordsHeatmap ? 'keyword' : 'testcase';
+      const nameAttribute = 'name';
 
-          // OQL: metric type + your executions
-          const oql = new OQLBuilder()
-            .open('and')
-            .append('attributes.metricType = "response-time"')
-            .append(execClause)
-            .close()
-            .build();
+      const execClause =
+        executions.length > 0
+          ? `(${executions.map((e) => `attributes.${executionIdAttribute} = "${e.id!}"`).join(' or ')})`
+          : '(1 = 1)';
 
-          const request: FetchBucketsRequest = {
-            start: timeRange.from,
-            end: timeRange.to,
-            numberOfBuckets: 1, // single aggregate bucket over the time range
-            oqlFilter: oql,
-            // We need the item name, the execution id, and the status in the key-space
-            groupDimensions: [nameAttribute, executionIdAttribute, statusAttribute],
-          };
+      const oql = new OQLBuilder()
+        .open('and')
+        .append('attributes.metricType = "response-time"')
+        .append(`attributes.type = "${attributesType}"`) // TODO add custom also?
+        .append(execClause)
+        .close()
+        .build();
 
-          return this._timeSeriesService.getTimeSeries(request).pipe(
-            map((response) => {
-              const allExecutionIds = executions.map((e) => String(e.id!));
-              const allStatuses = new Set<string>();
+      const request: FetchBucketsRequest = {
+        start: timeRange.from,
+        end: timeRange.to,
+        numberOfBuckets: 1,
+        oqlFilter: oql,
+        groupDimensions: [nameAttribute, executionIdAttribute, statusAttribute],
+      };
 
-              const itemsMap: Record<string, ItemWithExecutionsStatuses> = {};
+      return this._timeSeriesService.getTimeSeries(request).pipe(
+        map((response) => {
+          const allExecutionIds = executions.map((e) => String(e.id!));
+          const allStatuses = new Set<string>();
+          const itemsMap: Record<string, ItemWithExecutionsStatuses> = {};
 
-              // Each row corresponds to one (name, eId, status) group
-              response.matrixKeys.forEach((keyAttributes, i) => {
-                const bucket: BucketResponse = response.matrix[i][0];
-                const itemKey = String(keyAttributes[nameAttribute] ?? keyAttributes['key'] ?? '');
-                const execId = String(keyAttributes[executionIdAttribute]);
-                const status = String(keyAttributes[statusAttribute] ?? 'UNKNOWN');
-                const count = bucket?.count ?? 0;
+          response.matrixKeys.forEach((keyAttributes, i) => {
+            const bucket: BucketResponse = response.matrix[i][0];
+            const itemKey = String(keyAttributes[nameAttribute] ?? keyAttributes['key'] ?? '');
+            const execId = String(keyAttributes[executionIdAttribute]);
+            const status = String(keyAttributes[statusAttribute] ?? 'UNKNOWN');
+            const count = bucket?.count ?? 0;
 
-                allStatuses.add(status);
+            allStatuses.add(status);
 
-                const item =
-                  itemsMap[itemKey] ??
-                  (itemsMap[itemKey] = {
-                    key: itemKey,
-                    statusesByExecutions: {},
-                  });
+            const item = (itemsMap[itemKey] ??= { key: itemKey, statusesByExecutions: {} });
+            const execMap = (item.statusesByExecutions[execId] ??= {});
+            execMap[status] = (execMap[status] ?? 0) + count;
+          });
 
-                const execMap = item.statusesByExecutions[execId] ?? (item.statusesByExecutions[execId] = {});
-
-                execMap[status] = (execMap[status] ?? 0) + count;
+          const statusesArr = Array.from(allStatuses);
+          Object.values(itemsMap).forEach((item) => {
+            allExecutionIds.forEach((execId) => {
+              const execMap = (item.statusesByExecutions[execId] ??= {});
+              statusesArr.forEach((st) => {
+                if (execMap[st] == null) execMap[st] = 0;
               });
+            });
+          });
 
-              const statusesArr = Array.from(allStatuses);
-              Object.values(itemsMap).forEach((item) => {
-                allExecutionIds.forEach((execId) => {
-                  const execMap = item.statusesByExecutions[execId] ?? (item.statusesByExecutions[execId] = {});
-                  statusesArr.forEach((st) => {
-                    if (execMap[st] == null) execMap[st] = 0;
-                  });
-                });
-              });
-              return Object.values(itemsMap);
-            }),
-          );
+          return Object.values(itemsMap);
         }),
         map((items) => this.convertToTableData(executions, items)),
-      ),
-    ),
+      );
+    }),
   );
 
   convertToTableData(executions: Execution[], timeseriesItems: ItemWithExecutionsStatuses[]): HeatmapData {
