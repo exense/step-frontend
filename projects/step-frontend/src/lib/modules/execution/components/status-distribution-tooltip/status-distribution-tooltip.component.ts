@@ -1,4 +1,5 @@
-import { Component, computed, input, Signal } from '@angular/core';
+import { Component, computed, inject, input, Signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface StatusDistribution {
   status: string;
@@ -13,6 +14,8 @@ interface StatusDistribution {
   standalone: false,
 })
 export class StatusDistributionTooltipComponent {
+  private _router = inject(Router);
+
   statuses = input.required<Record<string, number>>();
   timestamp = input<number>();
   link = input<string>();
@@ -32,5 +35,9 @@ export class StatusDistributionTooltipComponent {
     });
   });
 
-  navigateToLink() {}
+  navigateToLink() {
+    if (this.link()) {
+      this._router.navigateByUrl(this.link()!);
+    }
+  }
 }

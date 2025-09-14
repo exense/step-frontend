@@ -4,12 +4,31 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  padding: 2rem;
+  padding: 1.6rem;
+  width: 26rem;
 }
 
 .footer {
   display: flex;
-  width: 100%;
   justify-content: space-between;
   align-items: center;
+  font-size: 1.1rem;
+  margin: 0 0.4rem;
+  margin-top: 1rem;
+  gap: 2rem;
+}
+
+.link-btn {
+  padding: 0.4rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.no-data {
+  margin-left: 4px;
+  text-align: left;
 }

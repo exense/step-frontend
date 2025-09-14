@@ -7,8 +7,12 @@ import {
   input,
   signal,
   computed,
+  effect,
+  viewChild,
+  ElementRef,
 } from '@angular/core';
-import { Execution } from '@exense/step-core';
+import { Execution, PaginatorComponent } from '@exense/step-core';
+import { PageEvent } from '@angular/material/paginator';
 
 export interface HeatmapColumn {
   id: string;
@@ -53,20 +57,52 @@ export class HeatmapComponent {
   readonly legendColors = input<HeatMapColor[]>([]);
 
   readonly searchValue = signal('');
+  readonly pageSize = signal(10);
+  readonly page = signal(0);
+
+  readonly paginator = viewChild(PaginatorComponent);
+  readonly container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
 
   /** Emitted on any cell click. */
   @Output() cellClick = new EventEmitter<{ row: HeatMapRow; column: HeatmapColumn }>();
 
+  scrollEffect = effect(() => {
+    const rows = this.rows();
+    const element = this.container()?.nativeElement!;
+    setTimeout(() => {
+      element?.scrollTo({
+        left: element.scrollWidth,
+        behavior: 'auto',
+      });
+    }, 200);
+  });
+
+  searchChange = effect(() => {
+    this.searchValue();
+    this.paginator()?.firstPage();
+  });
+
   filteredRows = computed(() => {
     const list = this.rows() ?? [];
     const q = (this.searchValue?.() ?? '').trim().toLowerCase();
-    if (!q) return list;
-
-    return list.filter((r) => (r.label ?? '').toLowerCase().includes(q));
+    return q ? list.filter((r) => (r.label ?? '').toLowerCase().includes(q)) : list;
   });
 
-  trackByColumn = (_: number, c: HeatmapColumn) => c.id;
-  trackByRow = (_: number, r: HeatMapRow) => r.label;
+  filteredAndPaginatedRows = computed(() => {
+    const filtered = this.filteredRows();
+    const rawPage = this.page();
+    const rawPageSize = this.pageSize();
+
+    const pageSize = Math.max(1, rawPageSize); // never 0
+    const total = filtered.length;
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(Math.max(1, rawPage + 1), pageCount); // clamp
+
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+
+    return filtered.slice(start, end);
+  });
 
   onCellClick(row: HeatMapRow, column: HeatmapColumn): void {
     this.cellClick.emit({ row, column });
@@ -76,7 +112,12 @@ export class HeatmapComponent {
     }
   }
 
-  handleSearchValueChange(newValue: string) {
-    this.searchValue.set(newValue);
+  handlePageChange(page: PageEvent) {
+    this.page.set(page.pageIndex);
+  }
+
+  handlePageSizeChange(size: number) {
+    this.pageSize.set(size);
+    this.paginator()?.firstPage();
   }
 }

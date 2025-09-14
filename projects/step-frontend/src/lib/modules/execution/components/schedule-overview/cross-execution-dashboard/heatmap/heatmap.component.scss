@@ -5,6 +5,10 @@
     margin: 0;
   }
 
+  thead tr {
+    border-bottom: 1px solid #f1f1f1;
+  }
+
   th {
     white-space: wrap;
     text-align: left;

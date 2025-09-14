@@ -6,12 +6,12 @@
       [percentage]="statusItem.percentage"
     />
   }
-  <!--  <step-status-distribution-badge [count]="12" [status]="'PASSED'" [percentage]="100"/>-->
-  <!--  <step-status-distribution-badge [count]="0" [status]="'TECHNICAL_ERROR'" [percentage]="0"/>-->
-  <!--  <step-status-distribution-badge [count]="0" [status]="'FAILED'" [percentage]="0"/>-->
+  @if (distribution().length === 0) {
+    <div class="no-data">No data</div>
+  }
 
-  <div>
+  <div class="footer">
     <span>{{ timestamp() | date: 'dd.MM.yy / HH:mm:ss' }}</span>
-    <span (click)="navigateToLink()">{{ linkLabel() }}</span>
+    <span class="link-btn" (click)="navigateToLink()">{{ linkLabel() }}</span>
   </div>
 </div>

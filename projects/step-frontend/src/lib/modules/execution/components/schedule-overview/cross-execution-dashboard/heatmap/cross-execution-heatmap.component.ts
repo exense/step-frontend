@@ -241,7 +241,11 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     });
     return {
       columns: columns,
-      rows: rows,
+      rows: [
+        ...rows,
+        ...rows.map((r) => ({ ...r, label: r.label + '1' })),
+        ...rows.map((r) => ({ ...r, label: r.label + '2' })).slice(0, 6),
+      ],
     };
   }
 

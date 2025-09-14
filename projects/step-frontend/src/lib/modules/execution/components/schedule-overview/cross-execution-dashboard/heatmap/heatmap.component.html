@@ -1,4 +1,4 @@
-<div class="scroll-x">
+<div #scrollableContainer class="scroll-x">
   <table class="heatmap-table" role="grid" style="border-collapse: collapse; width: 100%">
     <thead>
       <tr>
@@ -9,7 +9,7 @@
           </div>
         </th>
 
-        @for (col of columns(); track col.label) {
+        @for (col of columns(); track col.id) {
           <th
             scope="col"
             class="heatmap-col-header"
@@ -24,7 +24,7 @@
     </thead>
 
     <tbody>
-      @for (row of filteredRows(); track row.label) {
+      @for (row of filteredAndPaginatedRows(); track row.label) {
         <tr>
           <td
             class="sticky-col"
@@ -35,7 +35,7 @@
             {{ row.label }}
           </td>
 
-          @for (col of columns(); track col.label) {
+          @for (col of columns(); track col.id) {
             <td
               class="heatmap-cell"
               [style.width.px]="cellSize()"
@@ -48,15 +48,17 @@
               (click)="onCellClick(row, col)"
               (keydown.enter)="onCellClick(row, col)"
             >
-              <step-popover [noPadding]="true">
-                <div style="width: 100%; height: 100%; visibility: hidden">.</div>
-                <step-popover-content>
-                  <step-status-distribution-tooltip
-                    [statuses]="row.cells![col.id].statusesCount"
-                    [timestamp]="row.cells?.[col.id]?.timestamp"
-                  />
-                </step-popover-content>
-              </step-popover>
+              <!--              <step-popover [noPadding]="true">-->
+              <!--                <div style="width: 100%; height: 100%; visibility: hidden">.</div>-->
+              <!--                <step-popover-content>-->
+              <!--                  <step-status-distribution-tooltip-->
+              <!--                    [link]="'/executions/' + col.id"-->
+              <!--                    linkLabel="See execution"-->
+              <!--                    [statuses]="row.cells![col.id].statusesCount"-->
+              <!--                    [timestamp]="row.cells?.[col.id]?.timestamp"-->
+              <!--                  />-->
+              <!--                </step-popover-content>-->
+              <!--              </step-popover>-->
             </td>
           }
         </tr>
@@ -74,6 +76,11 @@
     </step-heatmap-gradient-legend>
   </div>
   <div>
-    <step-paginator [length]="filteredRows().length" [pageSizeOptions]="[10, 25, 50]" />
+    <step-paginator
+      (pageSizeChange)="handlePageSizeChange($event)"
+      (pageChange)="handlePageChange($event)"
+      [length]="filteredRows().length"
+      [pageSizeOptions]="[10, 25, 50]"
+    />
   </div>
 </div>
