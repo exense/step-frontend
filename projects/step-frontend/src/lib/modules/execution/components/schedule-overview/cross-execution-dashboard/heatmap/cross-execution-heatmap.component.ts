@@ -14,7 +14,6 @@ import {
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, switchMap, take } from 'rxjs';
 import { OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
-import { ReportNodesChartType } from '../report/scheduler-report-view.component';
 import { HeatmapColorUtils } from './heatmap-color-utils';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatmapData, HeatMapRow } from './types/heatmap-types';
@@ -44,7 +43,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
   defaultDateRange = input<DateRange>();
 
-  readonly tabs: Tab<ReportNodesChartType>[] = [
+  readonly tabs: Tab<'testcases' | 'keywords'>[] = [
     {
       id: 'testcases',
       label: 'Test Cases',
