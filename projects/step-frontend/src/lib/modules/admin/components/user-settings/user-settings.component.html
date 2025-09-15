@@ -28,11 +28,7 @@
 
 <div class="header-with-button">
   <div class="header-text title-with-hint">
-    <div>Api key</div>
-    <step-description-hint
-      description="API keys can be used for authentication with the step API (<a href='https://step.dev/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys' target='_blank'>documentation</a>)"
-    >
-    </step-description-hint>
+    <div>API key</div>
   </div>
   <button
     stepTestId="generate-key-btn"
@@ -45,6 +41,13 @@
     Generate new Key
   </button>
 </div>
+<p class="description">
+  API keys allow secure authentication when accessing Step via the REST API or CLI (<a
+    href="https://step.dev/knowledgebase/userdocs/userpreferences/#user-credentials-and-api-keys"
+    target="_blank"
+    >documentation</a
+  >)
+</p>
 <div class="role">
   <section>
     <step-table [dataSource]="tokensSource">
@@ -86,12 +89,15 @@
 <div class="header-with-button">
   <div class="header-text title-with-hint">
     <div>Preferences</div>
-    <step-description-hint
-      description="Add key/value pairs of custom preferences (<a href='https://step.dev/knowledgebase/userdocs/userpreferences/#preferences' target='_blank'>documentation</a>)"
-    >
-    </step-description-hint>
   </div>
 </div>
+<p class="description">
+  Add key/value pairs to enable custom preferences (<a
+    href="https://step.dev/knowledgebase/userdocs/userpreferences/#preferences"
+    target="_blank"
+    >documentation</a
+  >)
+</p>
 <div>
   <step-table [dataSource]="preferences$">
     <section class="header" *stepAdditionalHeader="'add-preference'">

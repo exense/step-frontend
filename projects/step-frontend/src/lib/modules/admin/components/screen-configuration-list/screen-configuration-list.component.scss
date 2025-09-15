@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 :host {
   position: relative;
   display: block;
@@ -26,5 +28,20 @@
 
   step-btn-group {
     margin-left: 1rem;
+  }
+
+  step-form-field {
+    flex-direction: initial;
+  }
+
+  .description {
+    border-radius: 0.8rem;
+    margin-right: auto;
+    color: white;
+    background-color: var.$gray-450;
+
+    p {
+      margin: 0.8rem 1.5rem;
+    }
   }
 }
