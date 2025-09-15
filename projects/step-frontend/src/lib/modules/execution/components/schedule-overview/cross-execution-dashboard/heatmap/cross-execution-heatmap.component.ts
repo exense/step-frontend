@@ -1,39 +1,27 @@
 import { Component, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
-  AugmentedExecutionsService,
   BucketResponse,
   COLORS,
   DateFormat,
   DateRange,
-  entitySelectionStateProvider,
   Execution,
-  ExecutiontTaskParameters,
   FetchBucketsRequest,
   FilterConditionFactoryService,
-  REQUEST_FILTERS_INTERCEPTORS,
   SearchValue,
   Tab,
-  tableColumnsConfigProvider,
-  tablePersistenceConfigProvider,
   TimeSeriesService,
 } from '@exense/step-core';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, switchMap, take } from 'rxjs';
-import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
 import { OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { ReportNodesChartType } from '../report/scheduler-report-view.component';
-import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatMapRow } from './heatmap.component';
 import { HeatmapColorUtils } from './heatmap-color-utils';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatmapData, HeatMapRow } from './types/heatmap-types';
 
 interface ItemWithExecutionsStatuses {
   key: string; // keyword or testcase
   statusesByExecutions: Record<string, Record<string, number>>; // execution - status - count
-}
-
-interface HeatmapData {
-  columns: HeatmapColumn[];
-  rows: HeatMapRow[];
 }
 
 export type HeatMapChartType = 'keywords' | 'testcases';
@@ -42,25 +30,7 @@ export type HeatMapChartType = 'keywords' | 'testcases';
   selector: 'step-cross-execution-heatmap',
   templateUrl: './cross-execution-heatmap.component.html',
   styleUrls: ['./cross-execution-heatmap.component.scss'],
-  providers: [
-    tableColumnsConfigProvider({
-      entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
-      entityScreenId: 'executionParameters',
-      entityScreenSubPath: 'executionParameters.customParameters',
-    }),
-    tablePersistenceConfigProvider('crossExecutionList', {
-      storePagination: false,
-      storeSort: false,
-      storeSearch: false,
-    }),
-    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
-    {
-      provide: REQUEST_FILTERS_INTERCEPTORS,
-      useClass: ExecutionListFilterInterceptorService,
-      multi: true,
-    },
-    FilterConditionFactoryService,
-  ],
+  providers: [],
   standalone: false,
 })
 export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {

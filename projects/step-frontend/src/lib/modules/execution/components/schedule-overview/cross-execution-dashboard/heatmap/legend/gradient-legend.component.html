@@ -7,10 +7,10 @@
     aria-label="Legend gradient"
   ></div>
 
-  <div class="markers" *ngIf="computed.length > 0">
+  <div class="markers" *ngIf="computedData().length > 0">
     <div
       class="marker"
-      *ngFor="let s of computed; let i = index; let last = last"
+      *ngFor="let s of computedData(); let i = index; let last = last"
       [style.left.%]="s.posPct"
       [class.first]="i === 0"
       [class.last]="last"
