@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   AugmentedExecutionsService,
   BucketResponse,
@@ -17,19 +17,9 @@ import {
   tablePersistenceConfigProvider,
   TimeSeriesService,
 } from '@exense/step-core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  map,
-  Observable,
-  of,
-  switchMap,
-  take,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, switchMap, take } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
-import { FilterUtils, OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
+import { OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { ReportNodesChartType } from '../report/scheduler-report-view.component';
 import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatMapRow } from './heatmap.component';
@@ -261,11 +251,6 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     this._state.testCasesChartSettings$.pipe(take(1)).subscribe(({ hasData }) => {
       this.heatmapType.set(hasData ? 'testcases' : 'keywords');
     });
-    // this.tableData$.subscribe((data) => {
-    //   if (!this.dataSource) {
-    //     this.dataSource = new TableLocalDataSource([]);
-    //   }
-    // });
   }
 
   formatExecutionHeader(ms: number) {

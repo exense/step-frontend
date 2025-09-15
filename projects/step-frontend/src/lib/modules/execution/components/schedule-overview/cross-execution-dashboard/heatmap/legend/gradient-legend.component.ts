@@ -1,11 +1,5 @@
-import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { HeatMapColor } from '../heatmap.component';
-
-export interface LegendStop {
-  color: string; // e.g. '#ff595b' or 'rgb(...)'
-  label: string; // e.g. 'Failed'
-  position?: number; // optional in [0,1] (0%..100%); if omitted, evenly spaced
-}
 
 interface ComputedStop {
   color: string;
@@ -41,7 +35,6 @@ export class GradientLegendComponent implements OnChanges {
       return;
     }
 
-    // Determine positions
     let withPos: ComputedStop[];
 
     // Evenly spaced across 0..100
@@ -54,8 +47,6 @@ export class GradientLegendComponent implements OnChanges {
 
     this.computed = withPos;
 
-    // Build linear-gradient with explicit color stops
-    // e.g., 'linear-gradient(to right, #ff595b 0%, #e1cc01 50%, #01a990 100%)'
     this.gradientCss = `linear-gradient(to right, ${withPos.map((s) => `${s.color} ${s.posPct}%`).join(', ')})`;
   }
 }
