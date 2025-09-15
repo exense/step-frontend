@@ -24,8 +24,8 @@ enum TreeNodeAction {
   EXPAND_CHILDREN = 'expand_children',
   COLLAPSE_CHILDREN = 'collapse_children',
   FIND_ROOT_CAUSE = 'find_root_cause',
-  PREV_ROOT_CAUSE = 'previous_root_cause',
-  NEXT_ROOT_CAUSE = 'next_root_cause',
+  //PREV_ROOT_CAUSE = 'previous_root_cause',
+  //NEXT_ROOT_CAUSE = 'next_root_cause',
 }
 
 @Component({
@@ -70,38 +70,35 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       { id: TreeNodeAction.COLLAPSE_CHILDREN, label: 'Collapse all children', disabled },
     ];
 
-    const searchForErrorsOnly = this._treeSate.searchForErrorsOnly();
+    const aggregatedNode = node as AggregatedTreeNode;
 
-    if (searchForErrorsOnly) {
-      const aggregatedNode = node as AggregatedTreeNode;
+    const hasErrors = this._utils.nodeHasStatuses(aggregatedNode, ERROR_STATUSES);
 
-      const hasErrors = this._utils.nodeHasStatuses(aggregatedNode, ERROR_STATUSES);
-
-      if (hasErrors) {
-        actions.push({
-          id: TreeNodeAction.FIND_ROOT_CAUSE,
-          label: 'Find error cause',
-        });
-      }
-
-      const errorLeafs = this._treeSate.errorLeafs();
-      const currentLeafIndex = errorLeafs ? errorLeafs.indexOf(node.id) : -1;
-      if (!!errorLeafs?.length && currentLeafIndex >= 0) {
-        const total = errorLeafs.length;
-        const [prev, next] = this.findErrorLeafSiblings(node.id);
-
-        actions.push(
-          {
-            id: TreeNodeAction.PREV_ROOT_CAUSE,
-            label: `Navigate to previous error cause (${prev + 1} of ${total})`,
-          },
-          {
-            id: TreeNodeAction.NEXT_ROOT_CAUSE,
-            label: `Navigate to next error cause (${next + 1} of ${total})`,
-          },
-        );
-      }
+    if (hasErrors) {
+      actions.push({
+        id: TreeNodeAction.FIND_ROOT_CAUSE,
+        label: 'Find error cause',
+      });
     }
+
+    //const errorLeafs = this._treeSate.errorLeafs();
+    //const currentLeafIndex = errorLeafs ? errorLeafs.indexOf(node.id) : -1;
+    //if (!!errorLeafs?.length && currentLeafIndex >= 0) {
+    //  const total = errorLeafs.length;
+    //  if (total > 1) {
+    //    const [prev, next] = this.findErrorLeafSiblings(node.id);
+    //    actions.push(
+    //      {
+    //        id: TreeNodeAction.PREV_ROOT_CAUSE,
+    //        label: `Navigate to previous error cause (${prev + 1} of ${total})`,
+    //      },
+    //      {
+    //        id: TreeNodeAction.NEXT_ROOT_CAUSE,
+    //        label: `Navigate to next error cause (${next + 1} of ${total})`,
+    //      },
+    //    );
+    //  }
+    //}
 
     return of(actions);
   }
@@ -123,29 +120,29 @@ export class AltExecutionTreeComponent implements TreeActionsService {
         break;
       case TreeNodeAction.FIND_ROOT_CAUSE:
         this._treeSate.findErrorLeafs(node.id);
-        const errorLeafs = this._treeSate.errorLeafs();
+        const errorLeafs = this._treeSate.searchResult();
         if (!!errorLeafs?.length) {
           this.focusNode(errorLeafs[0]);
         }
         break;
-      case TreeNodeAction.NEXT_ROOT_CAUSE:
-        const [, next] = this.findErrorLeafSiblings(node.id);
-        if (next >= 0) {
-          const nodeId = this._treeSate.pickErrorLeafByIndex(next);
-          if (nodeId) {
-            this.focusNode(nodeId);
-          }
-        }
-        break;
-      case TreeNodeAction.PREV_ROOT_CAUSE:
-        const [previous] = this.findErrorLeafSiblings(node.id);
-        if (previous >= 0) {
-          const nodeId = this._treeSate.pickErrorLeafByIndex(previous);
-          if (nodeId) {
-            this.focusNode(nodeId);
-          }
-        }
-        break;
+      //case TreeNodeAction.NEXT_ROOT_CAUSE:
+      //  const [, next] = this.findErrorLeafSiblings(node.id);
+      //  if (next >= 0) {
+      //    const nodeId = this._treeSate.pickErrorLeafByIndex(next);
+      //    if (nodeId) {
+      //      this.focusNode(nodeId);
+      //    }
+      //  }
+      //  break;
+      //case TreeNodeAction.PREV_ROOT_CAUSE:
+      //  const [previous] = this.findErrorLeafSiblings(node.id);
+      //  if (previous >= 0) {
+      //    const nodeId = this._treeSate.pickErrorLeafByIndex(previous);
+      //    if (nodeId) {
+      //      this.focusNode(nodeId);
+      //    }
+      //  }
+      //  break;
       default:
         break;
     }
@@ -165,17 +162,17 @@ export class AltExecutionTreeComponent implements TreeActionsService {
       });
   }
 
-  private findErrorLeafSiblings(nodeId: string): [number, number] {
-    const errorLeafs = this._treeSate.errorLeafs();
-    const currentLeafIndex = errorLeafs ? errorLeafs.indexOf(nodeId) : -1;
-    if (!!errorLeafs?.length && currentLeafIndex >= 0) {
-      const total = errorLeafs.length;
-      const next = (currentLeafIndex + 1) % total;
-      const prev = currentLeafIndex - 1 < 0 ? total - 1 : currentLeafIndex - 1;
+  //private findErrorLeafSiblings(nodeId: string): [number, number] {
+  //  const errorLeafs = this._treeSate.errorLeafs();
+  //  const currentLeafIndex = errorLeafs ? errorLeafs.indexOf(nodeId) : -1;
+  //  if (!!errorLeafs?.length && currentLeafIndex >= 0) {
+  //    const total = errorLeafs.length;
+  //    const next = (currentLeafIndex + 1) % total;
+  //    const prev = currentLeafIndex - 1 < 0 ? total - 1 : currentLeafIndex - 1;
 
-      return [prev, next];
-    }
+  //    return [prev, next];
+  //  }
 
-    return [-1, -1];
-  }
+  //  return [-1, -1];
+  //}
 }

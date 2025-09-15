@@ -41,6 +41,7 @@ export class AltExecutionTreeWidgetComponent {
 
   protected readonly searchCtrl = this._treeState.searchCtrl;
   protected readonly searchForErrorsOnly = this._treeState.searchForErrorsOnly;
+  protected readonly searchForErrorCause = this._treeState.searchForErrorCause;
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
@@ -93,5 +94,9 @@ export class AltExecutionTreeWidgetComponent {
 
   protected toggleErrorSearch(): void {
     this._treeState.toggleErrorSearch();
+  }
+
+  protected exitRootCauseSearch(): void {
+    this._treeState.clearErrorLeafs();
   }
 }

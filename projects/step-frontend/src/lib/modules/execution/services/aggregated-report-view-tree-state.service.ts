@@ -8,6 +8,7 @@ import {
   OnDestroy,
   runInInjectionContext,
   signal,
+  untracked,
 } from '@angular/core';
 import {
   AggregatedReport,
@@ -20,7 +21,7 @@ import {
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
@@ -59,11 +60,28 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
   readonly searchCtrl = this._fb.nonNullable.control('');
 
+  private selectedSearchResultItemInternal = signal<string | undefined>(undefined);
+  readonly selectedSearchResult = this.selectedSearchResultItemInternal.asReadonly();
+
+  private errorLeafsRootName = signal<string | undefined>(undefined);
+  private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
+  readonly searchForErrorCause = computed(() => this.errorsLeafsSet() !== undefined);
+
+  private effectLeafsClean = effect(() => {
+    const errorLeafs = this.errorsLeafsSet();
+    if (errorLeafs === undefined) {
+      this.errorLeafsRootName.set(undefined);
+    }
+  });
+
   private searchResultSet$ = this.searchCtrl.valueChanges.pipe(
     startWith(this.searchCtrl.value),
     debounceTime(300),
     map((searchValue) => {
-      if (searchValue === ERROR_STATUSES_SEARCH_VALUE) {
+      const errorLeafsRootName = untracked(() => this.errorLeafsRootName());
+      if (!!errorLeafsRootName && searchValue === errorLeafsRootName) {
+        return untracked(() => this.errorsLeafsSet());
+      } else if (searchValue === ERROR_STATUSES_SEARCH_VALUE) {
         // Search by Status.FAILED will return all possible errors, because
         // the index has been build in such way. It was done for optimization.
         return this.errorsSearchIndex.search(Status.FAILED);
@@ -84,42 +102,32 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     return tree.map((node) => node.id).filter((nodeId) => searchResultSet.has(nodeId));
   });
 
-  private selectedSearchResultItemInternal = signal<string | undefined>(undefined);
-  readonly selectedSearchResult = this.selectedSearchResultItemInternal.asReadonly();
-
   private searchResultChangeEffect = effect(() => {
     const searchResult = this.searchResult();
     const firstItem = searchResult.length > 0 ? searchResult[0] : undefined;
     this.selectedSearchResultItemInternal.set(firstItem);
   });
 
-  private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
-  readonly errorLeafs = computed(() => {
-    const { tree } = this.treeData();
-    const errorLeafsSet = this.errorsLeafsSet();
-    if (!errorLeafsSet?.size) {
-      return undefined;
-    }
-    return tree.map((node) => node.id).filter((nodeId) => errorLeafsSet.has(nodeId));
-  });
-
-  private errorLeafsChangeEffect = effect(() => {
-    const errorLeafs = this.errorLeafs();
-    if (!errorLeafs?.length) {
-      return;
-    }
-    this.selectedSearchResultItemInternal.set(errorLeafs[0]);
-  });
+  //private errorLeafsChangeEffect = effect(() => {
+  //  const errorLeafs = this.errorLeafs();
+  //  if (!errorLeafs?.length) {
+  //    return;
+  //  }
+  //  this.selectedSearchResultItemInternal.set(errorLeafs[0]);
+  //});
 
   private toggleErrorSearchEffect = effect(() => {
+    const errorLeafsRootName = this.errorLeafsRootName();
     const searchErrorsOnly = this.searchForErrorsOnly();
-    if (searchErrorsOnly) {
+    if (errorLeafsRootName) {
+      this.searchCtrl.setValue(errorLeafsRootName);
+      this.searchCtrl.disable();
+    } else if (searchErrorsOnly) {
       this.searchCtrl.setValue(ERROR_STATUSES_SEARCH_VALUE);
       this.searchCtrl.disable();
     } else if (this.searchCtrl.disabled) {
       this.searchCtrl.setValue('');
       this.searchCtrl.enable();
-      this.errorsLeafsSet.set(undefined);
     }
   });
 
@@ -155,15 +163,15 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     return item;
   }
 
-  pickErrorLeafByIndex(index: number): string | undefined {
-    const errorLeafs = this.errorLeafs();
-    if (!errorLeafs) {
-      return undefined;
-    }
-    const item = errorLeafs[index];
-    this.selectedSearchResultItemInternal.set(item);
-    return item;
-  }
+  //pickErrorLeafByIndex(index: number): string | undefined {
+  //  const errorLeafs = this.errorLeafs();
+  //  if (!errorLeafs) {
+  //    return undefined;
+  //  }
+  //  const item = errorLeafs[index];
+  //  this.selectedSearchResultItemInternal.set(item);
+  //  return item;
+  //}
 
   findErrorLeafs(nodeId: string): void {
     const node = this.findNodeById(nodeId);
@@ -179,18 +187,22 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       return;
     }
 
+    const root = this.findNodeById(nodeId);
+    const name = root?.originalArtefact?.attributes?.['name'] ?? '';
     const errorLeafs = this.getSubTree(nodeId)
       .map((node) => this.findNodeById(node.id))
       .filter((node) => !!node && !node.children?.length && this._utils.nodeHasStatuses(node, nodeErrorStatuses));
 
-    console.log('ERROR LEAFS', errorLeafs);
-
+    this.errorLeafsRootName.set(`${name} (Root Cause)`);
     if (!errorLeafs.length) {
-      this.errorsLeafsSet.set(undefined);
-      return;
+      this.errorsLeafsSet.set(new Set([node.id]));
+    } else {
+      this.errorsLeafsSet.set(new Set(errorLeafs.map((x) => x!.id!)));
     }
+  }
 
-    this.errorsLeafsSet.set(new Set(errorLeafs.map((x) => x!.id!)));
+  clearErrorLeafs(): void {
+    this.errorsLeafsSet.set(undefined);
   }
 
   getNodeIdsByArtefactId(artefactId: string): string[] {
