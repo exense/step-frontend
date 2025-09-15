@@ -167,45 +167,46 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
       columns.push({ id: e.id!, label: this.formatExecutionHeader(e.startTime!) });
     });
 
-    //@ts-ignore
-    const rows: HeatMapRow[] = timeseriesItems.map<HeatMapRow>((item) => {
-      const values: Record<string, HeatMapCell> = {};
+    const rows: HeatMapRow[] = timeseriesItems
+      .sort((a, b) => a.key.localeCompare(b.key))
+      .map<HeatMapRow>((item) => {
+        const values: Record<string, HeatMapCell> = {};
 
-      for (const exec of executions) {
-        const execId = exec.id!;
-        const statusCounts = item.statusesByExecutions?.[execId] || {};
-        const statuses = Object.keys(statusCounts);
-        let total = 0;
-        for (const st of statuses) total += statusCounts[st] || 0;
+        for (const exec of executions) {
+          const execId = exec.id!;
+          const statusCounts = item.statusesByExecutions?.[execId] || {};
+          const statuses = Object.keys(statusCounts);
+          let total = 0;
+          for (const st of statuses) total += statusCounts[st] || 0;
 
-        if (!total) {
-          values[execId] = { color: this.FALLBACK_COLOR, timestamp: exec.startTime!, statusesCount: {} };
-          continue;
+          if (!total) {
+            values[execId] = { color: this.FALLBACK_COLOR, timestamp: exec.startTime!, statusesCount: {} };
+            continue;
+          }
+
+          let r = 0,
+            g = 0,
+            b = 0;
+          for (const st of statuses) {
+            const count = statusCounts[st] || 0;
+            if (!count) continue;
+            // @ts-ignore
+            const colorHex = this.STATUS_COLORS[st] || this.STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
+            const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
+            const w = count / total;
+            r += cr * w;
+            g += cg * w;
+            b += cb * w;
+          }
+          values[execId] = {
+            color: HeatmapColorUtils.rgbToHex(r, g, b),
+            timestamp: exec.startTime!,
+            statusesCount: statusCounts,
+          };
         }
 
-        let r = 0,
-          g = 0,
-          b = 0;
-        for (const st of statuses) {
-          const count = statusCounts[st] || 0;
-          if (!count) continue;
-          // @ts-ignore
-          const colorHex = this.STATUS_COLORS[st] || this.STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
-          const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
-          const w = count / total;
-          r += cr * w;
-          g += cg * w;
-          b += cb * w;
-        }
-        values[execId] = {
-          color: HeatmapColorUtils.rgbToHex(r, g, b),
-          timestamp: exec.startTime!,
-          statusesCount: statusCounts,
-        };
-      }
-
-      return { label: item.key, cells: values };
-    });
+        return { label: item.key, cells: values };
+      });
     return {
       columns: columns,
       rows: [
