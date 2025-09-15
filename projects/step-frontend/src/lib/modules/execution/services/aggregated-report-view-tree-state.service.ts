@@ -14,7 +14,6 @@ import {
   AggregatedReport,
   AggregatedReportView,
   ArtefactService,
-  TreeFlatNode,
   TreeStateInitOptions,
   TreeStateService,
 } from '@exense/step-core';
@@ -108,14 +107,6 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.selectedSearchResultItemInternal.set(firstItem);
   });
 
-  //private errorLeafsChangeEffect = effect(() => {
-  //  const errorLeafs = this.errorLeafs();
-  //  if (!errorLeafs?.length) {
-  //    return;
-  //  }
-  //  this.selectedSearchResultItemInternal.set(errorLeafs[0]);
-  //});
-
   private toggleErrorSearchEffect = effect(() => {
     const errorLeafsRootName = this.errorLeafsRootName();
     const searchErrorsOnly = this.searchForErrorsOnly();
@@ -162,16 +153,6 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.selectedSearchResultItemInternal.set(item);
     return item;
   }
-
-  //pickErrorLeafByIndex(index: number): string | undefined {
-  //  const errorLeafs = this.errorLeafs();
-  //  if (!errorLeafs) {
-  //    return undefined;
-  //  }
-  //  const item = errorLeafs[index];
-  //  this.selectedSearchResultItemInternal.set(item);
-  //  return item;
-  //}
 
   findErrorLeafs(nodeId: string): void {
     const node = this.findNodeById(nodeId);

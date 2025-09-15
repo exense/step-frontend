@@ -1,13 +1,4 @@
 <step-form-field>
-  @if (hint(); as hint) {
-    <step-prefix class="icon-prefix" [matTooltip]="hint" matTooltipPosition="below">
-      <step-icon name="search" />
-    </step-prefix>
-  } @else {
-    <step-prefix class="icon-prefix">
-      <step-icon name="search" />
-    </step-prefix>
-  }
   <input
     class="search"
     type="text"
@@ -17,6 +8,8 @@
     (blur)="handleBlur()"
     (keydown.enter)="next()"
     [disabled]="isDisabled()"
+    [matTooltip]="hint()"
+    matTooltipPosition="below"
   />
   @if (tplFieldAddon(); as tplFieldAddon) {
     <step-suffix class="button-suffix">

@@ -45,6 +45,13 @@ step-btn-group {
         display: flex;
       }
     }
+
+    &.shrink {
+      .mat-mdc-button-base,
+      .mat-mdc-outlined-button {
+        padding: 0 0.8rem;
+      }
+    }
   }
 
   &.without-borders {
