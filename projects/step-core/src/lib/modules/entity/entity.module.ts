@@ -59,6 +59,7 @@ export * from './directives/entity-menu-item.directive';
 export * from './injectables/entity-registry';
 export * from './injectables/entity-type-resolver';
 export * from './injectables/entity-dialogs.service';
+export * from './injectables/entity-ref.service';
 export * from './types/entity';
 export * from './types/entity-object';
 export * from './types/entity-meta';

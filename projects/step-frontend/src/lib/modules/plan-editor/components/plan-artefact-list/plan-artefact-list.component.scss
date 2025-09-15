@@ -32,5 +32,8 @@ step-plan-artefact-list {
 
   table > tbody > tr.step-draggable-item {
     cursor: grab;
+    &.step-draggable-item-disabled {
+      cursor: not-allowed;
+    }
   }
 }

@@ -19,6 +19,9 @@ step-plan-otherplan-list {
     }
     tbody > tr.step-draggable-item {
       cursor: grab;
+      &.step-draggable-item-disabled {
+        cursor: not-allowed;
+      }
     }
   }
 

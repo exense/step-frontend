@@ -10,7 +10,11 @@
     <ng-container *stepRowsExtension="let rows">
       <step-drag-drop-container stepDropAreaId="planTree">
         @for (row of rows; track row) {
-          <step-drag-item [elRef]="row.elRef" [data]="row.data | artefactDropInfo" />
+          <step-drag-item
+            [elRef]="row.elRef"
+            [data]="row.data | artefactDropInfo"
+            [dragDisabled]="!('plan-write' | hasRight | async)"
+          />
         }
         <step-drag-preview>
           <step-plan-nodes-drag-preview />
@@ -44,7 +48,12 @@
         <div class="actions">
           <step-icon *ngIf="element.description" [matTooltip]="element.description" name="help-circle"></step-icon>
 
-          <button mat-icon-button matTooltip="Add Control" (click)="addControl(element.label)">
+          <button
+            mat-icon-button
+            matTooltip="Add Control"
+            (click)="addControl(element.label)"
+            [disabled]="!('plan-write' | hasRight | async)"
+          >
             <step-icon name="plus-circle"></step-icon>
           </button>
         </div>
