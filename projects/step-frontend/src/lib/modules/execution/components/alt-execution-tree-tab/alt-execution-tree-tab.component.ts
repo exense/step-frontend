@@ -55,6 +55,8 @@ export class AltExecutionTreeTabComponent implements OnInit {
 
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
   protected readonly searchCtrl = this._treeState.searchCtrl;
+  protected readonly searchForErrorsOnly = this._treeState.searchForErrorsOnly;
+  protected readonly searchForErrorCause = this._treeState.searchForErrorCause;
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
@@ -112,5 +114,13 @@ export class AltExecutionTreeTabComponent implements OnInit {
 
   protected expandAll(): void {
     this._treeState.expandAll();
+  }
+
+  protected toggleErrorSearch(): void {
+    this._treeState.toggleErrorSearch();
+  }
+
+  protected exitRootCauseSearch(): void {
+    this._treeState.clearErrorLeafs();
   }
 }

@@ -23,7 +23,25 @@
       [total]="foundItems()"
       [(searchIndex)]="pageIndex"
       [hint]="_treeSearchDescription"
-    />
+      [disableNavButtonsWithControl]="false"
+    >
+      <ng-container *stepSearchFieldAddon>
+        @if (searchForErrorCause()) {
+          <button type="button" mat-flat-button (click)="exitRootCauseSearch()">
+            <step-icon name="x" />
+          </button>
+        } @else {
+          <button
+            type="button"
+            mat-flat-button
+            [color]="searchForErrorsOnly() ? 'primary' : undefined"
+            (click)="toggleErrorSearch()"
+          >
+            <step-icon name="search-errors" />
+          </button>
+        }
+      </ng-container>
+    </step-search-field>
   </div>
 </section>
 <step-alt-execution-tree
