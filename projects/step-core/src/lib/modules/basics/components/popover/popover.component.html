@@ -1,4 +1,3 @@
-<!-- Trigger element -->
 <div
   class="trigger-wrapper"
   (mouseenter)="onTriggerMouseEnter()"
@@ -8,17 +7,23 @@
   <ng-content></ng-content>
 </div>
 
-<!-- The Popover Content rendered via CDK Overlay -->
 <ng-template #popoverTemplate>
   <div
     class="step-popover"
     [class.no-padding]="noPadding()"
     [class.with-border]="withBorder()"
-    [class.with-border]="withBorder()"
     [ngClass]="popoverClass()"
     (mouseenter)="onPopoverMouseEnter()"
     (mouseleave)="onPopoverMouseLeave()"
   >
+    <div
+      class="step-popover__arrow"
+      [class.top]="arrowSide === 'top'"
+      [class.bottom]="arrowSide === 'bottom'"
+      [class.left]="arrowSide === 'left'"
+      [class.right]="arrowSide === 'right'"
+    ></div>
+
     <ng-content select="step-popover-content"></ng-content>
   </div>
 </ng-template>
