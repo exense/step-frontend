@@ -8,6 +8,7 @@ import {
   DashletRegistryService,
   dialogRoute,
   EntityRegistry,
+  MultipleProjectsService,
   QuickAccessRouteService,
   SimpleOutletComponent,
   StepCoreModule,
@@ -97,6 +98,7 @@ export class FunctionPackagesModule {
           },
           canDeactivate: [
             () => {
+              inject(MultipleProjectsService).cleanupProjectMessage();
               inject(AugmentedKeywordPackagesService).cleanupCache();
               return true;
             },

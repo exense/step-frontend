@@ -8,6 +8,7 @@ import {
   EntityRegistry,
   ExportDialogComponent,
   ImportDialogComponent,
+  MultipleProjectsService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -97,6 +98,7 @@ export class ParameterModule {
               canDeactivate: [
                 () => {
                   inject(AugmentedParametersService).cleanupCache();
+                  inject(MultipleProjectsService).cleanupProjectMessage();
                   return true;
                 },
               ],

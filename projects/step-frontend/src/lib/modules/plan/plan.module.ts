@@ -16,6 +16,7 @@ import {
   SimpleOutletComponent,
   ViewRegistryService,
   PlanContextApiService,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { AltExecutionLaunchDialogComponent, ExecutionModule } from '../execution/execution.module';
 import { StepCommonModule } from '../_common/step-common.module';
@@ -182,6 +183,7 @@ export class PlanModule {
             canDeactivate: [
               () => {
                 inject(AugmentedPlansService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],

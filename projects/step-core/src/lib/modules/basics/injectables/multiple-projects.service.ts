@@ -21,10 +21,12 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
       get currentSwitchStatus() {
         return SwitchStatus.NONE;
       },
+      showProjectMessage: (message?: { icon: string; message: string }) => {},
       availableProjects: () => [],
       currentProject: () => undefined,
       getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
       switchToProject: (project: Project, navigationParams?: { url: string; search: Record<string, any> }) => {},
+      getUrlForProject: (project: Project, navigationParams?: { url: string; search?: Record<string, any> }) => '',
       checkLoadErrors<T extends { attributes?: Record<string, string> }>({
         entityType,
         entityId,
@@ -84,6 +86,10 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
 
   switchToProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): void {
     this.strategy.switchToProject(project, navigationParams);
+  }
+
+  getUrlForProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): string {
+    return this.strategy.getUrlForProject(project, navigationParams);
   }
 
   confirmEntityEditInASeparateProject<T extends { attributes?: Record<string, string> }>(params: {
@@ -148,6 +154,14 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     },
   >(config: CheckLoadErrorsConfig): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
     return this.strategy.checkLoadErrors(config);
+  }
+
+  showProjectMessage(message?: { icon: string; message: string }): void {
+    this.strategy.showProjectMessage(message);
+  }
+
+  cleanupProjectMessage(): void {
+    this.strategy.showProjectMessage(undefined);
   }
 
   useStrategy(strategy: MultipleProjectsStrategy): void {

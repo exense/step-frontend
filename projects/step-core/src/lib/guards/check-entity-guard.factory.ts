@@ -1,5 +1,5 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap, tap } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
 import { CheckLoadErrorsConfig, EntityEditLink, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
@@ -80,11 +80,39 @@ export const checkEntityGuardFactory =
         }
 
         const entityEditLink = runInInjectionContext(_injector, () => config.getEditorUrl(id, route, state));
-        return _multipleProjects.confirmEntityEditInASeparateProject({
-          entity,
-          entityEditLink,
-          entityType: config.entityType,
-        });
+        return _multipleProjects
+          .confirmEntityEditInASeparateProject({
+            entity,
+            entityEditLink,
+            entityType: config.entityType,
+          })
+          .pipe(
+            tap((isContinueOpenInCurrentProject) => {
+              if (!isContinueOpenInCurrentProject) {
+                return;
+              }
+
+              const targetProject = _multipleProjects.getProject(entity);
+
+              let openUrl = '';
+              if (targetProject) {
+                openUrl = _multipleProjects.getUrlForProject(
+                  targetProject,
+                  typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
+                );
+              }
+
+              let message = `Entity of type "${config.entityType}" doesn't belong to current project.`;
+              if (openUrl) {
+                message += ` Open it in the <a href="#${openUrl}">"${targetProject!.name!}"</a> project`;
+              }
+
+              _multipleProjects.showProjectMessage({
+                icon: 'alert-triangle',
+                message,
+              });
+            }),
+          );
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];

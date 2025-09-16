@@ -21,6 +21,7 @@ import {
   NavigatorService,
   preloadScreenDataResolver,
   stepRouteAdditionalConfig,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -107,6 +108,7 @@ export class FunctionModule {
                   canDeactivate: [
                     () => {
                       inject(AugmentedKeywordsService).cleanupCache();
+                      inject(MultipleProjectsService).cleanupProjectMessage();
                       return true;
                     },
                   ],
@@ -192,6 +194,7 @@ export class FunctionModule {
           canDeactivate: [
             () => {
               inject(AugmentedKeywordsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
           ],

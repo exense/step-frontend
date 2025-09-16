@@ -34,6 +34,7 @@ import {
   ReportNode,
   SimpleOutletComponent,
   editScheduledTaskRoute,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -444,6 +445,7 @@ export class ExecutionModule {
             canDeactivate: [
               () => {
                 inject(AugmentedExecutionsService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],
@@ -567,6 +569,7 @@ export class ExecutionModule {
           canDeactivate: [
             () => {
               inject(AugmentedExecutionsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
             () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),

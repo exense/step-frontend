@@ -7,6 +7,7 @@ import {
   dialogRoute,
   EntityBulkOperationsRegistryService,
   EntityRegistry,
+  MultipleProjectsService,
   ResourcesService,
   SimpleOutletComponent,
   ViewRegistryService,
@@ -57,6 +58,7 @@ const registerRoutes = () => {
             canDeactivate: [
               () => {
                 inject(AugmentedResourcesService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],
