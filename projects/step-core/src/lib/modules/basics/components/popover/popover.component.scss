@@ -38,3 +38,14 @@
     padding: 0;
   }
 }
+
+.step-popover {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: opacity 150ms ease-in-out;
+  pointer-events: bounding-box;
+}
