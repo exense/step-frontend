@@ -1,51 +1,28 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-.step-popover-menu {
-  margin-bottom: 1rem;
-  margin-left: 0;
-  min-width: unset !important;
-  width: unset !important;
-  max-width: inherit !important;
-  &.with-border {
-    border: solid 0.1rem var.$gray-150;
-  }
-
-  .mat-mdc-menu-item {
-    user-select: auto;
-    cursor: default;
-    height: auto;
-    white-space: normal;
-    line-height: inherit;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-
-    &.cdk-program-focused:not([disabled]),
-    &:hover:not([disabled]) {
-      background: inherit;
-    }
-    &.no-padding {
-      padding: 0;
-    }
-  }
-
-  .default-theme .cdk-overlay-pane {
-    padding: 0 0 8px 0;
-  }
-
-  .mat-mdc-menu-content {
-    padding: 0;
-  }
+.trigger-wrapper {
+  cursor: pointer;
 }
 
 .step-popover {
   position: absolute;
   z-index: 1000;
   background: white;
-  border: 1px solid #ccc;
   padding: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: opacity 150ms ease-in-out;
   pointer-events: bounding-box;
+  border: none;
+
+  border-radius: 0.8rem;
+  min-height: 3.2rem;
+  box-shadow: var(
+    --mat-menu-container-elevation-shadow,
+    0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12)
+  );
+
+  &.with-border {
+    border: solid 0.1rem var.$gray-150;
+  }
 }

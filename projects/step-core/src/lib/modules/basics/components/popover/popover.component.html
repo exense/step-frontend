@@ -14,11 +14,11 @@
     class="step-popover"
     [class.no-padding]="noPadding()"
     [class.with-border]="withBorder()"
+    [class.with-border]="withBorder()"
     [ngClass]="popoverClass()"
     (mouseenter)="onPopoverMouseEnter()"
     (mouseleave)="onPopoverMouseLeave()"
   >
-    {{ toggled ? 'TOGGLED' : '' }}
     <ng-content select="step-popover-content"></ng-content>
   </div>
 </ng-template>
