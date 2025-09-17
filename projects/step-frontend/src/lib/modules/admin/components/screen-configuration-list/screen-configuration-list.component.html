@@ -1,4 +1,7 @@
 <section class="header">
+  <div class="description">
+    <p>Screens let you define the entities model. Note: the column visibility is managed in each entity’s table.</p>
+  </div>
   <step-form-field class="screen-select">
     <step-select
       stepTestId="screen-select"
@@ -6,6 +9,7 @@
       (ngModelChange)="reloadTableForCurrentChoice($event)"
       [items]="screenChoicesRequest()"
       [useClear]="false"
+      matTooltip="Select model to modify"
     />
   </step-form-field>
   <step-btn-group>

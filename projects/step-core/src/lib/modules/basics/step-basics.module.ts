@@ -76,6 +76,7 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ElementSizeDirective } from './directives/element-size.directive';
 import { StatusIconClassDirective } from './directives/status-icon-class.directive';
+import { DescriptionDirective } from './directives/description.directive';
 import { FilterAddonDirective } from './directives/filter-addon.directive';
 
 @NgModule({
@@ -108,6 +109,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ModalWindowComponent,
     FormFieldComponent,
     LabelDirective,
+    DescriptionDirective,
     PrefixDirective,
     SuffixDirective,
     HintDirective,
@@ -180,6 +182,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ModalWindowComponent,
     FormFieldComponent,
     LabelDirective,
+    DescriptionDirective,
     PrefixDirective,
     SuffixDirective,
     HintDirective,
@@ -289,6 +292,7 @@ export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
 export * from './directives/label.directive';
+export * from './directives/description.directive';
 export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
