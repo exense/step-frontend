@@ -27,7 +27,7 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
-      <step-btn-group>
+      <step-btn-group [stepEntityRef]="element">
         <button
           stepTestId="pause-agent-btn"
           mat-icon-button

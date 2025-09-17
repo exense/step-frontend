@@ -17,6 +17,7 @@ import {
   ViewRegistryService,
   PlanContextApiService,
   MultipleProjectsService,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { AltExecutionLaunchDialogComponent, ExecutionModule } from '../execution/execution.module';
 import { StepCommonModule } from '../_common/step-common.module';
@@ -32,7 +33,7 @@ import { PlanRepoRefPipe } from './pipes/plan-repo-ref.pipe';
 
 @NgModule({
   declarations: [PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
-  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanRepoRefPipe],
+  imports: [StepCommonModule, ExecutionModule, PlanEditorModule, PlanRepoRefPipe, EntityRefDirective],
   exports: [PlanEditorModule, PlanListComponent, PlanEditorComponent, PlanSelectionComponent],
 })
 export class PlanModule {

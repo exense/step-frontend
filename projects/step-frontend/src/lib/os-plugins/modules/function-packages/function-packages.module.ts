@@ -7,6 +7,7 @@ import {
   CustomSearchCellRegistryService,
   DashletRegistryService,
   dialogRoute,
+  EntityRefDirective,
   EntityRegistry,
   MultipleProjectsService,
   QuickAccessRouteService,
@@ -35,7 +36,7 @@ import { PackageUrlPipe } from './pipes/package-url.pipe';
     UploadPackageBtnComponent,
     PackageUrlPipe,
   ],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, EntityRefDirective],
   exports: [
     FunctionPackageConfigurationDialogComponent,
     FunctionPackageLinkComponent,

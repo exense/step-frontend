@@ -107,7 +107,7 @@
         <step-column-settings data-step-testid="keywords-actions-settings" />
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
-        <step-btn-group>
+        <step-btn-group [stepEntityRef]="element">
           <button
             data-step-testid="open-keyword-btn"
             mat-icon-button

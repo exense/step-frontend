@@ -167,7 +167,7 @@
         <step-column-settings />
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
-        <step-btn-group>
+        <step-btn-group [stepEntityRef]="element">
           <a
             data-step-testid="edit-parameter-btn"
             mat-icon-button

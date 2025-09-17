@@ -5,6 +5,7 @@ import {
   CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
+  EntityRefDirective,
   EntityRegistry,
   ExportDialogComponent,
   ImportDialogComponent,
@@ -28,7 +29,7 @@ import { InputTypePipe } from './pipes/input-type.pipe';
 import { InputOptionsPipe } from './pipes/input-options.pipe';
 
 @NgModule({
-  imports: [StepCommonModule],
+  imports: [StepCommonModule, EntityRefDirective],
   exports: [ParameterListComponent, ParameterSelectionComponent, ParametersKeyComponent, ParameterScopeComponent],
   declarations: [
     ParameterListComponent,
