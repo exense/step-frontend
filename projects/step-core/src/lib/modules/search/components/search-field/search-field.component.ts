@@ -69,7 +69,7 @@ export class SearchFieldComponent implements ControlValueAccessor {
   });
 
   private fieldAddon = contentChild(SearchFieldAddonDirective);
-  protected readonly tplFieldAddon = computed(() => this.fieldAddon()?._templateRef);
+  protected readonly fieldAddonTemplate = computed(() => this.fieldAddon()?._templateRef);
 
   constructor(public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;

@@ -11,9 +11,9 @@
     [matTooltip]="hint()"
     matTooltipPosition="below"
   />
-  @if (tplFieldAddon(); as tplFieldAddon) {
+  @if (fieldAddonTemplate(); as fieldAddonTemplate) {
     <step-suffix class="button-suffix">
-      <ng-container *ngTemplateOutlet="tplFieldAddon" />
+      <ng-container *ngTemplateOutlet="fieldAddonTemplate" />
     </step-suffix>
   }
   <step-suffix class="button-suffix">
