@@ -18,6 +18,7 @@ import {
   ReportNode,
   SelectionList,
   StepDataSource,
+  TableIndicatorMode,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -142,4 +143,6 @@ export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestr
     }
     this.executionViewServices.showTestCase(nodeId);
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

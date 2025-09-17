@@ -76,6 +76,8 @@ import { TruncateStringPipe } from './pipes/truncate-string.pipe';
 import { StrategyClickDirective } from './directives/strategy-click.directive';
 import { ElementSizeDirective } from './directives/element-size.directive';
 import { StatusIconClassDirective } from './directives/status-icon-class.directive';
+import { DescriptionDirective } from './directives/description.directive';
+import { FilterAddonDirective } from './directives/filter-addon.directive';
 
 @NgModule({
   imports: [
@@ -91,6 +93,7 @@ import { StatusIconClassDirective } from './directives/status-icon-class.directi
     SelectComponent,
     ElementSizeDirective,
     StatusIconClassDirective,
+    FilterAddonDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -106,6 +109,7 @@ import { StatusIconClassDirective } from './directives/status-icon-class.directi
     ModalWindowComponent,
     FormFieldComponent,
     LabelDirective,
+    DescriptionDirective,
     PrefixDirective,
     SuffixDirective,
     HintDirective,
@@ -178,6 +182,7 @@ import { StatusIconClassDirective } from './directives/status-icon-class.directi
     ModalWindowComponent,
     FormFieldComponent,
     LabelDirective,
+    DescriptionDirective,
     PrefixDirective,
     SuffixDirective,
     HintDirective,
@@ -238,6 +243,7 @@ import { StatusIconClassDirective } from './directives/status-icon-class.directi
     StrategyClickDirective,
     ElementSizeDirective,
     StatusIconClassDirective,
+    FilterAddonDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -286,6 +292,7 @@ export * from './directives/element-ref-map.directive';
 export * from './directives/width-expanders.directive';
 export * from './directives/validate-json.directive';
 export * from './directives/label.directive';
+export * from './directives/description.directive';
 export * from './directives/prefix.directive';
 export * from './directives/suffix.directive';
 export * from './directives/hint.directive';
@@ -387,3 +394,4 @@ export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
 export * from './directives/status-icon-class.directive';
 export * from './injectables/app-host.token';
+export * from './directives/filter-addon.directive';

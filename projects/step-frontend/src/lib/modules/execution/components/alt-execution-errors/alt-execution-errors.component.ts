@@ -1,5 +1,11 @@
 import { Component, inject, input } from '@angular/core';
-import { AceMode, RichEditorDialogService, TableDataSource, TimeSeriesErrorEntry } from '@exense/step-core';
+import {
+  AceMode,
+  RichEditorDialogService,
+  TableDataSource,
+  TableIndicatorMode,
+  TimeSeriesErrorEntry,
+} from '@exense/step-core';
 import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
 
 @Component({
@@ -30,4 +36,6 @@ export class AltExecutionErrorsComponent {
       wrapText: true,
     });
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

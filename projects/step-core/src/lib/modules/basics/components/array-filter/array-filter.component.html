@@ -1,3 +1,8 @@
 <step-form-field [matTooltip]="invalidFilterMessage()">
   <step-select [formControl]="filterControl" [multiple]="true" [items]="items()" [extractor]="extractor()" />
+  @if (tplFilterAddon(); as tplAddon) {
+    <step-suffix class="button-suffix">
+      <ng-container *ngTemplateOutlet="tplAddon" />
+    </step-suffix>
+  }
 </step-form-field>

@@ -14,6 +14,7 @@
       matSort
       #testCaseSort="matSort"
       #testCasesSelection
+      [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
       (matSortChange)="handleTestCaseSort($event)"
       [dataSource]="testCasesDataSource"
     >
@@ -39,7 +40,7 @@
         <td mat-cell *matCellDef="let element">
           <step-current-operations
             *ngIf="element.status === 'RUNNING'"
-            [reportNodeId]="element.id"
+            [reportNodeId]="element.idObjectValue"
             [executionViewServices]="executionViewServices"
             [(showAll)]="showAllOperations"
           >
