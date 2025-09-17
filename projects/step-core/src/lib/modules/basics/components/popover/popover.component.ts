@@ -93,7 +93,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     this.positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this._el)
-      .withPositions(buildPositions(this.xPosition(), this.yPosition(), 8, 6));
+      .withPositions(buildPositions(this.xPosition(), this.yPosition()));
 
     this.overlayRef = this.overlay.create({
       positionStrategy: this.positionStrategy,

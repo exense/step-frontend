@@ -9,20 +9,14 @@
 
 <ng-template #popoverTemplate>
   <div
-    class="step-popover"
+    class="step-popover {{ arrowSide }}"
     [class.no-padding]="noPadding()"
     [class.with-border]="withBorder()"
     [ngClass]="popoverClass()"
     (mouseenter)="onPopoverMouseEnter()"
     (mouseleave)="onPopoverMouseLeave()"
   >
-    <div
-      class="step-popover__arrow"
-      [class.top]="arrowSide === 'top'"
-      [class.bottom]="arrowSide === 'bottom'"
-      [class.left]="arrowSide === 'left'"
-      [class.right]="arrowSide === 'right'"
-    ></div>
+    <div class="step-popover__arrow"></div>
 
     <ng-content select="step-popover-content"></ng-content>
   </div>
