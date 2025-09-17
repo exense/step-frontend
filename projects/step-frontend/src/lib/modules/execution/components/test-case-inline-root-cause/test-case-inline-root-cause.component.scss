@@ -1,0 +1,35 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+p {
+  white-space: nowrap;
+  margin: 0;
+}
+
+.error-count {
+  width: 3.2rem;
+  background: map.get(var.$statuses, 'FAILED');
+  color: var.$white;
+  border-radius: 1.6rem;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  & > div {
+    position: absolute;
+    border-radius: 1.6rem;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.3;
+    background: var.$white;
+  }
+}

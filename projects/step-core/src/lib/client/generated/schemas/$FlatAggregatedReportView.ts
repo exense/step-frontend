@@ -16,6 +16,20 @@ export const $FlatAggregatedReportView = {
         format: 'int64',
       },
     },
+    countByErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
+      },
+    },
+    countByContributingErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
+      },
+    },
     singleInstanceReportNode: {
       type: 'ReportNode',
     },
@@ -29,6 +43,13 @@ export const $FlatAggregatedReportView = {
       type: 'array',
       contains: {
         type: 'Operation',
+      },
+    },
+    countByChildrenErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
       },
     },
   },
