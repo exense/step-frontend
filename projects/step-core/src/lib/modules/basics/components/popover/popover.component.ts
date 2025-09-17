@@ -59,6 +59,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   readonly yPosition = input<'above' | 'below'>('above');
   readonly noPadding = input(false);
   readonly withBorder = input(false);
+  readonly whiteBackground = input(false);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
   readonly toggledEvent = output<boolean>();
   readonly PopoverMode = PopoverMode;
