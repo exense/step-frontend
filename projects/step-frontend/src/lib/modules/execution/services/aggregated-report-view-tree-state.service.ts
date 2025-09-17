@@ -14,13 +14,14 @@ import {
   AggregatedReport,
   AggregatedReportView,
   ArtefactService,
+  DialogsService,
   TreeStateInitOptions,
   TreeStateService,
 } from '@exense/step-core';
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
@@ -34,6 +35,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private _artefactService = inject(ArtefactService);
   private _fb = inject(FormBuilder);
   private _utils = inject(AggregatedReportViewTreeNodeUtilsService);
+  private _dialogs = inject(DialogsService);
 
   private querySearchIndex = new SearchIndex();
   private errorsSearchIndex = new SearchIndex();
@@ -170,15 +172,28 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     const root = this.findNodeById(nodeId);
     const name = root?.originalArtefact?.attributes?.['name'] ?? '';
-    const errorLeafs = this.getSubTree(nodeId)
-      .map((node) => this.findNodeById(node.id))
-      .filter((node) => !!node && !node.children?.length && this._utils.nodeHasStatuses(node, nodeErrorStatuses));
 
-    this.errorLeafsRootName.set(`${name} (Root Cause)`);
-    if (!errorLeafs.length) {
-      this.errorsLeafsSet.set(new Set([node.id]));
+    const errorLeafsSet = new Set<string>();
+    this.getSubTree(nodeId)
+      .map((node) => this.findNodeById(node.id))
+      .forEach((node) => {
+        if (!node || !this._utils.nodeHasStatuses(node, ERROR_STATUSES)) {
+          return;
+        }
+        // if current nodes parent was placed into result in previous iteration
+        // we need to remove it, because it's not a leaf
+        if (node.parentId && errorLeafsSet.has(node.parentId)) {
+          errorLeafsSet.delete(node.parentId);
+        }
+        errorLeafsSet.add(node.id);
+      });
+
+    if (!errorLeafsSet.size) {
+      this.errorsLeafsSet.set(undefined);
+      this._dialogs.showMsg('No root cause could be found in this nodes children.').subscribe();
     } else {
-      this.errorsLeafsSet.set(new Set(errorLeafs.map((x) => x!.id!)));
+      this.errorLeafsRootName.set(`${name} (Root Cause)`);
+      this.errorsLeafsSet.set(errorLeafsSet);
     }
   }
 
