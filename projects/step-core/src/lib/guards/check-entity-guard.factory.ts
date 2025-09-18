@@ -60,59 +60,51 @@ export const checkEntityGuardFactory =
 
     return entity$.pipe(
       _multipleProjects.checkLoadErrors(loadErrorsConfig),
-      switchMap((entityOrUrl) => {
+      map((entityOrUrl) => {
         if (!entityOrUrl) {
-          return of(false);
+          return false;
         }
 
         if (typeof entityOrUrl === 'string') {
-          return of(_router.parseUrl(entityOrUrl));
+          return _router.parseUrl(entityOrUrl);
         }
 
         const entity = entityOrUrl;
 
         if (_auth.hasRight('admin-no-multitenancy')) {
-          return of(true);
+          return true;
         }
 
         if (_multipleProjects.isEntityBelongsToCurrentProject(entity)) {
-          return of(true);
+          return true;
         }
 
         const entityEditLink = runInInjectionContext(_injector, () => config.getEditorUrl(id, route, state));
-        return _multipleProjects
-          .confirmEntityEditInASeparateProject({
-            entity,
-            entityEditLink,
-            entityType: config.entityType,
-          })
-          .pipe(
-            tap((isContinueOpenInCurrentProject) => {
-              if (!isContinueOpenInCurrentProject) {
-                return;
-              }
 
-              const targetProject = _multipleProjects.getProject(entity);
+        if (_multipleProjects.isProjectAvailable(entity)) {
+          const targetProject = _multipleProjects.getProject(entity);
 
-              let openUrl = '';
-              if (targetProject) {
-                openUrl = _multipleProjects.getUrlForProject(
-                  targetProject,
-                  typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
-                );
-              }
+          let openUrl = '';
+          if (targetProject) {
+            openUrl = _multipleProjects.getUrlForProject(
+              targetProject,
+              typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
+            );
+          }
 
-              let message = `This entity doesn't belong to the current project.`;
-              if (openUrl) {
-                message += ` <a href="#${openUrl}">Open it in the "${targetProject!.name!}" project.</a>`;
-              }
+          let message = `This entity doesn't belong to the current project.`;
+          if (openUrl) {
+            message += ` <a href="#${openUrl}">Open it in the "${targetProject!.name!}" project.</a>`;
+          }
 
-              _multipleProjects.showProjectMessage({
-                icon: 'alert-triangle',
-                message,
-              });
-            }),
-          );
+          _multipleProjects.showProjectMessage({
+            icon: 'alert-triangle',
+            message,
+          });
+
+          return true;
+        }
+        return false;
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];

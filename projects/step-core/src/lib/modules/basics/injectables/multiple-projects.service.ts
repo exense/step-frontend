@@ -84,6 +84,20 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     return projectId === currentProjectId;
   }
 
+  isProjectAvailable(projectId: string): boolean;
+  isProjectAvailable<T extends { attributes?: Record<string, string> }>(entity: T): boolean;
+  isProjectAvailable<T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string): boolean {
+    let project: Project | undefined = undefined;
+
+    if (typeof entityOrProjectId === 'string') {
+      project = this.getProjectById(entityOrProjectId);
+    } else {
+      project = this.getProject(entityOrProjectId);
+    }
+
+    return !!project;
+  }
+
   switchToProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): void {
     this.strategy.switchToProject(project, navigationParams);
   }
