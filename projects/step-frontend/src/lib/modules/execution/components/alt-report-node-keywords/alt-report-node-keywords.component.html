@@ -10,7 +10,7 @@
     #table
     [dataSource]="(dataSource$ | async)!"
     [tableParams]="(keywordsParameters$ | async)!"
-    [useSkeletonPlaceholder]="false"
+    [indicatorMode]="TableIndicatorMode.SPINNER"
     class="paddingless no-border hide-header no-highlight special-selection"
   >
     <ng-container matColumnDef="executionTime">

@@ -4,6 +4,7 @@ import {
   ItemsPerPageService,
   ReportNode,
   STORE_ALL,
+  TableIndicatorMode,
   TableMemoryStorageService,
   tablePersistenceConfigProvider,
   TablePersistenceStateService,
@@ -86,4 +87,6 @@ export class AltReportNodeKeywordsComponent extends BaseAltReportNodeTableConten
       }),
     );
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

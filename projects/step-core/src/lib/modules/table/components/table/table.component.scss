@@ -122,7 +122,7 @@ step-table {
       }
     }
 
-    &:not(.in-progress):not(.initial-load) .table-container table > tbody {
+    &:not(.in-progress) .table-container table > tbody {
       & > tr.no-data-row > td,
       & > tr.content-row > td {
         &::after {
