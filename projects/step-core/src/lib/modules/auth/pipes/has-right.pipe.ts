@@ -11,7 +11,6 @@ export class HasRightPipe implements PipeTransform {
   private _injector = inject(Injector);
 
   transform(right: string): Observable<boolean> {
-    console.log('CHECK FROM PIPE', this._injector.get(EntityRefService, null));
     return this._authService.hasRight$(right, this._injector);
   }
 }

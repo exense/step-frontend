@@ -112,7 +112,7 @@
             data-step-testid="open-keyword-btn"
             mat-icon-button
             matTooltip="Open keyword in editor"
-            [disabled]="!('kw-write' | hasRight | async)"
+            [disabled]="!('kw-read' | hasRight | async)"
             (click)="editFunction(element)"
           >
             <step-icon name="edit-2" />
@@ -158,7 +158,7 @@
     <a
       data-step-testid="configure-keyword-btn"
       mat-menu-item
-      [disabled]="!('kw-write' | hasRight | async)"
+      [disabled]="!('kw-read' | hasRight | async)"
       [routerLink]="element | keywordConfigurerUrl"
     >
       <step-icon name="tool" />

@@ -9,6 +9,7 @@ import {
   ViewRegistryService,
   AuthService,
   InfoBannerService,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
@@ -43,7 +44,7 @@ import { AdminSettingsMenuComponent } from './components/admin-settings-menu/adm
     ProjectSettingsMenuComponent,
     AdminSettingsMenuComponent,
   ],
-  imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive],
+  imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive, EntityRefDirective],
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {
@@ -132,8 +133,10 @@ export class AdminModule {
                     path: ':id',
                     dialogComponent: ScreenInputEditDialogComponent,
                     resolve: {
-                      screenInput: (route: ActivatedRouteSnapshot) =>
-                        inject(AugmentedScreenService).getInput(route.params['id']),
+                      screenInput: (route: ActivatedRouteSnapshot) => {
+                        console.log('GET SCREEN INPUT');
+                        return inject(AugmentedScreenService).getInput(route.params['id']);
+                      },
                     },
                   }),
                 ],

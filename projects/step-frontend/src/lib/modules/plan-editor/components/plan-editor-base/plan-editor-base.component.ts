@@ -4,6 +4,7 @@ import {
   EventEmitter,
   forwardRef,
   inject,
+  Injector,
   Input,
   OnChanges,
   OnInit,
@@ -38,6 +39,7 @@ import {
   CommonEntitiesUrlsService,
   ExecutiontTaskParameters,
   PlanContext,
+  AuthService,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
@@ -119,6 +121,8 @@ export class PlanEditorBaseComponent
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _destroyRef = inject(DestroyRef);
+  private _auth = inject(AuthService);
+  private _injector = inject(Injector);
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -149,7 +153,7 @@ export class PlanEditorBaseComponent
       }));
     }),
   );
-  planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
+  protected planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
   protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },
@@ -177,6 +181,11 @@ export class PlanEditorBaseComponent
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(
         (cPlanCtx?.currentValue as PlanContext)?.id,
       );
+      if (this._auth.hasRight('plan-write', this._injector)) {
+        this.planTypeControl.enable();
+      } else {
+        this.planTypeControl.disable();
+      }
     }
   }
 
