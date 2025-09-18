@@ -102,9 +102,9 @@ export const checkEntityGuardFactory =
                 );
               }
 
-              let message = `Entity of type "${config.entityType}" doesn't belong to current project.`;
+              let message = `This entity doesn't belong to the current project.`;
               if (openUrl) {
-                message += ` Open it in the <a href="#${openUrl}">"${targetProject!.name!}"</a> project`;
+                message += ` <a href="#${openUrl}">Open it in the "${targetProject!.name!}" project.</a>`;
               }
 
               _multipleProjects.showProjectMessage({
