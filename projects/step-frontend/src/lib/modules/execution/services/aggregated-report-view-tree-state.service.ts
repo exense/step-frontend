@@ -190,7 +190,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
     if (!errorLeafsSet.size) {
       this.errorsLeafsSet.set(undefined);
-      this._dialogs.showMsg('No root cause could be found in this nodes children.').subscribe();
+      this._dialogs.showErrorMsg('No root cause could be found in this nodes children.').subscribe();
     } else {
       this.errorLeafsRootName.set(`${name} (Root Cause)`);
       this.errorsLeafsSet.set(errorLeafsSet);
