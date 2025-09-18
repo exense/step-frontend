@@ -126,7 +126,7 @@
               mat-icon-button
               matTooltip="Edit package"
               (click)="editPackage(element)"
-              [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+              [disabled]="!(AutomationPackagePermission.READ | hasRight | async)"
             >
               <step-icon name="tool" />
             </button>

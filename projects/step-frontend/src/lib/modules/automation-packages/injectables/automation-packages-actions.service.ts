@@ -1,12 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  AugmentedAutomationPackagesService,
-  AutomationPackage,
-  DialogsService,
-  MultipleProjectsService,
-} from '@exense/step-core';
+import { AugmentedAutomationPackagesService, AutomationPackage, DialogsService } from '@exense/step-core';
 import { map, Observable, of, switchMap } from 'rxjs';
-import { ENTITY_ID, PATH } from '../types/constants';
+import { PATH } from '../types/constants';
 import { Router } from '@angular/router';
 
 const ROOT_URL = `/${PATH}/list`;
@@ -17,7 +12,6 @@ const ROOT_URL = `/${PATH}/list`;
 export class AutomationPackagesActionsService {
   private _dialogs = inject(DialogsService);
   private _api = inject(AugmentedAutomationPackagesService);
-  private _multipleProjects = inject(MultipleProjectsService);
   private _router = inject(Router);
 
   readonly rootUrl = ROOT_URL;
@@ -49,18 +43,7 @@ export class AutomationPackagesActionsService {
 
   editAutomationPackage(automationPackage: AutomationPackage): void {
     const url = `${ROOT_URL}/upload/${automationPackage.id}`;
-    if (this._multipleProjects.isEntityBelongsToCurrentProject(automationPackage)) {
-      this._router.navigateByUrl(url);
-      return;
-    }
-
-    this._multipleProjects
-      .confirmEntityEditInASeparateProject({ entity: automationPackage, entityEditLink: url, entityType: ENTITY_ID })
-      .subscribe((continueEdit) => {
-        if (continueEdit) {
-          this._router.navigateByUrl(url);
-        }
-      });
+    this._router.navigateByUrl(url);
   }
 
   showAutomationPackageEntities(automationPackage: AutomationPackage): void {

@@ -10,6 +10,8 @@ import {
   AuthService,
   InfoBannerService,
   EntityRefDirective,
+  checkEntityGuardFactory,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
@@ -24,6 +26,8 @@ import { first, map } from 'rxjs';
 import { ProjectSettingsMenuComponent } from './components/project-settings-menu/project-settings-menu.component';
 import { MatListItem, MatNavList } from '@angular/material/list';
 import { AdminSettingsMenuComponent } from './components/admin-settings-menu/admin-settings-menu.component';
+
+const REGEXP_EDITOR_URL = /\/settings\/\/screens\/\w+\/editor\/(?:\d|\w){24}/;
 
 @NgModule({
   declarations: [
@@ -132,12 +136,30 @@ export class AdminModule {
                   dialogRoute({
                     path: ':id',
                     dialogComponent: ScreenInputEditDialogComponent,
+                    canActivate: [
+                      checkEntityGuardFactory({
+                        entityType: 'screenInputs',
+                        getEntity: (id) => inject(AugmentedScreenService).getInputCached(id),
+                        getEditorUrl: (id, route) => {
+                          const screenId = route.parent!.parent!.params['screenId'];
+                          return `/settings/screens/${screenId}/editor/${id}`;
+                        },
+                        isMatchEditorUrl: (url) => REGEXP_EDITOR_URL.test(url),
+                        getListUrl: () => '/settings/screens',
+                      }),
+                    ],
                     resolve: {
                       screenInput: (route: ActivatedRouteSnapshot) => {
-                        console.log('GET SCREEN INPUT');
-                        return inject(AugmentedScreenService).getInput(route.params['id']);
+                        return inject(AugmentedScreenService).getInputCached(route.params['id']);
                       },
                     },
+                    canDeactivate: [
+                      () => {
+                        inject(AugmentedScreenService).clearCachedScreenInput();
+                        inject(MultipleProjectsService).currentProject();
+                        return true;
+                      },
+                    ],
                   }),
                 ],
               },
