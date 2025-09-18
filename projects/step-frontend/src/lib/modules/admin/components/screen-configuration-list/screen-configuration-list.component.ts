@@ -2,7 +2,6 @@ import { Component, DestroyRef, forwardRef, inject, OnInit } from '@angular/core
 import {
   TableFetchLocalDataSource,
   ScreenInput,
-  MultipleProjectsService,
   DialogsService,
   DialogParentService,
   AugmentedScreenService,
@@ -30,7 +29,6 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
   private _screenApi = inject(AugmentedScreenService);
   private _dialogs = inject(DialogsService);
   private _renderOptions = inject(RenderOptionsPipe);
-  private _multipleProjectList = inject(MultipleProjectsService);
   private _router = inject(Router);
 
   protected readonly screenChoicesRequest = toSignal(
@@ -97,18 +95,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
 
   editScreen(screen: ScreenInput): void {
     const url = `${this.baseScreenConfigurationUrl}/editor/${screen.id!}`;
-    if (this._multipleProjectList.isEntityBelongsToCurrentProject(screen)) {
-      this._router.navigateByUrl(url);
-      return;
-    }
-
-    this._multipleProjectList
-      .confirmEntityEditInASeparateProject(screen, url, 'screen input')
-      .subscribe((continueEdit) => {
-        if (continueEdit) {
-          this._router.navigateByUrl(url);
-        }
-      });
+    this._router.navigateByUrl(url);
   }
 
   moveScreen(dbId: string, offset: number): void {

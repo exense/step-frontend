@@ -4,6 +4,7 @@ import {
   DashboardView,
   DialogParentService,
   DialogsService,
+  EntityRefDirective,
   entitySelectionStateProvider,
   STORE_ALL,
   tableColumnsConfigProvider,
@@ -17,7 +18,7 @@ import { Params } from '@angular/router';
   selector: 'step-dashboard-list',
   templateUrl: './dashboard-list.component.html',
   styleUrls: ['./dashboard-list.component.scss'],
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, EntityRefDirective],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedDashboardsService.TABLE_ID,

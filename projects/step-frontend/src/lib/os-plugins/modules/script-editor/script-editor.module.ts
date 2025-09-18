@@ -5,6 +5,7 @@ import {
   CommonEntitiesUrlsService,
   FunctionType,
   FunctionTypeRegistryService,
+  MultipleProjectsService,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -57,6 +58,7 @@ export class ScriptEditorModule {
           canDeactivate: [
             canDeactivateFn,
             () => {
+              inject(MultipleProjectsService).cleanupProjectMessage();
               inject(AugmentedKeywordsService).cleanupCache();
               return true;
             },

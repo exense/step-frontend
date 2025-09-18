@@ -12,6 +12,8 @@ export enum SwitchStatus {
   RUNNING,
 }
 
+export type EntityEditLink = string | { url: string; search?: Record<string, any> };
+
 export interface CheckLoadErrorsConfig {
   entityType: string;
   entityId: string;
@@ -25,8 +27,11 @@ export interface MultipleProjectsStrategy {
   currentProject(): Project | undefined;
   availableProjects(): Project[];
   switchToProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): void;
-  getEntityProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;
+  getUrlForProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): string;
+  getProject(projectId: string): Project | undefined;
+  getProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;
   checkLoadErrors<T extends { attributes?: Record<string, string> }>(
     config: CheckLoadErrorsConfig,
   ): UnaryFunction<Observable<T>, Observable<T | string | undefined>>;
+  showProjectMessage(message?: { icon: string; message: string }): void;
 }
