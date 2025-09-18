@@ -1,22 +1,25 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed,
   DestroyRef,
   ElementRef,
+  TemplateRef,
+  ViewChild,
+  ViewEncapsulation,
+  ViewContainerRef,
   forwardRef,
   inject,
   input,
   output,
-  viewChild,
-  ViewEncapsulation,
+  computed,
+  AfterViewInit,
 } from '@angular/core';
-import { TriggerPopoverDirective } from '../../directives/trigger-popover.directive';
-import { MatMenu } from '@angular/material/menu';
+import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { debounceTime, map } from 'rxjs';
+import { debounceTime } from 'rxjs';
+import { ArrowSide, sideFromPair, buildPositions } from './popover-arrow-positioner';
 
 export enum PopoverMode {
   BOTH,
@@ -31,54 +34,153 @@ export abstract class PopoverService {
 
 @Component({
   selector: 'step-popover',
+  standalone: false,
   templateUrl: './popover.component.html',
   styleUrls: ['./popover.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  exportAs: 'StepPopover',
   encapsulation: ViewEncapsulation.None,
-  host: {
-    '(click)': 'handleClick($event)',
-    '(mouseenter)': 'onPopoverMouseEnter()',
-    '(mouseleave)': 'onPopoverMouseLeave()',
-    '(document:click)': 'handleDocumentClick()',
-  },
   providers: [
     {
       provide: PopoverService,
       useExisting: forwardRef(() => PopoverComponent),
     },
   ],
-  standalone: false,
 })
 export class PopoverComponent implements PopoverService, AfterViewInit {
-  private _el = inject<ElementRef<HTMLElement>>(ElementRef);
-  private _scrollDispatcher = inject(ScrollDispatcher);
-  private _destroyRef = inject(DestroyRef);
+  private readonly _el = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _scrollDispatcher = inject(ScrollDispatcher);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly overlay = inject(Overlay);
+  private readonly vcr = inject(ViewContainerRef);
 
-  readonly xPosition = input<MatMenu['xPosition']>('after');
-  readonly yPosition = input<MatMenu['yPosition']>('above');
+  @ViewChild('popoverTemplate', { static: true }) popoverTemplate!: TemplateRef<unknown>;
+
+  readonly xPosition = input<'before' | 'after'>('after');
+  readonly yPosition = input<'above' | 'below'>('above');
   readonly noPadding = input(false);
   readonly withBorder = input(false);
+  readonly whiteBackground = input(false);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
-
   readonly toggledEvent = output<boolean>();
+  readonly PopoverMode = PopoverMode;
 
-  private triggerPopoverDirective = viewChild(TriggerPopoverDirective);
-
-  private toggled = false;
-  private tooltipTimeout?: ReturnType<typeof setTimeout>;
-
+  protected toggled = false; // armed by click only
   private isPopoverFrozen = false;
+  private tooltipTimeout?: ReturnType<typeof setTimeout>;
+  private isMouseOverPopover = false;
+  private isMouseOverTrigger = false;
 
-  protected isMouseOverPopover = false;
+  private overlayRef?: OverlayRef;
+  private positionStrategy?: FlexibleConnectedPositionStrategy;
+
+  arrowSide: ArrowSide = 'top';
+
+  // backdrop classes
+  private readonly passiveBackdropClass = 'step-popover-backdrop--passive';
+  private readonly activeBackdropClass = 'step-popover-backdrop--active';
 
   protected readonly popoverClass = computed(() => {
-    const withBorder = this.withBorder();
-    return withBorder ? 'step-popover-menu with-border' : 'step-popover-menu';
+    const base = 'step-popover-menu';
+    return this.withBorder() ? `${base} with-border` : base;
   });
 
   ngAfterViewInit(): void {
     this.setupClosePopoverOnScroll();
+  }
+
+  private createOverlay(): void {
+    if (this.overlayRef) return;
+
+    this.positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo(this._el)
+      .withPositions(buildPositions(this.xPosition(), this.yPosition()));
+
+    this.overlayRef = this.overlay.create({
+      positionStrategy: this.positionStrategy,
+      hasBackdrop: true,
+      backdropClass: this.passiveBackdropClass,
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+    });
+
+    this.positionStrategy.positionChanges.subscribe(({ connectionPair }) => {
+      this.arrowSide = sideFromPair(connectionPair);
+      this.setBackdropActive(this.toggled); // keep passive/active in sync
+    });
+
+    this.overlayRef.backdropClick().subscribe(() => {
+      if (!this.isPopoverFrozen) this.closePopover();
+    });
+  }
+
+  private openPopover(): void {
+    this.createOverlay();
+    if (this.overlayRef && !this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new TemplatePortal(this.popoverTemplate, this.vcr));
+    }
+    this.overlayRef?.updatePosition();
+    this.setBackdropActive(this.toggled);
+    this.toggledEvent.emit(true);
+  }
+
+  private closePopover(): void {
+    if (this.overlayRef?.hasAttached()) {
+      this.setBackdropActive(false);
+      this.overlayRef.detach();
+    }
+    this.toggled = false;
+    this.toggledEvent.emit(false);
+  }
+
+  private setBackdropActive(active: boolean): void {
+    const backdrop = this.overlayRef?.backdropElement;
+    if (!backdrop) return;
+    backdrop.classList.toggle(this.activeBackdropClass, !!active);
+  }
+
+  protected handleClick(event: MouseEvent): void {
+    if (this.mode() === PopoverMode.HOVER) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    this.toggled = !this.toggled;
+    this.setBackdropActive(this.toggled);
+
+    if (this.toggled && !this.overlayRef?.hasAttached()) {
+      this.openPopover();
+    }
+  }
+
+  protected onTriggerMouseEnter(): void {
+    if (this.mode() === PopoverMode.CLICK || this.toggled) return;
+    this.isMouseOverTrigger = true;
+    this.tooltipTimeout = setTimeout(() => this.openPopover(), 300);
+  }
+
+  protected onTriggerMouseLeave(): void {
+    if (this.mode() === PopoverMode.CLICK) return;
+    this.isMouseOverTrigger = false;
+    clearTimeout(this.tooltipTimeout);
+    this.scheduleCloseIfNotHovered();
+  }
+
+  protected onPopoverMouseEnter(): void {
+    if (this.mode() === PopoverMode.CLICK) return;
+    this.isMouseOverPopover = true;
+  }
+
+  protected onPopoverMouseLeave(): void {
+    if (this.mode() === PopoverMode.CLICK) return;
+    this.isMouseOverPopover = false;
+    this.scheduleCloseIfNotHovered();
+  }
+
+  private scheduleCloseIfNotHovered(): void {
+    setTimeout(() => {
+      if (!this.isMouseOverPopover && !this.isMouseOverTrigger && !this.isPopoverFrozen && !this.toggled) {
+        this.closePopover();
+      }
+    }, 400);
   }
 
   freezePopover(): void {
@@ -93,71 +195,6 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     this._scrollDispatcher
       .ancestorScrolled(this._el)
       .pipe(debounceTime(300), takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => {
-        if (this.toggled) {
-          this.toggled = false;
-          this.toggledEvent.emit(false);
-        }
-        this.closePopover(true);
-      });
-  }
-
-  private togglePopover(): void {
-    if (this.isPopoverFrozen) {
-      return;
-    }
-    this.toggled = !this.toggled;
-    this.toggled ? this.triggerPopoverDirective()?.openMenu?.() : this.triggerPopoverDirective()?.closeMenu?.();
-    this.toggledEvent.emit(this.toggled);
-  }
-
-  protected handleClick($event: MouseEvent): void {
-    if (this.mode() === PopoverMode.HOVER) {
-      return;
-    }
-    $event.preventDefault();
-    $event.stopImmediatePropagation();
-    this.togglePopover();
-  }
-
-  protected handleDocumentClick(): void {
-    if (this.mode() !== PopoverMode.CLICK || !this.toggled) {
-      return;
-    }
-    this.togglePopover();
-  }
-
-  protected onPopoverMouseEnter(): void {
-    if (this.mode() === PopoverMode.CLICK) {
-      return;
-    }
-    this.tooltipTimeout = setTimeout(() => {
-      this.isMouseOverPopover = true;
-      this.triggerPopoverDirective()?.openMenu?.();
-    }, 300);
-  }
-
-  protected onPopoverMouseLeave(): void {
-    if (this.mode() === PopoverMode.CLICK) {
-      return;
-    }
-    clearTimeout(this.tooltipTimeout);
-    this.isMouseOverPopover = false;
-    this.closePopover();
-  }
-
-  private closePopover(force = false): void {
-    if (force) {
-      this.triggerPopoverDirective()?.closeMenu?.();
-      return;
-    }
-
-    if (!this.toggled) {
-      setTimeout(() => {
-        if (!this.isMouseOverPopover) {
-          this.triggerPopoverDirective()?.closeMenu?.();
-        }
-      }, 400);
-    }
+      .subscribe(() => this.closePopover());
   }
 }
