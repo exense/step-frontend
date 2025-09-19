@@ -4,4 +4,5 @@ export enum AttachmentType {
   TEXT,
   VIDEO,
   SKIPPED,
+  TRACE,
 }
