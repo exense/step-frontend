@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, filter, map } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
@@ -21,6 +21,7 @@ import {
   MessagesListDialogData,
   MessagesListDialogResult,
 } from '../components/messages-list-dialog/messages-list-dialog.component';
+import { AlertType } from '../types/alert-type.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -111,11 +112,27 @@ export class DialogsService {
       {
         data: {
           messageHTML,
+          title: 'Error',
         },
       },
     );
 
     // Explicitly map to a boolean to ensure consistency
+    return dialogRef.afterClosed().pipe(map((result) => !!result)) as Observable<boolean>;
+  }
+
+  showMsg(messageHTML: string): Observable<boolean> {
+    const dialogRef = this._matDialog.open<MessageDialogComponent, MessageDialogData, MessageDialogResult>(
+      MessageDialogComponent,
+      {
+        data: {
+          messageHTML,
+          hideOkButton: true,
+          alertType: AlertType.MINIMALIST,
+        },
+      },
+    );
+
     return dialogRef.afterClosed().pipe(map((result) => !!result)) as Observable<boolean>;
   }
 }
