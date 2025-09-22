@@ -1,34 +1,29 @@
 <form #form="ngForm">
-  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
-  <step-dynamic-checkbox
-    *ngIf="context.artefact!.dataSource"
-    label="For write"
-    [(ngModel)]="context.artefact!.dataSource!.forWrite"
-    [disabled]="context.readonly"
-    name="forWrite"
-  >
-  </step-dynamic-checkbox>
-  <step-dynamic-checkbox
-    *ngIf="context.artefact!.dataSource"
-    label="Protect data source"
-    [(ngModel)]="context.artefact!.dataSource!.protect"
-    [disabled]="context.readonly"
-    name="protect"
-  >
-  </step-dynamic-checkbox>
-
+  <step-data-source-configuration [context]="context" (forceProtected)="isProtectionForceDisabled.set($event)" />
+  @if (context.artefact!.dataSource) {
+    <step-dynamic-checkbox
+      label="For write"
+      [(ngModel)]="context.artefact!.dataSource!.forWrite"
+      [disabled]="context.readonly"
+      name="forWrite"
+    />
+    <step-dynamic-checkbox
+      label="Protect data source"
+      [(ngModel)]="context.artefact!.dataSource!.protect"
+      [disabled]="context.readonly || isProtectionForceDisabled()"
+      name="protect"
+    />
+  }
   <step-dynamic-textfield
     label="Iterator handle"
     [(ngModel)]="context.artefact!.item"
     [disabled]="context.readonly"
     name="item"
-  >
-  </step-dynamic-textfield>
+  />
   <step-dynamic-checkbox
     label="Reset at end"
     [(ngModel)]="context.artefact!.resetAtEnd"
     [disabled]="context.readonly"
     name="resetAtEnd"
-  >
-  </step-dynamic-checkbox>
+  />
 </form>

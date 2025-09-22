@@ -1,7 +1,7 @@
-import { Component, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnChanges, output, SimpleChanges, ViewChild } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { NgForm } from '@angular/forms';
-import { map } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, startWith, tap } from 'rxjs';
 import { DataSourceType } from '../../types/data-source-type.enum';
 import {
   AceMode,
@@ -12,6 +12,7 @@ import {
 } from '@exense/step-core';
 import { DataSourceConfigurationArtefact } from '../../types/data-source-configuration-artefact';
 import { DataSourceConf } from '../../types/data-source-conf';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 type DataSourceTypeItem = KeyValue<DataSourceType, string>;
 
@@ -29,6 +30,9 @@ export class DataSourceConfigurationComponent
   implements OnChanges
 {
   private _poolApi = inject(PrivateDataPoolPluginService);
+  private _destroyRef = inject(DestroyRef);
+
+  readonly forceProtected = output<boolean>();
 
   // @ts-ignore
   @Input() override context!: ArtefactContext<DataSourceConfigurationArtefact>;
@@ -65,6 +69,7 @@ export class DataSourceConfigurationComponent
       .pipe(map((conf) => conf as DataSourceConf))
       .subscribe((conf) => {
         this.context.artefact!.dataSource = conf;
+        this.checkProtection();
         this.context.save();
       });
   }
@@ -77,4 +82,49 @@ export class DataSourceConfigurationComponent
   }
 
   protected readonly AceMode = AceMode;
+
+  protected override setupFormChanges() {
+    super.setupFormChanges();
+    const form = this.form?.form;
+    if (!form) {
+      return;
+    }
+    form.valueChanges
+      .pipe(
+        startWith(form.value),
+        map((formValue) => {
+          const password = formValue?.password;
+          return password?.dynamic ? password?.expression : password?.value;
+        }),
+        tap((password) => console.log('password', password)),
+        distinctUntilChanged(),
+        debounceTime(300),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(() => {
+        const isChanged = this.checkProtection();
+        if (isChanged) {
+          this.context.save();
+        }
+      });
+  }
+
+  private checkProtection(): boolean {
+    const dataSource = this.context.artefact?.dataSource;
+    if (!dataSource) {
+      return false;
+    }
+    const isForceProtected =
+      (this.context.artefact?.dataSourceType === DataSourceType.EXCEL && !!dataSource.password.value) ||
+      !!dataSource.password.expression;
+
+    const isChanged = isForceProtected && !dataSource.protect.value && !dataSource.protect.dynamic;
+    if (isChanged) {
+      dataSource.protect = { value: true, dynamic: false };
+    }
+
+    this.forceProtected.emit(isForceProtected);
+
+    return isChanged;
+  }
 }

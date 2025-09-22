@@ -1,5 +1,5 @@
 <form #form="ngForm">
-  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
+  <step-data-source-configuration [context]="context" (forceProtected)="isProtectionForceDisabled.set($event)" />
   <step-dynamic-textfield
     label="Number of threads"
     tooltip="Number of threads to use in order to parallelize the loop"
@@ -18,14 +18,15 @@
     name="maxFailedLoops"
   >
   </step-dynamic-textfield>
-  <step-dynamic-checkbox
-    *ngIf="context.artefact!.dataSource"
-    label="Protect data source"
-    [(ngModel)]="context.artefact!.dataSource!.protect"
-    [disabled]="context.readonly"
-    name="protect"
-  >
-  </step-dynamic-checkbox>
+  @if (context.artefact!.dataSource) {
+    <step-dynamic-checkbox
+      label="Protect data source"
+      [(ngModel)]="context.artefact!.dataSource!.protect"
+      [disabled]="context.readonly || isProtectionForceDisabled()"
+      name="protect"
+    >
+    </step-dynamic-checkbox>
+  }
   <mat-expansion-panel [(expanded)]="showHandles">
     <mat-expansion-panel-header>
       <mat-panel-title>Handles</mat-panel-title>

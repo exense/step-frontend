@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { DataSetArtefact } from '../../types/data-set.artefact';
@@ -13,4 +13,6 @@ import { DataSetArtefact } from '../../types/data-set.artefact';
 export class DataSetComponent extends BaseArtefactComponent<DataSetArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
+
+  protected isProtectionForceDisabled = signal(false);
 }
