@@ -14,12 +14,11 @@ import {
   computed,
   AfterViewInit,
 } from '@angular/core';
-import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy, ConnectedPosition } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs';
-import { ArrowSide, sideFromPair, buildPositions } from './popover-arrow-positioner';
 
 export enum PopoverMode {
   BOTH,
@@ -73,9 +72,6 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   private overlayRef?: OverlayRef;
   private positionStrategy?: FlexibleConnectedPositionStrategy;
 
-  arrowSide: ArrowSide = 'top';
-
-  // backdrop classes
   private readonly passiveBackdropClass = 'step-popover-backdrop--passive';
   private readonly activeBackdropClass = 'step-popover-backdrop--active';
 
@@ -94,18 +90,49 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     this.positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this._el)
-      .withPositions(buildPositions(this.xPosition(), this.yPosition()));
+      .withPositions([
+        {
+          originX: 'center',
+          originY: 'bottom',
+          overlayX: 'start',
+          overlayY: 'top',
+        },
+        {
+          originX: 'center',
+          originY: 'bottom',
+          overlayX: 'end',
+          overlayY: 'top',
+        },
+        {
+          originX: 'center',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'bottom',
+        },
+        {
+          originX: 'center',
+          originY: 'top',
+          overlayX: 'end',
+          overlayY: 'bottom',
+        },
+      ])
+      .withViewportMargin(8)
+      .withPush(false);
+
+    this.positionStrategy.positionChanges.subscribe(({ connectionPair }) => {
+      requestAnimationFrame(() => this.applyStyleFromRenderedPosition(connectionPair));
+    });
 
     this.overlayRef = this.overlay.create({
       positionStrategy: this.positionStrategy,
+      panelClass: ['step-popover-pane'],
       hasBackdrop: true,
       backdropClass: this.passiveBackdropClass,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
     });
 
     this.positionStrategy.positionChanges.subscribe(({ connectionPair }) => {
-      this.arrowSide = sideFromPair(connectionPair);
-      this.setBackdropActive(this.toggled); // keep passive/active in sync
+      this.setBackdropActive(this.toggled);
     });
 
     this.overlayRef.backdropClick().subscribe(() => {
@@ -119,6 +146,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
       this.overlayRef.attach(new TemplatePortal(this.popoverTemplate, this.vcr));
     }
     this.overlayRef?.updatePosition();
+
     this.setBackdropActive(this.toggled);
     this.toggledEvent.emit(true);
   }
@@ -181,6 +209,34 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
         this.closePopover();
       }
     }, 400);
+  }
+
+  private applyStyleFromRenderedPosition(pair: ConnectedPosition) {
+    if (!this.overlayRef?.hasAttached()) return;
+
+    const originRect = this._el.nativeElement.getBoundingClientRect();
+    const overlayRect = this.overlayRef.overlayElement.getBoundingClientRect();
+
+    const originCenterX = originRect.left + originRect.width / 2;
+    const overlayCenterX = overlayRect.left + overlayRect.width / 2;
+
+    const isBelow = pair.overlayY === 'top' && pair.originY === 'bottom';
+
+    const flowsRight = overlayCenterX >= originCenterX;
+
+    let positionClass: 'right' | 'left' | 'bottom-right' | 'bottom-left';
+
+    if (isBelow) {
+      positionClass = flowsRight ? 'right' : 'left';
+    } else {
+      positionClass = flowsRight ? 'bottom-right' : 'bottom-left';
+    }
+
+    const panel = this.overlayRef.overlayElement.querySelector('.step-popover') as HTMLElement | null;
+    if (panel) {
+      panel.classList.remove('right', 'left', 'bottom-right', 'bottom-left');
+      panel.classList.add(positionClass);
+    }
   }
 
   freezePopover(): void {
