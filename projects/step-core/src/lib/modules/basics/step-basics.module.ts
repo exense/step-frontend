@@ -29,7 +29,6 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
-import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
@@ -124,7 +123,6 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     SingleItemArrayFilterComponent,
     ProgressBarComponent,
     UploadContainerComponent,
-    ProjectSwitchDialogComponent,
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
@@ -197,7 +195,6 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     UploadContainerComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
-    ProjectSwitchDialogComponent,
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
@@ -258,7 +255,6 @@ export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
-export * from './components/project-switch-dialog/project-switch-dialog.component';
 export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/errors-list/errors-list.component';
