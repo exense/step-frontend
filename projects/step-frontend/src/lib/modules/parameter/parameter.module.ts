@@ -83,6 +83,8 @@ export class ParameterModule {
                   entityType: 'parameter',
                   getEntity: (id) => inject(AugmentedParametersService).getParameterByIdCached(id),
                   getEditorUrl: (id) => inject(CommonEntitiesUrlsService).parameterEditorUrl(id),
+                  getListUrl: () => inject(CommonEntitiesUrlsService).parametersListUrl(),
+                  isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchParameterEditorUrl(url),
                 }),
               ],
               resolve: {

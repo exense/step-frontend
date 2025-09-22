@@ -2,9 +2,11 @@ import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit } from '@a
 import {
   AlertType,
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
+  BulkSelectionType,
   ControllerService,
   Dashlet,
+  entitySelectionStateProvider,
+  EntitySelectionStateUpdatable,
   Execution,
   ExecutionCloseHandleService,
   ExecutionSummaryDto,
@@ -13,12 +15,13 @@ import {
   IS_SMALL_SCREEN,
   Operation,
   PrivateViewPluginService,
-  RegistrationStrategy,
+  ReloadableDirective,
   ReportNode,
   ScheduledTaskTemporaryStorageService,
-  selectionCollectionProvider,
-  SelectionCollector,
+  SelectionList,
   SystemService,
+  TableDataSource,
+  TableLocalDataSource,
   TreeNodeUtilsService,
   TreeStateService,
   ViewRegistryService,
@@ -40,7 +43,8 @@ import { DOCUMENT } from '@angular/common';
 import { ExecutionTabManagerService } from '../../services/execution-tab-manager.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiveExecution, ActiveExecutionsService } from '../../services/active-executions.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { ReportNodeExt } from '../../shared/report-node-ext';
 
 const R_ERROR_KEY = /\\\\u([\d\w]{4})/gi;
 
@@ -81,15 +85,10 @@ interface RefreshParams {
     },
     SingleExecutionPanelsService,
     ExecutionTreePagingService,
-    ...selectionCollectionProvider(
-      {
-        selectionKeyProperty: 'artefactID',
-        registrationStrategy: RegistrationStrategy.MANUAL,
-      },
-      AutoDeselectStrategy.KEEP_SELECTION,
-    ),
+    ...entitySelectionStateProvider('artefactID'),
     TreeStateService,
   ],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ExecutionProgressComponent
@@ -103,7 +102,8 @@ export class ExecutionProgressComponent
   private _viewRegistry = inject(ViewRegistryService);
   private _executionTreeState = inject<TreeStateService<ReportNode, ReportTreeNode>>(TreeStateService);
   public _executionPanels = inject(SingleExecutionPanelsService);
-  public _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _testCasesSelectionState =
+    inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
   private _treeUtils = inject(ReportTreeNodeUtilsService);
   private _activeExecutions = inject(ActiveExecutionsService);
   private _executionTabManager = inject(ExecutionTabManagerService);
@@ -125,6 +125,8 @@ export class ExecutionProgressComponent
 
   execution?: Execution;
   testCases?: ReportNode[];
+  selectedTestCases?: ReportNode[];
+  testCasesDataSource?: TableDataSource<ReportNode>;
   keywordSearch?: string;
 
   readonly _executionMessages = inject(ViewRegistryService).getDashlets('execution/messages');
@@ -139,7 +141,17 @@ export class ExecutionProgressComponent
 
   showAutoRefreshButton = false;
 
-  readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this._testCasesSelection.selected$.pipe(
+  private selectionList?: SelectionList<string, ReportNode>;
+
+  private selected$ = toObservable(this._testCasesSelectionState.selectedKeys).pipe(
+    map((selectedKeys) => Array.from(selectedKeys)),
+  );
+
+  setupTableSelectionList(list?: SelectionList<string, ReportNode>): void {
+    this.selectionList = list;
+  }
+
+  readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(
     map((ids) => {
       const testCases = this.testCases || [];
       if (ids.length === testCases.length) {
@@ -183,9 +195,13 @@ export class ExecutionProgressComponent
         }),
         filter((node) => !!node),
         tap((node) => {
-          this._testCasesSelection.clear();
           if (node!.resolvedArtefact) {
-            this._testCasesSelection.selectById(node!.resolvedArtefact.id!);
+            this._testCasesSelectionState.updateSelection({
+              keys: [node!.resolvedArtefact.id!],
+              selectionType: BulkSelectionType.INDIVIDUAL,
+            });
+          } else {
+            this._testCasesSelectionState.updateSelection({ keys: [], selectionType: BulkSelectionType.NONE });
           }
         }),
         tap((node) => {
@@ -209,8 +225,7 @@ export class ExecutionProgressComponent
   }
 
   drillDownTestCase(id: string): void {
-    this._testCasesSelection.clear();
-    this._testCasesSelection.selectById(id);
+    this._testCasesSelectionState.updateSelection({ keys: [id], selectionType: BulkSelectionType.INDIVIDUAL });
     this._executionPanels.enablePanel(Panels.STEPS, true);
     this._executionPanels.setShowPanel(Panels.STEPS, true);
     this.scrollToPanel(Panels.STEPS);
@@ -320,9 +335,10 @@ export class ExecutionProgressComponent
 
   private determineDefaultSelection(testCases?: ReportNode[]): void {
     testCases = testCases ?? this.testCases;
-    if (!testCases || !this.execution) {
+    if (!testCases || testCases.length === 0 || !this.execution) {
       return;
     }
+
     const selectedTestCases = testCases.filter((value) => {
       const artefactFilter = this.execution?.executionParameters?.artefactFilter;
       if (!artefactFilter) {
@@ -337,7 +353,34 @@ export class ExecutionProgressComponent
           return true;
       }
     });
-    this._testCasesSelection.select(...selectedTestCases);
+
+    this.testCases = this.mergeReportNodes(this.testCases || [], testCases || []);
+    this.selectedTestCases = this.mergeReportNodes(this.selectedTestCases || [], selectedTestCases || []);
+
+    setTimeout(() => {
+      if (this.selectedTestCases?.length === this.testCases?.length) {
+        this.selectionList?.selectAll?.();
+      } else {
+        const ids = !!this.selectedTestCases ? (this.selectedTestCases.map((item) => item.artefactID) as string[]) : [];
+        this.selectionList?.selectIds?.(ids);
+      }
+    }, 250);
+  }
+
+  private mergeReportNodes(testcases1: ReportNode[], testcases2: ReportNode[]): ReportNode[] {
+    const existingIds = new Set(testcases1.map((node) => node.artefactID));
+    const merged = [...testcases1];
+
+    for (const node of testcases2) {
+      if (!node.artefactID || !existingIds.has(node.artefactID)) {
+        merged.push(node);
+        if (node.artefactID) {
+          existingIds.add(node.artefactID);
+        }
+      }
+    }
+
+    return merged;
   }
 
   private prepareRefreshParams(params?: RefreshParams): RefreshParams {
@@ -408,9 +451,10 @@ export class ExecutionProgressComponent
         const oldTestCasesIds = (this.testCases ?? []).map((testCase) => testCase.id);
         const newTestCases = reportNodes.filter((testCase) => !oldTestCasesIds.includes(testCase.id));
         this.testCases = reportNodes;
-        this._testCasesSelection.registerPossibleSelectionManually(this.testCases);
+        this.setupTestCasesDataSource(reportNodes);
         if (updateSelection !== UpdateSelection.NONE) {
-          this.determineDefaultSelection(updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes);
+          const testCases = updateSelection === UpdateSelection.ONLY_NEW ? newTestCases : reportNodes;
+          this.determineDefaultSelection(testCases);
         }
       });
   }
@@ -458,6 +502,31 @@ export class ExecutionProgressComponent
     const element = this._document.querySelector(`#${panelId}`);
     if (element) {
       element.scrollIntoView();
+    }
+  }
+
+  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
+    testCases = (testCases ?? []).map(
+      (item) =>
+        ({
+          ...item,
+          idObjectValue: new String(item.id),
+        }) as ReportNodeExt,
+    );
+    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
+      testCases,
+      TableLocalDataSource.configBuilder<ReportNode>()
+        .addSearchStringRegexPredicate('status', (item) => item.status)
+        .build(),
+    );
+    if (testCases.length > 0 && testCases.length === this._testCasesSelectionState.selectedSize()) {
+      const isAllIncluded = testCases.reduce(
+        (result, testCase) => result && this._testCasesSelectionState.isSelected(testCase),
+        true,
+      );
+      if (isAllIncluded) {
+        this.selectionList?.selectAll?.();
+      }
     }
   }
 }

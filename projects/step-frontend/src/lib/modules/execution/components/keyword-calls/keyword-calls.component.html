@@ -27,6 +27,8 @@
   matSort
   matSortActive="executionTime"
   matSortDirection="desc"
+  noSelectionState
+  [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
   [dataSource]="_leafReportsDataSource"
   [matSortDisableClear]="true"
   [tableParams]="(keywordParameters$ | async)!"

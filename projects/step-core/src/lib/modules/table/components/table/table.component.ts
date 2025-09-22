@@ -12,6 +12,7 @@ import {
   inject,
   input,
   Input,
+  linkedSignal,
   OnChanges,
   OnDestroy,
   OnInit,
@@ -21,6 +22,7 @@ import {
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
+  untracked,
   viewChild,
   ViewChild,
   viewChildren,
@@ -48,12 +50,12 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableRequestData, TableParameters, StepDataSource } from '../../../../client/step-client-module';
+import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
 import { ItemsPerPageDefaultService } from '../../services/items-per-page-default.service';
-import { HasFilter } from '../../../entities-selection/services/has-filter';
+import { HasFilter } from '../../../entities-selection/injectables/has-filter';
 import { FilterCondition } from '../../shared/filter-condition';
 import { SearchColumn } from '../../shared/search-column.interface';
 import { TablePersistenceStateService } from '../../services/table-persistence-state.service';
@@ -71,6 +73,11 @@ import { GlobalReloadService, isValidRegex } from '../../../basics/step-basics.m
 import { ItemsPerPageService } from '../../services/items-per-page.service';
 import { RowsExtensionDirective } from '../../directives/rows-extension.directive';
 import { RowDirective } from '../../directives/row.directive';
+import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
+import { TableSelectionList } from '../../shared/selection/table-selection-list';
+import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
+import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
+import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -79,11 +86,21 @@ interface SearchData {
   resetPagination: boolean;
 }
 
+enum EmptyState {
+  INITIAL,
+  NO_DATA,
+  NO_MATCHING_RECORDS,
+}
+
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.in-progress]': 'applyInProgressClass()',
+    '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
+  },
   providers: [
     {
       provide: TableSearch,
@@ -123,6 +140,11 @@ interface SearchData {
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
+    TableSelectionListFactoryService,
+    {
+      provide: SelectionList,
+      useExisting: forwardRef(() => TableComponent),
+    },
   ],
   standalone: false,
 })
@@ -137,7 +159,8 @@ export class TableComponent<T>
     TableReload,
     HasFilter,
     TableHighlightItemContainer,
-    TableColumnsDictionaryService
+    TableColumnsDictionaryService,
+    SelectionList<unknown, T>
 {
   private _globalReloadService = inject(GlobalReloadService);
   private _tableState = inject(TablePersistenceStateService);
@@ -145,6 +168,8 @@ export class TableComponent<T>
   private _destroyRef = inject(DestroyRef);
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
+  private _selectionState = inject(EntitySelectionStateUpdatable, { optional: true });
+  private _tableSelectionListFactory = inject(TableSelectionListFactoryService);
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
@@ -162,9 +187,61 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly inProgress = input(false);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
+
+  readonly inProgressExternal = input(false, { alias: 'inProgress' });
+  private inProgressDataSource = signal(false);
+  private total = signal<number | null>(null);
+  private isTableReadyToRenderColumns = signal(false);
+
+  protected readonly EmptyState = EmptyState;
+  protected readonly emptyState = computed(() => {
+    const total = this.total();
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    if (total === null || !isColumnsInitialized) {
+      return EmptyState.INITIAL;
+    }
+    if (total === 0) {
+      return EmptyState.NO_DATA;
+    }
+
+    return EmptyState.NO_MATCHING_RECORDS;
+  });
+
+  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
+  });
+
+  protected readonly useSpinner = computed(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode === TableIndicatorMode.SPINNER;
+  });
+
+  private effectResetSkeletonPlaceholderOnInitialLoad = effect(() => {
+    const indicatorMode = this.indicatorMode();
+    const emptyState = this.emptyState();
+    if (indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD && emptyState !== EmptyState.INITIAL) {
+      setTimeout(() => {
+        this.useSkeletonPlaceholder.set(false);
+      }, 500);
+    }
+  });
+
+  protected readonly inProgress = computed(() => {
+    const inProgressExternal = this.inProgressExternal();
+    const inProgressDataSource = this.inProgressDataSource();
+    return inProgressExternal || inProgressDataSource;
+  });
+
+  protected readonly applyInProgressClass = computed(() => {
+    const inProgress = this.inProgress();
+    const emptyState = this.emptyState();
+    return inProgress || emptyState === EmptyState.INITIAL;
+  });
 
   protected tableDataSource?: TableDataSource<T>;
+  private tableSelectionList?: TableSelectionList<T, TableDataSource<T>>;
 
   readonly pageSizeInputDisabled = input(false);
 
@@ -214,6 +291,12 @@ export class TableComponent<T>
   private contentColumns = contentChildren(ColumnDirective);
 
   private viewColumns = viewChildren(ColumnDirective);
+
+  private columnsPlaceholder = viewChild(ColumnsPlaceholdersComponent);
+  private columnsPlaceholderIds = computed(() => {
+    const cols = this.columnsPlaceholder()?.colDef?.() ?? [];
+    return cols.map((col) => col.name);
+  });
 
   private columnsUpdateTrigger = signal(0);
 
@@ -266,8 +349,16 @@ export class TableComponent<T>
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
 
   readonly displayColumns = computed(() => {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
+    const isTableReady = this.isTableReadyToRenderColumns();
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
     const visibleColumnsByInput = this.visibleColumns();
+
+    if (!isColumnsInitialized) {
+      return isTableReady ? columnPlaceholderIds : [];
+    }
+
     if (!visibleColumnsByInput) {
       return visibleColumnsByConfig;
     }
@@ -320,6 +411,7 @@ export class TableComponent<T>
       return hasFilter;
     }),
   );
+  readonly hasFilter = toSignal(this.hasFilter$, { initialValue: false });
 
   highlightedItem?: unknown;
 
@@ -327,6 +419,9 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
+    this.inProgressDataSource.set(false);
+    this.tableSelectionList?.destroy?.();
+    this.tableSelectionList = undefined;
   }
 
   private setupDatasource(dataSource?: DataSource<T>): void {
@@ -346,6 +441,10 @@ export class TableComponent<T>
     }
 
     this.tableDataSource = tableDataSource;
+
+    if (this._selectionState) {
+      this.tableSelectionList = this._tableSelectionListFactory.create(tableDataSource);
+    }
 
     if (!this.page) {
       this.initRequired = true;
@@ -380,8 +479,16 @@ export class TableComponent<T>
         tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params });
       });
 
-    tableDataSource.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
+    tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
+    });
+
+    tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+      this.inProgressDataSource.set(inProgress);
+    });
+
+    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.total.set(total);
     });
   }
 
@@ -585,6 +692,14 @@ export class TableComponent<T>
   }
 
   private configureColumns(): void {
+    const columnsPlaceholder = this.columnsPlaceholder()?.colDef?.() ?? [];
+    columnsPlaceholder.forEach((col) => {
+      if (!this.usedColumns.has(col.name)) {
+        this.usedColumns.add(col.name);
+        this.table!.addColumnDef(col);
+      }
+    });
+
     const allCollDef = this.allCollDef();
     allCollDef.forEach((col) => {
       if (!this.usedColumns.has(col.name) && !col.name.startsWith('search-')) {
@@ -592,6 +707,7 @@ export class TableComponent<T>
         this.table!.addColumnDef(col);
       }
     });
+    this.isTableReadyToRenderColumns.set(true);
   }
 
   private configureSearchColumns(): void {
@@ -623,4 +739,44 @@ export class TableComponent<T>
     }
     this.tableDataSource.exportAsCSV(fields, this.tableParams());
   }
+
+  /** Selection list methods begin **/
+
+  clearSelection(): void {
+    this.tableSelectionList?.clearSelection?.();
+  }
+
+  deselect(item: T): void {
+    this.tableSelectionList?.deselect?.(item);
+  }
+
+  select(item: T): void {
+    this.tableSelectionList?.select?.(item);
+  }
+
+  selectAll(): void {
+    this.tableSelectionList?.selectAll?.();
+  }
+
+  selectFiltered(): void {
+    this.tableSelectionList?.selectFiltered?.();
+  }
+
+  selectVisible(): void {
+    this.tableSelectionList?.selectVisible?.();
+  }
+
+  toggleSelection(item: T): void {
+    this.tableSelectionList?.toggleSelection?.(item);
+  }
+
+  selectIds<K>(keys: K[]): void {
+    this.tableSelectionList?.selectIds?.(keys);
+  }
+
+  checkCurrentSelectionState<K>(predicate: (item: T) => boolean): Map<K, boolean> | undefined {
+    return this.tableSelectionList?.checkCurrentSelectionState?.(predicate) as Map<K, boolean> | undefined;
+  }
+
+  /** Selection list methods end **/
 }

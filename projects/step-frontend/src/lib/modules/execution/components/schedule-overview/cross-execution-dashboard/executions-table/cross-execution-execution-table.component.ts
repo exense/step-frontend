@@ -1,26 +1,14 @@
-import {
-  AfterViewInit,
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedExecutionsService,
-  AutoDeselectStrategy,
   DateFormat,
   DateRange,
+  entitySelectionStateProvider,
   Execution,
   ExecutiontTaskParameters,
   FilterConditionFactoryService,
   REQUEST_FILTERS_INTERCEPTORS,
   SearchValue,
-  selectionCollectionProvider,
   StepDataSource,
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
@@ -46,7 +34,7 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
       storeSort: false,
       storeSearch: false,
     }),
-    ...selectionCollectionProvider<string, ExecutiontTaskParameters>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, ExecutiontTaskParameters>('id'),
     {
       provide: REQUEST_FILTERS_INTERCEPTORS,
       useClass: ExecutionListFilterInterceptorService,

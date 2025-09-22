@@ -14,6 +14,7 @@ import { ReportNodeStatusComponent } from './components/report-node-status/repor
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
+import { ClampFadeDirective } from './directives/clamp-fade.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -26,7 +27,7 @@ import {
   CustomRegistriesModule,
 } from './modules/custom-registeries/custom-registries.module';
 import { DynamicFormsModule } from './modules/dynamic-forms/dynamic-forms.module';
-import { EntitiesSelectionModule } from './modules/entities-selection/entities-selection.module';
+import { ENTITIES_SELECTION_EXPORTS } from './modules/entities-selection';
 import { EntityModule } from './modules/entity/entity.module';
 import { StepMaterialModule } from './modules/step-material/step-material.module';
 import { TableModule } from './modules/table/table.module';
@@ -111,7 +112,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     TableModule,
     StepBasicsModule,
     EntityModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
     StepGeneratedClientModule,
     CustomRegistriesModule,
     AngularSplitModule,
@@ -145,19 +146,21 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
     SEARCH_EXPORTS,
+    ClampFadeDirective,
   ],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CapsLockDirective,
+    ClampFadeDirective,
     StepMaterialModule,
     JsonViewerModule,
     MatchingAuthenticator,
     TableModule,
     StepBasicsModule,
     EntityModule,
-    EntitiesSelectionModule,
+    ENTITIES_SELECTION_EXPORTS,
     StepGeneratedClientModule,
     CustomRegistriesModule,
     TooltipImmediateCloseDirective,
@@ -264,6 +267,7 @@ export * from './components/user-settings-button/user-settings-button.component'
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './directives/caps-lock.directive';
+export * from './directives/clamp-fade.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -277,7 +281,7 @@ export * from './modules/basics/step-basics.module';
 export * from './modules/custom-registeries/custom-registries.module';
 export * from './modules/dynamic-forms/dynamic-forms.module';
 export * from './modules/json-forms';
-export * from './modules/entities-selection/entities-selection.module';
+export * from './modules/entities-selection';
 export * from './modules/entity/entity.module';
 export * from './modules/step-icons/step-icons.module';
 export * from './modules/step-material/step-material.module';

@@ -1,21 +1,16 @@
-<step-bulk-selection-di
-  [(selectionType)]="selectionType"
-  (selectionTypeChange)="selectionTypeChange.emit(selectionType)"
-  [showLabel]="false"
->
-</step-bulk-selection-di>
+<step-bulk-selection [showLabel]="false" />
 <div>
-  <button
-    *ngFor="let operation of entityOperations!; trackBy: trackByOperation"
-    type="button"
-    mat-icon-button
-    [class]="operation.type"
-    (click)="invoke(operation)"
-    [matTooltip]="operation.label!"
-    [disabled]="(operation.permission && !(operation.permission | hasRight | async)) || (isOperationsDisabled$ | async)"
-  >
-    <step-icon [name]="operation.icon"></step-icon>
-  </button>
+  @for (operation of entityOperations(); track operation.type) {
+    <button
+      type="button"
+      mat-icon-button
+      [class]="operation.type"
+      (click)="invoke(operation)"
+      [matTooltip]="operation.label!"
+      [disabled]="(operation.permission && !(operation.permission | hasRight | async)) || isOperationsDisabled()"
+    >
+      <step-icon [name]="operation.icon" />
+    </button>
+  }
 </div>
-<step-bulk-selection-label [(selectionType)]="selectionType" [selectionCollector]="_selectionCollector!">
-</step-bulk-selection-label>
+<step-bulk-selection-label />

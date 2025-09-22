@@ -1,9 +1,7 @@
 import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedKeywordsService,
-  AutoDeselectStrategy,
   Keyword,
-  selectionCollectionProvider,
   tablePersistenceConfigProvider,
   STORE_ALL,
   FunctionActionsService,
@@ -13,6 +11,7 @@ import {
   IsUsedByDialogService,
   CustomCellRegistryService,
   tableColumnsConfigProvider,
+  entitySelectionStateProvider,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
 
@@ -27,7 +26,7 @@ import { FunctionConfigurationApiImplService } from '../../injectables/function-
       entityScreenDefaultVisibleFields: ['attributes.name'],
     }),
     tablePersistenceConfigProvider('functionList', STORE_ALL),
-    ...selectionCollectionProvider<string, Keyword>('id', AutoDeselectStrategy.DESELECT_ON_UNREGISTER),
+    ...entitySelectionStateProvider<string, Keyword>('id'),
     {
       provide: FunctionConfigurationApiService,
       useClass: FunctionConfigurationApiImplService,
