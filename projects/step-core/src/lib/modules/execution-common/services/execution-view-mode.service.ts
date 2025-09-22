@@ -42,6 +42,8 @@ export class ExecutionViewModeService {
   isNewExecutionAvailable(execution: Execution): boolean {
     return (
       execution.status !== 'ENDED' ||
+      execution.result === 'VETOED' ||
+      execution.result === 'IMPORT_ERROR' ||
       (execution.resolvedPlanRootNodeId !== null && execution.customFields?.['hasReportNodeTimeSeries'] === true)
     );
   }
