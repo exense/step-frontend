@@ -6,6 +6,9 @@ export const $AttachmentMeta = {
     name: {
       type: 'string',
     },
+    mimeType: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
