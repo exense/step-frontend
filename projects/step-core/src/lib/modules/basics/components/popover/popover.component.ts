@@ -38,6 +38,9 @@ export abstract class PopoverService {
   styleUrls: ['./popover.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '(document:click)': 'handleDocumentClick()',
+  },
   providers: [
     {
       provide: PopoverService,
@@ -63,7 +66,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   readonly toggledEvent = output<boolean>();
   readonly PopoverMode = PopoverMode;
 
-  protected toggled = false; // armed by click only
+  protected toggled = false;
   private isPopoverFrozen = false;
   private tooltipTimeout?: ReturnType<typeof setTimeout>;
   private isMouseOverPopover = false;
@@ -177,6 +180,14 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     if (this.toggled && !this.overlayRef?.hasAttached()) {
       this.openPopover();
     }
+  }
+
+  // This is used to close step-popover from inside components by triggering a document click
+  protected handleDocumentClick(): void {
+    if (this.mode() !== PopoverMode.CLICK || !this.toggled) {
+      return;
+    }
+    this.closePopover();
   }
 
   protected onTriggerMouseEnter(): void {
