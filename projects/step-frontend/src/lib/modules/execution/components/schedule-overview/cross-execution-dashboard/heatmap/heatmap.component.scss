@@ -36,6 +36,8 @@
   }
 
   .heatmap-cell {
+    cursor: pointer;
+
     &:hover {
       filter: brightness(110%);
     }

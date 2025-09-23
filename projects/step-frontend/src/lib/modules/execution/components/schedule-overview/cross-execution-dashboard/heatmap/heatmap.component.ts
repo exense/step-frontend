@@ -48,12 +48,19 @@ export class HeatmapComponent {
   scrollEffect = effect(() => {
     const rows = this.rows();
     const element = this.container()?.nativeElement!;
-    setTimeout(() => {
+    if (rows.length > 0) {
+      setTimeout(() => {
+        element?.scrollTo({
+          left: element.scrollWidth,
+          behavior: 'auto',
+        });
+      }, 200);
+    } else {
       element?.scrollTo({
-        left: element.scrollWidth,
+        left: 0,
         behavior: 'auto',
       });
-    }, 200);
+    }
   });
 
   searchChange = effect(() => {

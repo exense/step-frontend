@@ -1,9 +1,23 @@
-<div class="chart-actions-container">
-  <step-tabs [tabs]="tabs" [shrink]="true" [activeTabId]="heatmapType()" (activeTabIdChange)="switchType($event)" />
-</div>
+<step-alt-report-widget
+  class="flex-grow-1"
+  [title]="heatmapType() === 'keywords' ? 'Keyword call statuses over time' : 'Test case statuses over time'"
+>
+  <step-alt-report-widget-content class="widget-content">
+    @if (defaultDateRange(); as dateRange) {
+      <div class="chart-actions-container">
+        <step-tabs
+          [tabs]="tabs"
+          [shrink]="true"
+          [activeTabId]="heatmapType()"
+          (activeTabIdChange)="switchType($event)"
+        />
+      </div>
 
-<div class="table-container">
-  @if (heatMapData$ | async; as heatmapData) {
-    <step-heatmap [rows]="heatmapData.rows" [columns]="heatmapData.columns" [legendColors]="legendColors" />
-  }
-</div>
+      <div class="table-container">
+        @if (heatMapData$ | async; as heatmapData) {
+          <step-heatmap [rows]="heatmapData.rows" [columns]="heatmapData.columns" [legendColors]="legendColors" />
+        }
+      </div>
+    }
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

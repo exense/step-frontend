@@ -46,19 +46,22 @@
               tabindex="0"
               [attr.aria-label]="(col.label || col.id) + ' for ' + row.label"
               (click)="onCellClick(row, col)"
-              (keydown.enter)="onCellClick(row, col)"
+              matTooltip="Click to display details"
+              matTooltipShowDelay="200"
+              [matMenuTriggerFor]="executionsMenu"
             >
-              <step-popover [noPadding]="true">
-                <div style="width: 100%; height: 100%; visibility: hidden">.</div>
-                <step-popover-content>
-                  <step-status-distribution-tooltip
-                    [link]="'/executions/' + col.id"
-                    linkLabel="See execution"
-                    [statuses]="row.cells![col.id].statusesCount"
-                    [timestamp]="row.cells?.[col.id]?.timestamp"
-                  />
-                </step-popover-content>
-              </step-popover>
+              <mat-menu #executionsMenu>
+                <ng-template matMenuContent>
+                  <div (click)="$event.stopPropagation()">
+                    <step-status-distribution-tooltip
+                      [link]="'/executions/' + col.id"
+                      linkLabel="See execution"
+                      [statuses]="row.cells![col.id].statusesCount"
+                      [timestamp]="row.cells?.[col.id]?.timestamp"
+                    />
+                  </div>
+                </ng-template>
+              </mat-menu>
             </td>
           }
         </tr>

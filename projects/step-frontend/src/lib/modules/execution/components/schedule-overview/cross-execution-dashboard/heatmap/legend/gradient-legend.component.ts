@@ -19,7 +19,8 @@ export class GradientLegendComponent {
 
   computedData = computed(() => {
     const gradientStops = this.gradientStops();
-    const clean = (gradientStops || []).filter((s) => !!s && !!s.hex && !!s.label);
+    console.log(gradientStops);
+    const clean = (gradientStops || []).filter((color) => !!color && !!color.hex && !!color.label);
 
     if (clean.length === 0) {
       return [];
@@ -36,7 +37,7 @@ export class GradientLegendComponent {
 
   gradientCss = computed(() => {
     const data = this.computedData();
-    if (data.length > 0) {
+    if (data.length === 0) {
       return 'transparent';
     } else {
       return `linear-gradient(to right, ${data.map((s) => `${s.color} ${s.posPct}%`).join(', ')})`;
