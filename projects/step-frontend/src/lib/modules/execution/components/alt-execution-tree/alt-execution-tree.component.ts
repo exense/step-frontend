@@ -44,10 +44,10 @@ export class AltExecutionTreeComponent implements TreeActionsService {
     this._urlParamsService.patchUrlParams(range, undefined, true);
   });
 
-  readonly showSpinnerForEmptyTree = input(false);
+  readonly showSpinnerWhileTreeInitialize = input(false);
 
   protected readonly showSpinner = computed(() => {
-    const showSpinnerForEmptyTree = this.showSpinnerForEmptyTree();
+    const showSpinnerForEmptyTree = this.showSpinnerWhileTreeInitialize();
     const isInitialized = this._treeSate.isInitialized();
     return showSpinnerForEmptyTree && !isInitialized;
   });
