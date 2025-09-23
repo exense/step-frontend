@@ -91,10 +91,10 @@ export const checkEntityGuardFactory =
               typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
             );
           }
-
-          let message = `This entity doesn't belong to the current project.`;
+          const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
+          let message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
           if (openUrl) {
-            message += ` <a href="#${openUrl}">Open it in the "${targetProject!.name!}" project.</a>`;
+            message += ` <a href="#${openUrl}">Open in "${targetProject!.name!}".</a>`;
           }
 
           _multipleProjects.showProjectMessage({
