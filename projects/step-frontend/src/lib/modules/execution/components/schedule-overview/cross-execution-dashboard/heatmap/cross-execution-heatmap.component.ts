@@ -69,8 +69,8 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     FAILED: '#ff595b',
     INTERRUPTED: '#e1cc01',
     PASSED: '#01a990',
-    SKIPPED: COLORS.NORUN,
-    NORUN: COLORS.NORUN,
+    SKIPPED: '#a0a0a0',
+    NORUN: '#a0a0a0',
     UNKNOWN: '#cccccc',
   };
 
@@ -136,17 +136,34 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
             allStatuses.add(status);
 
-            const item = (itemsMap[itemKey] ??= { key: itemKey, statusesByExecutions: {} });
-            const execMap = (item.statusesByExecutions[execId] ??= {});
-            execMap[status] = (execMap[status] ?? 0) + count;
+            let item = itemsMap[itemKey];
+            if (item === null || item === undefined) {
+              item = { key: itemKey, statusesByExecutions: {} };
+              itemsMap[itemKey] = item;
+            }
+
+            let statusesCount = item.statusesByExecutions[execId];
+            if (statusesCount === null || statusesCount === undefined) {
+              statusesCount = {};
+              item.statusesByExecutions[execId] = statusesCount;
+            }
+
+            statusesCount[status] = (statusesCount[status] ?? 0) + count;
           });
 
           const statusesArr = Array.from(allStatuses);
           Object.values(itemsMap).forEach((item) => {
             allExecutionIds.forEach((execId) => {
-              const execMap = (item.statusesByExecutions[execId] ??= {});
+              let execMap = item.statusesByExecutions[execId];
+              if (execMap === null || execMap === undefined) {
+                execMap = {};
+                item.statusesByExecutions[execId] = execMap;
+              }
+
               statusesArr.forEach((st) => {
-                if (execMap[st] == null) execMap[st] = 0;
+                if (execMap[st] === null || execMap[st] === undefined) {
+                  execMap[st] = 0;
+                }
               });
             });
           });

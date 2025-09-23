@@ -10,6 +10,7 @@ import {
   effect,
   viewChild,
   ElementRef,
+  untracked,
 } from '@angular/core';
 import { Execution, PaginatorComponent } from '@exense/step-core';
 import { PageEvent } from '@angular/material/paginator';
@@ -61,6 +62,7 @@ export class HeatmapComponent {
         behavior: 'auto',
       });
     }
+    untracked(() => this.paginator()?.firstPage());
   });
 
   searchChange = effect(() => {

@@ -28,9 +28,10 @@
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    overflow: hidden;
 
     .percentage {
-      width: 4rem;
+      min-width: 6rem;
       text-align: right;
       padding-right: 1rem;
     }

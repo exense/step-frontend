@@ -7,6 +7,18 @@ interface StatusDistribution {
   percentage: number;
 }
 
+const STATUS_COLORS: Record<string, string> = {
+  VETOED: '#000000',
+  TECHNICAL_ERROR: '#000000',
+  IMPORT_ERROR: '#000000',
+  FAILED: '#ff595b',
+  INTERRUPTED: '#e1cc01',
+  PASSED: '#01a990',
+  SKIPPED: '#a0a0a0',
+  NORUN: '#a0a0a0',
+  UNKNOWN: '#a0a0a0',
+};
+
 @Component({
   selector: 'step-status-distribution-tooltip',
   templateUrl: './status-distribution-tooltip.component.html',
@@ -21,10 +33,6 @@ export class StatusDistributionTooltipComponent {
   link = input<string>();
   linkLabel = input<string>();
 
-  constructor() {
-    console.log('IT WAS CONSTUCTED');
-  }
-
   distribution: Signal<StatusDistribution[]> = computed(() => {
     let totalCount = 0;
     const statuses = this.statuses();
@@ -32,11 +40,13 @@ export class StatusDistributionTooltipComponent {
     Object.keys(statuses).forEach((status) => {
       totalCount += statuses[status];
     });
-    return Object.keys(statuses).map((status) => {
-      const count = statuses[status];
-      const percentage = (count / totalCount) * 100;
-      return { status, count, percentage };
-    });
+    return Object.keys(statuses)
+      .map((status) => {
+        const count = statuses[status];
+        const percentage = (count / totalCount) * 100;
+        return { status, count, percentage };
+      })
+      .sort((a, b) => b.percentage - a.percentage);
   });
 
   navigateToLink() {

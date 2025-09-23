@@ -15,6 +15,10 @@ export class StatusDistributionBadgeComponent {
   count = input.required<number>();
   percentage = input.required<number>();
 
+  formattedPercentage = computed(() => {
+    return this.percentage().toFixed(2);
+  });
+
   protected readonly color = computed(() => {
     const status = this.status();
     return (status ? this._statusColors[status as Status] : undefined) ?? this._statusColors['TECHNICAL_ERROR'];
