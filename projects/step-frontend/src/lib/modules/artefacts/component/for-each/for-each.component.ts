@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { ArtefactFormChangeHelperService, BaseArtefactComponent } from '@exense/step-core';
 import { NgForm } from '@angular/forms';
 import { ForEachArtefact } from '../../types/for-each.artefact';
@@ -15,4 +15,6 @@ export class ForEachComponent extends BaseArtefactComponent<ForEachArtefact> {
 
   @ViewChild('form')
   protected form!: NgForm;
+
+  protected isProtectionForceDisabled = signal(false);
 }
