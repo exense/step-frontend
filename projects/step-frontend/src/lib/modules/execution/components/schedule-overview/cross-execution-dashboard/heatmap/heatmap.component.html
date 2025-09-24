@@ -66,11 +66,13 @@
           }
         </tr>
       }
+      @for (row of fillerRows(); track $index) {
+        <tr style="height: 30px">
+          <td [colSpan]="columns().length + 1">&nbsp;</td>
+        </tr>
+      }
     </tbody>
   </table>
-  @if (filteredRows().length === 0) {
-    <div class="no-data">No data</div>
-  }
 </div>
 
 <div class="footer-section">

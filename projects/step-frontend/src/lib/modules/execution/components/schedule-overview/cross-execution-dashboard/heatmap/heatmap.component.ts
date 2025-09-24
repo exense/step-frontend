@@ -75,6 +75,16 @@ export class HeatmapComponent {
     return q ? list.filter((r) => (r.label ?? '').toLowerCase().includes(q)) : list;
   });
 
+  fillerRows = computed(() => {
+    let pageSize = this.pageSize();
+    let filteredRows = this.filteredRows();
+    if (filteredRows.length < pageSize) {
+      return Array(pageSize - filteredRows.length);
+    } else {
+      return [];
+    }
+  });
+
   filteredAndPaginatedRows = computed(() => {
     const filtered = this.filteredRows();
     const rawPage = this.page();

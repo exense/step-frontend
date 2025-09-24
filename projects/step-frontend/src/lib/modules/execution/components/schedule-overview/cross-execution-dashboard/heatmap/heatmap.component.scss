@@ -1,6 +1,9 @@
 .heatmap-table {
   font-size: 1.2rem;
 
+  tbody {
+  }
+
   td {
     margin: 0;
   }
@@ -21,6 +24,26 @@
       border-radius: 6px;
       border: 1px solid #ccc;
       padding: 4px 8px;
+    }
+
+    &.sticky-col {
+      background-color: #fff;
+    }
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+
+    .sticky-col {
+      background-color: #f9f9f9;
+    }
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #fff;
+
+    .sticky-col {
+      background-color: #fff;
     }
   }
 
@@ -58,7 +81,6 @@
 .sticky-col {
   position: sticky;
   left: 0;
-  background: #fff;
   z-index: 3; /* above sticky header cells in same stack */
 }
 
@@ -69,11 +91,6 @@
   justify-content: space-between;
   align-items: center;
   gap: 8rem;
-}
-
-.no-data {
-  text-align: center;
-  margin-top: 1rem;
 }
 
 .heatmap-col-header {
