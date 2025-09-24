@@ -46,6 +46,8 @@ const registerRoutes = () => {
                 entityType: 'resource',
                 getEntity: (id) => inject(AugmentedResourcesService).getResource(id),
                 getEditorUrl: (id) => inject(CommonEntitiesUrlsService).resourceEditorUrl(id),
+                getListUrl: () => inject(CommonEntitiesUrlsService).resourceListUrl(),
+                isMatchEditorUrl: (url) => inject(CommonEntitiesUrlsService).isMatchResourceEditorUrl(url),
               }),
             ],
             resolve: {

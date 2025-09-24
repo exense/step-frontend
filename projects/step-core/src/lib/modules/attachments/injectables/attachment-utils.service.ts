@@ -1,7 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentMeta, AugmentedResourcesService, StreamingAttachmentMeta } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
-import { IMAGE_TYPES, ImageType, TEXT_TYPES, TextType, VIDEO_TYPES, VideoType } from '../../basics/step-basics.module';
+import {
+  IMAGE_TYPES,
+  ImageType,
+  SpecialMimeType,
+  TEXT_TYPES,
+  TextType,
+  VIDEO_TYPES,
+  VideoType,
+} from '../../basics/step-basics.module';
 import { AugmentedStreamingResourcesService } from '../../../client/augmented/services/augmented-streaming-resources.service';
 
 const SKIPPED_ATTACHMENT_META = 'step.attachments.SkippedAttachmentMeta';
@@ -24,6 +32,10 @@ export class AttachmentUtilsService {
 
     if (attachment.type === SKIPPED_ATTACHMENT_META) {
       return AttachmentType.SKIPPED;
+    }
+
+    if (attachment.mimeType === SpecialMimeType.PLAYWRIGHT_TRACE) {
+      return AttachmentType.TRACE;
     }
 
     const isStreaming = attachment.type === STREAMING_ATTACHMENT_META;
@@ -65,6 +77,8 @@ export class AttachmentUtilsService {
         return 'film';
       case AttachmentType.SKIPPED:
         return 'alert-circle';
+      case AttachmentType.TRACE:
+        return 'playwright';
       case AttachmentType.STREAMING_BINARY:
         return 'binary-file';
       default:

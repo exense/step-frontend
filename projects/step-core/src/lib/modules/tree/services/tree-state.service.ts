@@ -688,6 +688,25 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     return this.expandedNodeIdsInternal();
   }
 
+  findSubtreeRootsAmongIds(nodeIds: string[]): string[] {
+    const ids = new Set(nodeIds);
+    const result: string[] = [];
+    const rootNode = this.rootNode();
+    if (!rootNode) {
+      return [];
+    }
+    const nodesToVisit = [rootNode];
+    while (nodesToVisit.length > 0) {
+      const current = nodesToVisit.shift()!;
+      if (ids.has(current.id)) {
+        result.push(current.id);
+        continue;
+      }
+      nodesToVisit.push(...((current.children ?? []) as N[]));
+    }
+    return result;
+  }
+
   ngOnDestroy(): void {
     this.treeUpdateInternal$.complete();
   }

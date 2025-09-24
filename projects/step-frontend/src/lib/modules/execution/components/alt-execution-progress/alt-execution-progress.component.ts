@@ -29,13 +29,11 @@ import {
 } from 'rxjs';
 import {
   AggregatedReportView,
-  AggregatedReport,
   AlertType,
   AugmentedControllerService,
   AugmentedExecutionsService,
   AugmentedPlansService,
   AugmentedTimeSeriesService,
-  AutoDeselectStrategy,
   DateUtilsService,
   Execution,
   ExecutionCloseHandleService,
@@ -250,6 +248,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
   protected isResolvedParametersVisible = signal(false);
+  protected isAgentsVisible = signal(false);
 
   readonly displayStatus$ = this.execution$.pipe(
     map((execution) => (execution?.status === 'ENDED' ? execution?.result : execution?.status)),

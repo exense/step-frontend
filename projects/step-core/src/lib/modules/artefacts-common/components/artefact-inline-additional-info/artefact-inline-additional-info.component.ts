@@ -3,10 +3,11 @@ import { InlineArtefactContext } from '../../types/artefact-types';
 import { AbstractArtefact } from '../../../../client/step-client-module';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { ATTACHMENTS_EXPORTS } from '../../../attachments';
+import { ClampFadeDirective } from '../../../../directives/clamp-fade.directive';
 
 @Component({
   selector: 'step-artefact-inline-additional-info',
-  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS],
+  imports: [StepBasicsModule, ATTACHMENTS_EXPORTS, ClampFadeDirective],
   templateUrl: './artefact-inline-additional-info.component.html',
   styleUrl: './artefact-inline-additional-info.component.scss',
   encapsulation: ViewEncapsulation.None,

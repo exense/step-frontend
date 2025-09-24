@@ -1,5 +1,5 @@
 import { Component, EventEmitter, inject, Output, ViewEncapsulation } from '@angular/core';
-import { ArtefactService } from '@exense/step-core';
+import { ArtefactService, TableIndicatorMode } from '@exense/step-core';
 
 @Component({
   selector: 'step-plan-artefact-list',
@@ -16,4 +16,6 @@ export class PlanArtefactListComponent {
   addControl(id: string): void {
     this.onSelection.emit(id);
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

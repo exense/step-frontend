@@ -13,6 +13,18 @@
         <step-icon name="copy" />
       </button>
     }
+    @if (attachmentType === AttachmentType.TRACE) {
+      <button
+        type="button"
+        tabindex="-1"
+        mat-icon-button
+        matTooltip="Open trace in the separate tab"
+        matTooltipPosition="below"
+        (click)="openTraceViewerInSeparateTab()"
+      >
+        <step-icon name="external-link" />
+      </button>
+    }
     @if (attachmentType === AttachmentType.STREAMING_TEXT) {
       <section class="streaming-info">
         @if (isStreamingInProgress() || areLinesRequestInProgress()) {
@@ -78,6 +90,11 @@
         <div class="media-container">
           <p class="max-width-600">{{ $any(_data).reason }}</p>
         </div>
+      }
+      @case (AttachmentType.TRACE) {
+        @if (_data | attachmentUrl; as traceUrl) {
+          <step-trace-viewer #traceViewer [reportUrl]="traceUrl" />
+        }
       }
       @default {}
     }

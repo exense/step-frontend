@@ -5,10 +5,6 @@ step-attachment-dialog {
     padding-bottom: 0 !important;
   }
 
-  step-modal-window {
-    width: 80vw;
-  }
-
   div[step-modal-window-title] {
     display: flex;
     gap: 4rem;
@@ -93,5 +89,23 @@ step-attachment-dialog {
     line-height: 1;
     font-weight: normal;
     user-select: none;
+  }
+}
+
+.mat-mdc-dialog-panel.trace {
+  step-attachment-dialog {
+    step-modal-window {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    div.dialog-content {
+      flex: 1;
+      max-height: unset;
+      div[step-modal-window-body] {
+        height: 99%;
+      }
+    }
   }
 }

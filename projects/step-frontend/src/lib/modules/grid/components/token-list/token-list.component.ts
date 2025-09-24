@@ -6,6 +6,7 @@ import {
   TokenWrapper,
   tablePersistenceConfigProvider,
   STORE_ALL,
+  TableIndicatorMode,
 } from '@exense/step-core';
 import { FlatObjectStringFormatPipe } from '../../pipes/flat-object-format.pipe';
 
@@ -62,4 +63,6 @@ export class TokenListComponent {
       this.loadTable();
     });
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

@@ -1,9 +1,20 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
+input[type='text'] {
+  min-width: 15rem;
+}
+
+@mixin status-button($color) {
+  input[type='text'] {
+    background-color: $color;
+    color: var.$white;
+  }
+}
+
 .status-saved {
-  color: var.$green-650;
+  @include status-button(var.$green-650);
 }
 
 .status-pending-changes {
-  color: var.$orange;
+  @include status-button(var.$orange);
 }

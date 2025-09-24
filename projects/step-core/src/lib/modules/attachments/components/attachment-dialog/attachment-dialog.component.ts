@@ -21,12 +21,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { from, map } from 'rxjs';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 const DEFAULT_STREAMING_ATTACHMENT_LINE_CHUNK_SIZE = 10_000;
 
 @Component({
   selector: 'step-attachment-dialog',
-  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent, StreamingTextComponent],
+  imports: [
+    StepBasicsModule,
+    AttachmentUrlPipe,
+    NgOptimizedImage,
+    RichEditorComponent,
+    StreamingTextComponent,
+    TraceViewerComponent,
+  ],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +52,7 @@ export class AttachmentDialogComponent implements OnInit {
   private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
+  private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
   private streamingText = viewChild('streamingText', { read: StreamingTextComponent });
   private streamingAttachmentLineChunkSize$ = this._userService.getPreferences().pipe(
@@ -97,6 +106,10 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected toggleScrollDownOnRefresh(): void {
     this.scrollDownOnRefresh.update((value) => !value);
+  }
+
+  protected openTraceViewerInSeparateTab(): void {
+    this.traceViewer()?.openInSeparateTab?.();
   }
 
   private initializeContent(): void {

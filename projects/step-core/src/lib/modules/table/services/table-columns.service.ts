@@ -100,8 +100,10 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   );
 
   private hasChangesInternal = signal(false);
-
   readonly hasChanges = this.hasChangesInternal.asReadonly();
+
+  private isInitializedInternal = signal(false);
+  readonly isInitialized = this.isInitializedInternal.asReadonly();
 
   private originalSettings?: TableSettings;
   private settings = signal<TableSettings | undefined>(undefined);
@@ -124,6 +126,7 @@ export class TableColumnsService implements Reloadable, OnDestroy {
   initialize(): void {
     this.remoteSettings$.subscribe((settings) => {
       this.hasChangesInternal.set(false);
+      this.isInitializedInternal.set(true);
       this.originalSettings = settings;
       this.settings.set(settings);
     });

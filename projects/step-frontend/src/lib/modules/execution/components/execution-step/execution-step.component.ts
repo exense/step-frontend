@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   inject,
@@ -7,15 +8,17 @@ import {
   OnDestroy,
   Output,
   SimpleChanges,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import {
-  BulkSelectionType,
+  EntitySelectionStateUpdatable,
   Execution,
   ExecutionSummaryDto,
   ReportNode,
-  SelectionCollector,
-  TableLocalDataSource,
+  SelectionList,
+  StepDataSource,
+  TableIndicatorMode,
 } from '@exense/step-core';
 import { ExecutionViewServices } from '../../../operations/types/execution-view-services';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -25,6 +28,8 @@ import { Panels } from '../../shared/panels.enum';
 import { SingleExecutionPanelsService } from '../../services/single-execution-panels.service';
 import { MatSort, Sort } from '@angular/material/sort';
 import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { ExecutionStateService } from '../../services/execution-state.service';
 
 @Component({
   selector: 'step-execution-step',
@@ -32,16 +37,17 @@ import { REPORT_NODE_STATUS } from '../../../_common/shared/status.enum';
   styleUrls: ['./execution-step.component.scss'],
   standalone: false,
 })
-export class ExecutionStepComponent implements OnChanges, OnDestroy {
+export class ExecutionStepComponent implements AfterViewInit, OnChanges, OnDestroy {
+  protected readonly _state = inject(ExecutionStateService);
   private panelService = inject(SingleExecutionPanelsService);
-  private _testCasesSelection = inject<SelectionCollector<string, ReportNode>>(SelectionCollector);
+  private _testCaseSelectionState =
+    inject<EntitySelectionStateUpdatable<string, ReportNode>>(EntitySelectionStateUpdatable);
 
   private selectionTerminator$?: Subject<void>;
+  private selected$ = toObservable(this._testCaseSelectionState.selectedKeys).pipe(map((keys) => Array.from(keys)));
 
   protected keywordParameters$?: Observable<KeywordParameters>;
   readonly statusOptions = REPORT_NODE_STATUS;
-
-  selectionType: BulkSelectionType = BulkSelectionType.NONE;
 
   @Input() executionId: string = '';
   @Input() testCasesProgress?: ExecutionSummaryDto;
@@ -50,7 +56,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
   @Input() executionViewServices?: ExecutionViewServices;
   @Input() keywordSearch?: string;
 
-  @Input() testCases?: ReportNode[];
+  @Input() testCasesDataSource?: StepDataSource<ReportNode>;
 
   @Output() drilldownTestCase = new EventEmitter<string>();
 
@@ -62,7 +68,9 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
   readonly Panels = Panels;
 
-  protected testCasesDataSource?: TableLocalDataSource<ReportNode>;
+  private testCasesSelection = viewChild('testCasesSelection', {
+    read: SelectionList<ReportNode, StepDataSource<ReportNode>>,
+  });
 
   handleTestCaseSort(sort: Sort): void {
     if (sort.active === 'name' && sort.direction === '') {
@@ -89,16 +97,15 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     if (cExecutionId?.currentValue !== cExecutionId?.previousValue || cExecutionId?.firstChange) {
       this.setupSelectionChanges(cExecutionId?.currentValue);
     }
+  }
 
-    const cTestCases = changes['testCases'];
-    if (cTestCases?.previousValue !== cTestCases?.currentValue || cTestCases?.firstChange) {
-      this.setupTestCasesDataSource(cTestCases?.currentValue);
-      this.determineSelectionType(cTestCases?.currentValue);
-    }
+  ngAfterViewInit(): void {
+    this._state.setupTableSelectionList(this.testCasesSelection()!);
   }
 
   ngOnDestroy(): void {
     this.terminateSelectionChanges();
+    this._state.setupTableSelectionList(undefined);
   }
 
   private terminateSelectionChanges(): void {
@@ -113,7 +120,7 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
 
     this.selectionTerminator$ = new Subject<void>();
 
-    this.keywordParameters$ = this._testCasesSelection!.selected$.pipe(
+    this.keywordParameters$ = this.selected$.pipe(
       map((testcases) => ({
         type: TYPE_LEAF_REPORT_NODES_TABLE_PARAMS,
         eid: executionId,
@@ -137,26 +144,5 @@ export class ExecutionStepComponent implements OnChanges, OnDestroy {
     this.executionViewServices.showTestCase(nodeId);
   }
 
-  private setupTestCasesDataSource(testCases?: ReportNode[]): void {
-    this.testCasesDataSource = new TableLocalDataSource<ReportNode>(
-      testCases ?? [],
-      TableLocalDataSource.configBuilder<ReportNode>()
-        .addSearchStringRegexPredicate('status', (item) => item.status)
-        .build(),
-    );
-  }
-
-  private determineSelectionType(testCases?: ReportNode[]): void {
-    testCases = testCases ?? this.testCases ?? [];
-    const selected = this._testCasesSelection.selected ?? [];
-    if (testCases.length > 0 && testCases.length === selected.length) {
-      const isAllIncluded = testCases.reduce(
-        (result, testCase) => result && selected!.includes(testCase.artefactID!),
-        true,
-      );
-      if (isAllIncluded) {
-        this.selectionType = BulkSelectionType.ALL;
-      }
-    }
-  }
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }
