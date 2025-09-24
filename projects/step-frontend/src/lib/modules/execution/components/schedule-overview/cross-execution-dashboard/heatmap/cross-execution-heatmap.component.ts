@@ -201,15 +201,14 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
             continue;
           }
 
-          let r = 0,
-            g = 0,
-            b = 0;
+          let r = 0;
+          let g = 0;
+          let b = 0;
           for (const st of statuses) {
             const count = statusCounts[st] || 0;
             if (!count) continue;
-            // @ts-ignore
             const colorHex =
-              this.HEATMAP_STATUS_COLORS[st] || this.HEATMAP_STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
+              this.HEATMAP_STATUS_COLORS[st] || this.HEATMAP_STATUS_COLORS['UNKNOWN'] || this.FALLBACK_COLOR;
             const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
             const w = count / total;
             r += cr * w;
