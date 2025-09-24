@@ -23,7 +23,12 @@
     </step-popover>
   }
   @if (useShowAll()) {
-    <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isAllVisible.set($event)">
+    <step-popover
+      yPosition="below"
+      [mode]="PopoverMode.CLICK"
+      (toggledEvent)="isAllVisible.set($event)"
+      [whiteBackground]="true"
+    >
       <button
         type="button"
         class="more"
