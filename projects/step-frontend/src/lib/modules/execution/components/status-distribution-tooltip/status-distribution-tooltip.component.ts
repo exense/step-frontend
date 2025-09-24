@@ -7,18 +7,6 @@ interface StatusDistribution {
   percentage: number;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  VETOED: '#000000',
-  TECHNICAL_ERROR: '#000000',
-  IMPORT_ERROR: '#000000',
-  FAILED: '#ff595b',
-  INTERRUPTED: '#e1cc01',
-  PASSED: '#01a990',
-  SKIPPED: '#a0a0a0',
-  NORUN: '#a0a0a0',
-  UNKNOWN: '#a0a0a0',
-};
-
 @Component({
   selector: 'step-status-distribution-tooltip',
   templateUrl: './status-distribution-tooltip.component.html',

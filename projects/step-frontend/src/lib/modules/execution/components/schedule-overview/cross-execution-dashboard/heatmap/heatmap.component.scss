@@ -12,7 +12,7 @@
   th {
     white-space: wrap;
     text-align: left;
-    padding: 1rem 8px;
+    padding: 1rem 0.8rem;
 
     input {
       margin-top: 2px;
@@ -26,7 +26,7 @@
 
   td {
     font-weight: normal;
-    padding: 2px 0;
+    padding: 0.2rem 0;
     border-top: 1px solid #f1f1f1;
     border-right: 1px solid #f1f1f1;
   }
@@ -51,7 +51,7 @@
   overscroll-behavior-x: contain; /* prevent scroll chaining to body */
   -webkit-overflow-scrolling: touch;
   min-width: 0; /* important if parent is a flex child */
-  min-height: 400px;
+  min-height: 40rem;
   margin-bottom: 2rem;
 }
 

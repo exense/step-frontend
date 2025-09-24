@@ -43,7 +43,6 @@ export class HeatmapComponent {
   readonly paginator = viewChild(PaginatorComponent);
   readonly container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
 
-  /** Emitted on any cell click. */
   @Output() cellClick = new EventEmitter<{ row: HeatMapRow; column: HeatmapColumn }>();
 
   scrollEffect = effect(() => {

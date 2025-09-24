@@ -6,18 +6,18 @@
   align-items: center;
   background-color: color-mix(in oklab, var(--background) 80%, white);
   padding: 3px;
-  font-size: 12px;
+  font-size: 1.2rem;
   border-radius: 16px;
   gap: 2rem;
 
   .status-tag {
     background: var(--statusColor);
-    padding: 2px 14px 2px 4px;
+    padding: 0.2rem 1.4rem 0.2rem 0.4rem;
     border-radius: 16px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: 0.4rem;
   }
 
   .status-icon {
