@@ -1,7 +1,4 @@
-<step-alt-report-widget
-  class="flex-grow-1"
-  [title]="heatmapType() === 'keywords' ? 'Keyword call statuses over time' : 'Test case statuses over time'"
->
+<step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
   <step-alt-report-widget-content class="widget-content">
     @if (defaultDateRange(); as dateRange) {
       <div class="chart-actions-container">

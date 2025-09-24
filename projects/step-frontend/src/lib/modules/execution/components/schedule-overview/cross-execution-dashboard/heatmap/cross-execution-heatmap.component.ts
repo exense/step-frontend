@@ -1,4 +1,4 @@
-import { Component, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   BucketResponse,
   COLORS,
@@ -42,6 +42,12 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
   hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
   defaultDateRange = input<DateRange>();
+
+  dashletTitle = computed(() => {
+    let heatmapType = this.heatmapType();
+    const lastExecutionLabel = ` (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
+    return (heatmapType === 'keywords' ? 'Keyword statuses' : 'Test cases statuses') + lastExecutionLabel;
+  });
 
   readonly tabs: Tab<'testcases' | 'keywords'>[] = [
     {
