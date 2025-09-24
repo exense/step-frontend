@@ -75,7 +75,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.selectedSearchResultItemInternal.set(firstItem);
   });
 
-  override init(root: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
+  override init(root?: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
   }
