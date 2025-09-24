@@ -19,7 +19,6 @@ export class GradientLegendComponent {
 
   computedData = computed(() => {
     const gradientStops = this.gradientStops();
-    console.log(gradientStops);
     const clean = (gradientStops || []).filter((color) => !!color && !!color.hex && !!color.label);
 
     if (clean.length === 0) {
@@ -28,9 +27,9 @@ export class GradientLegendComponent {
 
     // Evenly spaced across 0..100
     const n = clean.length;
-    return clean.map<ComputedStop>((s, i) => ({
-      color: s.hex,
-      label: s.label,
+    return clean.map<ComputedStop>((heatmapColor, i) => ({
+      color: heatmapColor.hex,
+      label: heatmapColor.label,
       posPct: n === 1 ? 0 : Math.round((i / (n - 1)) * 100),
     })) as ComputedStop[];
   });
@@ -40,7 +39,7 @@ export class GradientLegendComponent {
     if (data.length === 0) {
       return 'transparent';
     } else {
-      return `linear-gradient(to right, ${data.map((s) => `${s.color} ${s.posPct}%`).join(', ')})`;
+      return `linear-gradient(to right, ${data.map((stopItem) => `${stopItem.color} ${stopItem.posPct}%`).join(', ')})`;
     }
   });
 }

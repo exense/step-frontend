@@ -25,7 +25,6 @@ import { HeatMapColor, HeatmapColumn, HeatMapRow } from './types/heatmap-types';
   standalone: false,
 })
 export class HeatmapComponent {
-  // === Inputs as signals ===
   readonly columns = input<HeatmapColumn[]>([]);
   readonly rows = input<HeatMapRow[]>([]);
   readonly firstColumnHeader = input<string>('Name');

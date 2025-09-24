@@ -62,7 +62,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     { hex: '#e1cc01', label: 'Interrupted' },
   ];
 
-  STATUS_COLORS: Record<string, string> = {
+  HEATMAP_STATUS_COLORS: Record<string, string> = {
     VETOED: '#000000',
     TECHNICAL_ERROR: '#000000',
     IMPORT_ERROR: '#000000',
@@ -208,7 +208,8 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
             const count = statusCounts[st] || 0;
             if (!count) continue;
             // @ts-ignore
-            const colorHex = this.STATUS_COLORS[st] || this.STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
+            const colorHex =
+              this.HEATMAP_STATUS_COLORS[st] || this.HEATMAP_STATUS_COLORS.UNKNOWN || this.FALLBACK_COLOR;
             const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
             const w = count / total;
             r += cr * w;

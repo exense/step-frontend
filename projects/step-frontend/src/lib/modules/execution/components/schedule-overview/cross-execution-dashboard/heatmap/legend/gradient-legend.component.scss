@@ -1,7 +1,6 @@
 .legend {
   position: relative;
   width: 100%;
-  /* space for labels below the bar */
   padding-bottom: 1.5rem;
 }
 
@@ -13,7 +12,7 @@
 
 .markers {
   position: absolute;
-  inset: auto 0 0 0; /* stick to bottom */
+  inset: auto 0 0 0;
   height: 1.5rem;
 }
 
@@ -22,7 +21,6 @@
   bottom: -0.5rem;
   transform: translateX(-50%);
   text-align: center;
-  /* prevent labels from spilling too much */
   max-width: 25%;
   white-space: nowrap;
   font-size: 1.2rem;
