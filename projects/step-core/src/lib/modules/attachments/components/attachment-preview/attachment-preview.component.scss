@@ -45,11 +45,7 @@ step-attachment-preview {
     bottom: 0;
     left: 0;
     right: 0;
-    padding-left: 1rem;
-    padding-bottom: 0.3rem;
-    padding-top: 0.3rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 0.3rem 1rem;
 
     &.overlay {
       background: var.$white-transparent;

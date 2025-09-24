@@ -20,7 +20,7 @@
     skipped: attachmentType() === AttachmentType.SKIPPED
   }"
 >
-  {{ attachment()?.name }}
+  <step-long-inline-text [text]="attachment()?.name" />
 </div>
 
 <div class="actions">

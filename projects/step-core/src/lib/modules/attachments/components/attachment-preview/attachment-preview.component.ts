@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal, ViewEncapsulation } from '@angular/core';
 import { AttachmentType } from '../../types/attachment-type.enum';
 import { AttachmentUrlPipe } from '../../pipes/attachment-url.pipe';
 import { SkippedAttachmentMeta } from '../../../../client/step-client-module';
