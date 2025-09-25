@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
 :host {
   font-size: 1.4rem;
@@ -18,6 +19,7 @@ section {
   align-items: flex-start;
   margin: 1rem 0;
   gap: 1rem;
+
   &.col-view {
     flex-direction: column;
   }
@@ -34,6 +36,7 @@ step-alt-execution-tree-partial {
 
 .tree-container {
   margin-top: 4rem;
+
   & > .data-container {
     height: 100%;
   }
@@ -43,9 +46,27 @@ step-alt-execution-tree-partial {
   position: relative;
   width: 4rem;
   height: 2rem;
+
   button {
     position: absolute;
     right: 0;
     margin-top: -1rem;
+  }
+}
+
+.error-root-causes-container {
+  margin-top: 2rem;
+}
+
+.error-root-causes {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1rem;
+  row-gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+
+  .error-count {
+    @include common.error-count;
   }
 }

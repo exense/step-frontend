@@ -15,4 +15,6 @@ export interface AggregatedTreeNode
   artefactId?: string;
   artefactHash?: string;
   hasDescendantInvocations?: boolean;
+  countByErrorMessage?: Record<string, number>;
+  countByChildrenErrorMessage?: Record<string, number>;
 }

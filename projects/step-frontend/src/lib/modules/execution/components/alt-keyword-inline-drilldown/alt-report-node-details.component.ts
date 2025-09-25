@@ -12,6 +12,8 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
+import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { KeyValue } from '@angular/common';
 // step.ar
 @Component({
   selector: 'step-alt-report-node-details',
@@ -38,6 +40,7 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
 export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
   private _artefactService = inject(ArtefactService);
+  private _treeState = inject(AggregatedReportViewTreeStateService);
 
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
@@ -59,6 +62,39 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
       );
     }),
   );
+
+  private aggregatedNode = computed(() => {
+    const reportNode = this.node();
+    const isTreeInitialized = this._treeState.isInitialized();
+    if (!isTreeInitialized) {
+      return undefined;
+    }
+    const treeNodes = this._treeState.findNodesByArtefactId(reportNode.artefactID);
+    const treeNode =
+      treeNodes.length === 1 ? treeNodes[0] : treeNodes.find((node) => node.artefactHash === reportNode.artefactHash);
+    return treeNode;
+  });
+
+  protected readonly rootCauseErrors = computed(() => {
+    const treeNode = this.aggregatedNode();
+    if (!treeNode) {
+      return undefined;
+    }
+
+    const result: KeyValue<string, number>[] = [];
+
+    if (treeNode.countByErrorMessage) {
+      const items = Object.entries(treeNode.countByErrorMessage).map(([key, value]) => ({ key, value }));
+      result.push(...items);
+    }
+
+    if (treeNode.countByChildrenErrorMessage) {
+      const items = Object.entries(treeNode.countByChildrenErrorMessage).map(([key, value]) => ({ key, value }));
+      result.push(...items);
+    }
+
+    return !result.length ? undefined : result;
+  });
 
   protected readonly children = toSignal(this.children$, { initialValue: [] });
   protected readonly artefactClass = computed(() => this.node().resolvedArtefact?._class);
