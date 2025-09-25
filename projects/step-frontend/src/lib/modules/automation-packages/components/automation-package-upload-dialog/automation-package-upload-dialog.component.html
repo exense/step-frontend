@@ -3,9 +3,8 @@
     @if (progress$) {
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
-      <step-tabs [tabs]="_tabs" [(activeTabId)]="selectedTab" [compactTabs]="true" />
       <form [formGroup]="form">
-        @switch (selectedTab()) {
+        @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
             <step-upload-container (filesChange)="handleDrop($event)">
               <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
@@ -16,10 +15,21 @@
                     matTooltip="Drag & Drop or select your automation package jar / ZIP file"
                   />
                 </step-label-addon>
-                <input type="text" readonly formControlName="fileName" name="fileName" />
+                <input type="text" readonly formControlName="APFileName" name="fileName" />
                 <step-suffix class="button-suffix">
-                  <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
+                  <button type="button" mat-stroked-button (click)="openFileChooseDialog(automationPackageFile)">
                     <step-icon name="folder-plus"></step-icon>
+                  </button>
+                </step-suffix>
+                <step-suffix class="button-suffix">
+                  <button
+                    type="button"
+                    class="maven"
+                    mat-stroked-button
+                    (click)="toggleMavenUpload(automationPackageFile)"
+                    matTooltip="Use maven snippet instead of uploading a file."
+                  >
+                    <step-icon name="maven"></step-icon>
                   </button>
                 </step-suffix>
               </step-form-field>
@@ -28,11 +38,71 @@
           @case (UploadType.MAVEN) {
             <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
               <step-label>Maven Snippet</step-label>
-              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="mavenSnippet" />
+              <step-label-addon>
+                <button
+                  type="button"
+                  class="active maven"
+                  mat-stroked-button
+                  (click)="toggleMavenUpload(automationPackageFile)"
+                  matTooltip="Use upload a file instead of using maven snippet."
+                >
+                  <step-icon name="maven"></step-icon>
+                </button>
+              </step-label-addon>
+              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="APMavenSnippet" />
             </step-form-field>
           }
           @default {}
         }
+
+        @switch (dependenciesFile.uploadType) {
+          @case (UploadType.UPLOAD) {
+            <step-upload-container (filesChange)="handleDrop($event)">
+              <step-form-field alignLabelAddon="near">
+                <step-label>Dependencies (jar or ZIP file)</step-label>
+                <step-label-addon>
+                  <step-icon name="help-circle" matTooltip="Drag & Drop or select dependencies as jar / ZIP file" />
+                </step-label-addon>
+                <input type="text" readonly formControlName="dependenciesFileName" name="dependenciesName" />
+                <step-suffix class="button-suffix">
+                  <button type="button" mat-stroked-button (click)="openFileChooseDialog(dependenciesFile)">
+                    <step-icon name="folder-plus"></step-icon>
+                  </button>
+                </step-suffix>
+                <step-suffix class="button-suffix">
+                  <button
+                    type="button"
+                    class="maven"
+                    mat-stroked-button
+                    (click)="toggleMavenUpload(dependenciesFile)"
+                    matTooltip="Use maven snippet instead of uploading a file."
+                  >
+                    <step-icon name="maven"></step-icon>
+                  </button>
+                </step-suffix>
+              </step-form-field>
+            </step-upload-container>
+          }
+          @case (UploadType.MAVEN) {
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+              <step-label>Maven Snippet</step-label>
+              <step-label-addon>
+                <button
+                  type="button"
+                  class="active maven"
+                  mat-stroked-button
+                  (click)="toggleMavenUpload(dependenciesFile)"
+                  matTooltip="Use upload a file instead of using maven snippet."
+                >
+                  <step-icon name="maven"></step-icon>
+                </button>
+              </step-label-addon>
+              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="dependenciesMavenSnippet" />
+            </step-form-field>
+          }
+          @default {}
+        }
+
         <step-form-field alignLabelAddon="near">
           <step-label>Automation Package Version</step-label>
           <step-label-addon>
@@ -58,7 +128,8 @@
             title="Activation Expression"
           />
         </step-form-field>
-        <input #fileInput type="file" (input)="selectFile()" />
+        <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
+        <input #dependenciesFileInput type="file" (input)="selectFile(dependenciesFile)" />
       </form>
     }
   </div>
@@ -68,7 +139,7 @@
       @if (!isNewPackage) {
         Update
       } @else {
-        @switch (selectedTab()) {
+        @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
             Upload
           }

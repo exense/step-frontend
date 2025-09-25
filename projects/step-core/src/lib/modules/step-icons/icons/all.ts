@@ -326,6 +326,7 @@ import { Clock } from './svg/clock';
 import { CloudDrizzle } from './svg/cloud-drizzle';
 import { CloudLightning } from './svg/cloud-lightning';
 import { ChevronsLeft } from './svg/chevrons-left';
+import { Maven } from './svg/maven';
 
 export const allIcons = {
   Delete,
@@ -656,4 +657,5 @@ export const allIcons = {
   CloudDrizzle,
   CloudLightning,
   ChevronsLeft,
+  Maven,
 };

@@ -326,5 +326,6 @@ export { Clock } from './svg/clock';
 export { CloudDrizzle } from './svg/cloud-drizzle';
 export { CloudLightning } from './svg/cloud-lightning';
 export { ChevronsLeft } from './svg/chevrons-left';
+export { Maven } from './svg/maven';
 
 export { allIcons } from './all';
