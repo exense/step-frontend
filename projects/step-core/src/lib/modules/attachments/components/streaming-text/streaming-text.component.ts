@@ -9,6 +9,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -84,6 +85,7 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
   readonly displayLatestRows = input<number | undefined>(undefined);
   readonly linesFrame = input<number>(Infinity);
   readonly fontSize = input(12);
+  readonly autoCloseChannelWhenFinished = input(false);
 
   readonly scrollDownOnRefresh = model(true);
 
@@ -276,8 +278,14 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
         return;
       }
 
+      const autoCloseChannelWhenFinished = untracked(() => this.autoCloseChannelWhenFinished());
+
       if (response['@'] === 'Lines') {
         this.proceedLinesResponse(response.lines);
+        const status = untracked(() => this.status());
+        if ((status === 'FAILED' || status === 'COMPLETED') && autoCloseChannelWhenFinished) {
+          this.closeChannel();
+        }
         return;
       }
 
@@ -285,6 +293,9 @@ export class StreamingTextComponent implements OnInit, OnDestroy {
       this.statusInternal.set(transferStatus);
       if (transferStatus === 'FAILED' && totalLines === 0) {
         this.areLinesRequestedIndicator.hide();
+        if (autoCloseChannelWhenFinished) {
+          this.closeChannel();
+        }
         return;
       }
 

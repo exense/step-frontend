@@ -1,8 +1,7 @@
-step-attachments-inline-preview {
-  span.skipped {
-    text-decoration: line-through;
-  }
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
 
+step-attachments-inline-preview {
   .attachment-name-container {
     display: flex;
     align-items: center;
@@ -11,5 +10,13 @@ step-attachments-inline-preview {
 
   p.reason {
     max-width: 35rem;
+  }
+
+  .skipped {
+    color: var.$red-50;
+  }
+
+  .incomplete {
+    color: var.$orange;
   }
 }

@@ -90,6 +90,17 @@ export class AttachmentUtilsService {
     }
   }
 
+  getDownloadAttachmentUrl(attachment?: AttachmentMeta, isInline?: boolean): string {
+    if (!attachment) {
+      return '';
+    }
+    if (attachment.type === STREAMING_ATTACHMENT_META) {
+      return this._streamingResourceService.getDownloadResourceUrl(attachment.id!, isInline);
+    } else {
+      return this._resourceService.getDownloadResourceUrl(attachment.id!, isInline);
+    }
+  }
+
   getAttachmentStreamingUrl(attachmentOrId?: string | AttachmentMeta): string | undefined {
     if (!attachmentOrId) {
       return undefined;

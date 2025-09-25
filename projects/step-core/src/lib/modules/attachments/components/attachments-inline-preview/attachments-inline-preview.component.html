@@ -7,8 +7,20 @@
           @if (att | attachmentType; as attachmentType) {
             @if (attachmentType !== AttachmentType.SKIPPED) {
               <div class="attachment-name-container">
+                @if (
+                  (attachmentType === AttachmentType.STREAMING_BINARY ||
+                    attachmentType === AttachmentType.STREAMING_TEXT) &&
+                  $any(att).status === 'FAILED'
+                ) {
+                  <step-icon
+                    class="incomplete"
+                    name="alert-triangle"
+                    matTooltip="Potentially incomplete file"
+                    matTooltipPosition="below"
+                  />
+                }
                 @if (attachmentType === AttachmentType.STREAMING_BINARY) {
-                  <span>
+                  <span (click)="downloadBinaryStream(att, $event)">
                     <step-long-inline-text [text]="att.name" />
                   </span>
                 } @else {
@@ -23,9 +35,12 @@
                 }
               </div>
             } @else {
-              <span class="highlight-inline-item skipped">
-                <step-long-inline-text [text]="att.name" />
-              </span>
+              <div class="attachment-name-container">
+                <step-icon class="skipped" name="alert-circle" matTooltip="Skipped" matTooltipPosition="below" />
+                <span class="highlight-inline-item">
+                  <step-long-inline-text [text]="att.name" />
+                </span>
+              </div>
             }
           }
           <step-popover-content>

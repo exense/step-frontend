@@ -2,7 +2,12 @@ import { computed, Directive, inject, input, OnDestroy } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, Observable, switchMap, tap } from 'rxjs';
 import { AttachmentUtilsService } from '../injectables/attachment-utils.service';
-import { AttachmentMeta, WsChannel, WsFactoryService } from '../../../client/step-client-module';
+import {
+  AttachmentMeta,
+  StreamingAttachmentMeta,
+  WsChannel,
+  WsFactoryService,
+} from '../../../client/step-client-module';
 import { WsResourceStatusChange } from '../types/ws-resource-status-change';
 import { AttachmentType } from '../types/attachment-type.enum';
 
@@ -17,16 +22,24 @@ export class StreamingAttachmentStatusDirective implements OnDestroy {
 
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
 
-  private attachmentUrl = computed(() => {
+  private streamingAttachment = computed(() => {
     const attachment = this.attachment();
     const attachmentType = this._attachmentUtils.determineAttachmentType(attachment);
     if (attachmentType !== AttachmentType.STREAMING_TEXT && attachmentType !== AttachmentType.STREAMING_BINARY) {
       return undefined;
     }
-    return this._attachmentUtils.getAttachmentStreamingUrl(attachment);
+    return attachment as StreamingAttachmentMeta;
   });
 
-  private status$ = toObservable(this.attachmentUrl).pipe(
+  private streamingAttachmentUrl = computed(() => {
+    const streamingAttachment = this.streamingAttachment();
+    if (!streamingAttachment || streamingAttachment.status === 'COMPLETED' || streamingAttachment.status === 'FAILED') {
+      return undefined;
+    }
+    return this._attachmentUtils.getAttachmentStreamingUrl(streamingAttachment);
+  });
+
+  private streamingStatus$ = toObservable(this.streamingAttachmentUrl).pipe(
     tap(() => this.closeChannel()),
     filter((url) => !!url),
     map((url) => {
@@ -47,7 +60,14 @@ export class StreamingAttachmentStatusDirective implements OnDestroy {
     map((response) => response?.resourceStatus?.transferStatus),
   );
 
-  readonly status = toSignal(this.status$);
+  private streamingStatus = toSignal(this.streamingStatus$, { initialValue: undefined });
+  private initialAttachmentStatus = computed(() => this.streamingAttachment()?.status);
+
+  readonly status = computed(() => {
+    const streamingStatus = this.streamingStatus();
+    const initialAttachmentStatus = this.initialAttachmentStatus();
+    return streamingStatus ?? initialAttachmentStatus;
+  });
 
   ngOnDestroy(): void {
     this.closeChannel();

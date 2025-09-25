@@ -4,7 +4,12 @@
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
     @case (AttachmentType.STREAMING_TEXT) {
-      <step-streaming-text [attachment]="attachment()!" [displayLatestRows]="6" [fontSize]="8" />
+      <step-streaming-text
+        [attachment]="attachment()!"
+        [displayLatestRows]="6"
+        [fontSize]="8"
+        [autoCloseChannelWhenFinished]="true"
+      />
     }
     @default {
       <div class="file-info">
@@ -16,8 +21,7 @@
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT,
-    skipped: attachmentType() === AttachmentType.SKIPPED
+    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT
   }"
 >
   <step-long-inline-text [text]="attachment()?.name" />

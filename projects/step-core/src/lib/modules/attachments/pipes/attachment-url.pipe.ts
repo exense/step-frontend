@@ -1,16 +1,17 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
+import { AttachmentMeta } from '../../../client/step-client-module';
+import { AttachmentUtilsService } from '../injectables/attachment-utils.service';
 
 @Pipe({
   name: 'attachmentUrl',
 })
 export class AttachmentUrlPipe implements PipeTransform {
-  protected _resourceService = inject(AugmentedResourcesService);
+  private _attachmentUtils = inject(AttachmentUtilsService);
 
   transform(attachment?: AttachmentMeta, isInline?: boolean): string | undefined {
-    if (!attachment?.id) {
+    if (!attachment) {
       return undefined;
     }
-    return this._resourceService.getDownloadResourceUrl(attachment.id!, isInline);
+    return this._attachmentUtils.getDownloadAttachmentUrl(attachment, isInline);
   }
 }
