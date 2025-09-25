@@ -18,8 +18,8 @@ import { StreamingAttachmentStatusDirective } from '../../directives/streaming-a
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class.with-action-bar]': 'showDownload() && attachmentType() !== AttachmentType.SKIPPED',
-    '[class.force-action-bar]': 'isStreamingInProgress()',
+    '[class.with-action-bar]':
+      '(isStreamingFailed() || isStreamingInProgress() || showDownload()) && attachmentType() !== AttachmentType.SKIPPED',
     '[class.with-border]': 'withBorder()',
     '[class.has-pointer]': 'canOpenDetails()',
     '(click)': 'open()',
@@ -40,9 +40,16 @@ export class AttachmentPreviewComponent {
   readonly showDownload = input(true);
   readonly withBorder = input(true);
 
+  private streamingStatus = computed(() => this._streamingStatus.status());
+
   protected readonly isStreamingInProgress = computed(() => {
-    const status = this._streamingStatus.status();
+    const status = this.streamingStatus();
     return !!status && status !== 'COMPLETED' && status !== 'FAILED';
+  });
+
+  protected readonly isStreamingFailed = computed(() => {
+    const status = this.streamingStatus();
+    return status === 'FAILED';
   });
 
   protected readonly attachment = computed(() => this._streamingStatus.attachment());
