@@ -43,6 +43,22 @@
         <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
       </section>
     }
+    @if (rootCauseErrors(); as rootCauseErrors) {
+      <div class="error-root-causes-container execution-report-node-details">
+        <div class="data-container">
+          <div class="container-title">Errors root causes</div>
+          <div class="error-root-causes">
+            @for (item of rootCauseErrors; track item.key) {
+              <div class="error-count">
+                <div></div>
+                <span>{{ item.value }}</span>
+              </div>
+              <div class="error-message">{{ item.key }}</div>
+            }
+          </div>
+        </div>
+      </div>
+    }
   </div>
   <div class="tree-container execution-report-node-details" stepElementSize>
     <div class="data-container">

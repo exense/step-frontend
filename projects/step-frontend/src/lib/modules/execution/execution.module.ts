@@ -154,6 +154,7 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
 
 @NgModule({
   declarations: [
@@ -267,6 +268,7 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    TestCaseInlineRootCauseComponent,
   ],
   exports: [
     ExecutionListComponent,

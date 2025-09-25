@@ -11,7 +11,10 @@ export type FlatAggregatedReportView = {
   artefact?: AbstractArtefact;
   artefactHash?: string;
   countByStatus?: Record<string, number>;
+  countByErrorMessage?: Record<string, number>;
+  countByContributingErrorMessage?: Record<string, number>;
   singleInstanceReportNode?: ReportNode;
   bucketsByStatus?: Record<string, Bucket>;
   currentOperations?: Array<Operation>;
+  countByChildrenErrorMessage?: Record<string, number>;
 };
