@@ -36,6 +36,7 @@ export class AutomationPackagesService {
   /**
    * @param async
    * @param version
+   * @param allowUpdateOfOtherPackages
    * @param activationExpr
    * @param formData
    * @returns any default response
@@ -44,9 +45,15 @@ export class AutomationPackagesService {
   public createOrUpdateAutomationPackage(
     async?: boolean,
     version?: string,
+    allowUpdateOfOtherPackages?: boolean,
     activationExpr?: string,
     formData?: {
       file?: FormDataContentDisposition;
+      apMavenSnippet?: string;
+      keywordLibrary?: FormDataContentDisposition;
+      keywordLibraryMavenSnippet?: string;
+      apResourceId?: string;
+      keywordLibraryResourceId?: string;
     },
   ): Observable<any> {
     return this.httpRequest.request({
@@ -55,6 +62,7 @@ export class AutomationPackagesService {
       query: {
         async: async,
         version: version,
+        allowUpdateOfOtherPackages: allowUpdateOfOtherPackages,
         activationExpr: activationExpr,
       },
       formData: formData,
@@ -65,6 +73,7 @@ export class AutomationPackagesService {
   /**
    * @param version
    * @param activationExpr
+   * @param allowUpdateOfOtherPackages
    * @param formData
    * @returns string default response
    * @throws ApiError
@@ -72,8 +81,14 @@ export class AutomationPackagesService {
   public createAutomationPackage(
     version?: string,
     activationExpr?: string,
+    allowUpdateOfOtherPackages?: boolean,
     formData?: {
       file?: FormDataContentDisposition;
+      apMavenSnippet?: string;
+      keywordLibrary?: FormDataContentDisposition;
+      keywordLibraryMavenSnippet?: string;
+      apResourceId?: string;
+      keywordLibraryResourceId?: string;
     },
   ): Observable<string> {
     return this.httpRequest.request({
@@ -82,49 +97,10 @@ export class AutomationPackagesService {
       query: {
         version: version,
         activationExpr: activationExpr,
+        allowUpdateOfOtherPackages: allowUpdateOfOtherPackages,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
-    });
-  }
-
-  /**
-   * @param async
-   * @param version
-   * @param activationExpr
-   * @returns AutomationPackageUpdateResult default response
-   * @throws ApiError
-   */
-  public createOrUpdateAutomationPackageFromMaven(
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
-  ): Observable<AutomationPackageUpdateResult> {
-    return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/mvn',
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
-      },
-    });
-  }
-
-  /**
-   * @param version
-   * @param activationExpr
-   * @returns string default response
-   * @throws ApiError
-   */
-  public createAutomationPackageFromMaven(version?: string, activationExpr?: string): Observable<string> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/automation-packages/mvn',
-      query: {
-        version: version,
-        activationExpr: activationExpr,
-      },
     });
   }
 
@@ -148,6 +124,7 @@ export class AutomationPackagesService {
    * @param async
    * @param version
    * @param activationExpr
+   * @param allowUpdateOfOtherPackages
    * @param formData
    * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
@@ -157,8 +134,14 @@ export class AutomationPackagesService {
     async?: boolean,
     version?: string,
     activationExpr?: string,
+    allowUpdateOfOtherPackages?: boolean,
     formData?: {
       file?: FormDataContentDisposition;
+      apMavenSnippet?: string;
+      keywordLibrary?: FormDataContentDisposition;
+      keywordLibraryMavenSnippet?: string;
+      apResourceId?: string;
+      keywordLibraryResourceId?: string;
     },
   ): Observable<AutomationPackageUpdateResult> {
     return this.httpRequest.request({
@@ -171,6 +154,7 @@ export class AutomationPackagesService {
         async: async,
         version: version,
         activationExpr: activationExpr,
+        allowUpdateOfOtherPackages: allowUpdateOfOtherPackages,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -199,7 +183,12 @@ export class AutomationPackagesService {
    */
   public executeAutomationPackage(formData?: {
     file?: FormDataContentDisposition;
+    apMavenSnippet?: string;
+    keywordLibrary?: FormDataContentDisposition;
     executionParams?: FormDataBodyPart;
+    keywordLibraryMavenSnippet?: string;
+    apResourceId?: string;
+    keywordLibraryResourceId?: string;
   }): Observable<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',
@@ -252,34 +241,6 @@ export class AutomationPackagesService {
       url: '/automation-packages/{id}/entities',
       path: {
         id: id,
-      },
-    });
-  }
-
-  /**
-   * @param id
-   * @param async
-   * @param version
-   * @param activationExpr
-   * @returns AutomationPackageUpdateResult default response
-   * @throws ApiError
-   */
-  public updateAutomationPackageFromMaven(
-    id: string,
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
-  ): Observable<AutomationPackageUpdateResult> {
-    return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/{id}/mvn',
-      path: {
-        id: id,
-      },
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
       },
     });
   }
