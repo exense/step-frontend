@@ -114,7 +114,7 @@ export class AugmentedAutomationPackagesService
       body.set('file', apFile!);
     }
     if (keywordLibraryFile) {
-      body.set('keywordLibraryFile', keywordLibraryFile!);
+      body.set('keywordLibrary', keywordLibraryFile!);
     }
 
     let headers: HttpHeaders;
