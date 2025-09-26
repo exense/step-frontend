@@ -75,7 +75,29 @@
           <step-drag-column-caption>Package file</step-drag-column-caption>
         </th>
         <td mat-cell *matCellDef="let element">
-          {{ element.customFields?.['automationPackageFileName'] }}
+          <step-popover yPosition="below">
+            @if (
+              element.automationPackageResourceObj?.origin &&
+              element.automationPackageResourceObj?.origin.includes('maven')
+            ) {
+              <step-icon class="maven" name="maven"></step-icon>
+            }
+            {{ element.customFields?.['automationPackageFileName'] }}
+            <step-popover-content class="resource-info">
+              <div><b>Creator</b></div>
+              <div>{{ element.automationPackageResourceObj?.creationUser }}</div>
+              <div><b>Creation time</b></div>
+              <div>{{ element.automationPackageResourceObj?.creationDate | date: DateFormat.DATE }}</div>
+              @if (element.automationPackageResourceObj?.lastModificationDate) {
+                <div><b>Last modified by</b></div>
+                <div>{{ element.automationPackageResourceObj?.lastModificationUser }}</div>
+                <div><b>Last modified</b></div>
+                <div>{{ element.automationPackageResourceObj?.lastModificationDate | date: DateFormat.DATE }}</div>
+              }
+              <div><b>Origin</b></div>
+              <div>{{ element.automationPackageResourceObj?.origin }}</div>
+            </step-popover-content>
+          </step-popover>
         </td>
       </ng-container>
       <ng-container
@@ -88,7 +110,29 @@
           <step-drag-column-caption>Keyword library</step-drag-column-caption>
         </th>
         <td mat-cell *matCellDef="let element">
-          {{ element.keywordLibraryResourceObj?.attributes?.['name'] }}
+          <step-popover yPosition="below">
+            @if (
+              element.automationPackageResourceObj?.origin &&
+              element.automationPackageResourceObj?.origin.includes('maven')
+            ) {
+              <step-icon class="maven" name="maven"></step-icon>
+            }
+            {{ element.keywordLibraryResourceObj?.attributes?.['name'] }}
+            <step-popover-content class="resource-info">
+              <div><b>Creator</b></div>
+              <div>{{ element.keywordLibraryResourceObj?.creationUser }}</div>
+              <div><b>Creation time</b></div>
+              <div>{{ element.keywordLibraryResourceObj?.creationDate | date: DateFormat.DATE }}</div>
+              @if (element.keywordLibraryResourceObj?.lastModificationDate) {
+                <div><b>Last modified by</b></div>
+                <div>{{ element.keywordLibraryResourceObj?.lastModificationUser }}</div>
+                <div><b>Last modified</b></div>
+                <div>{{ element.keywordLibraryResourceObj?.lastModificationDate | date: DateFormat.DATE }}</div>
+              }
+              <div><b>Origin</b></div>
+              <div>{{ element.keywordLibraryResourceObj?.origin }}</div>
+            </step-popover-content>
+          </step-popover>
         </td>
       </ng-container>
       <ng-container

@@ -2,6 +2,7 @@ import { Component, effect, forwardRef, inject, OnInit, viewChild } from '@angul
 import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
+  DateFormat,
   DialogParentService,
   entitySelectionStateProvider,
   StepCoreModule,
@@ -109,4 +110,6 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
       }),
     ).pipe(map(() => automationPackageFileName));
   }
+
+  protected readonly DateFormat = DateFormat;
 }

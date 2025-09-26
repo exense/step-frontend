@@ -31,7 +31,7 @@ type FileUploadOrMaven = {
 };
 
 const DEPENDENCIES_NAME = 'dependencies-file';
-
+const AUTOMATION_PACKAGE_LIBRARY_TYPE = 'automationPackageLibrary';
 @Component({
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
@@ -181,7 +181,7 @@ export class AutomationPackageUploadDialogComponent {
 
   protected selectResource(): void {
     this._resourceDialogsService
-      .showSearchResourceDialog('automationPackageLibrary')
+      .showSearchResourceDialog(AUTOMATION_PACKAGE_LIBRARY_TYPE)
       .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
         this.dependenciesResourceId = resourceId;
