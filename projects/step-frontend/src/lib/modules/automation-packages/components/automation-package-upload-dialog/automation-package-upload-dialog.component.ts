@@ -4,9 +4,10 @@ import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
   DialogRouteResult,
+  ResourceDialogsService,
   StepCoreModule,
 } from '@exense/step-core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, filter, map, Observable, of } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 
@@ -29,6 +30,8 @@ type FileUploadOrMaven = {
   formControl: FormControl<string>;
 };
 
+const DEPENDENCIES_NAME = 'dependencies-file';
+
 @Component({
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
@@ -42,6 +45,7 @@ export class AutomationPackageUploadDialogComponent {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
+  private _resourceDialogsService = inject(ResourceDialogsService);
 
   protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -69,7 +73,7 @@ export class AutomationPackageUploadDialogComponent {
 
   private dependenciesFileRef = viewChild.required<ElementRef<HTMLInputElement>>('dependenciesFileInput');
   protected dependenciesFile: FileUploadOrMaven = {
-    name: 'dependencies-file',
+    name: DEPENDENCIES_NAME,
     uploadType: UploadType.UPLOAD,
     fileInputRef: this.dependenciesFileRef,
     formControl: this.form.controls.dependenciesFileName,
@@ -88,6 +92,7 @@ export class AutomationPackageUploadDialogComponent {
     : `Edit Automation Package "${this._package.attributes?.['name'] ?? this._package.id}"`;
 
   protected files: Record<string, File> = {};
+  protected dependenciesResourceId?: string;
   protected progress$?: Observable<number>;
 
   protected toggleMavenUpload(control: FileUploadOrMaven): void {
@@ -108,6 +113,10 @@ export class AutomationPackageUploadDialogComponent {
     }
     this.files[control.name] = file!;
     control.formControl.setValue(file!.name ?? '');
+
+    if (control.name === DEPENDENCIES_NAME) {
+      this.dependenciesResourceId = undefined;
+    }
   }
 
   protected handleDrop(control: FileUploadOrMaven, files: FileList | File[]): void {
@@ -152,6 +161,7 @@ export class AutomationPackageUploadDialogComponent {
       apMavenSnippet: apMavenSnippet,
       keywordLibraryFile: this.files[this.dependenciesFile.name],
       keywordLibraryMavenSnippet: dependenciesMavenSnippet,
+      keywordLibraryResourceId: this.dependenciesResourceId,
       version,
       activationExpression,
     });
@@ -167,5 +177,16 @@ export class AutomationPackageUploadDialogComponent {
         }),
       )
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
+  }
+
+  protected selectResource(): void {
+    this._resourceDialogsService
+      .showSearchResourceDialog('automationPackageLibrary')
+      .pipe(filter((resourceId) => !!resourceId))
+      .subscribe((resourceId) => {
+        this.dependenciesResourceId = resourceId;
+        delete this.files[this.dependenciesFile.name];
+        this.dependenciesFile.formControl.setValue(resourceId);
+      });
   }
 }

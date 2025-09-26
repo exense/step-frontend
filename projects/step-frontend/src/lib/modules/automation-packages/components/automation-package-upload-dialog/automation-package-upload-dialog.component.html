@@ -72,6 +72,16 @@
                 <step-suffix class="button-suffix">
                   <button
                     type="button"
+                    mat-stroked-button
+                    matTooltip="Select an existing resource"
+                    (click)="selectResource()"
+                  >
+                    <step-icon name="search"></step-icon>
+                  </button>
+                </step-suffix>
+                <step-suffix class="button-suffix">
+                  <button
+                    type="button"
                     class="maven"
                     mat-stroked-button
                     (click)="toggleMavenUpload(dependenciesFile)"

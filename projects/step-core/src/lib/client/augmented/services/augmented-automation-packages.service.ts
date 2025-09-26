@@ -21,6 +21,7 @@ export interface AutomationPackageParams {
   apMavenSnippet?: string;
   keywordLibraryFile?: File;
   keywordLibraryMavenSnippet?: string;
+  keywordLibraryResourceId?: string;
   version?: string;
   activationExpression?: string;
 }
@@ -101,6 +102,7 @@ export class AugmentedAutomationPackagesService
     activationExpression,
     keywordLibraryFile,
     keywordLibraryMavenSnippet,
+    keywordLibraryResourceId,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
@@ -135,6 +137,8 @@ export class AugmentedAutomationPackagesService
 
     if (keywordLibraryMavenSnippet) {
       params = params.set('keywordLibraryMavenSnippet', keywordLibraryMavenSnippet);
+    } else if (keywordLibraryResourceId) {
+      params = params.set('keywordLibraryResourceId', keywordLibraryResourceId);
     }
 
     const request$ = this._http.request(
