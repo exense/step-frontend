@@ -6,7 +6,7 @@
       <form [formGroup]="form">
         @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
-            <step-upload-container (filesChange)="handleDrop($event)">
+            <step-upload-container (filesChange)="handleDrop(automationPackageFile, $event)">
               <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
                 <step-label>Automation Package (jar or ZIP file)</step-label>
                 <step-label-addon>
@@ -15,7 +15,7 @@
                     matTooltip="Drag & Drop or select your automation package jar / ZIP file"
                   />
                 </step-label-addon>
-                <input type="text" readonly formControlName="APFileName" name="fileName" />
+                <input type="text" readonly formControlName="apFileName" name="fileName" />
                 <step-suffix class="button-suffix">
                   <button type="button" mat-stroked-button (click)="openFileChooseDialog(automationPackageFile)">
                     <step-icon name="folder-plus"></step-icon>
@@ -57,7 +57,7 @@
 
         @switch (dependenciesFile.uploadType) {
           @case (UploadType.UPLOAD) {
-            <step-upload-container (filesChange)="handleDrop($event)">
+            <step-upload-container (filesChange)="handleDrop(dependenciesFile, $event)">
               <step-form-field alignLabelAddon="near">
                 <step-label>Dependencies (jar or ZIP file)</step-label>
                 <step-label-addon>

@@ -22,6 +22,7 @@ enum UploadType {
 }
 
 type FileUploadOrMaven = {
+  name: string;
   uploadType: UploadType;
   fileInputRef: Signal<ElementRef<HTMLInputElement>>;
   file?: File;
@@ -50,9 +51,9 @@ export class AutomationPackageUploadDialogComponent {
   protected readonly isNewPackage = !this._package;
 
   protected form = this._fb.group({
-    APFileName: this._fb.control('', this.isNewPackage ? Validators.required : null),
+    apFileName: this._fb.control('', this.isNewPackage ? Validators.required : null),
+    apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
     dependenciesFileName: this._fb.control(''),
-    APMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
     dependenciesMavenSnippet: this._fb.control(''),
     version: this._fb.control(this._package?.version),
     activationExpression: this._fb.control(this._package?.activationExpression?.script),
@@ -60,23 +61,25 @@ export class AutomationPackageUploadDialogComponent {
 
   private automationPackageFileRef = viewChild.required<ElementRef<HTMLInputElement>>('automationPackageFileInput');
   protected automationPackageFile: FileUploadOrMaven = {
+    name: 'automation-package-file',
     uploadType: UploadType.UPLOAD,
     fileInputRef: this.automationPackageFileRef,
-    formControl: this.form.controls.APFileName,
+    formControl: this.form.controls.apFileName,
   };
 
   private dependenciesFileRef = viewChild.required<ElementRef<HTMLInputElement>>('dependenciesFileInput');
   protected dependenciesFile: FileUploadOrMaven = {
+    name: 'dependencies-file',
     uploadType: UploadType.UPLOAD,
     fileInputRef: this.dependenciesFileRef,
-    formControl: this.form.controls.APFileName,
+    formControl: this.form.controls.dependenciesFileName,
   };
 
   private effectSwitchTab = effect(() => {
     if (this.automationPackageFile.uploadType === UploadType.UPLOAD) {
-      this.form.controls.APFileName.markAsUntouched();
+      this.form.controls.apFileName.markAsUntouched();
     } else {
-      this.form.controls.APMavenSnippet.markAsUntouched();
+      this.form.controls.apMavenSnippet.markAsUntouched();
     }
   });
 
@@ -84,7 +87,7 @@ export class AutomationPackageUploadDialogComponent {
     ? 'New Automation Package'
     : `Edit Automation Package "${this._package.attributes?.['name'] ?? this._package.id}"`;
 
-  protected file?: File;
+  protected files: Record<string, File> = {};
   protected progress$?: Observable<number>;
 
   protected toggleMavenUpload(control: FileUploadOrMaven): void {
@@ -96,18 +99,21 @@ export class AutomationPackageUploadDialogComponent {
   }
 
   protected selectFile(control: FileUploadOrMaven): void {
-    this.setFile(control.fileInputRef()?.nativeElement?.files?.[0] ?? undefined);
+    this.setFile(control, control.fileInputRef()?.nativeElement?.files?.[0] ?? undefined);
   }
 
-  protected setFile(file?: File) {
-    this.file = file;
-    this.form.controls.APFileName.setValue(file?.name ?? '');
+  protected setFile(control: FileUploadOrMaven, file?: File) {
+    if (!file) {
+      return;
+    }
+    this.files[control.name] = file!;
+    control.formControl.setValue(file!.name ?? '');
   }
 
-  protected handleDrop(files: FileList | File[]): void {
+  protected handleDrop(control: FileUploadOrMaven, files: FileList | File[]): void {
     const file = Array.isArray(files) ? files[0] : files.item(0);
     if (file) {
-      this.setFile(file);
+      this.setFile(control, file);
     }
   }
 
@@ -117,23 +123,23 @@ export class AutomationPackageUploadDialogComponent {
     }
 
     if (this.automationPackageFile.uploadType === UploadType.UPLOAD) {
-      if (!this.file) {
-        this.form.controls.APFileName.setValue('');
+      if (!this.files[this.automationPackageFile.name]) {
+        this.form.controls.apFileName.setValue('');
       }
-      if (this.form.controls.APFileName.invalid) {
-        this.form.controls.APFileName.markAsTouched();
+      if (this.form.controls.apFileName.invalid) {
+        this.form.controls.apFileName.markAsTouched();
         return;
       }
     }
 
-    if (this.automationPackageFile.uploadType === UploadType.MAVEN && this.form.controls.APMavenSnippet.invalid) {
-      this.form.controls.APMavenSnippet.markAsTouched();
+    if (this.automationPackageFile.uploadType === UploadType.MAVEN && this.form.controls.apMavenSnippet.invalid) {
+      this.form.controls.apMavenSnippet.markAsTouched();
       return;
     }
 
-    const { version, activationExpression, APMavenSnippet } = this.form.value;
+    const { version, activationExpression, apMavenSnippet, dependenciesMavenSnippet } = this.form.value;
 
-    if (this._package?.id && !this.file && !APMavenSnippet) {
+    if (this._package?.id && !this.files[this.automationPackageFile.name] && !apMavenSnippet) {
       this._api
         .updateAutomationPackageMetadata(this._package.id, activationExpression, version)
         .subscribe(() => this._dialogRef.close({ isSuccess: true }));
@@ -142,10 +148,12 @@ export class AutomationPackageUploadDialogComponent {
 
     const upload = this._api.automationPackageCreateOrUpdate({
       id: this._package?.id,
-      file: this.file,
+      apFile: this.files[this.automationPackageFile.name],
+      apMavenSnippet: apMavenSnippet,
+      keywordLibraryFile: this.files[this.dependenciesFile.name],
+      keywordLibraryMavenSnippet: dependenciesMavenSnippet,
       version,
       activationExpression,
-      mavenSnippet: APMavenSnippet,
     });
 
     this.progress$ = upload.progress$;

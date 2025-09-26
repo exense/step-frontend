@@ -17,8 +17,10 @@ import { HttpRequestContextHolderService } from './http-request-context-holder.s
 
 export interface AutomationPackageParams {
   id?: string;
-  file?: File;
-  mavenSnippet?: string;
+  apFile?: File;
+  apMavenSnippet?: string;
+  keywordLibraryFile?: File;
+  keywordLibraryMavenSnippet?: string;
   version?: string;
   activationExpression?: string;
 }
@@ -93,41 +95,46 @@ export class AugmentedAutomationPackagesService
 
   automationPackageCreateOrUpdate({
     id,
-    file,
+    apFile,
+    apMavenSnippet,
     version,
     activationExpression,
-    mavenSnippet,
+    keywordLibraryFile,
+    keywordLibraryMavenSnippet,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
     if (!!id) {
       url = `${url}/${id}`;
     }
-    if (!!mavenSnippet) {
-      url = `${url}/mvn`;
-    }
 
     let body: FormData | string;
-    if (mavenSnippet) {
-      body = mavenSnippet;
-    } else {
-      body = new FormData();
-      body.set('file', file!);
+    body = new FormData();
+    if (apFile) {
+      body.set('file', apFile!);
+    }
+    if (keywordLibraryFile) {
+      body.set('keywordLibraryFile', keywordLibraryFile!);
     }
 
     let headers: HttpHeaders;
-    if (typeof body === 'string') {
-      headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
-    } else {
-      headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    }
+    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
 
     let params = new HttpParams().set('async', true);
+
     if (version) {
       params = params.set('version', version);
     }
     if (activationExpression) {
       params = params.set('activationExpr', activationExpression);
+    }
+
+    if (apMavenSnippet) {
+      params = params.set('apMavenSnippet', apMavenSnippet);
+    }
+
+    if (keywordLibraryMavenSnippet) {
+      params = params.set('keywordLibraryMavenSnippet', keywordLibraryMavenSnippet);
     }
 
     const request$ = this._http.request(
