@@ -10,10 +10,11 @@ import { RichEditorComponent } from '../../../rich-editor';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { from } from 'rxjs';
+import { TraceViewerComponent } from '../trace-viewer/trace-viewer.component';
 
 @Component({
   selector: 'step-attachment-dialog',
-  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent],
+  imports: [StepBasicsModule, AttachmentUrlPipe, NgOptimizedImage, RichEditorComponent, TraceViewerComponent],
   templateUrl: './attachment-dialog.component.html',
   styleUrl: './attachment-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +31,7 @@ export class AttachmentDialogComponent implements OnInit {
   private _clipboard = inject(DOCUMENT).defaultView!.navigator.clipboard;
   protected readonly _data = inject<AttachmentMeta>(MAT_DIALOG_DATA);
 
+  private traceViewer = viewChild('traceViewer', { read: TraceViewerComponent });
   private richEditor = viewChild('richEditor', { read: RichEditorComponent });
   protected readonly contentCtrl = this._fb.control('');
   protected readonly attachmentType = this._attachmentUtils.determineAttachmentType(this._data);
@@ -41,6 +43,10 @@ export class AttachmentDialogComponent implements OnInit {
 
   protected download(): void {
     this._attachmentUtils.downloadAttachment(this._data);
+  }
+
+  protected openTraceViewerInSeparateTab(): void {
+    this.traceViewer()?.openInSeparateTab?.();
   }
 
   private initializeContent(): void {
