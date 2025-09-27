@@ -13,7 +13,7 @@ import { TooltipContextData } from '../../../../../timeseries/modules/chart/inje
 import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
 import { TSChartSeries } from '../../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
-import { FilterUtils, OQLBuilder } from '../../../../../timeseries/modules/_common';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 interface TransformedSeries {
@@ -46,17 +46,24 @@ export class ExecutionsChartTooltipComponent {
   reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
+  readonly scaleKey = input.required<string>();
 
   selectedSeries?: TransformedSeries;
   selectedSeriesExecutions: ExecutionItem[] = [];
   executionsListTruncated: boolean = false;
 
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
+    console.log('transofrmed data');
     const contextData = this.data();
     this.selectedSeriesExecutions = [];
     this.executionsListTruncated = false;
     this.selectedSeries = undefined;
     const transformedSeries: TransformedSeries[] = [];
+    if (!contextData) {
+      return [];
+    }
+    contextData.series = contextData.series.filter((s) => s.scale === this.scaleKey());
+    console.log(contextData.series, this.scaleKey);
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;
       let value =
