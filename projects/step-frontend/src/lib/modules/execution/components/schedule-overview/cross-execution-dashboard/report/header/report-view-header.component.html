@@ -1,7 +1,15 @@
 <div class="container">
   <step-alt-report-widget title="Success Rate" style="min-height: unset" class="summary-card">
     <step-alt-report-widget-content>
-      <div class="card-value">100%</div>
+      <div class="card-value">
+        @if (successRateValue | async; as data) {
+          {{ data }}
+        } @else {
+          <div class="spinner-container">
+            <mat-spinner [diameter]="18" />
+          </div>
+        }
+      </div>
     </step-alt-report-widget-content>
   </step-alt-report-widget>
 
@@ -17,3 +25,5 @@
     </step-alt-report-widget-content>
   </step-alt-report-widget>
 </div>
+
+<div style="visibility: hidden">{{ successRateValue | async }}</div>
