@@ -25,6 +25,17 @@ interface ItemWithExecutionsStatuses {
 
 export type HeatMapChartType = 'keywords' | 'testcases';
 
+type HeatmapStatus =
+  | 'VETOED'
+  | 'TECHNICAL_ERROR'
+  | 'IMPORT_ERROR'
+  | 'FAILED'
+  | 'INTERRUPTED'
+  | 'PASSED'
+  | 'SKIPPED'
+  | 'NORUN'
+  | 'UNKNOWN';
+
 @Component({
   selector: 'step-cross-execution-heatmap',
   templateUrl: './cross-execution-heatmap.component.html',
@@ -60,7 +71,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     },
   ];
 
-  readonly HEATMAP_STATUS_COLORS: Record<string, string> = {
+  readonly HEATMAP_STATUS_COLORS: Record<HeatmapStatus, string> = {
     VETOED: COLORS.TECHNICAL_ERROR,
     TECHNICAL_ERROR: COLORS.TECHNICAL_ERROR,
     IMPORT_ERROR: COLORS.TECHNICAL_ERROR,
@@ -211,7 +222,9 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
             const count = statusCounts[st] || 0;
             if (!count) continue;
             const statusHex =
-              this.HEATMAP_STATUS_COLORS[st] || this.HEATMAP_STATUS_COLORS['UNKNOWN'] || this.FALLBACK_COLOR;
+              this.HEATMAP_STATUS_COLORS[st as HeatmapStatus] ||
+              this.HEATMAP_STATUS_COLORS['UNKNOWN'] ||
+              this.FALLBACK_COLOR;
             const statusRgb = HeatmapColorUtils.hexToRgb(statusHex);
             combinedColor = HeatmapColorUtils.addColor(combinedColor, statusRgb, count / total);
           }
