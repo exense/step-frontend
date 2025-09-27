@@ -27,11 +27,12 @@
   line-height: 1.2;
   color: #333;
 
-  &.first {
+  &:first-child {
     transform: translateX(0%);
     text-align: left;
   }
-  &.last {
+
+  &:last-child {
     transform: translateX(-100%);
     text-align: right;
   }

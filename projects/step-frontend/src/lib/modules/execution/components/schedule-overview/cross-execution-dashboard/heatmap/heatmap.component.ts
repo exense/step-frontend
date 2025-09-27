@@ -87,9 +87,8 @@ export class HeatmapComponent {
   filteredAndPaginatedRows = computed(() => {
     const filtered = this.filteredRows();
     const rawPage = this.page();
-    const rawPageSize = this.pageSize();
+    const pageSize = this.pageSize();
 
-    const pageSize = Math.max(1, rawPageSize); // never 0
     const total = filtered.length;
     const pageCount = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(Math.max(1, rawPage + 1), pageCount); // clamp

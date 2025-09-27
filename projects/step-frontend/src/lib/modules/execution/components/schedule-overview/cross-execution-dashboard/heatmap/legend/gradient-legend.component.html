@@ -5,6 +5,7 @@
     [style.background]="gradientCss()"
     role="img"
     aria-label="Legend gradient"
+    matTooltip="The heatmap shows ambivalent statuses—i.e., a Test Case executed multiple times with different results—as mixed colors. The legend’s gradient provides a visual aid for some of these cases. Note: mixes can involve more than two statuses, or statuses that are not adjacent in this legend."
   ></div>
 
   <div class="markers" *ngIf="computedData().length > 0">

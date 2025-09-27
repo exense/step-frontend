@@ -14,7 +14,7 @@ import {
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, switchMap, take } from 'rxjs';
 import { OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
-import { HeatmapColorUtils } from './heatmap-color-utils';
+import { HeatmapColorUtils, RGB } from './heatmap-color-utils';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatmapData, HeatMapRow } from './types/heatmap-types';
 
@@ -60,25 +60,25 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     },
   ];
 
-  readonly legendColors: HeatMapColor[] = [
-    { hex: '#01a990', label: 'Passed' },
-    { hex: '#ff595b', label: 'Failed' },
-    { hex: '#000000', label: 'Technical Error' },
-    { hex: COLORS.NORUN, label: 'Skipped/No run' },
-    { hex: '#e1cc01', label: 'Interrupted' },
-  ];
-
-  HEATMAP_STATUS_COLORS: Record<string, string> = {
-    VETOED: '#000000',
-    TECHNICAL_ERROR: '#000000',
-    IMPORT_ERROR: '#000000',
-    FAILED: '#ff595b',
-    INTERRUPTED: '#e1cc01',
-    PASSED: '#01a990',
-    SKIPPED: '#a0a0a0',
-    NORUN: '#a0a0a0',
-    UNKNOWN: '#cccccc',
+  readonly HEATMAP_STATUS_COLORS: Record<string, string> = {
+    VETOED: COLORS.TECHNICAL_ERROR,
+    TECHNICAL_ERROR: COLORS.TECHNICAL_ERROR,
+    IMPORT_ERROR: COLORS.TECHNICAL_ERROR,
+    FAILED: COLORS.FAILED,
+    INTERRUPTED: COLORS.INTERRUPTED,
+    PASSED: COLORS.PASSED,
+    SKIPPED: COLORS.SKIPPED,
+    NORUN: COLORS.NORUN,
+    UNKNOWN: COLORS.UNKNOW,
   };
+
+  readonly legendColors: HeatMapColor[] = [
+    { hex: this.HEATMAP_STATUS_COLORS.PASSED, label: 'Passed' },
+    { hex: this.HEATMAP_STATUS_COLORS.FAILED, label: 'Failed' },
+    { hex: this.HEATMAP_STATUS_COLORS.TECHNICAL_ERROR, label: 'Technical Error' },
+    { hex: this.HEATMAP_STATUS_COLORS.NORUN, label: 'Skipped/No run' },
+    { hex: this.HEATMAP_STATUS_COLORS.INTERRUPTED, label: 'Interrupted' },
+  ];
 
   FALLBACK_COLOR = COLORS.NORUN;
 
@@ -89,7 +89,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     distinctUntilChanged(),
   );
 
-  switchType(newType: HeatMapChartType) {
+  protected switchType(newType: HeatMapChartType) {
     this.heatmapType.set(newType);
   }
 
@@ -106,7 +106,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
       const attributesType = isKeywordsHeatmap ? 'keyword' : 'testcase';
       const nameAttribute = 'name';
 
-      const execClause =
+      const executionsClause =
         executions.length > 0
           ? `(${executions.map((e) => `attributes.${executionIdAttribute} = "${e.id!}"`).join(' or ')})`
           : '(1 = 1)';
@@ -114,8 +114,8 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "response-time"')
-        .append(`attributes.type = "${attributesType}"`) // TODO add custom also?
-        .append(execClause)
+        .append(`attributes.type = "${attributesType}"`)
+        .append(executionsClause)
         .close()
         .build();
 
@@ -136,7 +136,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
           response.matrixKeys.forEach((keyAttributes, i) => {
             const bucket: BucketResponse = response.matrix[i][0];
             const itemKey = String(keyAttributes[nameAttribute] ?? keyAttributes['key'] ?? '');
-            const execId = String(keyAttributes[executionIdAttribute]);
+            const executionId = String(keyAttributes[executionIdAttribute]);
             const status = String(keyAttributes[statusAttribute] ?? 'UNKNOWN');
             const count = bucket?.count ?? 0;
 
@@ -148,27 +148,27 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
               itemsMap[itemKey] = item;
             }
 
-            let statusesCount = item.statusesByExecutions[execId];
+            let statusesCount = item.statusesByExecutions[executionId];
             if (statusesCount === null || statusesCount === undefined) {
               statusesCount = {};
-              item.statusesByExecutions[execId] = statusesCount;
+              item.statusesByExecutions[executionId] = statusesCount;
             }
 
             statusesCount[status] = (statusesCount[status] ?? 0) + count;
           });
 
-          const statusesArr = Array.from(allStatuses);
+          const statusArr = Array.from(allStatuses);
           Object.values(itemsMap).forEach((item) => {
             allExecutionIds.forEach((execId) => {
-              let execMap = item.statusesByExecutions[execId];
-              if (execMap === null || execMap === undefined) {
-                execMap = {};
-                item.statusesByExecutions[execId] = execMap;
+              let executionMap = item.statusesByExecutions[execId];
+              if (executionMap === null || executionMap === undefined) {
+                executionMap = {};
+                item.statusesByExecutions[execId] = executionMap;
               }
 
-              statusesArr.forEach((st) => {
-                if (execMap[st] === null || execMap[st] === undefined) {
-                  execMap[st] = 0;
+              statusArr.forEach((st) => {
+                if (executionMap[st] === null || executionMap[st] === undefined) {
+                  executionMap[st] = 0;
                 }
               });
             });
@@ -182,7 +182,6 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   );
 
   convertToTableData(executions: Execution[], timeseriesItems: ItemWithExecutionsStatuses[]): HeatmapData {
-    console.log(timeseriesItems);
     const executionsByIds: Record<string, Execution> = {};
     const columns: HeatmapColumn[] = [];
     executions.forEach((e) => {
@@ -195,35 +194,30 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
       .map<HeatMapRow>((item) => {
         const values: Record<string, HeatMapCell> = {};
 
-        for (const exec of executions) {
-          const execId = exec.id!;
-          const statusCounts = item.statusesByExecutions?.[execId] || {};
+        for (const execution of executions) {
+          const executionId = execution.id!;
+          const statusCounts = item.statusesByExecutions?.[executionId] || {};
           const statuses = Object.keys(statusCounts);
           let total = 0;
           for (const st of statuses) total += statusCounts[st] || 0;
 
           if (!total) {
-            values[execId] = { color: this.FALLBACK_COLOR, timestamp: exec.startTime!, statusesCount: {} };
+            values[executionId] = { color: this.FALLBACK_COLOR, timestamp: execution.startTime!, statusesCount: {} };
             continue;
           }
 
-          let r = 0;
-          let g = 0;
-          let b = 0;
+          let combinedColor: RGB = { r: 0, g: 0, b: 0 };
           for (const st of statuses) {
             const count = statusCounts[st] || 0;
             if (!count) continue;
-            const colorHex =
+            const statusHex =
               this.HEATMAP_STATUS_COLORS[st] || this.HEATMAP_STATUS_COLORS['UNKNOWN'] || this.FALLBACK_COLOR;
-            const { r: cr, g: cg, b: cb } = HeatmapColorUtils.convertHexToRgb(colorHex);
-            const w = count / total;
-            r += cr * w;
-            g += cg * w;
-            b += cb * w;
+            const statusRgb = HeatmapColorUtils.hexToRgb(statusHex);
+            combinedColor = HeatmapColorUtils.addColor(combinedColor, statusRgb, count / total);
           }
-          values[execId] = {
-            color: HeatmapColorUtils.rgbToHex(r, g, b),
-            timestamp: exec.startTime!,
+          values[executionId] = {
+            color: HeatmapColorUtils.rgbToHex(combinedColor),
+            timestamp: execution.startTime!,
             statusesCount: statusCounts,
           };
         }
