@@ -2,6 +2,7 @@
   <step-table
     #table
     [dataSource]="(dataSource$ | async)!"
+    [indicatorMode]="TableIndicatorMode.SPINNER"
     class="paddingless no-border hide-header no-highlight special-selection"
   >
     <ng-container matColumnDef="name">

@@ -10,19 +10,19 @@ import {
   EventEmitter,
   forwardRef,
   inject,
-  Injector,
   input,
   Input,
+  linkedSignal,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
   QueryList,
-  runInInjectionContext,
   signal,
   SimpleChanges,
   TemplateRef,
   TrackByFunction,
+  untracked,
   viewChild,
   ViewChild,
   viewChildren,
@@ -34,7 +34,6 @@ import {
   map,
   Observable,
   of,
-  shareReplay,
   startWith,
   Subject,
   switchMap,
@@ -51,7 +50,7 @@ import { TableLocalDataSource } from '../../shared/table-local-data-source';
 import { TableSearch } from '../../services/table-search';
 import { SearchValue } from '../../shared/search-value';
 import { ColumnDirective } from '../../directives/column.directive';
-import { TableRequestData, TableParameters, StepDataSource } from '../../../../client/step-client-module';
+import { StepDataSource, TableParameters, TableRequestData } from '../../../../client/step-client-module';
 import { AdditionalHeaderDirective } from '../../directives/additional-header.directive';
 import { TableFilter } from '../../services/table-filter';
 import { TableReload } from '../../services/table-reload';
@@ -76,8 +75,9 @@ import { RowsExtensionDirective } from '../../directives/rows-extension.directiv
 import { RowDirective } from '../../directives/row.directive';
 import { EntitySelectionStateUpdatable, SelectionList } from '../../../entities-selection';
 import { TableSelectionList } from '../../shared/selection/table-selection-list';
-import { TableRemoteSelectionList } from '../../shared/selection/table-remote-selection-list';
-import { TableLocalSelectionList } from '../../shared/selection/table-local-selection-list';
+import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
+import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
+import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -86,11 +86,21 @@ interface SearchData {
   resetPagination: boolean;
 }
 
+enum EmptyState {
+  INITIAL,
+  NO_DATA,
+  NO_MATCHING_RECORDS,
+}
+
 @Component({
   selector: 'step-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class.in-progress]': 'applyInProgressClass()',
+    '[class.use-skeleton-placeholder]': 'useSkeletonPlaceholder()',
+  },
   providers: [
     {
       provide: TableSearch,
@@ -130,6 +140,7 @@ interface SearchData {
     TableColumnsDefinitionService,
     TableCustomColumnsService,
     TableColumnsService,
+    TableSelectionListFactoryService,
     {
       provide: SelectionList,
       useExisting: forwardRef(() => TableComponent),
@@ -158,7 +169,7 @@ export class TableComponent<T>
   private _columnsDefinitions = inject(TableColumnsDefinitionService);
   readonly _tableColumns = inject(TableColumnsService);
   private _selectionState = inject(EntitySelectionStateUpdatable, { optional: true });
-  private _injector = inject(Injector);
+  private _tableSelectionListFactory = inject(TableSelectionListFactoryService);
 
   private initRequired: boolean = false;
   private hasCustom: boolean = false;
@@ -176,7 +187,58 @@ export class TableComponent<T>
 
   private usedColumns = new Set<string>();
 
-  readonly inProgress = input(false);
+  readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
+
+  readonly inProgressExternal = input(false, { alias: 'inProgress' });
+  private inProgressDataSource = signal(false);
+  private total = signal<number | null>(null);
+  private isTableReadyToRenderColumns = signal(false);
+
+  protected readonly EmptyState = EmptyState;
+  protected readonly emptyState = computed(() => {
+    const total = this.total();
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    if (total === null || !isColumnsInitialized) {
+      return EmptyState.INITIAL;
+    }
+    if (total === 0) {
+      return EmptyState.NO_DATA;
+    }
+
+    return EmptyState.NO_MATCHING_RECORDS;
+  });
+
+  protected readonly useSkeletonPlaceholder = linkedSignal(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD || indicatorMode == TableIndicatorMode.SKELETON;
+  });
+
+  protected readonly useSpinner = computed(() => {
+    const indicatorMode = this.indicatorMode();
+    return indicatorMode === TableIndicatorMode.SPINNER;
+  });
+
+  private effectResetSkeletonPlaceholderOnInitialLoad = effect(() => {
+    const indicatorMode = this.indicatorMode();
+    const emptyState = this.emptyState();
+    if (indicatorMode == TableIndicatorMode.SKELETON_ON_INITIAL_LOAD && emptyState !== EmptyState.INITIAL) {
+      setTimeout(() => {
+        this.useSkeletonPlaceholder.set(false);
+      }, 500);
+    }
+  });
+
+  protected readonly inProgress = computed(() => {
+    const inProgressExternal = this.inProgressExternal();
+    const inProgressDataSource = this.inProgressDataSource();
+    return inProgressExternal || inProgressDataSource;
+  });
+
+  protected readonly applyInProgressClass = computed(() => {
+    const inProgress = this.inProgress();
+    const emptyState = this.emptyState();
+    return inProgress || emptyState === EmptyState.INITIAL;
+  });
 
   protected tableDataSource?: TableDataSource<T>;
   private tableSelectionList?: TableSelectionList<T, TableDataSource<T>>;
@@ -230,6 +292,12 @@ export class TableComponent<T>
 
   private viewColumns = viewChildren(ColumnDirective);
 
+  private columnsPlaceholder = viewChild(ColumnsPlaceholdersComponent);
+  private columnsPlaceholderIds = computed(() => {
+    const cols = this.columnsPlaceholder()?.colDef?.() ?? [];
+    return cols.map((col) => col.name);
+  });
+
   private columnsUpdateTrigger = signal(0);
 
   private columns = computed(() => {
@@ -281,8 +349,16 @@ export class TableComponent<T>
   readonly pageSizeOptions = toSignal(this._itemsPerPageService.getItemsPerPage(), { initialValue: [] });
 
   readonly displayColumns = computed(() => {
+    const isColumnsInitialized = this._tableColumns.isInitialized();
+    const columnPlaceholderIds = untracked(() => this.columnsPlaceholderIds());
+    const isTableReady = this.isTableReadyToRenderColumns();
     const visibleColumnsByConfig = this._tableColumns.visibleColumns();
     const visibleColumnsByInput = this.visibleColumns();
+
+    if (!isColumnsInitialized) {
+      return isTableReady ? columnPlaceholderIds : [];
+    }
+
     if (!visibleColumnsByInput) {
       return visibleColumnsByConfig;
     }
@@ -343,6 +419,7 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
+    this.inProgressDataSource.set(false);
     this.tableSelectionList?.destroy?.();
     this.tableSelectionList = undefined;
   }
@@ -366,13 +443,7 @@ export class TableComponent<T>
     this.tableDataSource = tableDataSource;
 
     if (this._selectionState) {
-      if (tableDataSource instanceof TableRemoteDataSource) {
-        this.tableSelectionList =
-          runInInjectionContext(this._injector, () => new TableRemoteSelectionList(tableDataSource)) || undefined;
-      } else if (tableDataSource instanceof TableLocalDataSource) {
-        this.tableSelectionList =
-          runInInjectionContext(this._injector, () => new TableLocalSelectionList(tableDataSource)) || undefined;
-      }
+      this.tableSelectionList = this._tableSelectionListFactory.create(tableDataSource);
     }
 
     if (!this.page) {
@@ -410,6 +481,14 @@ export class TableComponent<T>
 
     tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
       this.page!.firstPage();
+    });
+
+    tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+      this.inProgressDataSource.set(inProgress);
+    });
+
+    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.total.set(total);
     });
   }
 
@@ -613,6 +692,14 @@ export class TableComponent<T>
   }
 
   private configureColumns(): void {
+    const columnsPlaceholder = this.columnsPlaceholder()?.colDef?.() ?? [];
+    columnsPlaceholder.forEach((col) => {
+      if (!this.usedColumns.has(col.name)) {
+        this.usedColumns.add(col.name);
+        this.table!.addColumnDef(col);
+      }
+    });
+
     const allCollDef = this.allCollDef();
     allCollDef.forEach((col) => {
       if (!this.usedColumns.has(col.name) && !col.name.startsWith('search-')) {
@@ -620,6 +707,7 @@ export class TableComponent<T>
         this.table!.addColumnDef(col);
       }
     });
+    this.isTableReadyToRenderColumns.set(true);
   }
 
   private configureSearchColumns(): void {

@@ -1,3 +1,11 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .form-field-content {
   height: 100%;
+}
+
+step-description {
+  color: var.$gray-500;
+  margin-bottom: 1rem;
+  display: inline-block;
 }

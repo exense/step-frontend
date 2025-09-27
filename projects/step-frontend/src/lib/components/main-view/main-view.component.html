@@ -40,10 +40,12 @@
   </button>
   @if (_appConfig.conf?.authentication) {
     @if (_authService.isAuthenticated$ | async) {
-      <button type="button" mat-menu-item (click)="_authService.logout()">
-        <step-icon name="power" />
-        Logout
-      </button>
+      @if (!_authService.isOidc()) {
+        <button type="button" mat-menu-item (click)="_authService.logout()">
+          <step-icon name="power" />
+          Logout
+        </button>
+      }
     } @else {
       <button type="button" mat-menu-item (click)="_authService.goToLoginPage()">Sign in</button>
     }

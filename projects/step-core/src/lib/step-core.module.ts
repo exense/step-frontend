@@ -14,6 +14,7 @@ import { ReportNodeStatusComponent } from './components/report-node-status/repor
 import { SettingButtonComponent } from './components/setting-button/setting-button.component';
 import { CORE_INITIALIZER } from './core-initialiser';
 import { CapsLockDirective } from './directives/caps-lock.directive';
+import { ClampFadeDirective } from './directives/clamp-fade.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
 import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
@@ -145,12 +146,14 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
     SEARCH_EXPORTS,
+    ClampFadeDirective,
   ],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CapsLockDirective,
+    ClampFadeDirective,
     StepMaterialModule,
     JsonViewerModule,
     MatchingAuthenticator,
@@ -264,6 +267,7 @@ export * from './components/user-settings-button/user-settings-button.component'
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './modules/plan-common/components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './directives/caps-lock.directive';
+export * from './directives/clamp-fade.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
 export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';

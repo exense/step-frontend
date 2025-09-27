@@ -1,7 +1,7 @@
 import { computed, DestroyRef, inject, Injectable } from '@angular/core';
 import { EXECUTION_ID } from './execution-id.token';
 import { FormBuilder } from '@angular/forms';
-import { REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
+import { ERROR_STATUSES, REPORT_NODE_STATUS, Status } from '../../_common/shared/status.enum';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, debounceTime, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs';
 import { AltExecutionStorageService } from './alt-execution-storage.service';
@@ -33,10 +33,12 @@ export abstract class AltReportNodesFilterService {
   );
 
   readonly statuses = REPORT_NODE_STATUS;
-
-  readonly isFilteredByNonPassedAndNoRunning = computed(() => {
-    const statuses = new Set(this.statusCtrlValue());
-    return statuses.size === this.statuses.length - 2 && !statuses.has(Status.PASSED) && !statuses.has(Status.RUNNING);
+  private errorStatusesSet = new Set(ERROR_STATUSES);
+  readonly isFilteredByErrorStatuses = computed(() => {
+    const statuses = this.statusCtrlValue() ?? [];
+    return (
+      statuses.length === this.errorStatusesSet.size && statuses.every((status) => this.errorStatusesSet.has(status))
+    );
   });
 
   updateStatusCtrl(statuses: Status[], artefactClass?: string): void {
@@ -44,11 +46,9 @@ export abstract class AltReportNodesFilterService {
     this.artefactClassCtrl.setValue(artefactClass ? [artefactClass] : []);
   }
 
-  toggleFilterNonPassedAndNoRunning(): void {
-    const isFilteredByNonPassed = this.isFilteredByNonPassedAndNoRunning();
-    const statuses = !isFilteredByNonPassed
-      ? this.statuses.filter((status) => status !== Status.PASSED && status !== Status.RUNNING)
-      : [];
+  toggleErrorStatuses(): void {
+    const isFilteredByErrorStatuses = this.isFilteredByErrorStatuses();
+    const statuses = !isFilteredByErrorStatuses ? [...ERROR_STATUSES] : [];
     this.statusesCtrl.setValue(statuses);
   }
 
