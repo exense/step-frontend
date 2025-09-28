@@ -1,0 +1,26 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1.6rem;
+}
+
+.history-item-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    height: 2px;
+    width: 40px;
+    background: #2563eb;
+    transform: translateY(-50%);
+    z-index: -1;
+  }
+}

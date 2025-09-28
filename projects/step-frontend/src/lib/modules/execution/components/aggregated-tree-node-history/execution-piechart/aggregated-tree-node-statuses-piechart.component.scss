@@ -1,0 +1,13 @@
+:host {
+  display: inline-block;
+  line-height: 0; // remove extra inline spacing around canvas
+}
+canvas {
+  display: block;
+  width: 80px;
+}
+
+.container {
+  width: 40px;
+  height: 40px;
+}

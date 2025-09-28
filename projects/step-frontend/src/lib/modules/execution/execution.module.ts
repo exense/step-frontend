@@ -163,6 +163,8 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
+import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 
 @NgModule({
   declarations: [
@@ -263,6 +265,8 @@ import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu'
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
     HeatmapComponent,
+    AggregatedTreeNodeHistoryComponent,
+    AggregatedTreeNodeStatusesPiechartComponent,
   ],
   imports: [
     StepCommonModule,

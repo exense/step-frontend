@@ -1,0 +1,20 @@
+<div class="container">
+  @if (lastExecutions | async; as executions) {
+    @for (execution of executions; track execution.id!) {
+      <div class="history-item-container">
+        <step-aggregated-tree-node-statuses-piechart
+          [slices]="[
+            { label: 'passed', color: '#0ea5a4', percentage: 70 },
+            { label: 'failed', color: '#ef4444', percentage: 20 },
+            { label: 'skipped', color: '#111827', percentage: 10 }
+          ]"
+        >
+        </step-aggregated-tree-node-statuses-piechart>
+        <div>
+          29.06 <br />
+          15:30
+        </div>
+      </div>
+    }
+  }
+</div>
