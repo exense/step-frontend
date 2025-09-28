@@ -2,7 +2,8 @@ import { Component, computed, inject, OnInit } from '@angular/core';
 import { CrossExecutionDashboardState } from '../../cross-execution-dashboard-state';
 import { map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { ReportNodeSummary } from '../../../../../shared/report-node-summary';
-import { FilterUtils, OQLBuilder } from '../../../../../../timeseries/modules/_common';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig } from '../../../../../../timeseries/modules/_common';
+import { BucketResponse } from '@exense/step-core';
 
 @Component({
   selector: 'step-scheduler-report-view-header',
@@ -13,7 +14,7 @@ import { FilterUtils, OQLBuilder } from '../../../../../../timeseries/modules/_c
 export class ReportViewHeaderComponent {
   readonly _state = inject(CrossExecutionDashboardState);
 
-  successRateValue: Observable<string> = this._state.summaryData$.pipe(
+  successRateValue$: Observable<string> = this._state.summaryData$.pipe(
     map((summaryData: ReportNodeSummary) => {
       const passed = summaryData.items['PASSED'];
       if (summaryData.total === 0) {
@@ -24,22 +25,34 @@ export class ReportViewHeaderComponent {
     shareReplay(1),
   );
 
-  // averageExecutionDurationValue = this._state.timeRange$.pipe(
-  //   switchMap(duration => {
-  //     const statusAttribute = 'result';
-  //     const oql = new OQLBuilder()
-  //       .open('and')
-  //       .append('attributes.metricType = "executions/duration"')
-  //       .append(FilterUtils.filtersToOQL([this.getDashboardFilter()], 'attributes'))
-  //       .build();
-  //     const request: FetchBucketsRequest = {
-  //       start: timeRange.from,
-  //       end: timeRange.to,
-  //       numberOfBuckets: 30, // good amount of uplotBarsFn visually
-  //       oqlFilter: oql,
-  //       groupDimensions: [statusAttribute],
-  //     };
-  //     return this._timeSeriesService.getTimeSeries(request)
-  //   })
-  // )
+  averageExecutionDurationLabel$ = this._state.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      // data is grouped by status
+      let totalCount = 0;
+      let totalDuration = 0;
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        let bucket: BucketResponse = response.matrix[i][0];
+        totalCount += bucket.count;
+        totalDuration += bucket.sum;
+      });
+      if (totalCount === 0) {
+        return '-';
+      } else {
+        return TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(totalDuration / totalCount);
+      }
+    }),
+    shareReplay(1),
+  );
+
+  totalExecutionsCount$ = this._state.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      let totalCount = 0;
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        let bucket: BucketResponse = response.matrix[i][0];
+        totalCount += bucket.count;
+      });
+      return totalCount;
+    }),
+    shareReplay(1),
+  );
 }
