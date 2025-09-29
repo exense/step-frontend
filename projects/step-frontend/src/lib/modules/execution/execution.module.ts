@@ -154,6 +154,8 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import { AltExecutionErrorsDialogComponent } from './components/alt-execution-errors-dialog/alt-execution-errors-dialog.component';
 
 @NgModule({
   declarations: [
@@ -249,6 +251,8 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    AltExecutionErrorsWidgetComponent,
+    AltExecutionErrorsDialogComponent,
   ],
   imports: [
     StepCommonModule,
@@ -298,6 +302,7 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
+    StatusCountBadgeComponent,
   ],
   providers: [
     {
@@ -668,6 +673,11 @@ export class ExecutionModule {
               component: AltExecutionAnalyticsComponent,
             },
             schedulePlanRoute('modal'),
+            dialogRoute({
+              path: 'errors',
+              outlet: 'modal',
+              dialogComponent: AltExecutionErrorsDialogComponent,
+            }),
             dialogRoute({
               path: 'launch',
               outlet: 'modal',

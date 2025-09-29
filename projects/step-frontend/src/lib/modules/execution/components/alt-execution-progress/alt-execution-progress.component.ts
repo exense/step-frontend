@@ -7,10 +7,12 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
@@ -46,6 +48,8 @@ import {
   TableDataSource,
   TableLocalDataSource,
   TimeRange,
+  TimeSeriesErrorEntry,
+  TimeSeriesErrorsRequest,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -348,6 +352,18 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
+
+  private errors$ = combineLatest([this.execution$, this.timeRange$]).pipe(
+    map(([execution, timeRange]) => {
+      const executionId = execution.id;
+      const errorsRequest: TimeSeriesErrorsRequest = { executionId, timeRange };
+      return errorsRequest;
+    }),
+    switchMap((request) => this._timeSeriesService.findErrors(request)),
+    catchError(() => of([] as TimeSeriesErrorEntry[])),
+    map((errors) => (!errors?.length ? undefined : errors)),
+  );
+  readonly errors = toSignal(this.errors$, { initialValue: undefined });
 
   private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
   readonly errorsDataSource$ = of(this.errorsDataSource);

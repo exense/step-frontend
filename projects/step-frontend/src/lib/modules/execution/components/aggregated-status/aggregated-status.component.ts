@@ -7,7 +7,7 @@ export interface StatusItem {
   status: Status;
   className: string;
   count: number;
-  tooltipMessage: string;
+  tooltipMessage?: string;
 }
 
 @Component({
@@ -28,11 +28,13 @@ export class AggregatedStatusComponent {
   readonly statusClick = output<{ status: Status; count: number; event: MouseEvent }>();
 
   readonly hasDescendantInvocations = input<boolean | undefined>(false);
+  readonly showTooltips = input(true);
 
   protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
+    const showTooltips = this.showTooltips();
     return Object.entries(countByStatus)
-      .map(([status, count]) => this.createStatusItem(status, count))
+      .map(([status, count]) => this.createStatusItem(showTooltips, status, count))
       .filter((item) => !!item) as StatusItem[];
   });
 
@@ -49,7 +51,8 @@ export class AggregatedStatusComponent {
   protected readonly emptyStatusMessage = computed(() => {
     const isEmptyStatus = this.isEmptyStatus();
     const hasDescendantInvocations = this.hasDescendantInvocations();
-    if (!isEmptyStatus) {
+    const showTooltips = this.showTooltips();
+    if (!isEmptyStatus || !showTooltips) {
       return '';
     }
 
@@ -62,12 +65,12 @@ export class AggregatedStatusComponent {
     this.statusClick.emit({ status, count, event });
   }
 
-  private createStatusItem(status?: string | Status, count?: number): StatusItem | undefined {
+  private createStatusItem(showTooltips: boolean, status?: string | Status, count?: number): StatusItem | undefined {
     if (!status || !count) {
       return undefined;
     }
     const className = `step-aggregated-status-${status}`;
-    const tooltipMessage = `${status}: ${count}`;
+    const tooltipMessage = showTooltips ? `${status}: ${count}` : undefined;
     return { className, count, status: status as Status, tooltipMessage };
   }
 

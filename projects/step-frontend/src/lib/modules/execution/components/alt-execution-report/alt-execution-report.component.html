@@ -52,8 +52,12 @@
       (fullRange)="_state.selectFullRange()"
     />
   }
+  @if (_state.errors(); as errors) {
+    <step-alt-execution-errors-widget class="widget" [errors]="errors" (showDetails)="showErrorsDetails()" />
+  }
+  <!--
   @if (_state.errorsDataSource$ | async; as errorsDataSource) {
-    <step-alt-report-widget title="Errors" class="widget" [style.--colSpan]="4">
+    <step-alt-report-widget title="Errors" class="widget" [style.&#45;&#45;colSpan]="4">
       <step-alt-report-widget-content>
         <step-alt-execution-errors
           [dataSource]="errorsDataSource"
@@ -63,6 +67,7 @@
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   }
+-->
   @if (_state.currentOperations$ | async; as currentOperations) {
     <step-alt-report-current-operations [operations]="currentOperations" class="widget" [style.--colSpan]="2" />
   }

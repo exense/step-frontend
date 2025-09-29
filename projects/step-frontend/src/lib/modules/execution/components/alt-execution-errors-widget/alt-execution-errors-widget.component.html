@@ -1,0 +1,19 @@
+<step-alt-report-widget title="Errors">
+  <step-alt-report-widget-content>
+    @if (hasErrors()) {
+      @if (singleError(); as singleError) {
+        <section class="single-error">
+          <div>{{ singleError.errorMessage }}</div>
+          <step-aggregated-status [countByStatus]="singleErrorCount()" [showTooltips]="false" />
+        </section>
+      } @else {
+        <section class="multiple-error">
+          <div>The execution contains</div>
+          <step-aggregated-status [countByStatus]="totalErrorsCount()" [showTooltips]="false" />
+          <div>errors</div>
+          <a href="#" (click)="showDetails.emit(); (false)">[details]</a>
+        </section>
+      }
+    }
+  </step-alt-report-widget-content>
+</step-alt-report-widget>

@@ -98,6 +98,13 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     });
   }
 
+  protected showErrorsDetails(): void {
+    this._router.navigate([{ outlets: { modal: ['errors'] } }], {
+      relativeTo: this._activatedRoute.parent!.parent!,
+      queryParamsHandling: 'preserve',
+    });
+  }
+
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
     this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
