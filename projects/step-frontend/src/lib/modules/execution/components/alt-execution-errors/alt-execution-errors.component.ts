@@ -4,6 +4,7 @@ import {
   RichEditorDialogService,
   TableDataSource,
   TableIndicatorMode,
+  tablePersistenceConfigProvider,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
 import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
@@ -13,6 +14,13 @@ import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.m
   templateUrl: './alt-execution-errors.component.html',
   styleUrl: './alt-execution-errors.component.scss',
   standalone: false,
+  providers: [
+    tablePersistenceConfigProvider('executionErrors', {
+      storePagination: true,
+      storeSearch: false,
+      storeSort: false,
+    }),
+  ],
 })
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);

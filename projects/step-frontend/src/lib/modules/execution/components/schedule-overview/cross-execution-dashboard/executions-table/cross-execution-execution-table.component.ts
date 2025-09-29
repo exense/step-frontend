@@ -30,7 +30,7 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('crossExecutionList', {
-      storePagination: false,
+      storePagination: true,
       storeSort: false,
       storeSearch: false,
     }),
