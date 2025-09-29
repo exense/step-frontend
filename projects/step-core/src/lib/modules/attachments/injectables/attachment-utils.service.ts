@@ -74,6 +74,8 @@ export class AttachmentUtilsService {
         return 'playwright';
       case AttachmentType.STREAMING_BINARY:
         return 'binary-file';
+      case AttachmentType.STREAMING_TEXT:
+        return 'file-text';
       default:
         return 'paperclip';
     }

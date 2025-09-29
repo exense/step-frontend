@@ -9,6 +9,7 @@ import { AttachmentDialogsService } from '../../injectables/attachment-dialogs.s
 import { AttachmentTypeIconPipe } from '../../pipes/attachment-type-icon.pipe';
 import { StreamingTextComponent } from '../streaming-text/streaming-text.component';
 import { StreamingAttachmentStatusDirective } from '../../directives/streaming-attachment-status.directive';
+import { PreviewAttachmentMeta } from '../../types/preview-attachment-meta';
 
 @Component({
   selector: 'step-attachment-preview',
@@ -53,6 +54,9 @@ export class AttachmentPreviewComponent {
   });
 
   protected readonly attachment = computed(() => this._streamingStatus.attachment());
+  protected readonly canUseStreamPreview = computed(
+    () => (this.attachment() as PreviewAttachmentMeta)?.canUseStreamPreview,
+  );
 
   protected readonly attachmentType = computed(() => this._attachmentUtils.determineAttachmentType(this.attachment()));
   protected readonly AttachmentType = AttachmentType;

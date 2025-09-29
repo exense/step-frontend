@@ -4,12 +4,18 @@
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
     @case (AttachmentType.STREAMING_TEXT) {
-      <step-streaming-text
-        [attachment]="attachment()!"
-        [displayLatestRows]="6"
-        [fontSize]="8"
-        [autoCloseChannelWhenFinished]="true"
-      />
+      @if (canUseStreamPreview()) {
+        <step-streaming-text
+          [attachment]="attachment()!"
+          [displayLatestRows]="6"
+          [fontSize]="8"
+          [autoCloseChannelWhenFinished]="true"
+        />
+      } @else {
+        <div class="file-info">
+          <step-icon [name]="attachmentType | attachmentTypeIcon" />
+        </div>
+      }
     }
     @default {
       <div class="file-info">

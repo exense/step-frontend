@@ -1,24 +1,13 @@
-import { computed, Directive, inject, input, OnDestroy } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Observable, switchMap, tap } from 'rxjs';
+import { computed, Directive, inject, input } from '@angular/core';
 import { AttachmentUtilsService } from '../injectables/attachment-utils.service';
-import {
-  AttachmentMeta,
-  StreamingAttachmentMeta,
-  WsChannel,
-  WsFactoryService,
-} from '../../../client/step-client-module';
-import { WsResourceStatusChange } from '../types/ws-resource-status-change';
+import { AttachmentMeta, StreamingAttachmentMeta } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
 
 @Directive({
   selector: '[stepStreamingAttachmentStatus]',
 })
-export class StreamingAttachmentStatusDirective implements OnDestroy {
+export class StreamingAttachmentStatusDirective {
   private _attachmentUtils = inject(AttachmentUtilsService);
-  private _wsFactory = inject(WsFactoryService);
-
-  private wsChannel?: WsChannel<unknown, WsResourceStatusChange>;
 
   readonly attachment = input<AttachmentMeta | undefined>(undefined);
 
@@ -31,50 +20,8 @@ export class StreamingAttachmentStatusDirective implements OnDestroy {
     return attachment as StreamingAttachmentMeta;
   });
 
-  private streamingAttachmentUrl = computed(() => {
-    const streamingAttachment = this.streamingAttachment();
-    if (!streamingAttachment || streamingAttachment.status === 'COMPLETED' || streamingAttachment.status === 'FAILED') {
-      return undefined;
-    }
-    return this._attachmentUtils.getAttachmentStreamingUrl(streamingAttachment);
-  });
-
-  private streamingStatus$ = toObservable(this.streamingAttachmentUrl).pipe(
-    tap(() => this.closeChannel()),
-    filter((url) => !!url),
-    map((url) => {
-      this.wsChannel = this._wsFactory.connect(url!);
-      return this.wsChannel;
-    }),
-    switchMap(
-      (channel) =>
-        channel.data$.pipe(
-          filter((response) => {
-            if (response instanceof Blob) {
-              return false;
-            }
-            return response['@'] === 'StatusChanged';
-          }),
-        ) as Observable<WsResourceStatusChange>,
-    ),
-    map((response) => response?.resourceStatus?.transferStatus),
-  );
-
-  private streamingStatus = toSignal(this.streamingStatus$, { initialValue: undefined });
-  private initialAttachmentStatus = computed(() => this.streamingAttachment()?.status);
-
   readonly status = computed(() => {
-    const streamingStatus = this.streamingStatus();
-    const initialAttachmentStatus = this.initialAttachmentStatus();
-    return streamingStatus ?? initialAttachmentStatus;
+    const streamingAttachment = this.streamingAttachment();
+    return streamingAttachment?.status;
   });
-
-  ngOnDestroy(): void {
-    this.closeChannel();
-  }
-
-  private closeChannel(): void {
-    this.wsChannel?.disconnect?.();
-    this.wsChannel = undefined;
-  }
 }
