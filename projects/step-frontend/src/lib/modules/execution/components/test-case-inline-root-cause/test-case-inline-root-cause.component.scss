@@ -15,4 +15,10 @@ p {
 
 .error-count {
   @include common.error-count;
+  width: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  .text {
+    white-space: nowrap;
+  }
 }

@@ -260,7 +260,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  & > div {
+  & > div.background {
     position: absolute;
     border-radius: 1.6rem;
     top: 0;

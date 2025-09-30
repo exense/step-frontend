@@ -1,8 +1,9 @@
 @if (errorCounts() === 1) {
-  <p>{{ singleMessage() }}</p>
+  <div class="error-count">
+    <div class="text">{{ singleMessage() }}</div>
+  </div>
 } @else if (errorCounts() > 0) {
   <div class="error-count">
-    <div></div>
-    <span>{{ errorCounts() }}</span>
+    <div class="text">Errors: {{ errorCounts() }}</div>
   </div>
 }

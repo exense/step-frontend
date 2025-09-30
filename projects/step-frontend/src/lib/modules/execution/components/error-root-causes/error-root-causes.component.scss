@@ -1,0 +1,24 @@
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+step-error-root-causes {
+  display: block;
+
+  .error-root-causes {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .error-count {
+    @include common.error-count;
+    width: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    .text {
+      white-space: nowrap;
+    }
+  }
+}

@@ -1,5 +1,4 @@
 @use 'projects/step-core/styles/core-variables' as var;
-@use 'projects/step-frontend/styles/common-mixins' as common;
 
 :host {
   font-size: 1.4rem;
@@ -56,17 +55,4 @@ step-alt-execution-tree-partial {
 
 .error-root-causes-container {
   margin-top: 2rem;
-}
-
-.error-root-causes {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  column-gap: 1rem;
-  row-gap: 0.5rem;
-  align-items: center;
-  width: 100%;
-
-  .error-count {
-    @include common.error-count;
-  }
 }
