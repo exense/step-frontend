@@ -106,7 +106,12 @@ export class RepositoryPlanTestcaseListComponent implements OnInit {
   readonly includedTestCases = computed(() => {
     const repoRef = this.repoRef();
     const selectedItems = this.selectedItems();
+    const allItems = this.allData();
     const selectionType = this._selectionState.selectionType();
+
+    if (!allItems.length) {
+      return { by: 'all', list: [] } as IncludeTestcases;
+    }
 
     let by: IncludeTestcases['by'] = repoRef?.repositoryID === 'local' ? 'id' : 'name';
     by = selectionType === BulkSelectionType.ALL ? 'all' : by;
