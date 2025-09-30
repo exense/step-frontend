@@ -29,6 +29,7 @@ export class AggregatedStatusComponent {
 
   readonly hasDescendantInvocations = input<boolean | undefined>(false);
   readonly showTooltips = input(true);
+  readonly hideSingleStatus = input(false);
 
   protected readonly allStatusItems = computed(() => {
     const countByStatus = this.countByStatus();
@@ -40,6 +41,10 @@ export class AggregatedStatusComponent {
 
   protected readonly singleStatus = computed(() => {
     const items = this.allStatusItems();
+    const hideSingleStatus = this.hideSingleStatus();
+    if (hideSingleStatus) {
+      return undefined;
+    }
     if (items.length === 1 && items[0].count === 1) {
       return items[0];
     }

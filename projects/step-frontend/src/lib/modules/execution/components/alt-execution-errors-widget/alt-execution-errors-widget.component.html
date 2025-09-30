@@ -4,7 +4,11 @@
       @if (singleError(); as singleError) {
         <section class="single-error">
           <div>{{ singleError.errorMessage }}</div>
-          <step-aggregated-status [countByStatus]="singleErrorCount()" [showTooltips]="false" />
+          <step-aggregated-status
+            [countByStatus]="singleErrorCount()"
+            [showTooltips]="false"
+            [hideSingleStatus]="true"
+          />
         </section>
       } @else {
         <section class="multiple-error">
