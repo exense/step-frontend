@@ -395,7 +395,7 @@ export abstract class CrossExecutionDashboardState {
       }),
     );
 
-  readonly errorsDataSource = this._timeSeriesService.createErrorsDataSource();
+  readonly errorsDataSource = this._timeSeriesService.createErrorsFetchDataSource();
 
   errorTableRefreshSub = this.timeRange$.subscribe((timeRange) => {
     let filterItem = this.getDashboardFilter();

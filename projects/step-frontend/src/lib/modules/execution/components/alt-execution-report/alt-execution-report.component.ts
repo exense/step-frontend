@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
@@ -46,6 +46,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+  private errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -98,11 +99,9 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     });
   }
 
-  protected showErrorsDetails(): void {
-    this._router.navigate([{ outlets: { modal: ['errors'] } }], {
-      relativeTo: this._activatedRoute.parent!.parent!,
-      queryParamsHandling: 'preserve',
-    });
+  protected scrollToErrorsSection(): void {
+    const errorsElement = this.errors()?.nativeElement as HTMLHtmlElement | undefined;
+    errorsElement?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }
 
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {

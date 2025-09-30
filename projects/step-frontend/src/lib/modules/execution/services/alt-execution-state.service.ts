@@ -20,8 +20,7 @@ export abstract class AltExecutionStateService {
   abstract readonly execution$: Observable<Execution>;
   abstract readonly keywordParameters$: Observable<KeywordParameters>;
   abstract readonly keywordsDataSource$: Observable<TableDataSource<ReportNode>>;
-  abstract readonly errorsDataSource$: Observable<TableDataSource<TimeSeriesErrorEntry>>;
-  abstract readonly errors: Signal<TimeSeriesErrorEntry[] | undefined>;
+  abstract readonly errors$: Observable<TimeSeriesErrorEntry[] | undefined>;
   abstract readonly availableErrorTypes$: Observable<Status[]>;
   abstract readonly testCases$: Observable<AggregatedReportView[] | undefined>;
   abstract readonly testCasesDataSource$: Observable<TableDataSource<AggregatedReportView>>;
