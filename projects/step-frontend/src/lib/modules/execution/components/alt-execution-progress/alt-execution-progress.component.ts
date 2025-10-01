@@ -444,6 +444,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
         if (!aggregatedReportView) {
+          this._aggregatedTreeTabState.init(undefined);
+          this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
           return;
         }
