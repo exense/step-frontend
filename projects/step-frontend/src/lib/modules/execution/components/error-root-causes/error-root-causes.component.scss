@@ -5,7 +5,7 @@ step-error-root-causes {
 
   .error-root-causes {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: min-content auto;
     column-gap: 1rem;
     row-gap: 0.5rem;
     align-items: center;
@@ -19,6 +19,17 @@ step-error-root-causes {
     padding-right: 1rem;
     .text {
       white-space: nowrap;
+    }
+  }
+
+  .error-message {
+    max-width: 60rem;
+  }
+
+  step-table tr {
+    height: 2.5rem !important;
+    td {
+      padding-bottom: 0.5rem !important;
     }
   }
 }

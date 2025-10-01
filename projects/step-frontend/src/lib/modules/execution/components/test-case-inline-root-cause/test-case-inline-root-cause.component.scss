@@ -16,9 +16,25 @@ p {
 .error-count {
   @include common.error-count;
   width: auto;
+  position: relative;
+  min-height: 2.5rem;
   padding-left: 1rem;
   padding-right: 1rem;
+
   .text {
     white-space: nowrap;
+  }
+
+  .hidden-text {
+    visibility: hidden;
+    height: 0;
+  }
+
+  .hidden-text + .text {
+    position: absolute;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    left: 1rem;
+    right: 1rem;
   }
 }
