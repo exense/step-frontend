@@ -5,6 +5,7 @@ import {
   BulkSelectionType,
   ControllerService,
   Dashlet,
+  EntityRefService,
   entitySelectionStateProvider,
   EntitySelectionStateUpdatable,
   Execution,
@@ -83,6 +84,10 @@ interface RefreshParams {
       provide: ExecutionCloseHandleService,
       useExisting: forwardRef(() => ExecutionProgressComponent),
     },
+    {
+      provide: EntityRefService,
+      useExisting: forwardRef(() => ExecutionProgressComponent),
+    },
     SingleExecutionPanelsService,
     ExecutionTreePagingService,
     ...entitySelectionStateProvider('artefactID'),
@@ -93,7 +98,7 @@ interface RefreshParams {
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionProgressComponent
-  implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy
+  implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy, EntityRefService
 {
   private _document = inject(DOCUMENT);
   private _executionService = inject(AugmentedExecutionsService);
@@ -150,6 +155,10 @@ export class ExecutionProgressComponent
 
   setupTableSelectionList(list?: SelectionList<string, ReportNode>): void {
     this.selectionList = list;
+  }
+
+  getCurrentEntity<T extends { attributes?: Record<string, string> }>(): T {
+    return this.execution as T;
   }
 
   readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(

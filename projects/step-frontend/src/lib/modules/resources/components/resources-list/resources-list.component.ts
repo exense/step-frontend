@@ -2,6 +2,7 @@ import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedResourcesService,
   DialogParentService,
+  EntityRefDirective,
   entitySelectionStateProvider,
   Resource,
   ResourceDialogsService,
@@ -17,7 +18,7 @@ import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
-  imports: [StepCoreModule, ResourceUrlPipe],
+  imports: [StepCoreModule, ResourceUrlPipe, EntityRefDirective],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
