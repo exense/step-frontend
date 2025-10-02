@@ -75,9 +75,13 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
     return treeNode;
   });
 
+  protected readonly children = toSignal(this.children$, { initialValue: [] });
+  protected readonly artefactClass = computed(() => this.node().resolvedArtefact?._class);
+
   protected readonly rootCauseErrors = computed(() => {
     const treeNode = this.aggregatedNode();
-    if (!treeNode) {
+    const artefactClass = this.artefactClass();
+    if (!treeNode || (artefactClass !== 'TestCase' && artefactClass !== 'TestSet')) {
       return undefined;
     }
 
@@ -95,9 +99,6 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
 
     return !result.length ? undefined : result;
   });
-
-  protected readonly children = toSignal(this.children$, { initialValue: [] });
-  protected readonly artefactClass = computed(() => this.node().resolvedArtefact?._class);
 
   protected readonly detailsComponent = computed(() => {
     const artefactClass = this.artefactClass();

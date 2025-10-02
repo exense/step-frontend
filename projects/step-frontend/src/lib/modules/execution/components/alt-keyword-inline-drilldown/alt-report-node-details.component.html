@@ -1,5 +1,11 @@
 @if (node(); as node) {
   <div>
+    @if (rootCauseErrors(); as rootCauseErrors) {
+      <step-error-root-causes
+        class="error-root-causes-container execution-report-node-details"
+        [data]="rootCauseErrors"
+      />
+    }
     @if (detailsComponent(); as detailsComponent) {
       <step-custom-item-render [component]="detailsComponent" [context]="node" />
     } @else {
@@ -42,12 +48,6 @@
         <span class="muted mat-small">Start: {{ node?.executionTime | date: 'dd.MM.yyyy HH:mm:ss:SSS' }}</span>
         <span class="muted mat-small"> | Duration (ms): {{ node?.duration }}</span>
       </section>
-    }
-    @if (rootCauseErrors(); as rootCauseErrors) {
-      <step-error-root-causes
-        class="error-root-causes-container execution-report-node-details"
-        [data]="rootCauseErrors"
-      />
     }
   </div>
   <div class="tree-container execution-report-node-details" stepElementSize>
