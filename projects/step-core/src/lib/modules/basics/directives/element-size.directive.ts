@@ -14,6 +14,7 @@ const debounceSignal = (value: WritableSignal<number>, dueTime: number = 300, in
       useExisting: forwardRef(() => ElementSizeDirective),
     },
   ],
+  exportAs: 'ElementSize',
 })
 export class ElementSizeDirective implements OnInit, OnDestroy, ElementSizeService {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

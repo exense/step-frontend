@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 step-attachment-dialog {
   .dialog-content {
     padding-bottom: 0 !important;
@@ -9,6 +11,31 @@ step-attachment-dialog {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .streaming-info {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1rem;
+    div {
+      font-size: 1.2rem;
+    }
+  }
+
+  button.rounded-icon-button {
+    padding: 0;
+    min-width: 36px;
+    border-radius: 2rem;
+
+    &.active {
+      background: var.$blue-10;
+      border: none;
+
+      step-icon {
+        color: var.$dark-blue;
+      }
+    }
   }
 
   div[step-modal-window-body] {
@@ -53,6 +80,15 @@ step-attachment-dialog {
 
   .max-width-600 {
     max-width: 600px;
+  }
+
+  step-alert.incomplete {
+    padding: 0.5rem;
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: normal;
+    user-select: none;
   }
 }
 

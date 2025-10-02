@@ -1,48 +1,10 @@
 @if (hasData()) {
   <section class="etc-container">
-    @if (attachmentMetas(); as attachments) {
-      @if (!!attachments.length) {
-        <div class="attachments-container">
-          <step-icon name="paperclip" matTooltip="Attachments" />
-          @for (att of attachments; track att.id) {
-            <step-popover [noPadding]="true" yPosition="below" [mode]="PopoverMode.HOVER" [withBorder]="true">
-              @if ((att | attachmentType) !== AttachmentType.SKIPPED) {
-                <span class="highlight-inline-item" (click)="open(att, $event)">{{ att.name }}</span>
-              } @else {
-                <span class="highlight-inline-item skipped">{{ att.name }}</span>
-              }
-              <step-popover-content>
-                @switch (att | attachmentType) {
-                  @case (AttachmentType.IMG) {
-                    <step-attachment-preview
-                      class="large"
-                      [attachment]="att"
-                      [showDownload]="false"
-                      [withBorder]="false"
-                    />
-                  }
-                  @case (AttachmentType.SKIPPED) {
-                    <div class="default-attachment-popover-view">
-                      <p class="reason">{{ $any(att).reason }}</p>
-                    </div>
-                  }
-                  @default {
-                    <div class="default-attachment-popover-view">
-                      <step-icon [name]="att | attachmentType | attachmentTypeIcon" />
-                      <span>{{ att.name }}</span>
-                    </div>
-                  }
-                }
-              </step-popover-content>
-            </step-popover>
-          }
-        </div>
-      }
-    }
+    <step-attachments-inline-preview [attachmentMetas]="attachmentMetas()" />
     @if (error(); as error) {
       <div class="error-container">
         <step-icon name="alert-triangle" />
-        <div stepClampFade [lines]="5">
+        <div class="error-text" stepClampFade [lines]="5">
           {{ error }}
         </div>
       </div>
