@@ -26,10 +26,18 @@ step-error-root-causes {
     max-width: 60rem;
   }
 
-  step-table tr {
-    height: 2.5rem !important;
-    td {
-      padding-bottom: 0.5rem !important;
+  step-table {
+    tr {
+      height: 2.5rem !important;
+
+      td {
+        padding-bottom: 0.5rem !important;
+      }
+    }
+    step-paginator {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: -1.4rem;
     }
   }
 }
