@@ -67,20 +67,36 @@ export class AutorefreshToggleComponent implements OnDestroy {
     );
   });
   protected readonly selectedIntervalValue = computed(() => this.selectedInterval().value);
+
+  private closestInterval = computed(() => {
+    const selectedInterval = this.selectedInterval();
+    const presets = this.presets();
+    if (!!selectedInterval.label) {
+      return selectedInterval;
+    }
+    let preset: AutorefreshPreset | undefined = undefined;
+    for (const p of presets) {
+      if (selectedInterval.value <= p.value) {
+        preset = p;
+        break;
+      }
+    }
+    return preset ?? selectedInterval;
+  });
+
   protected readonly selectedIntervalDisplayValue = computed(() => {
-    const value = this.selectedIntervalValue();
-    return this._durationPipe.transform(value, 0, { displaySingle: true });
+    const closestInterval = this.closestInterval();
+    return this._durationPipe.transform(closestInterval.value, 0, { displaySingle: true });
   });
   protected readonly isOff = computed(() => this.selectedIntervalValue() === 0);
 
   protected readonly tooltipMessage = computed(() => {
     const hideTooltip = this.hideTooltip();
-    const interval = this.selectedInterval();
-    const intervalDisplayValue = this.selectedIntervalDisplayValue();
+    const interval = this.closestInterval();
     if (hideTooltip) {
       return '';
     }
-    const label = interval.label || intervalDisplayValue;
+    const label = interval.label || this._durationPipe.transform(interval.value, 0, { displaySingle: true });
     return `refresh: ${label}`;
   });
 
