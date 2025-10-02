@@ -4,6 +4,7 @@ import { DateTime, Duration, DurationObjectUnits } from 'luxon';
 export interface DurationPipeParams {
   displayFull?: boolean;
   shortenMs?: boolean;
+  displaySingle?: boolean;
 }
 
 type UsedDurationTypeObject = Omit<DurationObjectUnits, 'quarters' | 'weeks'>;
@@ -43,7 +44,7 @@ export class DurationPipe implements PipeTransform {
       return '';
     }
 
-    const { displayFull, shortenMs } = this.getParams(param);
+    const { displayFull, shortenMs, displaySingle } = this.getParams(param);
 
     const startMs = start !== undefined ? this.getMs(start)! : 0;
     const duration = Duration.fromMillis(endMs - startMs).rescale();
@@ -65,11 +66,13 @@ export class DurationPipe implements PipeTransform {
       return '< 1s';
     }
 
-    if (!displayFull) {
+    if (displaySingle) {
+      partsToDisplay = [partsToDisplay[0]];
+    } else if (!displayFull) {
       partsToDisplay = partsToDisplay.slice(0, 2);
     }
 
-    if (partsToDisplay.length === 1) {
+    if (partsToDisplay.length === 1 && !displaySingle) {
       const unitIndex = UNITS_ORDER.indexOf(partsToDisplay[0].unit);
       const lowerNeighbourUnit = UNITS_ORDER[unitIndex - 1];
       if (!!lowerNeighbourUnit) {
@@ -105,17 +108,20 @@ export class DurationPipe implements PipeTransform {
       return {
         displayFull: false,
         shortenMs: false,
+        displaySingle: false,
       };
     }
     if (typeof params === 'boolean') {
       return {
         displayFull: !!params,
         shortenMs: false,
+        displaySingle: false,
       };
     }
     return {
       displayFull: !!params.displayFull,
       shortenMs: !!params.shortenMs,
+      displaySingle: !!params.displaySingle,
     };
   }
 }
