@@ -12,6 +12,5 @@
 @forward 'components/executions-menu';
 @forward 'components/custom-menu';
 @forward 'components/settings-menu';
-@forward 'components/execution-shared-styles' show execution-shared-styles, special-selection-item,
-  special-selection-item-hover;
+@forward 'components/execution-shared-styles' show execution-shared-styles, special-selection-item, special-selection-item-hover, execution-report-node-inline-details, highlight-inline-item;
 @forward 'components/plan-editor-control-selections';

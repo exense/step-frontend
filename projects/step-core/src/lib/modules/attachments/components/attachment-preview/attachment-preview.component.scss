@@ -6,8 +6,11 @@ step-attachment-preview {
   width: 15rem;
   height: 7rem;
   position: relative;
-  cursor: pointer;
   overflow: hidden;
+
+  &.has-pointer {
+    cursor: pointer;
+  }
 
   &.large {
     width: 45rem;
@@ -42,26 +45,21 @@ step-attachment-preview {
     bottom: 0;
     left: 0;
     right: 0;
-    padding-left: 1rem;
-    padding-bottom: 0.3rem;
-    padding-top: 0.3rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 0.3rem 1rem;
 
     &.overlay {
       background: var.$white-transparent;
     }
-
-    &.skipped {
-      text-decoration: line-through;
-    }
   }
 
   .actions {
-    opacity: 0;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 0.3rem;
+    right: 0.3rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.2rem;
 
     button {
       width: 2.5rem !important;
@@ -76,28 +74,37 @@ step-attachment-preview {
         @include core.step-icon-size(1.5rem);
       }
     }
+
+    .download {
+      opacity: 0;
+    }
+
+    .failed-attachment {
+      color: var.$orange;
+      fill: var.$white;
+    }
   }
 
-  &.with-actions {
+  &.with-action-bar {
     &:hover {
       img,
       .file-info {
         opacity: 0.5;
       }
 
-      .actions {
+      .actions .download {
         opacity: 1;
       }
     }
 
     img,
     .file-info,
-    .actions {
+    .actions .download {
       transition: opacity 0.5s ease;
     }
   }
 
-  &:not(.with-actions) {
+  &:not(.with-action-bar) {
     .actions {
       display: none;
     }

@@ -70,7 +70,7 @@
   <button
     type="button"
     mat-stroked-button
-    [class]="isInteractiveSessionActive ? 'activeMode' : ''"
+    [class.active]="isInteractiveSessionActive"
     (click)="toggleInteractiveSession()"
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
     [disabled]="!('plan-write' | hasRight | async)"
