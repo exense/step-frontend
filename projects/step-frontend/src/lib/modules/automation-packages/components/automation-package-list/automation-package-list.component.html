@@ -78,7 +78,7 @@
           <step-popover yPosition="below">
             @if (
               element.automationPackageResourceObj?.origin &&
-              element.automationPackageResourceObj?.origin.includes('maven')
+              element.automationPackageResourceObj?.origin.includes('mvn')
             ) {
               <step-icon class="maven" name="maven"></step-icon>
             }
@@ -112,8 +112,7 @@
         <td mat-cell *matCellDef="let element">
           <step-popover yPosition="below">
             @if (
-              element.automationPackageResourceObj?.origin &&
-              element.automationPackageResourceObj?.origin.includes('maven')
+              element.keywordLibraryResourceObj?.origin && element.keywordLibraryResourceObj?.origin.includes('mvn')
             ) {
               <step-icon class="maven" name="maven"></step-icon>
             }
