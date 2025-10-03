@@ -112,11 +112,19 @@ export class AugmentedAutomationPackagesService
 
     let body: FormData | string;
     body = new FormData();
+
     if (apFile) {
       body.set('file', apFile!);
+    } else if (apMavenSnippet) {
+      body.set('apMavenSnippet', apMavenSnippet);
     }
+
     if (keywordLibraryFile) {
       body.set('keywordLibrary', keywordLibraryFile!);
+    } else if (keywordLibraryMavenSnippet) {
+      body.set('keywordLibraryMavenSnippet', keywordLibraryMavenSnippet);
+    } else if (keywordLibraryResourceId) {
+      body.set('keywordLibraryResourceId', keywordLibraryResourceId);
     }
 
     let headers: HttpHeaders;
@@ -129,16 +137,6 @@ export class AugmentedAutomationPackagesService
     }
     if (activationExpression) {
       params = params.set('activationExpr', activationExpression);
-    }
-
-    if (apMavenSnippet) {
-      params = params.set('apMavenSnippet', apMavenSnippet);
-    }
-
-    if (keywordLibraryMavenSnippet) {
-      params = params.set('keywordLibraryMavenSnippet', keywordLibraryMavenSnippet);
-    } else if (keywordLibraryResourceId) {
-      params = params.set('keywordLibraryResourceId', keywordLibraryResourceId);
     }
 
     const request$ = this._http.request(
