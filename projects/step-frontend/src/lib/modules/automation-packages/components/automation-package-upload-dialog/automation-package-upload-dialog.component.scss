@@ -33,3 +33,15 @@ button.active {
     fill: white !important;
   }
 }
+
+step-description {
+  width: 524px;
+}
+
+step-label {
+  color: #293e50;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  pointer-events: all;
+}
