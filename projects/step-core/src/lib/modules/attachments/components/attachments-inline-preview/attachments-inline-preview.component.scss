@@ -1,0 +1,22 @@
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-core/styles/core-mixins' as core;
+
+step-attachments-inline-preview {
+  .attachment-name-container {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  p.reason {
+    max-width: 35rem;
+  }
+
+  .skipped {
+    color: var.$red-50;
+  }
+
+  .incomplete {
+    color: var.$orange;
+  }
+}

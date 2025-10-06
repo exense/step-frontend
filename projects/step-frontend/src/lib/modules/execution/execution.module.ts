@@ -155,6 +155,9 @@ import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+
 
 @NgModule({
   declarations: [
@@ -251,6 +254,7 @@ import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-er
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
     AltExecutionErrorsWidgetComponent,
+    ReportViewHeaderComponent,
   ],
   imports: [
     StepCommonModule,
@@ -269,6 +273,7 @@ import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-er
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    MatProgressSpinner,
   ],
   exports: [
     ExecutionListComponent,

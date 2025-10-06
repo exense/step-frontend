@@ -78,6 +78,7 @@ import { ElementSizeDirective } from './directives/element-size.directive';
 import { StatusIconClassDirective } from './directives/status-icon-class.directive';
 import { DescriptionDirective } from './directives/description.directive';
 import { FilterAddonDirective } from './directives/filter-addon.directive';
+import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
 
 @NgModule({
   imports: [
@@ -94,6 +95,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ElementSizeDirective,
     StatusIconClassDirective,
     FilterAddonDirective,
+    LongInlineTextComponent,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -244,6 +246,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ElementSizeDirective,
     StatusIconClassDirective,
     FilterAddonDirective,
+    LongInlineTextComponent,
   ],
 })
 export class StepBasicsModule {}
@@ -379,19 +382,16 @@ export { SelectComponentSearchCtrlContainer } from './injectables/select-compone
 export * from './injectables/dynamic-values-utils.service';
 export * from './types/reloadable';
 export * from './injectables/global-reload.service';
-export * from './types/image-type.enum';
-export * from './types/video-type.enum';
-export * from './types/text-type.enum';
-export * from './types/special-mime-type.enum';
-export * from './injectables/image-types.token';
-export * from './injectables/video-types.token';
-export * from './injectables/text-types.token';
-export * from './injectables/mime-types.token';
 export * from './directives/strategy-click.directive';
 export * from './injectables/click-strategy.token';
 export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
+export * from './injectables/indicator-state-factory.service';
 export * from './directives/status-icon-class.directive';
 export * from './injectables/app-host.token';
 export * from './directives/filter-addon.directive';
+export * from './types/type-info';
+export * from './types/file-types';
+export * from './injectables/file-type-utils.service';
+export * from './components/long-inline-text/long-inline-text.component';
