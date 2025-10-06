@@ -252,22 +252,11 @@
 
 @mixin error-count {
   width: 3.2rem;
-  background: map.get(var.$statuses, 'FAILED');
-  color: var.$white;
+  border: 0.1rem solid map.get(var.$statuses, 'FAILED');
   border-radius: 1.6rem;
-  padding: 0.4rem;
+  padding: 0.4rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  & > div.background {
-    position: absolute;
-    border-radius: 1.6rem;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    opacity: 0.3;
-    background: var.$white;
-  }
 }
