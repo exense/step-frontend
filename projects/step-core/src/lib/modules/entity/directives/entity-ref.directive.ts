@@ -11,11 +11,9 @@ import { EntityRefService } from '../injectables/entity-ref.service';
   ],
   exportAs: 'EntityRef',
 })
-export class EntityRefDirective<E extends { attributes?: Record<string, string> }> implements EntityRefService {
+export class EntityRefDirective<E extends { attributes?: Record<string, string> }> implements EntityRefService<E> {
   readonly _injector = inject(Injector);
   readonly entity = input.required<E>({ alias: 'stepEntityRef' });
 
-  getCurrentEntity<T extends { attributes?: Record<string, string> }>(): T {
-    return this.entity() as unknown as T;
-  }
+  readonly currentEntity = this.entity;
 }

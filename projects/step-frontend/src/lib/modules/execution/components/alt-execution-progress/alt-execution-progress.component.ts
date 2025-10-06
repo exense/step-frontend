@@ -147,7 +147,9 @@ interface RefreshParams {
   ],
   standalone: false,
 })
-export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService {
+export class AltExecutionProgressComponent
+  implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
+{
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
@@ -399,9 +401,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.subscribeToUrlNavigation();
   }
 
-  getCurrentEntity<T extends { attributes?: Record<string, string> }>(): T {
-    return this.execution() as T;
-  }
+  readonly currentEntity = this.execution;
 
   private subscribeToUrlNavigation() {
     // subscribe to back and forward events

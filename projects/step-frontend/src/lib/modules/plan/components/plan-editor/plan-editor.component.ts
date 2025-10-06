@@ -30,7 +30,7 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
   ],
   standalone: false,
 })
-export class PlanEditorComponent implements OnInit, SchedulerInvokerService, EntityRefService {
+export class PlanEditorComponent implements OnInit, SchedulerInvokerService, EntityRefService<Plan> {
   private _destroyRef = inject(DestroyRef);
   private _cd = inject(ChangeDetectorRef);
   private _purePlanContextApi = inject(PurePlanContextApiService);
@@ -60,9 +60,7 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService, Ent
     this._router.navigate(['.', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
   }
 
-  getCurrentEntity<T extends { attributes?: Record<string, string> }>(): T {
-    return this._planEditorService.plan() as any as T;
-  }
+  readonly currentEntity = this._planEditorService.plan;
 
   protected handlePlanChange(plan: Plan): void {
     const ctx = this._planEditorService.planContext();

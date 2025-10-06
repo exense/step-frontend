@@ -1,4 +1,4 @@
-import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, forwardRef, inject, OnDestroy, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import {
   AlertType,
   AugmentedExecutionsService,
@@ -98,7 +98,7 @@ interface RefreshParams {
   encapsulation: ViewEncapsulation.None,
 })
 export class ExecutionProgressComponent
-  implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy, EntityRefService
+  implements OnInit, ExecutionStateService, ExecutionCloseHandleService, OnDestroy, EntityRefService<Execution>
 {
   private _document = inject(DOCUMENT);
   private _executionService = inject(AugmentedExecutionsService);
@@ -129,6 +129,7 @@ export class ExecutionProgressComponent
   tabs: Dashlet[] = [];
   activeTab?: Dashlet;
 
+  private executionInternal = signal<Execution | undefined>(undefined);
   execution?: Execution;
   testCases?: ReportNode[];
   selectedTestCases?: ReportNode[];
@@ -157,9 +158,7 @@ export class ExecutionProgressComponent
     this.selectionList = list;
   }
 
-  getCurrentEntity<T extends { attributes?: Record<string, string> }>(): T {
-    return this.execution as T;
-  }
+  readonly currentEntity = this.executionInternal.asReadonly();
 
   readonly includedTestcases$: Observable<IncludeTestcases | undefined> = this.selected$.pipe(
     map((ids) => {
@@ -311,6 +310,7 @@ export class ExecutionProgressComponent
   private initRefreshExecution(): void {
     this._executionPanels.initialize(this.executionId!);
     this.activeExecution!.execution$.pipe(takeUntil(this._currentExecutionTerminator$!)).subscribe((execution) => {
+      this.executionInternal.set(execution);
       this.execution = execution;
       const isExecutionCompleted = execution.status === 'ENDED';
       this.showAutoRefreshButton = !isExecutionCompleted;
