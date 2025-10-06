@@ -1,5 +1,5 @@
-import { Component, computed, inject, OnInit, signal, ViewEncapsulation, effect, untracked } from '@angular/core';
-import { ArtefactService, AugmentedControllerService, ReportNode } from '@exense/step-core';
+import { Component, computed, inject, OnInit, ViewEncapsulation, effect, untracked } from '@angular/core';
+import { AugmentedControllerService, ReportNode } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { Status } from '../../../_common/shared/status.enum';

@@ -7,7 +7,7 @@ import { FlattenTreeData } from '../types/flatten-tree-data';
   providedIn: 'root',
 })
 export class TreeFlattenerService {
-  flattenTree(node?: TreeNode): FlattenTreeData {
+  flattenTree(node?: TreeNode | null): FlattenTreeData {
     const tree: TreeFlatNode[] = [];
     const accessCache = new Map<string, TreeNode>();
     const parentsCache = new Map<string, string | undefined>();

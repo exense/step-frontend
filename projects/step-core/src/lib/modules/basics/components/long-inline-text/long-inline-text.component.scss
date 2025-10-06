@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  position: relative;
+  &.cut-value {
+    width: 75%;
+    .value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &:after {
+      content: attr(data-suffix);
+      position: absolute;
+      top: 0;
+      left: 100%;
+    }
+  }
+}
+
+.value,
+.invisible-value {
+  white-space: nowrap;
+}
+
+.value {
+  width: 100%;
+}
+
+.invisible-value {
+  visibility: hidden;
+  height: 0;
+  width: fit-content;
+}
