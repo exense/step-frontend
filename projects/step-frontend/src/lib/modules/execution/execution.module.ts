@@ -156,6 +156,8 @@ import { CrossExecutionExecutionTableComponent } from './components/schedule-ove
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
 import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
 import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
+import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -251,6 +253,7 @@ import { ErrorRootCausesComponent } from './components/error-root-causes/error-r
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    ReportViewHeaderComponent,
   ],
   imports: [
     StepCommonModule,
