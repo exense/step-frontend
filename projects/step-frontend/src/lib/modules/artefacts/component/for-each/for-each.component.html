@@ -20,12 +20,12 @@
   </step-dynamic-textfield>
   @if (context.artefact!.dataSource) {
     <step-dynamic-checkbox
-      label="Protect data source"
+      label="Protect data source values"
+      tooltip="Protected data source values are hidden in reports and can only be passed to Keywords, not resolved in the Plan."
       [(ngModel)]="context.artefact!.dataSource!.protect"
       [disabled]="context.readonly || isProtectionForceDisabled()"
       name="protect"
-    >
-    </step-dynamic-checkbox>
+    />
   }
   <mat-expansion-panel [(expanded)]="showHandles">
     <mat-expansion-panel-header>

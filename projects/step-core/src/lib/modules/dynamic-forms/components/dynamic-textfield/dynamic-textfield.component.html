@@ -42,6 +42,7 @@
     } @else if (isPassword) {
       <input
         type="password"
+        autocomplete="new-password"
         [placeholder]="placeholder"
         [ngModel]="value"
         (ngModelChange)="onValueChange($event)"
