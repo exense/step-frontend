@@ -97,7 +97,7 @@ export abstract class CrossExecutionDashboardState {
 
   // charts
 
-  readonly summaryData$: Observable<ReportNodeSummary> = this.timeRange$.pipe(
+  readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
       const oql = new OQLBuilder()
         .open('and')
@@ -111,18 +111,20 @@ export abstract class CrossExecutionDashboardState {
         oqlFilter: oql,
         groupDimensions: ['result'],
       };
-      return this._timeSeriesService.getTimeSeries(request).pipe(
-        map((response) => {
-          let total = 0;
-          const items: { [key: string]: number } = {};
-          response.matrixKeys.forEach((keyAttributes, i) => {
-            let bucket: BucketResponse = response.matrix[i][0];
-            items[keyAttributes['result'] as string] = bucket.count;
-            total += bucket.count;
-          });
-          return { items: items, total: total };
-        }),
-      );
+      return this._timeSeriesService.getTimeSeries(request);
+    }),
+  );
+
+  readonly summaryData$: Observable<ReportNodeSummary> = this.executionsDurationTimeSeriesData.pipe(
+    map((response) => {
+      let total = 0;
+      const items: { [key: string]: number } = {};
+      response.matrixKeys.forEach((keyAttributes, i) => {
+        let bucket: BucketResponse = response.matrix[i][0];
+        items[keyAttributes['result'] as string] = bucket.count;
+        total += bucket.count;
+      });
+      return { items: items, total: total };
     }),
   );
 
