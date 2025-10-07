@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, effect, inject, untracked, viewChild } from '@angular/core';
 import { ElementSizeDirective, ReportNode, TreeStateService } from '@exense/step-core';
 import {
   AGGREGATED_TREE_WIDGET_STATE,
@@ -9,6 +9,7 @@ import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.
 import { AltReportNodesStateService } from '../../services/alt-report-nodes-state.service';
 import { AltKeywordNodesStateService } from '../../services/alt-keyword-nodes-state.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
+import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 
 @Component({
   selector: 'step-alt-execution-tree-widget',
@@ -31,6 +32,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       provide: AltReportNodesStateService,
       useExisting: AltKeywordNodesStateService,
     },
+    AggregatedReportViewTreeSearchFacadeService,
   ],
   hostDirectives: [ElementSizeDirective],
   standalone: false,
@@ -38,19 +40,13 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
 export class AltExecutionTreeWidgetComponent {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
-
-  protected readonly searchCtrl = this._treeState.searchCtrl;
-  protected readonly searchForErrorsOnly = this._treeState.searchForErrorsOnly;
-  protected readonly searchForErrorCause = this._treeState.searchForErrorCause;
+  protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
-  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
-  protected readonly pageIndex = signal(0);
-
   private effectFocusNode = effect(() => {
-    const foundItems = this.foundItems();
-    const pageIndex = this.pageIndex();
+    const foundItems = this._treeSearch.foundItems();
+    const pageIndex = this._treeSearch.pageIndex();
     if (!foundItems) {
       return;
     }
@@ -90,13 +86,5 @@ export class AltExecutionTreeWidgetComponent {
 
   protected expandAll(): void {
     this._treeState.expandAll();
-  }
-
-  protected toggleErrorSearch(): void {
-    this._treeState.toggleErrorSearch();
-  }
-
-  protected exitRootCauseSearch(): void {
-    this._treeState.clearErrorLeafs();
   }
 }

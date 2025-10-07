@@ -22,12 +22,14 @@ import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggrega
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
+import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
   templateUrl: './alt-execution-tree-partial.component.html',
   styleUrl: './alt-execution-tree-partial.component.scss',
   encapsulation: ViewEncapsulation.None,
+  providers: [AggregatedReportViewTreeSearchFacadeService],
   host: {
     '[class.no-padding]': 'noPadding()',
   },
@@ -40,6 +42,7 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
   protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   private isRunningExecution = toSignal(
@@ -54,10 +57,6 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   readonly autoFocusNode = input(true);
   readonly showDetailsButton = input(false);
 
-  protected readonly searchCtrl = this._treeState.searchCtrl;
-  protected readonly searchForErrorsOnly = this._treeState.searchForErrorsOnly;
-  protected readonly searchForErrorCause = this._treeState.searchForErrorCause;
-
   private isFirstLoad = signal(true);
   private loadInProgress = signal(false);
   protected showSpinner = computed(() => {
@@ -69,12 +68,9 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   private reportNode$ = toObservable(this.node);
 
-  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
-  protected readonly pageIndex = signal(0);
-
   private effectFocusNode = effect(() => {
-    const foundItems = this.foundItems();
-    const pageIndex = this.pageIndex();
+    const foundItems = this._treeSearch.foundItems();
+    const pageIndex = this._treeSearch.pageIndex();
     if (!foundItems) {
       return;
     }

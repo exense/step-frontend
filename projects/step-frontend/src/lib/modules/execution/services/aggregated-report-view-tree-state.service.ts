@@ -21,7 +21,7 @@ import {
 import { AggregatedTreeNode } from '../shared/aggregated-tree-node';
 import { FormBuilder } from '@angular/forms';
 import { debounceTime, map, startWith } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
@@ -64,20 +64,35 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private selectedSearchResultItemInternal = signal<string | undefined>(undefined);
   readonly selectedSearchResult = this.selectedSearchResultItemInternal.asReadonly();
 
-  private errorLeafsRootName = signal<string | undefined>(undefined);
+  private errorLeafsRootNameInternal = signal<string | undefined>(undefined);
   private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
   readonly searchForErrorCause = computed(() => this.errorsLeafsSet() !== undefined);
+  readonly errorLeafsRootName = this.errorLeafsRootNameInternal.asReadonly();
 
   private effectLeafsClean = effect(() => {
     const errorLeafs = this.errorsLeafsSet();
     if (errorLeafs === undefined) {
-      this.errorLeafsRootName.set(undefined);
+      this.errorLeafsRootNameInternal.set(undefined);
     }
   });
 
-  private searchResultSet$ = this.searchCtrl.valueChanges.pipe(
-    startWith(this.searchCtrl.value),
-    debounceTime(300),
+  private ctrlSearchValue$ = this.searchCtrl.valueChanges.pipe(debounceTime(300));
+  private ctrlSearchValue = toSignal(this.ctrlSearchValue$, { initialValue: this.searchCtrl.value });
+
+  private searchValue = computed(() => {
+    const errorLeafsRootName = this.errorLeafsRootName();
+    const searchErrorsOnly = this.searchForErrorsOnly();
+    const ctrlSearchValue = this.ctrlSearchValue();
+    if (errorLeafsRootName) {
+      return errorLeafsRootName;
+    }
+    if (searchErrorsOnly) {
+      return ERROR_STATUSES_SEARCH_VALUE;
+    }
+    return ctrlSearchValue;
+  });
+
+  private searchResultSet$ = toObservable(this.searchValue).pipe(
     map((searchValue) => {
       const errorLeafsRootName = untracked(() => this.errorLeafsRootName());
       if (!!errorLeafsRootName && searchValue === errorLeafsRootName) {
@@ -112,11 +127,8 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private toggleErrorSearchEffect = effect(() => {
     const errorLeafsRootName = this.errorLeafsRootName();
     const searchErrorsOnly = this.searchForErrorsOnly();
-    if (errorLeafsRootName) {
-      this.searchCtrl.setValue(errorLeafsRootName);
-      this.searchCtrl.disable();
-    } else if (searchErrorsOnly) {
-      this.searchCtrl.setValue(ERROR_STATUSES_SEARCH_VALUE);
+    if (errorLeafsRootName || searchErrorsOnly) {
+      this.searchCtrl.setValue('');
       this.searchCtrl.disable();
     } else if (this.searchCtrl.disabled) {
       this.searchCtrl.setValue('');
@@ -192,7 +204,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       this.errorsLeafsSet.set(undefined);
       this._dialogs.showErrorMsg('No root cause could be found in this nodes children.').subscribe();
     } else {
-      this.errorLeafsRootName.set(`${name} (Root Cause)`);
+      this.errorLeafsRootNameInternal.set(`${name} (Root Cause)`);
       this.errorsLeafsSet.set(errorLeafsSet);
     }
   }

@@ -1,15 +1,4 @@
-import {
-  Component,
-  computed,
-  DestroyRef,
-  effect,
-  inject,
-  OnInit,
-  signal,
-  untracked,
-  viewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, untracked, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AGGREGATED_TREE_TAB_STATE,
   AggregatedReportViewTreeStateService,
@@ -23,6 +12,7 @@ import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-t
 import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
 import { AggregatedReportViewTreeFilterService } from '../../services/aggregated-report-view-tree-filter.service';
 import { AltReportNodesFilterService } from '../../services/alt-report-nodes-filter.service';
+import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 
 @Component({
   selector: 'step-alt-execution-tree-tab',
@@ -43,6 +33,7 @@ import { AltReportNodesFilterService } from '../../services/alt-report-nodes-fil
       provide: AltReportNodesFilterService,
       useExisting: AggregatedReportViewTreeFilterService,
     },
+    AggregatedReportViewTreeSearchFacadeService,
   ],
   hostDirectives: [ElementSizeDirective],
   standalone: false,
@@ -51,21 +42,15 @@ export class AltExecutionTreeTabComponent implements OnInit {
   private _activatedRoute = inject(ActivatedRoute);
   private _destroyRef = inject(DestroyRef);
   private _executionDialogs = inject(AltExecutionDialogsService);
-  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
-
   private _treeState = inject(AGGREGATED_TREE_TAB_STATE);
-  protected readonly searchCtrl = this._treeState.searchCtrl;
-  protected readonly searchForErrorsOnly = this._treeState.searchForErrorsOnly;
-  protected readonly searchForErrorCause = this._treeState.searchForErrorCause;
+  protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
+  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   private tree = viewChild('tree', { read: AltExecutionTreeComponent });
 
-  protected readonly foundItems = computed(() => this._treeState.searchResult().length);
-  protected readonly pageIndex = signal(0);
-
   private effectFocusNode = effect(() => {
-    const foundItems = this.foundItems();
-    const pageIndex = this.pageIndex();
+    const foundItems = this._treeSearch.foundItems();
+    const pageIndex = this._treeSearch.pageIndex();
     if (!foundItems) {
       return;
     }
@@ -114,13 +99,5 @@ export class AltExecutionTreeTabComponent implements OnInit {
 
   protected expandAll(): void {
     this._treeState.expandAll();
-  }
-
-  protected toggleErrorSearch(): void {
-    this._treeState.toggleErrorSearch();
-  }
-
-  protected exitRootCauseSearch(): void {
-    this._treeState.clearErrorLeafs();
   }
 }

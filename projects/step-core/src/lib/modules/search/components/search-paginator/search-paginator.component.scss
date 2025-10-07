@@ -1,0 +1,28 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-search-paginator {
+  step-btn-group {
+    button {
+      width: 3.6rem;
+      height: 3.4rem !important;
+    }
+  }
+
+  &.active {
+    step-btn-group {
+      border: none;
+      button {
+        height: 3.6rem !important;
+        border-color: var.$dark-blue !important;
+        border-top: 0.1rem solid var.$dark-blue !important;
+        border-bottom: 0.1rem solid var.$dark-blue !important;
+        &:first-child {
+          border-left: 0.1rem solid var.$dark-blue !important;
+        }
+        &:last-child {
+          border-right: 0.1rem solid var.$dark-blue !important;
+        }
+      }
+    }
+  }
+}

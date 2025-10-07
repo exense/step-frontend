@@ -14,40 +14,20 @@
         <step-icon name="expand-all" />
       </button>
     </step-btn-group>
-    <step-alt-report-node-artefact-filter />
-    <step-alt-report-node-status-filter />
     <step-search-field
-      [formControl]="searchCtrl"
-      [total]="foundItems()"
-      [(searchIndex)]="pageIndex"
+      [formControl]="_treeSearch.searchCtrl"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
       [hint]="_treeSearchDescription"
-      [disableNavButtonsWithControl]="false"
-    >
-      <ng-container *stepSearchFieldAddon>
-        @if (searchForErrorCause()) {
-          <button
-            type="button"
-            mat-flat-button
-            (click)="exitRootCauseSearch()"
-            matTooltip="Cancel root cause error search"
-            matTooltipPosition="below"
-          >
-            <step-icon name="x" />
-          </button>
-        } @else {
-          <button
-            type="button"
-            mat-flat-button
-            [color]="searchForErrorsOnly() ? 'primary' : undefined"
-            (click)="toggleErrorSearch()"
-            [matTooltip]="searchForErrorsOnly() ? 'Cancel errors search' : 'Search for errors'"
-            matTooltipPosition="below"
-          >
-            <step-icon name="search-errors" />
-          </button>
-        }
-      </ng-container>
-    </step-search-field>
+    />
+    <step-search-paginator
+      [isActive]="_treeSearch.isErrorSearchActive()"
+      (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
+      inactiveTooltip="Search for errors"
+      [activeTooltip]="_treeSearch.errorsSearchHint()"
+    />
   </div>
 </section>
 <step-alt-execution-tree
