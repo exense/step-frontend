@@ -1,5 +1,5 @@
 <form #form="ngForm">
-  <step-data-source-configuration [context]="context" (forceProtected)="isProtectionForceDisabled.set($event)" />
+  <step-data-source-configuration [context]="context" />
   <step-dynamic-textfield
     label="Number of threads"
     tooltip="Number of threads to use in order to parallelize the loop"
@@ -21,9 +21,9 @@
   @if (context.artefact!.dataSource) {
     <step-dynamic-checkbox
       label="Protect data source values"
-      tooltip="Protected data source values are hidden in reports and can only be passed to Keywords, not resolved in the Plan."
+      tooltip="Protect values loaded from the data source. These will be hidden in reports and can only be passed to Keywords, not resolved in the Plan."
       [(ngModel)]="context.artefact!.dataSource!.protect"
-      [disabled]="context.readonly || isProtectionForceDisabled()"
+      [disabled]="context.readonly"
       name="protect"
     />
   }

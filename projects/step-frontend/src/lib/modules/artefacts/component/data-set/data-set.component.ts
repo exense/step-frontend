@@ -13,6 +13,4 @@ import { DataSetArtefact } from '../../types/data-set.artefact';
 export class DataSetComponent extends BaseArtefactComponent<DataSetArtefact> {
   @ViewChild('form')
   protected form!: NgForm;
-
-  protected isProtectionForceDisabled = signal(false);
 }
