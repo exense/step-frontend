@@ -154,7 +154,7 @@
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="!('task-write' | hasRight | async)"
+      [disabled]="!isSchedulePlan && !('task-write' | hasRight | async)"
     >
       Save
     </button>
