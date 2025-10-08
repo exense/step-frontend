@@ -1,0 +1,41 @@
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+step-error-root-causes {
+  display: block;
+
+  .error-root-causes {
+    display: grid;
+    grid-template-columns: min-content auto;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .error-count {
+    @include common.error-count;
+    width: auto;
+    .text {
+      white-space: nowrap;
+    }
+  }
+
+  .error-message {
+    max-width: 60rem;
+  }
+
+  step-table {
+    tr {
+      height: 2.5rem !important;
+
+      td {
+        padding-bottom: 0.5rem !important;
+      }
+    }
+    step-paginator {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: -1.4rem;
+    }
+  }
+}
