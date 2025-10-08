@@ -28,7 +28,7 @@ export class ToggleRequestWarningDirective {
 
   readonly requestWarningMessage = input.required<string>({ alias: 'requestWarning' });
 
-  private showWarningSubscription = this._autoRefreshToggle.refresh
+  private showWarningSubscription = this._autoRefreshToggle.refresh$
     .pipe(
       map(() => this._treeLoader.previousRequestCounter() > 1),
       takeUntilDestroyed(),

@@ -76,10 +76,7 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
     }
 
-    this._executionDialogs.openIterations({
-      aggregatedNodeId: node.id,
-      artefactHash: item.artefactHash!,
-      countByStatus: item.countByStatus,
+    this._executionDialogs.openIterations(node, {
       nodeStatus: status,
       nodeStatusCount: count,
     });
