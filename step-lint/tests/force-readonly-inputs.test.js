@@ -1,9 +1,8 @@
-import { TSESLint } from '@typescript-eslint/utils';
-import { rule } from '../rules/force-readonly-inputs';
+const { RuleTester } = require('eslint');
+const rule = require('../rules/force-readonly-inputs');
 
-const tester = new TSESLint.RuleTester({
+const tester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
-  parserOptions: { ecmaVersion: 2022, sourceType: 'module' },
 });
 
 tester.run('force-readonly-inputs', rule, {

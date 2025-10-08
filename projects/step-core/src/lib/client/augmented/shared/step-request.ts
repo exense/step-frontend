@@ -1,6 +1,3 @@
-/* istanbul ignore file */
-/* tslint:disable */
-/* eslint-disable */
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import type { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of, throwError } from 'rxjs';

@@ -2,6 +2,7 @@ import { Directive, ElementRef, inject, Input, OnDestroy, OnInit } from '@angula
 import { ElementRefMapDirective } from './element-ref-map.directive';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[widthExpanders]',
   standalone: false,
 })

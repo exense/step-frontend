@@ -1,9 +1,8 @@
-import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
-import { RuleMetaDataDocs } from '@typescript-eslint/utils/dist/ts-eslint';
+const { AST_NODE_TYPES, ESLintUtils } = require('@typescript-eslint/utils');
 
-const createRule = ESLintUtils.RuleCreator<RuleMetaDataDocs>((name) => '');
+const createRule = ESLintUtils.RuleCreator((name) => '');
 
-export const rule = createRule({
+module.exports = createRule({
   name: 'force-readonly-inputs',
   meta: {
     type: 'suggestion',
