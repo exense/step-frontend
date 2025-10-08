@@ -154,8 +154,12 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
+import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
+import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
 import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+
 
 @NgModule({
   declarations: [
@@ -251,6 +255,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    AltExecutionErrorsWidgetComponent,
     ReportViewHeaderComponent,
   ],
   imports: [
@@ -270,7 +275,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
-    MatProgressSpinner,
+    TestCaseInlineRootCauseComponent,
+    ErrorRootCausesComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -302,6 +308,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
+    StatusCountBadgeComponent,
   ],
   providers: [
     {
