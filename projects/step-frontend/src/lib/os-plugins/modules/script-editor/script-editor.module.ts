@@ -3,6 +3,7 @@ import {
   AugmentedKeywordsService,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  EntityRefDirective,
   FunctionType,
   FunctionTypeRegistryService,
   MultipleProjectsService,
@@ -20,7 +21,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
-  imports: [StepCoreModule, NgxMatSelectSearchModule],
+  imports: [StepCoreModule, NgxMatSelectSearchModule, EntityRefDirective],
   exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {

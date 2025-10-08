@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild, viewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import {
   AugmentedParametersService,
   AugmentedScreenService,
@@ -6,6 +6,7 @@ import {
   DateFormat,
   DialogRouteResult,
   Parameter,
+  ReloadableDirective,
   ScreensService,
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
@@ -35,6 +36,7 @@ interface ParameterEditDialogData {
       transition('hidden <=> visible', animate('300ms ease-in-out')),
     ]),
   ],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ParameterEditDialogComponent implements OnInit {

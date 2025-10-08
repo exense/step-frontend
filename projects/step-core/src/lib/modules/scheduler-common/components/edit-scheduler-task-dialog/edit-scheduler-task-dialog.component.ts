@@ -50,6 +50,8 @@ import { RepositoryParametersSchemasService } from '../../../repository-paramete
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 import { catchError } from 'rxjs/operators';
 import { HasRightPipe } from '../../../auth';
+import { EntityRefDirective } from '../../../entity/directives/entity-ref.directive';
+import { ReloadableDirective } from '../../../routing';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -81,7 +83,9 @@ const LOCAL_REPOSITORY_ID = 'local';
     JSON_FORM_EXPORTS,
     LIST_SELECTION_EXPORTS,
     HasRightPipe,
+    EntityRefDirective,
   ],
+  hostDirectives: [ReloadableDirective],
   host: {
     '(keydown.enter)': 'save()',
   },
