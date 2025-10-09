@@ -84,6 +84,8 @@ export class AggregatedReportViewTreeNodeUtilsService
       countByStatus: item.countByStatus,
       nodeType: AggregatedTreeNodeType.AGGREGATED_INFO,
       hasDescendantInvocations: item.hasDescendantInvocations,
+      countByErrorMessage: item.countByErrorMessage,
+      countByChildrenErrorMessage: item.countByChildrenErrorMessage,
     };
   }
 

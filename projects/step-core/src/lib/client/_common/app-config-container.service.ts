@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
-import { ApplicationConfiguration } from '../../../client/step-client-module';
-import { Mutable } from '../types/mutable';
-
-type FieldAccessor = Mutable<Pick<AppConfigContainerService, 'conf'>>;
+import { ApplicationConfiguration } from '../generated';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppConfigContainerService {
-  readonly conf?: ApplicationConfiguration;
+  private confInternal?: ApplicationConfiguration;
 
   private defaultClientUrl = '/plans/list';
 
+  get conf(): ApplicationConfiguration | undefined {
+    return this.confInternal;
+  }
+
   setConfiguration(conf: ApplicationConfiguration): void {
-    (this as FieldAccessor).conf = conf;
+    this.confInternal = conf;
   }
 
   setDefaultClientUrl(url: string): void {

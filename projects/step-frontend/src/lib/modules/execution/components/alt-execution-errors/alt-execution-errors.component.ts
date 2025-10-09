@@ -1,12 +1,16 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import {
   AceMode,
+  AugmentedTimeSeriesService,
   RichEditorDialogService,
   TableDataSource,
   TableIndicatorMode,
+  TableLocalDataSource,
+  TableRemoteDataSource,
   TimeSeriesErrorEntry,
 } from '@exense/step-core';
 import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'step-alt-execution-errors',
@@ -16,14 +20,34 @@ import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.m
 })
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);
+  private _timeSeriesApi = inject(AugmentedTimeSeriesService);
 
-  /** @Input() **/
-  readonly dataSource = input.required<TableDataSource<TimeSeriesErrorEntry>>();
+  readonly dataSourceInput = input<
+    | TableDataSource<TimeSeriesErrorEntry>
+    | TimeSeriesErrorEntry[]
+    | Observable<TimeSeriesErrorEntry[] | undefined>
+    | undefined
+  >(undefined, {
+    alias: 'dataSource',
+  });
 
-  /** @Input() **/
+  protected readonly dataSource = computed(() => {
+    const data = this.dataSourceInput();
+    if (!data) {
+      return [] as TimeSeriesErrorEntry[];
+    }
+    if (data instanceof TableLocalDataSource || data instanceof TableRemoteDataSource) {
+      return data;
+    }
+    if (data instanceof Array) {
+      return this._timeSeriesApi.createErrorsLocalDataSource(data);
+    }
+    const data$ = (data as Observable<TimeSeriesErrorEntry[] | undefined>).pipe(map((items) => items ?? []));
+    return this._timeSeriesApi.createErrorsLocalDataSource(data$);
+  });
+
   readonly showExecutionsMenu = input(true);
 
-  /** @Input() **/
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],
   });

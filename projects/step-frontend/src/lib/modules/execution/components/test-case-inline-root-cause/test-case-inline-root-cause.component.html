@@ -1,0 +1,12 @@
+@if (errorCounts() === 1) {
+  <div class="error-count">
+    @if (singleMessage(); as message) {
+      <div class="hidden-text">{{ message }}</div>
+      <div class="text">{{ message }}</div>
+    }
+  </div>
+} @else if (errorCounts() > 0) {
+  <div class="error-count">
+    <div class="text">{{ errorCounts() }} Errors</div>
+  </div>
+}
