@@ -21,6 +21,7 @@ export class DynamicTextfieldComponent
 
   @Input() isNumber = false;
   @Input() isNegativeNumberAllowed = false;
+  @Input() isPassword = false;
   @Input() predefinedRichEditorMode?: AceMode;
   @Input() allowedRichEditorModes?: AceMode[];
 
