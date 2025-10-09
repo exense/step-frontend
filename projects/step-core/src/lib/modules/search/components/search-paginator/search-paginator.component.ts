@@ -17,8 +17,11 @@ export class SearchPaginatorComponent {
   readonly total = input.required<number>();
   readonly isActive = model.required<boolean>();
   readonly isDisabled = input(false);
-  readonly activeTooltipInput = input<string | undefined>(undefined, { alias: 'activeTooltip' });
+  readonly activeTooltip = input<string | undefined>(undefined);
   readonly inactiveTooltip = input<string | undefined>(undefined);
+  readonly hintTooltip = input<string | undefined>(undefined);
+  readonly prevTooltip = input<string>('previous');
+  readonly nextTooltip = input<string>('next');
 
   protected readonly areButtonsActive = computed(() => {
     const isDisabled = this.isDisabled();
@@ -38,18 +41,6 @@ export class SearchPaginatorComponent {
       return '';
     }
     return `${searchIndex + 1} / ${total}`;
-  });
-
-  protected readonly activeTooltip = computed(() => {
-    const activeTooltipInput = this.activeTooltipInput();
-    const searchLabel = this.searchLabel();
-    if (!searchLabel) {
-      return activeTooltipInput;
-    }
-    if (!activeTooltipInput) {
-      return searchLabel;
-    }
-    return `${searchLabel}\n${activeTooltipInput}`;
   });
 
   private effectResetSearch = effect(() => {

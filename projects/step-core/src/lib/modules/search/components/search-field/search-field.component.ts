@@ -33,6 +33,8 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly total = input.required<number>();
 
   readonly hint = input('');
+  readonly prevTooltip = input<string>('previous');
+  readonly nextTooltip = input<string>('next (enter)');
 
   readonly disableNavButtonsWithControl = input(true);
 
@@ -50,6 +52,11 @@ export class SearchFieldComponent implements ControlValueAccessor {
       return false;
     }
     return !!value && total > 0;
+  });
+
+  protected readonly showButtons = computed(() => {
+    const value = (this.value() ?? '').trim();
+    return !!value;
   });
 
   protected readonly searchLabel = computed(() => {

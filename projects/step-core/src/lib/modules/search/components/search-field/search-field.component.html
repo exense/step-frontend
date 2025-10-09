@@ -23,30 +23,32 @@
       <ng-container *ngTemplateOutlet="fieldAddonTemplate" />
     </step-suffix>
   }
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-stroked-button
-      [disabled]="!areButtonsActive()"
-      (click)="prev()"
-      matTooltip="previous"
-      matTooltipPosition="below"
-    >
-      <step-icon name="chevron-left" />
-    </button>
-  </step-suffix>
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-stroked-button
-      [disabled]="!areButtonsActive()"
-      (click)="next()"
-      matTooltip="next (enter)"
-      matTooltipPosition="below"
-    >
-      <step-icon name="chevron-right" />
-    </button>
-  </step-suffix>
+  @if (showButtons()) {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        [disabled]="!areButtonsActive()"
+        (click)="prev()"
+        [matTooltip]="prevTooltip()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="chevron-left" />
+      </button>
+    </step-suffix>
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        [disabled]="!areButtonsActive()"
+        (click)="next()"
+        [matTooltip]="nextTooltip()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="chevron-right" />
+      </button>
+    </step-suffix>
+  }
   @if (searchLabel(); as searchLabel) {
     <step-suffix>
       <span class="search-label">{{ searchLabel }}</span>

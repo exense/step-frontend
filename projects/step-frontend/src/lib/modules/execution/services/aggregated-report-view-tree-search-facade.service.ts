@@ -23,11 +23,11 @@ export class AggregatedReportViewTreeSearchFacadeService {
     const searchForErrorsOnly = this._treeState.searchForErrorsOnly();
     const searchForErrorCause = this._treeState.searchForErrorCause();
     const rootCause = this._treeState.errorLeafsRootName();
-    if (searchForErrorsOnly) {
-      return `Nodes with statuses: ${ERROR_STATUSES_DISPLAY_VALUE}`;
-    }
     if (searchForErrorCause) {
       return `Errors of ${rootCause}`;
+    }
+    if (searchForErrorsOnly) {
+      return `${ERROR_STATUSES_DISPLAY_VALUE} are considered as errors in this search`;
     }
     return undefined;
   });
@@ -38,9 +38,14 @@ export class AggregatedReportViewTreeSearchFacadeService {
 
     if (!searchForErrorsOnly && !searchForErrorCause) {
       this._treeState.toggleErrorSearch();
-    } else if (searchForErrorsOnly) {
+      return;
+    }
+
+    if (searchForErrorsOnly) {
       this._treeState.toggleErrorSearch();
-    } else if (searchForErrorCause) {
+    }
+
+    if (searchForErrorCause) {
       this._treeState.clearErrorLeafs();
     }
   }

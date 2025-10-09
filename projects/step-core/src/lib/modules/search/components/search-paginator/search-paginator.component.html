@@ -11,18 +11,33 @@
     </button>
   }
   @if (isActive()) {
-    <button type="button" mat-flat-button color="primary" [matTooltip]="activeTooltip()" matTooltipPosition="below">
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="deactivate()"
+      [matTooltip]="activeTooltip()"
+      matTooltipPosition="below"
+    >
       <step-icon name="alert-circle" />
     </button>
-    <button type="button" mat-stroked-button color="primary" (click)="deactivate()">
-      <step-icon name="x" />
+    <button
+      class="label-placeholder"
+      type="button"
+      mat-stroked-button
+      [matTooltip]="hintTooltip()"
+      matTooltipPosition="below"
+    >
+      <div class="label-container-value">
+        {{ searchLabel() }}
+      </div>
     </button>
     <button
       type="button"
       mat-stroked-button
       [disabled]="!areButtonsActive()"
       (click)="prev()"
-      matTooltip="previous"
+      [matTooltip]="prevTooltip()"
       matTooltipPosition="below"
     >
       <step-icon name="chevron-left" />
@@ -32,7 +47,7 @@
       mat-stroked-button
       [disabled]="!areButtonsActive()"
       (click)="next()"
-      matTooltip="next"
+      [matTooltip]="nextTooltip()"
       matTooltipPosition="below"
     >
       <step-icon name="chevron-right" />
