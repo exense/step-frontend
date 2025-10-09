@@ -1,38 +1,39 @@
-const { RuleTester } = require('eslint');
+const { RuleTester } = require('@angular-eslint/test-utils');
 const rule = require('../rules/force-readonly-inputs');
 
-const tester = new RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-});
+const tester = new RuleTester();
+
+const VALID = `
+import { Component, input, output } from '@angular/core';
+@Component({selector: 'x', template: ''})
+export class C {
+  readonly title = input<string>('');
+  readonly saved = output<void>();
+}
+`;
+
+const INVALID = `
+import { Component, input, output } from '@angular/core';
+@Component({selector: 'x', template: ''})
+export class C {
+  title = input<string>('');
+  saved = output<void>();
+}
+`;
 
 tester.run('force-readonly-inputs', rule, {
-  valid: [
-    `
-      import { Component, input, output } from '@angular/core';
-      @Component({selector: 'x', template: ''})
-      export class C {
-        readonly title = input<string>('');
-        readonly saved = output<void>();
-      }
-    `,
-  ],
+  valid: [VALID],
   invalid: [
     {
-      code: `
-      import { Component, input, output } from '@angular/core';
-      @Component({selector: 'x', template: ''})
-      export class C {
-        title = input<string>('');
-        saved = output<void>();
-      }`,
-      errors: [{ messageId: 'notReadonly' }, { messageId: 'notReadonly' }],
-      output: `
-      import { Component, input, output } from '@angular/core';
-      @Component({selector: 'x', template: ''})
-      export class C {
-        title = input<string>('');
-        saved = output<void>();
-      }`,
+      code: INVALID,
+      errors: [
+        {
+          messageId: 'notReadonly',
+        },
+        {
+          messageId: 'notReadonly',
+        },
+      ],
     },
   ],
 });

@@ -5,7 +5,7 @@ const createRule = ESLintUtils.RuleCreator((name) => '');
 module.exports = createRule({
   name: 'force-readonly-inputs',
   meta: {
-    type: 'suggestion',
+    type: 'problem',
     docs: {
       description: 'Forces to mark inputs/outputs as readonly',
       recommended: 'strict',
@@ -19,14 +19,31 @@ module.exports = createRule({
   create(context) {
     return {
       PropertyDefinition(node) {
-        if (node.value.type !== AST_NODE_TYPES.CallExpression) {
+        const parent = node?.parent?.parent;
+        if (parent?.type !== AST_NODE_TYPES.ClassDeclaration) {
           return;
         }
-        if (node.value.callee.type !== AST_NODE_TYPES.Identifier) {
+        const decorators = parent?.decorators ?? [];
+        const componentOrDirectiveDecorator = decorators.find(
+          (item) => item?.expression?.callee?.name === 'Component' || item?.expression?.callee?.name === 'Directive',
+        );
+        if (!componentOrDirectiveDecorator) {
           return;
         }
-        const name = node.value.callee.name;
-        if ((name === 'input' || name === 'output') && !node.readonly) {
+        if (node?.value?.type !== AST_NODE_TYPES.CallExpression) {
+          return;
+        }
+        let value = undefined;
+        if (node?.value?.callee?.type === AST_NODE_TYPES.Identifier) {
+          value = node?.value?.callee;
+        } else if (node?.value?.callee?.type === AST_NODE_TYPES.MemberExpression) {
+          value = node?.value?.callee?.object;
+        }
+        if (!value) {
+          return;
+        }
+        const name = value?.name;
+        if ((name === 'input' || name === 'output') && !node?.readonly) {
           context.report({
             node,
             messageId: 'notReadonly',

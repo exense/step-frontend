@@ -1,16 +1,18 @@
 // @ts-check
 const angular = require('angular-eslint');
 const { defineConfig } = require('eslint/config');
-//const stepLint = require('./step-lint');
+const stepLint = require('./step-lint');
 
 module.exports = defineConfig([
   {
     files: ['**/*.ts'],
-    //plugins: [stepLint],
     extends: [...angular.configs.tsRecommended],
     processor: angular.processInlineTemplates,
+    plugins: {
+      stepLint,
+    },
     rules: {
-      //        "step-lint/force-readonly-inputs": "error",
+      'stepLint/force-readonly-inputs': 'warn',
       '@angular-eslint/prefer-standalone': 'off',
       '@angular-eslint/no-output-on-prefix': 'warn',
       '@angular-eslint/no-output-native': 'warn',
