@@ -7,6 +7,7 @@ const CLASS_INDETERMINATE = 'mat-pseudo-checkbox-indeterminate';
 const CLASS_CHECKED = 'mat-pseudo-checkbox-checked';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'mat-option.step-multi-level-plain-item',
 })
 export class MultiSelectOptionDirective<T extends string | number | symbol> {
