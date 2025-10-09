@@ -23,6 +23,15 @@ export class SearchPaginatorComponent {
   readonly prevTooltip = input<string>('previous');
   readonly nextTooltip = input<string>('next');
 
+  protected readonly disabledTooltip = computed(() => {
+    const inactiveTooltip = this.inactiveTooltip();
+    const isDisabled = this.isDisabled();
+    if (isDisabled && inactiveTooltip) {
+      return inactiveTooltip;
+    }
+    return undefined;
+  });
+
   protected readonly areButtonsActive = computed(() => {
     const isDisabled = this.isDisabled();
     const isActive = this.isActive();

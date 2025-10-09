@@ -1,10 +1,11 @@
-<step-btn-group class="with-borders">
+<step-btn-group class="with-borders" [matTooltip]="disabledTooltip()" matTooltipPosition="below">
   @if (!isActive()) {
     <button
       type="button"
       mat-stroked-button
       (click)="activate()"
       [matTooltip]="inactiveTooltip()"
+      [disabled]="isDisabled()"
       matTooltipPosition="below"
     >
       <step-icon name="alert-circle" />

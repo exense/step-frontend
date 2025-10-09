@@ -13,10 +13,17 @@ export class AggregatedReportViewTreeSearchFacadeService {
   readonly foundItems = computed(() => this._treeState.searchResult().length);
   readonly pageIndex = signal(0);
 
+  readonly hasErrors = computed(() => this._treeState.hasErrors());
+
   readonly isErrorSearchActive = computed(() => {
     const searchForErrorsOnly = this._treeState.searchForErrorsOnly();
     const searchForErrorCause = this._treeState.searchForErrorCause();
     return searchForErrorsOnly || searchForErrorCause;
+  });
+
+  readonly errorsButtonHint = computed(() => {
+    const hasErrors = this.hasErrors();
+    return hasErrors ? 'Search for errors' : 'No errors found';
   });
 
   readonly errorsSearchHint = computed(() => {

@@ -51,6 +51,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
       this.buildErrorStatusesSearchIndex(rootNode);
       this.buildArtefactsNodeIdIndex(rootNode);
     }
+    this.hasErrorsInternal.set(!this.errorsSearchIndex.isEmpty());
   });
 
   private resolvedPartialPathInternal = signal<string | undefined>(undefined);
@@ -68,6 +69,9 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   private errorsLeafsSet = signal<ReadonlySet<string> | undefined>(undefined);
   readonly searchForErrorCause = computed(() => this.errorsLeafsSet() !== undefined);
   readonly errorLeafsRootName = this.errorLeafsRootNameInternal.asReadonly();
+
+  private hasErrorsInternal = signal(false);
+  readonly hasErrors = this.hasErrorsInternal.asReadonly();
 
   private effectLeafsClean = effect(() => {
     const errorLeafs = this.errorsLeafsSet();
@@ -139,6 +143,10 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
   override init(root?: AggregatedReportView, options: AggregatedTreeStateInitOptions = {}) {
     super.init(root, options);
     this.resolvedPartialPathInternal.set(options?.resolvedPartialPath);
+    this.searchForErrorsOnlyInternal.set(false);
+    this.errorLeafsRootNameInternal.set(undefined);
+    this.errorsLeafsSet.set(undefined);
+    this.searchCtrl.setValue('');
   }
 
   override ngOnDestroy() {
@@ -324,6 +332,10 @@ class SearchIndex {
   clear(): void {
     this.index.clear();
     this.searchResultCache.clear();
+  }
+
+  isEmpty(): boolean {
+    return !this.index.size;
   }
 }
 
