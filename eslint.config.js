@@ -12,7 +12,7 @@ module.exports = defineConfig([
       stepLint,
     },
     rules: {
-      'stepLint/force-readonly-inputs': 'warn',
+      'stepLint/force-readonly-inputs': 'error',
       '@angular-eslint/prefer-standalone': 'off',
       '@angular-eslint/no-output-on-prefix': 'warn',
       '@angular-eslint/no-output-native': 'warn',
@@ -41,6 +41,7 @@ module.exports = defineConfig([
     extends: [...angular.configs.templateRecommended],
     rules: {
       '@angular-eslint/template/no-negated-async': 'off',
+      '@angular-eslint/template/prefer-control-flow': 'error',
     },
   },
   {
