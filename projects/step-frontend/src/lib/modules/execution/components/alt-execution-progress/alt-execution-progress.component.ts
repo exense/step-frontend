@@ -8,10 +8,12 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
@@ -48,6 +50,8 @@ import {
   TableDataSource,
   TableLocalDataSource,
   TimeRange,
+  TimeSeriesErrorEntry,
+  TimeSeriesErrorsRequest,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -359,10 +363,21 @@ export class AltExecutionProgressComponent
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
-  private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
-  readonly errorsDataSource$ = of(this.errorsDataSource);
-  readonly availableErrorTypes$ = this.errorsDataSource.allData$.pipe(
-    map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+  readonly errors$ = combineLatest([this.execution$, this.timeRange$]).pipe(
+    map(([execution, timeRange]) => {
+      const executionId = execution.id;
+      const errorsRequest: TimeSeriesErrorsRequest = { executionId, timeRange };
+      return errorsRequest;
+    }),
+    switchMap((request) => this._timeSeriesService.findErrors(request)),
+    catchError(() => of([] as TimeSeriesErrorEntry[])),
+    map((errors) => (!errors?.length ? undefined : errors)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly availableErrorTypes$ = this.errors$.pipe(
+    map((items) => (items ?? []).reduce((res, item) => [...res, ...item.types], [] as string[])),
     map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -396,7 +411,6 @@ export class AltExecutionProgressComponent
     }
 
     this.setupTreeRefresh();
-    this.setupErrorsRefresh();
     this.setupToggleWarningReset();
     this.subscribeToUrlNavigation();
   }
@@ -430,7 +444,6 @@ export class AltExecutionProgressComponent
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
-    this.errorsDataSource.destroy();
   }
 
   private setupTreeRefresh(): void {
@@ -465,15 +478,6 @@ export class AltExecutionProgressComponent
       .subscribe(() => {
         this._aggregatedTreeTabState.searchCtrl.setValue('');
         this._aggregatedTreeWidgetState.searchCtrl.setValue('');
-      });
-  }
-
-  private setupErrorsRefresh(): void {
-    combineLatest([this.execution$, this.timeRange$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, timeRange]) => {
-        const executionId = execution.id!;
-        this.errorsDataSource.reload({ request: { executionId, timeRange } });
       });
   }
 

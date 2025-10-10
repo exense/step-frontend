@@ -2,13 +2,13 @@ import { inject, Injectable, signal } from '@angular/core';
 import { WsChannel } from './ws-channel';
 import { map, Observable } from 'rxjs';
 import { WebSocketSubject } from 'rxjs/webSocket';
-import { DOCUMENT } from '@angular/common';
+import { APP_HOST } from '../_common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WsFactoryService {
-  private _location = inject(DOCUMENT).location;
+  private _appHost = inject(APP_HOST);
 
   connect<REQ, RESP>(url: string): WsChannel<REQ, RESP> {
     if (!url.startsWith('/')) {
@@ -19,9 +19,8 @@ export class WsFactoryService {
   }
 
   private get baseWsUrl(): string {
-    const protocol = this._location.protocol.replace('http', 'ws');
-    const host = this._location.host;
-    return `${protocol}//${host}/ws`;
+    const wsHost = this._appHost.replace('http', 'ws');
+    return `${wsHost}/ws`;
   }
 }
 
