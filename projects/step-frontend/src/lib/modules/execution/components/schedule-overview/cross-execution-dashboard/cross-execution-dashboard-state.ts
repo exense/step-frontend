@@ -174,7 +174,7 @@ export abstract class CrossExecutionDashboardState {
             });
 
             let color = this._statusColors[seriesKey as Status];
-            const fill = color + '99';
+            const fill = color + 'cc';
             const s: TSChartSeries = {
               id: seriesKey,
               scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
@@ -184,7 +184,7 @@ export abstract class CrossExecutionDashboardState {
               width: 1,
               value: (self: uPlot, rawValue: number, seriesIdx: number, idx: number) =>
                 this.calculateStackedValue(self, rawValue, seriesIdx, idx, 0),
-              stroke: color,
+              stroke: fill,
               fill: fill,
               paths: uplotBarsFn,
               points: { show: false },
@@ -199,7 +199,8 @@ export abstract class CrossExecutionDashboardState {
             id: 'response-time',
             data: responseTimeData,
             value: (x, value: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(value),
-            stroke: '#0082cb',
+            stroke: '#1082c3',
+            width: 1.5,
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
