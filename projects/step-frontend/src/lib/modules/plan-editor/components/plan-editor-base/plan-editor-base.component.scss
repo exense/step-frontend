@@ -1,5 +1,6 @@
 @use 'projects/step-core/styles/core-mixins' as core;
 @use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common;
 
 step-plan-editor-base {
   flex: 1;
@@ -49,6 +50,10 @@ step-plan-editor-base {
 
   .tab-content {
     padding: 0 24px;
+  }
+
+  .plan-editor-control-selections {
+    @include common.plan-editor-control-selections;
   }
 }
 

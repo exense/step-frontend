@@ -140,7 +140,7 @@
         }
       }
     </div>
-    <div step-modal-window-buttons>
+    <div step-modal-window-buttons [stepEntityRef]="parameter">
       <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
       <button
         [hidden]="isEditMode"

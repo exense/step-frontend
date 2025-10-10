@@ -74,9 +74,19 @@
     </form>
   </div>
 
-  <div step-modal-window-buttons>
+  <div step-modal-window-buttons [stepEntityRef]="$any(keyword)">
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
-    <button type="button" (click)="save(true)" mat-stroked-button>Save and edit</button>
-    <button type="button" (click)="save()" mat-flat-button color="primary">Save</button>
+    <button type="button" mat-stroked-button (click)="save(true)" [disabled]="!('kw-write' | hasRight | async)">
+      Save and edit
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="save()"
+      [disabled]="!('kw-write' | hasRight | async)"
+    >
+      Save
+    </button>
   </div>
 </step-modal-window>

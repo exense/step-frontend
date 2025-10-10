@@ -32,6 +32,7 @@ import {
   ItemInfo,
   CustomFormWrapperComponent,
   ArrayItemLabelValueExtractor,
+  ReloadableDirective,
 } from '@exense/step-core';
 import { map, of, switchMap, tap } from 'rxjs';
 import { Router } from '@angular/router';
@@ -47,6 +48,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       useExisting: forwardRef(() => FunctionConfigurationDialogComponent),
     },
   ],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class FunctionConfigurationDialogComponent implements OnInit, FunctionTypeParentFormService {

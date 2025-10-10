@@ -3,6 +3,7 @@ import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
   DialogParentService,
+  EntityRefDirective,
   entitySelectionStateProvider,
   StepCoreModule,
   STORE_ALL,
@@ -33,7 +34,7 @@ import { ExecutionModule } from '../../../execution/execution.module';
       useExisting: forwardRef(() => AutomationPackageListComponent),
     },
   ],
-  imports: [StepCoreModule, ExecutionModule],
+  imports: [StepCoreModule, ExecutionModule, EntityRefDirective],
 })
 export class AutomationPackageListComponent implements OnInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);

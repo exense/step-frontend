@@ -1,15 +1,6 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import {
-  CheckLoadErrorsConfig,
-  MultipleProjectsStrategy,
-  Project,
-  SwitchStatus,
-} from '../types/multiple-projects-strategy';
-import { ProjectSwitchDialogComponent } from '../components/project-switch-dialog/project-switch-dialog.component';
-import { ProjectSwitchDialogData } from '../types/project-switch-dialog-data.interface';
-import { ProjectSwitchDialogResult } from '../types/project-switch-dialog-result.enum';
-import { filter, map, Observable, of, pipe, tap, UnaryFunction } from 'rxjs';
+import { CheckLoadErrorsConfig, MultipleProjectsStrategy, Project } from '../types/multiple-projects-strategy';
+import { Observable, pipe, tap, UnaryFunction } from 'rxjs';
 import { ErrorMessageHandlerService } from './error-message-handler.service';
 
 const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default multiple project strategy', {
@@ -17,13 +8,10 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
   factory: () => {
     const _errorMessageHandler = inject(ErrorMessageHandlerService);
     return {
-      get currentSwitchStatus() {
-        return SwitchStatus.NONE;
-      },
-      availableProjects: () => [],
+      showProjectMessage: (message?: { icon: string; message: string }) => {},
       currentProject: () => undefined,
-      getEntityProject: <T extends { attributes?: Record<string, string> }>(entity: T) => undefined,
-      switchToProject: (project: Project, navigationParams?: { url: string; search: Record<string, any> }) => {},
+      getProject: <T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string) => undefined,
+      getUrlForProject: (project: Project, navigationParams?: { url: string; search?: Record<string, any> }) => '',
       checkLoadErrors<T extends { attributes?: Record<string, string> }>({
         entityType,
         entityId,
@@ -44,28 +32,21 @@ const DEFAULT_STRATEGY = new InjectionToken<MultipleProjectsStrategy>('Default m
   providedIn: 'root',
 })
 export class MultipleProjectsService implements MultipleProjectsStrategy {
-  private _matDialog = inject(MatDialog);
-
   private strategy = inject(DEFAULT_STRATEGY);
-
-  get currentSwitchStatus(): SwitchStatus {
-    return this.strategy.currentSwitchStatus;
-  }
-
-  availableProjects(): Project[] {
-    return this.strategy.availableProjects();
-  }
 
   currentProject(): Project | undefined {
     return this.strategy.currentProject();
   }
 
-  getProjectById(id: string): Project | undefined {
-    return this.availableProjects().find((project) => project.projectId === id);
-  }
-
-  getEntityProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined {
-    return this.strategy.getEntityProject(entity);
+  getProject(projectId: string): Project | undefined;
+  getProject<T extends { attributes?: Record<string, string> }>(entity: T): Project | undefined;
+  getProject<T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string): Project | undefined {
+    if (typeof entityOrProjectId === 'string') {
+      const projectId = entityOrProjectId as string;
+      return this.strategy.getProject(projectId);
+    }
+    const entity = entityOrProjectId as T;
+    return this.strategy.getProject(entity);
   }
 
   isEntityBelongsToCurrentProject<T extends { attributes?: Record<string, string> }>(entity: T): boolean {
@@ -74,51 +55,22 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     return projectId === currentProjectId;
   }
 
-  switchToProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): void {
-    this.strategy.switchToProject(project, navigationParams);
-  }
+  isProjectAvailable(projectId: string): boolean;
+  isProjectAvailable<T extends { attributes?: Record<string, string> }>(entity: T): boolean;
+  isProjectAvailable<T extends { attributes?: Record<string, string> }>(entityOrProjectId: T | string): boolean {
+    let project: Project | undefined = undefined;
 
-  confirmEntityEditInASeparateProject<T extends { attributes?: Record<string, string> }>(
-    entity: T,
-    entityEditLink: string | { url: string; search?: Record<string, any> },
-    entityType: string = 'entity',
-  ): Observable<boolean> {
-    if (this.currentSwitchStatus === SwitchStatus.RUNNING) {
-      return of(true);
+    if (typeof entityOrProjectId === 'string') {
+      project = this.getProject(entityOrProjectId);
+    } else {
+      project = this.getProject(entityOrProjectId);
     }
 
-    const targetProject = this.getEntityProject(entity);
+    return !!project;
+  }
 
-    const title = !!targetProject ? 'Switch to another project' : `Open ${entityType} in current project`;
-
-    const message = !!targetProject
-      ? `Selected ${entityType} belongs to the project "${targetProject?.name}", do you want to switch?`
-      : `Selected ${entityType} belongs to another global project, which you don't have access to. Do you want to open it in current project?`;
-
-    return this._matDialog
-      .open<ProjectSwitchDialogComponent, ProjectSwitchDialogData, ProjectSwitchDialogResult>(
-        ProjectSwitchDialogComponent,
-        {
-          data: {
-            title,
-            message,
-            targetProject,
-          },
-          width: '80rem',
-        },
-      )
-      .afterClosed()
-      .pipe(
-        filter((result) => {
-          if (result === ProjectSwitchDialogResult.OPEN_IN_TARGET && targetProject) {
-            const editParams = typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink;
-            this.switchToProject(targetProject, editParams);
-            return false;
-          }
-          return true;
-        }),
-        map((result) => result === ProjectSwitchDialogResult.OPEN_IN_CURRENT),
-      );
+  getUrlForProject(project: Project, navigationParams?: { url: string; search?: Record<string, any> }): string {
+    return this.strategy.getUrlForProject(project, navigationParams);
   }
 
   checkLoadErrors<
@@ -127,6 +79,14 @@ export class MultipleProjectsService implements MultipleProjectsStrategy {
     },
   >(config: CheckLoadErrorsConfig): UnaryFunction<Observable<T>, Observable<string | T | undefined>> {
     return this.strategy.checkLoadErrors(config);
+  }
+
+  showProjectMessage(message?: { icon: string; message: string }): void {
+    this.strategy.showProjectMessage(message);
+  }
+
+  cleanupProjectMessage(): void {
+    this.strategy.showProjectMessage(undefined);
   }
 
   useStrategy(strategy: MultipleProjectsStrategy): void {

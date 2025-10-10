@@ -17,17 +17,23 @@ import { EntityColumnComponent } from './components/entity-column/entity-column.
 import { EntityColumnContainerComponent } from './components/entity-column-container/entity-column-container.component';
 
 @NgModule({
-  imports: [CommonModule, StepMaterialModule, CustomRegistriesModule, StepBasicsModule, TableModule],
+  imports: [
+    CommonModule,
+    StepMaterialModule,
+    CustomRegistriesModule,
+    StepBasicsModule,
+    TableModule,
+    EntityMenuComponent,
+    EntityMenuContentDirective,
+    EntityMenuItemDirective,
+  ],
   declarations: [
     EntityIconComponent,
     SelectEntityOfTypeComponent,
-    EntityMenuComponent,
-    EntityMenuContentDirective,
     CastEntityToPlanPipe,
     CastEntityToTaskPipe,
     CastEntityToExecutionPipe,
     EntityMenuButtonComponent,
-    EntityMenuItemDirective,
     EntityColumnComponent,
     EntityColumnContainerComponent,
   ],
@@ -56,9 +62,11 @@ export * from './components/entity-column-container/entity-column-container.comp
 export * from './directives/entity-menu-content.directive';
 export * from './directives/entity-menu-item.directive';
 export * from './directives/entity-menu-item.directive';
+export * from './directives/entity-ref.directive';
 export * from './injectables/entity-registry';
 export * from './injectables/entity-type-resolver';
 export * from './injectables/entity-dialogs.service';
+export * from './injectables/entity-ref.service';
 export * from './types/entity';
 export * from './types/entity-object';
 export * from './types/entity-meta';

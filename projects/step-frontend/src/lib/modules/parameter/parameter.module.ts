@@ -5,9 +5,11 @@ import {
   CommonEntitiesUrlsService,
   CustomCellRegistryService,
   dialogRoute,
+  EntityRefDirective,
   EntityRegistry,
   ExportDialogComponent,
   ImportDialogComponent,
+  MultipleProjectsService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -27,7 +29,7 @@ import { InputTypePipe } from './pipes/input-type.pipe';
 import { InputOptionsPipe } from './pipes/input-options.pipe';
 
 @NgModule({
-  imports: [StepCommonModule],
+  imports: [StepCommonModule, EntityRefDirective],
   exports: [ParameterListComponent, ParameterSelectionComponent, ParametersKeyComponent, ParameterScopeComponent],
   declarations: [
     ParameterListComponent,
@@ -97,6 +99,7 @@ export class ParameterModule {
               canDeactivate: [
                 () => {
                   inject(AugmentedParametersService).cleanupCache();
+                  inject(MultipleProjectsService).cleanupProjectMessage();
                   return true;
                 },
               ],

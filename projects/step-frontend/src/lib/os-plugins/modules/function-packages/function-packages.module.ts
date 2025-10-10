@@ -7,7 +7,9 @@ import {
   CustomSearchCellRegistryService,
   DashletRegistryService,
   dialogRoute,
+  EntityRefDirective,
   EntityRegistry,
+  MultipleProjectsService,
   QuickAccessRouteService,
   SimpleOutletComponent,
   StepCoreModule,
@@ -34,7 +36,7 @@ import { PackageUrlPipe } from './pipes/package-url.pipe';
     UploadPackageBtnComponent,
     PackageUrlPipe,
   ],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, EntityRefDirective],
   exports: [
     FunctionPackageConfigurationDialogComponent,
     FunctionPackageLinkComponent,
@@ -97,6 +99,7 @@ export class FunctionPackagesModule {
           },
           canDeactivate: [
             () => {
+              inject(MultipleProjectsService).cleanupProjectMessage();
               inject(AugmentedKeywordPackagesService).cleanupCache();
               return true;
             },

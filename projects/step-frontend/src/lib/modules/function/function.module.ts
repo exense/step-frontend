@@ -21,6 +21,8 @@ import {
   NavigatorService,
   preloadScreenDataResolver,
   stepRouteAdditionalConfig,
+  MultipleProjectsService,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { PlanEditorModule } from '../plan-editor/plan-editor.module';
@@ -34,7 +36,7 @@ import { map } from 'rxjs';
 import { FunctionConfigurationDialogImplResolver } from './injectables/function-configuration-dialog-impl.resolver';
 
 @NgModule({
-  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule],
+  imports: [StepCommonModule, StepCoreModule, StepBasicsModule, PlanEditorModule, EntityRefDirective],
   declarations: [
     FunctionListComponent,
     CompositeFunctionEditorComponent,
@@ -107,6 +109,7 @@ export class FunctionModule {
                   canDeactivate: [
                     () => {
                       inject(AugmentedKeywordsService).cleanupCache();
+                      inject(MultipleProjectsService).cleanupProjectMessage();
                       return true;
                     },
                   ],
@@ -192,6 +195,7 @@ export class FunctionModule {
           canDeactivate: [
             () => {
               inject(AugmentedKeywordsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
           ],

@@ -4,12 +4,15 @@ import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
   DialogRouteResult,
+  EntityRefDirective,
+  ReloadableDirective,
   StepCoreModule,
   Tab,
 } from '@exense/step-core';
 import { catchError, map, Observable, of } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, Validators } from '@angular/forms';
+import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -40,7 +43,8 @@ const TABS = new InjectionToken<Tab<UploadType>[]>('Automation package dialog ta
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, EntityRefDirective],
+  hostDirectives: [ReloadableDirective],
   host: {
     '(keydown.enter)': 'upload()',
   },
@@ -152,4 +156,6 @@ export class AutomationPackageUploadDialogComponent {
       )
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
   }
+
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 }

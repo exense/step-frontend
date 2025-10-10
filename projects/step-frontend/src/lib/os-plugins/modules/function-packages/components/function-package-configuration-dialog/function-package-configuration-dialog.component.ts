@@ -9,6 +9,9 @@ import {
   ResourceInputBridgeService,
   CustomFormComponent,
   ResourceInputUtilsService,
+  NoAccessEntityError,
+  MultipleProjectsService,
+  ReloadableDirective,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
@@ -21,6 +24,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
   host: {
     '(keydown.enter)': 'save()',
   },
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class FunctionPackageConfigurationDialogComponent {
@@ -31,6 +35,7 @@ export class FunctionPackageConfigurationDialogComponent {
   protected _data = inject<FunctionPackageConfigurationDialogData>(MAT_DIALOG_DATA, { optional: true });
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
   private _resourceInputUtils = inject(ResourceInputUtilsService);
+  private _multipleProjects = inject(MultipleProjectsService);
 
   private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
@@ -169,7 +174,9 @@ export class FunctionPackageConfigurationDialogComponent {
         }),
         switchMap(() =>
           iif(
-            () => !this.functionPackage?.packageLocation,
+            () =>
+              !this.functionPackage?.packageLocation ||
+              !this._multipleProjects.isEntityBelongsToCurrentProject(this.functionPackage),
             of(undefined),
             this._api.packagePreview(this.functionPackage).pipe(
               map((response) => {

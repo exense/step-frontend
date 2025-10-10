@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  forwardRef,
   inject,
   OnDestroy,
   OnInit,
@@ -37,6 +38,7 @@ import {
   AugmentedPlansService,
   AugmentedTimeSeriesService,
   DateUtilsService,
+  EntityRefService,
   Execution,
   ExecutionCloseHandleService,
   IncludeTestcases,
@@ -141,11 +143,17 @@ interface RefreshParams {
       provide: ExecutionCloseHandleService,
       useClass: AltExecutionCloseHandleService,
     },
+    {
+      provide: EntityRefService,
+      useExisting: forwardRef(() => AltExecutionProgressComponent),
+    },
     AggregatedTreeDataLoaderService,
   ],
   standalone: false,
 })
-export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
+export class AltExecutionProgressComponent
+  implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
+{
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
@@ -190,6 +198,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     shareReplay(1),
     takeUntilDestroyed(),
   );
+
+  private execution = toSignal(this.execution$, { initialValue: undefined });
 
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
@@ -404,6 +414,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     this.setupToggleWarningReset();
     this.subscribeToUrlNavigation();
   }
+
+  readonly currentEntity = this.execution;
 
   private subscribeToUrlNavigation() {
     // subscribe to back and forward events

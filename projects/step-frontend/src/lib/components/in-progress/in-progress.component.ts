@@ -20,6 +20,6 @@ export class InProgressComponent implements OnInit {
     if (!goTo) {
       return;
     }
-    setTimeout(() => this._router.navigateByUrl(goTo), 500);
+    setTimeout(() => this._router.navigateByUrl(goTo, { skipLocationChange: true }), 500);
   }
 }
