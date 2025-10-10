@@ -137,4 +137,15 @@
   body {
     --status-passed: #01a990;
   }
+
+  /* disable cdk-overlay-backdrop when not active */
+  .cdk-overlay-backdrop.step-popover-backdrop--passive {
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+  .cdk-overlay-backdrop.step-popover-backdrop--active {
+    background: transparent !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
 }
