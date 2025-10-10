@@ -163,6 +163,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -287,10 +288,9 @@ import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu'
     AsyncPipe,
     AsyncPipe,
     MatMenu,
-    MatMenu,
-    MatMenuContent,
     MatMenuContent,
     MatMenuTrigger,
+    MatProgressSpinner,
   ],
   exports: [
     ExecutionListComponent,

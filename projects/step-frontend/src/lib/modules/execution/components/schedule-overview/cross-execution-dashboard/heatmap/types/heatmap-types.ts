@@ -24,3 +24,8 @@ export interface HeatmapData {
   columns: HeatmapColumn[];
   rows: HeatMapRow[];
 }
+
+export interface HeatmapDataResponse {
+  truncated: boolean;
+  data: HeatmapData;
+}

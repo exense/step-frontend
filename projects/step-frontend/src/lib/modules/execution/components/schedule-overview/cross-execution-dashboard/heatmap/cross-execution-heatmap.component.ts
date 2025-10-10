@@ -9,14 +9,22 @@ import {
   FilterConditionFactoryService,
   SearchValue,
   Tab,
+  TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, Observable, switchMap, take } from 'rxjs';
 import { OQLBuilder, TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { HeatmapColorUtils, RGB } from './heatmap-color-utils';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { HeatMapCell, HeatMapColor, HeatmapColumn, HeatmapData, HeatMapRow } from './types/heatmap-types';
+import {
+  HeatMapCell,
+  HeatMapColor,
+  HeatmapColumn,
+  HeatmapData,
+  HeatmapDataResponse,
+  HeatMapRow,
+} from './types/heatmap-types';
 
 interface ItemWithExecutionsStatuses {
   key: string; // keyword or testcase
@@ -35,6 +43,8 @@ type HeatmapStatus =
   | 'SKIPPED'
   | 'NORUN'
   | 'UNKNOWN';
+
+const HEATMAP_MAX_SERIES_COUNT = 10000;
 
 @Component({
   selector: 'step-cross-execution-heatmap',
@@ -104,7 +114,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     this.heatmapType.set(newType);
   }
 
-  readonly heatMapData$ = combineLatest([
+  readonly heatMapData$: Observable<HeatmapDataResponse> = combineLatest([
     this._state.lastExecutionsSorted$,
     this._state.timeRange$,
     this.heatmapType$,
@@ -136,10 +146,11 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
         numberOfBuckets: 1,
         oqlFilter: oql,
         groupDimensions: [nameAttribute, executionIdAttribute, statusAttribute],
+        maxNumberOfSeries: HEATMAP_MAX_SERIES_COUNT,
       };
 
       return this._timeSeriesService.getTimeSeries(request).pipe(
-        map((response) => {
+        map((response: TimeSeriesAPIResponse) => {
           const allExecutionIds = executions.map((e) => String(e.id!));
           const allStatuses = new Set<string>();
           const itemsMap: Record<string, ItemWithExecutionsStatuses> = {};
@@ -185,9 +196,8 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
             });
           });
 
-          return Object.values(itemsMap);
+          return { data: this.convertToTableData(executions, Object.values(itemsMap)), truncated: false };
         }),
-        map((items) => this.convertToTableData(executions, items)),
       );
     }),
   );

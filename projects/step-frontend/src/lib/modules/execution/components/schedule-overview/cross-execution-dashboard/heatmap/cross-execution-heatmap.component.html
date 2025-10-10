@@ -12,7 +12,21 @@
 
       <div class="table-container">
         @if (heatMapData$ | async; as heatmapData) {
-          <step-heatmap [rows]="heatmapData.rows" [columns]="heatmapData.columns" [legendColors]="legendColors" />
+          @if (heatmapData.truncated) {
+            <div class="trimmed-heatmap-placeholder">
+              <span>Results were trimmed (too much data). Refine filters to see the heatmap.</span>
+            </div>
+          } @else {
+            <step-heatmap
+              [rows]="heatmapData.data.rows"
+              [columns]="heatmapData.data.columns"
+              [legendColors]="legendColors"
+            />
+          }
+        } @else {
+          <div class="spinner-container">
+            <mat-spinner [diameter]="32" />
+          </div>
         }
       </div>
     }
