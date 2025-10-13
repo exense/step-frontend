@@ -151,6 +151,9 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
       return this._timeSeriesService.getTimeSeries(request).pipe(
         map((response: TimeSeriesAPIResponse) => {
+          if (response.truncated) {
+            return { truncated: true, data: { columns: [], rows: [] } };
+          }
           const allExecutionIds = executions.map((e) => String(e.id!));
           const allStatuses = new Set<string>();
           const itemsMap: Record<string, ItemWithExecutionsStatuses> = {};
