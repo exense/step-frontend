@@ -19,9 +19,9 @@ export interface AutomationPackageParams {
   id?: string;
   apFile?: File;
   apMavenSnippet?: string;
-  keywordLibraryFile?: File;
-  keywordLibraryMavenSnippet?: string;
-  keywordLibraryResourceId?: string;
+  apLibrary?: File;
+  apLibraryMavenSnippet?: string;
+  apLibraryResourceId?: string;
   version?: string;
   activationExpression?: string;
 }
@@ -100,9 +100,9 @@ export class AugmentedAutomationPackagesService
     apMavenSnippet,
     version,
     activationExpression,
-    keywordLibraryFile,
-    keywordLibraryMavenSnippet,
-    keywordLibraryResourceId,
+    apLibrary,
+    apLibraryMavenSnippet,
+    apLibraryResourceId,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
@@ -119,12 +119,12 @@ export class AugmentedAutomationPackagesService
       body.set('apMavenSnippet', apMavenSnippet);
     }
 
-    if (keywordLibraryFile) {
-      body.set('keywordLibrary', keywordLibraryFile!);
-    } else if (keywordLibraryMavenSnippet) {
-      body.set('keywordLibraryMavenSnippet', keywordLibraryMavenSnippet);
-    } else if (keywordLibraryResourceId) {
-      body.set('keywordLibraryResourceId', keywordLibraryResourceId);
+    if (apLibrary) {
+      body.set('apLibrary', apLibrary!);
+    } else if (apLibraryMavenSnippet) {
+      body.set('apLibraryMavenSnippet', apLibraryMavenSnippet);
+    } else if (apLibraryResourceId) {
+      body.set('apLibraryResourceId', apLibraryResourceId);
     }
 
     let headers: HttpHeaders;

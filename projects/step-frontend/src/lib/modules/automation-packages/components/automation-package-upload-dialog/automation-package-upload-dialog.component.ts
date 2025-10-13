@@ -159,9 +159,9 @@ export class AutomationPackageUploadDialogComponent {
       id: this._package?.id,
       apFile: this.files[this.automationPackageFile.name],
       apMavenSnippet: apMavenSnippet,
-      keywordLibraryFile: this.files[this.dependenciesFile.name],
-      keywordLibraryMavenSnippet: dependenciesMavenSnippet,
-      keywordLibraryResourceId: this.dependenciesResourceId,
+      apLibrary: this.files[this.dependenciesFile.name],
+      apLibraryMavenSnippet: dependenciesMavenSnippet,
+      apLibraryResourceId: this.dependenciesResourceId,
       version,
       activationExpression,
     });
