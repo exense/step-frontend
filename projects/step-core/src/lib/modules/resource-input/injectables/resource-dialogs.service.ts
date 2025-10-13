@@ -3,10 +3,6 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, filter, switchMap } from 'rxjs';
 import { Resource, ResourcesService } from '../../../client/step-client-module';
-import {
-  FileAlreadyExistingDialogComponent,
-  FileAlreadyExistingDialogData,
-} from '../components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from '../components/search-resource-dialog/search-resource-dialog.component';
 import { UpdateResourceWarningDialogComponent } from '../components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 import { UpdateResourceWarningResultState } from '../types/update-resource-warning-result-state.enum';
@@ -44,19 +40,6 @@ export class ResourceDialogsService {
   downloadResource(id: string): void {
     const url = `rest/resources/${id}/content`;
     this._document.defaultView!.open(url, '_blank');
-  }
-
-  showFileAlreadyExistsWarning(similarResources: Resource[]): Observable<Resource | undefined> {
-    return this._matDialog
-      .open<FileAlreadyExistingDialogComponent, FileAlreadyExistingDialogData, Resource | undefined>(
-        FileAlreadyExistingDialogComponent,
-        {
-          data: {
-            similarResources,
-          },
-        },
-      )
-      .afterClosed();
   }
 
   showUpdateResourceWarning(): Observable<UpdateResourceWarningResultState | undefined> {
