@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { CustomComponent } from '../../modules/custom-registeries/shared/custom-component';
 
 type DescriptionContext = Record<string, string> & { attributes?: Record<string, string> };
@@ -11,14 +11,17 @@ type DescriptionContext = Record<string, string> & { attributes?: Record<string,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HtmlDescriptionCellComponent implements CustomComponent {
-  context?: {
-    attributes?: Record<string, string>;
-  };
-
   private contextInternal = signal<DescriptionContext | undefined>(undefined);
+  readonly contextAsInput = input<DescriptionContext | undefined>(undefined, { alias: 'context' });
+
+  protected readonly actualContext = computed(() => {
+    const contextInternal = this.contextInternal();
+    const contextAsInput = this.contextAsInput();
+    return contextInternal ?? contextAsInput;
+  });
 
   protected readonly description = computed(() => {
-    const context = this.contextInternal();
+    const context = this.actualContext();
     return context?.attributes?.['description'] ?? context?.['description'];
   });
 
