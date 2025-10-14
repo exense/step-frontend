@@ -1,5 +1,5 @@
 import { inject, InjectionToken } from '@angular/core';
-import { AppConfigContainerService } from '../../basics/step-basics.module';
+import { AppConfigContainerService } from '../../../client/step-client-module';
 
 export const DEFAULT_PAGE = new InjectionToken<(forceClientUrl?: boolean) => string>('Default page', {
   providedIn: 'root',

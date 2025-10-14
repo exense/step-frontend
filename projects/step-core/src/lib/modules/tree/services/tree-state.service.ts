@@ -857,7 +857,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.selectedNodeIdsInternal.set(selectedOrdered);
   }
 
-  private getSubTree(subTreeRootId: string): TreeFlatNode[] {
+  protected getSubTree(subTreeRootId: string): TreeFlatNode[] {
     const { tree } = this.treeData();
     const subRootIndex = tree.findIndex((node) => node.id === subTreeRootId);
     if (subRootIndex < 0) {
