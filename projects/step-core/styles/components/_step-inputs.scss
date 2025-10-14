@@ -261,6 +261,9 @@
         margin-bottom: 0;
         box-sizing: border-box;
         outline: none;
+        &[disabled] {
+          background-color: var.$gray-100;
+        }
       }
 
       & > step-rich-editor {

@@ -171,4 +171,18 @@ export class AggregatedReportViewTreeNodeUtilsService
   cleanupImportantIds(): void {
     this.importantNodeIds.clear();
   }
+
+  nodeHasStatuses(node: AggregatedTreeNode, statuses: readonly Status[], strict: boolean = false): boolean {
+    const statusesSet = new Set(statuses);
+    const nodeStatuses = this.getNodeStatuses(node);
+    if (strict) {
+      return nodeStatuses.every((status) => statusesSet.has(status));
+    } else {
+      return nodeStatuses.some((status) => statusesSet.has(status));
+    }
+  }
+
+  getNodeStatuses(node: AggregatedTreeNode): Status[] {
+    return Object.keys(node.countByStatus ?? {}) as Status[];
+  }
 }

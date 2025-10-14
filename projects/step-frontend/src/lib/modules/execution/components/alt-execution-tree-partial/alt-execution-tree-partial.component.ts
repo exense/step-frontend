@@ -2,11 +2,13 @@ import {
   Component,
   computed,
   DestroyRef,
+  effect,
   inject,
   input,
   OnDestroy,
   OnInit,
   signal,
+  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -19,12 +21,15 @@ import { AltExecutionTreeComponent } from '../alt-execution-tree/alt-execution-t
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
 import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { AltExecutionDialogsService } from '../../services/alt-execution-dialogs.service';
+import { TREE_SEARCH_DESCRIPTION } from '../../services/tree-search-description.token';
+import { AggregatedReportViewTreeSearchFacadeService } from '../../services/aggregated-report-view-tree-search-facade.service';
 
 @Component({
   selector: 'step-alt-execution-tree-partial',
   templateUrl: './alt-execution-tree-partial.component.html',
   styleUrl: './alt-execution-tree-partial.component.scss',
   encapsulation: ViewEncapsulation.None,
+  providers: [AggregatedReportViewTreeSearchFacadeService],
   host: {
     '[class.no-padding]': 'noPadding()',
   },
@@ -37,6 +42,8 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
   private _treeState = inject(AggregatedReportViewTreeStateService);
   private _treeUtils = inject(AggregatedReportViewTreeNodeUtilsService);
   private _executionDialogs = inject(AltExecutionDialogsService);
+  protected readonly _treeSearch = inject(AggregatedReportViewTreeSearchFacadeService);
+  protected readonly _treeSearchDescription = inject(TREE_SEARCH_DESCRIPTION);
 
   private isRunningExecution = toSignal(
     this._executionState.execution$.pipe(map((execution) => execution.status === 'RUNNING')),
@@ -61,6 +68,20 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   private reportNode$ = toObservable(this.node);
 
+  private effectFocusNode = effect(() => {
+    const foundItems = this._treeSearch.foundItems();
+    const pageIndex = this._treeSearch.pageIndex();
+    if (!foundItems) {
+      return;
+    }
+    untracked(() => {
+      const itemId = this._treeState.pickSearchResultItemByIndex(pageIndex);
+      if (itemId) {
+        this.tree()?.focusNode(itemId);
+      }
+    });
+  });
+
   ngOnInit(): void {
     this.setupTree();
   }
@@ -71,6 +92,14 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
 
   protected openDetails(treeNode: AggregatedTreeNode): void {
     this._executionDialogs.openIterations(treeNode, {});
+  }
+
+  protected toggleErrorSearch(): void {
+    this._treeState.toggleErrorSearch();
+  }
+
+  protected exitRootCauseSearch(): void {
+    this._treeState.clearErrorLeafs();
   }
 
   private setupTree(): void {
