@@ -12,18 +12,9 @@
   </button>
 </div>
 <div class="credentials">
-  <section>
-    <step-form-field alignLabelAddon="near">
-      <step-label>Username</step-label>
-      <step-label-addon>{{ user.username }}</step-label-addon>
-    </step-form-field>
-  </section>
-  <section>
-    <step-form-field alignLabelAddon="near">
-      <step-label>Role</step-label>
-      <step-label-addon>{{ user.role }}</step-label-addon>
-    </step-form-field>
-  </section>
+  <step-icon name="user" />
+  <div class="username">{{ user.username }}</div>
+  <div class="role">{{ user.role }}</div>
 </div>
 
 <div class="header-with-button">
