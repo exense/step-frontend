@@ -101,35 +101,38 @@
         </td>
       </ng-container>
       <ng-container
-        data-step-testid="keyword-library-file-col"
-        matColumnDef="KeywordLibraryfileName"
-        stepActivityCol="Keyword library"
+        data-step-testid="ap-library-file-col"
+        matColumnDef="LibraryfileName"
+        stepActivityCol="Library"
         stepSearchCol
       >
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <step-drag-column-caption>Keyword library</step-drag-column-caption>
+          <step-drag-column-caption>Library</step-drag-column-caption>
         </th>
         <td mat-cell *matCellDef="let element">
           <step-popover yPosition="below">
             @if (
-              element.keywordLibraryResourceObj?.origin && element.keywordLibraryResourceObj?.origin.includes('mvn')
+              element.automationPackageLibraryResourceObj?.origin &&
+              element.automationPackageLibraryResourceObj?.origin.includes('mvn')
             ) {
               <step-icon class="maven" name="maven"></step-icon>
             }
-            {{ element.keywordLibraryResourceObj?.attributes?.['name'] }}
+            {{ element.automationPackageLibraryResourceObj?.attributes?.['name'] }}
             <step-popover-content class="resource-info">
               <div><b>Creator</b></div>
-              <div>{{ element.keywordLibraryResourceObj?.creationUser }}</div>
+              <div>{{ element.automationPackageLibraryResourceObj?.creationUser }}</div>
               <div><b>Creation time</b></div>
-              <div>{{ element.keywordLibraryResourceObj?.creationDate | date: DateFormat.DATE }}</div>
-              @if (element.keywordLibraryResourceObj?.lastModificationDate) {
+              <div>{{ element.automationPackageLibraryResourceObj?.creationDate | date: DateFormat.DATE }}</div>
+              @if (element.automationPackageLibraryResourceObj?.lastModificationDate) {
                 <div><b>Last modified by</b></div>
-                <div>{{ element.keywordLibraryResourceObj?.lastModificationUser }}</div>
+                <div>{{ element.automationPackageLibraryResourceObj?.lastModificationUser }}</div>
                 <div><b>Last modified</b></div>
-                <div>{{ element.keywordLibraryResourceObj?.lastModificationDate | date: DateFormat.DATE }}</div>
+                <div>
+                  {{ element.automationPackageLibraryResourceObj?.lastModificationDate | date: DateFormat.DATE }}
+                </div>
               }
               <div><b>Origin</b></div>
-              <div>{{ element.keywordLibraryResourceObj?.origin }}</div>
+              <div>{{ element.automationPackageLibraryResourceObj?.origin }}</div>
             </step-popover-content>
           </step-popover>
         </td>
