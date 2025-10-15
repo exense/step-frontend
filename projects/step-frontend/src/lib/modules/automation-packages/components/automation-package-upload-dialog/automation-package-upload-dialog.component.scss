@@ -46,6 +46,10 @@ step-label {
   pointer-events: all;
 }
 
+.advanced-label step-label {
+  font-size: 16px;
+}
+
 div.warning {
   border: 1px solid var.$orange-100;
   background: var.$orange-15;
