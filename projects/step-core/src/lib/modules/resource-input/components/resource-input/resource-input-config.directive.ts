@@ -13,7 +13,7 @@ export class ResourceInputConfigDirective {
   readonly isBounded = input(false);
   readonly supportsDirectory = input(false);
 
-  readonly withChooseExistingResourceButton = input(false);
+  readonly withChooseExistingResourceButton = input(true);
   readonly withClearButton = input(true);
   readonly withDynamicSwitch = input(false);
   readonly preserveExistingResource = input(false);
