@@ -37,6 +37,11 @@ step-user-settings {
       @include core.step-icon-size(3rem);
     }
 
+    .username,
+    .role {
+      user-select: none;
+    }
+
     .username {
       font-weight: bold;
     }
