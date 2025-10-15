@@ -199,8 +199,8 @@ export abstract class CrossExecutionDashboardState {
             id: 'response-time',
             data: responseTimeData,
             value: (x, value: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(value),
-            stroke: '#1082c3',
-            width: 1.5,
+            stroke: '#0976b5',
+            width: 2,
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
