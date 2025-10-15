@@ -45,3 +45,13 @@ step-label {
   line-height: 20px;
   pointer-events: all;
 }
+
+div.warning {
+  border: 1px solid var.$orange-100;
+  background: var.$orange-15;
+  margin-bottom: 1rem;
+
+  p {
+    margin: 1rem;
+  }
+}

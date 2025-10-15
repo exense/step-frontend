@@ -3,6 +3,11 @@
     @if (progress$) {
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
+      @if (isAffectingOtherPackage) {
+        <div class="warning">
+          <p>This automation package would also update existing packages. Select "Force" to proceed.</p>
+        </div>
+      }
       <form [formGroup]="form">
         @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
@@ -155,6 +160,9 @@
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
     <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">
+      @if (isAffectingOtherPackage) {
+        Force&nbsp;
+      }
       @if (!isNewPackage) {
         Update
       } @else {

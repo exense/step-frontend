@@ -24,6 +24,7 @@ export interface AutomationPackageParams {
   apLibraryResourceId?: string;
   version?: string;
   activationExpression?: string;
+  allowUpdateOfOtherPackages?: boolean;
 }
 
 @Injectable({
@@ -50,6 +51,7 @@ export class AugmentedAutomationPackagesService
     return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
       name: 'attributes.name',
       fileName: 'customFields.automationPackageFileName',
+      libraryName: 'automationPackageLibraryResourceObj.attributes.name',
       actions: '',
     });
   }
@@ -103,6 +105,7 @@ export class AugmentedAutomationPackagesService
     apLibrary,
     apLibraryMavenSnippet,
     apLibraryResourceId,
+    allowUpdateOfOtherPackages,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
@@ -137,6 +140,9 @@ export class AugmentedAutomationPackagesService
     }
     if (activationExpression) {
       params = params.set('activationExpr', activationExpression);
+    }
+    if (allowUpdateOfOtherPackages) {
+      params = params.set('allowUpdateOfOtherPackages', true);
     }
 
     const request$ = this._http.request(
