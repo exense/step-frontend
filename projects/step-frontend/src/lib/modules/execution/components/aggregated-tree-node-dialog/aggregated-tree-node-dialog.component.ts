@@ -22,6 +22,8 @@ export interface AggregatedTreeNodeDialogData {
   reportNodeChildren: ReportNode[];
 }
 
+const PREVIOUS_EXECUTIONS_TO_DISPLAY = 8;
+
 @Component({
   selector: 'step-aggregated-tree-node-dialog',
   templateUrl: './aggregated-tree-node-dialog.component.html',
@@ -52,6 +54,14 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   private _controllerService = inject(AugmentedControllerService);
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
+
+  isScheduledExecution = toSignal(this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)));
+
+  historyTitle = computed(() => {
+    const count = PREVIOUS_EXECUTIONS_TO_DISPLAY;
+    const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
+    return `History (${count} previous ${typeLabel})`;
+  });
 
   private isInitialLoad = true;
 
@@ -120,4 +130,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   protected navigateBack(): void {
     this._doc.defaultView?.history?.back?.();
   }
+
+  protected readonly PREVIOUS_EXECUTIONS_TO_DISPLAY = PREVIOUS_EXECUTIONS_TO_DISPLAY;
 }

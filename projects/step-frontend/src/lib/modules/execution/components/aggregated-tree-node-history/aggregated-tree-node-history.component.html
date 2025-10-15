@@ -1,20 +1,47 @@
 <div class="container">
-  @if (lastExecutions | async; as executions) {
-    @for (execution of executions; track execution.id!) {
-      <div class="history-item-container">
+  @if (historyArtefactsData | async; as historyData) {
+    <div class="previous-executions-container">
+      @if (historyData.previousExecutions.length === 0) {
+        <div class="no-previous-execution">No previous executions...</div>
+      }
+      @for (executionItem of historyData.previousExecutions; track executionItem.execution.id!) {
+        <step-popover [noPadding]="true">
+          <div class="history-item-container connect-line" [class.arrow]="$last">
+            <step-aggregated-tree-node-statuses-piechart [slices]="executionItem.statusSlices" />
+            <div class="timestamp">
+              <div>{{ executionItem.execution.startTime! | date: 'dd.MM' }}</div>
+              <div>{{ executionItem.execution.startTime! | date: 'HH:mm' }}</div>
+            </div>
+          </div>
+          <!--          <step-popover-content>-->
+          <!--            <step-status-distribution-tooltip-->
+          <!--              [statuses]="executionItem.statusesCount"-->
+          <!--              [linkLabel]="'See execution'"-->
+          <!--              [link]="'/executions/' + executionItem.execution.id!"-->
+          <!--              [timestamp]="executionItem.execution.startTime!"-->
+          <!--            />-->
+          <!--          </step-popover-content>-->
+        </step-popover>
+      }
+    </div>
+    <div class="history-item-container highlight">
+      <step-popover [noPadding]="true">
         <step-aggregated-tree-node-statuses-piechart
-          [slices]="[
-            { label: 'passed', color: '#0ea5a4', percentage: 70 },
-            { label: 'failed', color: '#ef4444', percentage: 20 },
-            { label: 'skipped', color: '#111827', percentage: 10 }
-          ]"
-        >
-        </step-aggregated-tree-node-statuses-piechart>
-        <div>
-          29.06 <br />
-          15:30
+          [slices]="historyData.currentExecution.statusSlices"
+          [highlight]="true"
+        />
+        <div class="timestamp">
+          <div>{{ historyData.currentExecution.execution.startTime! | date: 'dd.MM' }}</div>
+          <div>{{ historyData.currentExecution.execution.startTime! | date: 'HH:mm' }}</div>
         </div>
-      </div>
-    }
+
+        <!--        <step-popover-content>-->
+        <!--          <step-status-distribution-tooltip-->
+        <!--            [statuses]="historyData.currentExecution.statusesCount"-->
+        <!--            [timestamp]="historyData.currentExecution.execution.startTime!"-->
+        <!--          />-->
+        <!--        </step-popover-content>-->
+      </step-popover>
+    </div>
   }
 </div>

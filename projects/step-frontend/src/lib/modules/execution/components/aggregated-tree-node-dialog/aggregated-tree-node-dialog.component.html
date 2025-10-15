@@ -60,8 +60,11 @@
             />
           </div>
           <div class="history">
-            <div class="title">History (8 previous executions)</div>
-            <step-aggregated-tree-node-history [node]="aggregatedNode!" />
+            <div class="title">{{ historyTitle() }}</div>
+            <step-aggregated-tree-node-history
+              [node]="aggregatedNode!"
+              [previousExecutionsCount]="PREVIOUS_EXECUTIONS_TO_DISPLAY"
+            />
           </div>
         </div>
       }

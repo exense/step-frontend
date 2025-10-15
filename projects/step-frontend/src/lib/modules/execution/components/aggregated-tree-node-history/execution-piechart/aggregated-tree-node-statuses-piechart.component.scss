@@ -10,4 +10,15 @@ canvas {
 .container {
   width: 40px;
   height: 40px;
+  position: relative;
+
+  .highlight-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    border: 2px solid #636363;
+  }
 }
