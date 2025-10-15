@@ -29,6 +29,10 @@
     0px 1px 5px 0px rgba(0, 0, 0, 0.12)
   );
 
+  &.small-font {
+    font-size: 12px;
+  }
+
   &.with-border {
     border: solid 0.1rem var.$gray-150;
   }

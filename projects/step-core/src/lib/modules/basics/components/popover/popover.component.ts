@@ -62,6 +62,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   readonly noPadding = input(false);
   readonly withBorder = input(false);
   readonly whiteBackground = input(false);
+  readonly smallFont = input(true);
   readonly mode = input<PopoverMode>(PopoverMode.BOTH);
   readonly toggledEvent = output<boolean>();
   readonly PopoverMode = PopoverMode;
