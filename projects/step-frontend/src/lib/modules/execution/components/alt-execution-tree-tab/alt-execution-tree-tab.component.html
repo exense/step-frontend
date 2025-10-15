@@ -1,6 +1,6 @@
 <section class="controls-container">
   <div class="controls">
-    <step-btn-group class="with-round-borders">
+    <step-btn-group class="with-round-borders shrink">
       <button
         type="button"
         mat-stroked-button
@@ -10,19 +10,27 @@
       >
         <step-icon name="collapse-all" />
       </button>
-    </step-btn-group>
-    <step-btn-group class="with-round-borders">
       <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
         <step-icon name="expand-all" />
       </button>
     </step-btn-group>
-    <step-alt-report-node-artefact-filter />
-    <step-alt-report-node-status-filter />
     <step-search-field
-      [formControl]="searchCtrl"
-      [total]="foundItems()"
-      [(searchIndex)]="pageIndex"
+      [formControl]="_treeSearch.searchCtrl"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
       [hint]="_treeSearchDescription"
+    />
+    <step-search-paginator
+      [isActive]="_treeSearch.isErrorSearchActive()"
+      (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
+      [isDisabled]="!_treeSearch.hasErrors()"
+      [inactiveTooltip]="_treeSearch.errorsButtonHint()"
+      activeTooltip="Close error search"
+      [hintTooltip]="_treeSearch.errorsSearchHint()"
+      prevTooltip="show previous error"
+      nextTooltip="show next error"
     />
   </div>
 </section>
@@ -30,5 +38,5 @@
   #tree
   stepTreeAutoChooseVirtualScroll="100%"
   [applyVirtualScrollFrom]="150"
-  [showSpinnerForEmptyTree]="true"
+  [showSpinnerWhileTreeInitialize]="true"
 />

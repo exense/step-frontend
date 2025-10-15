@@ -1,5 +1,5 @@
 <form #form="ngForm">
-  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
+  <step-data-source-configuration [context]="context" />
   <step-dynamic-textfield
     label="Number of threads"
     tooltip="Number of threads to use in order to parallelize the loop"
@@ -18,6 +18,15 @@
     name="maxFailedLoops"
   >
   </step-dynamic-textfield>
+  @if (context.artefact!.dataSource) {
+    <step-dynamic-checkbox
+      label="Protect data source values"
+      tooltip="Protect values loaded from the data source. These will be hidden in reports and can only be passed to Keywords, not resolved in the Plan."
+      [(ngModel)]="context.artefact!.dataSource!.protect"
+      [disabled]="context.readonly"
+      name="protect"
+    />
+  }
   <mat-expansion-panel [(expanded)]="showHandles">
     <mat-expansion-panel-header>
       <mat-panel-title>Handles</mat-panel-title>

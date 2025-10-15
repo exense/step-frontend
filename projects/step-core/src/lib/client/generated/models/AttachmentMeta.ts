@@ -4,7 +4,7 @@
 
 export type AttachmentMeta = {
   name?: string;
+  mimeType?: string;
   id?: string;
-  type?: string;
-  reason?: string;
+  type: string;
 };

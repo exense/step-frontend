@@ -27,6 +27,7 @@
     "icons:generate": "node generate-icons.js",
     "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-nhy.stepcloud-test.ch/rest/private-openapi.json",
     "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate:2286": "node generate-openapi-client.js https://stepos-sed-2866.stepcloud-test.ch/rest/private-openapi.json",
     "lint:core": "ng lint @exense/step-core",
     "lint:step-frontend": "ng lint @exense/step-frontend",
     "lint:app": "ng lint @exense/step-app",
@@ -55,7 +56,7 @@
     "@angular/platform-browser-dynamic": "19.2.14",
     "@angular/router": "19.2.14",
     "@fontsource/roboto": "4.5.8",
-    "ace-builds": "1.17.0",
+    "ace-builds": "1.43.2",
     "angular-split": "19.0.0",
     "feather-icons": "4.29.0",
     "luxon": "3.4.4",
@@ -67,7 +68,8 @@
     "uuid": "8.3.2",
     "chart.js": "4.4.3",
     "chartjs-plugin-datalabels": "2.2.0",
-    "zone.js": "0.15.1"
+    "zone.js": "0.15.1",
+    "playwright-core": "1.55.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "19.2.14",

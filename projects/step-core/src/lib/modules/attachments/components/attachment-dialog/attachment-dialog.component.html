@@ -13,6 +13,51 @@
         <step-icon name="copy" />
       </button>
     }
+    @if (attachmentType === AttachmentType.TRACE) {
+      <button
+        type="button"
+        tabindex="-1"
+        mat-icon-button
+        matTooltip="Open trace in the separate tab"
+        matTooltipPosition="below"
+        (click)="openTraceViewerInSeparateTab()"
+      >
+        <step-icon name="external-link" />
+      </button>
+    }
+    @if (attachmentType === AttachmentType.STREAMING_TEXT) {
+      <section class="streaming-info">
+        @if (isStreamingInProgress() || areLinesRequestInProgress()) {
+          <mat-spinner [diameter]="25" />
+        }
+        @if (isStreamingFailed()) {
+          <step-alert
+            class="incomplete"
+            type="warning"
+            matTooltip="The attachment stream ended unexpectedly before it could complete."
+            matTooltipPosition="below"
+            >Potentially incomplete file</step-alert
+          >
+        }
+        @if (frameMessage(); as message) {
+          <div>{{ message }}</div>
+        }
+        @if (isStreamingInProgress()) {
+          <button
+            type="button"
+            mat-stroked-button
+            class="rounded-icon-button"
+            [class.active]="scrollDownOnRefresh()"
+            (click)="toggleScrollDownOnRefresh()"
+            matTooltip="Scroll down on refresh"
+            matTooltipPosition="below"
+            tabindex="-1"
+          >
+            <step-icon name="arrow-down" />
+          </button>
+        }
+      </section>
+    }
   </div>
   <div step-modal-window-body>
     @switch (attachmentType) {
@@ -29,19 +74,34 @@
         </div>
       }
       @case (AttachmentType.TEXT) {
-        <step-rich-editor #richEditor [formControl]="contentCtrl" [wrapText]="true" />
+        <step-rich-editor #richEditor [formControl]="contentCtrl" />
+      }
+      @case (AttachmentType.STREAMING_TEXT) {
+        @if (streamingAttachmentLineChunkSize(); as lineChunkSize) {
+          <step-streaming-text
+            #streamingText
+            [attachment]="_data"
+            [linesFrame]="lineChunkSize"
+            [(scrollDownOnRefresh)]="scrollDownOnRefresh"
+          />
+        }
       }
       @case (AttachmentType.SKIPPED) {
         <div class="media-container">
-          <p class="max-width-600">{{ _data.reason }}</p>
+          <p class="max-width-600">{{ $any(_data).reason }}</p>
         </div>
+      }
+      @case (AttachmentType.TRACE) {
+        @if (_data | attachmentUrl; as traceUrl) {
+          <step-trace-viewer #traceViewer [reportUrl]="traceUrl" />
+        }
       }
       @default {}
     }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close>Close</button>
-    @if (attachmentType !== AttachmentType.SKIPPED) {
+    @if (attachmentType !== AttachmentType.SKIPPED && !isStreamingInProgress()) {
       <button type="button" mat-flat-button color="primary" (click)="download()">Download</button>
     }
   </div>
