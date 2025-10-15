@@ -59,7 +59,16 @@
           }
           @default {}
         }
-        <step-label>Versioning</step-label>
+
+        <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
+        <input #libraryFileInput type="file" (input)="selectFile(libraryFile)" />
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title class="advanced-label"><step-label>Advanced</step-label></mat-panel-title>
+          </mat-expansion-panel-header>
+          <step-label>Versioning</step-label>
+          <step-form-field alignLabelAddon="near">
         <step-description
           >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled by
           an activation expression.
@@ -89,24 +98,18 @@
             />
           </step-suffix>
         </step-form-field>
-        <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
-        <input #dependenciesFileInput type="file" (input)="selectFile(dependenciesFile)" />
 
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title class="advanced-label"><step-label>Dependencies</step-label></mat-panel-title>
-          </mat-expansion-panel-header>
-
-          @switch (dependenciesFile.uploadType) {
+          <step-label>Libraries</step-label>
+          @switch (libraryFile.uploadType) {
             @case (UploadType.UPLOAD) {
-              <step-upload-container (filesChange)="handleDrop(dependenciesFile, $event)">
+              <step-upload-container (filesChange)="handleDrop(libraryFile, $event)">
                 <step-form-field alignLabelAddon="near">
                   <step-description
                     >Select a jar or ZIP file as a dependency for this automation package.</step-description
                   >
-                  <input type="text" readonly formControlName="dependenciesFileName" name="dependenciesName" />
+                  <input type="text" readonly formControlName="libraryFileName" name="dependenciesName" />
                   <step-suffix class="button-suffix">
-                    <button type="button" mat-stroked-button (click)="openFileChooseDialog(dependenciesFile)">
+                    <button type="button" mat-stroked-button (click)="openFileChooseDialog(libraryFile)">
                       <step-icon name="folder-plus"></step-icon>
                     </button>
                   </step-suffix>
@@ -125,7 +128,7 @@
                       type="button"
                       class="maven"
                       mat-stroked-button
-                      (click)="toggleMavenUpload(dependenciesFile)"
+                      (click)="toggleMavenUpload(libraryFile)"
                       matTooltip="Use maven snippet instead of uploading a file."
                     >
                       <step-icon name="maven"></step-icon>
@@ -142,7 +145,7 @@
                     type="button"
                     class="active maven"
                     mat-stroked-button
-                    (click)="toggleMavenUpload(dependenciesFile)"
+                    (click)="toggleMavenUpload(libraryFile)"
                     matTooltip="Use upload a file instead of using maven snippet."
                   >
                     <step-icon name="maven"></step-icon>

@@ -59,7 +59,7 @@ export class AutomationPackageUploadDialogComponent {
   protected form = this._fb.group({
     apFileName: this._fb.control('', this.isNewPackage ? Validators.required : null),
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
-    dependenciesFileName: this._fb.control(''),
+    libraryFileName: this._fb.control(''),
     dependenciesMavenSnippet: this._fb.control(''),
     version: this._fb.control(this._package?.version),
     activationExpression: this._fb.control(this._package?.activationExpression?.script),
@@ -73,12 +73,12 @@ export class AutomationPackageUploadDialogComponent {
     formControl: this.form.controls.apFileName,
   };
 
-  private dependenciesFileRef = viewChild.required<ElementRef<HTMLInputElement>>('dependenciesFileInput');
-  protected dependenciesFile: FileUploadOrMaven = {
+  private libraryFileRef = viewChild.required<ElementRef<HTMLInputElement>>('libraryFileInput');
+  protected libraryFile: FileUploadOrMaven = {
     name: DEPENDENCIES_NAME,
     uploadType: UploadType.UPLOAD,
-    fileInputRef: this.dependenciesFileRef,
-    formControl: this.form.controls.dependenciesFileName,
+    fileInputRef: this.libraryFileRef,
+    formControl: this.form.controls.libraryFileName,
   };
 
   private effectSwitchTab = effect(() => {
@@ -161,7 +161,7 @@ export class AutomationPackageUploadDialogComponent {
       id: this._package?.id,
       apFile: this.files[this.automationPackageFile.name],
       apMavenSnippet: apMavenSnippet,
-      apLibrary: this.files[this.dependenciesFile.name],
+      apLibrary: this.files[this.libraryFile.name],
       apLibraryMavenSnippet: dependenciesMavenSnippet,
       apLibraryResourceId: this.dependenciesResourceId,
       version,
@@ -200,8 +200,8 @@ export class AutomationPackageUploadDialogComponent {
       .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
         this.dependenciesResourceId = resourceId;
-        delete this.files[this.dependenciesFile.name];
-        this.dependenciesFile.formControl.setValue(resourceId);
+        delete this.files[this.libraryFile.name];
+        this.libraryFile.formControl.setValue(resourceId);
       });
   }
 }
