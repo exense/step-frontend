@@ -185,7 +185,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
 
   // This is used to close step-popover from inside components by triggering a document click
   protected handleDocumentClick(): void {
-    if (this.mode() !== PopoverMode.CLICK || !this.toggled) {
+    if (this.mode() === PopoverMode.CLICK || !this.toggled) {
       return;
     }
     this.closePopover();
