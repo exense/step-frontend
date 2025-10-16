@@ -9,9 +9,9 @@ import {
   ResourceInputBridgeService,
   CustomFormComponent,
   ResourceInputUtilsService,
-  NoAccessEntityError,
   MultipleProjectsService,
   ReloadableDirective,
+  FunctionPackage,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
@@ -41,14 +41,18 @@ export class FunctionPackageConfigurationDialogComponent {
 
   readonly modalTitle = `${this._data?.functionPackage ? 'Edit' : 'New'} Keyword Package`;
 
-  protected functionPackage = this._data?.functionPackage ?? { packageAttributes: {} };
+  protected functionPackage = this._data?.functionPackage ?? this.createEmptyPackage();
   protected customAttributes = { attributes: this.functionPackage.packageAttributes };
 
   protected readonly packageLocation = model(this.functionPackage?.packageLocation);
   protected readonly packageLibrariesLocation = model(this.functionPackage?.packageLibrariesLocation);
 
   private effectSyncPackageLocation = effect(() => {
-    this.functionPackage.packageLocation = this.packageLocation();
+    const packageLocation = this.packageLocation();
+    this.functionPackage = {
+      ...this.functionPackage,
+      packageLocation,
+    };
     // Immediately load preview, if value is valid resource id
     if (this._resourceInputUtils.isResourceValue(this.functionPackage.packageLocation)) {
       this.loadPackagePreview();
@@ -161,6 +165,17 @@ export class FunctionPackageConfigurationDialogComponent {
   protected handlePackageLibrariesLocationChange(packageLibrariesLocation?: string): void {
     this.functionPackage.packageLibrariesLocation = packageLibrariesLocation;
     this.loadPackagePreview();
+  }
+
+  private createEmptyPackage(): FunctionPackage {
+    const project = this._multipleProjects.currentProject()?.projectId;
+    const result: FunctionPackage = {
+      packageAttributes: {},
+    };
+    if (project) {
+      result.attributes = { project };
+    }
+    return result;
   }
 
   private loadPackagePreview(): void {
