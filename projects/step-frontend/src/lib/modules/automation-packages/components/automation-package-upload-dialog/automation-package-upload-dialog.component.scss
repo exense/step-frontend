@@ -34,8 +34,13 @@ button.active {
   }
 }
 
+step-icon.active {
+  stroke: var.$dark-blue;
+}
+
 step-description {
   width: 524px;
+  margin-top: -1rem;
 }
 
 step-label {
@@ -46,8 +51,34 @@ step-label {
   pointer-events: all;
 }
 
-.advanced-label step-label {
-  font-size: 16px;
+.advanced-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.advanced-settings-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  gap: 0.25rem;
+}
+
+.advanced-settings-label {
+  color: #293e50;
+  font-size: 12px;
+  line-height: 16px;
+}
+:host ::ng-deep h1.mat-mdc-dialog-title .header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: -3rem;
+}
+
+:host ::ng-deep h1.mat-mdc-dialog-title .header-title > div {
+  margin-left: auto;
 }
 
 div.warning {

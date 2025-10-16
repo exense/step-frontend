@@ -89,6 +89,14 @@ export class AutomationPackageUploadDialogComponent {
     }
   });
 
+  private hasPrefilledAdvancedSettings(): boolean {
+    return !!(
+      this._package?.version ||
+      this._package?.activationExpression?.script ||
+      this._package?.keywordLibraryResource
+    );
+  }
+
   protected readonly dialogTitle = !this._package
     ? 'New Automation Package'
     : `Edit Automation Package "${this._package.attributes?.['name'] ?? this._package.id}"`;
@@ -96,6 +104,7 @@ export class AutomationPackageUploadDialogComponent {
   protected files: Record<string, File> = {};
   protected libraryResourceId?: string;
   protected progress$?: Observable<number>;
+  protected showAdvancedSettings: boolean = this.hasPrefilledAdvancedSettings();
 
   protected toggleMavenUpload(control: FileUploadOrMaven): void {
     control.uploadType = control.uploadType === UploadType.UPLOAD ? UploadType.MAVEN : UploadType.UPLOAD;
@@ -223,5 +232,9 @@ export class AutomationPackageUploadDialogComponent {
         delete this.files[this.libraryFile.name];
         this.libraryFile.formControl.setValue(resourceId);
       });
+  }
+
+  protected toggleAdvancedSettings(): void {
+    this.showAdvancedSettings = !this.showAdvancedSettings;
   }
 }

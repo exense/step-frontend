@@ -1,4 +1,9 @@
 <step-modal-window [title]="dialogTitle" [disableCloseByEsc]="!!progress$">
+  <div class="advanced-settings-toggle" step-modal-window-title>
+    <button tabindex="-1" mat-icon-button matTooltip="Display Advanced Settings" (click)="toggleAdvancedSettings()">
+      <step-icon [class.active]="showAdvancedSettings" name="settings"></step-icon>
+    </button>
+  </div>
   <div step-modal-window-body>
     @if (progress$) {
       <step-progress-bar [progress]="(progress$ | async)!" />
@@ -63,41 +68,7 @@
         <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
         <input #libraryFileInput type="file" (input)="selectFile(libraryFile)" />
 
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title class="advanced-label"><step-label>Advanced</step-label></mat-panel-title>
-          </mat-expansion-panel-header>
-          <step-label>Versioning</step-label>
-          <step-form-field alignLabelAddon="near">
-            <step-description
-              >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled
-              by an activation expression.
-            </step-description>
-            <step-prefix>Version</step-prefix>
-            <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
-            <step-suffix>
-              <step-icon
-                name="help-circle"
-                matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
-              />
-            </step-suffix>
-          </step-form-field>
-          <step-form-field>
-            <step-prefix>Activation Expression</step-prefix>
-            <input
-              placeholder="Activation Expression (optional)"
-              name="activationExpression"
-              formControlName="activationExpression"
-              title="Activation Expression"
-            />
-            <step-suffix>
-              <step-icon
-                name="help-circle"
-                matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
-              />
-            </step-suffix>
-          </step-form-field>
-          <br />
+        @if (showAdvancedSettings) {
           <step-label>Libraries</step-label>
           @switch (libraryFile.uploadType) {
             @case (UploadType.UPLOAD) {
@@ -145,7 +116,7 @@
                     class="active maven"
                     mat-stroked-button
                     (click)="toggleMavenUpload(libraryFile)"
-                    matTooltip="Use upload a file instead of using maven snippet."
+                    matTooltip="Upload a file instead of using maven snippet."
                   >
                     <step-icon name="maven"></step-icon>
                   </button>
@@ -155,7 +126,37 @@
             }
             @default {}
           }
-        </mat-expansion-panel>
+          <step-label>Versioning</step-label>
+          <step-form-field alignLabelAddon="near">
+            <step-description
+              >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled
+              by an activation expression.
+            </step-description>
+            <step-prefix>Version</step-prefix>
+            <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
+            <step-suffix>
+              <step-icon
+                name="help-circle"
+                matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
+              />
+            </step-suffix>
+          </step-form-field>
+          <step-form-field>
+            <step-prefix>Activation Expression</step-prefix>
+            <input
+              placeholder="Activation Expression (optional)"
+              name="activationExpression"
+              formControlName="activationExpression"
+              title="Activation Expression"
+            />
+            <step-suffix>
+              <step-icon
+                name="help-circle"
+                matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
+              />
+            </step-suffix>
+          </step-form-field>
+        }
       </form>
     }
   </div>
