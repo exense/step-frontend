@@ -41,33 +41,35 @@
   </div>
   <div step-modal-window-body>
     @if (hasData()) {
-      @if (selectedReportNode(); as reportNode) {
-        <step-alt-report-node-details
-          [node]="reportNode"
-          [showArtefact]="true"
-          (openTreeView)="handleOpenTreeView(reportNode)"
-        />
-      } @else {
-        <div class="aggregated-data-container">
-          <div class="iteration-list">
-            <step-aggregated-tree-node-iteration-list
-              [node]="aggregatedNode!"
-              [resolvedPartialPath]="resolvedPartialPath"
-              [initialStatus]="initialSearchStatus"
-              [initialStatusCount]="initialSearchStatusCount"
-              (showDetails)="handleOpenDetails($event)"
-              (openTreeView)="handleOpenTreeView($event)"
+      <div class="panel-container">
+        <div class="main-content">
+          @if (selectedReportNode(); as reportNode) {
+            <step-alt-report-node-details
+              [node]="reportNode"
+              [showArtefact]="true"
+              (openTreeView)="handleOpenTreeView(reportNode)"
             />
-          </div>
-          <div class="history">
-            <div class="title">{{ historyTitle() }}</div>
-            <step-aggregated-tree-node-history
-              [node]="aggregatedNode!"
-              [previousExecutionsCount]="PREVIOUS_EXECUTIONS_TO_DISPLAY"
-            />
-          </div>
+          } @else {
+            <div class="iteration-list">
+              <step-aggregated-tree-node-iteration-list
+                [node]="aggregatedNode!"
+                [resolvedPartialPath]="resolvedPartialPath"
+                [initialStatus]="initialSearchStatus"
+                [initialStatusCount]="initialSearchStatusCount"
+                (showDetails)="handleOpenDetails($event)"
+                (openTreeView)="handleOpenTreeView($event)"
+              />
+            </div>
+          }
         </div>
-      }
+        <div class="history">
+          <div class="title">{{ historyTitle() }}</div>
+          <step-aggregated-tree-node-history
+            [artefactHash]="(aggregatedNode?.artefactHash || selectedReportNode()?.artefactHash)!"
+            [previousExecutionsCount]="PREVIOUS_EXECUTIONS_TO_DISPLAY"
+          />
+        </div>
+      </div>
     }
   </div>
 </step-modal-window>

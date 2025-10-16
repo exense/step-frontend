@@ -13,14 +13,14 @@
               <div>{{ executionItem.execution.startTime! | date: 'HH:mm' }}</div>
             </div>
           </div>
-          <!--          <step-popover-content>-->
-          <!--            <step-status-distribution-tooltip-->
-          <!--              [statuses]="executionItem.statusesCount"-->
-          <!--              [linkLabel]="'See execution'"-->
-          <!--              [link]="'/executions/' + executionItem.execution.id!"-->
-          <!--              [timestamp]="executionItem.execution.startTime!"-->
-          <!--            />-->
-          <!--          </step-popover-content>-->
+          <step-popover-content>
+            <step-status-distribution-tooltip
+              [statuses]="executionItem.statusesCount"
+              [linkLabel]="'See execution'"
+              [link]="'/executions/' + executionItem.execution.id!"
+              [timestamp]="executionItem.execution.startTime!"
+            />
+          </step-popover-content>
         </step-popover>
       }
     </div>
@@ -35,12 +35,12 @@
           <div>{{ historyData.currentExecution.execution.startTime! | date: 'HH:mm' }}</div>
         </div>
 
-        <!--        <step-popover-content>-->
-        <!--          <step-status-distribution-tooltip-->
-        <!--            [statuses]="historyData.currentExecution.statusesCount"-->
-        <!--            [timestamp]="historyData.currentExecution.execution.startTime!"-->
-        <!--          />-->
-        <!--        </step-popover-content>-->
+        <step-popover-content>
+          <step-status-distribution-tooltip
+            [statuses]="historyData.currentExecution.statusesCount"
+            [timestamp]="historyData.currentExecution.execution.startTime!"
+          />
+        </step-popover-content>
       </step-popover>
     </div>
   }

@@ -32,7 +32,7 @@ interface HistoryChainData {
   standalone: false,
 })
 export class AggregatedTreeNodeHistoryComponent implements OnInit {
-  readonly node = input.required<AggregatedTreeNode>();
+  readonly artefactHash = input.required<string>();
   readonly previousExecutionsCount = input.required<number>();
   protected _executionService = inject(ExecutionsService);
   private _executionState = inject(AltExecutionStateService);
@@ -56,7 +56,7 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
         start: 0,
         end: new Date().getTime(),
         numberOfBuckets: 1,
-        oqlFilter: `(attributes.artefactHash = ${this.node().artefactHash!}) and (${executionsIdsJoined})`,
+        oqlFilter: `(attributes.artefactHash = ${this.artefactHash()}) and (${executionsIdsJoined})`,
         groupDimensions: ['executionId', 'status'],
       };
       return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
@@ -133,7 +133,7 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
       start: 0,
       end: new Date().getTime(),
       numberOfBuckets: 1,
-      oqlFilter: `(attributes.artefactHash = ${this.node().artefactHash!}) and (${executionsIdsJoined})`,
+      oqlFilter: `(attributes.artefactHash = ${this.artefactHash()!}) and (${executionsIdsJoined})`,
       groupDimensions: ['executionId', 'status'],
     };
     return this._timeSeriesService.getReportNodesTimeSeries(request);
