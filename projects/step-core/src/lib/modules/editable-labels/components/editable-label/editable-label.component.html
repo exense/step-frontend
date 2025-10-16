@@ -1,8 +1,8 @@
 @switch (state) {
   @case (State.READABLE) {
-    <div class="editable-label" [matTooltip]="tooltip" (click)="onLabelClick()">
+    <div class="editable-label" (click)="onLabelClick()">
       @if (value) {
-        {{ value }}
+        <div class="editable-label-value" [matTooltip]="tooltip">{{ value }}</div>
       } @else {
         <ng-container *ngTemplateOutlet="labelTemplate()" />
       }

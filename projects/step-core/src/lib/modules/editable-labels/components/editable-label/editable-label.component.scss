@@ -16,6 +16,10 @@ step-editable-label {
     overflow: hidden;
     border: 1px solid transparent;
 
+    .editable-label-value {
+      width: fit-content;
+    }
+
     &:hover {
       background: var.$gray-50;
     }
