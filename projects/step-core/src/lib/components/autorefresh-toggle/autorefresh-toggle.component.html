@@ -1,8 +1,8 @@
-@switch (buttonType) {
+@switch (buttonType()) {
   @case ('icon') {
     <button
       mat-icon-button
-      [disabled]="disableAutoRefreshButton"
+      [disabled]="disableAutoRefreshButton()"
       [matMenuTriggerFor]="menu"
       [matTooltip]="tooltipMessage()"
     >
@@ -12,7 +12,7 @@
   @case ('stroke') {
     <button
       mat-stroked-button
-      [disabled]="disableAutoRefreshButton"
+      [disabled]="disableAutoRefreshButton()"
       [matMenuTriggerFor]="menu"
       [matTooltip]="tooltipMessage()"
     >
@@ -22,14 +22,24 @@
   @default {}
 }
 <ng-template #btnContent>
-  <step-icon name="refresh-cw" />
-  @if (model.interval === 0) {
-    <div class="refresh-off" [class.disabled]="disableAutoRefreshButton"><span>off</span></div>
-  }
+  <div class="btn-content">
+    <step-icon name="refresh-cw" />
+    @if (isOff()) {
+      <div class="refresh-label off" [class.disabled]="disableAutoRefreshButton()"><span>off</span></div>
+    } @else {
+      <div class="refresh-label active" [class.disabled]="disableAutoRefreshButton()">
+        <span>{{ selectedIntervalDisplayValue() }}</span>
+      </div>
+    }
+  </div>
 </ng-template>
 <mat-menu #menu="matMenu">
-  @for (p of presets; track p.value) {
-    <button mat-menu-item [class.active]="p.value === selectedInterval().value" (click)="changeRefreshInterval(p)">
+  @for (p of presets(); track p.value) {
+    <button
+      mat-menu-item
+      [class.step-auto-refresh-menu-active]="p.value === selectedIntervalValue()"
+      (click)="changeRefreshInterval(p)"
+    >
       {{ p.label }}
     </button>
   }

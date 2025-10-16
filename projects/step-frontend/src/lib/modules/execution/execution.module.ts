@@ -34,6 +34,7 @@ import {
   ReportNode,
   SimpleOutletComponent,
   editScheduledTaskRoute,
+  SearchPaginatorComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -154,16 +155,15 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
+import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
+import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
-import { AsyncPipe, DatePipe } from '@angular/common';
 import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
-import { FormsModule } from '@angular/forms';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -259,6 +259,8 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    AltExecutionErrorsWidgetComponent,
+    ReportViewHeaderComponent,
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
     StatusDistributionBadgeComponent,
@@ -282,6 +284,9 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    SearchPaginatorComponent,
+    TestCaseInlineRootCauseComponent,
+    ErrorRootCausesComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -313,6 +318,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
+    StatusCountBadgeComponent,
   ],
   providers: [
     {

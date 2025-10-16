@@ -10,7 +10,10 @@ export const APP_HOST = new InjectionToken<string>('Application host', {
     const _ngLocation = inject(Location);
     const { location } = _doc.defaultView as Window;
     const mainHost = `${location.protocol}//${location.hostname}${location.port ? `:${location.port}` : ''}`;
-    const contextRoot = _appConf?.conf?.contextRoot ?? '';
+    let contextRoot = _appConf?.conf?.contextRoot ?? '';
+    if (contextRoot.startsWith('/')) {
+      contextRoot = contextRoot.slice(1); // remove leading slash
+    }
 
     const result = [_ngLocation.normalize(mainHost), _ngLocation.normalize(contextRoot)].join('/');
     return _ngLocation.normalize(result);

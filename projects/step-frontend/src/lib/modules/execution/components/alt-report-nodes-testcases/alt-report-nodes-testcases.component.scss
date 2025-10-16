@@ -45,8 +45,14 @@ step-table {
         @include common.special-selection-item;
       }
     }
+    step-test-case-inline-root-cause,
     step-alt-current-operations {
       z-index: 3;
+    }
+
+    step-test-case-inline-root-cause {
+      flex: 1;
+      cursor: pointer;
     }
   }
 }

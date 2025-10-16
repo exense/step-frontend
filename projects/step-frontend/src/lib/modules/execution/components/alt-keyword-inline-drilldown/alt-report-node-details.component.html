@@ -1,5 +1,11 @@
 @if (node(); as node) {
   <div>
+    @if (rootCauseErrors(); as rootCauseErrors) {
+      <step-error-root-causes
+        class="error-root-causes-container execution-report-node-details"
+        [data]="rootCauseErrors"
+      />
+    }
     @if (detailsComponent(); as detailsComponent) {
       <step-custom-item-render [component]="detailsComponent" [context]="node" />
     } @else {
