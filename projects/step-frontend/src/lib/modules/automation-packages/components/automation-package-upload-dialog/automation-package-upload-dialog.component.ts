@@ -8,9 +8,10 @@ import {
   ResourceDialogsService,
   StepCoreModule,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, filter, map, Observable, of, pipe, switchMap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -169,27 +170,37 @@ export class AutomationPackageUploadDialogComponent {
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
     };
 
-    this.uploadAutomationPackage(automationPackageParams).subscribe((result) =>
-      this._dialogRef.close({ isSuccess: result }),
-    );
+    this.uploadAutomationPackage(automationPackageParams).subscribe((result) => {
+      if (this.progress$ !== undefined) {
+        this._dialogRef.close({ isSuccess: result });
+      }
+    });
   }
 
   uploadAutomationPackage(automationPackageParams: AutomationPackageParams): Observable<boolean> {
-    const upload = this._api.automationPackageCreateOrUpdate(automationPackageParams);
+    const upload = this._api
+      .overrideInterceptor(
+        pipe(
+          catchError((error: HttpHeaderResponse) => {
+            if (error.status === 409) {
+              this.isAffectingOtherPackage = true;
+              this.progress$ = undefined;
+              const empty = new HttpResponse({ status: HttpStatusCode.NoContent });
+              return of(empty);
+            }
+            throw error;
+          }),
+        ),
+      )
+      .automationPackageCreateOrUpdate(automationPackageParams);
 
     this.progress$ = upload.progress$;
 
     return upload.response$.pipe(
       map(() => true),
       catchError((err) => {
-        if (err?.status === 409) {
-          this.isAffectingOtherPackage = true;
-          this.progress$ = undefined;
-          return of(false);
-        } else {
-          console.error(err);
-          return of(false);
-        }
+        console.error(err);
+        return of(false);
       }),
     );
   }
