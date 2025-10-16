@@ -16,12 +16,12 @@ interface StatusDistribution {
 export class StatusDistributionTooltipComponent {
   private _router = inject(Router);
 
-  statuses = input.required<Record<string, number>>();
-  timestamp = input<number>();
-  link = input<string>();
-  linkLabel = input<string>();
+  readonly statuses = input.required<Record<string, number>>();
+  readonly timestamp = input<number>();
+  readonly link = input<string>();
+  readonly linkLabel = input<string>();
 
-  distribution: Signal<StatusDistribution[]> = computed(() => {
+  protected distribution: Signal<StatusDistribution[]> = computed(() => {
     let totalCount = 0;
     const statuses = this.statuses();
 
@@ -37,7 +37,7 @@ export class StatusDistributionTooltipComponent {
       .sort((a, b) => b.percentage - a.percentage);
   });
 
-  navigateToLink() {
+  protected navigateToLink() {
     if (this.link()) {
       this._router.navigateByUrl(this.link()!);
     }

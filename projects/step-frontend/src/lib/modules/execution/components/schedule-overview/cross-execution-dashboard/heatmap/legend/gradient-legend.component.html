@@ -9,16 +9,17 @@
   ></div>
 
   <div class="markers" *ngIf="computedData().length > 0">
-    <div
-      class="marker"
-      *ngFor="let s of computedData(); let i = index; let last = last"
-      [style.left.%]="s.posPct"
-      [class.first]="i === 0"
-      [class.last]="last"
-      [attr.aria-label]="s.label"
-      role="note"
-    >
-      <span class="label">{{ s.label }}</span>
-    </div>
+    @for (s of computedData(); track s.label) {
+      <div
+        class="marker"
+        [style.left.%]="s.posPct"
+        [class.first]="$first"
+        [class.last]="$last"
+        [attr.aria-label]="s.label"
+        role="note"
+      >
+        <span class="label">{{ s.label }}</span>
+      </div>
+    }
   </div>
 </div>

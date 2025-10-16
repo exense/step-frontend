@@ -1,6 +1,8 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .container {
   color: white;
-  background: #293e50;
+  background: var.$blue-700;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;

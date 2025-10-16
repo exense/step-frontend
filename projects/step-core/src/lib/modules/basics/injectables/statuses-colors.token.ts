@@ -5,7 +5,7 @@ import { DOCUMENT } from '@angular/common';
 type E = Pick<Required<Execution>, 'status' | 'result'>;
 type Status = E['status'] | E['result'] | 'UNKNOW' | 'DELAYED_UPDATE' | 'EMPTY';
 
-export const COLORS: Record<Status, string> = {
+const COLORS: Record<Status, string> = {
   EMPTY: '#e1e1e1',
   UNKNOW: '#dadada',
   ENDED: '#808080',

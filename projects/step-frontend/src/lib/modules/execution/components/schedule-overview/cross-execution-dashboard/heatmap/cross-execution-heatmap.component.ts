@@ -1,13 +1,13 @@
 import { Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import {
   BucketResponse,
-  COLORS,
   DateFormat,
   DateRange,
   Execution,
   FetchBucketsRequest,
   FilterConditionFactoryService,
   SearchValue,
+  STATUS_COLORS,
   Tab,
   TimeSeriesAPIResponse,
   TimeSeriesService,
@@ -60,11 +60,12 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   readonly DateFormat = DateFormat;
   private _timeSeriesService = inject(TimeSeriesService);
+  private _colors = inject(STATUS_COLORS);
 
-  hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
-  defaultDateRange = input<DateRange>();
+  readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
+  readonly defaultDateRange = input<DateRange>();
 
-  dashletTitle = computed(() => {
+  protected readonly dashletTitle = computed(() => {
     let heatmapType = this.heatmapType();
     const lastExecutionLabel = ` (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
     return (heatmapType === 'keywords' ? 'Keyword statuses' : 'Test cases statuses') + lastExecutionLabel;
@@ -82,15 +83,15 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
   ];
 
   readonly HEATMAP_STATUS_COLORS: Record<HeatmapStatus, string> = {
-    VETOED: COLORS.TECHNICAL_ERROR,
-    TECHNICAL_ERROR: COLORS.TECHNICAL_ERROR,
-    IMPORT_ERROR: COLORS.TECHNICAL_ERROR,
-    FAILED: COLORS.FAILED,
-    INTERRUPTED: COLORS.INTERRUPTED,
-    PASSED: COLORS.PASSED,
-    SKIPPED: COLORS.SKIPPED,
-    NORUN: COLORS.NORUN,
-    UNKNOWN: COLORS.UNKNOW,
+    VETOED: this._colors.TECHNICAL_ERROR,
+    TECHNICAL_ERROR: this._colors.TECHNICAL_ERROR,
+    IMPORT_ERROR: this._colors.TECHNICAL_ERROR,
+    FAILED: this._colors.FAILED,
+    INTERRUPTED: this._colors.INTERRUPTED,
+    PASSED: this._colors.PASSED,
+    SKIPPED: this._colors.SKIPPED,
+    NORUN: this._colors.NORUN,
+    UNKNOWN: this._colors.UNKNOW,
   };
 
   readonly legendColors: HeatMapColor[] = [
@@ -101,7 +102,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     { hex: this.HEATMAP_STATUS_COLORS.INTERRUPTED, label: 'Interrupted' },
   ];
 
-  FALLBACK_COLOR = COLORS.NORUN;
+  private FALLBACK_COLOR = this._colors.NORUN;
 
   readonly heatmapType = signal<HeatMapChartType | undefined>(undefined);
 
@@ -205,7 +206,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     }),
   );
 
-  convertToTableData(executions: Execution[], timeseriesItems: ItemWithExecutionsStatuses[]): HeatmapData {
+  private convertToTableData(executions: Execution[], timeseriesItems: ItemWithExecutionsStatuses[]): HeatmapData {
     const executionsByIds: Record<string, Execution> = {};
     const columns: HeatmapColumn[] = [];
     executions.forEach((e) => {
@@ -262,7 +263,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatExecutionHeader(ms: number) {
+  private formatExecutionHeader(ms: number) {
     const d = new Date(ms);
     const pad = (n: any) => String(n).padStart(2, '0');
     return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -272,6 +273,4 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
     this.reloadRunningExecutionsCount$.complete();
     this._timeSeriesEntityService.clearCache();
   }
-
-  refresh(): void {}
 }
