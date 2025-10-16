@@ -195,7 +195,7 @@ export abstract class CrossExecutionDashboardState {
           this.cumulateSeriesData(series); // used for stacked bar
           const responseTimeSeries: TSChartSeries = {
             scale: 'y',
-            labelItems: ['Response Time (AVG)'],
+            labelItems: ['Execution duration (AVG)'],
             id: 'response-time',
             data: responseTimeData,
             value: (x, value: number) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(value),
