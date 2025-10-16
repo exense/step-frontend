@@ -1,6 +1,7 @@
 import { Component, effect, ElementRef, inject, Signal, viewChild } from '@angular/core';
 import {
   AceMode,
+  AlertType,
   AugmentedAutomationPackagesService,
   AutomationPackage,
   AutomationPackageParams,
@@ -237,4 +238,6 @@ export class AutomationPackageUploadDialogComponent {
   protected toggleAdvancedSettings(): void {
     this.showAdvancedSettings = !this.showAdvancedSettings;
   }
+
+  protected readonly AlertType = AlertType;
 }

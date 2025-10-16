@@ -9,9 +9,9 @@
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
       @if (isAffectingOtherPackage) {
-        <div class="warning">
-          <p>This automation package would also update existing packages. Select "Force" to proceed.</p>
-        </div>
+        <step-alert [type]="AlertType.MINIMALIST">
+          This automation package would also update other packages. Select "Force" to proceed.
+        </step-alert>
       }
       <form [formGroup]="form">
         @switch (automationPackageFile.uploadType) {

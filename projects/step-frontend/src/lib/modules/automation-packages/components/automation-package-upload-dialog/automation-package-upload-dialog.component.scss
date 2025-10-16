@@ -80,13 +80,3 @@ step-label {
 :host ::ng-deep h1.mat-mdc-dialog-title .header-title > div {
   margin-left: auto;
 }
-
-div.warning {
-  border: 1px solid var.$orange-100;
-  background: var.$orange-15;
-  margin-bottom: 1rem;
-
-  p {
-    margin: 1rem;
-  }
-}
