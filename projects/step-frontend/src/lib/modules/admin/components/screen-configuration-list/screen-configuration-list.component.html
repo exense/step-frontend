@@ -54,11 +54,23 @@
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let element" class="cell-actions">
-      <step-btn-group>
-        <button stepTestId="move-down-btn" mat-icon-button matTooltip="Move Down" (click)="moveScreen(element.id, 1)">
+      <step-btn-group [stepEntityRef]="element">
+        <button
+          stepTestId="move-down-btn"
+          mat-icon-button
+          matTooltip="Move Down"
+          [disabled]="!('screenInputs-write' | hasRight | async)"
+          (click)="moveScreen(element.id, 1)"
+        >
           <step-icon name="chevron-down"></step-icon>
         </button>
-        <button stepTestId="move-up-btn" mat-icon-button matTooltip="Move Up" (click)="moveScreen(element.id, -1)">
+        <button
+          stepTestId="move-up-btn"
+          mat-icon-button
+          matTooltip="Move Up"
+          [disabled]="!('screenInputs-write' | hasRight | async)"
+          (click)="moveScreen(element.id, -1)"
+        >
           <step-icon name="chevron-up"></step-icon>
         </button>
         <button stepTestId="edit-btn" mat-icon-button matTooltip="Edit" (click)="editScreen(element)">
@@ -68,6 +80,7 @@
           stepTestId="delete-screen-btn"
           mat-icon-button
           matTooltip="Delete Screen"
+          [disabled]="!('screenInputs-write' | hasRight | async)"
           (click)="removeScreen(element.id, element.input.label)"
         >
           <step-icon name="trash-2">delete</step-icon>

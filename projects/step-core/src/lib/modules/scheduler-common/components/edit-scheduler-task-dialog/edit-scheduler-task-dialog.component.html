@@ -147,14 +147,14 @@
       }
     </form>
   </div>
-  <div step-modal-window-buttons>
+  <div step-modal-window-buttons [stepEntityRef]="task">
     <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
     <button
       type="button"
       mat-flat-button
       color="primary"
       (click)="save()"
-      [disabled]="!('task-write' | hasRight | async)"
+      [disabled]="!isSchedulePlan && !('task-write' | hasRight | async)"
     >
       Save
     </button>

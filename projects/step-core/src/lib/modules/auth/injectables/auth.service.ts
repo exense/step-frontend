@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
@@ -138,17 +138,17 @@ export class AuthService implements OnDestroy, Reloadable {
     return !!this._serviceContext?.conf?.noLoginMask;
   }
 
-  hasRight$(right: string): Observable<boolean> {
-    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right)));
+  hasRight$(right: string, injector?: Injector): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right, injector)));
   }
 
-  hasRight(right: string): boolean {
+  hasRight(right: string, injector?: Injector): boolean {
     const conf = this.getConf();
     if (!!conf && !conf.authentication) {
       return true;
     }
 
-    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right);
+    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right, injector);
     if (!additionalRulesCheckResult) {
       return false;
     }

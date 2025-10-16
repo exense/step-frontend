@@ -14,6 +14,9 @@ export const schedulePlanRoute = (outlet?: string): Route => ({
     dialogRoute({
       path: ':temporaryId',
       dialogComponent: EditSchedulerTaskDialogComponent,
+      data: {
+        isSchedulePlan: true,
+      },
       canActivate: [
         (route: ActivatedRouteSnapshot) => {
           return inject(ScheduledTaskTemporaryStorageService).has(route.params['temporaryId']);

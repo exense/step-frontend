@@ -45,7 +45,7 @@ export class ScriptEditorComponent implements AfterViewInit, DeactivateComponent
 
   private richEditor = viewChild(RichEditorComponent);
 
-  private keyword = toSignal(this._activatedRoute.data.pipe(map((data) => data['keyword'] as Keyword)));
+  protected readonly keyword = toSignal(this._activatedRoute.data.pipe(map((data) => data['keyword'] as Keyword)));
   private keywordId = computed(() => this.keyword()?.id);
   private keywordId$ = toObservable(this.keywordId);
   private initialScript = signal('');

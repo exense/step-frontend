@@ -26,6 +26,9 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
       customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
     }),
   ],
+  host: {
+    class: 'plan-editor-control-selections',
+  },
   standalone: false,
 })
 export class PlanOtherplanListComponent {

@@ -96,13 +96,13 @@
       </step-table>
     </mat-expansion-panel>
   </div>
-  <div step-modal-window-buttons>
+  <div step-modal-window-buttons [stepEntityRef]="functionPackage">
     <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
     <button
       type="button"
       mat-flat-button
       color="primary"
-      [disabled]="!isFunctionPackageReady && !_data?.functionPackage"
+      [disabled]="(!isFunctionPackageReady && !_data?.functionPackage) || !('kw-write' | hasRight | async)"
       (click)="save()"
     >
       Save
