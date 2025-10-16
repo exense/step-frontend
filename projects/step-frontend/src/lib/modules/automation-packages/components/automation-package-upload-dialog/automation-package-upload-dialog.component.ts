@@ -32,7 +32,6 @@ type FileUploadOrMaven = {
   formControl: FormControl<string>;
 };
 
-const DEPENDENCIES_NAME = 'dependencies-file';
 const AUTOMATION_PACKAGE_LIBRARY_TYPE = 'automationPackageLibrary';
 @Component({
   selector: 'step-automation-package-upload-dialog',
@@ -76,7 +75,7 @@ export class AutomationPackageUploadDialogComponent {
 
   private libraryFileRef = viewChild.required<ElementRef<HTMLInputElement>>('libraryFileInput');
   protected libraryFile: FileUploadOrMaven = {
-    name: DEPENDENCIES_NAME,
+    name: 'library-file',
     uploadType: UploadType.UPLOAD,
     fileInputRef: this.libraryFileRef,
     formControl: this.form.controls.libraryFileName,
@@ -95,7 +94,7 @@ export class AutomationPackageUploadDialogComponent {
     : `Edit Automation Package "${this._package.attributes?.['name'] ?? this._package.id}"`;
 
   protected files: Record<string, File> = {};
-  protected dependenciesResourceId?: string;
+  protected libraryResourceId?: string;
   protected progress$?: Observable<number>;
 
   protected toggleMavenUpload(control: FileUploadOrMaven): void {
@@ -117,8 +116,8 @@ export class AutomationPackageUploadDialogComponent {
     this.files[control.name] = file!;
     control.formControl.setValue(file!.name ?? '');
 
-    if (control.name === DEPENDENCIES_NAME) {
-      this.dependenciesResourceId = undefined;
+    if (control.name === 'library-file') {
+      this.libraryResourceId = undefined;
     }
   }
 
@@ -160,20 +159,20 @@ export class AutomationPackageUploadDialogComponent {
 
     const automationPackageParams: AutomationPackageParams = {
       id: this._package?.id,
-      apLibrary: this.files[this.libraryFile.name],
-      apLibraryMavenSnippet: libraryMavenSnippet,
-      apLibraryResourceId: this.dependenciesResourceId,
+      apLibraryResourceId: this.libraryResourceId,
       version,
       activationExpression,
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
     };
 
+    console.log(this.automationPackageFile, this.automationPackageFile.uploadType);
     if (this.automationPackageFile.uploadType === UploadType.UPLOAD) {
       automationPackageParams.apFile = this.files[this.automationPackageFile.name];
     } else {
       automationPackageParams.apMavenSnippet = apMavenSnippet;
     }
 
+    console.log(this.libraryFile, this.libraryFile.uploadType);
     if (this.libraryFile.uploadType === UploadType.UPLOAD) {
       automationPackageParams.apLibrary = this.files[this.libraryFile.name];
     } else {
@@ -220,7 +219,7 @@ export class AutomationPackageUploadDialogComponent {
       .showSearchResourceDialog(AUTOMATION_PACKAGE_LIBRARY_TYPE)
       .pipe(filter((resourceId) => !!resourceId))
       .subscribe((resourceId) => {
-        this.dependenciesResourceId = resourceId;
+        this.libraryResourceId = resourceId;
         delete this.files[this.libraryFile.name];
         this.libraryFile.formControl.setValue(resourceId);
       });

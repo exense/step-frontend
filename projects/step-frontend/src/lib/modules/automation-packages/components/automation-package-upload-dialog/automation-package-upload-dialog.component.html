@@ -106,7 +106,7 @@
                   <step-description
                     >Select a jar or ZIP file as a dependency for this automation package.</step-description
                   >
-                  <input type="text" readonly formControlName="libraryFileName" name="dependenciesName" />
+                  <input type="text" readonly formControlName="libraryFileName" name="libraryName" />
                   <step-suffix class="button-suffix">
                     <button type="button" mat-stroked-button (click)="openFileChooseDialog(libraryFile)">
                       <step-icon name="folder-plus"></step-icon>
@@ -150,7 +150,7 @@
                     <step-icon name="maven"></step-icon>
                   </button>
                 </step-label-addon>
-                <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="dependenciesMavenSnippet" />
+                <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="libraryMavenSnippet" />
               </step-form-field>
             }
             @default {}
