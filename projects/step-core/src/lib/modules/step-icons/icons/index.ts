@@ -276,6 +276,7 @@ export { Type } from './svg/type';
 export { Underline } from './svg/underline';
 export { TrendingUp } from './svg/trending-up';
 export { UploadCloud } from './svg/upload-cloud';
+export { Maven } from './svg/maven';
 export { UserMinus } from './svg/user-minus';
 export { User } from './svg/user';
 export { Voicemail } from './svg/voicemail';

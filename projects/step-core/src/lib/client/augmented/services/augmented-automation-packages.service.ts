@@ -17,10 +17,14 @@ import { HttpRequestContextHolderService } from './http-request-context-holder.s
 
 export interface AutomationPackageParams {
   id?: string;
-  file?: File;
-  mavenSnippet?: string;
+  apFile?: File;
+  apMavenSnippet?: string;
+  apLibrary?: File;
+  apLibraryMavenSnippet?: string;
+  apLibraryResourceId?: string;
   version?: string;
   activationExpression?: string;
+  allowUpdateOfOtherPackages?: boolean;
 }
 
 @Injectable({
@@ -47,6 +51,7 @@ export class AugmentedAutomationPackagesService
     return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
       name: 'attributes.name',
       fileName: 'customFields.automationPackageFileName',
+      libraryName: 'automationPackageLibraryResourceObj.attributes.name',
       actions: '',
     });
   }
@@ -93,41 +98,51 @@ export class AugmentedAutomationPackagesService
 
   automationPackageCreateOrUpdate({
     id,
-    file,
+    apFile,
+    apMavenSnippet,
     version,
     activationExpression,
-    mavenSnippet,
+    apLibrary,
+    apLibraryMavenSnippet,
+    apLibraryResourceId,
+    allowUpdateOfOtherPackages,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
     if (!!id) {
       url = `${url}/${id}`;
     }
-    if (!!mavenSnippet) {
-      url = `${url}/mvn`;
-    }
 
     let body: FormData | string;
-    if (mavenSnippet) {
-      body = mavenSnippet;
-    } else {
-      body = new FormData();
-      body.set('file', file!);
+    body = new FormData();
+
+    if (apFile) {
+      body.set('file', apFile!);
+    } else if (apMavenSnippet) {
+      body.set('apMavenSnippet', apMavenSnippet);
+    }
+
+    if (apLibrary) {
+      body.set('apLibrary', apLibrary!);
+    } else if (apLibraryMavenSnippet) {
+      body.set('apLibraryMavenSnippet', apLibraryMavenSnippet);
+    } else if (apLibraryResourceId) {
+      body.set('apLibraryResourceId', apLibraryResourceId);
     }
 
     let headers: HttpHeaders;
-    if (typeof body === 'string') {
-      headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
-    } else {
-      headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    }
+    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
 
     let params = new HttpParams().set('async', true);
+
     if (version) {
       params = params.set('version', version);
     }
     if (activationExpression) {
       params = params.set('activationExpr', activationExpression);
+    }
+    if (allowUpdateOfOtherPackages) {
+      params = params.set('allowUpdateOfOtherPackages', true);
     }
 
     const request$ = this._http.request(

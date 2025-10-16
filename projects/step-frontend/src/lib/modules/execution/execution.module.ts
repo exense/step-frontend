@@ -161,7 +161,6 @@ import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-er
 import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
-
 @NgModule({
   declarations: [
     ExecutionListComponent,

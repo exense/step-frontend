@@ -1,16 +1,13 @@
 import { ResourceInputComponent } from './components/resource-input/resource-input.component';
-import { FileAlreadyExistingDialogComponent } from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 import { SearchResourceDialogComponent } from './components/search-resource-dialog/search-resource-dialog.component';
 import { UpdateResourceWarningDialogComponent } from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 
 export const RESOURCE_INPUT_IMPORTS = [
-  FileAlreadyExistingDialogComponent,
   ResourceInputComponent,
   SearchResourceDialogComponent,
   UpdateResourceWarningDialogComponent,
 ];
 
-export * from './components/file-already-existing-dialog/file-already-existing-dialog.component';
 export * from './components/search-resource-dialog/search-resource-dialog.component';
 export * from './components/update-resource-warning-dialog/update-resource-warning-dialog.component';
 export * from './components/resource-input/resource-input.component';

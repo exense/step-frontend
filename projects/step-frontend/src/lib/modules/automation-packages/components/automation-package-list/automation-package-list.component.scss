@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-mixins' as core;
+@use 'projects/step-core/styles/core-variables' as var;
 
 :host {
   @include core.table-container;
@@ -18,4 +19,15 @@
 
 .header-btn {
   border-radius: 2rem;
+}
+
+step-icon.maven {
+  stroke: none !important;
+  fill: var.$blue-700 !important;
+}
+
+.resource-info {
+  div:nth-child(2n) {
+    margin-bottom: 1rem;
+  }
 }

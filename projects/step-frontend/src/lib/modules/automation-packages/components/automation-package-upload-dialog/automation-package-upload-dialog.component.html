@@ -1,13 +1,22 @@
 <step-modal-window [title]="dialogTitle" [disableCloseByEsc]="!!progress$">
+  <div class="advanced-settings-toggle" step-modal-window-title>
+    <button tabindex="-1" mat-icon-button matTooltip="Display Advanced Settings" (click)="toggleAdvancedSettings()">
+      <step-icon [class.active]="showAdvancedSettings" name="settings"></step-icon>
+    </button>
+  </div>
   <div step-modal-window-body>
     @if (progress$) {
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
-      <step-tabs [tabs]="_tabs" [(activeTabId)]="selectedTab" [compactTabs]="true" />
+      @if (isAffectingOtherPackage) {
+        <step-alert [type]="AlertType.MINIMALIST">
+          This automation package would also update other packages. Select "Force" to proceed.
+        </step-alert>
+      }
       <form [formGroup]="form">
-        @switch (selectedTab()) {
+        @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
-            <step-upload-container (filesChange)="handleDrop($event)">
+            <step-upload-container (filesChange)="handleDrop(automationPackageFile, $event)">
               <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
                 <step-label>Automation Package (jar or ZIP file)</step-label>
                 <step-label-addon>
@@ -16,10 +25,21 @@
                     matTooltip="Drag & Drop or select your automation package jar / ZIP file"
                   />
                 </step-label-addon>
-                <input type="text" readonly formControlName="fileName" name="fileName" />
+                <input type="text" readonly formControlName="apFileName" name="fileName" />
                 <step-suffix class="button-suffix">
-                  <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
+                  <button type="button" mat-stroked-button (click)="openFileChooseDialog(automationPackageFile)">
                     <step-icon name="folder-plus"></step-icon>
+                  </button>
+                </step-suffix>
+                <step-suffix class="button-suffix">
+                  <button
+                    type="button"
+                    class="maven"
+                    mat-stroked-button
+                    (click)="toggleMavenUpload(automationPackageFile)"
+                    matTooltip="Use maven snippet instead of uploading a file."
+                  >
+                    <step-icon name="maven"></step-icon>
                   </button>
                 </step-suffix>
               </step-form-field>
@@ -27,48 +47,129 @@
           }
           @case (UploadType.MAVEN) {
             <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-              <step-label>Maven Snippet</step-label>
-              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="mavenSnippet" />
+              <step-label>Automation Package (Maven Snippet)</step-label>
+              <step-label-addon>
+                <button
+                  type="button"
+                  class="active maven"
+                  mat-stroked-button
+                  (click)="toggleMavenUpload(automationPackageFile)"
+                  matTooltip="Use upload a file instead of using maven snippet."
+                >
+                  <step-icon name="maven"></step-icon>
+                </button>
+              </step-label-addon>
+              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="apMavenSnippet" />
             </step-form-field>
           }
           @default {}
         }
-        <step-form-field alignLabelAddon="near">
-          <step-label>Automation Package Version</step-label>
-          <step-label-addon>
-            <step-icon
-              name="help-circle"
-              matTooltip="Optionally set the version of this automation package. This allows to deploy and use multiple versions of the same package on Step in combination with an activation expression"
+
+        <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
+        <input #libraryFileInput type="file" (input)="selectFile(libraryFile)" />
+
+        @if (showAdvancedSettings) {
+          <step-label>Libraries</step-label>
+          @switch (libraryFile.uploadType) {
+            @case (UploadType.UPLOAD) {
+              <step-upload-container (filesChange)="handleDrop(libraryFile, $event)">
+                <step-form-field alignLabelAddon="near">
+                  <step-description
+                    >Select a jar or ZIP file as a dependency for this automation package.</step-description
+                  >
+                  <input type="text" readonly formControlName="libraryFileName" name="libraryName" />
+                  <step-suffix class="button-suffix">
+                    <button type="button" mat-stroked-button (click)="openFileChooseDialog(libraryFile)">
+                      <step-icon name="folder-plus"></step-icon>
+                    </button>
+                  </step-suffix>
+                  <step-suffix class="button-suffix">
+                    <button
+                      type="button"
+                      mat-stroked-button
+                      matTooltip="Select an existing resource"
+                      (click)="selectResource()"
+                    >
+                      <step-icon name="search"></step-icon>
+                    </button>
+                  </step-suffix>
+                  <step-suffix class="button-suffix">
+                    <button
+                      type="button"
+                      class="maven"
+                      mat-stroked-button
+                      (click)="toggleMavenUpload(libraryFile)"
+                      matTooltip="Use maven snippet instead of uploading a file."
+                    >
+                      <step-icon name="maven"></step-icon>
+                    </button>
+                  </step-suffix>
+                </step-form-field>
+              </step-upload-container>
+            }
+            @case (UploadType.MAVEN) {
+              <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+                <step-label>Maven Snippet</step-label>
+                <step-label-addon>
+                  <button
+                    type="button"
+                    class="active maven"
+                    mat-stroked-button
+                    (click)="toggleMavenUpload(libraryFile)"
+                    matTooltip="Upload a file instead of using maven snippet."
+                  >
+                    <step-icon name="maven"></step-icon>
+                  </button>
+                </step-label-addon>
+                <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="libraryMavenSnippet" />
+              </step-form-field>
+            }
+            @default {}
+          }
+          <step-label>Versioning</step-label>
+          <step-form-field alignLabelAddon="near">
+            <step-description
+              >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled
+              by an activation expression.
+            </step-description>
+            <step-prefix>Version</step-prefix>
+            <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
+            <step-suffix>
+              <step-icon
+                name="help-circle"
+                matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
+              />
+            </step-suffix>
+          </step-form-field>
+          <step-form-field>
+            <step-prefix>Activation Expression</step-prefix>
+            <input
+              placeholder="Activation Expression (optional)"
+              name="activationExpression"
+              formControlName="activationExpression"
+              title="Activation Expression"
             />
-          </step-label-addon>
-          <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
-        </step-form-field>
-        <step-form-field alignLabelAddon="near">
-          <step-label>Activation Expression</step-label>
-          <step-label-addon>
-            <step-icon
-              name="help-circle"
-              matTooltip="When deploying multiple versions of the same package (see version), the expression is used to select the proper versions during the execution of plans. Example: env == PROD"
-            />
-          </step-label-addon>
-          <input
-            placeholder="Activation Expression (optional)"
-            name="activationExpression"
-            formControlName="activationExpression"
-            title="Activation Expression"
-          />
-        </step-form-field>
-        <input #fileInput type="file" (input)="selectFile()" />
+            <step-suffix>
+              <step-icon
+                name="help-circle"
+                matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
+              />
+            </step-suffix>
+          </step-form-field>
+        }
       </form>
     }
   </div>
   <div step-modal-window-buttons>
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
     <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">
+      @if (isAffectingOtherPackage) {
+        Force&nbsp;
+      }
       @if (!isNewPackage) {
         Update
       } @else {
-        @switch (selectedTab()) {
+        @switch (automationPackageFile.uploadType) {
           @case (UploadType.UPLOAD) {
             Upload
           }
