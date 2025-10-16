@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, InjectionToken, model, Signal, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, Signal, viewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedAutomationPackagesService,
@@ -8,7 +8,7 @@ import {
   ResourceDialogsService,
   StepCoreModule,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, pipe, switchMap } from 'rxjs';
+import { catchError, filter, map, Observable, of, pipe } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
@@ -61,7 +61,7 @@ export class AutomationPackageUploadDialogComponent {
     apFileName: this._fb.control('', this.isNewPackage ? Validators.required : null),
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
     libraryFileName: this._fb.control(''),
-    dependenciesMavenSnippet: this._fb.control(''),
+    libraryMavenSnippet: this._fb.control(''),
     version: this._fb.control(this._package?.version),
     activationExpression: this._fb.control(this._package?.activationExpression?.script),
   });
@@ -149,7 +149,7 @@ export class AutomationPackageUploadDialogComponent {
       return;
     }
 
-    const { version, activationExpression, apMavenSnippet, dependenciesMavenSnippet } = this.form.value;
+    const { version, activationExpression, apMavenSnippet, libraryMavenSnippet } = this.form.value;
 
     if (this._package?.id && !this.files[this.automationPackageFile.name] && !apMavenSnippet) {
       this._api
@@ -158,17 +158,27 @@ export class AutomationPackageUploadDialogComponent {
       return;
     }
 
-    const automationPackageParams = {
+    const automationPackageParams: AutomationPackageParams = {
       id: this._package?.id,
-      apFile: this.files[this.automationPackageFile.name],
-      apMavenSnippet: apMavenSnippet,
       apLibrary: this.files[this.libraryFile.name],
-      apLibraryMavenSnippet: dependenciesMavenSnippet,
+      apLibraryMavenSnippet: libraryMavenSnippet,
       apLibraryResourceId: this.dependenciesResourceId,
       version,
       activationExpression,
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
     };
+
+    if (this.automationPackageFile.uploadType === UploadType.UPLOAD) {
+      automationPackageParams.apFile = this.files[this.automationPackageFile.name];
+    } else {
+      automationPackageParams.apMavenSnippet = apMavenSnippet;
+    }
+
+    if (this.libraryFile.uploadType === UploadType.UPLOAD) {
+      automationPackageParams.apLibrary = this.files[this.libraryFile.name];
+    } else {
+      automationPackageParams.apLibraryMavenSnippet = libraryMavenSnippet;
+    }
 
     this.uploadAutomationPackage(automationPackageParams).subscribe((result) => {
       if (this.progress$ !== undefined) {
