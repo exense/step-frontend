@@ -9,7 +9,7 @@
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
       @if (isAffectingOtherPackage) {
-        <step-alert [type]="AlertType.MINIMALIST">
+        <step-alert [type]="AlertType.DANGER">
           This automation package would also update other packages. Select "Force" to proceed.
         </step-alert>
       }
