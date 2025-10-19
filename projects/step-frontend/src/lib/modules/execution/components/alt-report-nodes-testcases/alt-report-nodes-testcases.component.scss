@@ -32,31 +32,6 @@ step-table {
   }
 }
 
-.operations {
-  width: 100%;
-  & > .half-gradient {
-    display: flex;
-    align-items: center;
-    & > div {
-      position: relative;
-      height: 3rem;
-      width: 0;
-      &:after {
-        @include common.special-selection-item;
-      }
-    }
-    step-test-case-inline-root-cause,
-    step-alt-current-operations {
-      z-index: 3;
-    }
-
-    step-test-case-inline-root-cause {
-      flex: 1;
-      cursor: pointer;
-    }
-  }
-}
-
 .name {
   white-space: nowrap;
   & > section {
@@ -66,15 +41,18 @@ step-table {
     cursor: pointer;
     position: relative;
 
-    background: var.$light-blue-gray;
-    border-top-left-radius: 4rem;
-    border-bottom-left-radius: 4rem;
-    padding-left: 1rem;
-    min-height: 3rem;
-    padding-right: 1rem;
-
     .details-trigger span {
       font-weight: 500;
+    }
+
+    .chip {
+      background: var.$light-blue-gray;
+      border-radius: 4rem;
+      display: flex;
+      padding-left: 1rem;
+      min-height: 3rem;
+      padding-right: 1rem;
+      align-items: center;
     }
   }
 }
@@ -95,6 +73,11 @@ step-table {
     gap: 0.5rem;
     position: relative;
   }
+}
+
+step-test-case-inline-root-cause {
+  justify-content: flex-start;
+  margin-left: 1rem;
 }
 
 @media print {

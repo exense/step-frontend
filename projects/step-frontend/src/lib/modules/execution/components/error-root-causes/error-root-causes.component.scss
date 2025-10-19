@@ -13,7 +13,6 @@ step-error-root-causes {
   }
 
   .error-count {
-    @include common.error-count;
     width: auto;
     .text {
       white-space: nowrap;

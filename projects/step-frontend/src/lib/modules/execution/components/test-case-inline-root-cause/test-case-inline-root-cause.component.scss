@@ -14,7 +14,6 @@ p {
 }
 
 .error-count {
-  @include common.error-count;
   width: auto;
   position: relative;
   min-height: 2.5rem;
@@ -32,7 +31,10 @@ p {
     position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
-    left: 1rem;
-    right: 1rem;
+    top: 0.4rem;
+  }
+
+  step-icon {
+    color: var(--status-FAILED);
   }
 }
