@@ -125,11 +125,17 @@ export class AdminModule {
                     dialogComponent: ScreenInputEditDialogComponent,
                     resolve: {
                       screenInput: (route: ActivatedRouteSnapshot) => {
+                        const _multipleProjects = inject(MultipleProjectsService);
                         const screenId = route.parent!.parent!.params['screenId'];
-                        return {
+                        const project = _multipleProjects.currentProject()?.projectId;
+                        const screenInput: ScreenInput = {
                           screenId,
                           input: { type: 'TEXT' },
-                        } as ScreenInput;
+                        };
+                        if (project) {
+                          screenInput.attributes = { project };
+                        }
+                        return screenInput;
                       },
                     },
                   }),
@@ -156,7 +162,7 @@ export class AdminModule {
                     canDeactivate: [
                       () => {
                         inject(AugmentedScreenService).clearCachedScreenInput();
-                        inject(MultipleProjectsService).currentProject();
+                        inject(MultipleProjectsService).cleanupProjectMessage();
                         return true;
                       },
                     ],
