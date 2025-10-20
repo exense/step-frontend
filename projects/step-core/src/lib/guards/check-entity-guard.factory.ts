@@ -81,30 +81,27 @@ export const checkEntityGuardFactory =
 
         const entityEditLink = runInInjectionContext(_injector, () => config.getEditorUrl(id, route, state));
 
-        if (_multipleProjects.isProjectAvailable(entity)) {
-          const targetProject = _multipleProjects.getProject(entity);
+        const targetProject = _multipleProjects.getProject(entity);
 
-          let openUrl = '';
-          if (targetProject) {
-            openUrl = _multipleProjects.getUrlForProject(
-              targetProject,
-              typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
-            );
-          }
-          const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
-          let message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
-          if (openUrl) {
-            message += ` <a href="#${openUrl}">Open in "${targetProject!.name!}".</a>`;
-          }
-
-          _multipleProjects.showProjectMessage({
-            icon: 'alert-triangle',
-            message,
-          });
-
-          return true;
+        let openUrl = '';
+        if (targetProject) {
+          openUrl = _multipleProjects.getUrlForProject(
+            targetProject,
+            typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
+          );
         }
-        return false;
+        const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
+        let message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
+        if (openUrl) {
+          message += ` <a href="#${openUrl}">Open in "${targetProject!.name!}".</a>`;
+        }
+
+        _multipleProjects.showProjectMessage({
+          icon: 'alert-triangle',
+          message,
+        });
+
+        return true;
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];
