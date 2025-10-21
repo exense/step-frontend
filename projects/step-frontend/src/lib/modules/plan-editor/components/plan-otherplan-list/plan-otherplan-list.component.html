@@ -11,7 +11,12 @@
     <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-bulk-selection />
       @if (hasSelection()) {
-        <button mat-icon-button matTooltip="Add selected plans" (click)="addAllPlans()">
+        <button
+          mat-icon-button
+          matTooltip="Add selected plans"
+          (click)="addAllPlans()"
+          [disabled]="!('plan-write' | hasRight | async)"
+        >
           <step-icon name="plus-circle" />
         </button>
       }
@@ -19,7 +24,11 @@
     <ng-container *stepRowsExtension="let rows">
       <step-drag-drop-container stepDropAreaId="planTree">
         @for (row of rows; track row) {
-          <step-drag-item [elRef]="row.elRef" [data]="row.data | planDropInfo" />
+          <step-drag-item
+            [elRef]="row.elRef"
+            [data]="row.data | planDropInfo"
+            [dragDisabled]="!('plan-write' | hasRight | async)"
+          />
         }
         <step-drag-preview>
           <step-plan-nodes-drag-preview />
@@ -74,7 +83,12 @@
         <div class="actions">
           <step-description-hint [description]="element.root.description" />
 
-          <button mat-icon-button matTooltip="Add plan" (click)="addPlan(element.id)">
+          <button
+            mat-icon-button
+            matTooltip="Add plan"
+            (click)="addPlan(element.id)"
+            [disabled]="!('plan-write' | hasRight | async)"
+          >
             <step-icon name="plus-circle"></step-icon>
           </button>
         </div>

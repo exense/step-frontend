@@ -158,7 +158,7 @@
         <step-column-settings />
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
-        <step-btn-group>
+        <step-btn-group [stepEntityRef]="element">
           <button
             data-step-testid="execute-schedule-btn"
             mat-icon-button
@@ -227,7 +227,7 @@
     <a
       data-step-testid="export-schedule-btn"
       mat-menu-item
-      [disabled]="!('task-write' | hasRight | async)"
+      [disabled]="!('task-read' | hasRight | async)"
       [routerLink]="['/', 'scheduler', 'export', element.id]"
     >
       <step-icon name="upload" />

@@ -1,7 +1,7 @@
 import { computed, effect, EffectRef, inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { PlanEditorStrategy } from '../types/plan-editor-strategy';
 import { Subject } from 'rxjs';
-import { AbstractArtefact } from '../../../client/step-client-module';
+import { AbstractArtefact, Plan } from '../../../client/step-client-module';
 import { PlanContext } from '../types/plan-context.interface';
 
 @Injectable({
@@ -27,7 +27,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
 
   readonly planContext = this.planContextInternal.asReadonly();
 
-  readonly plan = computed(() => this.planContextInternal()?.plan ?? {});
+  readonly plan = computed(() => this.planContextInternal()?.plan ?? ({} as Plan));
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
 

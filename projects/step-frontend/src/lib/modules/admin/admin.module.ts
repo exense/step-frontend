@@ -9,6 +9,9 @@ import {
   ViewRegistryService,
   AuthService,
   InfoBannerService,
+  EntityRefDirective,
+  checkEntityGuardFactory,
+  MultipleProjectsService,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
@@ -23,6 +26,8 @@ import { first, map } from 'rxjs';
 import { ProjectSettingsMenuComponent } from './components/project-settings-menu/project-settings-menu.component';
 import { MatListItem, MatNavList } from '@angular/material/list';
 import { AdminSettingsMenuComponent } from './components/admin-settings-menu/admin-settings-menu.component';
+
+const REGEXP_EDITOR_URL = /\/settings\/\/screens\/\w+\/editor\/(?:\d|\w){24}/;
 
 @NgModule({
   declarations: [
@@ -43,7 +48,7 @@ import { AdminSettingsMenuComponent } from './components/admin-settings-menu/adm
     ProjectSettingsMenuComponent,
     AdminSettingsMenuComponent,
   ],
-  imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive],
+  imports: [StepCoreModule, StepCommonModule, MatListItem, MatNavList, RouterLinkActive, EntityRefDirective],
   providers: [RenderOptionsPipe],
 })
 export class AdminModule {
@@ -120,21 +125,47 @@ export class AdminModule {
                     dialogComponent: ScreenInputEditDialogComponent,
                     resolve: {
                       screenInput: (route: ActivatedRouteSnapshot) => {
+                        const _multipleProjects = inject(MultipleProjectsService);
                         const screenId = route.parent!.parent!.params['screenId'];
-                        return {
+                        const project = _multipleProjects.currentProject()?.projectId;
+                        const screenInput: ScreenInput = {
                           screenId,
                           input: { type: 'TEXT' },
-                        } as ScreenInput;
+                        };
+                        if (project) {
+                          screenInput.attributes = { project };
+                        }
+                        return screenInput;
                       },
                     },
                   }),
                   dialogRoute({
                     path: ':id',
                     dialogComponent: ScreenInputEditDialogComponent,
+                    canActivate: [
+                      checkEntityGuardFactory({
+                        entityType: 'screenInputs',
+                        getEntity: (id) => inject(AugmentedScreenService).getInputCached(id),
+                        getEditorUrl: (id, route) => {
+                          const screenId = route.parent!.parent!.params['screenId'];
+                          return `/settings/screens/${screenId}/editor/${id}`;
+                        },
+                        isMatchEditorUrl: (url) => REGEXP_EDITOR_URL.test(url),
+                        getListUrl: () => '/settings/screens',
+                      }),
+                    ],
                     resolve: {
-                      screenInput: (route: ActivatedRouteSnapshot) =>
-                        inject(AugmentedScreenService).getInput(route.params['id']),
+                      screenInput: (route: ActivatedRouteSnapshot) => {
+                        return inject(AugmentedScreenService).getInputCached(route.params['id']);
+                      },
                     },
+                    canDeactivate: [
+                      () => {
+                        inject(AugmentedScreenService).clearCachedScreenInput();
+                        inject(MultipleProjectsService).cleanupProjectMessage();
+                        return true;
+                      },
+                    ],
                   }),
                 ],
               },

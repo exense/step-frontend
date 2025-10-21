@@ -1,7 +1,6 @@
 import {
   OnChanges,
   SimpleChanges,
-  TrackByFunction,
   AfterContentInit,
   Component,
   ContentChild,
@@ -19,7 +18,9 @@ import {
 } from '../../../custom-registeries/custom-registries.module';
 import { EntityMenuContentDirective } from '../../directives/entity-menu-content.directive';
 import { OperationCompleteHandler } from '../../injectables/operation-complete-handler';
-import { Mutable } from '../../../basics/step-basics.module';
+import { Mutable, StepBasicsModule } from '../../../basics/step-basics.module';
+import { EntityMenuItemDirective } from '../../directives/entity-menu-item.directive';
+import { EntityRefDirective } from '../../directives/entity-ref.directive';
 
 type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
 
@@ -27,19 +28,18 @@ type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
   selector: 'step-entity-menu',
   templateUrl: './entity-menu.component.html',
   styleUrls: ['./entity-menu.component.scss'],
+  imports: [StepBasicsModule, EntityMenuItemDirective, EntityRefDirective],
   providers: [
     {
       provide: OperationCompleteHandler,
       useExisting: forwardRef(() => EntityMenuComponent),
     },
   ],
-  standalone: false,
 })
 export class EntityMenuComponent implements OperationCompleteHandler, AfterContentInit, OnChanges {
   private _menuItemRegistry = inject(EntityMenuItemsRegistryService);
 
   protected menuItems: EntityMenuItemInfo[] = [];
-  protected readonly trackByMenuItem: TrackByFunction<EntityMenuItemInfo> = (index, item) => item.menuId;
 
   readonly hasContent: boolean = false;
 
