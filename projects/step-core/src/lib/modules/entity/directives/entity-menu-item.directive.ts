@@ -97,10 +97,6 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
         parent: this._parentInjector,
       }) as EnvironmentInjector;
 
-      console.log('MENU', menuItem.label);
-      console.log('FROM PARENT', this._parentInjector.get(this.EntityRefService, null));
-      console.log('FROM INTERNAL', this._parentInjector.get(this.EntityRefService, null));
-
       this.operationController = this.internalInjector.get(menuItemController);
     } else {
       this.operationController = new SimpleController(menuItem);
