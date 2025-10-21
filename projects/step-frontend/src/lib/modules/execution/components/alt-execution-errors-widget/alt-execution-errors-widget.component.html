@@ -15,7 +15,7 @@
         <section class="multiple-error">
           <div>The execution contains</div>
           <step-aggregated-status [countByStatus]="totalErrorsCount()" [showTooltips]="false" />
-          <div>errors</div>
+          <div><step-icon class="error" name="alert-triangle" /> errors</div>
           <a href="#" (click)="showDetails.emit(); (false)">show details</a>
         </section>
       }

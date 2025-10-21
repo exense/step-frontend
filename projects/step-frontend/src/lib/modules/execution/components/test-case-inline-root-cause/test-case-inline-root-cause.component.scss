@@ -19,24 +19,24 @@ p {
   min-height: 2.5rem;
 
   .text {
+    display: flex;
+    align-items: center;
     white-space: nowrap;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    margin-top: 0.3rem;
 
     step-icon {
-      margin-top: -0.3rem;
-      display: inline-block;
+      display: block;
     }
 
     span {
-      margin-top: 0.45rem;
-      display: inline-block;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
   }
 
-  step-icon {
+  step-icon.error {
     color: var(--status-FAILED);
   }
 }

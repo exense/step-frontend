@@ -2,13 +2,13 @@
   <div class="error-count">
     @if (singleMessage(); as message) {
       <div class="text" [style.width.px]="currentWidth">
-        <step-icon name="alert-triangle" />
+        <step-icon name="alert-triangle" class="error" />
         <span>{{ message }}</span>
       </div>
     }
   </div>
 } @else if (errorCounts() > 0) {
   <div class="error-count">
-    <div class="text"><step-icon name="alert-triangle" /> {{ errorCounts() }} Errors</div>
+    <div class="text"><step-icon name="alert-triangle" class="error" /> {{ errorCounts() }} Errors</div>
   </div>
 }
