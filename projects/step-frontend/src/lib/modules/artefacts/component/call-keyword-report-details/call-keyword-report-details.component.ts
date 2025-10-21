@@ -6,7 +6,6 @@ import {
   Measure,
   ReportNode,
   TableDataSource,
-  TableLocalDataSource,
   TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
@@ -89,19 +88,6 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
   protected readonly failedChildren = toSignal(this.failedChildren$, { initialValue: [] });
 
   protected readonly measuresDataSource = computed(() => {
-    const measures = this.node()?.measures;
-    if (!measures?.length) {
-      return undefined;
-    }
-    return new TableLocalDataSource(
-      measures,
-      TableLocalDataSource.configBuilder<Measure>()
-        .addSortNumberPredicate('duration', (item: Measure) => item.duration)
-        .build(),
-    );
-  });
-
-  protected readonly measuresDataSource2 = computed(() => {
     const id = this.node()?.id;
     if (!id) {
       return undefined;
