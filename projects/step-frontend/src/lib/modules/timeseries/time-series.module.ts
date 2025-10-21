@@ -7,6 +7,7 @@ import {
   DashboardsService,
   dialogRoute,
   EntityRegistry,
+  MultipleProjectsService,
   NAVIGATOR_QUERY_PARAMS_CLEANUP,
   SimpleOutletComponent,
   ViewRegistryService,
@@ -109,6 +110,12 @@ export class TimeSeriesModule {
                   return _router.parseUrl(link);
                 }),
               );
+            },
+          ],
+          canDeactivate: [
+            () => {
+              inject(MultipleProjectsService).cleanupProjectMessage();
+              return true;
             },
           ],
           resolve: {

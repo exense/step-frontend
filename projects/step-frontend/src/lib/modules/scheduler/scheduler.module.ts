@@ -16,6 +16,7 @@ import {
   ExportDialogComponent,
   preloadScreenDataResolver,
   stepRouteAdditionalConfig,
+  EntityRefDirective,
 } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import './components/scheduler-task-selection/scheduler-task-selection.component';
@@ -29,7 +30,7 @@ import { map, switchMap } from 'rxjs';
 import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
-  imports: [StepCoreModule, StepCommonModule],
+  imports: [StepCoreModule, StepCommonModule, EntityRefDirective],
   declarations: [
     ScheduledTaskListComponent,
     SchedulerTaskSelectionComponent,
