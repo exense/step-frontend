@@ -3,12 +3,13 @@
     @if (hasErrors()) {
       @if (singleError(); as singleError) {
         <section class="single-error">
-          <div>{{ singleError.errorMessage }}</div>
+          <div><step-icon class="error" name="alert-triangle" /> {{ singleError.errorMessage }}</div>
           <step-aggregated-status
             [countByStatus]="singleErrorCount()"
             [showTooltips]="false"
             [hideSingleStatus]="true"
           />
+          <a href="#" (click)="showDetails.emit(); (false)">show details</a>
         </section>
       } @else {
         <section class="multiple-error">

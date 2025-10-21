@@ -13,6 +13,9 @@ step-table {
   flex: 1;
 
   td {
+    width: 1px;
+    white-space: nowrap;
+
     padding-top: 0 !important;
     &:nth-child(1) {
       padding-right: 0 !important;
@@ -20,6 +23,11 @@ step-table {
     &:nth-child(2) {
       padding-left: 0 !important;
     }
+  }
+
+  td.error {
+    width: 100%;
+    min-width: 0;
   }
 }
 

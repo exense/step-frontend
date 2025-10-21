@@ -1,8 +1,10 @@
 @if (errorCounts() === 1) {
   <div class="error-count">
     @if (singleMessage(); as message) {
-      <div class="hidden-text"><step-icon name="alert-triangle" /> {{ message }}</div>
-      <div class="text"><step-icon name="alert-triangle" /> {{ message }}</div>
+      <div class="text" [style.width.px]="currentWidth">
+        <step-icon name="alert-triangle" />
+        <span>{{ message }}</span>
+      </div>
     }
   </div>
 } @else if (errorCounts() > 0) {

@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  NgZone,
+} from '@angular/core';
 import { AggregatedReportView, StepIconsModule } from '@exense/step-core';
 
 @Component({
@@ -8,8 +18,46 @@ import { AggregatedReportView, StepIconsModule } from '@exense/step-core';
   styleUrl: './test-case-inline-root-cause.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TestCaseInlineRootCauseComponent {
+export class TestCaseInlineRootCauseComponent implements AfterViewInit {
   readonly item = input.required<AggregatedReportView>();
+  private _element: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
+  private _zone: NgZone = inject(NgZone);
+  private _changeDetection = inject(ChangeDetectorRef);
+  private resizeObserver?: ResizeObserver;
+  protected currentWidth?: number;
+
+  ngAfterViewInit(): void {
+    const container = this.findContainer();
+    if (!container) return;
+
+    const update = () => {
+      const targetWidth = Math.max(0, container.clientWidth - 40);
+      console.log('targetWidth', targetWidth);
+
+      if (this.currentWidth || 0 < container.clientWidth - 60 || this.currentWidth || 0 > container.clientWidth + 60) {
+        this._zone.run(() => {
+          console.log('update currentWidth with', targetWidth);
+          this.currentWidth = targetWidth;
+          this._changeDetection.markForCheck();
+        });
+      }
+    };
+
+    // Observe the container size; also run once initially
+    this._zone.runOutsideAngular(() => {
+      this.resizeObserver = new ResizeObserver(update);
+      this.resizeObserver.observe(container);
+    });
+    update();
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+  }
+
+  private findContainer(): HTMLElement | null {
+    return this._element.nativeElement.closest('td');
+  }
 
   protected readonly errorCounts = computed(() => {
     const item = this.item();

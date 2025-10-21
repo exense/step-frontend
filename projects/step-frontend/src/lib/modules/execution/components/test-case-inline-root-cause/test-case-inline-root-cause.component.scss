@@ -20,18 +20,20 @@ p {
 
   .text {
     white-space: nowrap;
-  }
-
-  .hidden-text {
-    visibility: hidden;
-    height: 0;
-  }
-
-  .hidden-text + .text {
-    position: absolute;
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
-    top: 0.4rem;
+    max-width: 100%;
+
+    step-icon {
+      margin-top: -0.3rem;
+      display: inline-block;
+    }
+
+    span {
+      margin-top: 0.45rem;
+      display: inline-block;
+    }
   }
 
   step-icon {

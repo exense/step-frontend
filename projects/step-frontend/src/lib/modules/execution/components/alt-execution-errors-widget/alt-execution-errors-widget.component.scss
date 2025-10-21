@@ -5,6 +5,11 @@
   gap: 0.5rem;
   flex-wrap: nowrap;
 }
+
 step-alt-report-widget {
   min-height: 5rem;
+}
+
+step-icon.error {
+  color: var(--status-FAILED);
 }
