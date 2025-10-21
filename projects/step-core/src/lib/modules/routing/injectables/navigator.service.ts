@@ -3,7 +3,7 @@ import { DEFAULT_PAGE } from './default-page.token';
 import { DOCUMENT, Location } from '@angular/common';
 import { VIEW_ID_LINK_PREFIX } from './view-id-link-prefix.token';
 import { ActivatedRoute, NavigationEnd, Params, QueryParamsHandling, Router } from '@angular/router';
-import { filter, first, from, map, Observable, shareReplay, startWith, switchMap, tap, timer } from 'rxjs';
+import { filter, first, map, Observable, shareReplay, startWith } from 'rxjs';
 import { NAVIGATOR_QUERY_PARAMS_CLEANUP } from './navigator-query-params-cleanup.token';
 import { MenuEntry } from '../types/menu-entry';
 
@@ -98,7 +98,7 @@ export class NavigatorService {
     }
 
     const url = this._location.path(true);
-    this._router.navigateByUrl('/in-progress', { state: { goTo: url } });
+    this._router.navigateByUrl('/in-progress', { state: { goTo: url }, skipLocationChange: true });
   }
 
   private navigateInternal(link: string, isOpenInSeparateTab?: boolean): void {

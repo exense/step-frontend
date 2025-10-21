@@ -1,0 +1,61 @@
+step-auto-shrink-list {
+  width: 100%;
+  overflow: hidden;
+
+  .visible-items,
+  .invisible-items {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .invisible-items {
+    visibility: hidden;
+    height: 0;
+  }
+
+  .item {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    & > strong,
+    & > step-auto-shrink-item-value {
+      display: block;
+      white-space: nowrap;
+      max-width: 15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  button.more {
+    .mdc-button__label {
+      gap: 0.1rem;
+    }
+  }
+}
+
+.auto-shrink-popover-item {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  & > strong,
+  & > step-auto-shrink-item-value {
+    display: block;
+    white-space: nowrap;
+    max-width: 15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.auto-shrink-all-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

@@ -34,6 +34,8 @@ import {
   ReportNode,
   SimpleOutletComponent,
   editScheduledTaskRoute,
+  MultipleProjectsService,
+  SearchPaginatorComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -154,6 +156,15 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
+import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
+import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
+import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 
 @NgModule({
   declarations: [
@@ -249,6 +260,13 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    AltExecutionErrorsWidgetComponent,
+    ReportViewHeaderComponent,
+    CrossExecutionHeatmapComponent,
+    GradientLegendComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    HeatmapComponent,
   ],
   imports: [
     StepCommonModule,
@@ -267,6 +285,9 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    SearchPaginatorComponent,
+    TestCaseInlineRootCauseComponent,
+    ErrorRootCausesComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -298,6 +319,7 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
+    StatusCountBadgeComponent,
   ],
   providers: [
     {
@@ -444,6 +466,7 @@ export class ExecutionModule {
             canDeactivate: [
               () => {
                 inject(AugmentedExecutionsService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],
@@ -567,6 +590,7 @@ export class ExecutionModule {
           canDeactivate: [
             () => {
               inject(AugmentedExecutionsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
             () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),

@@ -612,6 +612,7 @@ export class ArtefactsModule {
     });
     this._artefactService.register('Failure', {
       icon: 'x-octagon',
+      inlineComponent: EmptyInlineComponent,
       isSelectable: false,
     });
     this._artefactService.register('PerformanceAssert', {

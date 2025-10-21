@@ -1,15 +1,11 @@
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
 step-plan-artefact-list {
+  @include common.plan-editor-control-selections(false);
   .artefact-name {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-
-  .actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 4px;
   }
 
   .icon-cell {
@@ -17,20 +13,5 @@ step-plan-artefact-list {
     step-icon {
       margin-right: 0.3rem;
     }
-  }
-
-  .move {
-    padding-left: 0;
-    padding-right: 0;
-    width: 0;
-    text-align: center;
-    step-icon {
-      width: auto;
-      cursor: grab;
-    }
-  }
-
-  table > tbody > tr.step-draggable-item {
-    cursor: grab;
   }
 }

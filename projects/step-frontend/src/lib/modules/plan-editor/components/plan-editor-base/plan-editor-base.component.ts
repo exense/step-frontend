@@ -4,8 +4,10 @@ import {
   EventEmitter,
   forwardRef,
   inject,
+  Injector,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -36,10 +38,10 @@ import {
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   CommonEntitiesUrlsService,
-  ExecutiontTaskParameters,
   PlanContext,
+  AuthService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -101,7 +103,8 @@ export class PlanEditorBaseComponent
     OnChanges,
     PlanInteractiveSessionService,
     PlanArtefactResolverService,
-    PlanContextInitializerService
+    PlanContextInitializerService,
+    OnDestroy
 {
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
@@ -119,6 +122,10 @@ export class PlanEditorBaseComponent
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _destroyRef = inject(DestroyRef);
+  private _auth = inject(AuthService);
+  private _injector = inject(Injector);
+
+  private planTypeChangeTerminator$?: Subject<void>;
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -149,7 +156,7 @@ export class PlanEditorBaseComponent
       }));
     }),
   );
-  planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
+  protected planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
   protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },
@@ -167,7 +174,10 @@ export class PlanEditorBaseComponent
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
-    this.initPlanTypeChanges();
+  }
+
+  ngOnDestroy() {
+    this.terminatePlanTypeChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -177,6 +187,11 @@ export class PlanEditorBaseComponent
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(
         (cPlanCtx?.currentValue as PlanContext)?.id,
       );
+      if (this._auth.hasRight('plan-write', this._injector)) {
+        this.planTypeControl.enable();
+      } else {
+        this.planTypeControl.disable();
+      }
     }
   }
 
@@ -338,6 +353,7 @@ export class PlanEditorBaseComponent
     }
 
     this.planClass = context.plan._class;
+    this.terminatePlanTypeChanges();
     this.planTypeControl.setValue(
       {
         planType: context!.plan!.root!._class,
@@ -345,6 +361,7 @@ export class PlanEditorBaseComponent
       },
       { emitEvent: false },
     );
+    this.setupPlanTypeChanges();
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
     const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
@@ -389,10 +406,19 @@ export class PlanEditorBaseComponent
     (artefact.children || []).forEach((child) => this.synchronizeDynamicName(child));
   }
 
-  private initPlanTypeChanges(): void {
+  private terminatePlanTypeChanges(): void {
+    this.planTypeChangeTerminator$?.next?.();
+    this.planTypeChangeTerminator$?.complete?.();
+    this.planTypeChangeTerminator$ = undefined;
+  }
+
+  private setupPlanTypeChanges(): void {
+    this.terminatePlanTypeChanges();
+    this.planTypeChangeTerminator$ = new Subject<void>();
     this.planTypeControl.valueChanges
       .pipe(
-        takeUntilDestroyed(this._destroyRef),
+        pairwise(),
+        map(([, current]) => current),
         map((item) => {
           const context = this._planEditService.planContext();
           return { item, context };
@@ -404,6 +430,7 @@ export class PlanEditorBaseComponent
           return contextCopy;
         }),
         switchMap((context) => this._planEditorApi.savePlan(context)),
+        takeUntil(this.planTypeChangeTerminator$),
       )
       .subscribe((context) => {
         this.planClass = context!.plan!._class;

@@ -85,7 +85,7 @@ export class DataSourceFieldsService {
   }
 
   private extractExcelSearchFields(dataSource: DataSourceConf): DynamicSimpleValue[] {
-    return [dataSource.file, dataSource.worksheet, dataSource.headers];
+    return [dataSource.file, dataSource.worksheet, dataSource.password, dataSource.headers];
   }
 
   private createCsvFields(dataSource: DataSourceConf, withIcon?: boolean): Observable<ArtefactInlineItemSource> {

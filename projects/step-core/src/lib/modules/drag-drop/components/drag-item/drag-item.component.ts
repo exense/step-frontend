@@ -1,37 +1,46 @@
-import { Component, ElementRef, input, OnDestroy } from '@angular/core';
+import { Component, effect, ElementRef, input, OnDestroy, untracked } from '@angular/core';
 import { DragItemBaseDirective } from '../../directives/drag-item-base.directive';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, pairwise, startWith } from 'rxjs';
 
 const DRAG_ITEM_CLASS = 'step-draggable-item';
+const DRAG_ITEM_DISABLED = 'step-draggable-item-disabled';
 
 @Component({
   selector: 'step-drag-item',
   template: '',
 })
 export class DragItemComponent extends DragItemBaseDirective implements OnDestroy {
-  /** @Input() **/
   override readonly elRef = input.required<ElementRef<HTMLElement>>();
-
-  /** @Input() **/
   override readonly dragNodeData = input<unknown>(undefined, { alias: 'data' });
-
-  /** @Input() **/
   override readonly dragDisabled = input(false);
-
-  /** @Input() **/
   override readonly dragExternalImage = input<HTMLElement | undefined>(undefined, { alias: 'dragImage' });
 
   private markElRefAsDraggableSubscription = toObservable(this.elRef)
     .pipe(startWith(undefined), distinctUntilChanged(), pairwise(), takeUntilDestroyed())
     .subscribe(([prev, current]) => {
+      const isDisabled = untracked(() => this.dragDisabled());
       if (prev?.nativeElement) {
         this._renderer.removeClass(prev.nativeElement, DRAG_ITEM_CLASS);
+        this._renderer.removeClass(prev.nativeElement, DRAG_ITEM_DISABLED);
       }
       if (current?.nativeElement) {
         this._renderer.addClass(current.nativeElement, DRAG_ITEM_CLASS);
+        if (isDisabled) {
+          this._renderer.addClass(current.nativeElement, DRAG_ITEM_DISABLED);
+        }
       }
     });
+
+  private effectDisabledChange = effect(() => {
+    const isDisabled = this.dragDisabled();
+    const elRef = untracked(() => this.elRef());
+    if (isDisabled) {
+      this._renderer.addClass(elRef.nativeElement, DRAG_ITEM_DISABLED);
+    } else {
+      this._renderer.removeClass(elRef.nativeElement, DRAG_ITEM_DISABLED);
+    }
+  });
 
   override ngOnDestroy() {
     super.ngOnDestroy();

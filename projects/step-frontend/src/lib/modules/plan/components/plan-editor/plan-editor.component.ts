@@ -8,6 +8,7 @@ import {
   ExecutiontTaskParameters,
   ScheduledTaskTemporaryStorageService,
   ReloadableDirective,
+  EntityRefService,
 } from '@exense/step-core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SchedulerInvokerService } from '../../../execution/execution.module';
@@ -22,10 +23,14 @@ import { SchedulerInvokerService } from '../../../execution/execution.module';
       provide: SchedulerInvokerService,
       useExisting: forwardRef(() => PlanEditorComponent),
     },
+    {
+      provide: EntityRefService,
+      useExisting: forwardRef(() => PlanEditorComponent),
+    },
   ],
   standalone: false,
 })
-export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
+export class PlanEditorComponent implements OnInit, SchedulerInvokerService, EntityRefService<Plan> {
   private _destroyRef = inject(DestroyRef);
   private _cd = inject(ChangeDetectorRef);
   private _purePlanContextApi = inject(PurePlanContextApiService);
@@ -46,14 +51,6 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
       .subscribe(() => this._cd.detectChanges());
   }
 
-  protected handlePlanChange(plan: Plan): void {
-    const ctx = this._planEditorService.planContext();
-    if (!ctx) {
-      return;
-    }
-    this._planEditorService.handlePlanContextChange({ ...ctx, plan });
-  }
-
   launchPlan(): void {
     this._router.navigate(['.', 'launch'], { relativeTo: this._activatedRoute });
   }
@@ -61,5 +58,15 @@ export class PlanEditorComponent implements OnInit, SchedulerInvokerService {
   openScheduler(task: ExecutiontTaskParameters): void {
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate(['.', 'schedule', temporaryId], { relativeTo: this._activatedRoute });
+  }
+
+  readonly currentEntity = this._planEditorService.plan;
+
+  protected handlePlanChange(plan: Plan): void {
+    const ctx = this._planEditorService.planContext();
+    if (!ctx) {
+      return;
+    }
+    this._planEditorService.handlePlanContextChange({ ...ctx, plan });
   }
 }

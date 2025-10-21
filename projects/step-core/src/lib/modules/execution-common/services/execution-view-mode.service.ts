@@ -1,12 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
-import {
-  Mutable,
-  LOCAL_STORAGE,
-  CommonEntitiesUrlsService,
-  AppConfigContainerService,
-} from '../../basics/step-basics.module';
-import { Execution } from '../../../client/step-client-module';
+import { Mutable, LOCAL_STORAGE, CommonEntitiesUrlsService } from '../../basics/step-basics.module';
+import { Execution, AppConfigContainerService } from '../../../client/step-client-module';
 import { ExecutionViewMode } from '../types/execution-view-mode';
 
 type FieldAccessor = Mutable<Pick<ExecutionViewModeService, 'forceLegacyReporting'>>;

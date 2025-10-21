@@ -1,0 +1,12 @@
+<step-table [dataSource]="dataSource()">
+  <ng-container matColumnDef="key" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef>Label</th>
+    <td mat-cell *matCellDef="let element" class="item-cell">{{ element.key }}</td>
+  </ng-container>
+  <ng-container matColumnDef="value" stepSearchCol>
+    <th mat-header-cell *matHeaderCellDef>Value</th>
+    <td mat-cell *matCellDef="let element" class="item-cell">
+      <step-auto-shrink-item-value [item]="element" [emptyValueTemplate]="emptyValueTemplate()" />
+    </td>
+  </ng-container>
+</step-table>
