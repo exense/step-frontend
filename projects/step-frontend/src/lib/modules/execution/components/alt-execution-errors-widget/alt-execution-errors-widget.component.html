@@ -13,9 +13,9 @@
         </section>
       } @else {
         <section class="multiple-error">
-          <div>The execution contains</div>
+          <div><step-icon class="error" name="alert-triangle" /> The execution contains</div>
           <step-aggregated-status [countByStatus]="totalErrorsCount()" [showTooltips]="false" />
-          <div><step-icon class="error" name="alert-triangle" /> errors</div>
+          <div>errors</div>
           <a href="#" (click)="showDetails.emit(); (false)">show details</a>
         </section>
       }
