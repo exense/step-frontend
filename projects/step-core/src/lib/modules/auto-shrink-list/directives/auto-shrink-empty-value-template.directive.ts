@@ -1,8 +1,8 @@
 import { Directive, inject, TemplateRef } from '@angular/core';
 
 @Directive({
-  selector: '[stepAutoShrankEmptyValueTemplate]',
+  selector: '[stepAutoShrinkEmptyValueTemplate]',
 })
-export class AutoShrankEmptyValueTemplateDirective {
+export class AutoShrinkEmptyValueTemplateDirective {
   readonly templateRef = inject(TemplateRef);
 }

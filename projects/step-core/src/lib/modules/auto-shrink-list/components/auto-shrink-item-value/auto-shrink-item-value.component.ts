@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, input, TemplateRef, ViewEncapsulati
 import { KeyValue, NgTemplateOutlet } from '@angular/common';
 
 @Component({
-  selector: 'step-auto-shrank-item-value',
+  selector: 'step-auto-shrink-item-value',
   imports: [NgTemplateOutlet],
-  templateUrl: './auto-shrank-item-value.component.html',
-  styleUrl: './auto-shrank-item-value.component.scss',
+  templateUrl: './auto-shrink-item-value.component.html',
+  styleUrl: './auto-shrink-item-value.component.scss',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AutoShrankItemValueComponent {
+export class AutoShrinkItemValueComponent {
   readonly item = input.required<KeyValue<string, string>>();
   readonly emptyValueTemplate = input<TemplateRef<unknown>>();
 }

@@ -56,9 +56,8 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   readonly byExecutionChartTitle = computed(() => {
-    const label =
-      this.reportNodesChartType() === 'keywords' ? 'Keywords calls by execution' : 'Test cases by execution';
-    return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY})`;
+    const label = this.reportNodesChartType() === 'keywords' ? 'Keyword calls count' : 'Test cases count';
+    return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
   });
 
   private updateUrlRefreshInterval = toObservable(this._state.refreshInterval)

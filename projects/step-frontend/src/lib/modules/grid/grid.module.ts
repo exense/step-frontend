@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { StepCommonModule } from '../_common/step-common.module';
-import { StepCoreModule, ViewRegistryService } from '@exense/step-core';
+import { EntityRefDirective, StepCoreModule, ViewRegistryService } from '@exense/step-core';
 import { AgentListComponent } from './components/agent-list/agent-list.component';
 import { TokenStateProgressbarComponent } from './components/token-state-progressbar/token-state-progressbar.component';
 import { TokenListComponent } from './components/token-list/token-list.component';
@@ -32,7 +32,7 @@ import { QuotaManagerComponent } from './components/quota-manager/quota-manager.
     TokenStateProgressbarComponent,
     QuotaManagerComponent,
   ],
-  imports: [StepCoreModule, StepCommonModule],
+  imports: [StepCoreModule, StepCommonModule, EntityRefDirective],
 })
 export class GridModule {
   constructor(private _viewRegistry: ViewRegistryService) {

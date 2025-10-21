@@ -39,6 +39,7 @@
     mat-stroked-button
     (click)="clone.emit()"
     [matTooltip]="captions.duplicate"
+    [disabled]="!('plan-write' | hasRight | async)"
     matTooltipPosition="below"
   >
     <step-icon name="copy" />
@@ -72,6 +73,7 @@
     [class.active]="isInteractiveSessionActive"
     (click)="toggleInteractiveSession()"
     [matTooltip]="isInteractiveSessionActive ? captions.stopInteractive : captions.startInteractive"
+    [disabled]="!('plan-write' | hasRight | async)"
     matTooltipPosition="below"
   >
     <step-icon name="bug-01" />

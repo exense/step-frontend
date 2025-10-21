@@ -12,6 +12,7 @@
         </step-alt-report-widget>
       }
     </div>
+
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
@@ -21,7 +22,7 @@
             [height]="340"
           >
             <ng-template tooltipContent let-data let-reposition="reposition">
-              <step-executions-chart-tooltip (reposition)="reposition()" [data]="data" />
+              <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />
             </ng-template>
           </step-timeseries-chart>
         } @else {
@@ -29,6 +30,11 @@
         }
       </step-alt-report-widget-content>
     </step-alt-report-widget>
+  </div>
+  <div class="row">
+    <div class="flex-grow-1">
+      <step-cross-execution-heatmap [defaultDateRange]="luxonDateRange()" #heatmap />
+    </div>
   </div>
   <div class="row">
     <step-alt-report-widget class="flex-grow-1" [title]="byExecutionChartTitle()">
