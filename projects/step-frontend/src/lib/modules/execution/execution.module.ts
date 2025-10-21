@@ -160,8 +160,11 @@ import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-
 import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
 import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
 import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-
+import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 
 @NgModule({
   declarations: [
@@ -259,6 +262,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     ExecutionAgentsListComponent,
     AltExecutionErrorsWidgetComponent,
     ReportViewHeaderComponent,
+    CrossExecutionHeatmapComponent,
+    GradientLegendComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    HeatmapComponent,
   ],
   imports: [
     StepCommonModule,
@@ -277,7 +285,6 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
-    MatProgressSpinner,
     SearchPaginatorComponent,
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,

@@ -68,7 +68,7 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 import { SPLIT_EXPORTS } from './modules/split';
-import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
+import { AUTO_SHRINK_LIST_EXPORTS } from './modules/auto-shrink-list';
 import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
 import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
@@ -141,7 +141,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     LIST_SELECTION_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
-    AUTO_SHRANK_LIST_EXPORTS,
+    AUTO_SHRINK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
@@ -206,7 +206,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
-    AUTO_SHRANK_LIST_EXPORTS,
+    AUTO_SHRINK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
@@ -343,7 +343,7 @@ export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
-export * from './modules/auto-srhank-list';
+export * from './modules/auto-shrink-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';

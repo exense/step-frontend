@@ -15,33 +15,33 @@ import {
 } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { ItemWidthRegisterService } from '../../injectables/item-width-register.service';
-import { AutoShrankItemDirective } from '../../directives/auto-shrank-item.directive';
+import { AutoShrinkItemDirective } from '../../directives/auto-shrink-item.directive';
 import { PopoverMode, StepBasicsModule } from '../../../basics/step-basics.module';
-import { AutoShrankEmptyValueTemplateDirective } from '../../directives/auto-shrank-empty-value-template.directive';
-import { AutoShrankItemValueComponent } from '../auto-shrank-item-value/auto-shrank-item-value.component';
-import { AutoShrankAllItemsComponent } from '../auto-shrank-all-items/auto-shrank-all-items.component';
+import { AutoShrinkEmptyValueTemplateDirective } from '../../directives/auto-shrink-empty-value-template.directive';
+import { AutoShrinkItemValueComponent } from '../auto-shrink-item-value/auto-shrink-item-value.component';
+import { AutoShrinkAllItemsComponent } from '../auto-shrink-all-items/auto-shrink-all-items.component';
 
 @Component({
-  selector: 'step-auto-shrank-list',
-  templateUrl: './auto-shrank-list.component.html',
-  styleUrl: './auto-shrank-list.component.scss',
-  imports: [AutoShrankItemDirective, StepBasicsModule, AutoShrankItemValueComponent, AutoShrankAllItemsComponent],
+  selector: 'step-auto-shrink-list',
+  templateUrl: './auto-shrink-list.component.html',
+  styleUrl: './auto-shrink-list.component.scss',
+  imports: [AutoShrinkItemDirective, StepBasicsModule, AutoShrinkItemValueComponent, AutoShrinkAllItemsComponent],
   providers: [
     {
       provide: ItemWidthRegisterService,
-      useExisting: forwardRef(() => AutoShrankListComponent),
+      useExisting: forwardRef(() => AutoShrinkListComponent),
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class AutoShrankListComponent implements ItemWidthRegisterService<KeyValue<string, string>>, OnInit, OnDestroy {
+export class AutoShrinkListComponent implements ItemWidthRegisterService<KeyValue<string, string>>, OnInit, OnDestroy {
   private _elRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   private observer?: ResizeObserver;
   private itemWidths = new Map<string, number>();
 
-  private autoShrinkEmptyValueTemplate = contentChild(AutoShrankEmptyValueTemplateDirective);
+  private autoShrinkEmptyValueTemplate = contentChild(AutoShrinkEmptyValueTemplateDirective);
   protected readonly emptyValueTemplate = computed(() => this.autoShrinkEmptyValueTemplate()?.templateRef);
 
   readonly items = input<KeyValue<string, string>[]>([]);

@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, input, TemplateRef } from
 import { KeyValue } from '@angular/common';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableLocalDataSource, TableModule } from '../../../table/table.module';
-import { AutoShrankItemValueComponent } from '../auto-shrank-item-value/auto-shrank-item-value.component';
+import { AutoShrinkItemValueComponent } from '../auto-shrink-item-value/auto-shrink-item-value.component';
 
 @Component({
-  selector: 'step-auto-shrank-all-items',
-  imports: [StepBasicsModule, TableModule, AutoShrankItemValueComponent],
-  templateUrl: './auto-shrank-all-items.component.html',
-  styleUrl: './auto-shrank-all-items.component.scss',
+  selector: 'step-auto-shrink-all-items',
+  imports: [StepBasicsModule, TableModule, AutoShrinkItemValueComponent],
+  templateUrl: './auto-shrink-all-items.component.html',
+  styleUrl: './auto-shrink-all-items.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AutoShrankAllItemsComponent {
+export class AutoShrinkAllItemsComponent {
   readonly items = input<KeyValue<string, string>[]>([]);
   readonly emptyValueTemplate = input<TemplateRef<unknown>>();
   readonly emptySearchPatterns = input('', {

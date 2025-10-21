@@ -35,6 +35,8 @@
         <step-popover
           yPosition="below"
           [mode]="PopoverMode.CLICK"
+          [whiteBackground]="true"
+          [smallFont]="false"
           (toggledEvent)="isResolvedParametersVisible.set($event)"
         >
           <button
@@ -53,7 +55,13 @@
           </step-popover-content>
         </step-popover>
       }
-      <step-popover yPosition="below" [mode]="PopoverMode.CLICK" (toggledEvent)="isAgentsVisible.set($event)">
+      <step-popover
+        yPosition="below"
+        [mode]="PopoverMode.CLICK"
+        (toggledEvent)="isAgentsVisible.set($event)"
+        [whiteBackground]="true"
+        [smallFont]="false"
+      >
         <button
           type="button"
           mat-icon-button

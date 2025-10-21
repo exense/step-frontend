@@ -9,7 +9,7 @@
 >
   <mat-select-trigger>
     @if (selection(); as selection) {
-      <div [matTooltip]="selection" matTooltipPosition="below">{{ selection }}</div>
+      <div>{{ selection }}</div>
     }
   </mat-select-trigger>
   @if (useSearch()) {
