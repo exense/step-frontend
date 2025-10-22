@@ -1,5 +1,3 @@
-// @ts-ignore
-
 declare class uPlot {
   /** when passing a function for @targ, call init() after attaching self.root to the DOM */
   constructor(
@@ -158,6 +156,9 @@ declare class uPlot {
 
   /** returns a pub/sub instance shared by all plots usng the provided key */
   static sync(key: string): uPlot.SyncPubSub;
+
+  /** cached devicePixelRatio (faster than reading it from window.devicePixelRatio) */
+  static pxRatio: number;
 }
 
 export default uPlot;
@@ -227,7 +228,20 @@ declare namespace uPlot {
     Vertical = 1,
   }
 
-  export type AlignedData = [xValues: number[], ...yValues: (number | null | undefined)[][]];
+  export type TypedArray =
+    | Int8Array
+    | Uint8Array
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Uint8ClampedArray
+    | Float32Array
+    | Float64Array;
+
+  export type AlignedData =
+    | TypedArray[]
+    | [xValues: number[] | TypedArray, ...yValues: ((number | null | undefined)[] | TypedArray)[]];
 
   export interface DateNames {
     /** long month names */
@@ -675,6 +689,8 @@ declare namespace uPlot {
     export interface SteppedPathBuilderOpts {
       align?: -1 | 1; // 1
 
+      alignGaps?: -1 | 0 | 1; // 0
+
       // whether to draw ascenders/descenders at null/gap boundaries
       ascDesc?: boolean; // false
     }
@@ -739,9 +755,17 @@ declare namespace uPlot {
       ) => void;
     }
 
+    export interface LinearPathBuilderOpts {
+      alignGaps?: -1 | 0 | 1; // 0
+    }
+
+    export interface SplinePathBuilderOpts {
+      alignGaps?: -1 | 0 | 1; // 0
+    }
+
     export type PointsPathBuilderFactory = () => Points.PathBuilder;
-    export type LinearPathBuilderFactory = () => Series.PathBuilder;
-    export type SplinePathBuilderFactory = () => Series.PathBuilder;
+    export type LinearPathBuilderFactory = (opts?: LinearPathBuilderOpts) => Series.PathBuilder;
+    export type SplinePathBuilderFactory = (opts?: SplinePathBuilderOpts) => Series.PathBuilder;
     export type SteppedPathBuilderFactory = (opts?: SteppedPathBuilderOpts) => Series.PathBuilder;
     export type BarsPathBuilderFactory = (opts?: BarsPathBuilderOpts) => Series.PathBuilder;
 
@@ -1210,6 +1234,5 @@ declare namespace uPlot {
     hooks: Hooks.ArraysOrFuncs;
   }
 }
-
 // @ts-ignore
 export as namespace uPlot;

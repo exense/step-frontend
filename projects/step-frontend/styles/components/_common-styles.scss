@@ -150,4 +150,15 @@
   mat-expansion-panel .mat-expansion-panel-header.mat-expanded:focus {
     background: none;
   }
+
+  /* disable cdk-overlay-backdrop when not active */
+  .cdk-overlay-backdrop.step-popover-backdrop--passive {
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+  .cdk-overlay-backdrop.step-popover-backdrop--active {
+    background: transparent !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
 }

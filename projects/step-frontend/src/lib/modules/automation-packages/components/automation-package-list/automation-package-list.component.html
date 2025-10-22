@@ -164,7 +164,7 @@
           <step-column-settings />
         </th>
         <td mat-cell *matCellDef="let element" class="cell-actions">
-          <step-btn-group>
+          <step-btn-group [stepEntityRef]="element">
             <button
               stepTestId="execute-package-btn"
               mat-icon-button
@@ -180,7 +180,7 @@
               mat-icon-button
               matTooltip="Edit package"
               (click)="editPackage(element)"
-              [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+              [disabled]="!(AutomationPackagePermission.READ | hasRight | async)"
             >
               <step-icon name="tool" />
             </button>

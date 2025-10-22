@@ -1,9 +1,14 @@
 <mat-menu #menu="matMenu">
-  <div *matMenuContent="let element = element" [stepItemHover]="element">
-    <ng-container *ngIf="menuContent?.templateRef as templateRef">
-      <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: element }"> </ng-container>
-    </ng-container>
-    <ng-container *ngFor="let item of menuItems; trackBy: trackByMenuItem">
+  <div
+    *matMenuContent="let element = element"
+    [stepItemHover]="element"
+    [stepEntityRef]="element"
+    #entityRef="EntityRef"
+  >
+    @if (menuContent?.templateRef; as templateRef) {
+      <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: element }; injector: entityRef._injector" />
+    }
+    @for (item of menuItems; track item.menuId) {
       <button
         type="button"
         mat-menu-item
@@ -14,9 +19,11 @@
         [class.hidden]="!(menuItem.isVisible$ | async)"
         (click)="menuItem.invoke()"
       >
-        <step-icon *ngIf="item.icon" [name]="item.icon"></step-icon>
+        @if (item.icon) {
+          <step-icon [name]="item.icon" />
+        }
         {{ item.label }}
       </button>
-    </ng-container>
+    }
   </div>
 </mat-menu>

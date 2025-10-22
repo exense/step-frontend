@@ -224,12 +224,13 @@
       </form>
     }
   </div>
-  <div step-modal-window-buttons>
+  <div step-modal-window-buttons [stepEntityRef]="_package">
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
-    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$">
+    <button type="button" mat-flat-button color="primary" (click)="upload()" [disabled]="!!progress$ || !(AutomationPackagePermission.WRITE | hasRight | async)">
       @if (isAffectingOtherPackage) {
         Force&nbsp;
       }
+
       @if (!isNewPackage) {
         Update
       } @else {

@@ -6,6 +6,7 @@ import {
   BookmarkCreateDialogComponent,
   BookmarkService,
   DialogsService,
+  EntityRefDirective,
   User,
   UserService,
 } from '@exense/step-core';
@@ -16,7 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
   selector: 'step-manage-bookmarks-list-page',
   templateUrl: './manage-bookmarks-list.component.html',
   styleUrls: ['./manage-bookmarks-list.component.scss'],
-  imports: [COMMON_IMPORTS],
+  imports: [COMMON_IMPORTS, EntityRefDirective],
 })
 export class ManageBookmarksListComponent implements OnInit {
   private _dialogs = inject(DialogsService);

@@ -3,8 +3,10 @@ import {
   AugmentedKeywordsService,
   checkEntityGuardFactory,
   CommonEntitiesUrlsService,
+  EntityRefDirective,
   FunctionType,
   FunctionTypeRegistryService,
+  MultipleProjectsService,
   SimpleOutletComponent,
   StepCoreModule,
   ViewRegistryService,
@@ -19,7 +21,7 @@ import { ActivatedRouteSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [ScriptEditorComponent, FunctionTypeScriptComponent],
-  imports: [StepCoreModule, NgxMatSelectSearchModule],
+  imports: [StepCoreModule, NgxMatSelectSearchModule, EntityRefDirective],
   exports: [ScriptEditorComponent, FunctionTypeScriptComponent],
 })
 export class ScriptEditorModule {
@@ -57,6 +59,7 @@ export class ScriptEditorModule {
           canDeactivate: [
             canDeactivateFn,
             () => {
+              inject(MultipleProjectsService).cleanupProjectMessage();
               inject(AugmentedKeywordsService).cleanupCache();
               return true;
             },

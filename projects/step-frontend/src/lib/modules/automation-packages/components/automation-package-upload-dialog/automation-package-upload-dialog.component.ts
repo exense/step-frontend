@@ -8,6 +8,8 @@ import {
   DialogRouteResult,
   Keyword,
   Plan,
+  EntityRefDirective,
+  ReloadableDirective,
   StepCoreModule,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe } from 'rxjs';
@@ -15,6 +17,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
+import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -40,7 +43,8 @@ type FileUploadOrMaven = {
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
-  imports: [StepCoreModule],
+  imports: [StepCoreModule, EntityRefDirective],
+  hostDirectives: [ReloadableDirective],
   host: {
     '(keydown.enter)': 'upload()',
   },
@@ -229,4 +233,5 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   }
 
   protected readonly AlertType = AlertType;
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 }

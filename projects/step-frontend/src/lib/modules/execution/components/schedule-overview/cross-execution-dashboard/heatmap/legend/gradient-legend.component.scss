@@ -1,0 +1,45 @@
+.legend {
+  position: relative;
+  width: 100%;
+  padding-bottom: 1.5rem;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.markers {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1.5rem;
+}
+
+.marker {
+  position: absolute;
+  bottom: -0.5rem;
+  transform: translateX(-50%);
+  text-align: center;
+  max-width: 25%;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: #333;
+
+  &:first-child {
+    transform: translateX(0%);
+    text-align: left;
+  }
+
+  &:last-child {
+    transform: translateX(-100%);
+    text-align: right;
+  }
+}
+
+.label {
+  display: inline-block;
+  padding: 0 0.25rem;
+  border-radius: 0.4rem;
+}
