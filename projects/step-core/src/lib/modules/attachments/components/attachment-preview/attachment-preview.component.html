@@ -3,6 +3,20 @@
     @case (AttachmentType.IMG) {
       <img [ngSrc]="(attachment() | attachmentUrl)!" fill />
     }
+    @case (AttachmentType.STREAMING_TEXT) {
+      @if (canUseStreamPreview()) {
+        <step-streaming-text
+          [attachment]="attachment()!"
+          [displayLatestRows]="6"
+          [fontSize]="8"
+          [autoCloseChannelWhenFinished]="true"
+        />
+      } @else {
+        <div class="file-info">
+          <step-icon [name]="attachmentType | attachmentTypeIcon" />
+        </div>
+      }
+    }
     @default {
       <div class="file-info">
         <step-icon [name]="attachmentType | attachmentTypeIcon" />
@@ -13,15 +27,36 @@
 <div
   class="name"
   [ngClass]="{
-    overlay: attachmentType() === AttachmentType.IMG,
-    skipped: attachmentType() === AttachmentType.SKIPPED
+    overlay: attachmentType() === AttachmentType.IMG || attachmentType() === AttachmentType.STREAMING_TEXT
   }"
 >
-  {{ attachment()?.name }}
+  <step-long-inline-text [text]="attachment()?.name" />
 </div>
 
 <div class="actions">
-  <button type="button" mat-icon-button matTooltip="Download" matTooltipPosition="below" (click)="download($event)">
-    <step-icon name="download" />
-  </button>
+  @if (isStreamingInProgress()) {
+    <mat-spinner [diameter]="15" />
+  } @else if (attachmentType() !== AttachmentType.SKIPPED) {
+    @if (showDownload()) {
+      <step-btn-group class="with-round-corners download">
+        <button
+          type="button"
+          mat-flat-button
+          matTooltip="Download"
+          matTooltipPosition="below"
+          (click)="download($event)"
+        >
+          <step-icon name="download" />
+        </button>
+      </step-btn-group>
+    }
+    @if (isStreamingFailed()) {
+      <step-icon
+        class="failed-attachment"
+        name="alert-triangle"
+        matTooltip="Potentially incomplete file"
+        matTooltipPosition="below"
+      />
+    }
+  }
 </div>

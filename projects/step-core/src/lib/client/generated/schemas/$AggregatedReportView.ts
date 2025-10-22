@@ -16,6 +16,20 @@ export const $AggregatedReportView = {
         format: 'int64',
       },
     },
+    countByErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
+      },
+    },
+    countByContributingErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
+      },
+    },
     children: {
       type: 'array',
       contains: {
@@ -41,6 +55,13 @@ export const $AggregatedReportView = {
       type: 'array',
       contains: {
         type: 'Operation',
+      },
+    },
+    countByChildrenErrorMessage: {
+      type: 'dictionary',
+      contains: {
+        type: 'number',
+        format: 'int64',
       },
     },
   },

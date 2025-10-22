@@ -14,10 +14,10 @@ interface ComputedStop {
   standalone: false,
 })
 export class GradientLegendComponent {
-  gradientStops = input.required<HeatMapColor[]>();
-  barHeight = input<number>(14);
+  readonly gradientStops = input.required<HeatMapColor[]>();
+  readonly barHeight = input<number>(14);
 
-  computedData = computed(() => {
+  protected computedData = computed(() => {
     const gradientStops = this.gradientStops();
     const clean = (gradientStops || []).filter((color) => !!color && !!color.hex && !!color.label);
 
@@ -34,7 +34,7 @@ export class GradientLegendComponent {
     })) as ComputedStop[];
   });
 
-  gradientCss = computed(() => {
+  protected gradientCss = computed(() => {
     const data = this.computedData();
     if (data.length === 0) {
       return 'transparent';

@@ -11,6 +11,7 @@ import {
   viewChild,
   ElementRef,
   untracked,
+  output,
 } from '@angular/core';
 import { Execution, PaginatorComponent } from '@exense/step-core';
 import { PageEvent } from '@angular/material/paginator';
@@ -42,7 +43,7 @@ export class HeatmapComponent {
   readonly paginator = viewChild(PaginatorComponent);
   readonly container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
 
-  @Output() cellClick = new EventEmitter<{ row: HeatMapRow; column: HeatmapColumn }>();
+  readonly cellClick = output<{ row: HeatMapRow; column: HeatmapColumn }>();
 
   scrollEffect = effect(() => {
     const rows = this.rows();

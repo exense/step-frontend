@@ -17,4 +17,29 @@
     flex-grow: 1;
     min-width: 0;
   }
+
+  .spinner-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    text-align: center;
+    top: 50%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .trimmed-heatmap-placeholder {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    text-align: center;
+    top: 50%;
+
+    span {
+      padding: 1rem 2rem;
+      background-color: #f3f3f3;
+    }
+  }
 }

@@ -1,16 +1,15 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { SessionDto } from '../../../domain';
 import { BehaviorSubject, catchError, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
-import { ApplicationConfiguration, PrivateApplicationService } from '../../../client/generated';
+import {
+  ApplicationConfiguration,
+  PrivateApplicationService,
+  AppConfigContainerService,
+} from '../../../client/step-client-module';
 import { Router } from '@angular/router';
 import { AdditionalRightRuleService } from './additional-right-rule.service';
-import {
-  AppConfigContainerService,
-  GlobalReloadService,
-  Reloadable,
-  SESSION_STORAGE,
-} from '../../basics/step-basics.module';
+import { GlobalReloadService, Reloadable, SESSION_STORAGE } from '../../basics/step-basics.module';
 import { AuthContext } from '../types/auth-context.interface';
 import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
@@ -139,17 +138,17 @@ export class AuthService implements OnDestroy, Reloadable {
     return !!this._serviceContext?.conf?.noLoginMask;
   }
 
-  hasRight$(right: string): Observable<boolean> {
-    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right)));
+  hasRight$(right: string, injector?: Injector): Observable<boolean> {
+    return this.triggerRightCheck$.pipe(map(() => this.hasRight(right, injector)));
   }
 
-  hasRight(right: string): boolean {
+  hasRight(right: string, injector?: Injector): boolean {
     const conf = this.getConf();
     if (!!conf && !conf.authentication) {
       return true;
     }
 
-    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right);
+    const additionalRulesCheckResult = this._additionalRightRules.checkRight(right, injector);
     if (!additionalRulesCheckResult) {
       return false;
     }

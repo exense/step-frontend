@@ -1,4 +1,5 @@
 <section>
+  <step-scheduler-report-view-header />
   <div class="row">
     <div class="piechart-container">
       @if (_state.summaryData$ | async; as summary) {
@@ -21,7 +22,7 @@
             [height]="340"
           >
             <ng-template tooltipContent let-data let-reposition="reposition">
-              <step-executions-chart-tooltip (reposition)="reposition()" [data]="data" />
+              <step-executions-chart-tooltip [scaleKey]="'z'" (reposition)="reposition()" [data]="data" />
             </ng-template>
           </step-timeseries-chart>
         } @else {

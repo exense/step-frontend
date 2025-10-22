@@ -6,6 +6,7 @@ import {
   DialogRouteResult,
   ModalWindowComponent,
   MultipleProjectsService,
+  ReloadableDirective,
   Resource,
   ResourceInputService,
   StepCoreModule,
@@ -24,6 +25,7 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   styleUrls: ['./resource-configuration-dialog.component.scss'],
   imports: [StepCoreModule],
   providers: [ResourceInputService],
+  hostDirectives: [ReloadableDirective],
 })
 export class ResourceConfigurationDialogComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);

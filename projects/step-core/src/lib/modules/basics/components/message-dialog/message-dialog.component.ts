@@ -5,6 +5,9 @@ import { AlertType } from '../../types/alert-type.enum';
 
 export interface MessageDialogData {
   messageHTML: string;
+  alertType?: AlertType;
+  hideOkButton?: boolean;
+  title?: string;
 }
 
 export type MessageDialogResult = boolean | undefined;
@@ -19,6 +22,8 @@ export class MessageDialogComponent implements AfterViewInit {
   private _dialogRef = inject<MatDialogRef<MessageDialogComponent, MessageDialogResult>>(MatDialogRef);
 
   readonly _dialogData = inject<MessageDialogData>(MAT_DIALOG_DATA);
+  readonly alertType = this._dialogData.alertType ?? AlertType.DANGER;
+  readonly dialogTitle = this._dialogData.title ?? '';
   readonly AlertType = AlertType;
 
   @ViewChild(ModalWindowComponent, { static: true })
