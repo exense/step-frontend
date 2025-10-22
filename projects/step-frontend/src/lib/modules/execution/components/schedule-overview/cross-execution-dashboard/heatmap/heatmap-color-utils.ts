@@ -7,7 +7,7 @@ export class HeatmapColorUtils {
     return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
   }
 
-  static rgbToHex(rgb: RGB) {
+  static rgbToHex(rgb: RGB): string {
     const toHex = (n: number) =>
       Math.max(0, Math.min(255, Math.round(n)))
         .toString(16)
@@ -20,7 +20,7 @@ export class HeatmapColorUtils {
    * @param color
    * @param colorWeight a number in [0, 1] interval, representing the percentage
    */
-  static addColor(base: RGB, color: RGB, colorWeight: number) {
+  static addColor(base: RGB, color: RGB, colorWeight: number): RGB {
     const maxValue = 255;
     return {
       r: Math.min(base.r + color.r * colorWeight, maxValue),
@@ -29,7 +29,7 @@ export class HeatmapColorUtils {
     };
   }
 
-  static rgbSum(color1: RGB, color2: RGB) {
+  static rgbSum(color1: RGB, color2: RGB): RGB {
     const maxValue = 255;
     return {
       r: Math.min(color1.r + color2.r, maxValue),
