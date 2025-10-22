@@ -97,6 +97,7 @@
       <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix"> </ng-content>
     </step-form-field>
   } @else if (!resourceNotExisting()) {
     <step-form-field
@@ -126,6 +127,7 @@
       <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="clearButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix"> </ng-content>
     </step-form-field>
   } @else {
     <step-form-field
@@ -152,6 +154,7 @@
       />
       <ng-container *ngTemplateOutlet="clearButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix"> </ng-content>
     </step-form-field>
   }
 </step-upload-container>

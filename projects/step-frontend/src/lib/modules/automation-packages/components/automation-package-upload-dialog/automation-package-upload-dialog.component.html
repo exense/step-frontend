@@ -14,36 +14,37 @@
         </step-alert>
       }
       <form [formGroup]="form">
-        @switch (automationPackageFile.uploadType) {
+        @switch (apType) {
           @case (UploadType.UPLOAD) {
-            <step-upload-container (filesChange)="handleDrop(automationPackageFile, $event)">
-              <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-                <step-label>Automation Package (jar or ZIP file)</step-label>
-                <step-label-addon>
-                  <step-icon
-                    name="help-circle"
-                    matTooltip="Drag & Drop or select your automation package jar / ZIP file"
-                  />
-                </step-label-addon>
-                <input type="text" readonly formControlName="apFileName" name="fileName" />
-                <step-suffix class="button-suffix">
-                  <button type="button" mat-stroked-button (click)="openFileChooseDialog(automationPackageFile)">
-                    <step-icon name="folder-plus"></step-icon>
-                  </button>
-                </step-suffix>
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+              <step-label>Automation Package (jar or ZIP file)</step-label>
+              <step-label-addon>
+                <step-icon
+                  name="help-circle"
+                  matTooltip="Drag & Drop or select your automation package jar / ZIP file"
+                />
+              </step-label-addon>
+
+              <step-resource-input
+                resourceType="automationPackage"
+                [disableServerPath]="true"
+                [withClearButton]="false"
+                [withChooseExistingResourceButton]="false"
+                formControlName="apFile"
+              >
                 <step-suffix class="button-suffix">
                   <button
                     type="button"
                     class="maven"
                     mat-stroked-button
-                    (click)="toggleMavenUpload(automationPackageFile)"
+                    (click)="apType = UploadType.MAVEN"
                     matTooltip="Use maven snippet instead of uploading a file."
                   >
                     <step-icon name="maven"></step-icon>
                   </button>
                 </step-suffix>
-              </step-form-field>
-            </step-upload-container>
+              </step-resource-input>
+            </step-form-field>
           }
           @case (UploadType.MAVEN) {
             <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
@@ -53,7 +54,7 @@
                   type="button"
                   class="active maven"
                   mat-stroked-button
-                  (click)="toggleMavenUpload(automationPackageFile)"
+                  (click)="apType = UploadType.UPLOAD"
                   matTooltip="Use upload a file instead of using maven snippet."
                 >
                   <step-icon name="maven"></step-icon>
@@ -64,48 +65,35 @@
           }
           @default {}
         }
-
-        <input #automationPackageFileInput type="file" (input)="selectFile(automationPackageFile)" />
-        <input #libraryFileInput type="file" (input)="selectFile(libraryFile)" />
-
         @if (showAdvancedSettings) {
           <step-label>Libraries</step-label>
-          @switch (libraryFile.uploadType) {
+          @switch (libraryType) {
             @case (UploadType.UPLOAD) {
-              <step-upload-container (filesChange)="handleDrop(libraryFile, $event)">
-                <step-form-field alignLabelAddon="near">
-                  <step-description
-                    >Select a jar or ZIP file as a dependency for this automation package.</step-description
-                  >
-                  <input type="text" readonly formControlName="libraryFileName" name="libraryName" />
-                  <step-suffix class="button-suffix">
-                    <button type="button" mat-stroked-button (click)="openFileChooseDialog(libraryFile)">
-                      <step-icon name="folder-plus"></step-icon>
-                    </button>
-                  </step-suffix>
-                  <step-suffix class="button-suffix">
-                    <button
-                      type="button"
-                      mat-stroked-button
-                      matTooltip="Select an existing resource"
-                      (click)="selectResource()"
-                    >
-                      <step-icon name="search"></step-icon>
-                    </button>
-                  </step-suffix>
+              <step-form-field alignLabelAddon="near">
+                <step-description
+                  >Select a jar or ZIP file as a dependency for this automation package.</step-description
+                >
+
+                <step-resource-input
+                  resourceType="automationPackageLibrary"
+                  [disableServerPath]="true"
+                  [withClearButton]="true"
+                  [withChooseExistingResourceButton]="true"
+                  formControlName="libraryFile"
+                >
                   <step-suffix class="button-suffix">
                     <button
                       type="button"
                       class="maven"
                       mat-stroked-button
-                      (click)="toggleMavenUpload(libraryFile)"
+                      (click)="libraryType = UploadType.MAVEN"
                       matTooltip="Use maven snippet instead of uploading a file."
                     >
                       <step-icon name="maven"></step-icon>
                     </button>
                   </step-suffix>
-                </step-form-field>
-              </step-upload-container>
+                </step-resource-input>
+              </step-form-field>
             }
             @case (UploadType.MAVEN) {
               <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
@@ -115,7 +103,7 @@
                     type="button"
                     class="active maven"
                     mat-stroked-button
-                    (click)="toggleMavenUpload(libraryFile)"
+                    (click)="libraryType = UploadType.UPLOAD"
                     matTooltip="Upload a file instead of using maven snippet."
                   >
                     <step-icon name="maven"></step-icon>
@@ -160,13 +148,11 @@
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <span>Custom keyword attributes</span>
-                &nbsp;
-                <step-icon
-                  name="help-circle"
-                  matTooltip="Custom attributes applied to all keywords and derived from the keyword screenInput"
-                ></step-icon>
               </mat-panel-title>
             </mat-expansion-panel-header>
+            <step-description>
+              Custom attributes applied to all keywords and derived from the keyword screenInput
+            </step-description>
             <step-custom-forms
               #customKeywordAttributesForm
               [(stModel)]="customKeywordAttributes"
@@ -179,13 +165,11 @@
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <span>Custom plan attributes</span>
-                &nbsp;
-                <step-icon
-                  name="help-circle"
-                  matTooltip="Custom attributes applied to all plans and derived from the plan screenInput"
-                ></step-icon>
               </mat-panel-title>
             </mat-expansion-panel-header>
+            <step-description>
+              Custom attributes applied to all plans and derived from the plan screenInput
+            </step-description>
             <step-custom-forms
               #customPlanAttributesForm
               [(stModel)]="customPlanAttributes"
@@ -198,44 +182,41 @@
             <mat-expansion-panel-header>
               <mat-panel-title>Routing options</mat-panel-title>
             </mat-expansion-panel-header>
-            <mat-checkbox color="primary" [(ngModel)]="_package.executeFunctionLocally">
-              <span>Execute on controller</span>
-              &nbsp;
-              <step-icon
-                name="help-circle"
-                matTooltip="Defines if the Keywords of this package should be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
-              ></step-icon>
-            </mat-checkbox>
-            @if (_package.executeFunctionLocally) {
+            <step-description>
+              The routing configuration will be propagated to all keywords in this Automation Package. For most cases
+              the default setting shouldn't be changed. (<a
+                target="_blank"
+                href="https://step.dev/knowledgebase/devops/step-automation-package-ui/"
+                >open documentation</a
+              >)
+            </step-description>
+            <step-form-field>
+              <mat-checkbox color="primary" #executeLocally="matCheckbox" formControlName="executeFunctionsLocally">
+                <span>Execute on controller</span>
+              </mat-checkbox>
+            </step-form-field>
+            @if (!executeLocally.checked) {
               <section class="criteria-header">
                 <div>
                   <label>Agent token selection criteria</label>
-                  <button type="button" mat-icon-button (click)="addRoutingCriteria()">
+                  <button type="button" mat-icon-button (click)="addRoutingCriterion()">
                     <step-icon name="plus"></step-icon>
                   </button>
                 </div>
-                <step-icon
-                  name="help-circle"
-                  matTooltip="Defines additional selection criteria for the agent token on which the keywords of this package should be executed"
-                >
-                </step-icon>
               </section>
-              <section class="criteria-body">
-                @for (criterion of criteria; track criterion.id) {
-                  <step-form-field>
-                    <input type="text" placeholder="Key" [(ngModel)]="criterion.key" (blur)="saveRoutingCriteria()" />
-                  </step-form-field>
-                  <step-form-field>
-                    <input
-                      type="text"
-                      placeholder="Value"
-                      [(ngModel)]="criterion.value"
-                      (blur)="saveRoutingCriteria()"
-                    />
-                  </step-form-field>
-                  <button type="button" mat-stroked-button (click)="removeRoutingCriteria(criterion)">
-                    <step-icon name="trash-2"></step-icon>
-                  </button>
+              <section class="criteria-body" formArrayName="routing">
+                @for (group of routing.controls; track $index; let i = $index) {
+                  <div [formGroupName]="i" class="criterion-row">
+                    <step-form-field>
+                      <input type="text" placeholder="Key" formControlName="key" />
+                    </step-form-field>
+                    <step-form-field>
+                      <input type="text" placeholder="Value" formControlName="value" />
+                    </step-form-field>
+                    <button type="button" mat-stroked-button (click)="routing.removeAt(i)">
+                      <step-icon name="trash-2"></step-icon>
+                    </button>
+                  </div>
                 }
               </section>
             }
@@ -253,7 +234,7 @@
       @if (!isNewPackage) {
         Update
       } @else {
-        @switch (automationPackageFile.uploadType) {
+        @switch (apType) {
           @case (UploadType.UPLOAD) {
             Upload
           }

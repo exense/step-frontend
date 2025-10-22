@@ -20,6 +20,7 @@ export interface AutomationPackageParams {
   id?: string;
   apFile?: File;
   apMavenSnippet?: string;
+  apResourceId?: string;
   apLibrary?: File;
   apLibraryMavenSnippet?: string;
   apLibraryResourceId?: string;
@@ -105,6 +106,7 @@ export class AugmentedAutomationPackagesService
     id,
     apFile,
     apMavenSnippet,
+    apResourceId,
     version,
     activationExpression,
     apLibrary,
@@ -129,6 +131,8 @@ export class AugmentedAutomationPackagesService
       body.set('file', apFile!);
     } else if (apMavenSnippet) {
       body.set('apMavenSnippet', apMavenSnippet);
+    } else if (apResourceId) {
+      body.set('apResourceId', apResourceId);
     }
 
     if (apLibrary) {
@@ -139,11 +143,17 @@ export class AugmentedAutomationPackagesService
       body.set('apLibraryResourceId', apLibraryResourceId);
     }
 
-    if (plansAttributes) {
-      body.set('plansAttributes', JSON.stringify(plansAttributes.attributes));
+    if (plansAttributes?.attributes) {
+      body.set('plansAttributes', JSON.stringify(plansAttributes!.attributes));
     }
-    if (functionsAttributes) {
-      body.set('functionsAttributes', JSON.stringify(functionsAttributes.attributes));
+    if (functionsAttributes?.attributes) {
+      body.set('functionsAttributes', JSON.stringify(functionsAttributes!.attributes));
+    }
+    if (tokenSelectionCriteria && !executeFunctionsLocally) {
+      body.set('tokenSelectionCriteria', JSON.stringify(tokenSelectionCriteria));
+    }
+    if (executeFunctionsLocally) {
+      body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
     }
 
     if (version) {
