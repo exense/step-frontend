@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, OnInit, Signal, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, OnInit, Signal } from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -8,10 +8,9 @@ import {
   DialogRouteResult,
   Keyword,
   Plan,
-  ResourceDialogsService,
   StepCoreModule,
 } from '@exense/step-core';
-import { catchError, filter, map, Observable, of, pipe } from 'rxjs';
+import { catchError, map, Observable, of, pipe } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
@@ -37,7 +36,6 @@ type FileUploadOrMaven = {
   formControl: FormControl<string>;
 };
 
-const AUTOMATION_PACKAGE_LIBRARY_TYPE = 'automationPackageLibrary';
 @Component({
   selector: 'step-automation-package-upload-dialog',
   templateUrl: './automation-package-upload-dialog.component.html',
@@ -51,7 +49,6 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
-  private _resourceDialogsService = inject(ResourceDialogsService);
 
   private _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -83,7 +80,6 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     ? 'New Automation Package'
     : `Edit Automation Package "${this.automationPackage.attributes?.['name'] ?? this.automationPackage.id}"`;
 
-  protected libraryResourceId?: string;
   protected progress$?: Observable<number>;
   protected showAdvancedSettings: boolean = this.hasPrefilledAdvancedSettings();
 
@@ -93,10 +89,6 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   protected apType: UploadType = UploadType.UPLOAD;
   protected libraryType: UploadType = UploadType.UPLOAD;
-
-  protected openFileChooseDialog(control: FileUploadOrMaven): void {
-    control.fileInputRef()?.nativeElement?.click?.();
-  }
 
   protected form = this._fb.group({
     apFile: this._fb.control(
