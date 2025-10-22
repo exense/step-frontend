@@ -156,6 +156,90 @@
               />
             </step-suffix>
           </step-form-field>
+          <mat-expansion-panel [class.hidden]="!customKeywordAttributesForm.inputs().length">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span>Custom keyword attributes</span>
+                &nbsp;
+                <step-icon
+                  name="help-circle"
+                  matTooltip="Custom attributes applied to all keywords and derived from the keyword screenInput"
+                ></step-icon>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <step-custom-forms
+              #customKeywordAttributesForm
+              [(stModel)]="customKeywordAttributes"
+              stScreen="keyword"
+              [stExcludeFields]="['attributes.name']"
+            >
+            </step-custom-forms>
+          </mat-expansion-panel>
+          <mat-expansion-panel [class.hidden]="!customPlanAttributesForm.inputs().length">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <span>Custom plan attributes</span>
+                &nbsp;
+                <step-icon
+                  name="help-circle"
+                  matTooltip="Custom attributes applied to all plans and derived from the plan screenInput"
+                ></step-icon>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <step-custom-forms
+              #customPlanAttributesForm
+              [(stModel)]="customPlanAttributes"
+              stScreen="plan"
+              [stExcludeFields]="['attributes.name']"
+            >
+            </step-custom-forms>
+          </mat-expansion-panel>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Routing options</mat-panel-title>
+            </mat-expansion-panel-header>
+            <mat-checkbox color="primary" [(ngModel)]="_package.executeFunctionLocally">
+              <span>Execute on controller</span>
+              &nbsp;
+              <step-icon
+                name="help-circle"
+                matTooltip="Defines if the Keywords of this package should be executed on an agent or locally on the controller. Please change this only if you really now what you're doing. In most of the cases the default setting doesn't have to be changed."
+              ></step-icon>
+            </mat-checkbox>
+            @if (_package.executeFunctionLocally) {
+              <section class="criteria-header">
+                <div>
+                  <label>Agent token selection criteria</label>
+                  <button type="button" mat-icon-button (click)="addRoutingCriteria()">
+                    <step-icon name="plus"></step-icon>
+                  </button>
+                </div>
+                <step-icon
+                  name="help-circle"
+                  matTooltip="Defines additional selection criteria for the agent token on which the keywords of this package should be executed"
+                >
+                </step-icon>
+              </section>
+              <section class="criteria-body">
+                @for (criterion of criteria; track criterion.id) {
+                  <step-form-field>
+                    <input type="text" placeholder="Key" [(ngModel)]="criterion.key" (blur)="saveRoutingCriteria()" />
+                  </step-form-field>
+                  <step-form-field>
+                    <input
+                      type="text"
+                      placeholder="Value"
+                      [(ngModel)]="criterion.value"
+                      (blur)="saveRoutingCriteria()"
+                    />
+                  </step-form-field>
+                  <button type="button" mat-stroked-button (click)="removeRoutingCriteria(criterion)">
+                    <step-icon name="trash-2"></step-icon>
+                  </button>
+                }
+              </section>
+            }
+          </mat-expansion-panel>
         }
       </form>
     }

@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, Signal, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, OnInit, Signal, viewChild } from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -6,6 +6,8 @@ import {
   AutomationPackage,
   AutomationPackageParams,
   DialogRouteResult,
+  Keyword,
+  Plan,
   ResourceDialogsService,
   StepCoreModule,
 } from '@exense/step-core';
@@ -43,7 +45,7 @@ const AUTOMATION_PACKAGE_LIBRARY_TYPE = 'automationPackageLibrary';
     '(keydown.enter)': 'upload()',
   },
 })
-export class AutomationPackageUploadDialogComponent {
+export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
@@ -107,12 +109,28 @@ export class AutomationPackageUploadDialogComponent {
   protected progress$?: Observable<number>;
   protected showAdvancedSettings: boolean = this.hasPrefilledAdvancedSettings();
 
+  // TODO initialize with data from AP if any
+  protected customPlanAttributes: Partial<Plan> = { attributes: {} };
+  protected customKeywordAttributes: Partial<Keyword> = { attributes: {} };
+
   protected toggleMavenUpload(control: FileUploadOrMaven): void {
     control.uploadType = control.uploadType === UploadType.UPLOAD ? UploadType.MAVEN : UploadType.UPLOAD;
   }
 
   protected openFileChooseDialog(control: FileUploadOrMaven): void {
     control.fileInputRef()?.nativeElement?.click?.();
+  }
+
+  ngOnInit(): void {
+    if (!this._package) {
+      return;
+    }
+    if (this._package.functionsAttributes) {
+      this.customKeywordAttributes = { attributes: this._package.functionsAttributes } as Partial<Keyword>;
+    }
+    if (this._package.plansAttributes) {
+      this.customPlanAttributes = { attributes: this._package.plansAttributes } as Partial<Plan>;
+    }
   }
 
   protected selectFile(control: FileUploadOrMaven): void {
@@ -175,18 +193,23 @@ export class AutomationPackageUploadDialogComponent {
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
     };
 
-    console.log(this.automationPackageFile, this.automationPackageFile.uploadType);
     if (this.automationPackageFile.uploadType === UploadType.UPLOAD) {
       automationPackageParams.apFile = this.files[this.automationPackageFile.name];
     } else {
       automationPackageParams.apMavenSnippet = apMavenSnippet;
     }
 
-    console.log(this.libraryFile, this.libraryFile.uploadType);
     if (this.libraryFile.uploadType === UploadType.UPLOAD) {
       automationPackageParams.apLibrary = this.files[this.libraryFile.name];
     } else {
       automationPackageParams.apLibraryMavenSnippet = libraryMavenSnippet;
+    }
+
+    if (this.customKeywordAttributes) {
+      automationPackageParams.functionsAttributes = this.customKeywordAttributes;
+    }
+    if (this.customPlanAttributes) {
+      automationPackageParams.plansAttributes = this.customPlanAttributes;
     }
 
     this.uploadAutomationPackage(automationPackageParams).subscribe((result) => {

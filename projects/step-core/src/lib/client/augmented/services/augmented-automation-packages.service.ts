@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters } from '../../generated';
+import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters, Plan } from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -14,6 +14,7 @@ import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { Keyword } from '../shared/keyword';
 
 export interface AutomationPackageParams {
   id?: string;
@@ -25,6 +26,10 @@ export interface AutomationPackageParams {
   version?: string;
   activationExpression?: string;
   allowUpdateOfOtherPackages?: boolean;
+  plansAttributes?: Partial<Plan>;
+  functionsAttributes?: Partial<Keyword>;
+  tokenSelectionCriteria?: any;
+  executeFunctionsLocally?: boolean;
 }
 
 @Injectable({
@@ -106,6 +111,10 @@ export class AugmentedAutomationPackagesService
     apLibraryMavenSnippet,
     apLibraryResourceId,
     allowUpdateOfOtherPackages,
+    plansAttributes,
+    functionsAttributes,
+    tokenSelectionCriteria,
+    executeFunctionsLocally,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
@@ -130,20 +139,25 @@ export class AugmentedAutomationPackagesService
       body.set('apLibraryResourceId', apLibraryResourceId);
     }
 
-    let headers: HttpHeaders;
-    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-
-    let params = new HttpParams().set('async', true);
+    if (plansAttributes) {
+      body.set('plansAttributes', JSON.stringify(plansAttributes.attributes));
+    }
+    if (functionsAttributes) {
+      body.set('functionsAttributes', JSON.stringify(functionsAttributes.attributes));
+    }
 
     if (version) {
-      params = params.set('version', version);
+      body.set('version', version);
     }
     if (activationExpression) {
-      params = params.set('activationExpr', activationExpression);
+      body.set('activationExpr', activationExpression);
     }
     if (allowUpdateOfOtherPackages) {
-      params = params.set('allowUpdateOfOtherPackages', true);
+      body.set('allowUpdateOfOtherPackages', 'true');
     }
+
+    let headers: HttpHeaders;
+    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
 
     const request$ = this._http.request(
       method,
@@ -151,7 +165,6 @@ export class AugmentedAutomationPackagesService
       this._requestContextHolder.decorateRequestOptions({
         headers,
         body,
-        params,
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,

@@ -34,7 +34,7 @@ export class FunctionPackageConfigurationDialogComponent {
 
   private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
-  readonly modalTitle = `${this._data?.functionPackage ? 'Edit' : 'New'} Keyword Package`;
+  readonly modalTitle = this._data?.functionPackage ? 'Edit Keyword Package' : 'New Keyword Package';
 
   protected functionPackage = this._data?.functionPackage ?? { packageAttributes: {} };
   protected customAttributes = { attributes: this.functionPackage.packageAttributes };

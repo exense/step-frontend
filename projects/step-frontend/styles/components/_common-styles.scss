@@ -137,4 +137,10 @@
   body {
     --status-passed: #01a990;
   }
+
+  mat-expansion-panel.mat-expansion-panel {
+    box-shadow: none !important;
+    border: 1px solid var.$gray-300;
+    border-radius: 0.8rem;
+  }
 }
