@@ -127,7 +127,7 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
 
   private createMeasurementsDataSource(reportNodeId: string): TableDataSource<Measure> {
     return this._dataSourceFactory.createDataSource(
-      'measurements',
+      'reportMeasurements',
       {
         begin: 'begin',
         name: 'name',
