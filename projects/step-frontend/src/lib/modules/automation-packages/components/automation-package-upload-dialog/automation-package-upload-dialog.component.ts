@@ -100,15 +100,11 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   protected form = this._fb.group({
     apFile: this._fb.control(
-      this.automationPackage?.customFields?.['automationPackageFileName'] ||
-        this.automationPackage?.automationPackageResource ||
-        '',
+      this.automationPackage?.automationPackageResource || '',
       this.isNewPackage ? Validators.required : null,
     ),
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
-    libraryFile: this._fb.control(
-      this.automationPackage?.customFields?.['libraryFileName'] || this.automationPackage?.keywordLibraryResource || '',
-    ),
+    libraryFile: this._fb.control(this.automationPackage?.keywordLibraryResource || ''),
     libraryMavenSnippet: this._fb.control(''),
     version: this._fb.control(this.automationPackage.version),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
