@@ -89,7 +89,7 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
               currentExecution: {
                 execution: currentExecution,
                 statusSlices: slices[currentExecution.id!],
-                statusesCount: Object.fromEntries(slices[currentExecution.id!].map((s) => [s.label, s.count])),
+                statusesCount: Object.fromEntries((slices[currentExecution.id!] || []).map((s) => [s.label, s.count])),
               },
             })),
           );
