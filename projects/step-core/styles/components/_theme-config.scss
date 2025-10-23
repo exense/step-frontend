@@ -272,5 +272,10 @@ $light-primary-text: var.$white;
     padding-bottom: 1px;
   }
 
+  .default-theme {
+    --mat-expansion-header-collapsed-state-height: 36px;
+    --mat-expansion-header-expanded-state-height: 48px;
+  }
+
   @include print.print-overrides;
 }

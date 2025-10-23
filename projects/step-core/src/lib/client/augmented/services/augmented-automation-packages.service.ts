@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters } from '../../generated';
+import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters, Plan } from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -14,13 +14,23 @@ import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { Keyword } from '../shared/keyword';
 
 export interface AutomationPackageParams {
   id?: string;
-  file?: File;
-  mavenSnippet?: string;
+  apFile?: File;
+  apMavenSnippet?: string;
+  apResourceId?: string;
+  apLibrary?: File;
+  apLibraryMavenSnippet?: string;
+  apLibraryResourceId?: string;
   version?: string;
   activationExpression?: string;
+  allowUpdateOfOtherPackages?: boolean;
+  plansAttributes?: Partial<Plan>;
+  functionsAttributes?: Partial<Keyword>;
+  tokenSelectionCriteria?: any;
+  executeFunctionsLocally?: boolean;
 }
 
 @Injectable({
@@ -53,6 +63,7 @@ export class AugmentedAutomationPackagesService
     return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
       name: 'attributes.name',
       fileName: 'customFields.automationPackageFileName',
+      libraryName: 'automationPackageLibraryResourceObj.attributes.name',
       actions: '',
     });
   }
@@ -110,42 +121,70 @@ export class AugmentedAutomationPackagesService
 
   automationPackageCreateOrUpdate({
     id,
-    file,
+    apFile,
+    apMavenSnippet,
+    apResourceId,
     version,
     activationExpression,
-    mavenSnippet,
+    apLibrary,
+    apLibraryMavenSnippet,
+    apLibraryResourceId,
+    allowUpdateOfOtherPackages,
+    plansAttributes,
+    functionsAttributes,
+    tokenSelectionCriteria,
+    executeFunctionsLocally,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
     if (!!id) {
       url = `${url}/${id}`;
     }
-    if (!!mavenSnippet) {
-      url = `${url}/mvn`;
-    }
 
     let body: FormData | string;
-    if (mavenSnippet) {
-      body = mavenSnippet;
-    } else {
-      body = new FormData();
-      body.set('file', file!);
+    body = new FormData();
+
+    if (apFile) {
+      body.set('file', apFile!);
+    } else if (apMavenSnippet) {
+      body.set('apMavenSnippet', apMavenSnippet);
+    } else if (apResourceId) {
+      body.set('apResourceId', apResourceId);
+    }
+
+    if (apLibrary) {
+      body.set('apLibrary', apLibrary!);
+    } else if (apLibraryMavenSnippet) {
+      body.set('apLibraryMavenSnippet', apLibraryMavenSnippet);
+    } else if (apLibraryResourceId) {
+      body.set('apLibraryResourceId', apLibraryResourceId);
+    }
+
+    if (plansAttributes?.attributes) {
+      body.set('plansAttributes', JSON.stringify(plansAttributes!.attributes));
+    }
+    if (functionsAttributes?.attributes) {
+      body.set('functionsAttributes', JSON.stringify(functionsAttributes!.attributes));
+    }
+    if (tokenSelectionCriteria && !executeFunctionsLocally) {
+      body.set('tokenSelectionCriteria', JSON.stringify(tokenSelectionCriteria));
+    }
+    if (executeFunctionsLocally) {
+      body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
+    }
+
+    if (version) {
+      body.set('version', version);
+    }
+    if (activationExpression) {
+      body.set('activationExpr', activationExpression);
+    }
+    if (allowUpdateOfOtherPackages) {
+      body.set('allowUpdateOfOtherPackages', 'true');
     }
 
     let headers: HttpHeaders;
-    if (typeof body === 'string') {
-      headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
-    } else {
-      headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    }
-
-    let params = new HttpParams().set('async', true);
-    if (version) {
-      params = params.set('version', version);
-    }
-    if (activationExpression) {
-      params = params.set('activationExpr', activationExpression);
-    }
+    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
 
     const request$ = this._http.request(
       method,
@@ -153,7 +192,6 @@ export class AugmentedAutomationPackagesService
       this._requestContextHolder.decorateRequestOptions({
         headers,
         body,
-        params,
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,

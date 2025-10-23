@@ -2,6 +2,7 @@ import { Component, effect, forwardRef, inject, OnInit, viewChild } from '@angul
 import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
+  DateFormat,
   DialogParentService,
   EntityRefDirective,
   entitySelectionStateProvider,
@@ -50,6 +51,7 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
   protected isReady = false;
 
   private automationPackageFileName?: string;
+
   private table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
   private effectTableChange = effect(() => {
@@ -110,4 +112,6 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
       }),
     ).pipe(map(() => automationPackageFileName));
   }
+
+  protected readonly DateFormat = DateFormat;
 }
