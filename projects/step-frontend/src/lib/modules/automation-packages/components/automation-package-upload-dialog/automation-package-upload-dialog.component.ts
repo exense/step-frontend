@@ -68,9 +68,11 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       this.automationPackage.version ||
       this.automationPackage.activationExpression?.script ||
       this.automationPackage.automationPackageLibraryResource ||
-      this.automationPackage.plansAttributes ||
-      this.automationPackage.functionsAttributes ||
-      this.automationPackage.tokenSelectionCriteria ||
+      (this.automationPackage.plansAttributes && Object.keys(this.automationPackage.plansAttributes).length > 0) ||
+      (this.automationPackage.functionsAttributes &&
+        Object.keys(this.automationPackage.functionsAttributes).length > 0) ||
+      (this.automationPackage.tokenSelectionCriteria &&
+        Object.keys(this.automationPackage.tokenSelectionCriteria).length > 0) ||
       this.automationPackage.executeFunctionLocally
     );
   }
