@@ -9,6 +9,14 @@
   </div>
 } @else if (errorCounts() > 0) {
   <div class="error-count">
-    <div class="text"><step-icon name="alert-triangle" class="error" /> {{ errorCounts() }} Errors</div>
+    <div class="text">
+      <step-popover>
+        <step-popover-content>
+          <p>Errors occured in this TestCase</p>
+        </step-popover-content>
+        <step-icon name="alert-triangle" class="error" />
+      </step-popover>
+      {{ errorCounts() }} Errors
+    </div>
   </div>
 }

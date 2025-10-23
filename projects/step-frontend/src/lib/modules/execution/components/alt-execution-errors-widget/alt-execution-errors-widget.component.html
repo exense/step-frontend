@@ -1,24 +1,18 @@
 <step-alt-report-widget>
   <step-alt-report-widget-content>
     @if (hasErrors()) {
-      @if (singleError(); as singleError) {
-        <section class="single-error">
-          <div><step-icon class="error" name="alert-triangle" /> {{ singleError.errorMessage }}</div>
-          <step-aggregated-status
-            [countByStatus]="singleErrorCount()"
-            [showTooltips]="false"
-            [hideSingleStatus]="true"
-          />
-          <a href="#" (click)="showDetails.emit(); (false)">show details</a>
-        </section>
-      } @else {
-        <section class="multiple-error">
-          <div><step-icon class="error" name="alert-triangle" /> The execution contains</div>
-          <step-aggregated-status [countByStatus]="totalErrorsCount()" [showTooltips]="false" />
-          <div>errors</div>
-          <a href="#" (click)="showDetails.emit(); (false)">show details</a>
-        </section>
-      }
+      <section class="error-info">
+        <div>
+          <step-icon class="error" name="alert-triangle" /> The execution contains
+          {{ totalErrorsCount()['FAILED'] }} errors
+          @if (singleError(); as singleError) {
+            :&nbsp;<span class="error-message">{{ singleError.errorMessage }}</span
+            >&nbsp;
+          }
+          (<a href="#" (click)="showDetails.emit(); (false)">find error</a>&nbsp;|&nbsp;
+          <a href="#" (click)="showDetails.emit(); (false)">show all errors</a>)
+        </div>
+      </section>
     }
   </step-alt-report-widget-content>
 </step-alt-report-widget>

@@ -23,6 +23,7 @@ p {
     align-items: center;
     white-space: nowrap;
     margin-top: 0.3rem;
+    font-style: italic;
 
     step-icon {
       display: block;
@@ -38,5 +39,6 @@ p {
 
   step-icon.error {
     color: var(--status-FAILED);
+    margin-right: 0.2rem;
   }
 }

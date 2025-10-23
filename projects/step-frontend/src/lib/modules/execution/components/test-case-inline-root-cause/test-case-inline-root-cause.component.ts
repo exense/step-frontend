@@ -9,11 +9,11 @@ import {
   input,
   NgZone,
 } from '@angular/core';
-import { AggregatedReportView, StepIconsModule } from '@exense/step-core';
+import { AggregatedReportView, StepBasicsModule, StepIconsModule } from '@exense/step-core';
 
 @Component({
   selector: 'step-test-case-inline-root-cause',
-  imports: [StepIconsModule],
+  imports: [StepIconsModule, StepBasicsModule],
   templateUrl: './test-case-inline-root-cause.component.html',
   styleUrl: './test-case-inline-root-cause.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

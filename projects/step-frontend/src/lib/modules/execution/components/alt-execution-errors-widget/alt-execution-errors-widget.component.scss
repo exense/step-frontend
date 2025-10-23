@@ -1,9 +1,12 @@
-.single-error,
-.multiple-error {
+.error-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: nowrap;
+}
+
+.error-message {
+  font-style: italic;
 }
 
 step-alt-report-widget {
