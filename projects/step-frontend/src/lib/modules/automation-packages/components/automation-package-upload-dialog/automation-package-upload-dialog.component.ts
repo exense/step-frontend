@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, OnInit, Signal } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -14,7 +14,7 @@ import {
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
@@ -29,15 +29,6 @@ enum UploadType {
   UPLOAD,
   MAVEN,
 }
-
-type FileUploadOrMaven = {
-  name: string;
-  uploadType: UploadType;
-  fileInputRef: Signal<ElementRef<HTMLInputElement>>;
-  file?: File;
-  fileSelect?: any;
-  formControl: FormControl<string>;
-};
 
 @Component({
   selector: 'step-automation-package-upload-dialog',
@@ -54,7 +45,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
 
-  private _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
+  protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
   protected automationPackage: AutomationPackage = this._package || {};
 
