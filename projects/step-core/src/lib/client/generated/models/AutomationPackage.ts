@@ -20,5 +20,5 @@ export type AutomationPackage = {
   plansAttributes?: Record<string, string>;
   functionsAttributes?: Record<string, string>;
   tokenSelectionCriteria?: Record<string, string>;
-  executeFunctionLocally?: boolean;
+  executeFunctionsLocally?: boolean;
 };

@@ -28,7 +28,7 @@ export interface AutomationPackageParams {
   plansAttributes?: Partial<Plan>;
   functionsAttributes?: Partial<Keyword>;
   tokenSelectionCriteria?: any;
-  executeFunctionLocally?: boolean;
+  executeFunctionsLocally?: boolean;
 }
 
 @Injectable({
@@ -129,7 +129,7 @@ export class AugmentedAutomationPackagesService
     plansAttributes,
     functionsAttributes,
     tokenSelectionCriteria,
-    executeFunctionLocally,
+    executeFunctionsLocally,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
@@ -158,11 +158,11 @@ export class AugmentedAutomationPackagesService
     if (functionsAttributes?.attributes) {
       body.set('functionsAttributes', JSON.stringify(functionsAttributes!.attributes));
     }
-    if (tokenSelectionCriteria && !executeFunctionLocally) {
+    if (tokenSelectionCriteria && !executeFunctionsLocally) {
       body.set('tokenSelectionCriteria', JSON.stringify(tokenSelectionCriteria));
     }
-    if (executeFunctionLocally) {
-      body.set('executeFunctionLocally', JSON.stringify(executeFunctionLocally));
+    if (executeFunctionsLocally) {
+      body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
     }
 
     if (version) {
