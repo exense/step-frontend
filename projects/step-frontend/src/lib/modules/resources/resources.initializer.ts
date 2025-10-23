@@ -8,7 +8,6 @@ import {
   EntityBulkOperationsRegistryService,
   EntityRegistry,
   MultipleProjectsService,
-  ResourcesService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -16,6 +15,7 @@ import { ResourceSelectionComponent } from './components/resource-selection/reso
 import { ResourcesListComponent } from './components/resources-list/resources-list.component';
 import { ResourceConfigurationDialogComponent } from './components/resource-configuration-dialog/resource-configuration-dialog.component';
 import { ActivatedRouteSnapshot } from '@angular/router';
+import { RESOURCE_FILTER } from './types/constants';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
@@ -79,12 +79,12 @@ const registerMenuEntries = () => {
 
 const registerBulkOperations = () => {
   const _entityBulOperationsRegister = inject(EntityBulkOperationsRegistryService);
-  const _resourceApi = inject(ResourcesService);
+  const _resourceApi = inject(AugmentedResourcesService);
 
   _entityBulOperationsRegister.register('resources', {
     type: BulkOperationType.DELETE,
     permission: 'resource-bulk-delete',
-    operation: (requestBody) => _resourceApi.bulkDelete1(requestBody),
+    operation: (requestBody) => _resourceApi.bulkDelete1(requestBody, RESOURCE_FILTER),
   });
 };
 

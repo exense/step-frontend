@@ -9,9 +9,6 @@ export const $StreamingAttachmentMeta = {
     },
     {
       properties: {
-        mimeType: {
-          type: 'string',
-        },
         currentSize: {
           type: 'number',
           format: 'int64',

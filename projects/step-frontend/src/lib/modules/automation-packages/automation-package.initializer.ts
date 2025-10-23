@@ -1,5 +1,16 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector, runInInjectionContext } from '@angular/core';
-import { EDITOR_PATH, ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH, REGEX_EDITOR } from './types/constants';
+import {
+  EDITOR_PATH,
+  AP_ENTITY_ID,
+  AP_ICON,
+  AP_LABEL_ENTITY,
+  LABEL_MENU,
+  PATH,
+  REGEX_EDITOR,
+  AP_RESOURCE_ENTITY_ID,
+  AP_RESOURCE_LABEL_ENTITY,
+  AP_RESOURCE_ICON,
+} from './types/constants';
 import {
   AugmentedAutomationPackagesService,
   AutomationPackageEntityTableRegistryService,
@@ -22,10 +33,12 @@ import { TableKeywordsComponent } from './components/table-keywords/table-keywor
 import { TableParametersComponent } from './components/table-parameters/table-parameters.component';
 import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
 import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
+import { AutomationPackageResourceListComponent } from './components/automation-package-resource-list/automation-package-resource-list.component';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
-  _entityRegistry.register(ENTITY_ID, LABEL_ENTITY, { icon: ICON });
+  _entityRegistry.register(AP_ENTITY_ID, AP_LABEL_ENTITY, { icon: AP_ICON });
+  _entityRegistry.register(AP_RESOURCE_ENTITY_ID, AP_RESOURCE_LABEL_ENTITY, { icon: AP_RESOURCE_ICON });
 };
 
 const registerRoutes = () => {
@@ -57,7 +70,7 @@ const registerRoutes = () => {
                   dialogComponent: AutomationPackageUploadDialogComponent,
                   canActivate: [
                     checkEntityGuardFactory({
-                      entityType: ENTITY_ID,
+                      entityType: AP_ENTITY_ID,
                       getEntity: (id) => inject(AugmentedAutomationPackagesService).getAutomationPackageCached(id),
                       getEditorUrl: (id) => `${EDITOR_PATH}/${id}`,
                       isMatchEditorUrl: (url) => REGEX_EDITOR.test(url),
@@ -101,6 +114,10 @@ const registerRoutes = () => {
             ),
           ],
         },
+        {
+          path: 'resources',
+          component: AutomationPackageResourceListComponent,
+        },
       ],
     },
     { accessPermissions: ['automation-package-read'] },
@@ -109,7 +126,7 @@ const registerRoutes = () => {
 
 const registerMenuEntries = () => {
   const _viewRegistry = inject(ViewRegistryService);
-  _viewRegistry.registerMenuEntry(LABEL_MENU, PATH, ICON, {
+  _viewRegistry.registerMenuEntry(LABEL_MENU, PATH, AP_ICON, {
     parentId: 'automation-root',
     weight: 100,
   });

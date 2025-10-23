@@ -1,15 +1,12 @@
-<step-modal-window title="Error">
+<step-modal-window title="Refresh result">
   <div step-modal-window-body>
     <section class="messages-container">
-      @for (error of _state.errors() | uniqueErrors; track error.id) {
-        <step-alert [type]="AlertType.DANGER">
+      @for (item of messages; track item.message) {
+        <step-alert [type]="item.alertType">
           <section class="message-content">
-            <div>{{ error.message }}</div>
+            <div>{{ item.message }}</div>
           </section>
         </step-alert>
-      }
-      @if (!_state.count()) {
-        <step-alert [type]="AlertType.SUCCESS">No errors to display</step-alert>
       }
     </section>
   </div>
