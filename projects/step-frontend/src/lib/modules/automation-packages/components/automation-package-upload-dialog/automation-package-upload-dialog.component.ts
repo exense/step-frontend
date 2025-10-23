@@ -67,7 +67,11 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     return !!(
       this.automationPackage.version ||
       this.automationPackage.activationExpression?.script ||
-      this.automationPackage.automationPackageLibraryResource
+      this.automationPackage.automationPackageLibraryResource ||
+      this.automationPackage.plansAttributes ||
+      this.automationPackage.functionsAttributes ||
+      this.automationPackage.tokenSelectionCriteria ||
+      this.automationPackage.executeFunctionLocally
     );
   }
 
@@ -95,7 +99,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     libraryMavenSnippet: this._fb.control(''),
     version: this._fb.control(this.automationPackage.version),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
-    executeFunctionsLocally: this._fb.control(this.automationPackage.executeFunctionsLocally ?? false),
+    executeFunctionLocally: this._fb.control(this.automationPackage.executeFunctionLocally ?? false),
     routing: this._fb.array(
       (this.routingCriteria ?? []).map((c) =>
         this._fb.group({
@@ -138,7 +142,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       activationExpression,
       apMavenSnippet,
       libraryMavenSnippet,
-      executeFunctionsLocally,
+      executeFunctionLocally,
       routing,
       libraryFile,
       apFile,
@@ -159,7 +163,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       functionsAttributes: this.customKeywordAttributes,
       plansAttributes: this.customPlanAttributes,
       tokenSelectionCriteria,
-      executeFunctionsLocally,
+      executeFunctionLocally,
     };
 
     if (this.apType === UploadType.UPLOAD) {
