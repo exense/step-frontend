@@ -165,6 +165,7 @@ import { GradientLegendComponent } from './components/schedule-overview/cross-ex
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 
 @NgModule({
   declarations: [
@@ -285,6 +286,7 @@ import { StatusDistributionBadgeComponent } from './components/status-distributi
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    AltExecutionTimePopoverTitleDirective,
     SearchPaginatorComponent,
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
@@ -477,7 +479,7 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'plan-view/:id',
+      path: 'plans/:id/report',
       component: PlanPageComponent,
       children: [
         {
