@@ -15,10 +15,10 @@ export type AutomationPackage = {
   version?: string;
   activationExpression?: Expression;
   automationPackageResource?: string;
-  keywordLibraryResource?: string;
+  automationPackageLibraryResource?: string;
   id?: string;
   plansAttributes?: Record<string, string>;
   functionsAttributes?: Record<string, string>;
   tokenSelectionCriteria?: Record<string, string>;
-  executeFunctionLocally?: boolean;
+  executeFunctionsLocally?: boolean;
 };

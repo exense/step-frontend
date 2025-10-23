@@ -67,7 +67,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     return !!(
       this.automationPackage.version ||
       this.automationPackage.activationExpression?.script ||
-      this.automationPackage.keywordLibraryResource
+      this.automationPackage.automationPackageLibraryResource
     );
   }
 
@@ -91,11 +91,11 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       this.isNewPackage ? Validators.required : null,
     ),
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
-    libraryFile: this._fb.control(this.automationPackage?.keywordLibraryResource || ''),
+    libraryFile: this._fb.control(this.automationPackage?.automationPackageLibraryResource || ''),
     libraryMavenSnippet: this._fb.control(''),
     version: this._fb.control(this.automationPackage.version),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
-    executeFunctionsLocally: this._fb.control(this.automationPackage.executeFunctionLocally ?? false),
+    executeFunctionsLocally: this._fb.control(this.automationPackage.executeFunctionsLocally ?? false),
     routing: this._fb.array(
       (this.routingCriteria ?? []).map((c) =>
         this._fb.group({

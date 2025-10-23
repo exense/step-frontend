@@ -76,10 +76,7 @@
         </th>
         <td mat-cell *matCellDef="let element">
           <step-popover yPosition="below">
-            @if (
-              element.automationPackageResourceObj?.origin &&
-              element.automationPackageResourceObj?.origin.includes('mvn')
-            ) {
+            @if (element.automationPackageResourceObj?.origin | includesString: 'mvn') {
               <step-icon class="maven" name="maven"></step-icon>
             }
             {{ element.customFields?.['automationPackageFileName'] }}

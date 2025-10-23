@@ -44,10 +44,10 @@ step-description {
 }
 
 step-label {
-  color: #293e50;
+  color: var.$blue-700;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 1.4rem;
+  line-height: 2rem;
   pointer-events: all;
 }
 
@@ -66,9 +66,9 @@ step-label {
 }
 
 .advanced-settings-label {
-  color: #293e50;
-  font-size: 12px;
-  line-height: 16px;
+  color: var.$blue-700;
+  font-size: 1.2rem;
+  line-height: 1.6rem;
 }
 :host ::ng-deep h1.mat-mdc-dialog-title .header-title {
   display: flex;

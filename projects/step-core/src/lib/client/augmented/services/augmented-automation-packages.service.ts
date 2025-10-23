@@ -8,7 +8,7 @@ import {
 } from '../../table';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
@@ -18,10 +18,8 @@ import { Keyword } from '../shared/keyword';
 
 export interface AutomationPackageParams {
   id?: string;
-  apFile?: File;
   apMavenSnippet?: string;
   apResourceId?: string;
-  apLibrary?: File;
   apLibraryMavenSnippet?: string;
   apLibraryResourceId?: string;
   version?: string;
@@ -121,12 +119,10 @@ export class AugmentedAutomationPackagesService
 
   automationPackageCreateOrUpdate({
     id,
-    apFile,
     apMavenSnippet,
     apResourceId,
     version,
     activationExpression,
-    apLibrary,
     apLibraryMavenSnippet,
     apLibraryResourceId,
     allowUpdateOfOtherPackages,
@@ -144,17 +140,13 @@ export class AugmentedAutomationPackagesService
     let body: FormData | string;
     body = new FormData();
 
-    if (apFile) {
-      body.set('file', apFile!);
-    } else if (apMavenSnippet) {
+    if (apMavenSnippet) {
       body.set('apMavenSnippet', apMavenSnippet);
     } else if (apResourceId) {
       body.set('apResourceId', apResourceId);
     }
 
-    if (apLibrary) {
-      body.set('apLibrary', apLibrary!);
-    } else if (apLibraryMavenSnippet) {
+    if (apLibraryMavenSnippet) {
       body.set('apLibraryMavenSnippet', apLibraryMavenSnippet);
     } else if (apLibraryResourceId) {
       body.set('apLibraryResourceId', apLibraryResourceId);
