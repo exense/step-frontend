@@ -11,6 +11,7 @@ import type { AutomationPackageExecutionParameters } from '../models/AutomationP
 import type { AutomationPackageUpdateResult } from '../models/AutomationPackageUpdateResult';
 import type { FormDataBodyPart } from '../models/FormDataBodyPart';
 import type { FormDataContentDisposition } from '../models/FormDataContentDisposition';
+import type { RefreshResourceResult } from '../models/RefreshResourceResult';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 
 import { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -34,97 +35,109 @@ export class AutomationPackagesService {
   }
 
   /**
-   * @param async
-   * @param version
-   * @param activationExpr
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public bulkDeleteAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/resources/bulk/delete',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns AsyncTaskStatusTableBulkOperationReport default response
+   * @throws ApiError
+   */
+  public bulkRefreshAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/resources/bulk/refresh',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
    * @param formData
    * @returns any default response
    * @throws ApiError
    */
-  public createOrUpdateAutomationPackage(
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
-    formData?: {
-      file?: FormDataContentDisposition;
-    },
-  ): Observable<any> {
+  public createOrUpdateAutomationPackage(formData?: {
+    async?: boolean;
+    version?: string;
+    allowUpdateOfOtherPackages?: boolean;
+    activationExpr?: string;
+    file?: FormDataContentDisposition;
+    apMavenSnippet?: string;
+    apLibrary?: FormDataContentDisposition;
+    apLibraryMavenSnippet?: string;
+    apResourceId?: string;
+    apLibraryResourceId?: string;
+    plansAttributes?: string;
+    functionsAttributes?: string;
+    tokenSelectionCriteria?: string;
+    executeFunctionsLocally?: boolean;
+  }): Observable<any> {
     return this.httpRequest.request({
       method: 'PUT',
       url: '/automation-packages',
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
-      },
       formData: formData,
       mediaType: 'multipart/form-data',
     });
   }
 
   /**
-   * @param version
-   * @param activationExpr
    * @param formData
    * @returns string default response
    * @throws ApiError
    */
-  public createAutomationPackage(
-    version?: string,
-    activationExpr?: string,
-    formData?: {
-      file?: FormDataContentDisposition;
-    },
-  ): Observable<string> {
+  public createAutomationPackage(formData?: {
+    version?: string;
+    activationExpr?: string;
+    allowUpdateOfOtherPackages?: boolean;
+    file?: FormDataContentDisposition;
+    apMavenSnippet?: string;
+    apLibrary?: FormDataContentDisposition;
+    apLibraryMavenSnippet?: string;
+    apResourceId?: string;
+    apLibraryResourceId?: string;
+    plansAttributes?: string;
+    functionsAttributes?: string;
+    tokenSelectionCriteria?: string;
+    executeFunctionsLocally?: boolean;
+  }): Observable<string> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/automation-packages',
-      query: {
-        version: version,
-        activationExpr: activationExpr,
-      },
       formData: formData,
       mediaType: 'multipart/form-data',
     });
   }
 
   /**
-   * @param async
-   * @param version
-   * @param activationExpr
-   * @returns AutomationPackageUpdateResult default response
-   * @throws ApiError
-   */
-  public createOrUpdateAutomationPackageFromMaven(
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
-  ): Observable<AutomationPackageUpdateResult> {
-    return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/mvn',
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
-      },
-    });
-  }
-
-  /**
-   * @param version
-   * @param activationExpr
+   * @param formData
    * @returns string default response
    * @throws ApiError
    */
-  public createAutomationPackageFromMaven(version?: string, activationExpr?: string): Observable<string> {
+  public createNewAutomationPackageResource(formData?: {
+    resourceType?: string;
+    file?: FormDataContentDisposition;
+    mavenSnippet?: string;
+  }): Observable<string> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/automation-packages/mvn',
-      query: {
-        version: version,
-        activationExpr: activationExpr,
-      },
+      url: '/automation-packages/resources',
+      formData: formData,
+      mediaType: 'multipart/form-data',
     });
   }
 
@@ -145,20 +158,27 @@ export class AutomationPackagesService {
 
   /**
    * @param id
-   * @param async
-   * @param version
-   * @param activationExpr
    * @param formData
    * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
    */
   public updateAutomationPackage(
     id: string,
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
     formData?: {
+      async?: boolean;
+      version?: string;
+      activationExpr?: string;
+      allowUpdateOfOtherPackages?: boolean;
       file?: FormDataContentDisposition;
+      apMavenSnippet?: string;
+      apLibrary?: FormDataContentDisposition;
+      apLibraryMavenSnippet?: string;
+      apResourceId?: string;
+      apLibraryResourceId?: string;
+      plansAttributes?: string;
+      functionsAttributes?: string;
+      tokenSelectionCriteria?: string;
+      executeFunctionsLocally?: boolean;
     },
   ): Observable<AutomationPackageUpdateResult> {
     return this.httpRequest.request({
@@ -166,11 +186,6 @@ export class AutomationPackagesService {
       url: '/automation-packages/{id}',
       path: {
         id: id,
-      },
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -193,13 +208,33 @@ export class AutomationPackagesService {
   }
 
   /**
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public deleteAutomationPackageResource(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/automation-packages/resources/{id}',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
    * @param formData
    * @returns string default response
    * @throws ApiError
    */
   public executeAutomationPackage(formData?: {
     file?: FormDataContentDisposition;
+    apMavenSnippet?: string;
+    apLibrary?: FormDataContentDisposition;
     executionParams?: FormDataBodyPart;
+    apLibraryMavenSnippet?: string;
+    apResourceId?: string;
+    apLibraryResourceId?: string;
   }): Observable<Array<string>> {
     return this.httpRequest.request({
       method: 'POST',
@@ -243,6 +278,21 @@ export class AutomationPackagesService {
 
   /**
    * @param id
+   * @returns AutomationPackage default response
+   * @throws ApiError
+   */
+  public getLinkedAutomationPackagesForResource(id: string): Observable<Array<AutomationPackage>> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/automation-packages/resources/{id}/automation-packages',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
    * @returns AbstractOrganizableObject default response
    * @throws ApiError
    */
@@ -258,49 +308,15 @@ export class AutomationPackagesService {
 
   /**
    * @param id
-   * @param async
-   * @param version
-   * @param activationExpr
-   * @returns AutomationPackageUpdateResult default response
+   * @returns RefreshResourceResult default response
    * @throws ApiError
    */
-  public updateAutomationPackageFromMaven(
-    id: string,
-    async?: boolean,
-    version?: string,
-    activationExpr?: string,
-  ): Observable<AutomationPackageUpdateResult> {
+  public refreshAutomationPackageResource(id: string): Observable<RefreshResourceResult> {
     return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/{id}/mvn',
+      method: 'POST',
+      url: '/automation-packages/resources/{id}/refresh',
       path: {
         id: id,
-      },
-      query: {
-        async: async,
-        version: version,
-        activationExpr: activationExpr,
-      },
-    });
-  }
-
-  /**
-   * @param id
-   * @param activationExpr
-   * @param version
-   * @returns any default response
-   * @throws ApiError
-   */
-  public updateAutomationPackageMetadata(id: string, activationExpr?: string, version?: string): Observable<any> {
-    return this.httpRequest.request({
-      method: 'PUT',
-      url: '/automation-packages/{id}/metadata',
-      path: {
-        id: id,
-      },
-      query: {
-        activationExpr: activationExpr,
-        version: version,
       },
     });
   }

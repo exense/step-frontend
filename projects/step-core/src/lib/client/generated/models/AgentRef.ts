@@ -5,5 +5,6 @@
 export type AgentRef = {
   agentId?: string;
   agentUrl?: string;
+  localAgentUrl?: string;
   agentType?: string;
 };

@@ -10,5 +10,8 @@ export const $AutomationPackageUpdateResult = {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
     },
+    conflictingAutomationPackages: {
+      type: 'ConflictingAutomationPackages',
+    },
   },
 } as const;

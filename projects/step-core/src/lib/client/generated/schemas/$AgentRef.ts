@@ -9,6 +9,9 @@ export const $AgentRef = {
     agentUrl: {
       type: 'string',
     },
+    localAgentUrl: {
+      type: 'string',
+    },
     agentType: {
       type: 'string',
     },

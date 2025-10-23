@@ -15,6 +15,20 @@ export const $AutomationPackage = {
         type: 'string',
       },
     },
+    creationDate: {
+      type: 'string',
+      format: 'date-time',
+    },
+    creationUser: {
+      type: 'string',
+    },
+    lastModificationDate: {
+      type: 'string',
+      format: 'date-time',
+    },
+    lastModificationUser: {
+      type: 'string',
+    },
     status: {
       type: 'Enum',
     },
@@ -23,6 +37,33 @@ export const $AutomationPackage = {
     },
     activationExpression: {
       type: 'Expression',
+    },
+    automationPackageResource: {
+      type: 'string',
+    },
+    automationPackageLibraryResource: {
+      type: 'string',
+    },
+    functionsAttributes: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    plansAttributes: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    tokenSelectionCriteria: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    executeFunctionLocally: {
+      type: 'boolean',
     },
     id: {
       type: 'string',

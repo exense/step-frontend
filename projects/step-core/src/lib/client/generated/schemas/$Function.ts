@@ -48,6 +48,9 @@ export const $Function = {
     description: {
       type: 'string',
     },
+    automationPackageFile: {
+      type: 'string',
+    },
     id: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',

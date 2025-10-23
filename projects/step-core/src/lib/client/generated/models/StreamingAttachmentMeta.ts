@@ -5,7 +5,6 @@
 import type { AttachmentMeta } from './AttachmentMeta';
 
 export type StreamingAttachmentMeta = AttachmentMeta & {
-  mimeType?: string;
   currentSize?: number;
   currentNumberOfLines?: number;
   status?: 'INITIATED' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';

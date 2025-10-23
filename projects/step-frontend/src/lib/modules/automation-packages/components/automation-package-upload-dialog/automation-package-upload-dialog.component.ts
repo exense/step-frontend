@@ -130,9 +130,10 @@ export class AutomationPackageUploadDialogComponent {
     const { version, activationExpression, mavenSnippet } = this.form.value;
 
     if (this._package?.id && !this.file && !mavenSnippet) {
-      this._api
-        .updateAutomationPackageMetadata(this._package.id, activationExpression, version)
-        .subscribe(() => this._dialogRef.close({ isSuccess: true }));
+      // todo `updateAutomationPackageMetadata` has been removed from the API. Alternative implementation should be solved under SED-4282
+      //this._api
+      //  .updateAutomationPackageMetadata(this._package.id, activationExpression, version)
+      //  .subscribe(() => this._dialogRef.close({ isSuccess: true }));
       return;
     }
 

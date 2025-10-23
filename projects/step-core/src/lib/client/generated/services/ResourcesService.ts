@@ -32,18 +32,20 @@ export class ResourcesService {
 
   /**
    * @param type
-   * @param duplicateCheck
    * @param directory
    * @param trackingAttribute
+   * @param origin
+   * @param originTimestamp
    * @param formData
    * @returns ResourceUploadResponse default response
    * @throws ApiError
    */
   public createResource(
     type?: string,
-    duplicateCheck?: boolean,
     directory?: boolean,
     trackingAttribute?: string,
+    origin?: string,
+    originTimestamp?: number,
     formData?: {
       file?: FormDataContentDisposition;
     },
@@ -53,9 +55,10 @@ export class ResourcesService {
       url: '/resources/content',
       query: {
         type: type,
-        duplicateCheck: duplicateCheck,
         directory: directory,
         trackingAttribute: trackingAttribute,
+        origin: origin,
+        originTimestamp: originTimestamp,
       },
       formData: formData,
       mediaType: 'multipart/form-data',
@@ -86,6 +89,21 @@ export class ResourcesService {
     return this.httpRequest.request({
       method: 'DELETE',
       url: '/resources/{id}',
+      path: {
+        id: id,
+      },
+    });
+  }
+
+  /**
+   * @param id
+   * @returns any default response
+   * @throws ApiError
+   */
+  public deleteResourceRevisions(id: string): Observable<any> {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/resources/{id}/revisions',
       path: {
         id: id,
       },

@@ -1,27 +1,29 @@
 <step-drag-drop-container>
   <step-table
-    data-step-testid="resources-table"
+    data-step-testid="automation-packages-resources-table"
     #table
     [dataSource]="dataSource"
     matSort
     [matSortDisableClear]="true"
-    [filter]="RESOURCE_FILTER"
+    [filter]="AP_RESOURCE_FILTER"
   >
-    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="resources" />
+    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="automationPackageResources" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
+      <!--
       <step-btn-group>
         <a
-          data-step-testid="new-resource-btn"
-          mat-mini-fab
-          color="primary"
-          matTooltip="New resource"
-          matTooltipPosition="below"
-          [disabled]="!('resource-write' | hasRight | async)"
-          [routerLink]="'new' | resourceUrl"
+            data-step-testid="new-resource-btn"
+            mat-mini-fab
+            color="primary"
+            matTooltip="New resource"
+            matTooltipPosition="below"
+            [disabled]="!('resource-write' | hasRight | async)"
+            [routerLink]="'new' | resourceUrl"
         >
           <step-icon name="plus"></step-icon>
         </a>
       </step-btn-group>
+-->
     </section>
     <ng-container matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
@@ -59,12 +61,12 @@
       <td mat-cell *matCellDef="let element">{{ element.id }}</td>
     </ng-container>
     <ng-container matColumnDef="automationPackage" stepActivityCol="Automation package" stepSearchCol>
-      <step-automation-package-filter *stepSearchCellDef stepFilterConnect></step-automation-package-filter>
+      <step-automation-package-filter *stepSearchCellDef stepFilterConnect />
       <th class="automation-package-cell" mat-header-cell *matHeaderCellDef>
         <step-drag-column-caption>&nbsp;</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        <step-automation-package-ref-icon [entity]="element"></step-automation-package-ref-icon>
+        <step-automation-package-ref-icon [entity]="element" />
       </td>
     </ng-container>
     <ng-container matColumnDef="actions" stepActionCol>
@@ -80,26 +82,17 @@
             matTooltip="Download resource"
             (click)="downloadResource(element.id)"
           >
-            <step-icon name="download-cloud"></step-icon>
+            <step-icon name="download-cloud" />
           </button>
           <button
-            data-step-testid="search-resource-btn"
+            data-step-testid="refresh-resource-btn"
             mat-icon-button
-            matTooltip="Search for resource"
-            [disabled]="element.resourceType !== 'datasource' && element.resourceType !== 'functions'"
-            (click)="searchResource(element)"
-          >
-            <step-icon name="search"></step-icon>
-          </button>
-          <a
-            data-step-testid="edit-resource-btn"
-            mat-icon-button
-            matTooltip="Edit resource"
+            matTooltip="Refresh resource"
             [disabled]="!('resource-write' | hasRight | async)"
-            [routerLink]="element | resourceUrl"
+            (click)="refreshResource(element)"
           >
-            <step-icon name="edit-2"></step-icon>
-          </a>
+            <step-icon name="refresh-cw" />
+          </button>
           <button
             data-step-testid="delete-resource-btn"
             mat-icon-button
@@ -109,18 +102,8 @@
           >
             <step-icon name="trash-2">delete</step-icon>
           </button>
-          <step-entity-menu-button
-            data-step-testid="resources-entity-menu-btn"
-            [entityItem]="element"
-            [entityMenu]="entityMenu"
-            stepHighlightTableRow
-          >
-            <step-icon name="more-horizontal"></step-icon>
-          </step-entity-menu-button>
         </step-btn-group>
       </td>
     </ng-container>
   </step-table>
 </step-drag-drop-container>
-<step-entity-menu #entityMenu entity="resources" (entityOperationSuccess)="table.reload()"></step-entity-menu>
-<router-outlet></router-outlet>

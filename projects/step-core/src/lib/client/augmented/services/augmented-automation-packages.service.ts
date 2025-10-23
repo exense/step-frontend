@@ -1,5 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters } from '../../generated';
+import {
+  AsyncTaskStatusTableBulkOperationReport,
+  AutomationPackage,
+  AutomationPackagesService,
+  ExecutiontTaskParameters,
+  TableBulkOperationRequest,
+} from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -14,6 +20,7 @@ import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
 
 export interface AutomationPackageParams {
   id?: string;
@@ -47,6 +54,20 @@ export class AugmentedAutomationPackagesService
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
     return this;
+  }
+
+  override bulkDeleteAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkDeleteAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
+  }
+
+  override bulkRefreshAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkRefreshAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
   }
 
   createDataSource(): StepDataSource<AutomationPackage> {

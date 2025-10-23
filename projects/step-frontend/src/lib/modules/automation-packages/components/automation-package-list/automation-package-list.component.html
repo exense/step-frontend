@@ -13,7 +13,7 @@
         [entity]="ENTITY_ID"
       />
       <section class="header" *stepAdditionalHeader="'automation-package-header'">
-        <step-btn-group class="import-export">
+        <step-btn-group>
           <button
             type="button"
             mat-icon-button
@@ -23,6 +23,9 @@
           >
             <step-icon name="help-circle" />
           </button>
+        </step-btn-group>
+        <step-btn-group>
+          <button type="button" mat-flat-button class="header-btn" (click)="openResources()">Package resources</button>
         </step-btn-group>
         <step-btn-group>
           <button

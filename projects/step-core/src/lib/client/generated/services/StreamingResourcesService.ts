@@ -11,17 +11,6 @@ export class StreamingResourcesService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
 
   /**
-   * @returns any default response
-   * @throws ApiError
-   */
-  public demo(): Observable<any> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/streaming-resources/demo',
-    });
-  }
-
-  /**
    * @param id
    * @param start
    * @param end

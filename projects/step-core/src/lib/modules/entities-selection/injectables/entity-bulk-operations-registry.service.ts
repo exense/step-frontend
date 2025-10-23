@@ -42,6 +42,7 @@ export class EntityBulkOperationsRegistryService {
     [BulkOperationType.RESTART]: { label: 'Restart selected', icon: 'play-circle' },
     [BulkOperationType.STOP]: { label: 'Stop selected', icon: 'stop-circle' },
     [BulkOperationType.CLOSE]: { label: 'Close selected', icon: 'x-circle' },
+    [BulkOperationType.REFRESH]: { label: 'Refresh selected', icon: 'refresh-cw' },
   };
 
   register(
