@@ -59,7 +59,6 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       src.length <= 1
         ? { borderWidth: 0, borderColor: 'transparent', hoverBorderWidth: 0 }
         : { borderWidth: 1, borderColor: '#fff', hoverBorderWidth: 1 };
-    console.log(arcStyle);
 
     const options = {
       responsive: false,
