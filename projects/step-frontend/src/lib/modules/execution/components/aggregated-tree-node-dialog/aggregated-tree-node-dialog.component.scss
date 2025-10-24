@@ -38,4 +38,27 @@ step-aggregated-tree-node-dialog {
       padding-left: 0.9rem !important;
     }
   }
+
+  .panel-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .main-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .history {
+      flex: 0 0 auto;
+      padding-top: 2rem;
+
+      .title {
+        padding: 2rem 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+      }
+    }
+  }
 }
