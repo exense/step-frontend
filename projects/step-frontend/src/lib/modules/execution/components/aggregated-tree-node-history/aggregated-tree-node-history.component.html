@@ -3,7 +3,12 @@
     <div class="previous-executions-container">
       @for (executionItem of historyData.previousExecutions; track executionItem?.execution?.id! || $index) {
         @if (executionItem === null) {
-          <div class="history-item-container connect-line" matTooltip="No execution" [class.arrow]="$last">
+          <div
+            class="history-item-container connect-line"
+            matTooltipPosition="above"
+            matTooltip="No execution"
+            [class.arrow]="$last"
+          >
             <div class="empty-piechart"></div>
           </div>
         } @else {
