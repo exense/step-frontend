@@ -58,9 +58,9 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   isScheduledExecution = toSignal(this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)));
 
   historyTitle = computed(() => {
-    const count = PREVIOUS_EXECUTIONS_TO_DISPLAY;
     const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
-    return `History (${count} previous ${typeLabel})`;
+    const nodeName = this._data.aggregatedNode?.name || this.selectedReportNode()?.name || 'node';
+    return `Last ${typeLabel} of '${nodeName}'`;
   });
 
   private isInitialLoad = true;

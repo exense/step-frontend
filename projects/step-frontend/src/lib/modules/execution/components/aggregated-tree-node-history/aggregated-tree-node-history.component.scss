@@ -1,3 +1,7 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+$lines-color: var.$gray-300;
+
 .container {
   width: 100%;
   display: flex;
@@ -18,6 +22,28 @@
   align-items: center;
 }
 
+.empty-piechart {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid $lines-color;
+  position: relative;
+  z-index: 1;
+  background: white;
+}
+
+.connect-line::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  height: 2px;
+  width: 40px;
+  background: $lines-color;
+  transform: translateY(-50%);
+  z-index: -1;
+}
+
 .history-item-container {
   display: flex;
   flex-direction: column;
@@ -26,22 +52,11 @@
   z-index: 1;
   --arrow-w: 10px; /* triangle base width */
   --arrow-h: 6px; /* triangle half-height */
-  --line-color: #d9d9d9;
+  --line-color: #{$lines-color};
 
   .timestamp {
+    font-size: 1.2rem;
     margin-top: 0.4rem;
-  }
-
-  &.connect-line::after {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    height: 2px;
-    width: 40px;
-    background: #d9d9d9;
-    transform: translateY(-50%);
-    z-index: -1;
   }
 
   &.arrow:last-child::before {

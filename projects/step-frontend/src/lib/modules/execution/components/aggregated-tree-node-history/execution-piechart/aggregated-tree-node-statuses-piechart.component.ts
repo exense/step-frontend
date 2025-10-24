@@ -55,12 +55,18 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
             ],
           };
 
+    const arcStyle =
+      src.length <= 1
+        ? { borderWidth: 0, borderColor: 'transparent', hoverBorderWidth: 0 }
+        : { borderWidth: 1, borderColor: '#fff', hoverBorderWidth: 1 };
+    console.log(arcStyle);
+
     const options = {
       responsive: false,
       maintainAspectRatio: false,
       animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      elements: { arc: { borderWidth: 0 } },
+      elements: { arc: arcStyle },
       rotation: (start * Math.PI) / 180,
       circumference: (circ * Math.PI) / 180,
     } as const;
@@ -81,7 +87,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
           responsive: true,
           animation: { duration: 0 },
           plugins: { legend: { display: false }, tooltip: { enabled: false } },
-          elements: { arc: { borderWidth: 1 } },
+          elements: { arc: arcStyle },
         },
       }) as Chart;
       el.nativeElement.width = sz;

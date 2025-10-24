@@ -21,7 +21,7 @@ interface ExecutionItem {
 }
 
 interface HistoryChainData {
-  previousExecutions: ExecutionItem[];
+  previousExecutions: (ExecutionItem | null)[];
   currentExecution: ExecutionItem;
 }
 
@@ -85,7 +85,7 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
           }));
           return this._executionState.execution$.pipe(
             map((currentExecution) => ({
-              previousExecutions: allExecutions.slice(0, -1), // remove the current execution
+              previousExecutions: this.padArrayWithNull(allExecutions.slice(0, -1), this.previousExecutionsCount()), // remove the current execution
               currentExecution: {
                 execution: currentExecution,
                 statusSlices: slices[currentExecution.id!],
@@ -137,5 +137,12 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
       groupDimensions: ['executionId', 'status'],
     };
     return this._timeSeriesService.getReportNodesTimeSeries(request);
+  }
+
+  padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
+    const padCount = Math.max(0, size - (array?.length ?? 0));
+    return Array(padCount)
+      .fill(null)
+      .concat(array ?? []);
   }
 }
