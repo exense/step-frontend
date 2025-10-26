@@ -8,6 +8,7 @@ import {
   inject,
   input,
   NgZone,
+  output,
 } from '@angular/core';
 import { AggregatedReportView, StepBasicsModule, StepIconsModule } from '@exense/step-core';
 
@@ -20,6 +21,8 @@ import { AggregatedReportView, StepBasicsModule, StepIconsModule } from '@exense
 })
 export class TestCaseInlineRootCauseComponent implements AfterViewInit {
   readonly item = input.required<AggregatedReportView>();
+  readonly searchFor = output<string>();
+
   private _element: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
   private _zone: NgZone = inject(NgZone);
   private _changeDetection = inject(ChangeDetectorRef);
@@ -32,11 +35,9 @@ export class TestCaseInlineRootCauseComponent implements AfterViewInit {
 
     const update = () => {
       const targetWidth = Math.max(0, container.clientWidth - 40);
-      console.log('targetWidth', targetWidth);
 
       if (this.currentWidth || 0 < container.clientWidth - 60 || this.currentWidth || 0 > container.clientWidth + 60) {
         this._zone.run(() => {
-          console.log('update currentWidth with', targetWidth);
           this.currentWidth = targetWidth;
           this._changeDetection.markForCheck();
         });
@@ -49,6 +50,11 @@ export class TestCaseInlineRootCauseComponent implements AfterViewInit {
       this.resizeObserver.observe(container);
     });
     update();
+  }
+
+  onErrorClick(event: MouseEvent, message: string): void {
+    event.stopPropagation();
+    this.searchFor.emit(message);
   }
 
   ngOnDestroy(): void {

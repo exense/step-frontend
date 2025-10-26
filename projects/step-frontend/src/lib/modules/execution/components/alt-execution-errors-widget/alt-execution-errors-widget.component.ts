@@ -11,6 +11,7 @@ import { Status } from '../../../_common/shared/status.enum';
 export class AltExecutionErrorsWidgetComponent {
   readonly errors = input.required<TimeSeriesErrorEntry[]>();
   readonly showDetails = output<void>();
+  readonly searchFor = output<string>();
 
   protected readonly hasErrors = computed(() => this.errors().length > 0);
 
@@ -18,6 +19,10 @@ export class AltExecutionErrorsWidgetComponent {
     const errors = this.errors();
     return errors.length === 1 ? errors[0] : undefined;
   });
+
+  onFindInTree(message: string) {
+    this.searchFor.emit(message);
+  }
 
   protected readonly singleErrorCount = computed(() => {
     const singleError = this.singleError();

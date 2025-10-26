@@ -1,13 +1,13 @@
 @if (errorCounts() === 1) {
   <div class="error-count">
     @if (singleMessage(); as message) {
-      <div class="text" [style.width.px]="currentWidth">
+      <div class="text" [style.width.px]="currentWidth" (click)="onErrorClick($event, message)">
         <step-icon name="alert-triangle" class="error" />
         <span>{{ message }}</span>
       </div>
     }
   </div>
-} @else if (errorCounts() > 0) {
+} @else if (errorCounts() > 1) {
   <div class="error-count">
     <div class="text">
       <step-popover>

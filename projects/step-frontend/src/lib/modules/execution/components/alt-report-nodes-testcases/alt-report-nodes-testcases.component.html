@@ -16,7 +16,9 @@
                 <step-aggregated-status
                   [hasDescendantInvocations]="element.hasDescendantInvocations"
                   [countByStatus]="element.countByStatus"
-                  (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
+                  (statusClick)="
+                    showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
+                  "
                 />
               </div>
               <span class="test-case-name">
@@ -34,7 +36,11 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="error" mat-cell *matCellDef="let element">
         <section>
-          <step-test-case-inline-root-cause [item]="element" (click)="showIterations(element)" />
+          <step-test-case-inline-root-cause
+            [item]="element"
+            (click)="showIterations(element)"
+            (searchFor)="onSearchFor(element, $event)"
+          />
         </section>
       </td>
     </ng-container>

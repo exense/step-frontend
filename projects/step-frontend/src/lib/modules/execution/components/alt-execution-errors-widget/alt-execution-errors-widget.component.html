@@ -3,14 +3,15 @@
     @if (hasErrors()) {
       <section class="error-info">
         <div>
-          <step-icon class="error" name="alert-triangle" /> The execution contains
+          <step-icon class="error" name="alert-triangle" /> This execution contains
           {{ totalErrorsCount()['FAILED'] }} errors
           @if (singleError(); as singleError) {
-            :&nbsp;<span class="error-message">{{ singleError.errorMessage }}</span
+            :&nbsp;<a class="error-message" href="#" (click)="onFindInTree(singleError.errorMessage); (false)">{{
+              singleError.errorMessage
+            }}</a
             >&nbsp;
           }
-          (<a href="#" (click)="showDetails.emit(); (false)">find error</a>&nbsp;|&nbsp;
-          <a href="#" (click)="showDetails.emit(); (false)">show all errors</a>)
+          (<a href="#" (click)="showDetails.emit(); (false)">show all errors</a>)
         </div>
       </section>
     }

@@ -90,6 +90,10 @@ export class AltExecutionTreePartialComponent implements OnInit, OnDestroy {
     this._treeUtils.cleanupImportantIds();
   }
 
+  focusAndSearch(query: string) {
+    this._treeSearch.searchCtrl.setValue(query ?? '');
+  }
+
   protected openDetails(treeNode: AggregatedTreeNode): void {
     this._executionDialogs.openIterations(treeNode, {});
   }

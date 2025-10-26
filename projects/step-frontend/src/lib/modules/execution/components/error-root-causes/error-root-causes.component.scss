@@ -1,26 +1,23 @@
 @use 'projects/step-frontend/styles/common-mixins' as common;
+@use 'projects/step-core/styles/core-variables' as var;
 
 step-error-root-causes {
   display: block;
 
-  .error-root-causes {
-    display: grid;
-    grid-template-columns: min-content auto;
-    column-gap: 1rem;
-    row-gap: 0.5rem;
-    align-items: center;
-    width: 100%;
+  .error-summary {
+    font-weight: 500;
   }
 
-  .error-count {
-    width: auto;
-    .text {
-      white-space: nowrap;
-    }
+  step-icon.error {
+    color: var.$red-650;
   }
 
   .error-message {
     max-width: 60rem;
+
+    span {
+      font-style: italic;
+    }
   }
 
   step-table {

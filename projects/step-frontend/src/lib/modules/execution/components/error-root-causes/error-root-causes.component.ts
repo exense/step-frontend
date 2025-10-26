@@ -29,6 +29,15 @@ export class ErrorRootCausesComponent implements ItemsPerPageService {
   });
   protected readonly TableIndicatorMode = TableIndicatorMode;
 
+  protected readonly totalErrorCount = computed(() => {
+    const data = this.data();
+    let totalCount = 0;
+    for (const entry of data) {
+      totalCount += entry.value;
+    }
+    return totalCount;
+  });
+
   getDefaultPageSizeItem(): Observable<number> {
     return of(PAGE_SIZE);
   }

@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 .error-info {
   display: flex;
   align-items: center;
@@ -7,6 +9,7 @@
 
 .error-message {
   font-style: italic;
+  color: var.$blue-700;
 }
 
 step-alt-report-widget {

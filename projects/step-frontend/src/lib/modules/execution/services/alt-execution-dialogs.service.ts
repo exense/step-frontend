@@ -23,9 +23,13 @@ export interface OpenIterationsParams {
   nodeStatus?: Status;
   reportNodeId?: string;
   nodeStatusCount?: number;
+  searchFor?: string;
 }
 
-export type PartialOpenIterationsParams = Pick<OpenIterationsParams, 'nodeStatus' | 'reportNodeId' | 'nodeStatusCount'>;
+export type PartialOpenIterationsParams = Pick<
+  OpenIterationsParams,
+  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
+>;
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -51,8 +55,15 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       return;
     }
 
-    const { aggregatedNodeId, countByStatus, reportNodeId, nodeStatus, nodeStatusCount, singleInstanceReportNode } =
-      nodeOrParams as OpenIterationsParams;
+    const {
+      aggregatedNodeId,
+      countByStatus,
+      reportNodeId,
+      nodeStatus,
+      nodeStatusCount,
+      singleInstanceReportNode,
+      searchFor,
+    } = nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
       this.navigateToIterationDetails(reportNodeId);
       return;
@@ -61,7 +72,11 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
       const reportNode = singleInstanceReportNode!;
       this._reportNodeDetails?.setReportNode?.(reportNode);
-      this.navigateToIterationDetails(reportNode.id!);
+      let params = {};
+      if (searchFor) {
+        params = { searchFor: searchFor };
+      }
+      this.navigateToIterationDetails(reportNode.id!, params);
       return;
     }
     this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);
@@ -86,8 +101,8 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this.openNodeDetails(`agid_${aggregatedNodeId}`, queryParams);
   }
 
-  private navigateToIterationDetails(reportNodeId: string): void {
-    this.openNodeDetails(`rnid_${reportNodeId}`, {});
+  private navigateToIterationDetails(reportNodeId: string, queryParams: Params = {}): void {
+    this.openNodeDetails(`rnid_${reportNodeId}`, queryParams);
   }
 
   private openNodeDetails(detailsId: string, queryParams: Params): void {
