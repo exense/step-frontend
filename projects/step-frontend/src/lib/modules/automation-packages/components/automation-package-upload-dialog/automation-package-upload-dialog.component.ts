@@ -18,17 +18,13 @@ import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
+import { UploadType } from '../../types/upload-type.enum';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
 }
 
 type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRouteResult>;
-
-enum UploadType {
-  UPLOAD,
-  MAVEN,
-}
 
 @Component({
   selector: 'step-automation-package-upload-dialog',

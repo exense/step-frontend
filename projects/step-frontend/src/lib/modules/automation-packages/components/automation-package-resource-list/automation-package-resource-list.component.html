@@ -9,21 +9,20 @@
   >
     <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="automationPackageResources" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
-      <!--
       <step-btn-group>
         <a
-            data-step-testid="new-resource-btn"
-            mat-mini-fab
-            color="primary"
-            matTooltip="New resource"
-            matTooltipPosition="below"
-            [disabled]="!('resource-write' | hasRight | async)"
-            [routerLink]="'new' | resourceUrl"
+          data-step-testid="new-resource-btn"
+          mat-mini-fab
+          color="primary"
+          matTooltip="New automation package library"
+          matTooltipPosition="below"
+          [disabled]="!('resource-write' | hasRight | async)"
+          [routerLink]="['.', 'upload']"
+          [relativeTo]="_activatedRoute"
         >
           <step-icon name="plus"></step-icon>
         </a>
       </step-btn-group>
--->
     </section>
     <ng-container matColumnDef="bulkSelection">
       <th mat-header-cell *matHeaderCellDef class="bulk-selection-cell"></th>
@@ -107,3 +106,4 @@
     </ng-container>
   </step-table>
 </step-drag-drop-container>
+<router-outlet />

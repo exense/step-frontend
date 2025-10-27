@@ -1,0 +1,76 @@
+<step-modal-window title="Create automation package library" [disableCloseByEsc]="!!progress$">
+  <div step-modal-window-body>
+    @if (progress$) {
+      <step-progress-bar [progress]="(progress$ | async)!" />
+    } @else {
+      <form [formGroup]="form">
+        @switch (selectedType()) {
+          @case (UploadType.UPLOAD) {
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
+              <step-label>Automation Package Library (jar or ZIP file)</step-label>
+              <step-label-addon>
+                <step-icon name="help-circle" matTooltip="Select your automation package jar / ZIP file" />
+              </step-label-addon>
+              <input type="text" readonly formControlName="fileName" name="fileName" />
+              <step-suffix class="button-suffix">
+                <button type="button" mat-stroked-button (click)="openFileChooseDialog()">
+                  <step-icon name="folder-plus" />
+                </button>
+              </step-suffix>
+              <step-suffix class="button-suffix">
+                <button
+                  type="button"
+                  class="maven"
+                  mat-stroked-button
+                  (click)="selectedType.set(UploadType.MAVEN)"
+                  matTooltip="Use maven snippet instead of uploading a file."
+                >
+                  <step-icon name="maven" />
+                </button>
+              </step-suffix>
+            </step-form-field>
+          }
+          @case (UploadType.MAVEN) {
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
+              <step-label>Automation Package Library (Maven Snippet)</step-label>
+              <step-label-addon>
+                <button
+                  type="button"
+                  class="active maven"
+                  mat-stroked-button
+                  (click)="selectedType.set(UploadType.UPLOAD)"
+                  matTooltip="Use upload a file instead of using maven snippet."
+                >
+                  <step-icon name="maven"></step-icon>
+                </button>
+              </step-label-addon>
+              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="mavenSnippet" />
+            </step-form-field>
+          }
+          @default {}
+        }
+        <input #fileInput type="file" (input)="selectFile()" />
+      </form>
+    }
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="upload()"
+      [disabled]="!!progress$ || !('resource-write' | hasRight | async)"
+    >
+      @switch (selectedType()) {
+        @case (UploadType.UPLOAD) {
+          Upload
+        }
+        @case (UploadType.MAVEN) {
+          Add
+        }
+        @default {}
+      }
+    </button>
+  </div>
+</step-modal-window>

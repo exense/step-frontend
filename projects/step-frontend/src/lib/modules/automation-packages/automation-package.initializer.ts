@@ -34,6 +34,7 @@ import { TableParametersComponent } from './components/table-parameters/table-pa
 import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
 import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
 import { AutomationPackageResourceListComponent } from './components/automation-package-resource-list/automation-package-resource-list.component';
+import { AutomationPackageResourceUploadDialogComponent } from './components/automation-package-resource-upload-dialog/automation-package-resource-upload-dialog.component';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
@@ -117,6 +118,12 @@ const registerRoutes = () => {
         {
           path: 'resources',
           component: AutomationPackageResourceListComponent,
+          children: [
+            dialogRoute({
+              path: 'upload',
+              dialogComponent: AutomationPackageResourceUploadDialogComponent,
+            }),
+          ],
         },
       ],
     },

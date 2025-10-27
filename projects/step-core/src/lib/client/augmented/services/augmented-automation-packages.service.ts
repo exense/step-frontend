@@ -4,6 +4,7 @@ import {
   AutomationPackage,
   AutomationPackagesService,
   ExecutiontTaskParameters,
+  FormDataContentDisposition,
   Plan,
   TableBulkOperationRequest,
 } from '../../generated';
@@ -37,6 +38,12 @@ export interface AutomationPackageParams {
   functionsAttributes?: Partial<Keyword>;
   tokenSelectionCriteria?: any;
   executeFunctionsLocally?: boolean;
+}
+
+export interface AutomationPackageResourceParams {
+  resourceType: string;
+  mavenSnippet?: string;
+  resourceFile?: File;
 }
 
 @Injectable({
@@ -137,6 +144,37 @@ export class AugmentedAutomationPackagesService
         this.cachedAutomationPackage = automationPackage;
       }),
     );
+  }
+
+  createAutomationPackageResource({
+    resourceType,
+    resourceFile,
+    mavenSnippet,
+  }: AutomationPackageResourceParams): ReturnType<typeof uploadWithProgress> {
+    const url = 'rest/automation-packages/resources';
+    const body = new FormData();
+    body.set('resourceType', resourceType);
+    if (resourceFile) {
+      body.set('file', resourceFile);
+    } else if (mavenSnippet) {
+      body.set('mavenSnippet', mavenSnippet);
+    }
+
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+
+    const request$ = this._http.request(
+      'POST',
+      url,
+      this._requestContextHolder.decorateRequestOptions({
+        headers,
+        body,
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
+
+    return uploadWithProgress(request$);
   }
 
   automationPackageCreateOrUpdate({

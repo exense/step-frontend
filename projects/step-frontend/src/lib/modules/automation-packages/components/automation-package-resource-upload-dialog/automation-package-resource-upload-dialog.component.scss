@@ -1,0 +1,39 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+input[type='file'] {
+  display: none;
+}
+
+input[readonly] {
+  cursor: default;
+}
+
+div[step-modal-window-body] form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+button.maven {
+  step-icon {
+    stroke: none !important;
+    fill: var.$blue-700 !important;
+  }
+}
+
+button.active {
+  right: 2.4rem;
+  margin-top: -2rem;
+  position: absolute;
+  min-width: 0;
+  width: 3rem;
+  height: 3rem;
+  background: var.$blue-600;
+  step-icon {
+    fill: white !important;
+  }
+}
+
+step-icon.active {
+  stroke: var.$dark-blue;
+}
