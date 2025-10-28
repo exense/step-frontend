@@ -6,7 +6,7 @@ import {
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
 } from '../../table';
-import { map, Observable, of, OperatorFunction } from 'rxjs';
+import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
 import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
@@ -37,6 +37,12 @@ export class AugmentedAutomationPackagesService
   private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _requestContextHolder = inject(HttpRequestContextHolderService);
+
+  private cachedAutomationPackage?: AutomationPackage;
+
+  clearCache(): void {
+    this.cachedAutomationPackage = undefined;
+  }
 
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
@@ -89,6 +95,17 @@ export class AugmentedAutomationPackagesService
           return of([]);
         }),
       );
+  }
+
+  getAutomationPackageCached(id: string): Observable<AutomationPackage> {
+    if (this.cachedAutomationPackage && this.cachedAutomationPackage.id === id) {
+      return of(this.cachedAutomationPackage);
+    }
+    return super.getAutomationPackage(id).pipe(
+      tap((automationPackage) => {
+        this.cachedAutomationPackage = automationPackage;
+      }),
+    );
   }
 
   automationPackageCreateOrUpdate({

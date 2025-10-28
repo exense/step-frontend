@@ -1,6 +1,7 @@
 import {
   Directive,
   EnvironmentInjector,
+  forwardRef,
   inject,
   Injector,
   Input,
@@ -17,6 +18,7 @@ import {
 import { Mutable } from '../../basics/step-basics.module';
 import { OperationCompleteHandler } from '../injectables/operation-complete-handler';
 import { AuthService } from '../../auth';
+import { EntityRefService } from '../injectables/entity-ref.service';
 
 class SimpleController implements EntityMenuItemCommandController<unknown> {
   constructor(private _menuItemInfo: EntityMenuItemInfo) {}
@@ -31,12 +33,13 @@ type FieldAccessor = Mutable<Pick<EntityMenuItemDirective, 'isVisible$' | 'isDis
 @Directive({
   selector: '[stepEntityMenuItem]',
   exportAs: 'EntityMenuItem',
-  standalone: false,
 })
 export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestroy {
   private _auth = inject(AuthService);
   private _parentInjector = inject(Injector);
   private _operationCompleteHandler = inject(OperationCompleteHandler);
+
+  private EntityRefService = EntityRefService;
 
   private keepInternalInjector = false;
   private internalInjector?: EnvironmentInjector;
@@ -112,7 +115,10 @@ export class EntityMenuItemDirective<E = unknown> implements OnChanges, OnDestro
     let isDisabled$ = operationController?.isDisabled && entity ? operationController.isDisabled(entity) : undefined;
 
     if (!isDisabled$ && !!this.entityMenuItem?.permission) {
-      isDisabled$ = this._auth.hasRight$(this.entityMenuItem.permission).pipe(map((hasRight) => !hasRight));
+      console.log('BASIC CHECK FROM PARENT', this._parentInjector.get(this.EntityRefService));
+      isDisabled$ = this._auth
+        .hasRight$(this.entityMenuItem.permission, this._parentInjector)
+        .pipe(map((hasRight) => !hasRight));
     }
 
     (this as FieldAccessor).isDisabled$ = isDisabled$ ?? of(false);

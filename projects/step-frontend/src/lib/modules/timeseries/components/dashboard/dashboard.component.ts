@@ -669,8 +669,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
     if (!this.storageId) {
-      this.mainEngine.state.context.destroy();
-      this.compareEngine?.state.context.destroy();
+      this.mainEngine?.state?.context?.destroy?.();
+      this.compareEngine?.state?.context?.destroy?.();
     }
   }
 }

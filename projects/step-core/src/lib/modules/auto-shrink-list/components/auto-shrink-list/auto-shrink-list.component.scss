@@ -1,4 +1,4 @@
-step-auto-shrank-list {
+step-auto-shrink-list {
   width: 100%;
   overflow: hidden;
 
@@ -22,7 +22,7 @@ step-auto-shrank-list {
     align-items: center;
 
     & > strong,
-    & > step-auto-shrank-item-value {
+    & > step-auto-shrink-item-value {
       display: block;
       white-space: nowrap;
       max-width: 15rem;
@@ -38,14 +38,14 @@ step-auto-shrank-list {
   }
 }
 
-.auto-shrank-popover-item {
+.auto-shrink-popover-item {
   display: flex;
   gap: 0.5rem;
   flex-wrap: nowrap;
   align-items: center;
 
   & > strong,
-  & > step-auto-shrank-item-value {
+  & > step-auto-shrink-item-value {
     display: block;
     white-space: nowrap;
     max-width: 15rem;
@@ -54,7 +54,7 @@ step-auto-shrank-list {
   }
 }
 
-.auto-shrank-all-items {
+.auto-shrink-all-items {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

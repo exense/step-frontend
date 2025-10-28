@@ -1,0 +1,13 @@
+<div class="container" [style.--background]="color()">
+  <div class="status-tag" [style.--statusColor]="color()">
+    <div class="status-icon">
+      <step-icon [name]="status() | statusIcon" />
+    </div>
+    <span>{{ status() }}</span>
+  </div>
+
+  <div class="stats">
+    <div>{{ count() | bigNumber }}</div>
+    <div class="percentage">{{ formattedPercentage() }}%</div>
+  </div>
+</div>

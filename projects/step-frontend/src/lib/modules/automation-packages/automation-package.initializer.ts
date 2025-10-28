@@ -1,11 +1,13 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector, runInInjectionContext } from '@angular/core';
-import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
+import { EDITOR_PATH, ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH, REGEX_EDITOR } from './types/constants';
 import {
   AugmentedAutomationPackagesService,
   AutomationPackageEntityTableRegistryService,
+  checkEntityGuardFactory,
   dialogRoute,
   EntityRegistry,
   InfoBannerService,
+  MultipleProjectsService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -53,10 +55,26 @@ const registerRoutes = () => {
                 dialogRoute({
                   path: ':id',
                   dialogComponent: AutomationPackageUploadDialogComponent,
+                  canActivate: [
+                    checkEntityGuardFactory({
+                      entityType: ENTITY_ID,
+                      getEntity: (id) => inject(AugmentedAutomationPackagesService).getAutomationPackageCached(id),
+                      getEditorUrl: (id) => `${EDITOR_PATH}/${id}`,
+                      isMatchEditorUrl: (url) => REGEX_EDITOR.test(url),
+                      getListUrl: () => `/${PATH}/list`,
+                    }),
+                  ],
                   resolve: {
                     automationPackage: (route: ActivatedRouteSnapshot) =>
-                      inject(AugmentedAutomationPackagesService).getAutomationPackage(route.params['id']),
+                      inject(AugmentedAutomationPackagesService).getAutomationPackageCached(route.params['id']),
                   },
+                  canDeactivate: [
+                    () => {
+                      inject(AugmentedAutomationPackagesService).clearCache();
+                      inject(MultipleProjectsService).cleanupProjectMessage();
+                      return true;
+                    },
+                  ],
                 }),
               ],
             },
