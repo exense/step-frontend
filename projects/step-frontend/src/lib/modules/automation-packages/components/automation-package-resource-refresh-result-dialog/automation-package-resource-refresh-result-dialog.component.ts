@@ -13,7 +13,7 @@ interface Message {
   templateUrl: './automation-package-resource-refresh-result-dialog.component.html',
   styleUrl: './automation-package-resource-refresh-result-dialog.component.scss',
   host: {
-    class: 'message-view-dialog',
+    class: 'messages-view-dialog',
   },
 })
 export class AutomationPackageResourceRefreshResultDialogComponent {
@@ -22,20 +22,6 @@ export class AutomationPackageResourceRefreshResultDialogComponent {
   protected readonly messages = this.createMessageList();
 
   private createMessageList(): Message[] {
-    const result: Message[] = [];
-    switch (this._data.resultStatus) {
-      case 'REFRESHED':
-        result.push({ alertType: AlertType.SUCCESS, message: 'Resource has been successfully refreshed' });
-        break;
-      case 'FAILED':
-        result.push({ alertType: AlertType.DANGER, message: "Resource's refresh has been failed" });
-        break;
-      case 'NOT_REQUIRED':
-        result.push({ alertType: AlertType.INFO, message: "Resource's refresh not required" });
-        break;
-      default:
-        break;
-    }
     const errors: Message[] = (this._data?.errorMessages ?? []).map((message) => ({
       alertType: AlertType.DANGER,
       message,
@@ -44,7 +30,25 @@ export class AutomationPackageResourceRefreshResultDialogComponent {
       alertType: AlertType.INFO,
       message,
     }));
-    result.push(...errors, ...infos);
+
+    const result: Message[] = [...errors, ...infos];
+
+    if (!result.length) {
+      switch (this._data.resultStatus) {
+        case 'REFRESHED':
+          result.unshift({ alertType: AlertType.SUCCESS, message: 'Resource has been successfully refreshed' });
+          break;
+        case 'FAILED':
+          result.unshift({ alertType: AlertType.DANGER, message: "Resource's refresh has been failed" });
+          break;
+        case 'NOT_REQUIRED':
+          result.unshift({ alertType: AlertType.INFO, message: "Resource's refresh not required" });
+          break;
+        default:
+          break;
+      }
+    }
+
     return result;
   }
 }

@@ -11,7 +11,7 @@
 </section>
 <step-drag-drop-container>
   <step-table
-    data-step-testid="automation-packages-library-resources-table"
+    data-step-testid="automation-packages-library-library-table"
     #table
     [dataSource]="dataSource"
     matSort
@@ -22,7 +22,7 @@
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
-          data-step-testid="new-resource-btn"
+          data-step-testid="new-library-btn"
           mat-mini-fab
           color="primary"
           matTooltip="New automation package library"
@@ -87,7 +87,7 @@
       <td mat-cell *matCellDef="let element" class="cell-actions">
         <step-btn-group [stepEntityRef]="element">
           <button
-            data-step-testid="download-resource-btn"
+            data-step-testid="download-library-btn"
             mat-icon-button
             matTooltip="Download library"
             (click)="downloadResource(element.id)"
@@ -95,7 +95,15 @@
             <step-icon name="download-cloud" />
           </button>
           <button
-            data-step-testid="refresh-resource-btn"
+            data-step-testid="search-library-btn"
+            mat-icon-button
+            matTooltip="Search for library"
+            (click)="searchUsages(element)"
+          >
+            <step-icon name="search" />
+          </button>
+          <button
+            data-step-testid="refresh-library-btn"
             mat-icon-button
             matTooltip="Refresh library"
             [disabled]="!('resource-write' | hasRight | async)"
@@ -104,7 +112,7 @@
             <step-icon name="refresh-cw" />
           </button>
           <button
-            data-step-testid="delete-resource-btn"
+            data-step-testid="delete-library-btn"
             mat-icon-button
             matTooltip="Delete library"
             [disabled]="!('resource-delete' | hasRight | async)"

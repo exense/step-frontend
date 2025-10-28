@@ -12,6 +12,7 @@ import {
   entitySelectionStateProvider,
   DialogsService,
   DialogParentService,
+  IsUsedByDialogService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
 import { AutomationPackageResourceRefreshResultDialogComponent } from '../automation-package-resource-refresh-result-dialog/automation-package-resource-refresh-result-dialog.component';
@@ -42,6 +43,7 @@ export class AutomationPackageLibraryListComponent implements DialogParentServic
   private _resourceDialogs = inject(ResourceDialogsService);
   private _dialogs = inject(DialogsService);
   private _matDialog = inject(MatDialog);
+  private _isUsedBy = inject(IsUsedByDialogService);
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
   protected readonly AP_RESOURCE_LIBRARY_FILTER = AP_RESOURCE_LIBRARY_FILTER;
@@ -72,5 +74,9 @@ export class AutomationPackageLibraryListComponent implements DialogParentServic
       }
       this._matDialog.open(AutomationPackageResourceRefreshResultDialogComponent, { data: result });
     });
+  }
+
+  protected searchUsages(resource: Resource): void {
+    this._isUsedBy.displayDialog(resource.resourceName || '', 'AUTOMATION_PACKAGE', resource.id!);
   }
 }
