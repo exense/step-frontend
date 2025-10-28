@@ -28,6 +28,7 @@ type OnTouch = () => void;
         'isBounded',
         'supportsDirectory',
         'withChooseExistingResourceButton',
+        'searchTypes',
         'withClearButton',
         'withDynamicSwitch',
         'preserveExistingResource',

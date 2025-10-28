@@ -1,0 +1,6 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-icon.maven {
+  stroke: none !important;
+  fill: var.$blue-700 !important;
+}

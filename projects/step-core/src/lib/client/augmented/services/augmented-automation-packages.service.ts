@@ -31,7 +31,7 @@ export interface AutomationPackageParams {
   apResourceId?: string;
   apLibraryMavenSnippet?: string;
   apLibraryResourceId?: string;
-  version?: string;
+  versionName?: string;
   activationExpression?: string;
   allowUpdateOfOtherPackages?: boolean;
   plansAttributes?: Partial<Plan>;
@@ -41,9 +41,11 @@ export interface AutomationPackageParams {
 }
 
 export interface AutomationPackageResourceParams {
+  id?: string;
   resourceType: string;
   mavenSnippet?: string;
   resourceFile?: File;
+  managedLibraryName?: string;
 }
 
 @Injectable({
@@ -146,18 +148,25 @@ export class AugmentedAutomationPackagesService
     );
   }
 
-  createAutomationPackageResource({
+  createOrUpdateAutomationPackageResource({
+    id,
     resourceType,
     resourceFile,
     mavenSnippet,
+    managedLibraryName,
   }: AutomationPackageResourceParams): ReturnType<typeof uploadWithProgress> {
-    const url = 'rest/automation-packages/resources';
+    const url = !id ? 'rest/automation-packages/resources' : `rest/automation-packages/resources/${id}`;
+
     const body = new FormData();
     body.set('resourceType', resourceType);
     if (resourceFile) {
       body.set('file', resourceFile);
     } else if (mavenSnippet) {
       body.set('mavenSnippet', mavenSnippet);
+    }
+
+    if (managedLibraryName) {
+      body.set('managedLibraryName', managedLibraryName);
     }
 
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
@@ -181,7 +190,7 @@ export class AugmentedAutomationPackagesService
     id,
     apMavenSnippet,
     apResourceId,
-    version,
+    versionName,
     activationExpression,
     apLibraryMavenSnippet,
     apLibraryResourceId,
@@ -225,8 +234,8 @@ export class AugmentedAutomationPackagesService
       body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
     }
 
-    if (version) {
-      body.set('version', version);
+    if (versionName) {
+      body.set('versionName', versionName);
     }
     if (activationExpression) {
       body.set('activationExpr', activationExpression);

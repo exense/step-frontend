@@ -32,7 +32,7 @@ export const $AutomationPackage = {
     status: {
       type: 'Enum',
     },
-    version: {
+    versionName: {
       type: 'string',
     },
     activationExpression: {

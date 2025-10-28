@@ -1,10 +1,17 @@
 import { Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { AceMode, AugmentedAutomationPackagesService, DialogRouteResult, StepCoreModule } from '@exense/step-core';
+import {
+  AceMode,
+  AugmentedAutomationPackagesService,
+  DialogRouteResult,
+  StepCoreModule,
+  toggleValidators,
+} from '@exense/step-core';
 import { UploadType } from '../../types/upload-type.enum';
 import { FormBuilder, Validators } from '@angular/forms';
 import { catchError, map, Observable, of } from 'rxjs';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 import { MatDialogRef } from '@angular/material/dialog';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type DialogRef = MatDialogRef<unknown, DialogRouteResult>;
 
@@ -27,16 +34,36 @@ export class AutomationPackageLibraryUploadDialogComponent {
   private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   protected form = this._fb.group({
-    fileName: this._fb.control('', [Validators.required]),
-    mavenSnippet: this._fb.control('', [Validators.required]),
+    fileName: this._fb.control(''),
+    mavenSnippet: this._fb.control(''),
+    isManagedLibrary: this._fb.control(false),
+    managedLibraryName: this._fb.control(''),
+  });
+
+  protected readonly isManagedLibrary = toSignal(this.form.controls.isManagedLibrary.valueChanges, {
+    initialValue: this.form.controls.isManagedLibrary.value,
   });
 
   private effectSwitchType = effect(() => {
     const selectedType = this.selectedType();
     if (selectedType === UploadType.UPLOAD) {
+      toggleValidators(true, this.form.controls.fileName, Validators.required);
+      toggleValidators(false, this.form.controls.mavenSnippet, Validators.required);
       this.form.controls.fileName.markAsUntouched();
     } else {
+      toggleValidators(false, this.form.controls.fileName, Validators.required);
+      toggleValidators(true, this.form.controls.mavenSnippet, Validators.required);
       this.form.controls.mavenSnippet.markAsUntouched();
+    }
+  });
+
+  private effectToggleManagedLibrary = effect(() => {
+    const isManagedLibrary = this.isManagedLibrary();
+    if (isManagedLibrary) {
+      toggleValidators(true, this.form.controls.managedLibraryName, Validators.required);
+      this.form.controls.managedLibraryName.markAsUntouched();
+    } else {
+      toggleValidators(false, this.form.controls.managedLibraryName, Validators.required);
     }
   });
 
@@ -65,23 +92,23 @@ export class AutomationPackageLibraryUploadDialogComponent {
       if (!this.file) {
         this.form.controls.fileName.setValue('');
       }
-      if (this.form.controls.fileName.invalid) {
-        this.form.controls.fileName.markAsTouched();
-        return;
-      }
     }
 
-    if (this.selectedType() === UploadType.MAVEN && this.form.controls.mavenSnippet.invalid) {
-      this.form.controls.mavenSnippet.markAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const { mavenSnippet } = this.form.value;
+    const { mavenSnippet, isManagedLibrary, managedLibraryName } = this.form.value;
+    const resourceType = isManagedLibrary
+      ? AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY
+      : AutomationPackageResourceType.AUTOMATION_PACKAGE_LIBRARY;
 
-    const upload = this._api.createAutomationPackageResource({
-      resourceType: AutomationPackageResourceType.AUTOMATION_PACKAGE_LIBRARY,
+    const upload = this._api.createOrUpdateAutomationPackageResource({
+      resourceType,
       resourceFile: this.file,
       mavenSnippet,
+      managedLibraryName,
     });
 
     this.progress$ = upload.progress$;

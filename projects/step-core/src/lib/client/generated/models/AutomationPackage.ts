@@ -12,7 +12,7 @@ export type AutomationPackage = {
   lastModificationDate?: string;
   lastModificationUser?: string;
   status?: 'DELAYED_UPDATE';
-  version?: string;
+  versionName?: string;
   activationExpression?: Expression;
   automationPackageResource?: string;
   automationPackageLibraryResource?: string;

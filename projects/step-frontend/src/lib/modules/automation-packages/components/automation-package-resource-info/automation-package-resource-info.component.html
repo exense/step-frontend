@@ -1,0 +1,22 @@
+@if (resource(); as lib) {
+  <step-popover yPosition="below">
+    <step-icon [class.maven]="isMaven()" [name]="icon()" />
+    <ng-content />
+    <step-popover-content class="resource-info">
+      <div><b>Creator</b></div>
+      <div>{{ lib?.creationUser }}</div>
+      <div><b>Creation time</b></div>
+      <div>{{ lib?.creationDate | date: DateFormat.DATE }}</div>
+      @if (lib?.lastModificationDate) {
+        <div><b>Last modified by</b></div>
+        <div>{{ lib?.lastModificationUser }}</div>
+        <div><b>Last modified</b></div>
+        <div>
+          {{ lib?.lastModificationDate | date: DateFormat.DATE }}
+        </div>
+      }
+      <div><b>Origin</b></div>
+      <div>{{ lib?.origin }}</div>
+    </step-popover-content>
+  </step-popover>
+}

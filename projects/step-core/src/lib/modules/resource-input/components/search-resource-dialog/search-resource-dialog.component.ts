@@ -1,4 +1,4 @@
-import { Component, inject, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AugmentedResourcesService, Resource } from '../../../../client/step-client-module';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
@@ -13,9 +13,10 @@ import { TableModule } from '../../../table/table.module';
 export class SearchResourceDialogComponent {
   private _augmentedResourceService = inject(AugmentedResourcesService);
   private _matDialogRef = inject<MatDialogRef<SearchResourceDialogComponent>>(MatDialogRef);
-  private _resourceType = inject<string>(MAT_DIALOG_DATA);
+  private _resourceTypes = inject<string[]>(MAT_DIALOG_DATA);
 
-  readonly filter: string = `resourceType=${this._resourceType}`;
+  readonly filter: string = this._resourceTypes.map((resourceType) => `resourceType=${resourceType}`).join(' or ');
+
   readonly dataSource = this._augmentedResourceService.createDataSource();
 
   select(resource: Resource): void {

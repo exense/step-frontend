@@ -37,3 +37,9 @@ button.active {
 step-icon.active {
   stroke: var.$dark-blue;
 }
+
+.managed-libraries-description {
+  white-space: pre-wrap;
+  max-width: 50rem;
+  text-align: justify;
+}

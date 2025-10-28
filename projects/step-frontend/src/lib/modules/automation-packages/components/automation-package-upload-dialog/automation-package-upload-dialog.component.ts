@@ -19,6 +19,7 @@ import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/commo
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { UploadType } from '../../types/upload-type.enum';
+import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -50,6 +51,10 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   protected readonly isNewPackage = !this.automationPackage.id;
   protected isAffectingOtherPackage = false;
+  protected readonly existingLibrariesSearchTypes = [
+    AutomationPackageResourceType.AUTOMATION_PACKAGE_LIBRARY,
+    AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY,
+  ];
 
   private effectSwitchTab = effect(() => {
     if (this.apType === UploadType.UPLOAD) {
@@ -61,7 +66,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   private hasPrefilledAdvancedSettings(): boolean {
     return !!(
-      this.automationPackage.version ||
+      this.automationPackage.versionName ||
       this.automationPackage.activationExpression?.script ||
       this.automationPackage.automationPackageLibraryResource ||
       (this.automationPackage.plansAttributes && Object.keys(this.automationPackage.plansAttributes).length > 0) ||
@@ -95,7 +100,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
     libraryFile: this._fb.control(this.automationPackage?.automationPackageLibraryResource || ''),
     libraryMavenSnippet: this._fb.control(''),
-    version: this._fb.control(this.automationPackage.version),
+    versionName: this._fb.control(this.automationPackage.versionName),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
     executeFunctionsLocally: this._fb.control(this.automationPackage.executeFunctionsLocally ?? false),
     routing: this._fb.array(
@@ -136,7 +141,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     }
 
     const {
-      version,
+      versionName,
       activationExpression,
       apMavenSnippet,
       libraryMavenSnippet,
@@ -155,7 +160,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
     const automationPackageParams: AutomationPackageParams = {
       id: this.automationPackage.id,
-      version,
+      versionName,
       activationExpression,
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
       functionsAttributes: this.customKeywordAttributes,
@@ -227,4 +232,5 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   protected readonly AlertType = AlertType;
   protected readonly AutomationPackagePermission = AutomationPackagePermission;
+  protected readonly AutomationPackageResourceType = AutomationPackageResourceType;
 }

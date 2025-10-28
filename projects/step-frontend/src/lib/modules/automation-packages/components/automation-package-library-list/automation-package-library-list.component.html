@@ -18,7 +18,7 @@
     [matSortDisableClear]="true"
     [filter]="AP_RESOURCE_LIBRARY_FILTER"
   >
-    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="automationPackageResources" />
+    <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="automationPackageLibrary" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-btn-group>
         <a
@@ -41,7 +41,7 @@
         <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
-    <step-entity-column-container entityName="resources"></step-entity-column-container>
+    <step-entity-column-container entityName="automationPackageLibrary" />
     <ng-container matColumnDef="name" stepActivityCol="Name" stepSearchCol>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Name</step-drag-column-caption>
@@ -56,7 +56,11 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         <step-drag-column-caption>Type</step-drag-column-caption>
       </th>
-      <td mat-cell *matCellDef="let element">{{ element.resourceType }}</td>
+      <td mat-cell *matCellDef="let element">
+        <step-automation-package-resource-info [resource]="element">
+          {{ element.resourceType }}
+        </step-automation-package-resource-info>
+      </td>
     </ng-container>
     <ng-container matColumnDef="id" stepActivityCol="Id" stepSearchCol>
       <step-input-filter

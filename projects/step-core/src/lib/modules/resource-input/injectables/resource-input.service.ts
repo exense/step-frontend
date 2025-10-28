@@ -77,7 +77,7 @@ export class ResourceInputService implements OnDestroy {
       throw 'Config not set';
     }
 
-    return this._resourceDialogsService.showSearchResourceDialog(this.config.type);
+    return this._resourceDialogsService.showSearchResourceDialog(this.config.searchTypes ?? this.config.type);
   }
 
   uploadResource(file: File, resourceId?: string): Observable<Resource | undefined> {

@@ -78,6 +78,7 @@
                   [disableServerPath]="true"
                   [withClearButton]="true"
                   [withChooseExistingResourceButton]="true"
+                  [searchTypes]="existingLibrariesSearchTypes"
                   formControlName="libraryFile"
                 >
                   <step-suffix class="button-suffix">
@@ -120,7 +121,7 @@
               by an activation expression.
             </step-description>
             <step-prefix>Version</step-prefix>
-            <input placeholder="Version (optional)" formControlName="version" name="version" title="Version" />
+            <input placeholder="Version (optional)" formControlName="versionName" name="versionName" title="Version" />
             <step-suffix>
               <step-icon
                 name="help-circle"

@@ -17,6 +17,7 @@ import {
   checkEntityGuardFactory,
   dialogRoute,
   EntityRegistry,
+  EntityTypeResolver,
   InfoBannerService,
   MultipleProjectsService,
   SimpleOutletComponent,
