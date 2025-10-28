@@ -16,14 +16,14 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { AutomationPackageResourceRefreshResultDialogComponent } from '../automation-package-resource-refresh-result-dialog/automation-package-resource-refresh-result-dialog.component';
 import { filter, switchMap } from 'rxjs';
-import { AP_RESOURCE_FILTER } from '../../types/constants';
+import { AP_RESOURCE_LIBRARY_FILTER } from '../../types/constants';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'step-automation-package-resource-list',
+  selector: 'step-automation-package-library-list',
   imports: [StepCoreModule, EntityRefDirective],
-  templateUrl: './automation-package-resource-list.component.html',
-  styleUrl: './automation-package-resource-list.component.scss',
+  templateUrl: './automation-package-library-list.component.html',
+  styleUrl: './automation-package-library-list.component.scss',
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
@@ -32,11 +32,11 @@ import { ActivatedRoute } from '@angular/router';
     ...entitySelectionStateProvider<string, Resource>('id'),
     {
       provide: DialogParentService,
-      useExisting: forwardRef(() => AutomationPackageResourceListComponent),
+      useExisting: forwardRef(() => AutomationPackageLibraryListComponent),
     },
   ],
 })
-export class AutomationPackageResourceListComponent implements DialogParentService {
+export class AutomationPackageLibraryListComponent implements DialogParentService {
   private _automationPackageApi = inject(AugmentedAutomationPackagesService);
   private _resourcesService = inject(AugmentedResourcesService);
   private _resourceDialogs = inject(ResourceDialogsService);
@@ -44,7 +44,7 @@ export class AutomationPackageResourceListComponent implements DialogParentServi
   private _matDialog = inject(MatDialog);
 
   protected readonly _activatedRoute = inject(ActivatedRoute);
-  protected readonly AP_RESOURCE_FILTER = AP_RESOURCE_FILTER;
+  protected readonly AP_RESOURCE_LIBRARY_FILTER = AP_RESOURCE_LIBRARY_FILTER;
   protected readonly dataSource = this._resourcesService.createDataSource();
 
   dialogSuccessfullyClosed(): void {
@@ -52,10 +52,13 @@ export class AutomationPackageResourceListComponent implements DialogParentServi
   }
 
   protected deleteResource(id: string, label: string): void {
-    this._dialogs.showDeleteWarning(1, `Resource "${label}"`).pipe(
-      filter((result) => result),
-      switchMap(() => this._automationPackageApi.deleteAutomationPackageResource(id)),
-    );
+    this._dialogs
+      .showDeleteWarning(1, `Library "${label}"`)
+      .pipe(
+        filter((result) => result),
+        switchMap(() => this._automationPackageApi.deleteAutomationPackageResource(id)),
+      )
+      .subscribe(() => this.dataSource.reload());
   }
 
   protected downloadResource(id: string): void {

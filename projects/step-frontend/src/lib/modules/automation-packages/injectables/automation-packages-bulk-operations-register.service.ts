@@ -4,7 +4,7 @@ import {
   BulkOperationType,
   EntityBulkOperationsRegistryService,
 } from '@exense/step-core';
-import { AP_ENTITY_ID, AP_RESOURCE_ENTITY_ID, AP_RESOURCE_FILTER } from '../types/constants';
+import { AP_ENTITY_ID, AP_RESOURCE_LIBRARY_ENTITY_ID, AP_RESOURCE_LIBRARY_FILTER } from '../types/constants';
 import { AutomationPackagePermission } from '../types/automation-package-permission.enum';
 
 @Injectable({
@@ -20,17 +20,17 @@ export class AutomationPackagesBulkOperationsRegisterService {
       permission: AutomationPackagePermission.DELETE,
       operation: (requestBody) => this._automationPackagesApi.bulkDelete(requestBody),
     });
-    this._entityBulkOperationsRegister.register(AP_RESOURCE_ENTITY_ID, {
+    this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.DELETE,
       permission: 'resource-bulk-delete',
       operation: (requestBody) =>
-        this._automationPackagesApi.bulkDeleteAutomationPackageResource(requestBody, AP_RESOURCE_FILTER),
+        this._automationPackagesApi.bulkDeleteAutomationPackageResource(requestBody, AP_RESOURCE_LIBRARY_FILTER),
     });
-    this._entityBulkOperationsRegister.register(AP_RESOURCE_ENTITY_ID, {
+    this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.REFRESH,
       permission: 'resource-write',
       operation: (requestBody) =>
-        this._automationPackagesApi.bulkRefreshAutomationPackageResource(requestBody, AP_RESOURCE_FILTER),
+        this._automationPackagesApi.bulkRefreshAutomationPackageResource(requestBody, AP_RESOURCE_LIBRARY_FILTER),
     });
   }
 }

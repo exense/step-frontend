@@ -9,15 +9,15 @@ import { MatDialogRef } from '@angular/material/dialog';
 type DialogRef = MatDialogRef<unknown, DialogRouteResult>;
 
 @Component({
-  selector: 'step-automation-package-resource-upload-dialog',
+  selector: 'step-automation-package-library-upload-dialog',
   imports: [StepCoreModule],
-  templateUrl: './automation-package-resource-upload-dialog.component.html',
-  styleUrl: './automation-package-resource-upload-dialog.component.scss',
+  templateUrl: './automation-package-library-upload-dialog.component.html',
+  styleUrl: './automation-package-library-upload-dialog.component.scss',
   host: {
     '(keydown.enter)': 'upload()',
   },
 })
-export class AutomationPackageResourceUploadDialogComponent {
+export class AutomationPackageLibraryUploadDialogComponent {
   private _fb = inject(FormBuilder).nonNullable;
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);

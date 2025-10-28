@@ -5,8 +5,10 @@ export const REGEX_EDITOR = /\/automation-package\/list\/upload\/(?:\d|\w){24}/;
 export const AP_LABEL_ENTITY = 'Automation Package';
 export const LABEL_MENU = 'Automation Packages';
 export const AP_ICON = 'automation';
-export const AP_RESOURCE_ENTITY_ID = 'automationPackageResources';
-export const AP_RESOURCE_LABEL_ENTITY = "Automation Package's Resource";
+export const AP_RESOURCE_LIBRARY_ENTITY_ID = 'automationPackageLibrary';
+export const AP_RESOURCE_LIBRARY_LABEL_ENTITY = "Automation Package's Library";
 export const AP_RESOURCE_ICON = 'file-attachment-03';
 export const AP_RESOURCE_FILTER =
   'not(resourceType=attachment) and (resourceType=automationPackage or resourceType=automationPackageLibrary)';
+export const AP_RESOURCE_LIBRARY_FILTER =
+  'not(resourceType=attachment) and (resourceType=automationPackageLibrary or resourceType=automationPackageManagedLibrary)';

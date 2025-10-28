@@ -7,8 +7,8 @@ import {
   LABEL_MENU,
   PATH,
   REGEX_EDITOR,
-  AP_RESOURCE_ENTITY_ID,
-  AP_RESOURCE_LABEL_ENTITY,
+  AP_RESOURCE_LIBRARY_ENTITY_ID,
+  AP_RESOURCE_LIBRARY_LABEL_ENTITY,
   AP_RESOURCE_ICON,
 } from './types/constants';
 import {
@@ -33,13 +33,13 @@ import { TableKeywordsComponent } from './components/table-keywords/table-keywor
 import { TableParametersComponent } from './components/table-parameters/table-parameters.component';
 import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
 import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
-import { AutomationPackageResourceListComponent } from './components/automation-package-resource-list/automation-package-resource-list.component';
-import { AutomationPackageResourceUploadDialogComponent } from './components/automation-package-resource-upload-dialog/automation-package-resource-upload-dialog.component';
+import { AutomationPackageLibraryListComponent } from './components/automation-package-library-list/automation-package-library-list.component';
+import { AutomationPackageLibraryUploadDialogComponent } from './components/automation-package-library-upload-dialog/automation-package-library-upload-dialog.component';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
   _entityRegistry.register(AP_ENTITY_ID, AP_LABEL_ENTITY, { icon: AP_ICON });
-  _entityRegistry.register(AP_RESOURCE_ENTITY_ID, AP_RESOURCE_LABEL_ENTITY, { icon: AP_RESOURCE_ICON });
+  _entityRegistry.register(AP_RESOURCE_LIBRARY_ENTITY_ID, AP_RESOURCE_LIBRARY_LABEL_ENTITY, { icon: AP_RESOURCE_ICON });
 };
 
 const registerRoutes = () => {
@@ -117,11 +117,11 @@ const registerRoutes = () => {
         },
         {
           path: 'resources',
-          component: AutomationPackageResourceListComponent,
+          component: AutomationPackageLibraryListComponent,
           children: [
             dialogRoute({
               path: 'upload',
-              dialogComponent: AutomationPackageResourceUploadDialogComponent,
+              dialogComponent: AutomationPackageLibraryUploadDialogComponent,
             }),
           ],
         },

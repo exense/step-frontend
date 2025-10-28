@@ -14,18 +14,9 @@
       />
       <section class="header" *stepAdditionalHeader="'automation-package-header'">
         <step-btn-group>
-          <button
-            type="button"
-            mat-icon-button
-            [matMenuTriggerFor]="menu"
-            matTooltip="Automation Package Documentation"
-            matTooltipPosition="below"
-          >
-            <step-icon name="help-circle" />
+          <button type="button" mat-stroked-button class="header-btn" (click)="openResources()">
+            Manage Libraries
           </button>
-        </step-btn-group>
-        <step-btn-group>
-          <button type="button" mat-flat-button class="header-btn" (click)="openResources()">Package resources</button>
         </step-btn-group>
         <step-btn-group>
           <button
@@ -38,6 +29,17 @@
             [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
           >
             Upload package
+          </button>
+        </step-btn-group>
+        <step-btn-group>
+          <button
+            type="button"
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            matTooltip="Automation Package Documentation"
+            matTooltipPosition="below"
+          >
+            <step-icon name="help-circle" />
           </button>
         </step-btn-group>
         <mat-menu #menu>

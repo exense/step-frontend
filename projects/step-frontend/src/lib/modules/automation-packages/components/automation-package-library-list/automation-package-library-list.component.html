@@ -1,11 +1,22 @@
+<section class="page-header">
+  <a
+    [routerLink]="['..']"
+    [relativeTo]="_activatedRoute"
+    matTooltip="Back to automation packages"
+    matTooltipPosition="below"
+  >
+    <step-icon name="chevron-left" class="black" aria-hidden="true" />
+  </a>
+  <h3>Package Libraries</h3>
+</section>
 <step-drag-drop-container>
   <step-table
-    data-step-testid="automation-packages-resources-table"
+    data-step-testid="automation-packages-library-resources-table"
     #table
     [dataSource]="dataSource"
     matSort
     [matSortDisableClear]="true"
-    [filter]="AP_RESOURCE_FILTER"
+    [filter]="AP_RESOURCE_LIBRARY_FILTER"
   >
     <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="automationPackageResources" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">
@@ -78,7 +89,7 @@
           <button
             data-step-testid="download-resource-btn"
             mat-icon-button
-            matTooltip="Download resource"
+            matTooltip="Download library"
             (click)="downloadResource(element.id)"
           >
             <step-icon name="download-cloud" />
@@ -86,7 +97,7 @@
           <button
             data-step-testid="refresh-resource-btn"
             mat-icon-button
-            matTooltip="Refresh resource"
+            matTooltip="Refresh library"
             [disabled]="!('resource-write' | hasRight | async)"
             (click)="refreshResource(element)"
           >
@@ -95,7 +106,7 @@
           <button
             data-step-testid="delete-resource-btn"
             mat-icon-button
-            matTooltip="Delete resource"
+            matTooltip="Delete library"
             [disabled]="!('resource-delete' | hasRight | async)"
             (click)="deleteResource(element.id, element.resourceName)"
           >
