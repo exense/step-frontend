@@ -48,14 +48,16 @@
           (openTreeView)="handleOpenTreeView(reportNode)"
         />
       } @else {
-        <step-aggregated-tree-node-iteration-list
-          [node]="aggregatedNode!"
-          [resolvedPartialPath]="resolvedPartialPath"
-          [initialStatus]="initialSearchStatus"
-          [initialStatusCount]="initialSearchStatusCount"
-          (showDetails)="handleOpenDetails($event)"
-          (openTreeView)="handleOpenTreeView($event)"
-        />
+        @if (aggregatedNode(); as aggregatedNode) {
+          <step-aggregated-tree-node-iteration-list
+            [node]="aggregatedNode"
+            [resolvedPartialPath]="resolvedPartialPath"
+            [initialStatus]="initialSearchStatus"
+            [initialStatusCount]="initialSearchStatusCount"
+            (showDetails)="handleOpenDetails($event)"
+            (openTreeView)="handleOpenTreeView($event)"
+          />
+        }
       }
     }
   </div>
