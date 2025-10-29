@@ -36,6 +36,7 @@ import {
   editScheduledTaskRoute,
   MultipleProjectsService,
   SearchPaginatorComponent,
+  StepBasicsModule,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -165,6 +166,8 @@ import { GradientLegendComponent } from './components/schedule-overview/cross-ex
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 
 @NgModule({
   declarations: [
@@ -267,6 +270,8 @@ import { StatusDistributionBadgeComponent } from './components/status-distributi
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
     HeatmapComponent,
+    AggregatedTreeNodeHistoryComponent,
+    AggregatedTreeNodeStatusesPiechartComponent,
   ],
   imports: [
     StepCommonModule,
