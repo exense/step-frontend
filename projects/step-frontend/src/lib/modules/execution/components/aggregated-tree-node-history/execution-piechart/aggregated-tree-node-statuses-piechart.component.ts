@@ -25,13 +25,13 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   private chart?: Chart | undefined;
 
   private renderEffect = effect(() => {
-    const el = this.canvas();
-    const sz = this.size();
-    const start = this.startAngleDeg();
+    const canvasElement = this.canvas();
+    const size = this.size();
+    const startAngle = this.startAngleDeg();
     const circ = this.circumferenceDeg();
-    const empty = this.emptyColor();
+    const emptyColor = this.emptyColor();
 
-    if (!el) return;
+    if (!canvasElement) return;
 
     const src = (this.slices() ?? [])
       .filter((s) => (s?.count ?? 0) > 0)
@@ -42,7 +42,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       total === 0
         ? {
             labels: ['empty'],
-            datasets: [{ data: [100], backgroundColor: [empty] }],
+            datasets: [{ data: [100], backgroundColor: [emptyColor] }],
           }
         : {
             labels: src.map((s) => s.label),
@@ -66,7 +66,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       elements: { arc: arcStyle },
-      rotation: (start * Math.PI) / 180,
+      rotation: (startAngle * Math.PI) / 180,
       circumference: (circ * Math.PI) / 180,
     } as const;
 
@@ -79,7 +79,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
       (this.chart.options as any).circumference = options.circumference;
       this.chart.update();
     } else {
-      this.chart = new Chart(el.nativeElement, {
+      this.chart = new Chart(canvasElement.nativeElement, {
         type: 'pie',
         data: data,
         options: {
@@ -89,8 +89,8 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
           elements: { arc: arcStyle },
         },
       }) as Chart;
-      el.nativeElement.width = sz;
-      el.nativeElement.height = sz;
+      canvasElement.nativeElement.width = size;
+      canvasElement.nativeElement.height = size;
     }
   });
 

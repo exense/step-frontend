@@ -50,8 +50,8 @@ $lines-color: var.$gray-300;
   align-items: center;
   position: relative;
   z-index: 1;
-  --arrow-w: 10px; /* triangle base width */
-  --arrow-h: 6px; /* triangle half-height */
+  --arrow-w: 10px;
+  --arrow-h: 6px;
   --line-color: #{$lines-color};
 
   .timestamp {
@@ -63,7 +63,7 @@ $lines-color: var.$gray-300;
     content: '';
     position: absolute;
     top: 20px;
-    right: -22px; /* nudge outside the end */
+    right: -22px;
     transform: translateY(-50%);
     width: 0;
     height: 0;

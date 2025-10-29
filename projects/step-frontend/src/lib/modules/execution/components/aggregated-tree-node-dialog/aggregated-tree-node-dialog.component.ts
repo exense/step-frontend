@@ -60,7 +60,7 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   historyTitle = computed(() => {
     const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
     const nodeName = this._data.aggregatedNode?.name || this.selectedReportNode()?.name || 'node';
-    return `Last ${typeLabel} of '${nodeName}'`;
+    return `Previous ${typeLabel} of '${nodeName}'`;
   });
 
   private isInitialLoad = true;
