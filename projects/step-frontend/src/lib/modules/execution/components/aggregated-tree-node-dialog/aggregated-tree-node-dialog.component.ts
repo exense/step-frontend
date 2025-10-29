@@ -104,12 +104,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
   });
   protected readonly hasBackButton = computed(() => !!this.selectedReportNode());
 
-  historyTitle = computed(() => {
-    const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
-    const nodeName = this.aggregatedNode()?.name || this.selectedReportNode()?.name || 'node';
-    return `Previous ${typeLabel} of '${nodeName}'`;
-  });
-
   private effectNotifyReportNodeOpen = effect(() => {
     const selectedReportNode = this.selectedReportNode();
     if (!selectedReportNode) {
