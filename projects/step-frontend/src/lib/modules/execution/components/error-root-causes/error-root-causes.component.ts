@@ -1,4 +1,4 @@
-import { Component, computed, forwardRef, input, TrackByFunction, ViewEncapsulation } from '@angular/core';
+import { Component, computed, forwardRef, input, output, TrackByFunction, ViewEncapsulation } from '@angular/core';
 import { KeyValue } from '@angular/common';
 import { ItemsPerPageService, StepCoreModule, TableIndicatorMode } from '@exense/step-core';
 import { Observable, of } from 'rxjs';
@@ -20,6 +20,7 @@ const PAGE_SIZE = 8;
 })
 export class ErrorRootCausesComponent implements ItemsPerPageService {
   readonly data = input.required<KeyValue<string, number>[]>();
+  readonly onErrorSearch = output<string>();
 
   protected readonly trackByItem: TrackByFunction<KeyValue<string, number>> = (index, item) => item.key;
 

@@ -25,6 +25,10 @@ p {
     margin-top: 0.3rem;
     font-style: italic;
 
+    &.link {
+      cursor: pointer;
+    }
+
     step-icon {
       display: block;
     }

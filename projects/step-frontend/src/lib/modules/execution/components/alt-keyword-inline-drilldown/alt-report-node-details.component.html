@@ -4,6 +4,7 @@
       <step-error-root-causes
         class="error-root-causes-container execution-report-node-details"
         [data]="rootCauseErrors"
+        (onErrorSearch)="searchFor($event)"
       />
     }
     @if (detailsComponent(); as detailsComponent) {
