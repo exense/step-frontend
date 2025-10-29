@@ -19,11 +19,10 @@ import { AutomationPackageResourceRefreshResultDialogComponent } from '../automa
 import { filter, switchMap } from 'rxjs';
 import { AP_RESOURCE_LIBRARY_FILTER } from '../../types/constants';
 import { ActivatedRoute } from '@angular/router';
-import { AutomationPackageResourceInfoComponent } from '../automation-package-resource-info/automation-package-resource-info.component';
 
 @Component({
   selector: 'step-automation-package-library-list',
-  imports: [StepCoreModule, EntityRefDirective, AutomationPackageResourceInfoComponent],
+  imports: [StepCoreModule, EntityRefDirective],
   templateUrl: './automation-package-library-list.component.html',
   styleUrl: './automation-package-library-list.component.scss',
   providers: [

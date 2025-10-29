@@ -50,15 +50,26 @@
           @default {}
         }
         <section>
-          <mat-slide-toggle color="primary" formControlName="isManagedLibrary">Managed Library</mat-slide-toggle>
+          <step-form-field>
+            <step-label>Managed Library</step-label>
+          </step-form-field>
           <p class="managed-libraries-description">
             Managed libraries are referenced with an identifier instead of a file name. If this library is updated all
             automation package using it will automatically switch to the new version as well.
           </p>
+          <mat-slide-toggle color="primary" formControlName="isManagedLibrary"
+            >Activate Managed Library</mat-slide-toggle
+          >
         </section>
         @if (isManagedLibrary()) {
-          <step-form-field>
+          <step-form-field alignLabelAddon="near">
             <step-label>Identifier</step-label>
+            <step-label-addon>
+              <step-icon
+                name="help-circle"
+                matTooltip="This is used to find this managed library when selecting one for an automation package"
+              />
+            </step-label-addon>
             <input type="text" formControlName="managedLibraryName" />
           </step-form-field>
         }

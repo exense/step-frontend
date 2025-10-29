@@ -3,12 +3,13 @@ import { AugmentedResourcesService, Resource } from '../../../../client/step-cli
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { TableModule } from '../../../table/table.module';
+import { ResourceInfoComponent } from '../resource-info/resource-info.component';
 
 @Component({
   selector: 'step-search-resource-dialog',
   templateUrl: './search-resource-dialog.component.html',
   styleUrls: ['./search-resource-dialog.component.scss'],
-  imports: [StepBasicsModule, TableModule],
+  imports: [StepBasicsModule, TableModule, ResourceInfoComponent],
 })
 export class SearchResourceDialogComponent {
   private _augmentedResourceService = inject(AugmentedResourcesService);

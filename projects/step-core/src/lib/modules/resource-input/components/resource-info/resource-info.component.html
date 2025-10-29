@@ -1,0 +1,42 @@
+@if (resource(); as lib) {
+  @if (popoverOverAllContent()) {
+    <step-popover yPosition="below">
+      <step-icon [class.maven]="isMaven()" [name]="icon()" />
+      <ng-container *ngTemplateOutlet="mainContent" />
+      <step-popover-content class="resource-info">
+        <ng-container *ngTemplateOutlet="popoverContent" />
+      </step-popover-content>
+    </step-popover>
+  } @else {
+    <step-popover yPosition="below">
+      <step-icon [class.maven]="isMaven()" [name]="icon()" />
+      <step-popover-content class="resource-info">
+        <ng-container *ngTemplateOutlet="popoverContent" />
+      </step-popover-content>
+    </step-popover>
+    <ng-container *ngTemplateOutlet="mainContent" />
+  }
+  <ng-template #popoverContent>
+    <div><b>Creator</b></div>
+    <div>{{ lib?.creationUser }}</div>
+    <div><b>Creation time</b></div>
+    <div>{{ lib?.creationDate | date: DateFormat.DATE }}</div>
+    @if (isManaged()) {
+      <div><b>Library resource</b></div>
+      <div>Managed</div>
+    }
+    @if (lib?.lastModificationDate) {
+      <div><b>Last modified by</b></div>
+      <div>{{ lib?.lastModificationUser }}</div>
+      <div><b>Last modified</b></div>
+      <div>
+        {{ lib?.lastModificationDate | date: DateFormat.DATE }}
+      </div>
+    }
+    <div><b>Origin</b></div>
+    <div>{{ lib?.origin }}</div>
+  </ng-template>
+  <ng-template #mainContent>
+    <ng-content />
+  </ng-template>
+}

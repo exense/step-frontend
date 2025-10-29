@@ -19,7 +19,6 @@ import { AutomationPackagePermission } from '../../types/automation-package-perm
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
 import { ExecutionModule } from '../../../execution/execution.module';
-import { AutomationPackageResourceInfoComponent } from '../automation-package-resource-info/automation-package-resource-info.component';
 
 @Component({
   selector: 'step-automation-package-list',
@@ -36,7 +35,7 @@ import { AutomationPackageResourceInfoComponent } from '../automation-package-re
       useExisting: forwardRef(() => AutomationPackageListComponent),
     },
   ],
-  imports: [StepCoreModule, ExecutionModule, EntityRefDirective, AutomationPackageResourceInfoComponent],
+  imports: [StepCoreModule, ExecutionModule, EntityRefDirective],
 })
 export class AutomationPackageListComponent implements OnInit, DialogParentService {
   private _actions = inject(AutomationPackagesActionsService);

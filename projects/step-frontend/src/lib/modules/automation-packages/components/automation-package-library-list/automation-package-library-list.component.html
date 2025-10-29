@@ -57,9 +57,9 @@
         <step-drag-column-caption>Type</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        <step-automation-package-resource-info [resource]="element">
+        <step-resource-info [resource]="element">
           {{ element.resourceType }}
-        </step-automation-package-resource-info>
+        </step-resource-info>
       </td>
     </ng-container>
     <ng-container matColumnDef="id" stepActivityCol="Id" stepSearchCol>
