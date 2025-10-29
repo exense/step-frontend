@@ -7,6 +7,7 @@
     matSortActive="executionTime"
     matSortDirection="desc"
     [matSortDisableClear]="true"
+    [indicatorMode]="TableIndicatorMode.SKELETON_ON_INITIAL_LOAD"
   >
     <step-entity-column-container entityName="executions" />
     <ng-container
