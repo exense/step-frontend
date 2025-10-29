@@ -58,12 +58,6 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   isScheduledExecution = toSignal(this._executionState.execution$.pipe(map((ex) => !!ex.executionTaskID)));
 
-  historyTitle = computed(() => {
-    const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
-    const nodeName = this._data.aggregatedNode?.name || this.selectedReportNode()?.name || 'node';
-    return `Previous ${typeLabel} of '${nodeName}'`;
-  });
-
   private isInitialLoad = true;
 
   private aggregatedNode$ = this._executionState.timeRange$.pipe(
@@ -109,6 +103,12 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
     return !!aggregatedNode || !!reportNode;
   });
   protected readonly hasBackButton = computed(() => !!this.selectedReportNode());
+
+  historyTitle = computed(() => {
+    const typeLabel = this.isScheduledExecution() ? 'scheduled executions' : 'executions';
+    const nodeName = this.aggregatedNode()?.name || this.selectedReportNode()?.name || 'node';
+    return `Previous ${typeLabel} of '${nodeName}'`;
+  });
 
   private effectNotifyReportNodeOpen = effect(() => {
     const selectedReportNode = this.selectedReportNode();
