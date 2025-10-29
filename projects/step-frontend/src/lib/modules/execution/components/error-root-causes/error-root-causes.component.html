@@ -1,6 +1,7 @@
 <div class="data-container">
   <div class="error-summary">
-    <step-icon class="error" name="alert-triangle" /> This node contains {{ totalErrorCount() }} errors
+    <step-icon class="error" name="alert-triangle" /> This node contains {{ totalErrorCount() }}
+    {{ totalErrorCount() > 1 ? 'errors' : 'error' }}
   </div>
   @if (isSimpleView()) {
     <div class="error-root-causes">

@@ -15,6 +15,7 @@ step-table {
   td {
     width: 1px;
     white-space: nowrap;
+    cursor: pointer;
 
     padding-top: 0 !important;
     &:nth-child(1) {

@@ -23,10 +23,10 @@ p {
     align-items: center;
     white-space: nowrap;
     margin-top: 0.3rem;
-    font-style: italic;
 
     &.link {
       cursor: pointer;
+      font-style: italic;
     }
 
     step-icon {
