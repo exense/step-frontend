@@ -11,6 +11,7 @@ import {
   SearchValue,
   StepDataSource,
   tableColumnsConfigProvider,
+  TableIndicatorMode,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
 import { BehaviorSubject, of } from 'rxjs';
@@ -52,13 +53,13 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
-  dataSource: StepDataSource<Execution> | undefined;
+  protected dataSource: StepDataSource<Execution> | undefined;
   readonly DateFormat = DateFormat;
 
-  hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
-  defaultDateRange = input<DateRange>();
+  readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
+  readonly defaultDateRange = input<DateRange>();
 
-  tableFilters = computed(() => {
+  protected tableFilters = computed(() => {
     const filters = this.hiddenFilters();
     const range = this.defaultDateRange();
     if (!range) {
@@ -84,4 +85,6 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
     this.dataSource!.reload({ hideProgress: true });
     this.reloadRunningExecutionsCount$.next();
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }
