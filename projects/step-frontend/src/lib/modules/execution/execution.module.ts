@@ -99,7 +99,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, filter, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -775,16 +775,9 @@ export class ExecutionModule {
                   {
                     path: ':detailsId',
                     resolve: {
-                      aggregatedNode: (route: ActivatedRouteSnapshot) => {
+                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
-                        const _state = inject(AggregatedReportViewTreeStateContextService).getState();
-                        const aggregatedNodeId = detailsId.startsWith('agid_')
-                          ? detailsId.replace('agid_', '')
-                          : undefined;
-                        if (!aggregatedNodeId) {
-                          return undefined;
-                        }
-                        return _state.findNodeById(aggregatedNodeId);
+                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
                       },
                       resolvedPartialPath: () =>
                         inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
@@ -792,22 +785,6 @@ export class ExecutionModule {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
                       },
-                      /*
-                      reportNode: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                        const _controllerService = inject(AugmentedControllerService);
-                        const reportNodeId = detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                        if (!reportNodeId) {
-                          return undefined;
-                        }
-                        const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
-                        if (reportNode) {
-                          return reportNode;
-                        }
-                        return _controllerService.getReportNode(reportNodeId);
-                      },
-*/
                       searchStatus: (route: ActivatedRouteSnapshot) => {
                         const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                         return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
