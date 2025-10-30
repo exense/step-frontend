@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage, DialogsService } from '@exense/step-core';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { PATH } from '../types/constants';
+import { AP_LIST_PATH } from '../types/constants';
 import { Router } from '@angular/router';
 
-const ROOT_URL = `/${PATH}/list`;
+const ROOT_URL = AP_LIST_PATH;
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +49,7 @@ export class AutomationPackagesActionsService {
   }
 
   executeAutomationPackage(automationPackage: AutomationPackage): void {
-    this._router.navigateByUrl(`/${ROOT_URL}/execute/${automationPackage.id}`);
+    this._router.navigateByUrl(`${ROOT_URL}/execute/${automationPackage.id}`);
   }
 
   editAutomationPackage(automationPackage: AutomationPackage): void {

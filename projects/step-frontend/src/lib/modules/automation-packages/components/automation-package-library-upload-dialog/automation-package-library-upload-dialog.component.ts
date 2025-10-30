@@ -1,8 +1,9 @@
-import { Component, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import {
   AceMode,
   AugmentedAutomationPackagesService,
   DialogRouteResult,
+  Resource,
   StepCoreModule,
   toggleValidators,
 } from '@exense/step-core';
@@ -10,10 +11,13 @@ import { UploadType } from '../../types/upload-type.enum';
 import { FormBuilder, Validators } from '@angular/forms';
 import { catchError, map, Observable, of } from 'rxjs';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 type DialogRef = MatDialogRef<unknown, DialogRouteResult>;
+type DialogData = {
+  automationPackageLibrary?: Resource;
+};
 
 @Component({
   selector: 'step-automation-package-library-upload-dialog',
@@ -24,14 +28,17 @@ type DialogRef = MatDialogRef<unknown, DialogRouteResult>;
     '(keydown.enter)': 'upload()',
   },
 })
-export class AutomationPackageLibraryUploadDialogComponent {
+export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
   private _fb = inject(FormBuilder).nonNullable;
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
+  private _dialogData = inject<DialogData>(MAT_DIALOG_DATA);
   protected readonly UploadType = UploadType;
   protected readonly selectedType = signal(UploadType.UPLOAD);
 
   private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+
+  protected readonly AceMode = AceMode;
 
   protected form = this._fb.group({
     fileName: this._fb.control(''),
@@ -70,6 +77,13 @@ export class AutomationPackageLibraryUploadDialogComponent {
   protected file?: File;
   protected progress$?: Observable<number>;
 
+  ngOnInit(): void {
+    const library = this._dialogData.automationPackageLibrary;
+    if (library) {
+      this.setFormValue(library);
+    }
+  }
+
   protected openFileChooseDialog(): void {
     this.fileInput()?.nativeElement?.click?.();
   }
@@ -104,7 +118,9 @@ export class AutomationPackageLibraryUploadDialogComponent {
       ? AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY
       : AutomationPackageResourceType.AUTOMATION_PACKAGE_LIBRARY;
 
+    const id = this._dialogData?.automationPackageLibrary?.id;
     const upload = this._api.createOrUpdateAutomationPackageResource({
+      id,
       resourceType,
       resourceFile: this.file,
       mavenSnippet,
@@ -124,5 +140,14 @@ export class AutomationPackageLibraryUploadDialogComponent {
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
   }
 
-  protected readonly AceMode = AceMode;
+  private setFormValue(libraryResource: Resource): void {
+    if (libraryResource.resourceType !== AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY) {
+      throw new Error(
+        `Only '${AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY}' are supported for editing.`,
+      );
+    }
+    this.form.controls.isManagedLibrary.setValue(true);
+    this.form.controls.isManagedLibrary.disable();
+    this.form.controls.managedLibraryName.setValue(libraryResource?.resourceName ?? '');
+  }
 }

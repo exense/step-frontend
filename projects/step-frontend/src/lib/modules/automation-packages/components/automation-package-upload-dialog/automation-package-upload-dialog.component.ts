@@ -11,15 +11,17 @@ import {
   EntityRefDirective,
   ReloadableDirective,
   StepCoreModule,
+  AutomationPackageUpdateResult,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, pipe } from 'rxjs';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { UploadType } from '../../types/upload-type.enum';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
+import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -41,6 +43,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
+  private _matDialog = inject(MatDialog);
 
   protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -208,6 +211,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     this.progress$ = upload.progress$;
 
     return upload.response$.pipe(
+      tap((response) => this.proceedUploadResult(response)),
       map(() => true),
       catchError((err) => {
         console.error(err);
@@ -228,6 +232,21 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     return Object.entries(this.automationPackage.tokenSelectionCriteria || {}).map(
       ([key, value]) => ({ key, value }) as KeyValue<string, string>,
     );
+  }
+
+  private proceedUploadResult(response?: string): void {
+    if (!response) {
+      return;
+    }
+    let updateResult: AutomationPackageUpdateResult | undefined = undefined;
+    try {
+      updateResult = JSON.parse(response);
+    } catch (e) {}
+    const warnings = updateResult?.warnings ?? [];
+    if (!warnings.length) {
+      return;
+    }
+    this._matDialog.open(AutomationPackageWarningsDialogComponent, { data: warnings });
   }
 
   protected readonly AlertType = AlertType;

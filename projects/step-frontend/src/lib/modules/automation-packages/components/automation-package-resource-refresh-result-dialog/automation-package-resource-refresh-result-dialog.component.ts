@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AlertType, RefreshResourceResult, StepCoreModule } from '@exense/step-core';
 
@@ -15,6 +15,7 @@ interface Message {
   host: {
     class: 'messages-view-dialog',
   },
+  encapsulation: ViewEncapsulation.None,
 })
 export class AutomationPackageResourceRefreshResultDialogComponent {
   private _data = inject<RefreshResourceResult>(MAT_DIALOG_DATA);

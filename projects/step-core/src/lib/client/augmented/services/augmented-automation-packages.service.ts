@@ -166,7 +166,11 @@ export class AugmentedAutomationPackagesService
     }
 
     if (managedLibraryName) {
-      body.set('managedLibraryName', managedLibraryName);
+      if (!id) {
+        body.set('managedLibraryName', managedLibraryName);
+      } else {
+        body.set('newManagedLibraryName', managedLibraryName);
+      }
     }
 
     const headers = new HttpHeaders({ enctype: 'multipart/form-data' });

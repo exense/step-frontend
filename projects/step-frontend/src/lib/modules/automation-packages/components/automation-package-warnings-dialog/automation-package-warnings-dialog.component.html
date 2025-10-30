@@ -1,10 +1,10 @@
-<step-modal-window title="Refresh result">
+<step-modal-window title="Warnings">
   <div step-modal-window-body>
     <section class="message-container">
-      @for (item of messages; track item.message) {
-        <step-alert [type]="item.alertType">
+      @for (item of _warnings; track item) {
+        <step-alert [type]="AlertType.WARNING">
           <section class="message-content">
-            <div>{{ item.message }}</div>
+            <div>{{ item }}</div>
           </section>
         </step-alert>
       }

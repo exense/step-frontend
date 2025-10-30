@@ -28,7 +28,7 @@
           matTooltip="New automation package library"
           matTooltipPosition="below"
           [disabled]="!('resource-write' | hasRight | async)"
-          [routerLink]="['.', 'upload']"
+          [routerLink]="['.', 'upload', 'new']"
           [relativeTo]="_activatedRoute"
         >
           <step-icon name="plus"></step-icon>
@@ -47,9 +47,13 @@
         <step-drag-column-caption>Name</step-drag-column-caption>
       </th>
       <td mat-cell *matCellDef="let element">
-        <a class="resource-link" [routerLink]="element | resourceUrl">
+        @if (element.resourceType === AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY) {
+          <a class="resource-link" [routerLink]="['.', 'upload', element.id]" [relativeTo]="_activatedRoute">
+            {{ element.attributes.name }}
+          </a>
+        } @else {
           {{ element.attributes.name }}
-        </a>
+        }
       </td>
     </ng-container>
     <ng-container matColumnDef="resourceType" stepActivityCol="Type" stepSearchCol>

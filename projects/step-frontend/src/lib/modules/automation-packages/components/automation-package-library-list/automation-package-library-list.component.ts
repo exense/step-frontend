@@ -19,6 +19,7 @@ import { AutomationPackageResourceRefreshResultDialogComponent } from '../automa
 import { filter, switchMap } from 'rxjs';
 import { AP_RESOURCE_LIBRARY_FILTER } from '../../types/constants';
 import { ActivatedRoute } from '@angular/router';
+import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 
 @Component({
   selector: 'step-automation-package-library-list',
@@ -79,4 +80,6 @@ export class AutomationPackageLibraryListComponent implements DialogParentServic
   protected searchUsages(resource: Resource): void {
     this._isUsedBy.displayDialog(resource.resourceName || '', 'AUTOMATION_PACKAGE', resource.id!);
   }
+
+  protected readonly AutomationPackageResourceType = AutomationPackageResourceType;
 }
