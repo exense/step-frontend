@@ -54,13 +54,20 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
 
   readonly openTestCaseInTreeView = output<ReportNode>();
 
+  onSearchFor(item: AggregatedReportView, message: string): void {
+    this.showIterations(item, { searchFor: message });
+  }
+
   override setupDateRangeFilter(): void {
     // Empty implementation
   }
 
-  protected showIterations(item: AggregatedReportView, status?: Status, count?: number, event?: MouseEvent): void {
-    event?.stopPropagation?.();
-    event?.stopImmediatePropagation?.();
+  protected showIterations(
+    item: AggregatedReportView,
+    options?: { searchFor?: string; status?: Status; count?: number; event?: MouseEvent },
+  ): void {
+    options?.event?.stopPropagation?.();
+    options?.event?.stopImmediatePropagation?.();
 
     const artefactId = item.artefact!.id!;
 
@@ -72,13 +79,14 @@ export class AltReportNodesTestcasesComponent extends BaseAltReportNodeTableCont
       return;
     }
 
-    if (!count) {
-      count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
+    if (options && !options?.count) {
+      options!.count = Object.values(item.countByStatus ?? {}).reduce((res, item) => res + item, 0);
     }
 
     this._executionDialogs.openIterations(node, {
-      nodeStatus: status,
-      nodeStatusCount: count,
+      nodeStatus: options?.status,
+      nodeStatusCount: options?.count,
+      searchFor: options?.searchFor,
     });
   }
 
