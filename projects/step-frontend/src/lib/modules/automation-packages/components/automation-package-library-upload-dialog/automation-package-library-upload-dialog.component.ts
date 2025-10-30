@@ -125,4 +125,5 @@ export class AutomationPackageLibraryUploadDialogComponent {
   }
 
   protected readonly AceMode = AceMode;
+  protected readonly MANAGED_LIBRARY_DESCRIPTION = `Managed libraries are referenced with an identifier instead of a file name. If this library is updated all automation package using it will automatically switch to the new version as well.`;
 }
