@@ -12,6 +12,12 @@ step-error-root-causes {
     color: var.$red-650;
   }
 
+  .error-root-causes > .error-message {
+    /* only selects error-messages not in a table */
+    padding-top: 0.2rem;
+    padding-bottom: 0.7rem;
+  }
+
   .error-message {
     max-width: 60rem;
 
