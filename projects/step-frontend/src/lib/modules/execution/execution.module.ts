@@ -36,6 +36,7 @@ import {
   editScheduledTaskRoute,
   MultipleProjectsService,
   SearchPaginatorComponent,
+  StepBasicsModule,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -98,7 +99,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, filter, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -165,6 +166,8 @@ import { GradientLegendComponent } from './components/schedule-overview/cross-ex
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 
 @NgModule({
   declarations: [
@@ -267,6 +270,8 @@ import { StatusDistributionBadgeComponent } from './components/status-distributi
     StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
     HeatmapComponent,
+    AggregatedTreeNodeHistoryComponent,
+    AggregatedTreeNodeStatusesPiechartComponent,
   ],
   imports: [
     StepCommonModule,
@@ -770,16 +775,9 @@ export class ExecutionModule {
                   {
                     path: ':detailsId',
                     resolve: {
-                      aggregatedNode: (route: ActivatedRouteSnapshot) => {
+                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
-                        const _state = inject(AggregatedReportViewTreeStateContextService).getState();
-                        const aggregatedNodeId = detailsId.startsWith('agid_')
-                          ? detailsId.replace('agid_', '')
-                          : undefined;
-                        if (!aggregatedNodeId) {
-                          return undefined;
-                        }
-                        return _state.findNodeById(aggregatedNodeId);
+                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
                       },
                       resolvedPartialPath: () =>
                         inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
@@ -787,22 +785,6 @@ export class ExecutionModule {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
                       },
-                      /*
-                      reportNode: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                        const _controllerService = inject(AugmentedControllerService);
-                        const reportNodeId = detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                        if (!reportNodeId) {
-                          return undefined;
-                        }
-                        const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
-                        if (reportNode) {
-                          return reportNode;
-                        }
-                        return _controllerService.getReportNode(reportNodeId);
-                      },
-*/
                       searchStatus: (route: ActivatedRouteSnapshot) => {
                         const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                         return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;
