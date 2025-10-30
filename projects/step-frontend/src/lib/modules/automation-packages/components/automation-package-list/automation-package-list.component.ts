@@ -99,8 +99,16 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
     });
   }
 
-  protected openResources(): void {
-    this._router.navigate(['..', 'resources'], { relativeTo: this._activatedRoute });
+  protected refreshPackage(automationPackage: AutomationPackage): void {
+    this._actions.refreshAutomationPackage(automationPackage).subscribe((isSuccess) => {
+      if (isSuccess) {
+        this._dataSource.reload();
+      }
+    });
+  }
+
+  protected openLibraries(): void {
+    this._router.navigate(['..', 'libraries'], { relativeTo: this._activatedRoute });
   }
 
   private getAutomationPackageFileFilter(): Observable<string | undefined> {

@@ -10,7 +10,6 @@ import { Resource } from '../../../../client/step-client-module';
 })
 export class ResourceInfoComponent {
   readonly resource = input<Resource | undefined>();
-  readonly popoverOverAllContent = input(false);
 
   protected readonly isMaven = computed(() => {
     const library = this.resource();

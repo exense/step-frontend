@@ -117,7 +117,7 @@ const registerRoutes = () => {
           ],
         },
         {
-          path: 'resources',
+          path: 'libraries',
           component: AutomationPackageLibraryListComponent,
           children: [
             dialogRoute({

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AugmentedAutomationPackagesService, AutomationPackage, DialogsService } from '@exense/step-core';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 import { PATH } from '../types/constants';
 import { Router } from '@angular/router';
 
@@ -30,6 +30,17 @@ export class AutomationPackagesActionsService {
         }
         return of(isDeleteConfirmed);
       }),
+    );
+  }
+
+  refreshAutomationPackage(automationPackage: AutomationPackage): Observable<boolean> {
+    const id = automationPackage.id;
+    if (!id) {
+      return of(false);
+    }
+    return this._api.refreshAutomationPackage(id).pipe(
+      map(() => true),
+      catchError(() => of(false)),
     );
   }
 

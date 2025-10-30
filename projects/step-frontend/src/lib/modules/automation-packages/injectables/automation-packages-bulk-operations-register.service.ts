@@ -20,6 +20,11 @@ export class AutomationPackagesBulkOperationsRegisterService {
       permission: AutomationPackagePermission.DELETE,
       operation: (requestBody) => this._automationPackagesApi.bulkDelete(requestBody),
     });
+    this._entityBulkOperationsRegister.register(AP_ENTITY_ID, {
+      type: BulkOperationType.REFRESH,
+      permission: AutomationPackagePermission.READ,
+      operation: (requestBody) => this._automationPackagesApi.bulkRefresh(requestBody),
+    });
     this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.DELETE,
       permission: 'resource-bulk-delete',
@@ -28,7 +33,7 @@ export class AutomationPackagesBulkOperationsRegisterService {
     });
     this._entityBulkOperationsRegister.register(AP_RESOURCE_LIBRARY_ENTITY_ID, {
       type: BulkOperationType.REFRESH,
-      permission: 'resource-write',
+      permission: 'resource-read',
       operation: (requestBody) =>
         this._automationPackagesApi.bulkRefreshAutomationPackageResource(requestBody, AP_RESOURCE_LIBRARY_FILTER),
     });
