@@ -2,6 +2,7 @@ import { Component, effect, forwardRef, inject, OnInit, viewChild } from '@angul
 import {
   AugmentedAutomationPackagesService,
   AutomationPackage,
+  DateFormat,
   DialogParentService,
   EntityRefDirective,
   entitySelectionStateProvider,
@@ -11,7 +12,7 @@ import {
   TableComponent,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { ENTITY_ID } from '../../types/constants';
+import { AP_ENTITY_ID } from '../../types/constants';
 import { AutomationPackagesActionsService } from '../../injectables/automation-packages-actions.service';
 import { map, Observable, of } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
@@ -43,13 +44,14 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
 
   readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
 
-  readonly ENTITY_ID = ENTITY_ID;
+  readonly ENTITY_ID = AP_ENTITY_ID;
 
   readonly AutomationPackagePermission = AutomationPackagePermission;
 
   protected isReady = false;
 
   private automationPackageFileName?: string;
+
   private table = viewChild('table', { read: TableComponent<AutomationPackage> });
 
   private effectTableChange = effect(() => {
@@ -97,6 +99,18 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
     });
   }
 
+  protected refreshPackage(automationPackage: AutomationPackage): void {
+    this._actions.refreshAutomationPackage(automationPackage).subscribe((isSuccess) => {
+      if (isSuccess) {
+        this._dataSource.reload();
+      }
+    });
+  }
+
+  protected openLibraries(): void {
+    this._router.navigate(['..', 'libraries'], { relativeTo: this._activatedRoute });
+  }
+
   private getAutomationPackageFileFilter(): Observable<string | undefined> {
     const automationPackageFileName = this._activatedRoute.snapshot.queryParams?.['automationPackageFileName'];
     if (!automationPackageFileName) {
@@ -110,4 +124,6 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
       }),
     ).pipe(map(() => automationPackageFileName));
   }
+
+  protected readonly DateFormat = DateFormat;
 }

@@ -1,3 +1,5 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
 input[type='file'] {
   display: none;
 }
@@ -10,4 +12,97 @@ div[step-modal-window-body] form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+button.maven {
+  step-icon {
+    stroke: none !important;
+    fill: var.$blue-700 !important;
+  }
+}
+
+button.active {
+  right: 2.4rem;
+  margin-top: -2rem;
+  position: absolute;
+  min-width: 0;
+  width: 3rem;
+  height: 3rem;
+  background: var.$blue-600;
+  step-icon {
+    fill: white !important;
+  }
+}
+
+step-icon.active {
+  stroke: var.$dark-blue;
+}
+
+step-description {
+  width: 524px;
+  margin-top: -1rem;
+}
+
+step-label {
+  color: var.$blue-700;
+  font-weight: 500;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  pointer-events: all;
+}
+
+.advanced-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.advanced-settings-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  gap: 0.25rem;
+}
+
+.advanced-settings-label {
+  color: var.$blue-700;
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+}
+:host ::ng-deep h1.mat-mdc-dialog-title .header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: -3rem;
+}
+
+:host ::ng-deep h1.mat-mdc-dialog-title .header-title > div {
+  margin-left: auto;
+}
+
+step-resource-input {
+  width: 100%;
+}
+
+.criteria-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  & > div {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.criteria-body .criterion-row {
+  display: grid;
+  grid-template-columns: 45% 45% auto;
+  column-gap: 1rem;
+  row-gap: 1rem;
+
+  button {
+    min-width: 4rem;
+    width: 4rem;
+  }
 }

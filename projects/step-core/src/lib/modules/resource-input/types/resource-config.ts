@@ -1,5 +1,6 @@
 export interface ResourceConfig {
   readonly type: string;
+  readonly searchTypes?: string[];
   readonly isBounded?: boolean;
   readonly supportsDirectory?: boolean;
   readonly withChooseExistingResourceButton?: boolean;

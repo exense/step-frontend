@@ -1,9 +1,9 @@
 <step-modal-window title="Error">
   <div step-modal-window-body>
-    <section class="error-container">
+    <section class="messages-container">
       @for (error of _state.errors() | uniqueErrors; track error.id) {
         <step-alert [type]="AlertType.DANGER">
-          <section class="error-content">
+          <section class="message-content">
             <div>{{ error.message }}</div>
           </section>
         </step-alert>

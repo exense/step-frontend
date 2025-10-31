@@ -78,6 +78,7 @@ import { StatusIconClassDirective } from './directives/status-icon-class.directi
 import { DescriptionDirective } from './directives/description.directive';
 import { FilterAddonDirective } from './directives/filter-addon.directive';
 import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
+import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 
 @NgModule({
   imports: [
@@ -95,6 +96,7 @@ import { LongInlineTextComponent } from './components/long-inline-text/long-inli
     StatusIconClassDirective,
     FilterAddonDirective,
     LongInlineTextComponent,
+    ResourceUrlPipe,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -244,6 +246,7 @@ import { LongInlineTextComponent } from './components/long-inline-text/long-inli
     StatusIconClassDirective,
     FilterAddonDirective,
     LongInlineTextComponent,
+    ResourceUrlPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -389,3 +392,5 @@ export * from './types/type-info';
 export * from './types/file-types';
 export * from './injectables/file-type-utils.service';
 export * from './components/long-inline-text/long-inline-text.component';
+export * from './pipes/resource-url.pipe';
+export * from './utils/toggle-validators';

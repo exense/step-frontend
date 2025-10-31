@@ -1,0 +1,16 @@
+<step-modal-window title="Refresh result">
+  <div step-modal-window-body>
+    <section class="message-container">
+      @for (item of messages; track item.message) {
+        <step-alert [type]="item.alertType">
+          <section class="message-content">
+            <div>{{ item.message }}</div>
+          </section>
+        </step-alert>
+      }
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Close</button>
+  </div>
+</step-modal-window>

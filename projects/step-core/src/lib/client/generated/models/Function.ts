@@ -18,6 +18,7 @@ export type Function = {
   useCustomTemplate?: boolean;
   htmlTemplate?: string;
   description?: string;
+  automationPackageFile?: string;
   id?: string;
   type: string;
 };
