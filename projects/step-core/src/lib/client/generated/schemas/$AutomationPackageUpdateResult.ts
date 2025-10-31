@@ -13,5 +13,11 @@ export const $AutomationPackageUpdateResult = {
     conflictingAutomationPackages: {
       type: 'ConflictingAutomationPackages',
     },
+    warnings: {
+      type: 'array',
+      contains: {
+        type: 'string',
+      },
+    },
   },
 } as const;

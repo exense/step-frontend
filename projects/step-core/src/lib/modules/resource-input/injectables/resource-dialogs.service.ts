@@ -32,8 +32,9 @@ export class ResourceDialogsService {
     this._isUsedByDialogs.displayDialog(resource.resourceName || '', RESOURCE_SEARCH_TYPE, resource.id!);
   }
 
-  showSearchResourceDialog(type: string): Observable<string> {
-    const dialogRef = this._matDialog.open(SearchResourceDialogComponent, { data: type });
+  showSearchResourceDialog(type: string | string[]): Observable<string> {
+    const data = typeof type === 'string' ? [type] : type;
+    const dialogRef = this._matDialog.open(SearchResourceDialogComponent, { data });
     return dialogRef.afterClosed() as Observable<string>;
   }
 

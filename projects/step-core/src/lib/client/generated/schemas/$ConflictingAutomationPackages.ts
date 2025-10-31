@@ -10,7 +10,7 @@ export const $ConflictingAutomationPackages = {
         pattern: '[a-f0-9]{24}}',
       },
     },
-    apWithSameKeywordLib: {
+    apWithSameLibrary: {
       type: 'array',
       contains: {
         type: 'string',

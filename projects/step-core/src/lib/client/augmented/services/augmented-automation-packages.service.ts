@@ -1,5 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters, Plan } from '../../generated';
+import {
+  AsyncTaskStatusTableBulkOperationReport,
+  AutomationPackage,
+  AutomationPackagesService,
+  ExecutiontTaskParameters,
+  FormDataContentDisposition,
+  Plan,
+  TableBulkOperationRequest,
+} from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
@@ -15,6 +23,7 @@ import { HttpOverrideResponseInterceptor } from '../shared/http-override-respons
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 import { Keyword } from '../shared/keyword';
+import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
 
 export interface AutomationPackageParams {
   id?: string;
@@ -22,13 +31,21 @@ export interface AutomationPackageParams {
   apResourceId?: string;
   apLibraryMavenSnippet?: string;
   apLibraryResourceId?: string;
-  version?: string;
+  versionName?: string;
   activationExpression?: string;
   allowUpdateOfOtherPackages?: boolean;
   plansAttributes?: Partial<Plan>;
   functionsAttributes?: Partial<Keyword>;
   tokenSelectionCriteria?: any;
   executeFunctionsLocally?: boolean;
+}
+
+export interface AutomationPackageResourceParams {
+  id?: string;
+  resourceType: string;
+  mavenSnippet?: string;
+  resourceFile?: File;
+  managedLibraryName?: string;
 }
 
 @Injectable({
@@ -55,6 +72,20 @@ export class AugmentedAutomationPackagesService
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
     return this;
+  }
+
+  override bulkDeleteAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkDeleteAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
+  }
+
+  override bulkRefreshAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkRefreshAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
   }
 
   createDataSource(): StepDataSource<AutomationPackage> {
@@ -117,11 +148,53 @@ export class AugmentedAutomationPackagesService
     );
   }
 
+  createOrUpdateAutomationPackageResource({
+    id,
+    resourceType,
+    resourceFile,
+    mavenSnippet,
+    managedLibraryName,
+  }: AutomationPackageResourceParams): ReturnType<typeof uploadWithProgress> {
+    const url = !id ? 'rest/automation-packages/resources' : `rest/automation-packages/resources/${id}`;
+
+    const body = new FormData();
+    body.set('resourceType', resourceType);
+    if (resourceFile) {
+      body.set('file', resourceFile);
+    } else if (mavenSnippet) {
+      body.set('mavenSnippet', mavenSnippet);
+    }
+
+    if (managedLibraryName) {
+      if (!id) {
+        body.set('managedLibraryName', managedLibraryName);
+      } else {
+        body.set('newManagedLibraryName', managedLibraryName);
+      }
+    }
+
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+
+    const request$ = this._http.request(
+      'POST',
+      url,
+      this._requestContextHolder.decorateRequestOptions({
+        headers,
+        body,
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
+
+    return uploadWithProgress(request$);
+  }
+
   automationPackageCreateOrUpdate({
     id,
     apMavenSnippet,
     apResourceId,
-    version,
+    versionName,
     activationExpression,
     apLibraryMavenSnippet,
     apLibraryResourceId,
@@ -165,8 +238,8 @@ export class AugmentedAutomationPackagesService
       body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
     }
 
-    if (version) {
-      body.set('version', version);
+    if (versionName) {
+      body.set('versionName', versionName);
     }
     if (activationExpression) {
       body.set('activationExpr', activationExpression);

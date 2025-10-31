@@ -11,24 +11,23 @@ import {
   EntityRefDirective,
   ReloadableDirective,
   StepCoreModule,
+  AutomationPackageUpdateResult,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, pipe } from 'rxjs';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
+import { UploadType } from '../../types/upload-type.enum';
+import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
+import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
 }
 
 type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRouteResult>;
-
-enum UploadType {
-  UPLOAD,
-  MAVEN,
-}
 
 @Component({
   selector: 'step-automation-package-upload-dialog',
@@ -44,6 +43,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
+  private _matDialog = inject(MatDialog);
 
   protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -54,6 +54,10 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   protected readonly isNewPackage = !this.automationPackage.id;
   protected isAffectingOtherPackage = false;
+  protected readonly existingLibrariesSearchTypes = [
+    AutomationPackageResourceType.AUTOMATION_PACKAGE_LIBRARY,
+    AutomationPackageResourceType.AUTOMATION_PACKAGE_MANAGED_LIBRARY,
+  ];
 
   private effectSwitchTab = effect(() => {
     if (this.apType === UploadType.UPLOAD) {
@@ -65,7 +69,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
   private hasPrefilledAdvancedSettings(): boolean {
     return !!(
-      this.automationPackage.version ||
+      this.automationPackage.versionName ||
       this.automationPackage.activationExpression?.script ||
       this.automationPackage.automationPackageLibraryResource ||
       (this.automationPackage.plansAttributes && Object.keys(this.automationPackage.plansAttributes).length > 0) ||
@@ -99,7 +103,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
     libraryFile: this._fb.control(this.automationPackage?.automationPackageLibraryResource || ''),
     libraryMavenSnippet: this._fb.control(''),
-    version: this._fb.control(this.automationPackage.version),
+    versionName: this._fb.control(this.automationPackage.versionName),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
     executeFunctionsLocally: this._fb.control(this.automationPackage.executeFunctionsLocally ?? false),
     routing: this._fb.array(
@@ -140,7 +144,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     }
 
     const {
-      version,
+      versionName,
       activationExpression,
       apMavenSnippet,
       libraryMavenSnippet,
@@ -159,7 +163,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
     const automationPackageParams: AutomationPackageParams = {
       id: this.automationPackage.id,
-      version,
+      versionName,
       activationExpression,
       allowUpdateOfOtherPackages: this.isAffectingOtherPackage,
       functionsAttributes: this.customKeywordAttributes,
@@ -207,6 +211,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     this.progress$ = upload.progress$;
 
     return upload.response$.pipe(
+      tap((response) => this.proceedUploadResult(response)),
       map(() => true),
       catchError((err) => {
         console.error(err);
@@ -229,6 +234,22 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     );
   }
 
+  private proceedUploadResult(response?: string): void {
+    if (!response) {
+      return;
+    }
+    let updateResult: AutomationPackageUpdateResult | undefined = undefined;
+    try {
+      updateResult = JSON.parse(response);
+    } catch (e) {}
+    const warnings = updateResult?.warnings ?? [];
+    if (!warnings.length) {
+      return;
+    }
+    this._matDialog.open(AutomationPackageWarningsDialogComponent, { data: warnings });
+  }
+
   protected readonly AlertType = AlertType;
   protected readonly AutomationPackagePermission = AutomationPackagePermission;
+  protected readonly AutomationPackageResourceType = AutomationPackageResourceType;
 }

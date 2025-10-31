@@ -12,7 +12,7 @@ import {
   TableComponent,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { ENTITY_ID } from '../../types/constants';
+import { AP_ENTITY_ID } from '../../types/constants';
 import { AutomationPackagesActionsService } from '../../injectables/automation-packages-actions.service';
 import { map, Observable, of } from 'rxjs';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
@@ -44,7 +44,7 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
 
   readonly _dataSource = inject(AugmentedAutomationPackagesService).createDataSource();
 
-  readonly ENTITY_ID = ENTITY_ID;
+  readonly ENTITY_ID = AP_ENTITY_ID;
 
   readonly AutomationPackagePermission = AutomationPackagePermission;
 
@@ -97,6 +97,18 @@ export class AutomationPackageListComponent implements OnInit, DialogParentServi
         this._dataSource.reload();
       }
     });
+  }
+
+  protected refreshPackage(automationPackage: AutomationPackage): void {
+    this._actions.refreshAutomationPackage(automationPackage).subscribe((isSuccess) => {
+      if (isSuccess) {
+        this._dataSource.reload();
+      }
+    });
+  }
+
+  protected openLibraries(): void {
+    this._router.navigate(['..', 'libraries'], { relativeTo: this._activatedRoute });
   }
 
   private getAutomationPackageFileFilter(): Observable<string | undefined> {

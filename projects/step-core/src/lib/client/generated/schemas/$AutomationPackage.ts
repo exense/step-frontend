@@ -32,7 +32,7 @@ export const $AutomationPackage = {
     status: {
       type: 'Enum',
     },
-    version: {
+    versionName: {
       type: 'string',
     },
     activationExpression: {
@@ -41,8 +41,29 @@ export const $AutomationPackage = {
     automationPackageResource: {
       type: 'string',
     },
-    keywordLibraryResource: {
+    automationPackageLibraryResource: {
       type: 'string',
+    },
+    functionsAttributes: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    plansAttributes: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    tokenSelectionCriteria: {
+      type: 'dictionary',
+      contains: {
+        type: 'string',
+      },
+    },
+    executeFunctionsLocally: {
+      type: 'boolean',
     },
     id: {
       type: 'string',

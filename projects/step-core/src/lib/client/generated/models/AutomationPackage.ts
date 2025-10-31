@@ -12,13 +12,13 @@ export type AutomationPackage = {
   lastModificationDate?: string;
   lastModificationUser?: string;
   status?: 'DELAYED_UPDATE';
-  version?: string;
+  versionName?: string;
   activationExpression?: Expression;
   automationPackageResource?: string;
   automationPackageLibraryResource?: string;
-  id?: string;
-  plansAttributes?: Record<string, string>;
   functionsAttributes?: Record<string, string>;
+  plansAttributes?: Record<string, string>;
   tokenSelectionCriteria?: Record<string, string>;
   executeFunctionsLocally?: boolean;
+  id?: string;
 };
