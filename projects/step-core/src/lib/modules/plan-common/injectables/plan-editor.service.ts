@@ -27,7 +27,10 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
 
   readonly planContext = this.planContextInternal.asReadonly();
 
-  readonly plan = computed(() => this.planContextInternal()?.plan ?? ({} as Plan));
+  readonly plan = computed(() => {
+    const planContext = this.planContextInternal();
+    return planContext?.plan ?? ({} as Plan);
+  });
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
 
