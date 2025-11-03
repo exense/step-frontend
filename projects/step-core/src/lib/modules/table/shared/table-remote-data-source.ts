@@ -188,6 +188,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: Record<string, string | string[]>,
     private _filters?: Record<string, string | string[] | SearchValue>,
+    private includeGlobalEntities?: boolean,
   ) {
     if (_filters) {
       for (const key in _filters) {
@@ -236,7 +237,9 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   }
 
   private doRequest({ request }: RequestContainer<TableRequestData>): Observable<TableResponseGeneric<T> | null> {
-    return this._rest.requestTable<T>(this.tableId, request!).pipe(catchError((err) => of(null)));
+    return this._rest
+      .requestTable<T>(this.tableId, request!, this.includeGlobalEntities)
+      .pipe(catchError((err) => of(null)));
   }
 
   private createInternalRequestObject({ params, filter, search }: TableFilterOptions = {}): TableRequestInternal {

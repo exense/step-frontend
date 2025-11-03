@@ -13,7 +13,8 @@ export class TableRemoteDataSourceFactoryImplService implements TableRemoteDataS
     tableId: string,
     requestColumnsMap: Record<string, string | string[]>,
     filters?: Record<string, string[]>,
+    includeGlobalEntities?: boolean,
   ): TableDataSource<T> {
-    return new TableRemoteDataSource(tableId, this._tableRest, requestColumnsMap, filters);
+    return new TableRemoteDataSource(tableId, this._tableRest, requestColumnsMap, filters, includeGlobalEntities);
   }
 }

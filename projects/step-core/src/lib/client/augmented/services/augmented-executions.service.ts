@@ -50,14 +50,19 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   }
 
   getExecutionsTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
-      description: 'description',
-      executionTime: 'startTime',
-      startTime: 'startTime',
-      endTime: 'endTime',
-      user: 'executionParameters.userID',
-      status: ['status', 'result'],
-    });
+    return this._dataSourceFactory.createDataSource(
+      AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      {
+        description: 'description',
+        executionTime: 'startTime',
+        startTime: 'startTime',
+        endTime: 'endTime',
+        user: 'executionParameters.userID',
+        status: ['status', 'result'],
+      },
+      undefined,
+      false,
+    );
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {

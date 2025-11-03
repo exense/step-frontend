@@ -70,16 +70,24 @@ export class TablesService {
 
   /**
    * @param tableName
+   * @param includeGlobalEntities
    * @param requestBody
    * @returns TableResponseObject default response
    * @throws ApiError
    */
-  public request(tableName: string, requestBody?: TableRequest): Observable<TableResponseObject> {
+  public request(
+    tableName: string,
+    includeGlobalEntities: boolean = true,
+    requestBody?: TableRequest,
+  ): Observable<TableResponseObject> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/table/{tableName}',
       path: {
         tableName: tableName,
+      },
+      query: {
+        includeGlobalEntities: includeGlobalEntities,
       },
       body: requestBody,
       mediaType: 'application/json',
