@@ -1,4 +1,14 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  inject,
+  Injector,
+  OnInit,
+  runInInjectionContext,
+  ViewChild,
+} from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -12,6 +22,7 @@ import {
   ReloadableDirective,
   StepCoreModule,
   AutomationPackageUpdateResult,
+  RichEditorComponent,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -44,6 +55,11 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
   private _matDialog = inject(MatDialog);
+  private _changeDetection = inject(ChangeDetectorRef);
+  private _injector = inject(Injector);
+
+  @ViewChild('apSnippetEditor') apSnippetEditor?: RichEditorComponent;
+  @ViewChild('librarySnippetEditor') librarySnippetEditor?: RichEditorComponent;
 
   protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -66,6 +82,30 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       this.form.controls.apMavenSnippet.markAsUntouched();
     }
   });
+
+  switchApType(type: UploadType) {
+    this.apType = type;
+    if (type === UploadType.MAVEN) {
+      this._changeDetection.detectChanges();
+      runInInjectionContext(this._injector, () => {
+        afterNextRender(() => {
+          this.apSnippetEditor?.focusOnText();
+        });
+      });
+    }
+  }
+
+  switchLibraryType(type: UploadType) {
+    this.libraryType = type;
+    if (type === UploadType.MAVEN) {
+      this._changeDetection.detectChanges();
+      runInInjectionContext(this._injector, () => {
+        afterNextRender(() => {
+          this.librarySnippetEditor?.focusOnText();
+        });
+      });
+    }
+  }
 
   private hasPrefilledAdvancedSettings(): boolean {
     return !!(
