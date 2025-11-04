@@ -156,12 +156,8 @@
               />
             </step-suffix>
           </step-form-field>
-          <mat-expansion-panel [class.hidden]="!customKeywordAttributesForm.inputs().length">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <span>Custom keyword attributes</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+          <div [class.hidden]="!customKeywordAttributesForm.inputs().length">
+            <h5>Custom keyword attributes</h5>
             <step-description>
               Custom attributes applied to all keywords and derived from the keyword screenInput
             </step-description>
@@ -172,13 +168,9 @@
               [stExcludeFields]="['attributes.name']"
             >
             </step-custom-forms>
-          </mat-expansion-panel>
-          <mat-expansion-panel [class.hidden]="!customPlanAttributesForm.inputs().length">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <span>Custom plan attributes</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+          </div>
+          <div [class.hidden]="!customPlanAttributesForm.inputs().length">
+            <h5>Custom plan attributes</h5>
             <step-description>
               Custom attributes applied to all plans and derived from the plan screenInput
             </step-description>
@@ -189,50 +181,46 @@
               [stExcludeFields]="['attributes.name']"
             >
             </step-custom-forms>
-          </mat-expansion-panel>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>Routing options</mat-panel-title>
-            </mat-expansion-panel-header>
-            <step-description>
-              The routing configuration will be propagated to all keywords in this Automation Package. For most cases
-              the default setting shouldn't be changed. (<a
-                target="_blank"
-                href="https://step.dev/knowledgebase/devops/step-automation-package-ui/"
-                >open documentation</a
-              >)
-            </step-description>
-            <step-form-field>
-              <mat-checkbox color="primary" #executeLocally="matCheckbox" formControlName="executeFunctionsLocally">
-                <span>Execute on controller</span>
-              </mat-checkbox>
-            </step-form-field>
-            @if (!executeLocally.checked) {
-              <section class="criteria-header">
-                <div>
-                  <label>Agent token selection criteria</label>
-                  <button type="button" mat-icon-button (click)="addRoutingCriterion()">
-                    <step-icon name="plus"></step-icon>
+          </div>
+          <step-label>Routing options</step-label>
+          <step-description>
+            The routing configuration will be propagated to all keywords in this Automation Package. For most cases the
+            default setting shouldn't be changed. (<a
+              target="_blank"
+              href="https://step.dev/knowledgebase/devops/step-automation-package-ui/"
+              >open documentation</a
+            >)
+          </step-description>
+          <step-form-field>
+            <mat-checkbox color="primary" #executeLocally="matCheckbox" formControlName="executeFunctionsLocally">
+              <span>Execute on controller</span>
+            </mat-checkbox>
+          </step-form-field>
+          @if (!executeLocally.checked) {
+            <section class="criteria-header">
+              <div>
+                <label>Agent token selection criteria</label>
+                <button type="button" mat-icon-button (click)="addRoutingCriterion()">
+                  <step-icon name="plus"></step-icon>
+                </button>
+              </div>
+            </section>
+            <section class="criteria-body" formArrayName="routing">
+              @for (group of routing.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="criterion-row">
+                  <step-form-field>
+                    <input type="text" placeholder="Key" formControlName="key" />
+                  </step-form-field>
+                  <step-form-field>
+                    <input type="text" placeholder="Value" formControlName="value" />
+                  </step-form-field>
+                  <button type="button" mat-stroked-button (click)="routing.removeAt(i)">
+                    <step-icon name="trash-2"></step-icon>
                   </button>
                 </div>
-              </section>
-              <section class="criteria-body" formArrayName="routing">
-                @for (group of routing.controls; track $index; let i = $index) {
-                  <div [formGroupName]="i" class="criterion-row">
-                    <step-form-field>
-                      <input type="text" placeholder="Key" formControlName="key" />
-                    </step-form-field>
-                    <step-form-field>
-                      <input type="text" placeholder="Value" formControlName="value" />
-                    </step-form-field>
-                    <button type="button" mat-stroked-button (click)="routing.removeAt(i)">
-                      <step-icon name="trash-2"></step-icon>
-                    </button>
-                  </div>
-                }
-              </section>
-            }
-          </mat-expansion-panel>
+              }
+            </section>
+          }
         }
       </form>
     }
