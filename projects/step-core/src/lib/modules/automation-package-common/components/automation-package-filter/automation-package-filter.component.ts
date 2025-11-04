@@ -84,8 +84,11 @@ export class AutomationPackageFilterComponent
 
     component.select(this.filterControl.value as string[]);
     component.selected$.pipe(takeUntil(this.popoverStreamsTerminator$)).subscribe((selectedIds) => {
-      this.selectedIds = selectedIds as string[];
-      this._cd.detectChanges();
+      if (this.selectedIds.length !== selectedIds.length) {
+        this.filterControl.setValue(this.selectedIds);
+        this.selectedIds = selectedIds as string[];
+        this._cd.detectChanges();
+      }
     });
     component.cleared.subscribe(() => this._popoverOverlay.close());
 
@@ -93,7 +96,6 @@ export class AutomationPackageFilterComponent
       .getCloseStream$()
       ?.pipe(takeUntil(this.popoverStreamsTerminator$))
       .subscribe(() => {
-        this.filterControl.setValue(this.selectedIds);
         this.terminatePopoverStreams();
       });
   }
