@@ -46,9 +46,6 @@ type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRout
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
   imports: [StepCoreModule, EntityRefDirective],
   hostDirectives: [ReloadableDirective],
-  host: {
-    '(keydown.enter)': 'upload()',
-  },
 })
 export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
