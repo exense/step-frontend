@@ -37,7 +37,7 @@
                     type="button"
                     class="maven"
                     mat-stroked-button
-                    (click)="apType = UploadType.MAVEN"
+                    (click)="switchApType(UploadType.MAVEN)"
                     matTooltip="Use maven snippet instead of uploading a file."
                   >
                     <step-icon name="maven"></step-icon>
@@ -60,7 +60,7 @@
                   <step-icon name="maven"></step-icon>
                 </button>
               </step-label-addon>
-              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="apMavenSnippet" />
+              <step-rich-editor #apSnippetEditor [syntaxMode]="AceMode.XML" formControlName="apMavenSnippet" />
             </step-form-field>
           }
           @default {}
@@ -86,7 +86,7 @@
                       type="button"
                       class="maven"
                       mat-stroked-button
-                      (click)="libraryType = UploadType.MAVEN"
+                      (click)="switchLibraryType(UploadType.MAVEN)"
                       matTooltip="Use maven snippet instead of uploading a file."
                     >
                       <step-icon name="maven"></step-icon>
@@ -112,7 +112,11 @@
                     <step-icon name="maven"></step-icon>
                   </button>
                 </step-label-addon>
-                <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="libraryMavenSnippet" />
+                <step-rich-editor
+                  #librarySnippetEditor
+                  [syntaxMode]="AceMode.XML"
+                  formControlName="libraryMavenSnippet"
+                />
               </step-form-field>
             }
             @default {}
