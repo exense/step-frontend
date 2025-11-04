@@ -124,7 +124,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       value: `${status}`,
     };
     return this._tableApiWrapper
-      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
+      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] }, false)
       .pipe(map((response) => response.recordsFiltered));
   }
 }
