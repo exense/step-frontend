@@ -66,9 +66,9 @@
           @default {}
         }
         @if (showAdvancedSettings) {
-          <step-label>Libraries</step-label>
           @switch (libraryType) {
             @case (UploadType.UPLOAD) {
+              <step-label>Libraries</step-label>
               <step-form-field alignLabelAddon="near">
                 <step-description>
                   Select a jar or ZIP file as a dependency for this automation package.
@@ -96,8 +96,11 @@
               </step-form-field>
             }
             @case (UploadType.MAVEN) {
-              <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-                <step-label>Maven Snippet</step-label>
+              <step-label>Libraries (Maven Snippet)</step-label>
+              <step-form-field alignLabelAddon="near">
+                <step-description>
+                  Select a maven snippet as a dependency for this automation package.
+                </step-description>
                 <step-label-addon>
                   <button
                     type="button"
