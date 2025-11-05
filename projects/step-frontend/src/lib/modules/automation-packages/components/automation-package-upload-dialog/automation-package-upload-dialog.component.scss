@@ -114,3 +114,10 @@ h5 {
 .hidden {
   display: none;
 }
+
+div.button {
+  cursor: pointer;
+  line-height: 34px;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}

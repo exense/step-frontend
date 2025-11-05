@@ -24,6 +24,7 @@ import {
   AutomationPackageUpdateResult,
   RichEditorComponent,
   ScreensService,
+  ActivationExpressionWizardDialogComponent,
 } from '@exense/step-core';
 import { catchError, map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -299,52 +300,32 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     return this.form.get('activationExpression') as FormControl<string | null>;
   }
 
-  addCondition(type?: 'OR' | 'AND') {
-    /*
+  addCondition(type?: 'AND' | 'OR') {
     this._screenService
       .getScreenInputsByScreenId('executionParameters')
       .pipe(
         take(1),
-        switchMap((inputs) => {
-          const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
-            data: { type, inputs },
-            width: '50rem',
-          });
-          return dialogRef.afterClosed();
-        })
+        switchMap((inputs) =>
+          this._matDialog
+            .open(ActivationExpressionWizardDialogComponent, {
+              data: {
+                type,
+                inputs,
+                initialScript: (this.form.get('activationExpression')?.value ?? '') as string,
+              },
+              width: '50rem',
+            })
+            .afterClosed(),
+        ),
       )
-      .subscribe((result) => {
-        if (!result) return;
-
-        const snippet = this.createGroovyExpression(result); // your existing builder
-        const current = (this.activationExpression.value ?? '').trim();
-
-        let next = '';
-        switch (type) {
-          case 'OR':
-            next = current ? `${wrap(current)} || ${wrap(snippet)}` : snippet;
-            break;
-          case 'AND':
-            next = current ? `${wrap(current)} && ${wrap(snippet)}` : snippet;
-            break;
-          default:
-            next = snippet;
-        }
-
-        this.activationExpression.setValue(next);
-        this.activationExpression.markAsDirty();
-        this.activationExpression.markAsTouched();
-        this.activationExpression.updateValueAndValidity();
-
+      .subscribe((finalScript?: string) => {
+        if (!finalScript) return;
+        const ctrl = this.form.get('activationExpression');
+        ctrl?.setValue(finalScript);
+        ctrl?.markAsDirty();
+        ctrl?.markAsTouched();
+        ctrl?.updateValueAndValidity();
       });
-
-    function wrap(expression: string): string {
-      const trimmed = expression.trim();
-      if (!trimmed) return trimmed;
-      const needsParens = /(\s(?:&&|\|\|)\s)|(^!)/.test(trimmed);
-      return needsParens ? `(${trimmed})` : trimmed;
-    }
-     */
   }
 
   protected readonly AlertType = AlertType;

@@ -152,6 +152,33 @@
               formControlName="activationExpression"
               title="Activation Expression"
             />
+            <step-suffix [primary]="true">
+              <div [matMenuTriggerFor]="activationMenu">
+                <div class="button">Wizard</div>
+
+                <mat-menu #activationMenu="matMenu">
+                  <button mat-menu-item [disabled]="!!form.get('activationExpression')!.value" (click)="addCondition()">
+                    Add condition
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    [disabled]="!form.get('activationExpression')!.value"
+                    (click)="addCondition('OR')"
+                  >
+                    Add OR condition
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    [disabled]="!form.get('activationExpression')!.value"
+                    (click)="addCondition('AND')"
+                  >
+                    Add AND condition
+                  </button>
+                </mat-menu>
+              </div>
+            </step-suffix>
             <step-suffix>
               <step-icon
                 name="help-circle"
