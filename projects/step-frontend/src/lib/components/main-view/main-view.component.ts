@@ -1,8 +1,9 @@
-import { Component, inject, TrackByFunction, viewChild } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import {
   AppConfigContainerService,
   AuthService,
   BookmarkCreateDialogComponent,
+  DialogRouteOpenStateService,
   ViewRegistryService,
 } from '@exense/step-core';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +22,7 @@ export class MainViewComponent {
   private _viewRegistry = inject(ViewRegistryService);
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
+  private _dialogRouteOpenState = inject(DialogRouteOpenStateService);
   readonly _appConfig = inject(AppConfigContainerService);
   readonly _authService = inject(AuthService);
 
@@ -34,7 +36,12 @@ export class MainViewComponent {
       filter((event) => event instanceof NavigationEnd),
       takeUntilDestroyed(),
     )
-    .subscribe(() => this.mainScrollableContent()?.scrollTo?.({ top: 0, left: 0 }));
+    .subscribe(() => {
+      if (this._dialogRouteOpenState.isOpen()) {
+        return;
+      }
+      this.mainScrollableContent()?.scrollTo?.({ top: 0, left: 0 });
+    });
 
   addBookmark(): void {
     this._matDialog.open(BookmarkCreateDialogComponent);
