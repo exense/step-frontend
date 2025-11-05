@@ -425,8 +425,6 @@ export class PlanEditorBaseComponent
     this.planTypeChangeTerminator$ = new Subject<void>();
     this.planTypeControl.valueChanges
       .pipe(
-        pairwise(),
-        map(([, current]) => current),
         map((item) => {
           const context = this._planEditService.planContext();
           return { item, context };
