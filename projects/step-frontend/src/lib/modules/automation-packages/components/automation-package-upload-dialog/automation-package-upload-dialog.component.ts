@@ -23,16 +23,18 @@ import {
   StepCoreModule,
   AutomationPackageUpdateResult,
   RichEditorComponent,
+  ScreensService,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
+import { catchError, map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { UploadType } from '../../types/upload-type.enum';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';
+import { pairRequiredValidator } from '../../validators/pair-required.validators';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -54,6 +56,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   private _matDialog = inject(MatDialog);
   private _changeDetection = inject(ChangeDetectorRef);
   private _injector = inject(Injector);
+  private _screenService = inject(ScreensService);
 
   @ViewChild('apSnippetEditor') apSnippetEditor?: RichEditorComponent;
   @ViewChild('librarySnippetEditor') librarySnippetEditor?: RichEditorComponent;
@@ -161,6 +164,8 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     if (this.automationPackage.plansAttributes) {
       this.customPlanAttributes = { attributes: this.automationPackage.plansAttributes } as Partial<Plan>;
     }
+
+    this.form.addValidators(pairRequiredValidator('versionName', 'activationExpression'));
   }
 
   protected upload(): void {
@@ -177,6 +182,10 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
     if (this.apType === UploadType.MAVEN && this.form.controls.apMavenSnippet.invalid) {
       this.form.controls.apMavenSnippet.markAsTouched();
+      return;
+    }
+
+    if (this.form.controls.versionName.invalid || this.form.controls.activationExpression.invalid) {
       return;
     }
 
@@ -284,6 +293,58 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       return;
     }
     this._matDialog.open(AutomationPackageWarningsDialogComponent, { data: warnings });
+  }
+
+  get activationExpression(): FormControl<string | null> {
+    return this.form.get('activationExpression') as FormControl<string | null>;
+  }
+
+  addCondition(type?: 'OR' | 'AND') {
+    /*
+    this._screenService
+      .getScreenInputsByScreenId('executionParameters')
+      .pipe(
+        take(1),
+        switchMap((inputs) => {
+          const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
+            data: { type, inputs },
+            width: '50rem',
+          });
+          return dialogRef.afterClosed();
+        })
+      )
+      .subscribe((result) => {
+        if (!result) return;
+
+        const snippet = this.createGroovyExpression(result); // your existing builder
+        const current = (this.activationExpression.value ?? '').trim();
+
+        let next = '';
+        switch (type) {
+          case 'OR':
+            next = current ? `${wrap(current)} || ${wrap(snippet)}` : snippet;
+            break;
+          case 'AND':
+            next = current ? `${wrap(current)} && ${wrap(snippet)}` : snippet;
+            break;
+          default:
+            next = snippet;
+        }
+
+        this.activationExpression.setValue(next);
+        this.activationExpression.markAsDirty();
+        this.activationExpression.markAsTouched();
+        this.activationExpression.updateValueAndValidity();
+
+      });
+
+    function wrap(expression: string): string {
+      const trimmed = expression.trim();
+      if (!trimmed) return trimmed;
+      const needsParens = /(\s(?:&&|\|\|)\s)|(^!)/.test(trimmed);
+      return needsParens ? `(${trimmed})` : trimmed;
+    }
+     */
   }
 
   protected readonly AlertType = AlertType;

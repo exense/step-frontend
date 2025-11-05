@@ -127,7 +127,7 @@
               >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled
               by an activation expression.
             </step-description>
-            <step-prefix>Version name</step-prefix>
+            <step-prefix>Version Name</step-prefix>
             <input
               placeholder="Version name (optional)"
               formControlName="versionName"
@@ -140,6 +140,9 @@
                 matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
               />
             </step-suffix>
+            @if (form.controls.versionName.hasError('requiredWhenOtherPresent')) {
+              <step-error> Version name is required when Activation Expression is set. </step-error>
+            }
           </step-form-field>
           <step-form-field>
             <step-prefix>Activation Expression</step-prefix>
@@ -155,6 +158,9 @@
                 matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
               />
             </step-suffix>
+            @if (form.controls.activationExpression.hasError('requiredWhenOtherPresent')) {
+              <step-error> Activation Expression is required when Version name is set. </step-error>
+            }
           </step-form-field>
           <div [class.hidden]="!customKeywordAttributesForm.inputs().length">
             <h5>Custom keyword attributes</h5>
