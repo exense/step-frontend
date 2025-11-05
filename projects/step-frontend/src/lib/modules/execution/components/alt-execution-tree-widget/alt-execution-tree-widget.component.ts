@@ -58,6 +58,10 @@ export class AltExecutionTreeWidgetComponent {
     });
   });
 
+  focusAndSearch(query: string) {
+    this._treeSearch.searchCtrl.setValue(query ?? '');
+  }
+
   focusNodeById(nodeId: string): void {
     this.tree()?.focusNode(nodeId);
   }

@@ -1,0 +1,17 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+:host {
+  display: flex;
+}
+
+section {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+step-icon.maven {
+  stroke: none !important;
+  fill: var.$blue-700 !important;
+}

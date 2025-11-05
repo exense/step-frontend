@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output, viewChild } from '@angular/core';
 import {
   ArtefactService,
   AugmentedControllerService,
@@ -12,9 +12,9 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { AggregatedReportViewTreeStateService } from '../../services/aggregated-report-view-tree-state.service';
 import { AggregatedReportViewTreeNodeUtilsService } from '../../services/aggregated-report-view-tree-node-utils.service';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
 import { KeyValue } from '@angular/common';
-// step.ar
+import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/alt-execution-tree-partial.component';
+
 @Component({
   selector: 'step-alt-report-node-details',
   templateUrl: './alt-report-node-details.component.html',
@@ -37,7 +37,7 @@ import { KeyValue } from '@angular/common';
   ],
   standalone: false,
 })
-export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
+export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> implements OnInit {
   private _controllerService = inject(AugmentedControllerService);
   private _artefactService = inject(ArtefactService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
@@ -45,6 +45,8 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   readonly node = input.required<R>();
   readonly showArtefact = input(false);
   readonly openTreeView = output();
+
+  private partialTree = viewChild('partialTree', { read: AltExecutionTreePartialComponent });
 
   private children$ = toObservable(this.node).pipe(
     switchMap((node) => {
@@ -62,6 +64,18 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
       );
     }),
   );
+
+  ngOnInit(): void {
+    console.log();
+  }
+
+  searchFor($event: string) {
+    if (!this.partialTree()) {
+      return;
+    }
+
+    this.partialTree()!.focusAndSearch($event);
+  }
 
   private aggregatedNode = computed(() => {
     const reportNode = this.node();

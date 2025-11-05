@@ -35,6 +35,7 @@ import { TREE_EXPORTS } from './modules/tree';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
+import { IncludesStringPipe } from './pipes/includes-string.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { FunctionActionsService } from './modules/keywords-common';
@@ -103,6 +104,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     LockColumnComponent,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    IncludesStringPipe,
   ],
   imports: [
     CommonModule,
@@ -215,6 +217,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     SEARCH_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    IncludesStringPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -305,6 +308,7 @@ export * from './modules/is-used-by';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
+export * from './pipes/includes-string.pipe';
 export * from './modules/artefacts-common';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';

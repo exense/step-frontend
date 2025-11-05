@@ -1,5 +1,6 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { CommonEntitiesUrlsService, Resource } from '@exense/step-core';
+import { CommonEntitiesUrlsService } from '../injectables/common-entities-urls.service';
+import { Resource } from '../../../client/generated';
 
 @Pipe({
   name: 'resourceUrl',

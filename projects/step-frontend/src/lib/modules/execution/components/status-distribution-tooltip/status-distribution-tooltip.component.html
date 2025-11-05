@@ -12,6 +12,6 @@
 
   <div class="footer">
     <span>{{ timestamp() | date: 'dd.MM.yy / HH:mm:ss' }}</span>
-    <span class="link-btn" (click)="navigateToLink()">{{ linkLabel() }}</span>
+    <span class="label" [class.link]="!!link()" (click)="navigateToLink()">{{ linkLabel() }}</span>
   </div>
 </div>

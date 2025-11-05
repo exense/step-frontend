@@ -23,9 +23,13 @@ export interface OpenIterationsParams {
   nodeStatus?: Status;
   reportNodeId?: string;
   nodeStatusCount?: number;
+  searchFor?: string;
 }
 
-export type PartialOpenIterationsParams = Pick<OpenIterationsParams, 'nodeStatus' | 'reportNodeId' | 'nodeStatusCount'>;
+export type PartialOpenIterationsParams = Pick<
+  OpenIterationsParams,
+  'nodeStatus' | 'reportNodeId' | 'nodeStatusCount' | 'searchFor'
+>;
 
 @Injectable()
 export class AltExecutionDialogsService implements SchedulerInvokerService {
@@ -51,8 +55,15 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
       return;
     }
 
-    const { aggregatedNodeId, countByStatus, reportNodeId, nodeStatus, nodeStatusCount, singleInstanceReportNode } =
-      nodeOrParams as OpenIterationsParams;
+    const {
+      aggregatedNodeId,
+      countByStatus,
+      reportNodeId,
+      nodeStatus,
+      nodeStatusCount,
+      singleInstanceReportNode,
+      searchFor,
+    } = nodeOrParams as OpenIterationsParams;
     if (!!reportNodeId) {
       this.navigateToIterationDetails(reportNodeId);
       return;
@@ -61,7 +72,7 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     if (itemsCounts.length === 1 && itemsCounts[0] === 1) {
       const reportNode = singleInstanceReportNode!;
       this._reportNodeDetails?.setReportNode?.(reportNode);
-      this.navigateToIterationDetails(reportNode.id!);
+      this.navigateToIterationDetails(reportNode.id!, {}, searchFor);
       return;
     }
     this.navigateToIterationList(aggregatedNodeId, nodeStatus, nodeStatusCount);
@@ -86,24 +97,20 @@ export class AltExecutionDialogsService implements SchedulerInvokerService {
     this.openNodeDetails(`agid_${aggregatedNodeId}`, queryParams);
   }
 
-  private navigateToIterationDetails(reportNodeId: string): void {
-    this.openNodeDetails(`rnid_${reportNodeId}`, {});
+  private navigateToIterationDetails(reportNodeId: string, queryParams: Params = {}, searchFor?: string): void {
+    this.openNodeDetails(`rnid_${reportNodeId}`, queryParams, searchFor);
   }
 
-  private openNodeDetails(detailsId: string, queryParams: Params): void {
+  private openNodeDetails(detailsId: string, queryParams: Params, searchFor?: string): void {
+    const mergedParams = { ...queryParams };
+    if (searchFor) {
+      mergedParams['searchFor'] = searchFor;
+    }
+
     this._router.navigate([{ outlets: { nodeDetails: ['node-details', detailsId] } }], {
       relativeTo: this._nodeDetailsRelativeParent,
-      queryParams,
+      queryParams: mergedParams,
       queryParamsHandling: 'merge',
-    });
-  }
-
-  openAgentsModal(involvedAgents: string, description: string) {
-    this._matDialog.open(AgentsModalComponent, {
-      data: {
-        agents: (involvedAgents ?? '').split(' ').filter((agent) => agent.trim() !== ''),
-        description: description,
-      },
     });
   }
 }

@@ -1,4 +1,6 @@
 <ng-content> </ng-content>
-<div class="step-badge" *ngIf="runningExecutionsCount" [matTooltip]="tooltipText" matTooltipPosition="above">
-  {{ badgeText }}
-</div>
+@if (runningExecutionsCount()) {
+  <div class="step-badge" [matTooltip]="tooltipText()" matTooltipPosition="above">
+    {{ badgeText() }}
+  </div>
+}
