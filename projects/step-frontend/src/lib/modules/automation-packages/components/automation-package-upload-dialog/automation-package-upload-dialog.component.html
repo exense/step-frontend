@@ -13,6 +13,15 @@
           This automation package would also update other packages. Select "Force" to proceed.
         </step-alert>
       }
+      @if (!isNewPackage && !_package?.automationPackageResource) {
+        <step-alert [type]="AlertType.MINIMALIST">
+          The Automation Package file is not available anymore, please select and upload it again.
+          <step-icon
+            name="help"
+            matTooltip="In Step 29 the resource management for Automation Packages has changed, requirering all existing Automation Packages to be uploaded again."
+          ></step-icon>
+        </step-alert>
+      }
       <form [formGroup]="form">
         @switch (apType) {
           @case (UploadType.UPLOAD) {

@@ -148,7 +148,7 @@
               data-step-testid="refresh-package-btn"
               type="button"
               mat-icon-button
-              matTooltip="Refresh pacakge"
+              matTooltip="Refresh the Automation Package from its maven repository. Note: Libraries are not affected by this."
               (click)="refreshPackage(element)"
               [disabled]="!(AutomationPackagePermission.READ | hasRight | async)"
             >
