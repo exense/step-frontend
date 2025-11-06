@@ -39,7 +39,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   ) {
     this.setupExecutionRefresh();
   }
-  timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
+  private timeRangeSelectionInternal$ = new BehaviorSubject<TimeRangePickerSelection>({ type: 'FULL' });
   timeRangeSelectionChange$ = this.timeRangeSelectionInternal$.asObservable();
   performanceTabSettings: PerformanceTabSettings = { resolution: 0, compareModeEnabled: false };
 
@@ -58,6 +58,7 @@ class ActiveExecutionImpl implements ActiveExecution {
   destroy(): void {
     this.executionInternal$.complete();
     this.autoRefreshModel.destroy();
+    this.timeRangeSelectionInternal$.complete();
   }
 
   private setupExecutionRefresh(): void {
@@ -84,7 +85,10 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   manualRefresh(): void {
-    this.loadExecution(this.executionId).subscribe((execution) => this.executionInternal$.next(execution));
+    this.loadExecution(this.executionId).subscribe((execution) => {
+      this.executionInternal$.next(execution);
+      this.timeRangeSelectionInternal$.next(this.timeRangeSelectionInternal$.value);
+    });
   }
 
   updateChartsResolution(resolution: number): void {
