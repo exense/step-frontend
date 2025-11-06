@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ArrayItemLabelValueExtractor } from '@exense/step-core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { valueRequiredWhenNeededValidator } from '../../validators/value-required-when-needed.validator';
 import { Predicate } from '../../types/predicate.enum';
 import { ActivationExpressionConditionDialogData } from '../../types/activation-expression-condition.type';
 import { KeyValue } from '@angular/common';
+import { ArrayItemLabelValueExtractor } from '../../modules/basics/injectables/array-item-label-value-extractor';
 
 type PredicateItem = KeyValue<Predicate, string>;
 const createPredicateItem = (key: Predicate, value: string): PredicateItem => ({ key, value });
