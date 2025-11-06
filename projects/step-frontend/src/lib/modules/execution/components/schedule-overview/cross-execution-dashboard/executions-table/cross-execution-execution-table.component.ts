@@ -13,10 +13,10 @@ import {
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
-import { EXECUTION_STATUS_TREE, Status } from '../../../../../_common/shared/status.enum';
+import { EXECUTION_STATUS_TREE } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 @Component({
@@ -25,7 +25,7 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
   styleUrls: ['./cross-execution-execution-table.component.scss'],
   providers: [
     tableColumnsConfigProvider({
-      entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      entityTableRemoteId: 'crossExecutions',
       entityScreenId: 'executionParameters',
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
