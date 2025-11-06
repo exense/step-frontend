@@ -16,7 +16,7 @@ export class ReportViewHeaderComponent {
 
   successRateValue$: Observable<string> = this._state.summaryData$.pipe(
     map((summaryData: ReportNodeSummary) => {
-      const passed = summaryData.items['PASSED'];
+      const passed = summaryData.items['PASSED'] || 0;
       if (summaryData.total === 0) {
         return '-';
       }

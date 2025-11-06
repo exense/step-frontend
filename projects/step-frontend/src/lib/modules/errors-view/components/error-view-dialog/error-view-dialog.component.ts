@@ -10,6 +10,9 @@ import { UniqueErrorsPipe } from '../../pipes/unique-errors.pipe';
   styleUrl: './error-view-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    class: 'message-view-dialog',
+  },
 })
 export class ErrorViewDialogComponent {
   protected readonly _state = inject(ErrorsViewStateService);

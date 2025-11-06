@@ -1,6 +1,7 @@
 import {
   Component,
   DestroyRef,
+  effect,
   EventEmitter,
   forwardRef,
   inject,
@@ -11,6 +12,7 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  untracked,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -171,6 +173,17 @@ export class PlanEditorBaseComponent
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
 
+  private effectCheckAccessToPlanTypeControl = effect(() => {
+    const planEditorType = this._planEditService.plan();
+    untracked(() => {
+      if (this._auth.hasRight('plan-write', this._injector)) {
+        this.planTypeControl.enable({ emitEvent: false });
+      } else {
+        this.planTypeControl.disable({ emitEvent: false });
+      }
+    });
+  });
+
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
@@ -187,11 +200,6 @@ export class PlanEditorBaseComponent
       this.repositoryObjectRef = this._planEditorApi.createRepositoryObjectReference(
         (cPlanCtx?.currentValue as PlanContext)?.id,
       );
-      if (this._auth.hasRight('plan-write', this._injector)) {
-        this.planTypeControl.enable();
-      } else {
-        this.planTypeControl.disable();
-      }
     }
   }
 
@@ -417,8 +425,6 @@ export class PlanEditorBaseComponent
     this.planTypeChangeTerminator$ = new Subject<void>();
     this.planTypeControl.valueChanges
       .pipe(
-        pairwise(),
-        map(([, current]) => current),
         map((item) => {
           const context = this._planEditService.planContext();
           return { item, context };

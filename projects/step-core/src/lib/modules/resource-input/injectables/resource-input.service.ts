@@ -77,7 +77,7 @@ export class ResourceInputService implements OnDestroy {
       throw 'Config not set';
     }
 
-    return this._resourceDialogsService.showSearchResourceDialog(this.config.type);
+    return this._resourceDialogsService.showSearchResourceDialog(this.config.searchTypes ?? this.config.type);
   }
 
   uploadResource(file: File, resourceId?: string): Observable<Resource | undefined> {
@@ -107,28 +107,12 @@ export class ResourceInputService implements OnDestroy {
       takeUntilDestroyed(this._destroyRef),
       switchMap((response) => {
         this.uploadProgress$.next(of(undefined));
+        const responseResourceId = response.resource!.id!;
 
-        if (!response.similarResources?.length) {
-          const responseResourceId = response.resource!.id!;
-          // Exclude current resource id to be deleted, in case if it is a reupload of the same resource
-          this.deleteUploadedResources(responseResourceId);
-          this.uploadedResourceIds.add(responseResourceId);
-          return of(response.resource);
-        } else {
-          return this._resourceDialogsService.showFileAlreadyExistsWarning(response.similarResources).pipe(
-            map((existingResource) => {
-              if (existingResource) {
-                if (resourceId) {
-                  this.deleteResource(resourceId);
-                }
-                return existingResource;
-              } else {
-                this.uploadedResourceIds.add(response.resource!.id!);
-                return response.resource;
-              }
-            }),
-          );
-        }
+        // Exclude current resource id to be deleted, in case if it is a reupload of the same resource
+        this.deleteUploadedResources(responseResourceId);
+        this.uploadedResourceIds.add(responseResourceId);
+        return of(response.resource);
       }),
       switchMap((resource) => {
         if (!resource || resource.resourceName === file.name) {

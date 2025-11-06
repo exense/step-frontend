@@ -14,25 +14,35 @@ p {
 }
 
 .error-count {
-  @include common.error-count;
   width: auto;
   position: relative;
   min-height: 2.5rem;
 
   .text {
+    display: flex;
+    align-items: center;
     white-space: nowrap;
+    margin-top: 0.3rem;
+
+    &.link {
+      cursor: pointer;
+      font-style: italic;
+    }
+
+    step-icon {
+      display: block;
+    }
+
+    span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
   }
 
-  .hidden-text {
-    visibility: hidden;
-    height: 0;
-  }
-
-  .hidden-text + .text {
-    position: absolute;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    left: 1rem;
-    right: 1rem;
+  step-icon.error {
+    color: var(--status-FAILED);
+    margin-right: 0.2rem;
   }
 }

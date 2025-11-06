@@ -15,6 +15,20 @@ export const $Resource = {
         type: 'string',
       },
     },
+    creationDate: {
+      type: 'string',
+      format: 'date-time',
+    },
+    creationUser: {
+      type: 'string',
+    },
+    lastModificationDate: {
+      type: 'string',
+      format: 'date-time',
+    },
+    lastModificationUser: {
+      type: 'string',
+    },
     currentRevisionId: {
       type: 'string',
       pattern: '[a-f0-9]{24}}',
@@ -30,6 +44,13 @@ export const $Resource = {
     },
     ephemeral: {
       type: 'boolean',
+    },
+    origin: {
+      type: 'string',
+    },
+    originTimestamp: {
+      type: 'number',
+      format: 'int64',
     },
     id: {
       type: 'string',

@@ -46,6 +46,7 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+  private treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
   private errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
@@ -123,4 +124,14 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   protected readonly ViewMode = ViewMode;
+
+  searchFor($event: string) {
+    if (!this.treeWidget() || !this.treeWidgetContainer()) {
+      return;
+    }
+
+    this.treeWidgetContainer()!.nativeElement.scrollIntoView({ behavior: 'smooth' });
+
+    this.treeWidget()!.focusAndSearch($event);
+  }
 }

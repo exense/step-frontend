@@ -5,7 +5,7 @@
     [dataSource]="dataSource"
     matSort
     [matSortDisableClear]="true"
-    filter="not(resourceType=attachment)"
+    [filter]="RESOURCE_FILTER"
   >
     <step-bulk-operations *stepAdditionalHeader="'btngroup-bulk-import-create'" entity="resources" />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-import-create'">

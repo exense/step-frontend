@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   AceMode,
   AugmentedTimeSeriesService,
@@ -29,6 +29,7 @@ import { map, Observable } from 'rxjs';
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);
   private _timeSeriesApi = inject(AugmentedTimeSeriesService);
+  readonly searchFor = output<string>();
 
   readonly dataSourceInput = input<
     | TableDataSource<TimeSeriesErrorEntry>
@@ -67,6 +68,10 @@ export class AltExecutionErrorsComponent {
       predefinedMode: AceMode.TEXT,
       wrapText: true,
     });
+  }
+
+  onFindInTree(message: string) {
+    this.searchFor.emit(message);
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;
