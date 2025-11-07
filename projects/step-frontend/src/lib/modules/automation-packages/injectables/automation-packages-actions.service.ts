@@ -1,15 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  AugmentedAutomationPackagesService,
-  AutomationPackage,
-  DialogsService,
-  MultipleProjectsService,
-} from '@exense/step-core';
-import { map, Observable, of, switchMap } from 'rxjs';
-import { ENTITY_ID, PATH } from '../types/constants';
+import { AugmentedAutomationPackagesService, AutomationPackage, DialogsService } from '@exense/step-core';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { AP_LIST_PATH } from '../types/constants';
 import { Router } from '@angular/router';
 
-const ROOT_URL = `/${PATH}/list`;
+const ROOT_URL = AP_LIST_PATH;
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +12,6 @@ const ROOT_URL = `/${PATH}/list`;
 export class AutomationPackagesActionsService {
   private _dialogs = inject(DialogsService);
   private _api = inject(AugmentedAutomationPackagesService);
-  private _multipleProjects = inject(MultipleProjectsService);
   private _router = inject(Router);
 
   readonly rootUrl = ROOT_URL;
@@ -39,28 +33,28 @@ export class AutomationPackagesActionsService {
     );
   }
 
+  refreshAutomationPackage(automationPackage: AutomationPackage): Observable<boolean> {
+    const id = automationPackage.id;
+    if (!id) {
+      return of(false);
+    }
+    return this._api.refreshAutomationPackage(id).pipe(
+      map(() => true),
+      catchError(() => of(false)),
+    );
+  }
+
   createAutomationPackage(): void {
     this._router.navigateByUrl(`${ROOT_URL}/upload/new`);
   }
 
   executeAutomationPackage(automationPackage: AutomationPackage): void {
-    this._router.navigateByUrl(`/${ROOT_URL}/execute/${automationPackage.id}`);
+    this._router.navigateByUrl(`${ROOT_URL}/execute/${automationPackage.id}`);
   }
 
   editAutomationPackage(automationPackage: AutomationPackage): void {
     const url = `${ROOT_URL}/upload/${automationPackage.id}`;
-    if (this._multipleProjects.isEntityBelongsToCurrentProject(automationPackage)) {
-      this._router.navigateByUrl(url);
-      return;
-    }
-
-    this._multipleProjects
-      .confirmEntityEditInASeparateProject(automationPackage, url, ENTITY_ID)
-      .subscribe((continueEdit) => {
-        if (continueEdit) {
-          this._router.navigateByUrl(url);
-        }
-      });
+    this._router.navigateByUrl(url);
   }
 
   showAutomationPackageEntities(automationPackage: AutomationPackage): void {

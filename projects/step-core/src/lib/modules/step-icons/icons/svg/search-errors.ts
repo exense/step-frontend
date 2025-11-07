@@ -1,0 +1,19 @@
+export const SearchErrors = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.74 19.66" class="feather feather-search-errors">
+    
+  <defs>
+    <style>
+      .icon-search-errors {
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <line class="icon-search-errors" x1="18.73" y1="4.68" x2="18.73" y2="8.68"/>
+  <line class="icon-search-errors" x1="18.73" y1="12.68" x2="18.74" y2="12.68"/>
+  <circle class="icon-search-errors" cx="7.93" cy="7.93" r="6.93"/>
+  <line class="icon-search-errors" x1="18.66" y1="18.66" x2="12.8" y2="12.96"/>
+
+</svg>`;

@@ -1,0 +1,25 @@
+<div class="legend">
+  <div
+    class="bar"
+    [style.height.px]="barHeight()"
+    [style.background]="gradientCss()"
+    role="img"
+    aria-label="Legend gradient"
+    matTooltip="The heatmap shows ambivalent statuses—i.e., a Test Case executed multiple times with different results—as mixed colors. The legend’s gradient provides a visual aid for some of these cases. Note: mixes can involve more than two statuses, or statuses that are not adjacent in this legend."
+  ></div>
+
+  <div class="markers" *ngIf="computedData().length > 0">
+    @for (s of computedData(); track s.label) {
+      <div
+        class="marker"
+        [style.left.%]="s.posPct"
+        [class.first]="$first"
+        [class.last]="$last"
+        [attr.aria-label]="s.label"
+        role="note"
+      >
+        <span class="label">{{ s.label }}</span>
+      </div>
+    }
+  </div>
+</div>

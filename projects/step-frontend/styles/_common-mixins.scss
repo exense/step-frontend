@@ -4,6 +4,7 @@
 @use 'components/executions-menu';
 @use 'components/settings-menu';
 @use 'components/execution-shared-styles';
+@use 'components/plan-editor-control-selections';
 
 @forward 'components/ts-tooltip';
 @forward 'components/common-styles';
@@ -13,3 +14,5 @@
 @forward 'components/settings-menu';
 @forward 'components/execution-shared-styles' show execution-shared-styles, special-selection-item,
   special-selection-item-hover, execution-report-node-inline-details, highlight-inline-item, error-count;
+@forward 'components/plan-editor-control-selections';
+@forward 'components/execution-shared-styles';

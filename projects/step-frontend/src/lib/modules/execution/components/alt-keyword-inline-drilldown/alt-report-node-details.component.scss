@@ -34,7 +34,7 @@ step-alt-execution-tree-partial {
 }
 
 .tree-container {
-  margin-top: 4rem;
+  margin-top: 2rem;
 
   & > .data-container {
     height: 100%;
@@ -55,4 +55,9 @@ step-alt-execution-tree-partial {
 
 .error-root-causes-container {
   margin-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
 }

@@ -1,4 +1,5 @@
 @use 'projects/step-core/styles/core-variables' as var;
+@use './messages-view-dialog' as m;
 
 @mixin common-styles {
   @import 'normalize.css/normalize.css';
@@ -136,5 +137,31 @@
   }
   body {
     --status-passed: #01a990;
+    --mat-expansion-header-collapsed-state-height: 3.8rem !important;
+    --mat-expansion-header-expanded-state-height: 5rem !important;
   }
+
+  mat-expansion-panel.mat-expansion-panel {
+    box-shadow: none !important;
+    border: 1px solid var.$gray-300;
+    border-radius: 0.8rem;
+  }
+
+  mat-expansion-panel .mat-expansion-panel-header.mat-expanded:hover,
+  mat-expansion-panel .mat-expansion-panel-header.mat-expanded:focus {
+    background: none;
+  }
+
+  /* disable cdk-overlay-backdrop when not active */
+  .cdk-overlay-backdrop.step-popover-backdrop--passive {
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+  .cdk-overlay-backdrop.step-popover-backdrop--active {
+    background: transparent !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+  }
+
+  @include m.messages-view-dialog;
 }

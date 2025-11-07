@@ -1,10 +1,11 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import {
   AceMode,
   AugmentedTimeSeriesService,
   RichEditorDialogService,
   TableDataSource,
   TableIndicatorMode,
+  tablePersistenceConfigProvider,
   TableLocalDataSource,
   TableRemoteDataSource,
   TimeSeriesErrorEntry,
@@ -17,10 +18,18 @@ import { map, Observable } from 'rxjs';
   templateUrl: './alt-execution-errors.component.html',
   styleUrl: './alt-execution-errors.component.scss',
   standalone: false,
+  providers: [
+    tablePersistenceConfigProvider('executionErrors', {
+      storePagination: true,
+      storeSearch: false,
+      storeSort: false,
+    }),
+  ],
 })
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);
   private _timeSeriesApi = inject(AugmentedTimeSeriesService);
+  readonly searchFor = output<string>();
 
   readonly dataSourceInput = input<
     | TableDataSource<TimeSeriesErrorEntry>
@@ -59,6 +68,10 @@ export class AltExecutionErrorsComponent {
       predefinedMode: AceMode.TEXT,
       wrapText: true,
     });
+  }
+
+  onFindInTree(message: string) {
+    this.searchFor.emit(message);
   }
 
   protected readonly TableIndicatorMode = TableIndicatorMode;

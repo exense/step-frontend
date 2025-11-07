@@ -6,6 +6,7 @@ import { TreeNodeUtilsService } from './tree-node-utils.service';
 import { TreeStateInitOptions } from '../types/tree-state-init-options.interface';
 import { TreeFlattenerService } from './tree-flattener.service';
 import { TreeFlatNode } from '../types/tree-flat-node';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 const DEFAULT_OPTIONS: TreeStateInitOptions = {
   expandAllByDefault: true,
@@ -53,6 +54,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
   readonly selectedNodeIds = this.selectedNodeIdsInternal.asReadonly();
   readonly expandedNodeIds = this.expandedNodeIdsInternal.asReadonly();
   readonly isInitialized = computed(() => this.rootNode() !== null);
+  readonly isInitialized$ = toObservable(this.isInitialized);
 
   readonly selectedForInsertCandidate = computed(() => {
     const selectedNodeIds = this.selectedNodeIdsInternal();
@@ -857,7 +859,7 @@ export class TreeStateService<T, N extends TreeNode> implements OnDestroy {
     this.selectedNodeIdsInternal.set(selectedOrdered);
   }
 
-  private getSubTree(subTreeRootId: string): TreeFlatNode[] {
+  protected getSubTree(subTreeRootId: string): TreeFlatNode[] {
     const { tree } = this.treeData();
     const subRootIndex = tree.findIndex((node) => node.id === subTreeRootId);
     if (subRootIndex < 0) {

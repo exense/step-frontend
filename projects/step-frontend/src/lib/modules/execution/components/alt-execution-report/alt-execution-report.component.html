@@ -5,6 +5,7 @@
       [style.--colSpan]="4"
       [errors]="errors"
       (showDetails)="scrollToErrorsSection()"
+      (searchFor)="searchFor($event)"
     />
   }
   @if (hasTestCases$ | async) {
@@ -66,6 +67,7 @@
         [dataSource]="_state.errors$"
         [statusFilterItems]="_state.availableErrorTypes$ | async"
         [showExecutionsMenu]="false"
+        (searchFor)="searchFor($event)"
       />
     </step-alt-report-widget-content>
   </step-alt-report-widget>

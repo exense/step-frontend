@@ -1,0 +1,79 @@
+<div #scrollableContainer class="scroll-x">
+  <table class="heatmap-table" role="grid">
+    <thead>
+      <tr>
+        <th class="label-header-container sticky-col" [style.max-width.px]="labelColWidth()">
+          <div>Name</div>
+          <div>
+            <input [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" />
+          </div>
+        </th>
+
+        @for (col of columns(); track col.id) {
+          <th scope="col" class="heatmap-col-header" [style.width.px]="cellSize()" [style.max-width.px]="cellSize()">
+            {{ col.label || col.id }}
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (row of filteredAndPaginatedRows(); track row.label) {
+        <tr>
+          <td class="sticky-col label-cell" [style.max-width.px]="labelColWidth()" [style.height.px]="rowHeight()">
+            {{ row.label }}
+          </td>
+
+          @for (col of columns(); track col.id) {
+            <td
+              class="heatmap-cell"
+              [style.width.px]="cellSize()"
+              [style.min-width.px]="cellSize()"
+              [style.max-width.px]="cellSize()"
+              [style.height.px]="rowHeight()"
+              [style.background-color]="row.cells?.[col.id]?.color || emptyColor"
+              tabindex="0"
+              [attr.aria-label]="(col.label || col.id) + ' for ' + row.label"
+              (click)="handleCellClick(row, col)"
+              matTooltip="Click to display details"
+              matTooltipShowDelay="200"
+              [matMenuTriggerFor]="executionsMenu"
+            >
+              <mat-menu #executionsMenu>
+                <ng-template matMenuContent>
+                  <div (click)="$event.stopPropagation()">
+                    <step-status-distribution-tooltip
+                      [link]="'/executions/' + col.id"
+                      linkLabel="See execution"
+                      [statuses]="row.cells![col.id].statusesCount"
+                      [timestamp]="row.cells?.[col.id]?.timestamp"
+                    />
+                  </div>
+                </ng-template>
+              </mat-menu>
+            </td>
+          }
+        </tr>
+      }
+      @for (row of fillerRows(); track $index) {
+        <tr class="content-row">
+          <td [colSpan]="columns().length + 1">&nbsp;</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="footer-section">
+  <div>
+    <step-heatmap-gradient-legend [gradientStops]="legendColors()" [barHeight]="16" />
+  </div>
+  <div>
+    <step-paginator
+      [pageSize]="pageSize()"
+      (pageChange)="handlePageChange($event)"
+      [length]="filteredRows().length"
+      [pageSizeOptions]="PAGE_SIZES"
+    />
+  </div>
+</div>

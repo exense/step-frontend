@@ -1,12 +1,17 @@
 <div class="data-container">
-  <div class="container-title">Errors</div>
+  <div class="error-summary">
+    <step-icon class="error" name="alert-triangle" /> This node contains {{ totalErrorCount() }}
+    {{ totalErrorCount() > 1 ? 'errors' : 'error' }}
+  </div>
   @if (isSimpleView()) {
     <div class="error-root-causes">
       @for (item of data(); track item.key) {
-        <div class="error-count">
-          <div class="text">{{ item.value }} {{ item.value > 1 ? 'Errors' : 'Error' }}</div>
+        <div class="error-message">
+          <span class="link" (click)="onErrorSearch.emit(item.key)">{{ item.key }}</span>
+          @if (item.value > 1) {
+            &nbsp;({{ item.value }}x)
+          }
         </div>
-        <div class="error-message">{{ item.key }}</div>
       }
     </div>
   } @else {
@@ -18,11 +23,11 @@
     >
       <ng-container matColumnDef="item">
         <td mat-cell *matCellDef="let item">
-          <div class="error-root-causes">
-            <div class="error-count">
-              <div class="text">{{ item.value }} {{ item.value > 1 ? 'Errors' : 'Error' }}</div>
-            </div>
-            <div class="error-message">{{ item.key }}</div>
+          <div class="error-message">
+            <span class="link" (click)="onErrorSearch.emit(item.key)">{{ item.key }}</span>
+            @if (item.value > 1) {
+              &nbsp;({{ item.value }}x)
+            }
           </div>
         </td>
       </ng-container>

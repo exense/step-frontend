@@ -11,13 +11,17 @@
         <section (click)="showIterations(element)">
           <div class="details-trigger">
             <div class="smaller-view shift-rows">
-              <step-report-node-icon [node]="element" />
-              <step-aggregated-status
-                [hasDescendantInvocations]="element.hasDescendantInvocations"
-                [countByStatus]="element.countByStatus"
-                (statusClick)="showIterations(element, $event.status, $event.count, $event.event)"
-              />
-              <span>
+              <div class="chip">
+                <step-report-node-icon [node]="element" />
+                <step-aggregated-status
+                  [hasDescendantInvocations]="element.hasDescendantInvocations"
+                  [countByStatus]="element.countByStatus"
+                  (statusClick)="
+                    showIterations(element, { status: $event.status, count: $event.count, event: $event.event })
+                  "
+                />
+              </div>
+              <span class="test-case-name">
                 {{ element?.singleInstanceReportNode?.name ?? element?.artefact?.attributes?.['name'] ?? '' }}
               </span>
             </div>
@@ -28,10 +32,22 @@
         </section>
       </td>
     </ng-container>
+    <ng-container matColumnDef="error">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td class="error" mat-cell *matCellDef="let element">
+        <section>
+          <step-test-case-inline-root-cause
+            [item]="element"
+            (click)="showIterations(element)"
+            (searchFor)="onSearchFor(element, $event)"
+          />
+        </section>
+      </td>
+    </ng-container>
     <ng-container matColumnDef="operations">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="operations" mat-cell *matCellDef="let element">
-        <section class="half-gradient">
+        <section>
           <div></div>
           @if (element.currentOperations; as operations) {
             <step-alt-current-operations
@@ -40,7 +56,6 @@
               [(showAll)]="showAllOperations"
             />
           }
-          <step-test-case-inline-root-cause [item]="element" (click)="showIterations(element)" />
         </section>
       </td>
     </ng-container>

@@ -1,11 +1,9 @@
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { CheckLoadErrorsConfig, MultipleProjectsService } from '../modules/basics/step-basics.module';
+import { CheckLoadErrorsConfig, EntityEditLink, MultipleProjectsService } from '../modules/basics/step-basics.module';
 import { AuthService } from '../modules/auth';
 import { DEFAULT_PAGE } from '../modules/routing';
-
-type EntityEditLink = Parameters<MultipleProjectsService['confirmEntityEditInASeparateProject']>[1];
 
 export interface CheckProjectGuardConfig {
   entityType: string;
@@ -62,27 +60,48 @@ export const checkEntityGuardFactory =
 
     return entity$.pipe(
       _multipleProjects.checkLoadErrors(loadErrorsConfig),
-      switchMap((entityOrUrl) => {
+      map((entityOrUrl) => {
         if (!entityOrUrl) {
-          return of(false);
+          return false;
         }
 
         if (typeof entityOrUrl === 'string') {
-          return of(_router.parseUrl(entityOrUrl));
+          return _router.parseUrl(entityOrUrl);
         }
 
         const entity = entityOrUrl;
 
         if (_auth.hasRight('admin-no-multitenancy')) {
-          return of(true);
+          return true;
         }
 
         if (_multipleProjects.isEntityBelongsToCurrentProject(entity)) {
-          return of(true);
+          return true;
         }
 
         const entityEditLink = runInInjectionContext(_injector, () => config.getEditorUrl(id, route, state));
-        return _multipleProjects.confirmEntityEditInASeparateProject(entity, entityEditLink, config.entityType);
+
+        const targetProject = _multipleProjects.getProject(entity);
+
+        let openUrl = '';
+        if (targetProject) {
+          openUrl = _multipleProjects.getUrlForProject(
+            targetProject,
+            typeof entityEditLink === 'string' ? { url: entityEditLink } : entityEditLink,
+          );
+        }
+        const writableEntityText = config.entityType !== 'execution' ? ' and is read-only' : '';
+        let message = `This ${config.entityType} doesn't belong to the currently selected project${writableEntityText}.`;
+        if (openUrl) {
+          message += ` <a href="#${openUrl}">Open in "${targetProject!.name!}".</a>`;
+        }
+
+        _multipleProjects.showProjectMessage({
+          icon: 'alert-triangle',
+          message,
+        });
+
+        return true;
       }),
       map((result) => {
         const emptyUrls = ['', '/', '/login'];

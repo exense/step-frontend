@@ -4,7 +4,7 @@
       <ng-container matColumnDef="name" stepSearchCol>
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td class="cell-name" mat-cell *matCellDef="let element">
-          {{ element.attributes.name }}
+          <step-resource-info [resource]="element">{{ element.attributes.name }}</step-resource-info>
         </td>
       </ng-container>
       <ng-container matColumnDef="actions">

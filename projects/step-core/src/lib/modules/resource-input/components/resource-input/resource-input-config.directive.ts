@@ -13,7 +13,8 @@ export class ResourceInputConfigDirective {
   readonly isBounded = input(false);
   readonly supportsDirectory = input(false);
 
-  readonly withChooseExistingResourceButton = input(false);
+  readonly withChooseExistingResourceButton = input(true);
+  readonly searchTypes = input<string[] | undefined>(undefined);
   readonly withClearButton = input(true);
   readonly withDynamicSwitch = input(false);
   readonly preserveExistingResource = input(false);
@@ -24,6 +25,7 @@ export class ResourceInputConfigDirective {
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
     const withChooseExistingResourceButton = this.withChooseExistingResourceButton();
+    const searchTypes = this.searchTypes();
     const withClearButton = this.withClearButton();
     const withDynamicSwitch = this.withDynamicSwitch();
     const preventExistingResource = this.preserveExistingResource();
@@ -33,6 +35,7 @@ export class ResourceInputConfigDirective {
       isBounded,
       supportsDirectory,
       withChooseExistingResourceButton,
+      searchTypes,
       withClearButton,
       withDynamicSwitch,
       preventExistingResource,

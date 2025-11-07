@@ -22,10 +22,15 @@ export class AugmentedScreenService
 
   private screenCache: Record<string, Input[]> = {};
   private screenInputCache: Record<string, ScreenInput[]> = {};
+  private cachedScreenInput?: ScreenInput;
 
   clearCache(): void {
     this.screenCache = {};
     this.screenInputCache = {};
+  }
+
+  clearCachedScreenInput(): void {
+    this.cachedScreenInput = undefined;
   }
 
   constructor(httpRequest: BaseHttpRequest) {
@@ -53,6 +58,13 @@ export class AugmentedScreenService
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
     return this;
+  }
+
+  getInputCached(id: string): Observable<ScreenInput> {
+    if (this.cachedScreenInput && this.cachedScreenInput.id === id) {
+      return of(this.cachedScreenInput);
+    }
+    return super.getInput(id).pipe(tap((screenInput) => (this.cachedScreenInput = screenInput)));
   }
 
   override getInputsForScreenPost(id: string, requestBody?: any): Observable<Input[]> {

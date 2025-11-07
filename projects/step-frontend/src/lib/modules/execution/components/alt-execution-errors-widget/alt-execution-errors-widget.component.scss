@@ -1,10 +1,21 @@
-.single-error,
-.multiple-error {
+@use 'projects/step-core/styles/core-variables' as var;
+
+.error-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: nowrap;
 }
+
+.error-message {
+  font-style: italic;
+  color: var.$blue-700;
+}
+
 step-alt-report-widget {
   min-height: 5rem;
+}
+
+step-icon.error {
+  color: var(--status-FAILED);
 }

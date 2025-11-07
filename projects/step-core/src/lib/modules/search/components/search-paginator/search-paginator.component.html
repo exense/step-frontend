@@ -1,0 +1,57 @@
+<step-btn-group class="with-borders" [matTooltip]="disabledTooltip()" matTooltipPosition="below">
+  @if (!isActive()) {
+    <button
+      type="button"
+      mat-stroked-button
+      (click)="activate()"
+      [matTooltip]="inactiveTooltip()"
+      [disabled]="isDisabled()"
+      matTooltipPosition="below"
+    >
+      <step-icon name="alert-circle" />
+    </button>
+  }
+  @if (isActive()) {
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="deactivate()"
+      [matTooltip]="activeTooltip()"
+      matTooltipPosition="below"
+    >
+      <step-icon name="alert-circle" />
+    </button>
+    <button
+      class="label-placeholder"
+      type="button"
+      mat-stroked-button
+      [matTooltip]="hintTooltip()"
+      matTooltipPosition="below"
+    >
+      <div class="label-container-value">
+        {{ searchLabel() }}
+      </div>
+    </button>
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!areButtonsActive()"
+      (click)="prev()"
+      [matTooltip]="prevTooltip()"
+      matTooltipPosition="below"
+    >
+      <step-icon name="chevron-left" />
+    </button>
+    <button
+      type="button"
+      mat-stroked-button
+      [disabled]="!areButtonsActive()"
+      (click)="next()"
+      [matTooltip]="nextTooltip()"
+      matTooltipPosition="below"
+    >
+      <step-icon name="chevron-right" />
+    </button>
+  }
+</step-btn-group>

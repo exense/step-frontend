@@ -34,6 +34,9 @@ import {
   ReportNode,
   SimpleOutletComponent,
   editScheduledTaskRoute,
+  MultipleProjectsService,
+  SearchPaginatorComponent,
+  StepBasicsModule,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -96,7 +99,7 @@ import { AltExecutionLaunchDialogComponent } from './components/alt-execution-la
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
 import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, filter, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -158,8 +161,13 @@ import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-
 import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
 import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
 import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-
+import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 
 @NgModule({
   declarations: [
@@ -257,6 +265,13 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     ExecutionAgentsListComponent,
     AltExecutionErrorsWidgetComponent,
     ReportViewHeaderComponent,
+    CrossExecutionHeatmapComponent,
+    GradientLegendComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    HeatmapComponent,
+    AggregatedTreeNodeHistoryComponent,
+    AggregatedTreeNodeStatusesPiechartComponent,
   ],
   imports: [
     StepCommonModule,
@@ -275,6 +290,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    SearchPaginatorComponent,
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
   ],
@@ -455,6 +471,7 @@ export class ExecutionModule {
             canDeactivate: [
               () => {
                 inject(AugmentedExecutionsService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],
@@ -578,6 +595,7 @@ export class ExecutionModule {
           canDeactivate: [
             () => {
               inject(AugmentedExecutionsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
             () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
@@ -757,16 +775,9 @@ export class ExecutionModule {
                   {
                     path: ':detailsId',
                     resolve: {
-                      aggregatedNode: (route: ActivatedRouteSnapshot) => {
+                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
-                        const _state = inject(AggregatedReportViewTreeStateContextService).getState();
-                        const aggregatedNodeId = detailsId.startsWith('agid_')
-                          ? detailsId.replace('agid_', '')
-                          : undefined;
-                        if (!aggregatedNodeId) {
-                          return undefined;
-                        }
-                        return _state.findNodeById(aggregatedNodeId);
+                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
                       },
                       resolvedPartialPath: () =>
                         inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
@@ -774,22 +785,6 @@ export class ExecutionModule {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
                       },
-                      /*
-                      reportNode: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                        const _controllerService = inject(AugmentedControllerService);
-                        const reportNodeId = detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                        if (!reportNodeId) {
-                          return undefined;
-                        }
-                        const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
-                        if (reportNode) {
-                          return reportNode;
-                        }
-                        return _controllerService.getReportNode(reportNodeId);
-                      },
-*/
                       searchStatus: (route: ActivatedRouteSnapshot) => {
                         const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                         return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;

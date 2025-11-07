@@ -1,25 +1,30 @@
 <form #form="ngForm">
-  <step-data-source-configuration [context]="context"> </step-data-source-configuration>
-  <step-dynamic-checkbox
-    *ngIf="context.artefact!.dataSource"
-    label="For write"
-    [(ngModel)]="context.artefact!.dataSource!.forWrite"
-    [disabled]="context.readonly"
-    name="forWrite"
-  >
-  </step-dynamic-checkbox>
+  <step-data-source-configuration [context]="context" />
+  @if (context.artefact!.dataSource) {
+    <step-dynamic-checkbox
+      label="For write"
+      [(ngModel)]="context.artefact!.dataSource!.forWrite"
+      [disabled]="context.readonly"
+      name="forWrite"
+    />
+    <step-dynamic-checkbox
+      label="Protect data source values"
+      tooltip="Protect values loaded from the data source. These will be hidden in reports and can only be passed to Keywords, not resolved in the Plan."
+      [(ngModel)]="context.artefact!.dataSource!.protect"
+      [disabled]="context.readonly"
+      name="protect"
+    />
+  }
   <step-dynamic-textfield
     label="Iterator handle"
     [(ngModel)]="context.artefact!.item"
     [disabled]="context.readonly"
     name="item"
-  >
-  </step-dynamic-textfield>
+  />
   <step-dynamic-checkbox
     label="Reset at end"
     [(ngModel)]="context.artefact!.resetAtEnd"
     [disabled]="context.readonly"
     name="resetAtEnd"
-  >
-  </step-dynamic-checkbox>
+  />
 </form>

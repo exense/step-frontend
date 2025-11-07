@@ -1,26 +1,51 @@
 import { inject, Injectable } from '@angular/core';
-import { AutomationPackage, AutomationPackagesService, ExecutiontTaskParameters } from '../../generated';
+import {
+  AsyncTaskStatusTableBulkOperationReport,
+  AutomationPackage,
+  AutomationPackagesService,
+  ExecutiontTaskParameters,
+  FormDataContentDisposition,
+  Plan,
+  TableBulkOperationRequest,
+} from '../../generated';
 import {
   StepDataSource,
   TableApiWrapperService,
   TableCollectionFilter,
   TableRemoteDataSourceFactoryService,
 } from '../../table';
-import { map, Observable, of, OperatorFunction } from 'rxjs';
+import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
 import { CompareCondition } from '../../../modules/basics/types/compare-condition.enum';
-import { HttpClient, HttpEvent, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { catchError } from 'rxjs/operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
+import { Keyword } from '../shared/keyword';
+import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
 
 export interface AutomationPackageParams {
   id?: string;
-  file?: File;
-  mavenSnippet?: string;
-  version?: string;
+  apMavenSnippet?: string;
+  apResourceId?: string;
+  apLibraryMavenSnippet?: string;
+  apLibraryResourceId?: string;
+  versionName?: string;
   activationExpression?: string;
+  allowUpdateOfOtherPackages?: boolean;
+  plansAttributes?: Partial<Plan>;
+  functionsAttributes?: Partial<Keyword>;
+  tokenSelectionCriteria?: any;
+  executeFunctionsLocally?: boolean;
+}
+
+export interface AutomationPackageResourceParams {
+  id?: string;
+  resourceType: string;
+  mavenSnippet?: string;
+  resourceFile?: File;
+  managedLibraryName?: string;
 }
 
 @Injectable({
@@ -38,15 +63,36 @@ export class AugmentedAutomationPackagesService
   private _interceptorOverride = inject(HttpOverrideResponseInterceptorService);
   private _requestContextHolder = inject(HttpRequestContextHolderService);
 
+  private cachedAutomationPackage?: AutomationPackage;
+
+  clearCache(): void {
+    this.cachedAutomationPackage = undefined;
+  }
+
   overrideInterceptor(override: OperatorFunction<HttpEvent<any>, HttpEvent<any>>): this {
     this._interceptorOverride.overrideInterceptor(override);
     return this;
+  }
+
+  override bulkDeleteAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkDeleteAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
+  }
+
+  override bulkRefreshAutomationPackageResource(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkRefreshAutomationPackageResource(extendTableBulkOperationRequest(requestBody, filter));
   }
 
   createDataSource(): StepDataSource<AutomationPackage> {
     return this._dataSourceFactory.createDataSource(AugmentedAutomationPackagesService.AUTOMATION_PACKAGE_TABLE_ID, {
       name: 'attributes.name',
       fileName: 'customFields.automationPackageFileName',
+      libraryName: 'automationPackageLibraryResourceObj.attributes.name',
       actions: '',
     });
   }
@@ -91,44 +137,119 @@ export class AugmentedAutomationPackagesService
       );
   }
 
+  getAutomationPackageCached(id: string): Observable<AutomationPackage> {
+    if (this.cachedAutomationPackage && this.cachedAutomationPackage.id === id) {
+      return of(this.cachedAutomationPackage);
+    }
+    return super.getAutomationPackage(id).pipe(
+      tap((automationPackage) => {
+        this.cachedAutomationPackage = automationPackage;
+      }),
+    );
+  }
+
+  createOrUpdateAutomationPackageResource({
+    id,
+    resourceType,
+    resourceFile,
+    mavenSnippet,
+    managedLibraryName,
+  }: AutomationPackageResourceParams): ReturnType<typeof uploadWithProgress> {
+    const url = !id ? 'rest/automation-packages/resources' : `rest/automation-packages/resources/${id}`;
+
+    const body = new FormData();
+    body.set('resourceType', resourceType);
+    if (resourceFile) {
+      body.set('file', resourceFile);
+    } else if (mavenSnippet) {
+      body.set('mavenSnippet', mavenSnippet);
+    }
+
+    if (managedLibraryName) {
+      if (!id) {
+        body.set('managedLibraryName', managedLibraryName);
+      } else {
+        body.set('newManagedLibraryName', managedLibraryName);
+      }
+    }
+
+    const headers = new HttpHeaders({ enctype: 'multipart/form-data' });
+
+    const request$ = this._http.request(
+      'POST',
+      url,
+      this._requestContextHolder.decorateRequestOptions({
+        headers,
+        body,
+        observe: 'events',
+        responseType: 'arraybuffer',
+        reportProgress: true,
+      }),
+    );
+
+    return uploadWithProgress(request$);
+  }
+
   automationPackageCreateOrUpdate({
     id,
-    file,
-    version,
+    apMavenSnippet,
+    apResourceId,
+    versionName,
     activationExpression,
-    mavenSnippet,
+    apLibraryMavenSnippet,
+    apLibraryResourceId,
+    allowUpdateOfOtherPackages,
+    plansAttributes,
+    functionsAttributes,
+    tokenSelectionCriteria,
+    executeFunctionsLocally,
   }: AutomationPackageParams): ReturnType<typeof uploadWithProgress> {
     const method = !!id ? 'PUT' : 'POST';
     let url = 'rest/automation-packages';
     if (!!id) {
       url = `${url}/${id}`;
     }
-    if (!!mavenSnippet) {
-      url = `${url}/mvn`;
-    }
 
     let body: FormData | string;
-    if (mavenSnippet) {
-      body = mavenSnippet;
-    } else {
-      body = new FormData();
-      body.set('file', file!);
+    body = new FormData();
+
+    if (apMavenSnippet) {
+      body.set('apMavenSnippet', apMavenSnippet);
+    } else if (apResourceId) {
+      body.set('apResourceId', apResourceId);
+    }
+
+    if (apLibraryMavenSnippet) {
+      body.set('apLibraryMavenSnippet', apLibraryMavenSnippet);
+    } else if (apLibraryResourceId) {
+      body.set('apLibraryResourceId', apLibraryResourceId);
+    }
+
+    if (plansAttributes?.attributes) {
+      body.set('plansAttributes', JSON.stringify(plansAttributes!.attributes));
+    }
+    if (functionsAttributes?.attributes) {
+      body.set('functionsAttributes', JSON.stringify(functionsAttributes!.attributes));
+    }
+    if (tokenSelectionCriteria && !executeFunctionsLocally) {
+      body.set('tokenSelectionCriteria', JSON.stringify(tokenSelectionCriteria));
+    }
+    if (executeFunctionsLocally) {
+      body.set('executeFunctionsLocally', JSON.stringify(executeFunctionsLocally));
+    }
+
+    if (versionName) {
+      body.set('versionName', versionName);
+    }
+    if (activationExpression) {
+      body.set('activationExpr', activationExpression);
+    }
+    if (allowUpdateOfOtherPackages) {
+      body.set('allowUpdateOfOtherPackages', 'true');
     }
 
     let headers: HttpHeaders;
-    if (typeof body === 'string') {
-      headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
-    } else {
-      headers = new HttpHeaders({ enctype: 'multipart/form-data' });
-    }
-
-    let params = new HttpParams().set('async', true);
-    if (version) {
-      params = params.set('version', version);
-    }
-    if (activationExpression) {
-      params = params.set('activationExpr', activationExpression);
-    }
+    headers = new HttpHeaders({ enctype: 'multipart/form-data' });
 
     const request$ = this._http.request(
       method,
@@ -136,7 +257,6 @@ export class AugmentedAutomationPackagesService
       this._requestContextHolder.decorateRequestOptions({
         headers,
         body,
-        params,
         observe: 'events',
         responseType: 'arraybuffer',
         reportProgress: true,
