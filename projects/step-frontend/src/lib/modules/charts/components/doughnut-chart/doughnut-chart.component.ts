@@ -52,7 +52,7 @@ export class DoughnutChartComponent implements OnDestroy {
     return new Chart(canvas.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: [settings.items.map((i) => i.label)],
+        labels: settings.items.map((i) => i.label),
         datasets: [
           {
             label: 'Test',
