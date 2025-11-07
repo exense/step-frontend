@@ -25,6 +25,7 @@ import {
   HeatmapDataResponse,
   HeatMapRow,
 } from './types/heatmap-types';
+import { HEATMAP_STORE_ALL, heatmapPersistenceConfigProvider } from './injectables/heatmap-persistence-config.provider';
 
 interface ItemWithExecutionsStatuses {
   key: string; // keyword or testcase
@@ -50,7 +51,7 @@ const HEATMAP_MAX_SERIES_COUNT = 10000;
   selector: 'step-cross-execution-heatmap',
   templateUrl: './cross-execution-heatmap.component.html',
   styleUrls: ['./cross-execution-heatmap.component.scss'],
-  providers: [],
+  providers: [heatmapPersistenceConfigProvider('crossExecutionHeatmap', HEATMAP_STORE_ALL)],
   standalone: false,
 })
 export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
