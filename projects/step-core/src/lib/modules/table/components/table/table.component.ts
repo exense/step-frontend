@@ -88,7 +88,6 @@ interface SearchData {
 
 enum EmptyState {
   INITIAL,
-  NO_DATA,
   NO_MATCHING_RECORDS,
 }
 
@@ -191,18 +190,15 @@ export class TableComponent<T>
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
-  private total = signal<number | null>(null);
+  private totalFiltered = signal<number | null>(null);
   private isTableReadyToRenderColumns = signal(false);
 
   protected readonly EmptyState = EmptyState;
   protected readonly emptyState = computed(() => {
-    const total = this.total();
+    const totalFiltered = this.totalFiltered();
     const isColumnsInitialized = this._tableColumns.isInitialized();
-    if (total === null || !isColumnsInitialized) {
+    if (totalFiltered === null || !isColumnsInitialized) {
       return EmptyState.INITIAL;
-    }
-    if (total === 0) {
-      return EmptyState.NO_DATA;
     }
 
     return EmptyState.NO_MATCHING_RECORDS;
@@ -487,8 +483,8 @@ export class TableComponent<T>
       this.inProgressDataSource.set(inProgress);
     });
 
-    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
-      this.total.set(total);
+    tableDataSource!.totalFiltered$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.totalFiltered.set(total);
     });
   }
 

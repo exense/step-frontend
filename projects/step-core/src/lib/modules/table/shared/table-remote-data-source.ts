@@ -170,7 +170,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   );
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
-  readonly total$ = this._response$.pipe(map((r) => r?.recordsTotal ?? null));
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
   readonly forceNavigateToFirstPage$ = this._response$.pipe(
     map((r) => {

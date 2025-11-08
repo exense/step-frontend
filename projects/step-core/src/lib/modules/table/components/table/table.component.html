@@ -54,11 +54,6 @@
             <td class="mat-mdc-cell no-data"></td>
           }
         }
-        @case (EmptyState.NO_DATA) {
-          <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
-            {{ noResultsPlaceholder() || 'No data available in table' }}
-          </td>
-        }
         @case (EmptyState.NO_MATCHING_RECORDS) {
           <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">No matching records found</td>
         }

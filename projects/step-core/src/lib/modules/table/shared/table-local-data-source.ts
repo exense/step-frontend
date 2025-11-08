@@ -21,13 +21,12 @@ import { FilterCondition } from './filter-condition';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 import { Mutable } from '../../basics/step-basics.module';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { RequestContainer } from '../types/request-container';
 
 type FieldAccessor = Mutable<
   Pick<
     TableLocalDataSource<any>,
-    'total$' | 'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$'
+    'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$'
   >
 >;
 
@@ -52,7 +51,6 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
 
   readonly inProgress$: Observable<boolean> = of(false);
 
-  readonly total$!: Observable<number | null>;
   readonly allData$!: Observable<T[]>;
   readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
@@ -110,7 +108,6 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     );
 
     const self = this as FieldAccessor;
-    self.total$ = requestResult$.pipe(map((r) => r.total));
     self.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
     self.data$ = requestResult$.pipe(map((r) => r.data));
     self.allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));

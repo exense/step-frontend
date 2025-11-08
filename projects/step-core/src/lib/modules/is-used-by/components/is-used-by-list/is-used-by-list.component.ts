@@ -59,7 +59,7 @@ export class IsUsedByListComponent implements OnInit {
       .build(),
   );
 
-  readonly emptyResults$ = this.searchableReferences.total$.pipe(
+  readonly emptyResults$ = this.searchableReferences.totalFiltered$.pipe(
     map((total) => total === 0),
     startWith(false),
   );
