@@ -188,6 +188,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _requestColumnsMap: Record<string, string | string[]>,
     private _filters?: Record<string, string | string[] | SearchValue>,
     private includeGlobalEntities?: boolean,
+    private calculateCounts?: boolean,
   ) {
     if (_filters) {
       for (const key in _filters) {
