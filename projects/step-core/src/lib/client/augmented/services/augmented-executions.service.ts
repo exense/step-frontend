@@ -61,7 +61,7 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
         status: ['status', 'result'],
       },
       undefined,
-      false,
+      { includeGlobalEntities: false, calculateCounts: false },
     );
   }
 

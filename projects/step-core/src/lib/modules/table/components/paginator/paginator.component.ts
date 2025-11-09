@@ -94,6 +94,7 @@ export class PaginatorComponent {
 
     const from = pageIndex * pageSize;
     const to = pageIndex < pagesCount - 1 ? from + pageSize : length;
+
     if (pageSize === 1) {
       return `${to} of ${length}`;
     }

@@ -187,8 +187,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _rest: TableApiWrapperService,
     private _requestColumnsMap: Record<string, string | string[]>,
     private _filters?: Record<string, string | string[] | SearchValue>,
-    private includeGlobalEntities?: boolean,
-    private calculateCounts?: boolean,
+    private _options?: {
+      includeGlobalEntities?: boolean;
+      calculateCounts?: boolean;
+    },
   ) {
     if (_filters) {
       for (const key in _filters) {
@@ -238,7 +240,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
   private doRequest({ request }: RequestContainer<TableRequestData>): Observable<TableResponseGeneric<T> | null> {
     return this._rest
-      .requestTable<T>(this.tableId, request!, this.includeGlobalEntities)
+      .requestTable<T>(this.tableId, request!, this._options?.includeGlobalEntities)
       .pipe(catchError((err) => of(null)));
   }
 
@@ -270,11 +272,19 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     return tableRequest;
   }
 
+  private toTableRequest(request: TableRequestInternal): TableRequestData {
+    const tableRequest = convertTableRequest(request);
+    if (this._options?.calculateCounts !== undefined) {
+      tableRequest.calculateCounts = this._options?.calculateCounts;
+    }
+    return tableRequest;
+  }
+
   getTableData(options?: TableGetDataOptions): void;
   getTableData(req: TableRequestInternal): void;
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
     if (reqOrOptions instanceof TableRequestInternal) {
-      const req = convertTableRequest(reqOrOptions as TableRequestInternal);
+      const req = this.toTableRequest(reqOrOptions as TableRequestInternal);
       this._request$.next({ request: req, isForce: true });
       return;
     }
