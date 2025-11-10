@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ActiveExecution, ActiveExecutionsService } from './active-executions.service';
-import { BehaviorSubject, distinctUntilChanged, filter, map, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, filter, map, Observable, of, switchMap } from 'rxjs';
 import { Execution } from '@exense/step-core';
 
 @Injectable()
@@ -12,6 +12,7 @@ export class ActiveExecutionContextService {
   readonly executionId$: Observable<string> = this.executionIdInternal$.pipe(
     filter((id) => !!id),
     distinctUntilChanged((a, b) => a === b),
+    debounceTime(500),
   );
 
   readonly activeExecution$: Observable<ActiveExecution> = this.executionId$.pipe(
