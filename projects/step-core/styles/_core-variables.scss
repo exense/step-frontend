@@ -94,6 +94,8 @@ $statuses: (
   'IMPORTING': var(--status-IMPORTING),
   'EXPORTING': var(--status-EXPORTING),
   'DELAYED_UPDATE': var(--status-DELAYED_UPDATE),
+  'SCHEDULED_RELOAD': var(--status-SCHEDULED_RELOAD),
+  'RELOAD_FAILED': var(--status-RELOAD_FAILED),
   'RUNNING': var(--status-RUNNING),
   'ABORTING': var(--status-ABORTING),
   'FORCING_ABORT': var(--status-FORCING_ABORT),
