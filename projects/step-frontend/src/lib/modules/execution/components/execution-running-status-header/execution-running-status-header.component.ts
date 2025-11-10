@@ -26,7 +26,11 @@ export class ExecutionRunningStatusHeaderComponent {
 
   protected tooltipText = computed(() => {
     const count = this.runningExecutionsCount();
-    return `Currently running executions: ${count}`;
+    if (count < 10) {
+      return `Currently running executions: ${count}`;
+    } else {
+      return `Currently running executions: 10 or more`;
+    }
   });
 
   protected handleClick(event: MouseEvent): void {
