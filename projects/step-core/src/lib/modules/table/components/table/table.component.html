@@ -65,7 +65,9 @@
   <ng-content select="step-table-paginator-addon" />
   <step-paginator
     [disabled]="pageSizeInputDisabled()"
-    [length]="tableDataSource?.totalFiltered$ | async"
+    [length]="totalFiltered()"
+    [hasNext]="hasNext()"
+    [usePagesCount]="calculateCounts()"
     [pageSizeOptions]="pageSizeOptions()"
   />
 </section>

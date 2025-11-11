@@ -6,6 +6,7 @@
     matSortActive="executionTime"
     matSortDirection="desc"
     [matSortDisableClear]="true"
+    [calculateCounts]="calculateCounts()"
   >
     <step-bulk-operations
       data-step-testid="execution-bulk-operations"
@@ -14,6 +15,19 @@
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>
+        <button
+          type="button"
+          mat-icon-button
+          [color]="calculateCounts() ? 'primary' : undefined"
+          [matTooltip]="
+            calculateCounts()
+              ? 'Click to not load total number of executions to improve the performance'
+              : 'Click to load total number of executions'
+          "
+          (click)="toggleCountsCalculation()"
+        >
+          <step-icon name="loader" />
+        </button>
         <step-autorefresh-toggle
           data-step-testid="execution-auto-refresh"
           [(disabled)]="autoRefreshDisabled"

@@ -1,8 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Output,
   ViewEncapsulation,
   input,
   signal,
@@ -13,8 +11,7 @@ import {
   untracked,
   output,
 } from '@angular/core';
-import { Execution, PaginatorComponent } from '@exense/step-core';
-import { PageEvent } from '@angular/material/paginator';
+import { PaginatorComponent, StepPageEvent } from '@exense/step-core';
 import { HeatMapColor, HeatmapColumn, HeatMapRow } from './types/heatmap-types';
 
 @Component({
@@ -108,7 +105,7 @@ export class HeatmapComponent {
     }
   }
 
-  handlePageChange(page: PageEvent) {
+  handlePageChange(page: StepPageEvent) {
     this.page.set(page.pageIndex);
   }
 

@@ -206,3 +206,4 @@ export * from './components/bulk-operations/bulk-operations.component';
 export * from './directives/table-without-selection-state.directive';
 export * from './types/table-indicator-mode.enum';
 export * from './components/columns-placeholders/columns-placeholders.component';
+export * from './types/step-page-event';

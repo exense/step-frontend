@@ -13,7 +13,6 @@ import {
   takeUntil,
   timer,
 } from 'rxjs';
-import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { SearchValue } from './search-value';
 import { TableRequestData, TableParameters, StepDataSourceReloadOptions } from '../../../client/step-client-module';
@@ -22,16 +21,17 @@ import { TableLocalDataSourceConfig } from './table-local-data-source-config';
 import { TableLocalDataSourceConfigBuilder } from './table-local-data-source-config-builder';
 import { Mutable } from '../../basics/step-basics.module';
 import { RequestContainer } from '../types/request-container';
+import { StepPageEvent } from '../types/step-page-event';
 
 type FieldAccessor = Mutable<
   Pick<
     TableLocalDataSource<any>,
-    'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$'
+    'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$' | 'hasNext$'
   >
 >;
 
 interface Request {
-  page?: PageEvent;
+  page?: StepPageEvent;
   sort?: Sort;
   search?: { [key: string]: SearchValue };
 }
@@ -54,6 +54,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   readonly allData$!: Observable<T[]>;
   readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
+  readonly hasNext$!: Observable<boolean>;
   readonly totalFiltered$!: Observable<number>;
   readonly forceNavigateToFirstPage$!: Observable<unknown>;
 
@@ -86,6 +87,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
             allFiltered: [],
             data: [],
             allData: [],
+            hasNext: false,
           };
         }
         total = src.length;
@@ -96,12 +98,15 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
         let data = this.applySort(allFiltered, req.sort);
         data = this.applyPage(data, req.page);
 
+        const hasNext = !this.isLastPage(data, req.page);
+
         return {
           data,
           allData: src,
           allFiltered,
           total,
           totalFiltered,
+          hasNext,
         };
       }),
       shareReplay(1),
@@ -112,6 +117,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     self.data$ = requestResult$.pipe(map((r) => r.data));
     self.allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
     self.allData$ = requestResult$.pipe(map((r) => r.allData));
+    self.hasNext$ = requestResult$.pipe(map((r) => r.hasNext));
 
     self.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
       map(([data, totalFiltered]) => {
@@ -214,13 +220,23 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     return result;
   }
 
-  private applyPage(source: T[], page?: PageEvent): T[] {
+  private applyPage(source: T[], page?: StepPageEvent): T[] {
     if (!page) {
       return [];
     }
     const start = page.pageIndex * page.pageSize;
     const length = page.pageSize;
     return source.slice(start, start + length);
+  }
+
+  private isLastPage(source: T[], page?: StepPageEvent): boolean {
+    if (!page) {
+      return true;
+    }
+    const start = page.pageIndex * page.pageSize;
+    const length = page.pageSize;
+    const approximateEnd = start + length;
+    return approximateEnd >= source.length;
   }
 
   connect(collectionViewer: CollectionViewer): Observable<T[]> {

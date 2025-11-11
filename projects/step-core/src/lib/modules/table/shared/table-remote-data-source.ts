@@ -37,6 +37,7 @@ export class TableRequestInternal {
   start?: number;
   length?: number;
   filter?: string;
+  calculateCounts?: boolean;
   params?: TableParameters;
 
   constructor(data?: Partial<TableRequestInternal>) {
@@ -47,6 +48,7 @@ export class TableRequestInternal {
     this.length = data?.length || undefined;
     this.filter = data?.filter || undefined;
     this.params = data?.params || undefined;
+    this.calculateCounts = data?.calculateCounts || undefined;
   }
 }
 
@@ -77,6 +79,7 @@ const convertTableRequest = (req: TableRequestInternal): TableRequestData => {
   const result: TableRequestData = {
     skip: req.start || 0,
     limit: req.length || 10,
+    calculateCounts: req.calculateCounts ?? true,
   };
 
   const filters = (req.searchBy || [])
@@ -171,6 +174,7 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
   readonly data$: Observable<T[]> = this._response$.pipe(map((r) => r?.data || []));
 
   readonly totalFiltered$ = this._response$.pipe(map((r) => r?.recordsFiltered || 0));
+  readonly hasNext$ = this._response$.pipe(map((r) => r?.hasNext || false));
   readonly forceNavigateToFirstPage$ = this._response$.pipe(
     map((r) => {
       const recordsInPage = (r?.data || []).length;
@@ -189,7 +193,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     private _filters?: Record<string, string | string[] | SearchValue>,
     private _options?: {
       includeGlobalEntities?: boolean;
-      calculateCounts?: boolean;
     },
   ) {
     if (_filters) {
@@ -272,24 +275,16 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
     return tableRequest;
   }
 
-  private toTableRequest(request: TableRequestInternal): TableRequestData {
-    const tableRequest = convertTableRequest(request);
-    if (this._options?.calculateCounts !== undefined) {
-      tableRequest.calculateCounts = this._options?.calculateCounts;
-    }
-    return tableRequest;
-  }
-
   getTableData(options?: TableGetDataOptions): void;
   getTableData(req: TableRequestInternal): void;
   getTableData(reqOrOptions: TableRequestInternal | TableGetDataOptions | undefined): void {
     if (reqOrOptions instanceof TableRequestInternal) {
-      const req = this.toTableRequest(reqOrOptions as TableRequestInternal);
+      const req = convertTableRequest(reqOrOptions);
       this._request$.next({ request: req, isForce: true });
       return;
     }
 
-    let { page, sort, search, params, filter } = (reqOrOptions || {}) as TableGetDataOptions;
+    let { page, sort, search, params, filter, calculateCounts } = (reqOrOptions || {}) as TableGetDataOptions;
 
     const tableRequest = this.createInternalRequestObject({ search, filter, params });
 
@@ -308,6 +303,10 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
       } else {
         tableRequest.orderBy = [{ column: col, order }];
       }
+    }
+
+    if (calculateCounts !== undefined) {
+      tableRequest.calculateCounts = calculateCounts;
     }
 
     this.getTableData(tableRequest);
