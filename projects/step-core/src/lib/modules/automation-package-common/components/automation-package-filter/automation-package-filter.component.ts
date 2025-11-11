@@ -20,6 +20,8 @@ import {
 } from '../../../basics/step-basics.module';
 import { AutomationPackageFilterPopoverComponent } from '../automation-package-filter-popover/automation-package-filter-popover.component';
 import { EntityAutomationPackageService } from '../../injectables/entity-automation-package.service';
+import _default from 'chart.js/dist/plugins/plugin.title';
+import id = _default.id;
 
 type PopoverOverlay = PopoverOverlayService<AutomationPackageFilterPopoverComponent>;
 
@@ -84,9 +86,9 @@ export class AutomationPackageFilterComponent
 
     component.select(this.filterControl.value as string[]);
     component.selected$.pipe(takeUntil(this.popoverStreamsTerminator$)).subscribe((selectedIds) => {
-      if (this.selectedIds.length !== selectedIds.length) {
-        this.filterControl.setValue(this.selectedIds);
-        this.selectedIds = selectedIds as string[];
+      if (this.compareArrays<string>(this.selectedIds, selectedIds) === false) {
+        this.filterControl.setValue(selectedIds);
+        this.selectedIds = selectedIds;
         this._cd.detectChanges();
       }
     });
@@ -98,6 +100,16 @@ export class AutomationPackageFilterComponent
       .subscribe(() => {
         this.terminatePopoverStreams();
       });
+  }
+
+  private compareArrays<T>(arrayA: T[], arrayB: T[]): boolean {
+    if (arrayA.length !== arrayB.length) return false;
+
+    const setB = new Set(arrayB);
+    for (const v of arrayA) {
+      if (!setB.has(v)) return false;
+    }
+    return true;
   }
 
   protected createControl(fb: FormBuilder): FormControl<string[]> {

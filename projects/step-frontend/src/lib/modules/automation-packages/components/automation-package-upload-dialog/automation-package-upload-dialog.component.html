@@ -9,15 +9,15 @@
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
       @if (isAffectingOtherPackage) {
-        <step-alert [type]="AlertType.MINIMALIST">
+        <step-alert [type]="AlertType.WARNING">
           This automation package would also update other packages. Select "Force" to proceed.
         </step-alert>
       }
       @if (!isNewPackage && !_package?.automationPackageResource) {
-        <step-alert [type]="AlertType.MINIMALIST">
+        <step-alert [type]="AlertType.WARNING">
           The Automation Package file is not available anymore, please select and upload it again.
           <step-icon
-            name="help"
+            name="help-circle"
             matTooltip="In Step 29 the resource management for Automation Packages has changed, requirering all existing Automation Packages to be uploaded again."
           ></step-icon>
         </step-alert>
@@ -26,7 +26,7 @@
         @switch (apType) {
           @case (UploadType.UPLOAD) {
             <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-              <step-label>Automation Package (jar or ZIP file)</step-label>
+              <step-label>Automation Package (jar, DLL or ZIP file)</step-label>
               <step-label-addon>
                 <step-icon
                   name="help-circle"
