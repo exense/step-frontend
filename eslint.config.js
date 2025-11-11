@@ -1,7 +1,12 @@
 // @ts-check
 const angular = require('angular-eslint');
 const { defineConfig } = require('eslint/config');
+const typescriptEslint = require('typescript-eslint');
 const stepLint = require('./step-lint');
+
+const stepLintRules = {
+  'stepLint/force-readonly-inputs': 'error',
+};
 
 module.exports = defineConfig([
   {
@@ -10,9 +15,19 @@ module.exports = defineConfig([
     processor: angular.processInlineTemplates,
     plugins: {
       stepLint,
+      '@typescript-eslint': typescriptEslint.plugin,
     },
     rules: {
-      'stepLint/force-readonly-inputs': 'error',
+      ...stepLintRules,
+      '@typescript-eslint/consistent-indexed-object-style': 'error',
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+        },
+      ],
+      '@angular-eslint/prefer-signals': 'error',
+      '@angular-eslint/prefer-inject': 'error',
       '@angular-eslint/prefer-standalone': 'off',
       '@angular-eslint/no-output-on-prefix': 'warn',
       '@angular-eslint/no-output-native': 'warn',
