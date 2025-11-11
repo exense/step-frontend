@@ -44,10 +44,11 @@ import { CustomCellApplySubPathPipe } from './pipe/custom-cell-apply-sub-path.pi
 import { SettingsInsideActionColDirective } from './directives/settings-inside-action-col.directive';
 import { RowsExtensionDirective } from './directives/rows-extension.directive';
 import { RowDirective } from './directives/row.directive';
-import { TablePaginatorAddonDirective } from './directives/table-paginator-addon.directive';
+import { TablePaginatorPrefixDirective } from './directives/table-paginator-prefix.directive';
 import { BulkOperationsComponent } from './components/bulk-operations/bulk-operations.component';
 import { TableWithoutSelectionStateDirective } from './directives/table-without-selection-state.directive';
 import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/columns-placeholders.component';
+import { TablePaginatorContentDirective } from './directives/table-paginator-content.directive';
 
 @NgModule({
   imports: [
@@ -63,12 +64,13 @@ import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/
     DRAG_DROP_EXPORTS,
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
+    TablePaginatorContentDirective,
   ],
   declarations: [
     TableComponent,
     SearchColDirective,
     SearchCellDefDirective,
-    TablePaginatorAddonDirective,
+    TablePaginatorPrefixDirective,
     CustomColumnsComponent,
     ColumnDirective,
     CustomCellComponentsPipe,
@@ -98,7 +100,7 @@ import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/
   exports: [
     TableComponent,
     SearchColDirective,
-    TablePaginatorAddonDirective,
+    TablePaginatorPrefixDirective,
     SearchCellDefDirective,
     CustomColumnsComponent,
     ColumnDirective,
@@ -120,6 +122,7 @@ import { ColumnsPlaceholdersComponent } from './components/columns-placeholders/
     RowsExtensionDirective,
     BulkOperationsComponent,
     TableWithoutSelectionStateDirective,
+    TablePaginatorContentDirective,
   ],
   providers: [
     TitleCasePipe,
@@ -178,7 +181,7 @@ export * from './directives/search-cell-def.directive';
 export * from './directives/filter-connect.directive';
 export * from './directives/highlight-table-row.directive';
 export * from './directives/settings-inside-action-col.directive';
-export * from './directives/table-paginator-addon.directive';
+export * from './directives/table-paginator-prefix.directive';
 export * from './services/custom-column-options';
 export * from './directives/additional-header.directive';
 export * from './shared/filter-condition';
@@ -207,3 +210,4 @@ export * from './directives/table-without-selection-state.directive';
 export * from './types/table-indicator-mode.enum';
 export * from './components/columns-placeholders/columns-placeholders.component';
 export * from './types/step-page-event';
+export * from './directives/table-paginator-content.directive';

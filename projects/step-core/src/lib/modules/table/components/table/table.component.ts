@@ -79,6 +79,8 @@ import { TableSelectionListFactoryService } from '../../shared/selection/table-s
 import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
 import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
 import { StepPageEvent } from '../../types/step-page-event';
+import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
+import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -288,6 +290,8 @@ export class TableComponent<T>
   });
 
   protected readonly rowsExtension = contentChild(RowsExtensionDirective);
+  protected readonly tablePaginatorPrefix = contentChild(TablePaginatorPrefixDirective);
+  protected readonly tablePaginatorContent = contentChild(TablePaginatorContentDirective);
 
   private contentColumns = contentChildren(ColumnDirective);
 

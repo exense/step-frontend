@@ -77,7 +77,7 @@
         </step-btn-group>
       </td>
     </ng-container>
-    <step-table-paginator-addon>
+    <ng-container *stepTablePaginatorPrefix>
       @if (totalItems() >= 1000) {
         <step-alert [type]="AlertType.WARNING">
           <step-icon name="alert-triangle" />
@@ -95,6 +95,6 @@
           />
         </step-alert>
       }
-    </step-table-paginator-addon>
+    </ng-container>
   </step-table>
 </section>

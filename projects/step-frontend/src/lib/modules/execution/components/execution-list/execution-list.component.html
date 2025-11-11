@@ -15,19 +15,6 @@
     />
     <section class="header" *stepAdditionalHeader="'btngroup-bulk-new'">
       <step-btn-group>
-        <button
-          type="button"
-          mat-icon-button
-          [color]="calculateCounts() ? 'primary' : undefined"
-          [matTooltip]="
-            calculateCounts()
-              ? 'Click to not load total number of executions to improve the performance'
-              : 'Click to load total number of executions'
-          "
-          (click)="toggleCountsCalculation()"
-        >
-          <step-icon name="loader" />
-        </button>
         <step-autorefresh-toggle
           data-step-testid="execution-auto-refresh"
           [(disabled)]="autoRefreshDisabled"
@@ -167,6 +154,21 @@
         <step-column-settings />
       </th>
       <td mat-cell *matCellDef></td>
+    </ng-container>
+    <ng-container *stepTablePaginatorContent>
+      <button
+        type="button"
+        mat-icon-button
+        [color]="calculateCounts() ? 'primary' : undefined"
+        [matTooltip]="
+          calculateCounts()
+            ? 'Click to not load total number of executions to improve the performance'
+            : 'Click to load total number of executions'
+        "
+        (click)="toggleCountsCalculation()"
+      >
+        <step-icon name="loader" />
+      </button>
     </ng-container>
   </step-table>
 </step-drag-drop-container>
