@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { AugmentedScreenService, Input as StInput, ScreenInput } from '../../../../client/step-client-module';
 import { ObjectUtilsService, ScreenDataMetaService } from '../../../basics/step-basics.module';
 import { StandardCustomFormInputComponent } from '../custom-form-input/standard-custom-form-input.component';
@@ -11,8 +11,10 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  groupBy,
   map,
   merge,
+  mergeMap,
   Observable,
   of,
   take,
@@ -49,7 +51,10 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private _objectUtils = inject(ObjectUtilsService);
 
   private valueChange$ = new BehaviorSubject<{ inputId: string; value: string } | undefined>(undefined);
-  private valueChangeDebounced$ = this.valueChange$.pipe(debounceTime(500));
+  private valueChangeDebounced$ = this.valueChange$.pipe(
+    groupBy((value) => value?.inputId),
+    mergeMap((group) => group.pipe(debounceTime(500))),
+  );
 
   private changeStart$ = this.valueChange$.pipe(map(() => true));
   private changeEnd$ = this.valueChangeDebounced$.pipe(map(() => false));
@@ -74,6 +79,8 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private originalInputs = signal<Record<string, StInput>>({});
   private visibilityFlags = signal<Record<string, boolean> | undefined>(undefined);
   private visibilityFlagsJson = computed(() => JSON.stringify(this.visibilityFlags()));
+
+  private internalModel = linkedSignal(() => this.stModel());
 
   readonly inputs = computed(() => {
     const orderedIds = this.orderedIds();
@@ -202,10 +209,11 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private setupValueChange(): void {
     this.valueChangeDebounced$.pipe(filter((valueChange) => !!valueChange)).subscribe((valueChange) => {
       const changedModel = this._objectUtils.setObjectFieldValue(
-        this.stModel(),
+        this.internalModel(),
         valueChange!.inputId,
         valueChange!.value,
       );
+      this.internalModel.set(changedModel);
       this.stModelChange.emit(changedModel);
     });
   }
@@ -218,15 +226,16 @@ export class CustomFormComponent implements OnInit, OnDestroy {
             return undefined;
           }
           const changedModel = this._objectUtils.setObjectFieldValue(
-            this.stModel(),
+            this.internalModel(),
             valueChange!.inputId,
             valueChange!.value,
           );
+          this.internalModel.set(changedModel);
           this.stModelChange.emit(changedModel);
           return changedModel;
         }),
         switchMap((changedModel) =>
-          this._screensService.getScreenInputsForScreenPost(this.stScreen(), changedModel ?? this.stModel()),
+          this._screensService.getScreenInputsForScreenPost(this.stScreen(), changedModel ?? this.internalModel()),
         ),
         map((screenInputs) => this.filterScreenInputs(screenInputs)),
         map((screenInputs) =>
@@ -240,10 +249,12 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   private setDefaultValues(screenInputs: ScreenInput[]): void {
     const inputs = screenInputs
       .map((item) => item.input as StInput)
-      .filter((input) => !!input && this._objectUtils.getObjectFieldValue(this.stModel(), input.id!) === undefined);
+      .filter(
+        (input) => !!input && this._objectUtils.getObjectFieldValue(this.internalModel(), input.id!) === undefined,
+      );
 
     let valueHasBeenChanged = false;
-    let model = this.stModel();
+    let model = this.internalModel();
     for (let item of inputs) {
       const defaultValue = item.type === 'CHECKBOX' ? item.defaultValue ?? false : item.defaultValue;
       if (defaultValue !== null && defaultValue !== undefined && defaultValue !== '') {
@@ -253,6 +264,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
     }
 
     if (valueHasBeenChanged) {
+      this.internalModel.set(model);
       this.stModelChange.emit(model);
     }
   }
