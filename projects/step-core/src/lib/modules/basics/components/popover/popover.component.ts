@@ -13,6 +13,7 @@ import {
   output,
   computed,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy, ConnectedPosition } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
@@ -48,7 +49,7 @@ export abstract class PopoverService {
     },
   ],
 })
-export class PopoverComponent implements PopoverService, AfterViewInit {
+export class PopoverComponent implements PopoverService, AfterViewInit, OnDestroy {
   private readonly _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _scrollDispatcher = inject(ScrollDispatcher);
   private readonly _destroyRef = inject(DestroyRef);
@@ -86,6 +87,11 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupClosePopoverOnScroll();
+  }
+
+  ngOnDestroy(): void {
+    // Clear timeout to prevent overlay creation, if it was scheduled
+    clearTimeout(this.tooltipTimeout);
   }
 
   private createOverlay(): void {
