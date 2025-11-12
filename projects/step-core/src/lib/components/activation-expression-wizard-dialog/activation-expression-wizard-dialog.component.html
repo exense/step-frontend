@@ -20,13 +20,13 @@
               predicateValue !== Predicate.MATCHES &&
               predicateValue !== Predicate.NOT_MATCHES
             ) {
-              @switch (conditionForm.controls['key'].value | inputType: inputs) {
+              @switch (conditionForm.controls['key'].value | screenInputType: inputs) {
                 @case ('dropdown') {
                   <step-form-field>
                     <step-autocomplete-input
                       placeHolder="Value"
                       formControlName="value"
-                      [possibleItems]="conditionForm.controls['key'].value | inputOptions: inputs"
+                      [possibleItems]="conditionForm.controls['key'].value | screenInputOptions: inputs"
                       [valueLabelExtractor]="bindingKeyExtractor"
                     />
                   </step-form-field>

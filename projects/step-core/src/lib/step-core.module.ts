@@ -49,6 +49,7 @@ import { ReportNodeIconComponent } from './modules/artefacts-common/components/r
 import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
+import { ActivationExpressionWizardDialogComponent } from './components/activation-expression-wizard-dialog/activation-expression-wizard-dialog.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
 import { EDITABLE_LABELS_EXPORTS } from './modules/editable-labels';
 import { CUSTOM_FORMS_EXPORTS } from './modules/custom-forms';
@@ -76,6 +77,8 @@ import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
 import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
 import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
+import { ScreenInputTypePipe } from './pipes/screen-input-type.pipe';
+import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
 
 @NgModule({
   declarations: [
@@ -102,9 +105,12 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    ActivationExpressionWizardDialogComponent,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
     IncludesStringPipe,
+    ScreenInputTypePipe,
+    ScreenInputOptionsPipe,
   ],
   imports: [
     CommonModule,
@@ -192,6 +198,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
+    ActivationExpressionWizardDialogComponent,
     DatePickerModule,
     AUTH_EXPORTS,
     EDITABLE_LABELS_EXPORTS,
@@ -332,6 +339,7 @@ export * from './modules/split';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';
+export * from './components/activation-expression-wizard-dialog/activation-expression-wizard-dialog.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
