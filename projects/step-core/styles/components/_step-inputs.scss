@@ -325,6 +325,11 @@
         align-items: center;
         max-width: 200px;
         padding: 0 12px;
+
+        &.step-suffix--primary {
+          background-color: var.$dark-blue;
+          color: white;
+        }
       }
 
       step-prefix {
