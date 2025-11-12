@@ -6,6 +6,7 @@ const stepLint = require('./step-lint');
 
 const stepLintRules = {
   'stepLint/force-readonly-inputs': 'error',
+  'stepLint/inline-style-variables-name': 'error',
 };
 
 module.exports = defineConfig([
