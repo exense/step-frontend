@@ -51,5 +51,4 @@ export class AttachmentsInlinePreviewComponent {
   }
 
   protected readonly PopoverMode = PopoverMode;
-  protected readonly eval = eval;
 }
