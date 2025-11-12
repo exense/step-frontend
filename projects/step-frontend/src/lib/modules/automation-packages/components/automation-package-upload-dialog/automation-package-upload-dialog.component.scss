@@ -122,6 +122,6 @@ div.button {
   padding: 0 1rem;
 }
 
-step-custom-forms step-label {
+step-custom-forms ::ng-deep step-label {
   font-size: 1.2rem;
 }
