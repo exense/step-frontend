@@ -1,6 +1,6 @@
-import { Component, computed, effect, input, model, output, signal, untracked, ViewEncapsulation } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, computed, effect, input, model, output, signal, ViewEncapsulation } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { StepPageEvent } from '../../types/step-page-event';
 
 @Component({
   selector: 'step-paginator',
@@ -25,7 +25,10 @@ export class PaginatorComponent {
     }
   });
 
-  lengthInput = input(0, {
+  readonly usePagesCount = input(true);
+  readonly hasNext = input(false);
+
+  readonly lengthInput = input(0, {
     alias: 'length',
     transform: (value: number | undefined | null) => value ?? 0,
   });
@@ -44,16 +47,14 @@ export class PaginatorComponent {
   pageSize = model(0);
   readonly pageIndex = signal(0);
 
-  readonly pageChange = output<PageEvent>();
+  readonly pageChange = output<StepPageEvent>();
 
-  private pageEvent = computed<PageEvent>(() => {
+  private pageEvent = computed<StepPageEvent>(() => {
     const pageIndex = this.pageIndex();
     const pageSize = this.pageSize();
-    const length = untracked(() => this.length());
     return {
       pageIndex,
       pageSize,
-      length,
     };
   });
 
@@ -78,26 +79,45 @@ export class PaginatorComponent {
   });
 
   protected canGoPrev = computed(() => this.pageIndex() > 0);
-  protected canGoNext = computed(() => this.pageIndex() < this.pagesCount() - 1);
+  protected canGoNext = computed(() => {
+    const [usePagesCount, pageIndex, pagesCount, hasNext] = [
+      this.usePagesCount(),
+      this.pageIndex(),
+      this.pagesCount(),
+      this.hasNext(),
+    ];
+    if (usePagesCount) {
+      return pageIndex < pagesCount - 1;
+    }
+    return hasNext;
+  });
 
   protected pageLabel = computed(() => {
-    const [pageIndex, pageSize, pagesCount, length] = [
+    const [pageIndex, pageSize, pagesCount, length, usePagesCount] = [
       this.pageIndex(),
       this.pageSize(),
       this.pagesCount(),
       this.length(),
+      this.usePagesCount(),
     ];
 
-    if (!length) {
+    if (usePagesCount && !length) {
       return '';
     }
 
     const from = pageIndex * pageSize;
-    const to = pageIndex < pagesCount - 1 ? from + pageSize : length;
-    if (pageSize === 1) {
-      return `${to} of ${length}`;
+    let to = from + pageSize;
+
+    if (usePagesCount && length > 0 && pageIndex >= pagesCount - 1) {
+      to = length;
     }
-    return `${from + 1} - ${to} of ${length}`;
+
+    const total = usePagesCount && length > 0 ? `${length}` : 'many';
+
+    if (pageSize === 1) {
+      return `${to} of ${total}`;
+    }
+    return `${from + 1} - ${to} of ${total}`;
   });
 
   next(): void {

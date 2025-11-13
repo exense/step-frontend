@@ -54,11 +54,6 @@
             <td class="mat-mdc-cell no-data"></td>
           }
         }
-        @case (EmptyState.NO_DATA) {
-          <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">
-            {{ noResultsPlaceholder() || 'No data available in table' }}
-          </td>
-        }
         @case (EmptyState.NO_MATCHING_RECORDS) {
           <td class="mat-mdc-cell no-data" [colSpan]="displayColumns().length">No matching records found</td>
         }
@@ -67,12 +62,20 @@
   </table>
 </div>
 <section class="paginator-container">
-  <ng-content select="step-table-paginator-addon" />
+  @if (tablePaginatorPrefix(); as paginatorPrefix) {
+    <ng-container *ngTemplateOutlet="paginatorPrefix.templateRef" />
+  }
   <step-paginator
     [disabled]="pageSizeInputDisabled()"
-    [length]="tableDataSource?.totalFiltered$ | async"
+    [length]="totalFiltered()"
+    [hasNext]="hasNext()"
+    [usePagesCount]="calculateCounts()"
     [pageSizeOptions]="pageSizeOptions()"
-  />
+  >
+    @if (tablePaginatorContent(); as paginatorContent) {
+      <ng-container *ngTemplateOutlet="paginatorContent.templateRef" />
+    }
+  </step-paginator>
 </section>
 @if (rowsExtension(); as rowsExtension) {
   @if (rowInfos(); as rows) {

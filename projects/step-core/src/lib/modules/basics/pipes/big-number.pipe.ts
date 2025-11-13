@@ -22,7 +22,7 @@ export class BigNumberPipe implements PipeTransform {
     if (!suffixItem) {
       return '0';
     }
-    let result = (value / suffixItem.value).toFixed(2);
+    let result = (value / suffixItem.value).toFixed(0);
     result = result.replace(TRAILING_ZERO_PATTERN, '$1');
     result = `${result}${suffixItem.symbol}`;
     return result;

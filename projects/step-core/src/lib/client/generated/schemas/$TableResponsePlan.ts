@@ -17,5 +17,8 @@ export const $TableResponsePlan = {
         type: 'Plan',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

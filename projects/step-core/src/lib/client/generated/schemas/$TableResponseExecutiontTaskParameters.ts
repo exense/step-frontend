@@ -17,5 +17,8 @@ export const $TableResponseExecutiontTaskParameters = {
         type: 'ExecutiontTaskParameters',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

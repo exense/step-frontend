@@ -85,13 +85,12 @@ step-table {
           content: ' ';
           display: block;
           position: absolute;
-          margin: 1.5rem 0.8rem;
           border-radius: 0.5rem;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: var.$gray-50;
+          background: var.$white;
         }
 
         &::before {
@@ -118,6 +117,15 @@ step-table {
 
         & > * {
           opacity: 0;
+        }
+      }
+    }
+
+    &:not(.not-highlight).in-progress {
+      tr.row-highlight,
+      tr.content-row:hover {
+        & > td::after {
+          background: var.$highlight !important;
         }
       }
     }

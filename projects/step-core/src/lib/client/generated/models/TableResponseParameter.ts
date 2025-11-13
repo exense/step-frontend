@@ -8,4 +8,5 @@ export type TableResponseParameter = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<Parameter>;
+  hasNext?: boolean;
 };

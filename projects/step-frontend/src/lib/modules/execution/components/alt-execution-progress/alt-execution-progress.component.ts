@@ -1,14 +1,12 @@
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import {
   Component,
-  computed,
   DestroyRef,
   forwardRef,
   inject,
   OnDestroy,
   OnInit,
   signal,
-  untracked,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -24,10 +22,8 @@ import {
   pairwise,
   scan,
   shareReplay,
-  skip,
   startWith,
   switchMap,
-  take,
   tap,
 } from 'rxjs';
 import {
@@ -210,22 +206,14 @@ export class AltExecutionProgressComponent
 
   protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
-  readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
-    .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
-    .subscribe((activeExecution) => {
-      // force trigger time range change
-      const timeRangeSelection = activeExecution.getTimeRangeSelection();
-      setTimeout(() => {
-        this.updateTimeRangeSelection({ ...timeRangeSelection });
-      }, 100);
-    });
-
+  /** Active execution's range selection data stream **/
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
     switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(200))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
+  /** Subscribes to active execution's range selection data stream and update url's parameters **/
   private updateUrlParamsSubscription = this.timeRangeSelection$
     .pipe(
       scan(
@@ -399,25 +387,14 @@ export class AltExecutionProgressComponent
   );
 
   ngOnInit(): void {
-    const urlParams = this._urlParamsService.collectUrlParams();
-
-    // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
-    if (urlParams.timeRange) {
-      this.updateTimeRangeSelection(urlParams.timeRange);
-    } else {
-      // force event
-      let activeExecution = this._activeExecutionsService.getActiveExecution(this._executionId());
-      this.updateTimeRangeSelection({ ...activeExecution.getTimeRangeSelection() });
-    }
-
     this.setupTreeRefresh();
     this.setupToggleWarningReset();
-    this.subscribeToUrlNavigation();
+    this.setupNavigationHistoryChange();
   }
 
   readonly currentEntity = this.execution;
 
-  private subscribeToUrlNavigation() {
+  private setupNavigationHistoryChange() {
     // subscribe to back and forward events
     this._router.events
       .pipe(
@@ -433,7 +410,7 @@ export class AltExecutionProgressComponent
         // analytics tab is handling events itself
         const isAnalytics = this.isAnalyticsRoute();
         if (!isAnalytics) {
-          let urlParams = this._urlParamsService.collectUrlParams();
+          const urlParams = this._urlParamsService.collectUrlParams();
           if (urlParams.timeRange) {
             this.updateTimeRangeSelection(urlParams.timeRange);
           }
@@ -519,28 +496,33 @@ export class AltExecutionProgressComponent
 
   protected readonly PopoverMode = PopoverMode;
 
+  /**
+   * Updates time range selection data in active execution
+   * **/
   updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
-    this.execution$.pipe(take(1)).subscribe((execution) => {
-      if (selection.type === 'RELATIVE') {
-        let time = selection.relativeSelection!.timeInMs;
-        let now = new Date().getTime();
-        let end = execution.endTime || now - 5000;
-        let from = end - time;
-        if (from > end) {
-          // remove the 5 sec buffer
-          end = now;
-        }
-        selection!.absoluteSelection = { from: from, to: end };
-        if (!selection.relativeSelection!.label) {
-          let foundRelativeOption = this.timeRangeOptions.find(
-            (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
-          );
-          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label;
-        }
-      } else if (selection.type === 'FULL') {
-        selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
+    const execution = this.execution();
+    if (!execution) {
+      return;
+    }
+    if (selection.type === 'RELATIVE') {
+      let time = selection.relativeSelection!.timeInMs;
+      let now = new Date().getTime();
+      let end = execution.endTime || now - 5000;
+      let from = end - time;
+      if (from > end) {
+        // remove the 5 sec buffer
+        end = now;
       }
-      this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
-    });
+      selection!.absoluteSelection = { from: from, to: end };
+      if (!selection.relativeSelection!.label) {
+        let foundRelativeOption = this.timeRangeOptions.find(
+          (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+        );
+        selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label;
+      }
+    } else if (selection.type === 'FULL') {
+      selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
+    }
+    this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
   }
 }

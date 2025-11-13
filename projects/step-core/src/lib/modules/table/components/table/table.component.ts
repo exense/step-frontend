@@ -78,6 +78,9 @@ import { TableSelectionList } from '../../shared/selection/table-selection-list'
 import { TableSelectionListFactoryService } from '../../shared/selection/table-selection-list-factory.service';
 import { TableIndicatorMode } from '../../types/table-indicator-mode.enum';
 import { ColumnsPlaceholdersComponent } from '../columns-placeholders/columns-placeholders.component';
+import { StepPageEvent } from '../../types/step-page-event';
+import { TablePaginatorPrefixDirective } from '../../directives/table-paginator-prefix.directive';
+import { TablePaginatorContentDirective } from '../../directives/table-paginator-content.directive';
 
 export type DataSource<T> = StepDataSource<T> | TableDataSource<T> | T[] | Observable<T[]>;
 
@@ -88,7 +91,6 @@ interface SearchData {
 
 enum EmptyState {
   INITIAL,
-  NO_DATA,
   NO_MATCHING_RECORDS,
 }
 
@@ -182,8 +184,8 @@ export class TableComponent<T>
   @Output() onReload = new EventEmitter<unknown>();
   @Input() trackBy: TrackByFunction<T> = (index) => index;
   @Input() dataSource?: DataSource<T>;
-  staticFilters = input<Record<string, SearchValue> | undefined>();
-  staticFilters$ = toObservable(this.staticFilters);
+  readonly staticFilters = input<Record<string, SearchValue> | undefined>();
+  private staticFilters$ = toObservable(this.staticFilters);
 
   private usedColumns = new Set<string>();
 
@@ -191,18 +193,16 @@ export class TableComponent<T>
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
   private inProgressDataSource = signal(false);
-  private total = signal<number | null>(null);
+  protected readonly hasNext = signal(false);
+  protected readonly totalFiltered = signal<number | null>(null);
   private isTableReadyToRenderColumns = signal(false);
 
   protected readonly EmptyState = EmptyState;
   protected readonly emptyState = computed(() => {
-    const total = this.total();
+    const totalFiltered = this.totalFiltered();
     const isColumnsInitialized = this._tableColumns.isInitialized();
-    if (total === null || !isColumnsInitialized) {
+    if (totalFiltered === null || !isColumnsInitialized) {
       return EmptyState.INITIAL;
-    }
-    if (total === 0) {
-      return EmptyState.NO_DATA;
     }
 
     return EmptyState.NO_MATCHING_RECORDS;
@@ -259,6 +259,9 @@ export class TableComponent<T>
 
   readonly blockGlobalReload = input(false);
 
+  readonly calculateCounts = input(true);
+  private calculateCounts$ = toObservable(this.calculateCounts);
+
   private effectSetupGlobalReload = effect(() => {
     const isGlobalBlocked = this.blockGlobalReload();
     if (isGlobalBlocked) {
@@ -287,6 +290,8 @@ export class TableComponent<T>
   });
 
   protected readonly rowsExtension = contentChild(RowsExtensionDirective);
+  protected readonly tablePaginatorPrefix = contentChild(TablePaginatorPrefixDirective);
+  protected readonly tablePaginatorContent = contentChild(TablePaginatorContentDirective);
 
   private contentColumns = contentChildren(ColumnDirective);
 
@@ -471,12 +476,12 @@ export class TableComponent<T>
       }),
     );
 
-    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$])
+    combineLatest([pageAndSearch$, sort$, this.filter$, this.tableParams$, this.staticFilters$, this.calculateCounts$])
       .pipe(takeUntil(this.dataSourceTerminator$))
-      .subscribe(([{ page, search }, sort, filter, params, staticFilters]) => {
+      .subscribe(([{ page, search }, sort, filter, params, staticFilters, calculateCounts]) => {
         this._tableState.saveState(search, page, sort);
         const mergedSearch: Record<string, SearchValue> = { ...search, ...staticFilters };
-        tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params });
+        tableDataSource.getTableData({ page, sort, search: mergedSearch, filter, params, calculateCounts });
       });
 
     tableDataSource!.forceNavigateToFirstPage$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe(() => {
@@ -487,8 +492,12 @@ export class TableComponent<T>
       this.inProgressDataSource.set(inProgress);
     });
 
-    tableDataSource!.total$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
-      this.total.set(total);
+    tableDataSource!.totalFiltered$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((total) => {
+      this.totalFiltered.set(total);
+    });
+
+    tableDataSource!.hasNext$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((hasNext) => {
+      this.hasNext.set(hasNext);
     });
   }
 
@@ -513,19 +522,13 @@ export class TableComponent<T>
     return this._sort.sortChange.pipe(startWith(initialSort));
   }
 
-  private setupPageStream(): Observable<PageEvent> {
-    let initialPage$: Observable<PageEvent>;
+  private setupPageStream(): Observable<StepPageEvent> {
+    let initialPage$: Observable<StepPageEvent>;
 
     const statePage = this._tableState.getPage();
     if (statePage) {
       this.page.pageSize.set(statePage.pageSize);
       this.page.pageIndex.set(statePage.pageIndex);
-      this.page.length.update((current) => {
-        if (!!current && !statePage.length) {
-          return current;
-        }
-        return statePage.length;
-      });
       initialPage$ = of(statePage);
     } else {
       this.page.firstPage();

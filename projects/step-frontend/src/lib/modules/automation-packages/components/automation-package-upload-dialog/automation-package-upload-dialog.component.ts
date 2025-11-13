@@ -1,4 +1,14 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectorRef,
+  Component,
+  effect,
+  inject,
+  Injector,
+  OnInit,
+  runInInjectionContext,
+  ViewChild,
+} from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -12,16 +22,20 @@ import {
   ReloadableDirective,
   StepCoreModule,
   AutomationPackageUpdateResult,
+  RichEditorComponent,
+  ScreensService,
+  ActivationExpressionWizardDialogComponent,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
+import { catchError, map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { AutomationPackagePermission } from '../../types/automation-package-permission.enum';
 import { UploadType } from '../../types/upload-type.enum';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';
+import { pairRequiredValidator } from '../../validators/pair-required.validators';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -35,15 +49,18 @@ type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRout
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
   imports: [StepCoreModule, EntityRefDirective],
   hostDirectives: [ReloadableDirective],
-  host: {
-    '(keydown.enter)': 'upload()',
-  },
 })
 export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
   private _matDialog = inject(MatDialog);
+  private _changeDetection = inject(ChangeDetectorRef);
+  private _injector = inject(Injector);
+  private _screenService = inject(ScreensService);
+
+  @ViewChild('apSnippetEditor') apSnippetEditor?: RichEditorComponent;
+  @ViewChild('librarySnippetEditor') librarySnippetEditor?: RichEditorComponent;
 
   protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
 
@@ -66,6 +83,30 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       this.form.controls.apMavenSnippet.markAsUntouched();
     }
   });
+
+  switchApType(type: UploadType) {
+    this.apType = type;
+    if (type === UploadType.MAVEN) {
+      this._changeDetection.detectChanges();
+      runInInjectionContext(this._injector, () => {
+        afterNextRender(() => {
+          this.apSnippetEditor?.focusOnText();
+        });
+      });
+    }
+  }
+
+  switchLibraryType(type: UploadType) {
+    this.libraryType = type;
+    if (type === UploadType.MAVEN) {
+      this._changeDetection.detectChanges();
+      runInInjectionContext(this._injector, () => {
+        afterNextRender(() => {
+          this.librarySnippetEditor?.focusOnText();
+        });
+      });
+    }
+  }
 
   private hasPrefilledAdvancedSettings(): boolean {
     return !!(
@@ -124,6 +165,8 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     if (this.automationPackage.plansAttributes) {
       this.customPlanAttributes = { attributes: this.automationPackage.plansAttributes } as Partial<Plan>;
     }
+
+    this.form.addValidators(pairRequiredValidator('versionName', 'activationExpression'));
   }
 
   protected upload(): void {
@@ -140,6 +183,10 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
 
     if (this.apType === UploadType.MAVEN && this.form.controls.apMavenSnippet.invalid) {
       this.form.controls.apMavenSnippet.markAsTouched();
+      return;
+    }
+
+    if (this.form.controls.versionName.invalid || this.form.controls.activationExpression.invalid) {
       return;
     }
 
@@ -247,6 +294,38 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       return;
     }
     this._matDialog.open(AutomationPackageWarningsDialogComponent, { data: warnings });
+  }
+
+  get activationExpression(): FormControl<string | null> {
+    return this.form.get('activationExpression') as FormControl<string | null>;
+  }
+
+  addCondition(type?: 'AND' | 'OR') {
+    this._screenService
+      .getScreenInputsByScreenId('executionParameters')
+      .pipe(
+        take(1),
+        switchMap((inputs) =>
+          this._matDialog
+            .open(ActivationExpressionWizardDialogComponent, {
+              data: {
+                type,
+                inputs,
+                initialScript: (this.form.get('activationExpression')?.value ?? '') as string,
+              },
+              width: '50rem',
+            })
+            .afterClosed(),
+        ),
+      )
+      .subscribe((finalScript?: string) => {
+        if (!finalScript) return;
+        const ctrl = this.form.get('activationExpression');
+        ctrl?.setValue(finalScript);
+        ctrl?.markAsDirty();
+        ctrl?.markAsTouched();
+        ctrl?.updateValueAndValidity();
+      });
   }
 
   protected readonly AlertType = AlertType;
