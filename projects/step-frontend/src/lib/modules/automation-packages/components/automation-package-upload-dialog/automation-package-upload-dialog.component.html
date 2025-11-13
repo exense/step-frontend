@@ -9,15 +9,24 @@
       <step-progress-bar [progress]="(progress$ | async)!" />
     } @else {
       @if (isAffectingOtherPackage) {
-        <step-alert [type]="AlertType.MINIMALIST">
+        <step-alert [type]="AlertType.WARNING">
           This automation package would also update other packages. Select "Force" to proceed.
+        </step-alert>
+      }
+      @if (!isNewPackage && !_package?.automationPackageResource) {
+        <step-alert [type]="AlertType.WARNING">
+          The Automation Package file is not available anymore, please select and upload it again.
+          <step-icon
+            name="help-circle"
+            matTooltip="In Step 29 the resource management for Automation Packages has changed, requirering all existing Automation Packages to be uploaded again."
+          ></step-icon>
         </step-alert>
       }
       <form [formGroup]="form">
         @switch (apType) {
           @case (UploadType.UPLOAD) {
             <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-              <step-label>Automation Package (jar or ZIP file)</step-label>
+              <step-label>Automation Package (jar, DLL or ZIP file)</step-label>
               <step-label-addon>
                 <step-icon
                   name="help-circle"
@@ -37,7 +46,7 @@
                     type="button"
                     class="maven"
                     mat-stroked-button
-                    (click)="apType = UploadType.MAVEN"
+                    (click)="switchApType(UploadType.MAVEN)"
                     matTooltip="Use maven snippet instead of uploading a file."
                   >
                     <step-icon name="maven"></step-icon>
@@ -60,15 +69,15 @@
                   <step-icon name="maven"></step-icon>
                 </button>
               </step-label-addon>
-              <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="apMavenSnippet" />
+              <step-rich-editor #apSnippetEditor [syntaxMode]="AceMode.XML" formControlName="apMavenSnippet" />
             </step-form-field>
           }
           @default {}
         }
         @if (showAdvancedSettings) {
-          <step-label>Libraries</step-label>
           @switch (libraryType) {
             @case (UploadType.UPLOAD) {
+              <step-label>Libraries</step-label>
               <step-form-field alignLabelAddon="near">
                 <step-description>
                   Select a jar or ZIP file as a dependency for this automation package.
@@ -86,7 +95,7 @@
                       type="button"
                       class="maven"
                       mat-stroked-button
-                      (click)="libraryType = UploadType.MAVEN"
+                      (click)="switchLibraryType(UploadType.MAVEN)"
                       matTooltip="Use maven snippet instead of uploading a file."
                     >
                       <step-icon name="maven"></step-icon>
@@ -96,8 +105,11 @@
               </step-form-field>
             }
             @case (UploadType.MAVEN) {
-              <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
-                <step-label>Maven Snippet</step-label>
+              <step-label>Libraries (Maven Snippet)</step-label>
+              <step-form-field alignLabelAddon="near">
+                <step-description>
+                  Select a maven snippet as a dependency for this automation package.
+                </step-description>
                 <step-label-addon>
                   <button
                     type="button"
@@ -109,7 +121,11 @@
                     <step-icon name="maven"></step-icon>
                   </button>
                 </step-label-addon>
-                <step-rich-editor [syntaxMode]="AceMode.XML" formControlName="libraryMavenSnippet" />
+                <step-rich-editor
+                  #librarySnippetEditor
+                  [syntaxMode]="AceMode.XML"
+                  formControlName="libraryMavenSnippet"
+                />
               </step-form-field>
             }
             @default {}
@@ -120,7 +136,7 @@
               >Optional: specify a package version. This lets you deploy and run different versions on Step, controlled
               by an activation expression.
             </step-description>
-            <step-prefix>Version name</step-prefix>
+            <step-prefix>Version Name</step-prefix>
             <input
               placeholder="Version name (optional)"
               formControlName="versionName"
@@ -133,6 +149,9 @@
                 matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
               />
             </step-suffix>
+            @if (form.controls.versionName.hasError('requiredWhenOtherPresent')) {
+              <step-error> Version name is required when Activation Expression is set. </step-error>
+            }
           </step-form-field>
           <step-form-field>
             <step-prefix>Activation Expression</step-prefix>
@@ -142,19 +161,45 @@
               formControlName="activationExpression"
               title="Activation Expression"
             />
+            <step-suffix [primary]="true">
+              <div [matMenuTriggerFor]="activationMenu">
+                <div class="button">Wizard</div>
+
+                <mat-menu #activationMenu="matMenu">
+                  <button mat-menu-item [disabled]="!!form.get('activationExpression')!.value" (click)="addCondition()">
+                    Add condition
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    [disabled]="!form.get('activationExpression')!.value"
+                    (click)="addCondition('OR')"
+                  >
+                    Add OR condition
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    [disabled]="!form.get('activationExpression')!.value"
+                    (click)="addCondition('AND')"
+                  >
+                    Add AND condition
+                  </button>
+                </mat-menu>
+              </div>
+            </step-suffix>
             <step-suffix>
               <step-icon
                 name="help-circle"
                 matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
               />
             </step-suffix>
+            @if (form.controls.activationExpression.hasError('requiredWhenOtherPresent')) {
+              <step-error> Activation Expression is required when Version name is set. </step-error>
+            }
           </step-form-field>
-          <mat-expansion-panel [class.hidden]="!customKeywordAttributesForm.inputs().length">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <span>Custom keyword attributes</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+          <div [class.hidden]="!customKeywordAttributesForm.inputs().length">
+            <h5>Custom keyword attributes</h5>
             <step-description>
               Custom attributes applied to all keywords and derived from the keyword screenInput
             </step-description>
@@ -165,13 +210,9 @@
               [stExcludeFields]="['attributes.name']"
             >
             </step-custom-forms>
-          </mat-expansion-panel>
-          <mat-expansion-panel [class.hidden]="!customPlanAttributesForm.inputs().length">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <span>Custom plan attributes</span>
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+          </div>
+          <div [class.hidden]="!customPlanAttributesForm.inputs().length">
+            <h5>Custom plan attributes</h5>
             <step-description>
               Custom attributes applied to all plans and derived from the plan screenInput
             </step-description>
@@ -182,50 +223,46 @@
               [stExcludeFields]="['attributes.name']"
             >
             </step-custom-forms>
-          </mat-expansion-panel>
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>Routing options</mat-panel-title>
-            </mat-expansion-panel-header>
-            <step-description>
-              The routing configuration will be propagated to all keywords in this Automation Package. For most cases
-              the default setting shouldn't be changed. (<a
-                target="_blank"
-                href="https://step.dev/knowledgebase/devops/step-automation-package-ui/"
-                >open documentation</a
-              >)
-            </step-description>
-            <step-form-field>
-              <mat-checkbox color="primary" #executeLocally="matCheckbox" formControlName="executeFunctionsLocally">
-                <span>Execute on controller</span>
-              </mat-checkbox>
-            </step-form-field>
-            @if (!executeLocally.checked) {
-              <section class="criteria-header">
-                <div>
-                  <label>Agent token selection criteria</label>
-                  <button type="button" mat-icon-button (click)="addRoutingCriterion()">
-                    <step-icon name="plus"></step-icon>
+          </div>
+          <step-label>Routing options</step-label>
+          <step-description>
+            The routing configuration will be propagated to all keywords in this Automation Package. For most cases the
+            default setting shouldn't be changed. (<a
+              target="_blank"
+              href="https://step.dev/knowledgebase/devops/step-automation-package-ui/"
+              >open documentation</a
+            >)
+          </step-description>
+          <step-form-field>
+            <mat-checkbox color="primary" #executeLocally="matCheckbox" formControlName="executeFunctionsLocally">
+              <span>Execute on controller</span>
+            </mat-checkbox>
+          </step-form-field>
+          @if (!executeLocally.checked) {
+            <section class="criteria-header">
+              <div>
+                <label>Agent token selection criteria</label>
+                <button type="button" mat-icon-button (click)="addRoutingCriterion()">
+                  <step-icon name="plus"></step-icon>
+                </button>
+              </div>
+            </section>
+            <section class="criteria-body" formArrayName="routing">
+              @for (group of routing.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="criterion-row">
+                  <step-form-field>
+                    <input type="text" placeholder="Key" formControlName="key" />
+                  </step-form-field>
+                  <step-form-field>
+                    <input type="text" placeholder="Value" formControlName="value" />
+                  </step-form-field>
+                  <button type="button" mat-stroked-button (click)="routing.removeAt(i)">
+                    <step-icon name="trash-2"></step-icon>
                   </button>
                 </div>
-              </section>
-              <section class="criteria-body" formArrayName="routing">
-                @for (group of routing.controls; track $index; let i = $index) {
-                  <div [formGroupName]="i" class="criterion-row">
-                    <step-form-field>
-                      <input type="text" placeholder="Key" formControlName="key" />
-                    </step-form-field>
-                    <step-form-field>
-                      <input type="text" placeholder="Value" formControlName="value" />
-                    </step-form-field>
-                    <button type="button" mat-stroked-button (click)="routing.removeAt(i)">
-                      <step-icon name="trash-2"></step-icon>
-                    </button>
-                  </div>
-                }
-              </section>
-            }
-          </mat-expansion-panel>
+              }
+            </section>
+          }
         }
       </form>
     }

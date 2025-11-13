@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'step-status',
@@ -11,4 +11,8 @@ import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@a
 export class StatusComponent {
   readonly status = input<string | undefined>();
   readonly iconMode = input(false);
+  protected readonly className = computed(() => {
+    const status = this.status();
+    return !status ? '' : `status-${status}`;
+  });
 }

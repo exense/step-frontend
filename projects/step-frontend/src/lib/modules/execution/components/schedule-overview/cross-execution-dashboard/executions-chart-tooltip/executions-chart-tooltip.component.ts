@@ -52,8 +52,20 @@ export class ExecutionsChartTooltipComponent {
   selectedSeriesExecutions: ExecutionItem[] = [];
   executionsListTruncated: boolean = false;
 
+  readonly timeRange = computed(() => {
+    const contextData = this.data();
+    const bucketRange = (contextData?.xValues[1] || 0) - (contextData?.xValues[0] || 0);
+
+    if (!contextData || !bucketRange || !contextData.idx) {
+      return undefined;
+    }
+
+    const bucketStart = contextData.xValues[contextData.idx];
+    const bucketEnd = bucketStart + bucketRange;
+    return `${new Date(bucketStart).toLocaleString()} - ${new Date(bucketEnd).toLocaleString()}`;
+  });
+
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
-    console.log('transofrmed data');
     const contextData = this.data();
     this.selectedSeriesExecutions = [];
     this.executionsListTruncated = false;
@@ -63,7 +75,6 @@ export class ExecutionsChartTooltipComponent {
       return [];
     }
     contextData.series = contextData.series.filter((s) => s.scale === this.scaleKey());
-    console.log(contextData.series, this.scaleKey);
     for (let i = contextData!.series.length - 1; i >= 0; i--) {
       let series: TSChartSeries = contextData!.series[i]!;
       let value =

@@ -10,9 +10,12 @@ import {
   ElementRef,
   untracked,
   output,
+  inject,
 } from '@angular/core';
 import { PaginatorComponent, StepPageEvent } from '@exense/step-core';
+import { PageEvent } from '@angular/material/paginator';
 import { HeatMapColor, HeatmapColumn, HeatMapRow } from './types/heatmap-types';
+import { HeatmapPersistenceStateService } from './injectables/heatmap-persistence-state.service';
 
 @Component({
   selector: 'step-heatmap',
@@ -21,8 +24,12 @@ import { HeatMapColor, HeatmapColumn, HeatMapRow } from './types/heatmap-types';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
+  providers: [HeatmapPersistenceStateService],
 })
 export class HeatmapComponent {
+  private _heatmapState = inject(HeatmapPersistenceStateService);
+  private defaultPage = this._heatmapState.getPage();
+
   readonly columns = input<HeatmapColumn[]>([]);
   readonly rows = input<HeatMapRow[]>([]);
   readonly firstColumnHeader = input<string>('Name');
@@ -33,16 +40,18 @@ export class HeatmapComponent {
   readonly enableCellLinks = input<boolean>(true);
   readonly legendColors = input<HeatMapColor[]>([]);
 
-  readonly searchValue = signal('');
-  readonly pageSize = signal(10);
-  readonly page = signal(0);
+  protected readonly PAGE_SIZES = [10, 25, 50];
+  protected readonly searchValue = signal('');
 
-  readonly paginator = viewChild(PaginatorComponent);
-  readonly container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
+  protected readonly pageSize = signal(this.defaultPage?.pageSize ?? 10);
+  protected readonly page = signal(this.defaultPage?.pageIndex ?? 0);
+
+  private paginator = viewChild(PaginatorComponent);
+  private container = viewChild('scrollableContainer', { read: ElementRef<HTMLElement> });
 
   readonly cellClick = output<{ row: HeatMapRow; column: HeatmapColumn }>();
 
-  scrollEffect = effect(() => {
+  private scrollEffect = effect(() => {
     const rows = this.rows();
     const element = this.container()?.nativeElement!;
     if (rows.length > 0) {
@@ -61,18 +70,18 @@ export class HeatmapComponent {
     untracked(() => this.paginator()?.firstPage());
   });
 
-  searchChange = effect(() => {
+  private searchChange = effect(() => {
     this.searchValue();
     this.paginator()?.firstPage();
   });
 
-  filteredRows = computed(() => {
+  protected filteredRows = computed(() => {
     const list = this.rows() ?? [];
     const q = (this.searchValue?.() ?? '').trim().toLowerCase();
     return q ? list.filter((r) => (r.label ?? '').toLowerCase().includes(q)) : list;
   });
 
-  fillerRows = computed(() => {
+  protected fillerRows = computed(() => {
     let pageSize = this.pageSize();
     let filteredRows = this.filteredRows();
     if (filteredRows.length < pageSize) {
@@ -82,7 +91,7 @@ export class HeatmapComponent {
     }
   });
 
-  filteredAndPaginatedRows = computed(() => {
+  protected filteredAndPaginatedRows = computed(() => {
     const filtered = this.filteredRows();
     const rawPage = this.page();
     const pageSize = this.pageSize();
@@ -97,7 +106,7 @@ export class HeatmapComponent {
     return filtered.slice(start, end);
   });
 
-  onCellClick(row: HeatMapRow, column: HeatmapColumn): void {
+  protected handleCellClick(row: HeatMapRow, column: HeatmapColumn): void {
     this.cellClick.emit({ row, column });
     const link = row.cells?.[column.id]?.link;
     if (link && this.enableCellLinks()) {
@@ -105,12 +114,13 @@ export class HeatmapComponent {
     }
   }
 
+  
   handlePageChange(page: StepPageEvent) {
-    this.page.set(page.pageIndex);
-  }
+    if (page.pageSize !== this.pageSize()) {
+      page.pageIndex = 0;
+    }
 
-  handlePageSizeChange(size: number) {
-    this.pageSize.set(size);
-    this.paginator()?.firstPage();
+    this.page.set(page.pageIndex);
+    this.pageSize.set(page.pageSize);
   }
 }

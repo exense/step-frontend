@@ -16,7 +16,8 @@ step-status {
   .status-RUNNING,
   .status-ESTIMATING,
   .status-PROVISIONING,
-  .status-DEPROVISIONING {
+  .status-DEPROVISIONING,
+  .status-FORCING_ABORT {
     step-icon {
       animation: rotate-icon 4s linear infinite;
     }

@@ -106,3 +106,22 @@ step-resource-input {
     width: 4rem;
   }
 }
+
+h5 {
+  margin: 0.3rem 0;
+}
+
+.hidden {
+  display: none;
+}
+
+div.button {
+  cursor: pointer;
+  line-height: 34px;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}
+
+step-custom-forms ::ng-deep step-label {
+  font-size: 1.2rem;
+}

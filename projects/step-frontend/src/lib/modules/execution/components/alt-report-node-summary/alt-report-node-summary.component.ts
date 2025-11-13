@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { ReportNodeSummary } from '../../shared/report-node-summary';
 import { VIEW_MODE } from '../../shared/view-mode';
-import { STATUS_COLORS } from '@exense/step-core';
+import { NumberSeparateThousandsPipe, STATUS_COLORS } from '@exense/step-core';
 import {
   ChartItemClickEvent,
   DoughnutChartItem,
@@ -21,9 +21,11 @@ import { Status } from '../../../_common/shared/status.enum';
     '[attr.title]': 'null',
   },
   standalone: false,
+  providers: [NumberSeparateThousandsPipe],
 })
 export class AltReportNodeSummaryComponent {
   private _statusColors = inject(STATUS_COLORS);
+  private _numberSeparateThousands = inject(NumberSeparateThousandsPipe);
   protected readonly _mode = inject(VIEW_MODE);
 
   readonly title = input('');
@@ -33,8 +35,8 @@ export class AltReportNodeSummaryComponent {
 
   readonly statusFilterModel = model<Status[]>([], { alias: 'statusFilter' });
 
-  readonly totalTooltip = input<string | undefined>();
-  readonly totalForecastTooltip = input<string | undefined>();
+  readonly totalTooltipInput = input<string | undefined>(undefined, { alias: 'totalTooltip' });
+  readonly totalForecastTooltipInput = input<string | undefined>(undefined, { alias: 'totalForecastTooltip' });
 
   private statusFilter = computed(() => new Set(this.statusFilterModel()));
 
@@ -130,6 +132,17 @@ export class AltReportNodeSummaryComponent {
   protected readonly total = computed(() => this.summaryDistinct()?.total ?? 0);
   protected readonly totalForecast = computed(() => this.summaryDistinct()?.countForecast);
 
+  protected readonly totalTooltip = computed(() => {
+    const prefix = this.totalTooltipInput();
+    const total = this.total();
+    return this.formatTotalTooltip(prefix, total);
+  });
+  protected readonly totalForecastTooltip = computed(() => {
+    const prefix = this.totalForecastTooltipInput();
+    const total = this.totalForecast();
+    return this.formatTotalTooltip(prefix, total);
+  });
+
   protected toggleChartItem(event: ChartItemClickEvent) {
     if (this.disableChartItemClick()) {
       return;
@@ -195,5 +208,9 @@ export class AltReportNodeSummaryComponent {
     }
 
     return true;
+  }
+
+  private formatTotalTooltip(prefix?: string, total?: number | null): string {
+    return [prefix, this._numberSeparateThousands.transform(total)].filter((part) => !!part).join(': ');
   }
 }

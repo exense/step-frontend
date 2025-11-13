@@ -5,6 +5,7 @@ import {
   RichEditorDialogService,
   TableDataSource,
   TableIndicatorMode,
+  tablePersistenceConfigProvider,
   TableLocalDataSource,
   TableRemoteDataSource,
   TimeSeriesErrorEntry,
@@ -17,6 +18,13 @@ import { map, Observable } from 'rxjs';
   templateUrl: './alt-execution-errors.component.html',
   styleUrl: './alt-execution-errors.component.scss',
   standalone: false,
+  providers: [
+    tablePersistenceConfigProvider('executionErrors', {
+      storePagination: true,
+      storeSearch: false,
+      storeSort: false,
+    }),
+  ],
 })
 export class AltExecutionErrorsComponent {
   private _richEditorDialogs = inject(RichEditorDialogService);

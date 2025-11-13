@@ -53,6 +53,7 @@ export class CustomFormWrapperComponent implements ControlValueAccessor {
   }
 
   protected onValueChange(value: Record<string, unknown>): void {
+    this.value = value;
     this.onChange?.(value);
   }
 
