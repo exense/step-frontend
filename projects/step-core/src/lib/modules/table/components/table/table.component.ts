@@ -642,10 +642,10 @@ export class TableComponent<T>
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
-  reload(isGlobal?: boolean): void {
+  reload(isCausedByProjectChange?: boolean): void {
     this.onReload.emit({});
     this.tableDataSource?.reload();
-    if (isGlobal) {
+    if (isCausedByProjectChange) {
       this.page?.firstPage?.();
     }
   }
