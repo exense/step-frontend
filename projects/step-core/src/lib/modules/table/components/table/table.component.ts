@@ -642,9 +642,12 @@ export class TableComponent<T>
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
-  reload(): void {
+  reload(isGlobal?: boolean): void {
     this.onReload.emit({});
     this.tableDataSource?.reload();
+    if (isGlobal) {
+      this.page?.firstPage?.();
+    }
   }
 
   ngOnInit(): void {
