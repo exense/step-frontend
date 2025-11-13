@@ -162,8 +162,8 @@
         [color]="calculateCounts() ? 'primary' : undefined"
         [matTooltip]="
           calculateCounts()
-            ? 'Click to not load total number of executions to improve the performance'
-            : 'Click to load total number of executions'
+            ? 'Click to disable loading the total number of executions to enhance performance.'
+            : 'Click to load the total number of executions. Note: this may slow down performance for large numbers of executions'
         "
         (click)="toggleCountsCalculation()"
       >
