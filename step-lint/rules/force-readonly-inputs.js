@@ -2,8 +2,13 @@ const { AST_NODE_TYPES, ESLintUtils } = require('@typescript-eslint/utils');
 
 const createRule = ESLintUtils.RuleCreator((name) => '');
 
-module.exports = createRule({
-  name: 'force-readonly-inputs',
+const RULE_NAME = 'force-readonly-inputs';
+const MESSAGE_IDS = {
+  notReadonly: 'notReadonly',
+};
+
+const rule = createRule({
+  name: RULE_NAME,
   meta: {
     type: 'problem',
     docs: {
@@ -12,7 +17,7 @@ module.exports = createRule({
     },
     schema: [],
     messages: {
-      notReadonly: 'Mark input/outputs as readonly',
+      [MESSAGE_IDS.notReadonly]: 'Mark input/outputs as readonly',
     },
   },
   defaultOptions: [],
@@ -46,10 +51,16 @@ module.exports = createRule({
         if ((name === 'input' || name === 'output') && !node?.readonly) {
           context.report({
             node,
-            messageId: 'notReadonly',
+            messageId: MESSAGE_IDS.notReadonly,
           });
         }
       },
     };
   },
 });
+
+module.exports = {
+  RULE_NAME,
+  MESSAGE_IDS,
+  rule,
+};

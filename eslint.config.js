@@ -4,22 +4,16 @@ const { defineConfig } = require('eslint/config');
 const typescriptEslint = require('typescript-eslint');
 const stepLint = require('./step-lint');
 
-const stepLintRules = {
-  'stepLint/force-readonly-inputs': 'error',
-  'stepLint/inline-style-variables-name': 'error',
-};
-
 module.exports = defineConfig([
   {
     files: ['**/*.ts'],
-    extends: [...angular.configs.tsRecommended],
+    extends: [...angular.configs.tsRecommended, ...stepLint.configs.tsRecommended],
     processor: angular.processInlineTemplates,
     plugins: {
-      stepLint,
+      'step-lint': stepLint,
       '@typescript-eslint': typescriptEslint.plugin,
     },
     rules: {
-      ...stepLintRules,
       '@typescript-eslint/consistent-indexed-object-style': 'error',
       '@typescript-eslint/explicit-function-return-type': [
         'error',
@@ -54,7 +48,10 @@ module.exports = defineConfig([
   },
   {
     files: ['**/*.html'],
-    extends: [...angular.configs.templateRecommended],
+    extends: [...angular.configs.templateRecommended, ...stepLint.configs.htmlRecommended],
+    plugins: {
+      'step-lint': stepLint,
+    },
     rules: {
       '@angular-eslint/template/no-negated-async': 'off',
       '@angular-eslint/template/prefer-control-flow': 'error',

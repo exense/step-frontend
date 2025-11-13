@@ -1,5 +1,5 @@
 const { RuleTester } = require('@angular-eslint/test-utils');
-const rule = require('../rules/inline-style-variables-name');
+const { RULE_NAME, MESSAGE_IDS, rule } = require('../rules/inline-style-variables-name');
 
 const tester = new RuleTester();
 
@@ -31,14 +31,14 @@ export class C {
 }
 `;
 
-tester.run('inline-style-variables-name', rule, {
+tester.run(RULE_NAME, rule, {
   valid: [VALID],
   invalid: [
     {
       code: INVALID,
       errors: [
         {
-          messageId: 'noStylePrefix',
+          messageId: MESSAGE_IDS.noStylePrefix,
         },
       ],
     },

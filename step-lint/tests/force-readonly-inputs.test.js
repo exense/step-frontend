@@ -1,5 +1,5 @@
 const { RuleTester } = require('@angular-eslint/test-utils');
-const rule = require('../rules/force-readonly-inputs');
+const { rule, RULE_NAME, MESSAGE_IDS } = require('../rules/force-readonly-inputs');
 
 const tester = new RuleTester();
 
@@ -21,17 +21,17 @@ export class C {
 }
 `;
 
-tester.run('force-readonly-inputs', rule, {
+tester.run(RULE_NAME, rule, {
   valid: [VALID],
   invalid: [
     {
       code: INVALID,
       errors: [
         {
-          messageId: 'notReadonly',
+          messageId: MESSAGE_IDS.notReadonly,
         },
         {
-          messageId: 'notReadonly',
+          messageId: MESSAGE_IDS.notReadonly,
         },
       ],
     },

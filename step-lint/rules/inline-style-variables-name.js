@@ -2,8 +2,13 @@ const { AST_NODE_TYPES, ESLintUtils } = require('@typescript-eslint/utils');
 
 const createRule = ESLintUtils.RuleCreator((name) => '');
 
-module.exports = createRule({
-  name: 'inline-style-variable-name',
+const RULE_NAME = 'inline-style-variables-name';
+const MESSAGE_IDS = {
+  noStylePrefix: 'noStylePrefix',
+};
+
+const rule = createRule({
+  name: RULE_NAME,
   meta: {
     type: 'problem',
     docs: {
@@ -12,7 +17,7 @@ module.exports = createRule({
     },
     schema: [],
     messages: {
-      noStylePrefix: 'Apply --style__ prefix',
+      [MESSAGE_IDS.noStylePrefix]: 'Apply --style__ prefix',
     },
   },
   defaultOptions: [],
@@ -40,10 +45,12 @@ module.exports = createRule({
           .forEach((hostProp) =>
             context.report({
               node: hostProp,
-              messageId: 'noStylePrefix',
+              messageId: MESSAGE_IDS.noStylePrefix,
             }),
           );
       },
     };
   },
 });
+
+module.exports = { rule, RULE_NAME, MESSAGE_IDS };
