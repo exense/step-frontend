@@ -40,7 +40,7 @@ export class AutomationPackagesUsedByResourceListComponent implements OnInit {
       if (!ds) {
         return of(0);
       }
-      return ds.total$;
+      return ds.totalFiltered$;
     }),
     map((total) => total === 0),
   );

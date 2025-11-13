@@ -8,4 +8,5 @@ export type TableResponseExecutiontTaskParameters = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<ExecutiontTaskParameters>;
+  hasNext?: boolean;
 };

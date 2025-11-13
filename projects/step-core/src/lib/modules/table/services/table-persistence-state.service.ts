@@ -4,10 +4,10 @@ import { TableStorageService } from './table-storage.service';
 import { SearchValue } from '../shared/search-value';
 import { FilterConditionFactoryService } from './filter-condition-factory.service';
 import { FilterConditionJson } from '../shared/filter-condition-json.interface';
-import { PageEvent } from '@angular/material/paginator';
 import { Sort } from '@angular/material/sort';
 import { Subject } from 'rxjs';
 import { TableLocalStorageService } from './table-local-storage.service';
+import { StepPageEvent } from '../types/step-page-event';
 
 @Injectable()
 export class TablePersistenceStateService implements OnDestroy {
@@ -62,7 +62,7 @@ export class TablePersistenceStateService implements OnDestroy {
 
   initialize(): void {}
 
-  saveState(search: Record<string, SearchValue>, page: PageEvent, sort?: Sort): void {
+  saveState(search: Record<string, SearchValue>, page: StepPageEvent, sort?: Sort): void {
     this.saveSearch(search);
     this.savePage(page);
     if (sort) {
@@ -109,7 +109,7 @@ export class TablePersistenceStateService implements OnDestroy {
     );
   }
 
-  savePage(page: PageEvent): void {
+  savePage(page: StepPageEvent): void {
     if (!this.canStorePagination) {
       return;
     }
@@ -117,7 +117,7 @@ export class TablePersistenceStateService implements OnDestroy {
     this.savePageSize(page.pageSize);
   }
 
-  getPage(): PageEvent | undefined {
+  getPage(): StepPageEvent | undefined {
     if (!this.canStorePagination) {
       return undefined;
     }
@@ -126,11 +126,11 @@ export class TablePersistenceStateService implements OnDestroy {
     if (!jsonString && pageSize === undefined) {
       return undefined;
     }
-    let result: PageEvent;
+    let result: StepPageEvent;
     if (jsonString) {
       result = JSON.parse(jsonString);
     } else {
-      result = { pageIndex: 0, pageSize: 0, length: 0 };
+      result = { pageIndex: 0, pageSize: 0 };
     }
     if (pageSize !== undefined) {
       result.pageSize = pageSize;

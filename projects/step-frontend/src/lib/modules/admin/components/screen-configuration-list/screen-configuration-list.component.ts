@@ -86,7 +86,7 @@ export class ScreenConfigurationListComponent implements DialogParentService, On
   }
 
   addScreen(): void {
-    this.searchableScreens.total$
+    this.searchableScreens.totalFiltered$
       .pipe(takeUntilDestroyed(this._destroyRef), take(1))
       .subscribe((data) =>
         this._router.navigateByUrl(`${this.baseScreenConfigurationUrl}/editor/new?nextIndex=${data}`),

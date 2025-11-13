@@ -8,4 +8,5 @@ export type TableResponseDashboardView = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<DashboardView>;
+  hasNext?: boolean;
 };
