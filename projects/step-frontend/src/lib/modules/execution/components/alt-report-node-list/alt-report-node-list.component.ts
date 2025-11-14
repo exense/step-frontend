@@ -40,7 +40,7 @@ export class AltReportNodeListComponent {
     if (!sortByColumns || !this._matSort) {
       return;
     }
-    this._matSort.sort({ id: sortByColumns, start: sort, disableClear: false });
+    this._matSort.sort({ id: sortByColumns, start: sort, disableClear: true });
   });
 
   protected showSort = computed(() => {
