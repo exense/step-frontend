@@ -8,4 +8,5 @@ export interface ResourceConfig {
   readonly disableServerPath?: boolean;
   readonly withDynamicSwitch?: boolean;
   readonly preserveExistingResource?: boolean;
+  readonly withUploadFromFileSystem?: boolean;
 }

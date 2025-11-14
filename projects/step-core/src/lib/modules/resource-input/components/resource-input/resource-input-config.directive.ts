@@ -19,6 +19,7 @@ export class ResourceInputConfigDirective {
   readonly withDynamicSwitch = input(false);
   readonly preserveExistingResource = input(false);
   readonly disableServerPath = input(false);
+  readonly withUploadFromFileSystem = input(true);
 
   readonly config = computed<ResourceConfig>(() => {
     const type = this.type();
@@ -30,6 +31,7 @@ export class ResourceInputConfigDirective {
     const withDynamicSwitch = this.withDynamicSwitch();
     const preventExistingResource = this.preserveExistingResource();
     const disableServerPath = this.disableServerPath();
+    const withUploadFromFileSystem = this.withUploadFromFileSystem();
     return {
       type,
       isBounded,
@@ -40,6 +42,7 @@ export class ResourceInputConfigDirective {
       withDynamicSwitch,
       preventExistingResource,
       disableServerPath,
+      withUploadFromFileSystem,
     };
   });
 
