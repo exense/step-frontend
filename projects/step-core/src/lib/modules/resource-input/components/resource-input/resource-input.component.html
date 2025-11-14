@@ -7,17 +7,19 @@
 </ng-template>
 
 <ng-template #uploadResourceButtonTemplate>
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-stroked-button
-      matTooltip="Select from file system"
-      (click)="openFileChooser()"
-      [disabled]="isDisabled()"
-    >
-      <step-icon name="folder-plus" />
-    </button>
-  </step-suffix>
+  @if (_config.withUploadFromFileSystem()) {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Select from file system"
+        (click)="openFileChooser()"
+        [disabled]="isDisabled()"
+      >
+        <step-icon name="folder-plus" />
+      </button>
+    </step-suffix>
+  }
 </ng-template>
 
 <ng-template #chooseExistingResourceButtonTemplate>

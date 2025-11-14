@@ -33,6 +33,7 @@ type OnTouch = () => void;
         'withDynamicSwitch',
         'preserveExistingResource',
         'disableServerPath',
+        'withUploadFromFileSystem',
       ],
     },
   ],
