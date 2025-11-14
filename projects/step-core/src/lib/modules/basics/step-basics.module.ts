@@ -395,6 +395,7 @@ export * from './types/type-info';
 export * from './types/file-types';
 export * from './injectables/file-type-utils.service';
 export * from './components/long-inline-text/long-inline-text.component';
+export * from './injectables/dialog-route-open-state.service';
 export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';

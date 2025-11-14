@@ -21,7 +21,7 @@
         </div>
       </section>
     </header>
-    <div id="step-main-scrollable-content" cdkScrollable>
+    <div #mainScrollableContent id="step-main-scrollable-content" cdkScrollable>
       <step-info-banner />
       <step-dashlet id="project-alerts" itemKey="projectAlerts" />
       @for (alert of adminAlerts; track alert.id) {
