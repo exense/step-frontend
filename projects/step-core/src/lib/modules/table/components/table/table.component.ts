@@ -642,9 +642,12 @@ export class TableComponent<T>
     return this.tableDataSource?.getFilterRequest({ search, filter, params });
   }
 
-  reload(): void {
+  reload(isCausedByProjectChange?: boolean): void {
     this.onReload.emit({});
     this.tableDataSource?.reload();
+    if (isCausedByProjectChange) {
+      this.page?.firstPage?.();
+    }
   }
 
   ngOnInit(): void {

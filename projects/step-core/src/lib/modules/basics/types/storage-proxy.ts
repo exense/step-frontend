@@ -32,9 +32,9 @@ export abstract class StorageProxy implements Storage {
     return `${this.storagePrefix}_${key}`;
   }
 
-  clearTokens(): void {
+  clearTokens(query?: RegExp): void {
     Object.keys(this.storage)
-      .filter((key) => key.startsWith(this.storagePrefix))
+      .filter((key) => key.startsWith(this.storagePrefix) && (!query || query.test(key)))
       .forEach((key) => {
         this.storage.removeItem(key);
       });
