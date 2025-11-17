@@ -14,6 +14,9 @@ import { BaseModalWindowComponent } from '../../../basics/components/modal-windo
   selector: 'step-async-operation-dialog',
   templateUrl: './async-operation-dialog.component.html',
   styleUrls: ['./async-operation-dialog.component.scss'],
+  host: {
+    class: 'messages-view-dialog',
+  },
   standalone: false,
 })
 export class AsyncOperationDialogComponent extends BaseModalWindowComponent implements AfterViewInit {
