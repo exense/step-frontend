@@ -1,6 +1,7 @@
 <step-reference-artefact-name
   [artefact]="artefact"
   [isDisabled]="isDisabled"
+  [refreshTrigger]="targetExecutionParameters()"
   (referenceUpdate)="keywordUpdate.emit($event)"
   (onSave)="onSave.emit($event)"
 >
