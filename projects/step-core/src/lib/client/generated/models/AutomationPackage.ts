@@ -16,6 +16,8 @@ export type AutomationPackage = {
   activationExpression?: Expression;
   automationPackageResource?: string;
   automationPackageLibraryResource?: string;
+  automationPackageResourceRevision?: string;
+  automationPackageLibraryResourceRevision?: string;
   functionsAttributes?: Record<string, string>;
   plansAttributes?: Record<string, string>;
   tokenSelectionCriteria?: Record<string, string>;

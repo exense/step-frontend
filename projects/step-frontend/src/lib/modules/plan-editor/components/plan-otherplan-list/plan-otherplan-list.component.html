@@ -6,6 +6,7 @@
     matSort
     matSortActive="name"
     matSortDirection="asc"
+    [tableParams]="activatableEntitiesTableParams()"
     [matSortDisableClear]="true"
   >
     <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">

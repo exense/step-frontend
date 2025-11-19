@@ -1,7 +1,7 @@
 import { computed, effect, EffectRef, inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { PlanEditorStrategy } from '../types/plan-editor-strategy';
 import { Subject } from 'rxjs';
-import { AbstractArtefact, Plan } from '../../../client/step-client-module';
+import { AbstractArtefact, type ExecutionParameters, Plan } from '../../../client/step-client-module';
 import { PlanContext } from '../types/plan-context.interface';
 
 @Injectable({
@@ -33,6 +33,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   });
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
+  public targetExecutionParameters?: ExecutionParameters;
 
   ngOnDestroy(): void {
     this.strategyChangedInternal$.complete();
@@ -230,5 +231,9 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   terminateStrategySubscriptions(): void {
     this.strategySyncEffects.forEach((effectRef) => effectRef.destroy());
     this.strategySyncEffects = [];
+  }
+
+  setTargetExecutionParameters(executionParameters: ExecutionParameters) {
+    this.targetExecutionParameters = executionParameters;
   }
 }

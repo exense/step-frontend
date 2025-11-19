@@ -5,12 +5,14 @@ import {
   EntitySelectionState,
   entitySelectionStateProvider,
   Plan,
+  PlanEditorService,
   SelectionList,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
+import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-otherplan-list',
@@ -34,6 +36,7 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
 export class PlanOtherplanListComponent {
   private _selectionState = inject<EntitySelectionState<string, Plan>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
+  private _planEditorService = inject(PlanEditorService);
 
   protected readonly dataSource = inject(
     AugmentedPlansService,
@@ -42,6 +45,9 @@ export class PlanOtherplanListComponent {
   private selectionList = viewChild('selectionList', { read: SelectionList<string, Plan> });
 
   protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
+  protected readonly activatableEntitiesTableParams = computed(() =>
+    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters),
+  );
 
   readonly addPlans = output<string[]>();
 

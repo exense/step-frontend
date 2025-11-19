@@ -9,6 +9,7 @@ import {
 import { ReferenceArtefactNameConfig } from '../reference-artefact-name/reference-artefact-name.component';
 import { Observable } from 'rxjs';
 import { HintFor } from '../../shared/hint-for.enum';
+import { PlanEditorService } from '../../modules/plan-common';
 
 const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['captions'] = {
   searchReference: 'No Keyword selected',
@@ -36,6 +37,7 @@ const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['capt
 })
 export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFunction, Keyword> {
   private _keywordApi = inject(AugmentedKeywordsService);
+  protected _planEditorService = inject(PlanEditorService);
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: CallFunction;
@@ -55,6 +57,9 @@ export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFun
   }
 
   lookupReference(artefact: AbstractArtefact): Observable<Keyword> {
-    return this._keywordApi.lookupCallFunction(artefact);
+    return this._keywordApi.lookupCallFunctionWithBindings({
+      callFunction: artefact,
+      bindings: this._planEditorService.targetExecutionParameters,
+    });
   }
 }

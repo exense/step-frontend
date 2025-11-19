@@ -5,12 +5,14 @@ import {
   EntitySelectionState,
   entitySelectionStateProvider,
   Keyword,
+  PlanEditorService,
   SelectionList,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
+import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-function-list',
@@ -34,6 +36,7 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
 export class PlanFunctionListComponent {
   private _selectionState = inject<EntitySelectionState<string, Keyword>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
+  private _planEditorService = inject(PlanEditorService);
   readonly dataSource = inject(
     AugmentedKeywordsService,
   ).createFilteredTableDataSource() as TableRemoteDataSource<Keyword>;
@@ -41,7 +44,9 @@ export class PlanFunctionListComponent {
   private selectionList = viewChild('selectionList', { read: SelectionList<string, Keyword> });
 
   protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
-
+  protected readonly activatableEntitiesTableParams = computed(() =>
+    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters),
+  );
   readonly addKeywords = output<string[]>();
 
   protected addKeyword(id: string): void {
