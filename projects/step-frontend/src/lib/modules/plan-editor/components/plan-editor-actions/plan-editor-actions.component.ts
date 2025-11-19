@@ -52,7 +52,7 @@ export class PlanEditorActionsComponent {
   @Output() stop = new EventEmitter<void>();
   @Output() showSource = new EventEmitter<void>();
   @Output() runPlan = new EventEmitter<void>();
-  @Output() targetExecutionParametersChange = new EventEmitter<ExecutionParameters>();
+  @Output() targetExecutionParametersChange = new EventEmitter<Record<string, string>>();
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
   @ViewChild('targetExecutionParameterTrigger', { read: MatMenuTrigger })
@@ -67,7 +67,6 @@ export class PlanEditorActionsComponent {
     duplicate: 'Duplicate this plan',
     showSource: "Show plan's YAML source",
     export: 'Export this plan',
-    start: 'Execute this plan',
     resetInteractive: 'Reset the session of the interactive mode',
     startInteractiveShort: 'Start interactive session',
     startInteractive: 'Start an interactive session to debug this plan',
@@ -105,9 +104,10 @@ export class PlanEditorActionsComponent {
     }
   }
 
-  setTargetExecutionParameters(targetExecutionParameters?: ExecutionParameters) {
-    this.targetExecutionParameters = targetExecutionParameters;
-    this.targetExecutionParametersChange.emit(targetExecutionParameters);
+  setExecutionParameters(parameters?: Record<string, unknown>) {
+    this.targetExecutionParameters = parameters;
+    this.targetExecutionParametersChange.emit(parameters as Record<string, string>);
+    this._interactiveSession.executionParameters.set(parameters);
   }
 
   protected readonly Object = Object;

@@ -93,12 +93,12 @@
   <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
 </step-btn-group>
 
-@if (_interactiveSession.executionParameters() && Object.keys(_interactiveSession.executionParameters()!).length > 0) {
+@if (_interactiveSession.hasExecutionParameters()) {
   <step-btn-group class="with-borders">
     <button
       type="button"
       mat-stroked-button
-      [class.active]="targetExecutionParameters"
+      [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
       (click)="toggleTargetParameterSelection()"
       matTooltip="Set execution parameters to accurately select keywords or plans with activation expressions. (advanced)"
       matTooltipPosition="below"
@@ -123,7 +123,7 @@
       type="button"
       mat-stroked-button
       color="primary"
-      [matTooltip]="captions.start"
+      matTooltip="Execute this plan"
       matTooltipPosition="below"
       (click)="runPlan.emit()"
     >
@@ -139,7 +139,7 @@
         <step-custom-forms
           #interactiveSessionCustomForm
           [stModel]="_interactiveSession.executionParameters()!"
-          (stModelChange)="_interactiveSession.executionParameters.set($event)"
+          (stModelChange)="setExecutionParameters($event)"
           stScreen="executionParameters"
         />
       }
@@ -165,7 +165,7 @@
         <step-custom-forms
           #interactiveSessionCustomForm
           [stModel]="targetExecutionParameters || {}"
-          (stModelChange)="setTargetExecutionParameters($event)"
+          (stModelChange)="setExecutionParameters($event)"
           stScreen="executionParameters"
         />
       }
@@ -173,7 +173,7 @@
         <button
           type="button"
           mat-stroked-button
-          (click)="setTargetExecutionParameters()"
+          (click)="setExecutionParameters({})"
           matTooltip="Reset target execution parameters"
           matTooltipPosition="below"
         >
