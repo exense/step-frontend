@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   inject,
@@ -10,7 +11,6 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesEntityService } from '../../modules/_common';
-import { ChartSkeletonComponent } from '../../modules/chart';
 import {
   BucketResponse,
   ColumnSelection,
@@ -100,6 +100,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
+  private _cd = inject(ChangeDetectorRef);
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
@@ -432,6 +433,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
           Object.assign(this.item, updatedItem);
           this.prepareState();
           this.refresh(true).subscribe();
+          this._cd.markForCheck();
         }
       });
   }

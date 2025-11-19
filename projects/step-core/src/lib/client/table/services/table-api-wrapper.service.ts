@@ -42,8 +42,12 @@ export class TableApiWrapperService {
     return this._tables.saveTableSettings(tableName, tableSettingsRequest);
   }
 
-  requestTable<T>(tableId: string, tableRequest: TableRequestData): Observable<TableResponseGeneric<T>> {
-    return this._tables.request(tableId, tableRequest) as Observable<TableResponseGeneric<T>>;
+  requestTable<T>(
+    tableId: string,
+    tableRequest: TableRequestData,
+    includeGlobalEntities = true,
+  ): Observable<TableResponseGeneric<T>> {
+    return this._tables.request(tableId, includeGlobalEntities, tableRequest) as Observable<TableResponseGeneric<T>>;
   }
 
   exportTable(tableId: string, tableRequest: TableRequestData, fields: string[]): Observable<AsyncTaskStatus> {

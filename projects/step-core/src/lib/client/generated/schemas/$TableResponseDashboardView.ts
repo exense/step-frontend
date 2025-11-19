@@ -17,5 +17,8 @@ export const $TableResponseDashboardView = {
         type: 'DashboardView',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

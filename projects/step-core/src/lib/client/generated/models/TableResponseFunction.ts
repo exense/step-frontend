@@ -8,4 +8,5 @@ export type TableResponseFunction = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<Function>;
+  hasNext?: boolean;
 };

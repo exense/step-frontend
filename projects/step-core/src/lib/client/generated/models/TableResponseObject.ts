@@ -6,4 +6,5 @@ export type TableResponseObject = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<any>;
+  hasNext?: boolean;
 };

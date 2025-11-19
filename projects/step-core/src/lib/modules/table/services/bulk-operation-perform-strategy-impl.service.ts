@@ -3,7 +3,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable, of, switchMap } from 'rxjs';
 import { TitleCasePipe } from '@angular/common';
 import { TableFilter } from './table-filter';
-import { BulkOperationType } from '../../basics/step-basics.module';
+import { AlertType, BulkOperationType } from '../../basics/step-basics.module';
 import {
   AsyncOperationCloseStatus,
   AsyncOperationDialogOptions,
@@ -11,7 +11,7 @@ import {
   AsyncOperationService,
 } from '../../async-operations/async-operations.module';
 import { BulkOperationConfig, BulkOperationPerformStrategy, BulkSelectionType } from '../../entities-selection';
-import { TableBulkOperationRequest, TableParameters, AsyncTaskStatus } from '../../../client/step-client-module';
+import { AsyncTaskStatus, TableBulkOperationRequest, TableParameters } from '../../../client/step-client-module';
 
 const formatMessageWithDeleteWarning = (
   strings: TemplateStringsArray,
@@ -122,7 +122,7 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
 
   private createErrorMessageHandler(
     config: BulkOperationConfig<ID>,
-  ): (errorOrReulst: Error | AsyncTaskStatus) => string {
+  ): (errorOrResult: Error | AsyncTaskStatus) => string {
     return (errorOrResult) => {
       if (!(errorOrResult instanceof Error) && errorOrResult.error) {
         return `Error: ${errorOrResult.error}`;
@@ -137,20 +137,37 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
       const count = result?.result?.count;
       const skipped = result?.result?.skipped;
       const failed = result?.result?.failed;
+      const warnings = (result?.result?.warnings ?? []) as string[];
+      const errors = (result?.result?.errors ?? []) as string[];
 
-      let message =
+      let mainMessage =
         count || count === 0
           ? `Bulk operation ${config.operationInfo.type} for ${count} item(s) completed.`
           : `Bulk operation ${config.operationInfo.type} for selected items completed.`;
 
       if (skipped) {
-        message += ` ${skipped} item(s) have been skipped.`;
+        mainMessage += ` ${skipped} item(s) have been skipped.`;
       }
 
       if (failed) {
-        message += ` ${failed} item(s) have failed.`;
+        mainMessage += ` ${failed} item(s) have failed.`;
       }
-      return this._sanitizer.bypassSecurityTrustHtml(message);
+
+      let htmlResult = '<div class="message-container">';
+
+      htmlResult += this.alertLayout(AlertType.MINIMALIST, mainMessage);
+
+      warnings.forEach((warn) => {
+        htmlResult += this.alertLayout(AlertType.WARNING, warn);
+      });
+
+      errors.forEach((error) => {
+        htmlResult += this.alertLayout(AlertType.DANGER, error);
+      });
+
+      htmlResult += '</div>';
+
+      return this._sanitizer.bypassSecurityTrustHtml(htmlResult);
     };
   }
 
@@ -173,5 +190,13 @@ export class BulkOperationPerformStrategyImplService<ID = string> implements Bul
 
       return this._sanitizer.bypassSecurityTrustHtml(message);
     };
+  }
+
+  private alertLayout(alertType: AlertType, text: string): string {
+    return `<step-alert type="${alertType}">
+      <section class="message-content">
+        <div>${text}</div>
+      </section>
+    </step-alert>`;
   }
 }

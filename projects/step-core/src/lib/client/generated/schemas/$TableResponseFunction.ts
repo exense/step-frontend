@@ -17,5 +17,8 @@ export const $TableResponseFunction = {
         type: 'Function',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

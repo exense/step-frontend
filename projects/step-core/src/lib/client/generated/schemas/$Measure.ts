@@ -14,6 +14,9 @@ export const $Measure = {
       type: 'number',
       format: 'int64',
     },
+    status: {
+      type: 'Enum',
+    },
     data: {
       type: 'dictionary',
       contains: {

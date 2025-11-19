@@ -6,5 +6,6 @@ export abstract class TableRemoteDataSourceFactoryService {
     tableId: string,
     requestColumnsMap: Record<string, string | string[]>,
     filters?: Record<string, string | string[] | SearchValue>,
+    options?: { includeGlobalEntities?: boolean },
   ): TableDataSource<T>;
 }

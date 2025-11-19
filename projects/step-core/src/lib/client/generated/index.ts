@@ -352,6 +352,7 @@ export { InteractivePlanExecutionService } from './services/InteractivePlanExecu
 export { KeywordEditorService } from './services/KeywordEditorService';
 export { KeywordPackagesService } from './services/KeywordPackagesService';
 export { KeywordsService } from './services/KeywordsService';
+export { LiveReportingService } from './services/LiveReportingService';
 export { ParametersService } from './services/ParametersService';
 export { PlansService } from './services/PlansService';
 export { PrivateApplicationService } from './services/PrivateApplicationService';
