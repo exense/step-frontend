@@ -38,6 +38,7 @@ const KEYWORD_CAPTIONS: ReferenceArtefactNameConfig<CallFunction, Keyword>['capt
 export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFunction, Keyword> {
   private _keywordApi = inject(AugmentedKeywordsService);
   protected _planEditorService = inject(PlanEditorService);
+  readonly targetExecutionParameters = this._planEditorService.targetExecutionParameters;
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: CallFunction;
