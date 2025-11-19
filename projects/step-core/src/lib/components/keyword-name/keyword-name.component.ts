@@ -59,7 +59,7 @@ export class KeywordNameComponent implements ReferenceArtefactNameConfig<CallFun
   lookupReference(artefact: AbstractArtefact): Observable<Keyword> {
     return this._keywordApi.lookupCallFunctionWithBindings({
       callFunction: artefact,
-      bindings: this._planEditorService.targetExecutionParameters,
+      bindings: this._planEditorService.targetExecutionParameters(),
     });
   }
 }

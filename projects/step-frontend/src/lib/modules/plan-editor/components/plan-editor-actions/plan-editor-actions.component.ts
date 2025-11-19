@@ -104,10 +104,13 @@ export class PlanEditorActionsComponent {
     }
   }
 
-  setExecutionParameters(parameters?: Record<string, unknown>) {
+  setInteractiveSessionExecutionParameters(parameters?: Record<string, unknown>) {
+    this._interactiveSession.executionParameters.set(parameters);
+  }
+
+  setTargetExecutionParameters(parameters?: Record<string, unknown>) {
     this.targetExecutionParameters = parameters;
     this.targetExecutionParametersChange.emit(parameters as Record<string, string>);
-    this._interactiveSession.executionParameters.set(parameters);
   }
 
   protected readonly Object = Object;
