@@ -1,7 +1,7 @@
 <div
   class="trigger-wrapper"
-  (mouseenter)="onTriggerMouseEnter()"
-  (mouseleave)="onTriggerMouseLeave()"
+  (mouseenter)="handleTriggerMouseEnter()"
+  (mouseleave)="handleTriggerMouseLeave()"
   (click)="handleClick($event)"
 >
   <ng-content></ng-content>
@@ -15,8 +15,8 @@
     [class.white-background]="whiteBackground()"
     [class.small-font]="smallFont()"
     [ngClass]="popoverClass()"
-    (mouseenter)="onPopoverMouseEnter()"
-    (mouseleave)="onPopoverMouseLeave()"
+    (mouseenter)="handlePopoverMouseEnter()"
+    (mouseleave)="handlePopoverMouseLeave()"
   >
     <div class="step-popover__arrow"></div>
 
