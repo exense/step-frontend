@@ -13,6 +13,7 @@ import {
 import { filter, switchMap } from 'rxjs';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-parameter-list',
@@ -68,4 +69,6 @@ export class ParameterListComponent implements DialogParentService, OnInit {
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();
   }
+
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 }

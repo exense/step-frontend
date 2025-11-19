@@ -32,6 +32,16 @@
       </step-btn-group>
       <step-btn-group class="create-keyword-button-group">
         <a
+          stepTestId="upload-package-btn"
+          mat-flat-button
+          color="primary"
+          class="header-btn"
+          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+          routerLink="/automation-package/list/upload/new/"
+        >
+          <step-icon name="plus" /> Automation Package
+        </a>
+        <a
           data-step-testid="new-keyword-btn"
           type="button"
           mat-mini-fab
@@ -43,7 +53,6 @@
         >
           <step-icon name="plus" />
         </a>
-        <step-dashlet data-step-testid="keywords-upload-package-btn" itemKey="uploadPackageBtn" />
       </step-btn-group>
     </section>
 

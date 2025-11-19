@@ -1,4 +1,10 @@
 <step-drag-drop-container>
+  <div class="description">
+    <p>
+      Keyword Packages have been deprecated as of Step 29. We recommend using the more capable
+      <a href="#/automation-package/list">Automation Packages</a>.
+    </p>
+  </div>
   <step-table #table [dataSource]="dataSource" matSort [matSortDisableClear]="true">
     <step-bulk-operations *stepAdditionalHeader="'buttongroup-bulk-create'" entity="functionPackage" />
     <section class="header" *stepAdditionalHeader="'buttongroup-bulk-create'">
