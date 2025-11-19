@@ -73,6 +73,7 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
 
   @Input() isDisabled: boolean = false;
   @Input() artefact?: A;
+  @Input() refreshTrigger?: unknown;
 
   @Output() onSave = new EventEmitter<unknown>();
 
@@ -94,10 +95,15 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
 
   ngOnChanges(changes: SimpleChanges): void {
     const cArtefact = changes['artefact'];
-    if (cArtefact?.previousValue !== cArtefact?.currentValue || cArtefact.firstChange) {
-      this.initArtefactName(cArtefact?.currentValue);
-      this.parseArtefactKeywordAttributes(cArtefact?.currentValue);
-      this.loadArtefactReference(cArtefact?.currentValue);
+    if (cArtefact && (cArtefact.previousValue !== cArtefact.currentValue || cArtefact.firstChange)) {
+      this.initArtefactName(cArtefact.currentValue);
+      this.parseArtefactKeywordAttributes(cArtefact.currentValue);
+      this.loadArtefactReference(cArtefact.currentValue);
+    }
+
+    const cRefreshTrigger = changes['refreshTrigger'];
+    if (cRefreshTrigger && !cRefreshTrigger.firstChange) {
+      this.loadArtefactReference(this.artefact);
     }
   }
 

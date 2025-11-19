@@ -32,6 +32,7 @@ const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
 export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, Plan> {
   private _plansApi = inject(AugmentedPlansService);
   protected _planEditorService = inject(PlanEditorService);
+  readonly targetExecutionParameters = this._planEditorService.targetExecutionParameters;
 
   readonly artefactClass = 'CallPlan';
 
