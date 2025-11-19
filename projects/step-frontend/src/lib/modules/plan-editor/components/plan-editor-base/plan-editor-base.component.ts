@@ -1,6 +1,5 @@
 import {
   Component,
-  DestroyRef,
   effect,
   EventEmitter,
   forwardRef,
@@ -13,7 +12,7 @@ import {
   Output,
   SimpleChanges,
   untracked,
-  ViewChild,
+  viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -43,16 +42,15 @@ import {
   PlanContext,
   AuthService,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
-import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
+import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanSourceDialogComponent } from '../plan-source-dialog/plan-source-dialog.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ArtefactTreeStateService } from '../../injectables/artefact-tree-state.service';
+import { PlanControlsComponent } from '../plan-controls/plan-controls.component';
 
 const PLAN_SIZE = 'PLAN_SIZE';
 const PLAN_CONTROLS_SIZE = 'PLAN_CONTROLS_SIZE';
@@ -123,7 +121,6 @@ export class PlanEditorBaseComponent
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
-  private _destroyRef = inject(DestroyRef);
   private _auth = inject(AuthService);
   private _injector = inject(Injector);
 
@@ -145,8 +142,6 @@ export class PlanEditorBaseComponent
   };
   @Output() runPlan = new EventEmitter<void>();
 
-  selectedTab = 'controls';
-
   readonly isInteractiveSessionActive$ = this._interactiveSession.isActive$;
   readonly showInteractiveWarning$ = this.isInteractiveSessionActive$.pipe(debounceTime(300));
 
@@ -159,16 +154,10 @@ export class PlanEditorBaseComponent
     }),
   );
   protected planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
-  protected componentTabs = [
-    { id: 'controls', label: 'Controls' },
-    { id: 'keywords', label: 'Keywords' },
-    { id: 'other', label: 'Other Plans' },
-  ];
   protected repositoryObjectRef?: RepositoryObjectReference;
 
   protected planClass?: string;
-  @ViewChild('keywordCalls', { read: KeywordCallsComponent, static: false })
-  private keywords?: KeywordCallsComponent;
+  private planControls = viewChild('planControls', { read: PlanControlsComponent });
 
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
@@ -186,7 +175,6 @@ export class PlanEditorBaseComponent
 
   ngOnInit(): void {
     this._interactiveSession.init();
-    this.initConsoleTabToggle();
   }
 
   ngOnDestroy() {
@@ -261,7 +249,7 @@ export class PlanEditorBaseComponent
   }
 
   stopInteractive(): void {
-    this._interactiveSession.stopInteractive().subscribe(() => (this.selectedTab = 'controls'));
+    this._interactiveSession.stopInteractive().subscribe(() => this.planControls()?.setTab?.('controls'));
   }
 
   resetInteractive(): void {
@@ -345,9 +333,7 @@ export class PlanEditorBaseComponent
     }
 
     this._interactiveSession.execute(this.currentPlanId!, artefactIds).subscribe(() => {
-      if (this.keywords) {
-        this.keywords._leafReportsDataSource.reload();
-      }
+      this.planControls()?.reloadConsoleLog?.();
     });
   }
 
@@ -377,30 +363,6 @@ export class PlanEditorBaseComponent
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
-  }
-
-  private initConsoleTabToggle(): void {
-    const consoleTab = { id: 'console', label: 'Console' };
-    this._interactiveSession.isActive$
-      .pipe(
-        filter((shouldConsoleExists) => {
-          const hasConsole = this.componentTabs.some((tab) => tab.id === consoleTab.id);
-          return hasConsole !== shouldConsoleExists;
-        }),
-        map((withConsole) => {
-          const tabs = withConsole
-            ? [...this.componentTabs, { ...consoleTab }]
-            : this.componentTabs.filter((tab) => tab.id !== consoleTab.id);
-          return { tabs, withConsole };
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(({ tabs, withConsole }) => {
-        this.componentTabs = tabs;
-        if (withConsole) {
-          this.selectedTab = consoleTab.id;
-        }
-      });
   }
 
   private openFunctionEditor(keyword: Keyword): Observable<unknown> {

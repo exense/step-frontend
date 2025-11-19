@@ -1,27 +1,31 @@
 import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
-  AugmentedPlansService,
+  AugmentedKeywordsService,
   BulkSelectionType,
   EntitySelectionState,
   entitySelectionStateProvider,
-  Plan,
+  Keyword,
   SelectionList,
+  StepCoreModule,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
+import { PlanNodesDragPreviewComponent } from '../../plan-nodes-drag-preview/plan-nodes-drag-preview.component';
+import { KeywordDropInfoPipe } from './keyword-drop-info.pipe';
 
 @Component({
-  selector: 'step-plan-otherplan-list',
-  templateUrl: './plan-otherplan-list.component.html',
-  styleUrls: ['./plan-otherplan-list.component.scss'],
+  selector: 'step-plan-function-list',
+  templateUrl: './plan-function-list.component.html',
+  styleUrls: ['./plan-function-list.component.scss'],
+  imports: [StepCoreModule, PlanNodesDragPreviewComponent, KeywordDropInfoPipe],
   encapsulation: ViewEncapsulation.None,
   providers: [
-    ...entitySelectionStateProvider<string, Plan>('id'),
+    ...entitySelectionStateProvider<string, Keyword>('id'),
     tableColumnsConfigProvider({
-      entityTableRemoteId: 'planEditorOtherPlanTable',
-      entityScreenId: 'plan',
+      entityTableRemoteId: 'planEditorFunctionTable',
+      entityScreenId: 'keyword',
       entityScreenDefaultVisibleFields: ['attributes.name'],
       customColumnOptions: ['noEditorLink', 'noDescriptionHint'],
     }),
@@ -29,45 +33,43 @@ import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
   host: {
     class: 'plan-editor-control-selections',
   },
-  standalone: false,
 })
-export class PlanOtherplanListComponent {
-  private _selectionState = inject<EntitySelectionState<string, Plan>>(EntitySelectionState);
+export class PlanFunctionListComponent {
+  private _selectionState = inject<EntitySelectionState<string, Keyword>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
+  readonly dataSource = inject(
+    AugmentedKeywordsService,
+  ).createFilteredTableDataSource() as TableRemoteDataSource<Keyword>;
 
-  protected readonly dataSource = inject(
-    AugmentedPlansService,
-  ).getPlansTableDataSource() as TableRemoteDataSource<Plan>;
-
-  private selectionList = viewChild('selectionList', { read: SelectionList<string, Plan> });
+  private selectionList = viewChild('selectionList', { read: SelectionList<string, Keyword> });
 
   protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
 
-  readonly addPlans = output<string[]>();
+  readonly addKeywords = output<string[]>();
 
-  protected addPlan(id: string): void {
-    this.addPlans.emit([id]);
+  protected addKeyword(id: string): void {
+    this.addKeywords.emit([id]);
   }
 
-  protected addAllPlans(): void {
+  protected addSelectedKeywords(): void {
     of(this._selectionState.selectionType())
       .pipe(
         switchMap((selectionType) => {
           const isGetFromRemote =
             selectionType === BulkSelectionType.ALL || selectionType === BulkSelectionType.FILTERED;
           return isGetFromRemote
-            ? this.requestPlanIdsWithoutPagination()
+            ? this.requestKeywordIdsWithoutPagination()
             : of(Array.from(this._selectionState.selectedKeys()));
         }),
         filter((ids) => !!ids.length),
       )
       .subscribe((ids) => {
         this.selectionList()?.clearSelection?.();
-        this.addPlans.emit(ids);
+        this.addKeywords.emit(ids);
       });
   }
 
-  private requestPlanIdsWithoutPagination(): Observable<string[]> {
+  private requestKeywordIdsWithoutPagination(): Observable<string[]> {
     const tableId = this.dataSource.tableId;
     const request = this.dataSource.getCurrentRequest();
     if (!request) {
@@ -75,7 +77,7 @@ export class PlanOtherplanListComponent {
     }
     request.skip = 0;
     request.limit = undefined;
-    return this._tableApi.requestTable<Plan>(tableId, request).pipe(
+    return this._tableApi.requestTable<Keyword>(tableId, request).pipe(
       map((data) => data?.data?.map((item) => item.id!)),
       catchError(() => of([])),
     );

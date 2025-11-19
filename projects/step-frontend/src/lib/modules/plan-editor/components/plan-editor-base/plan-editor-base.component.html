@@ -54,25 +54,14 @@
 
       <step-split-area
         [size]="planControlsSize"
-        (sizeChange)="handlePlanControlsChange($event); rightTabs.updatePagination()"
+        (sizeChange)="handlePlanControlsChange($event); planControls.updateTabsPagination()"
       >
-        <step-tabs #rightTabs="StepTabs" [tabs]="componentTabs" [(activeTabId)]="selectedTab" [shrink]="true" />
-        <div class="tab-content" [ngSwitch]="selectedTab">
-          @switch (selectedTab) {
-            @case ('controls') {
-              <step-plan-artefact-list (onSelection)="addControl($event)" />
-            }
-            @case ('keywords') {
-              <step-plan-function-list (addKeywords)="addKeywords($event)" />
-            }
-            @case ('other') {
-              <step-plan-otherplan-list (addPlans)="addPlans($event)" />
-            }
-            @case ('console') {
-              <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
-            }
-          }
-        </div>
+        <step-plan-controls
+          #planControls
+          (addControl)="addControl($event)"
+          (addKeywords)="addKeywords($event)"
+          (addPlans)="addPlans($event)"
+        />
       </step-split-area>
     </step-split>
   </section>

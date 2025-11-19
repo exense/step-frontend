@@ -3,36 +3,24 @@ import { PlanTypeRegistryService } from '@exense/step-core';
 import { StepCommonModule } from '../_common/step-common.module';
 import { ExecutionModule } from '../execution/execution.module';
 import { PlanEditorBaseComponent } from './components/plan-editor-base/plan-editor-base.component';
-import { PlanArtefactListComponent } from './components/plan-artefact-list/plan-artefact-list.component';
-import { PlanFunctionListComponent } from './components/plan-function-list/plan-function-list.component';
-import { PlanOtherplanListComponent } from './components/plan-otherplan-list/plan-otherplan-list.component';
 import { PlanEditorActionsComponent } from './components/plan-editor-actions/plan-editor-actions.component';
 import { PlanCommonTreeEditorFormComponent } from './components/plan-common-tree-editor-form/plan-common-tree-editor-form.component';
 import { PlanEditorKeyHandlerDirective } from './directives/plan-editor-key-handler.directive';
 import { PlanAlertsComponent } from './components/plan-alerts/plan-alerts.component';
 import { PlanSourceDialogComponent } from './components/plan-source-dialog/plan-source-dialog.component';
 import { PlanNodesDragPreviewComponent } from './components/plan-nodes-drag-preview/plan-nodes-drag-preview.component';
-import { PlanDropInfoPipe } from './pipes/plan-drop-info.pipe';
-import { KeywordDropInfoPipe } from './pipes/keyword-drop-info.pipe';
-import { ArtefactDropInfoPipe } from './pipes/artefact-drop-info.pipe';
+import { PlanControlsComponent } from './components/plan-controls/plan-controls.component';
 
 @NgModule({
   declarations: [
     PlanEditorBaseComponent,
-    PlanArtefactListComponent,
-    PlanFunctionListComponent,
-    PlanOtherplanListComponent,
     PlanEditorActionsComponent,
     PlanCommonTreeEditorFormComponent,
     PlanEditorKeyHandlerDirective,
     PlanAlertsComponent,
     PlanSourceDialogComponent,
-    PlanNodesDragPreviewComponent,
-    ArtefactDropInfoPipe,
-    KeywordDropInfoPipe,
-    PlanDropInfoPipe,
   ],
-  imports: [StepCommonModule, ExecutionModule],
+  imports: [StepCommonModule, ExecutionModule, PlanNodesDragPreviewComponent, PlanControlsComponent],
   exports: [
     PlanEditorBaseComponent,
     PlanCommonTreeEditorFormComponent,
