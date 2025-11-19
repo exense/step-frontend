@@ -139,7 +139,7 @@
         <step-custom-forms
           #interactiveSessionCustomForm
           [stModel]="_interactiveSession.executionParameters()!"
-          (stModelChange)="setExecutionParameters($event)"
+          (stModelChange)="setInteractiveSessionExecutionParameters($event)"
           stScreen="executionParameters"
         />
       }
@@ -165,7 +165,7 @@
         <step-custom-forms
           #interactiveSessionCustomForm
           [stModel]="targetExecutionParameters || {}"
-          (stModelChange)="setExecutionParameters($event)"
+          (stModelChange)="setTargetExecutionParameters($event)"
           stScreen="executionParameters"
         />
       }
@@ -173,7 +173,7 @@
         <button
           type="button"
           mat-stroked-button
-          (click)="setExecutionParameters({})"
+          (click)="setTargetExecutionParameters({})"
           matTooltip="Reset target execution parameters"
           matTooltipPosition="below"
         >

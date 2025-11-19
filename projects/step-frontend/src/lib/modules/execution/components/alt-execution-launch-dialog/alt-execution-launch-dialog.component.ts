@@ -61,7 +61,6 @@ export class AltExecutionLaunchDialogComponent
   private _artefactsService = inject(ArtefactService);
   private _data = inject<AltExecutionLaunchDialogData>(MAT_DIALOG_DATA);
   protected _schedulerInvoker = inject(SchedulerInvokerService, { optional: true });
-  private _planEditorService = inject(PlanEditorService);
 
   protected readonly title = this._data.title ?? 'Launch Execution';
   protected readonly repoRef = this._data.repoRef;
@@ -94,13 +93,6 @@ export class AltExecutionLaunchDialogComponent
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe((executionParameters) => {
-        if (
-          this._planEditorService.targetExecutionParameters &&
-          this._planEditorService.plan().attributes?.['name'] === this.artefact()?.name
-        ) {
-          executionParameters = this._planEditorService.targetExecutionParameters();
-        }
-
         this.executionParameters.set(executionParameters);
       });
   }
