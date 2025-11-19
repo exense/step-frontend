@@ -2,13 +2,13 @@
 <div class="tab-content">
   @switch (selectedTab()) {
     @case ('controls') {
-      <step-plan-artefact-list (onSelection)="addControl.emit($event)" />
+      <step-plan-artefact-list (onSelection)="_planEditorService.addControl($event)" />
     }
     @case ('keywords') {
-      <step-plan-function-list (addKeywords)="addKeywords.emit($event)" />
+      <step-plan-function-list (addKeywords)="_planEditorService.addKeywords($event)" />
     }
     @case ('other') {
-      <step-plan-otherplan-list (addPlans)="addPlans.emit($event)" />
+      <step-plan-otherplan-list (addPlans)="_planEditorService.addPlans($event)" />
     }
     @case ('console') {
       <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />

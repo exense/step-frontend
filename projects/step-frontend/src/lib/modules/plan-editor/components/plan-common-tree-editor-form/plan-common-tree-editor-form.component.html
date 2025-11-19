@@ -1,1 +1,7 @@
-<step-plan-tree (externalObjectDrop)="handleExternalNodeDrop($event)"></step-plan-tree>
+<step-plan-tree (externalObjectDrop)="handleExternalNodeDrop($event)">
+  @if (controlTemplate(); as ctrlTemplate) {
+    <div *stepPlanTreeRightPanel>
+      <ng-container *ngTemplateOutlet="ctrlTemplate" />
+    </div>
+  }
+</step-plan-tree>

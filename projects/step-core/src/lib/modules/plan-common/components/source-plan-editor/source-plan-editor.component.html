@@ -1,16 +1,13 @@
-<step-split>
-  <step-split-area sizeType="flex" [size]="editorSize" (sizeChange)="handleEditorSizeChange($event)">
-    <mat-card class="h-100">
-      <mat-card-title> Source </mat-card-title>
-      <mat-card-content>
-        <div #editor class="h-100"></div>
-      </mat-card-content>
-    </mat-card>
-  </step-split-area>
-
-  <step-split-gutter></step-split-gutter>
-
-  <step-split-area [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
-    <step-plan-tree [isReadonly]="true"></step-plan-tree>
-  </step-split-area>
-</step-split>
+<step-plan-tree [isReadonly]="true">
+  <mat-card class="h-100" *stepPlanTreeLeftPanel="'flex'">
+    <mat-card-title> Source </mat-card-title>
+    <mat-card-content>
+      <div #editor class="h-100"></div>
+    </mat-card-content>
+  </mat-card>
+  @if (templateControls(); as controls) {
+    <div *stepPlanTreeRightPanel>
+      <ng-container *ngTemplateOutlet="controls" />
+    </div>
+  }
+</step-plan-tree>

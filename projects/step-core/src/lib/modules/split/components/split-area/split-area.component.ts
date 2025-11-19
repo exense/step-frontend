@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { debounceTime, Subject } from 'rxjs';
 
-type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
+export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 
 @Component({
   selector: 'step-split-area',

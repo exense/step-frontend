@@ -1,11 +1,10 @@
-import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, OnDestroy, Renderer2 } from '@angular/core';
-import { debounceTime, map, startWith, Subject, takeUntil } from 'rxjs';
-import { resizeObservable } from '../modules/basics/step-basics.module';
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, Renderer2 } from '@angular/core';
+import { debounceTime, map, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { resizeObservable } from '../types/resize-observable';
 
 @Directive({
   selector: '[stepMaxHeightViewportHeightMinusOffsetTop]',
-  standalone: false,
 })
 export class MaxHeightViewportHeightMinusOffsetTopDirective implements AfterViewInit {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);

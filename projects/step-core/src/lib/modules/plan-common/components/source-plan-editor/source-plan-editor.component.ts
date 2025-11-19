@@ -1,43 +1,41 @@
 import {
-  AfterViewInit,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   input,
   OnDestroy,
   OnInit,
   signal,
+  TemplateRef,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { forkJoin, map } from 'rxjs';
 import * as ace from 'ace-builds';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
 import { PlansService, KeywordsService, AbstractArtefact } from '../../../../client/step-client-module';
-import { DialogsService } from '../../../basics/step-basics.module';
+import { DialogsService, StepBasicsModule } from '../../../basics/step-basics.module';
 import { AceMode } from '../../../rich-editor';
 import { TreeStateService } from '../../../tree';
-import { SPLIT_EXPORTS } from '../../../split';
-import { StepMaterialModule } from '../../../step-material/step-material.module';
 import { SourceEditorAutocompleteService } from '../../injectables/source-editor-autocomplete.service';
 import { PlanEditorStrategy } from '../../types/plan-editor-strategy';
 import { PlanContextApiService } from '../../injectables/plan-context-api.service';
 import { PlanEditorService } from '../../injectables/plan-editor.service';
 import { ArtefactTreeNode } from '../../types/artefact-tree-node';
 import { PlanContext } from '../../types/plan-context.interface';
-import { PlanEditorPersistenceStateService } from '../../injectables/plan-editor-persistence-state.service';
 import { PlanTreeComponent } from '../plan-tree/plan-tree.component';
-
-const EDITOR_SIZE = 'DUAL_EDITOR_SIZE';
-const PLAN_SIZE = 'DUAL_PLAN_SIZE';
+import { PlanTreeLeftPanelDirective } from '../../directives/plan-tree-left-panel.directive';
+import { PlanTreeRightPanelDirective } from '../../directives/plan-tree-right-panel.directive';
 
 @Component({
   selector: 'step-source-plan-editor',
   templateUrl: './source-plan-editor.component.html',
   styleUrls: ['./source-plan-editor.component.scss'],
-  imports: [StepMaterialModule, SPLIT_EXPORTS, PlanTreeComponent],
+  imports: [StepBasicsModule, PlanTreeComponent, PlanTreeLeftPanelDirective, PlanTreeRightPanelDirective],
 })
-export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrategy, OnInit, OnDestroy {
+export class SourcePlanEditorComponent implements PlanEditorStrategy, OnInit, OnDestroy {
   private _sourceEditorAutocomplete = inject(SourceEditorAutocompleteService, { optional: true });
   private _planContextApi = inject(PlanContextApiService);
   private _planApi = inject(PlansService);
@@ -45,9 +43,9 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
   private _planEditorService = inject(PlanEditorService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _dialogs = inject(DialogsService);
-  private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
 
   readonly mode = input.required<AceMode>();
+  readonly templateControls = input<TemplateRef<unknown> | undefined>(undefined);
 
   private editorElement = viewChild<ElementRef<HTMLDivElement>>('editor');
 
@@ -59,8 +57,13 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
 
   private updateEditorWithoutSave = false;
 
-  protected editorSize = this._planEditorPersistenceState.getPanelSize(EDITOR_SIZE);
-  protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
+  private effectElementReady = effect(() => {
+    const editorElement = this.editorElement();
+    this.destroyEditor();
+    if (!!editorElement?.nativeElement) {
+      untracked(() => this.createEditor(editorElement.nativeElement));
+    }
+  });
 
   private parseCallback = () => {
     if (this.updateEditorWithoutSave) {
@@ -68,62 +71,6 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
     }
     this.parse();
   };
-
-  ngAfterViewInit(): void {
-    ace.require('ace/ext/language_tools');
-    this.editor = ace.edit(this.editorElement()!.nativeElement);
-    this.editor.getSession().getUndoManager().reset();
-    this.editor.setTheme('ace/theme/chrome');
-    this.editor.getSession().setMode(this.mode());
-    this.editor.getSession().setUseWorker(false);
-    if (this._sourceEditorAutocomplete) {
-      this.editor.setOptions({
-        enableBasicAutocompletion: [
-          {
-            getCompletions: (
-              editor: ace.Editor,
-              session: ace.EditSession,
-              position: ace.Ace.Point,
-              prefix: string,
-              callback: ace.Ace.CompleterCallback,
-            ) => {
-              this._sourceEditorAutocomplete!.autocomplete(prefix).subscribe((parsingResult) => {
-                callback(
-                  null,
-                  parsingResult.map((text) => ({
-                    name: text,
-                    value: text,
-                    meta: 'Keyword',
-                  })),
-                );
-              });
-            },
-          },
-        ],
-        enableSnippets: true,
-        enableLiveAutocompletion: false,
-      });
-    }
-    const planContext = this.planContext();
-    if (planContext) {
-      const plan = planContext.plan;
-      this.updateEditorWithoutSave = true;
-      this.editor.setValue((plan as any).source, 1);
-      this.updateEditorWithoutSave = false;
-    }
-
-    this.editor.getSession().on('change', this.parseCallback);
-
-    this.editor.focus();
-  }
-
-  handleEditorSizeChange(size: number): void {
-    this._planEditorPersistenceState.setPanelSize(EDITOR_SIZE, size);
-  }
-
-  handlePlanSizeChange(size: number): void {
-    this._planEditorPersistenceState.setPanelSize(PLAN_SIZE, size);
-  }
 
   addControl(artefactTypeId: string): void {
     this._dialogs
@@ -197,13 +144,66 @@ export class SourcePlanEditorComponent implements AfterViewInit, PlanEditorStrat
   }
 
   ngOnInit(): void {
+    ace.require('ace/ext/language_tools');
     this._planEditorService.useStrategy(this);
   }
 
   ngOnDestroy(): void {
+    this.destroyEditor();
     this._planEditorService.removeStrategy();
-    this.editor!.getSession().off('change', this.parseCallback);
-    this.editor!.destroy();
+  }
+
+  private destroyEditor(): void {
+    this.editor?.getSession()?.off?.('change', this.parseCallback);
+    this.editor?.destroy?.();
+    this.editor = undefined;
+  }
+
+  private createEditor(element: HTMLDivElement): void {
+    this.editor = ace.edit(element);
+    this.editor.getSession().getUndoManager().reset();
+    this.editor.setTheme('ace/theme/chrome');
+    this.editor.getSession().setMode(this.mode());
+    this.editor.getSession().setUseWorker(false);
+    if (this._sourceEditorAutocomplete) {
+      this.editor.setOptions({
+        enableBasicAutocompletion: [
+          {
+            getCompletions: (
+              editor: ace.Editor,
+              session: ace.EditSession,
+              position: ace.Ace.Point,
+              prefix: string,
+              callback: ace.Ace.CompleterCallback,
+            ) => {
+              this._sourceEditorAutocomplete!.autocomplete(prefix).subscribe((parsingResult) => {
+                callback(
+                  null,
+                  parsingResult.map((text) => ({
+                    name: text,
+                    value: text,
+                    meta: 'Keyword',
+                  })),
+                );
+              });
+            },
+          },
+        ],
+        enableSnippets: true,
+        enableLiveAutocompletion: false,
+      });
+    }
+    const planContext = this.planContext();
+    if (planContext) {
+      const plan = planContext.plan;
+      this.updateEditorWithoutSave = true;
+      this.editor.setValue((plan as any).source, 1);
+      this.updateEditorWithoutSave = false;
+    }
+
+    this.editor.getSession().on('change', this.parseCallback);
+
+    this.editor.focus();
   }
 
   handlePlanContextChange(planContext?: PlanContext): void {

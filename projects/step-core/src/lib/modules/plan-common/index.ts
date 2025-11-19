@@ -9,6 +9,8 @@ import { ArtefactDetailsComponent } from './components/artefact-details/artefact
 import { PlanTreeComponent } from './components/plan-tree/plan-tree.component';
 import { SourcePlanEditorComponent } from './components/source-plan-editor/source-plan-editor.component';
 import { PlanEditorAttributesDirective } from './directives/plan-editor-attributes.directive';
+import { PlanTreePanelSizesDirective } from './components/plan-tree/plan-tree-panel-sizes.directive';
+import { PlanTreeRightPanelDirective } from './directives/plan-tree-right-panel.directive';
 
 export * from './components/plan-create-dialog/plan-create-dialog.component';
 export * from './components/select-plan/select-plan.component';
@@ -17,9 +19,12 @@ export * from './components/thread-distribution-wizard-dialog/thread-distributio
 export * from './components/artefact-child-container-settings/artefact-child-container-settings.component';
 export * from './components/artefact-details/artefact-details.component';
 export * from './components/plan-tree/plan-tree.component';
+export * from './components/plan-tree/plan-tree-panel-sizes.directive';
 export * from './components/source-plan-editor/source-plan-editor.component';
 
 export * from './directives/plan-editor-attributes.directive';
+export * from './directives/plan-tree-left-panel.directive';
+export * from './directives/plan-tree-right-panel.directive';
 
 export * from './injectables/plan-artefact-resolver.service';
 export * from './injectables/plan-by-id-cache.service';
@@ -56,4 +61,6 @@ export const PLAN_COMMON_EXPORTS = [
   PlanTreeComponent,
   SourcePlanEditorComponent,
   PlanEditorAttributesDirective,
+  PlanTreePanelSizesDirective,
+  PlanTreeRightPanelDirective,
 ];

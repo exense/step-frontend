@@ -1,4 +1,4 @@
-import { Component, ContentChildren, QueryList } from '@angular/core';
+import { Component, contentChildren } from '@angular/core';
 import { SplitAreaComponent } from '../split-area/split-area.component';
 import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
 
@@ -8,6 +8,6 @@ import { SplitGutterComponent } from '../split-gutter/split-gutter.component';
   styleUrls: ['./split.component.scss'],
 })
 export class SplitComponent {
-  @ContentChildren(SplitAreaComponent) areas?: QueryList<SplitAreaComponent>;
-  @ContentChildren(SplitGutterComponent) gutters?: QueryList<SplitGutterComponent>;
+  readonly areas = contentChildren(SplitAreaComponent);
+  readonly gutters = contentChildren(SplitGutterComponent);
 }

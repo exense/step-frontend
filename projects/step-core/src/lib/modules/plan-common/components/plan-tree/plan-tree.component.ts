@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   computed,
+  contentChild,
   DestroyRef,
   ElementRef,
   forwardRef,
@@ -20,7 +21,6 @@ import { ArtefactChildContainerSettingsComponent } from '../artefact-child-conta
 import { ArtefactDetailsComponent } from '../artefact-details/artefact-details.component';
 import { ArtefactTreeNode } from '../../types/artefact-tree-node';
 import { PlanArtefactResolverService } from '../../injectables/plan-artefact-resolver.service';
-import { PlanEditorPersistenceStateService } from '../../injectables/plan-editor-persistence-state.service';
 import { PlanEditorService } from '../../injectables/plan-editor.service';
 import { PlanInteractiveSessionService } from '../../injectables/plan-interactive-session.service';
 import { PlanTreeAction } from '../../types/plan-tree-action.enum';
@@ -30,9 +30,10 @@ import { SPLIT_EXPORTS } from '../../../split';
 import { StepIconsModule } from '../../../step-icons/step-icons.module';
 import { AsyncPipe } from '@angular/common';
 import { StepMaterialModule } from '../../../step-material/step-material.module';
-
-const TREE_SIZE = 'TREE_SIZE';
-const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
+import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { PlanTreeLeftPanelDirective } from '../../directives/plan-tree-left-panel.directive';
+import { PlanTreeRightPanelDirective } from '../../directives/plan-tree-right-panel.directive';
+import { PlanTreePanelSizesDirective } from './plan-tree-panel-sizes.directive';
 
 @Component({
   selector: 'step-plan-tree',
@@ -43,12 +44,14 @@ const ARTEFACT_DETAILS_SIZE = 'ARTEFACT_DETAILS_SIZE';
     SPLIT_EXPORTS,
     DRAG_DROP_EXPORTS,
     StepMaterialModule,
+    StepBasicsModule,
     TREE_EXPORTS,
     StepIconsModule,
     ArtefactDetailsComponent,
     ArtefactChildContainerSettingsComponent,
     AsyncPipe,
   ],
+  hostDirectives: [PlanTreePanelSizesDirective],
   providers: [
     {
       provide: TreeActionsService,
@@ -61,11 +64,28 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
-  private _planPersistenceState = inject(PlanEditorPersistenceStateService);
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
+  protected readonly _panelSizes = inject(PlanTreePanelSizesDirective, { self: true });
+
   readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
+
+  private readonly leftPanel = contentChild(PlanTreeLeftPanelDirective);
+  private readonly rightPanel = contentChild(PlanTreeRightPanelDirective);
+
+  protected readonly templateLeftPanel = computed(() => this.leftPanel()?._templateRef);
+  protected readonly templateRightPanel = computed(() => this.rightPanel()?._templateRef);
+
+  protected readonly sizeTypeLeftPanel = computed(() => {
+    const leftPanel = this.leftPanel();
+    return leftPanel?.sizeType?.() || 'pixel';
+  });
+
+  protected readonly sizeTypeRightPanel = computed(() => {
+    const rightPanel = this.rightPanel();
+    return rightPanel?.sizeType?.() || 'pixel';
+  });
 
   /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();
@@ -78,9 +98,6 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   /** @ViewChild **/
   private dragData = viewChild(DragDataService);
-
-  protected treeSize = this._planPersistenceState.getPanelSize(TREE_SIZE);
-  protected artefactDetailsSize = this._planPersistenceState.getPanelSize(ARTEFACT_DETAILS_SIZE);
 
   private actions: TreeAction[] = [
     { id: PlanTreeAction.OPEN, label: 'Open (Ctrl + O)' },
@@ -272,14 +289,6 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
       const ctx = this._planEditService.planContext();
       this._planEditService.handlePlanContextChange(!ctx ? undefined : { ...ctx });
     }, 200);
-  }
-
-  handleTreeSizeChange(size: number): void {
-    this._planPersistenceState.setPanelSize(TREE_SIZE, size);
-  }
-
-  handleArtefactDetailsSizeChange(size: number): void {
-    this._planPersistenceState.setPanelSize(ARTEFACT_DETAILS_SIZE, size);
   }
 
   private canOpenArtefact(artefact?: AbstractArtefact): boolean {

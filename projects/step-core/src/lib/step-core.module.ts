@@ -17,7 +17,6 @@ import { CapsLockDirective } from './directives/caps-lock.directive';
 import { ClampFadeDirective } from './directives/clamp-fade.directive';
 import { FocusableDirective } from './directives/focusable.directive';
 import { FocusablesDirective } from './directives/focusables.directive';
-import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 import { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 import { TooltipImmediateCloseDirective } from './directives/tooltip-immediate-close.directive';
 import { TrapFocusDirective } from './directives/trap-focus.directive';
@@ -94,7 +93,6 @@ import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
-    MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     ReferenceArtefactNameComponent,
     PlanNameComponent,
@@ -185,7 +183,6 @@ import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
     TrapFocusDirective,
     FocusableDirective,
     FocusablesDirective,
-    MaxHeightViewportHeightMinusOffsetTopDirective,
     RecursiveTabIndexDirective,
     PlanNameComponent,
     PredefinedOptionsInputComponent,
@@ -280,7 +277,6 @@ export * from './directives/caps-lock.directive';
 export * from './directives/clamp-fade.directive';
 export { FocusableDirective } from './directives/focusable.directive';
 export { FocusablesDirective } from './directives/focusables.directive';
-export { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 export { RecursiveTabIndexDirective } from './directives/recursive-tab-index.directive';
 export * from './directives/tooltip-immediate-close.directive';
 export { TrapFocusDirective } from './directives/trap-focus.directive';

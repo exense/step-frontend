@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit, signal, TemplateRef } from '@angular/core';
 import {
   AbstractArtefact,
   ArtefactsFactoryService,
@@ -14,6 +14,7 @@ import {
   PlanContextApiService,
   PlanContext,
   DropInfo,
+  PlanTypeContext,
 } from '@exense/step-core';
 import { BehaviorSubject, filter, first, forkJoin, map, merge, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { PlanHistoryService } from '../../injectables/plan-history.service';
@@ -42,7 +43,12 @@ export class PlanCommonTreeEditorFormComponent implements CustomComponent, PlanE
   private _artefactsFactory = inject(ArtefactsFactoryService);
   private _destroyRef = inject(DestroyRef);
 
-  context?: any;
+  protected readonly controlTemplate = signal<TemplateRef<unknown> | undefined>(undefined);
+
+  contextChange(previousContext?: PlanTypeContext, currentContext?: PlanTypeContext): void {
+    this.controlTemplate.set(currentContext?.templateControls);
+  }
+
   private planContextChange$ = new Subject<PlanContext>();
 
   private selectedNode$ = toObservable(this._treeState.selectedNode);

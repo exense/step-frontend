@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, inject, model, OnInit, output, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { StepCoreModule, Tab, TabsComponent } from '@exense/step-core';
+import { PlanEditorService, StepCoreModule, Tab, TabsComponent } from '@exense/step-core';
 import { distinctUntilChanged, filter } from 'rxjs';
 import { ExecutionModule } from '../../../execution/execution.module';
 import { PlanArtefactListComponent } from './plan-artefact-list/plan-artefact-list.component';
@@ -32,14 +32,11 @@ const TABS = {
 })
 export class PlanControlsComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
+  protected readonly _planEditorService = inject(PlanEditorService);
   protected readonly _interactiveSession = inject(InteractiveSessionService);
 
   private tabs = viewChild('tabs', { read: TabsComponent });
   private keywordCalls = viewChild('keywordCalls', { read: KeywordCallsComponent });
-
-  readonly addControl = output<string>();
-  readonly addKeywords = output<string[]>();
-  readonly addPlans = output<string[]>();
 
   protected readonly selectedTab = model<PlanControlsTab>('controls');
   protected readonly componentTabs = signal<Tab<PlanControlsTab>[]>([TABS.controls, TABS.keywords, TABS.other]);

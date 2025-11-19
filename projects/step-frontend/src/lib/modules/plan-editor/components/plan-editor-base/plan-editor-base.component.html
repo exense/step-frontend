@@ -43,11 +43,15 @@
   </div>
 
   <section stepDragDropGroupContainer stepDropAreaId="planTree">
+    @if (planClass) {
+      <step-plan-type [itemKey]="planClass" [context]="{ templateControls: controls }" />
+      <ng-template #controls>
+        <step-plan-controls #planControls />
+      </ng-template>
+    }
+    <!--
     <step-split stepMaxHeightViewportHeightMinusOffsetTop>
       <step-split-area sizeType="flex" [size]="planSize" (sizeChange)="handlePlanSizeChange($event)">
-        @if (planClass) {
-          <step-plan-type [itemKey]="planClass" />
-        }
       </step-split-area>
 
       <step-split-gutter />
@@ -64,5 +68,6 @@
         />
       </step-split-area>
     </step-split>
+-->
   </section>
 </div>
