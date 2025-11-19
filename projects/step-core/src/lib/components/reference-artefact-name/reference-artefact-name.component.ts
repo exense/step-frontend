@@ -105,11 +105,6 @@ export class ReferenceArtefactNameComponent<A extends Artefact, T = any> impleme
     if (cRefreshTrigger && !cRefreshTrigger.firstChange) {
       this.loadArtefactReference(this.artefact);
     }
-
-    const cRefreshTrigger = changes['refreshTrigger'];
-    if (cRefreshTrigger && !cRefreshTrigger.firstChange) {
-      this.loadArtefactReference(this.artefact);
-    }
   }
 
   onArtefactNameChange(newName: string): void {
