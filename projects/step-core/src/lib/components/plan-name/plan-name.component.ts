@@ -54,7 +54,7 @@ export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, 
   lookupReference(artefact: CallPlan): Observable<Plan> {
     return this._plansApi.lookupCallPlanWithBindings({
       callPlan: artefact,
-      bindings: this._planEditorService.targetExecutionParameters,
+      bindings: this._planEditorService.targetExecutionParameters(),
     });
   }
 }
