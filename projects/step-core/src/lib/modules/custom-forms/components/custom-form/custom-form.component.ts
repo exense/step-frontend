@@ -66,7 +66,7 @@ export class CustomFormComponent implements OnInit, OnDestroy {
   readonly stExcludeFields = input<string[]>([]);
   readonly stIncludeFieldsOnly = input<string[] | undefined>();
 
-  readonly stModelChange = output<Record<string, unknown>>();
+  readonly stModelChange = output<Record<string, unknown | string>>();
   readonly customInputTouch = output<void>();
 
   private activeExpressionInputsKeys = new Set<string>();

@@ -445,7 +445,7 @@ export class PlanEditorBaseComponent
       });
   }
 
-  setTargetExecutionParameters(executionParameters: ExecutionParameters) {
+  setTargetExecutionParameters(executionParameters: Record<string, string>) {
     this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }

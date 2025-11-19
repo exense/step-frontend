@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedPlansService,
   BulkSelectionType,
@@ -38,6 +38,11 @@ export class PlanOtherplanListComponent {
   private _tableApi = inject(TableApiWrapperService);
   private _planEditorService = inject(PlanEditorService);
 
+  private reloadTargetExecutionParametersEffect = effect(() => {
+    this._planEditorService.targetExecutionParameters();
+    this.dataSource.reload({ immediateHideProgress: true });
+  });
+
   protected readonly dataSource = inject(
     AugmentedPlansService,
   ).getPlansTableDataSource() as TableRemoteDataSource<Plan>;
@@ -46,7 +51,7 @@ export class PlanOtherplanListComponent {
 
   protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
   protected readonly activatableEntitiesTableParams = computed(() =>
-    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters),
+    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters()),
   );
 
   readonly addPlans = output<string[]>();

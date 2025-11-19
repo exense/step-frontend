@@ -21,6 +21,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   private planContextInternal = signal<PlanContext | undefined>(undefined);
   private hasRedoInternal = signal(false);
   private hasUndoInternal = signal(false);
+  private targetExecutionParametersInternal = signal<Record<string, string>>({});
 
   readonly hasRedo = this.hasRedoInternal.asReadonly();
   readonly hasUndo = this.hasUndoInternal.asReadonly();
@@ -33,7 +34,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   });
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
-  public targetExecutionParameters?: ExecutionParameters;
+  readonly targetExecutionParameters = this.targetExecutionParametersInternal.asReadonly();
 
   ngOnDestroy(): void {
     this.strategyChangedInternal$.complete();
@@ -85,6 +86,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.hasUndoInternal.set(false);
     this.hasRedoInternal.set(false);
     this.planContextInternal.set(undefined);
+    this.targetExecutionParametersInternal.set({});
   }
 
   addControl(artefactTypeId: string): void {
@@ -233,7 +235,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.strategySyncEffects = [];
   }
 
-  setTargetExecutionParameters(executionParameters: ExecutionParameters) {
-    this.targetExecutionParameters = executionParameters;
+  setTargetExecutionParameters(params?: Record<string, string>): void {
+    this.targetExecutionParametersInternal.set(params || {});
   }
 }

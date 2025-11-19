@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, output, viewChild, ViewEncapsulation, effect } from '@angular/core';
 import {
   AugmentedKeywordsService,
   BulkSelectionType,
@@ -43,9 +43,14 @@ export class PlanFunctionListComponent {
 
   private selectionList = viewChild('selectionList', { read: SelectionList<string, Keyword> });
 
+  private reloadTargetExecutionParametersEffect = effect(() => {
+    this._planEditorService.targetExecutionParameters();
+    this.dataSource.reload({ immediateHideProgress: true });
+  });
+
   protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
   protected readonly activatableEntitiesTableParams = computed(() =>
-    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters),
+    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters()),
   );
   readonly addKeywords = output<string[]>();
 
