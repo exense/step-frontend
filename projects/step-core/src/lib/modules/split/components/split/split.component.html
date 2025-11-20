@@ -1,12 +1,26 @@
-@for (section of sections(); track section.header(); let isLast = $last) {
-  <step-split-resizable-area
-    [sizePrefix]="section.header()"
-    [sizeType]="section.sizeType()"
-    [padding]="section.padding()"
-  >
-    <ng-container *ngTemplateOutlet="section._templateRef" />
-  </step-split-resizable-area>
-  @if (!isLast) {
-    <step-split-gutter />
+@if (isFoldableView()) {
+  <section class="foldable-items">
+    @for (section of sections(); track section.header()) {
+      <step-split-foldable-area
+        [header]="section.header()"
+        [activeSectionHeader]="activeFoldableArea()"
+        (activate)="activateFoldableArea(section.header())"
+      >
+        <ng-container *ngTemplateOutlet="section._templateRef" />
+      </step-split-foldable-area>
+    }
+  </section>
+} @else {
+  @for (section of sections(); track section.header(); let isLast = $last) {
+    <step-split-resizable-area
+      [sizePrefix]="section.header()"
+      [sizeType]="section.sizeType()"
+      [padding]="section.padding()"
+    >
+      <ng-container *ngTemplateOutlet="section._templateRef" />
+    </step-split-resizable-area>
+    @if (!isLast) {
+      <step-split-gutter />
+    }
   }
 }

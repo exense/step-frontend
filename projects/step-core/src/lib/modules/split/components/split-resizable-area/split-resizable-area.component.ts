@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { debounceTime, map, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { SplitAreaSizePersistenceService } from '../../injectables/split-area-size-persistence.service';
+import { SplitResizableAreaPersistenceService } from '../../injectables/split-resizable-area-persistence.service';
 import { SplitComponent } from '../split/split.component';
 
 export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
@@ -29,7 +29,7 @@ export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 export class SplitResizableAreaComponent implements AfterViewInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _splitComponent = inject(SplitComponent);
-  private _splitAreaSizePersistenceService = inject(SplitAreaSizePersistenceService);
+  private _splitResizableAreaPersistenceService = inject(SplitResizableAreaPersistenceService);
 
   private sizeUpdateInternal$ = new Subject<void>();
 
@@ -40,14 +40,14 @@ export class SplitResizableAreaComponent implements AfterViewInit, OnDestroy {
   readonly sizePrefix = input.required<string>();
 
   private appliedPrefix = computed(() => {
-    const splitPrefix = this._splitComponent.sizePrefix();
+    const splitPrefix = this._splitComponent.persistencePrefix();
     const sizePrefix = this.sizePrefix();
     return `${splitPrefix}_${sizePrefix}`;
   });
 
   private splitAreaSizeController = computed(() => {
     const appliedPrefix = this.appliedPrefix();
-    return this._splitAreaSizePersistenceService.createSplitAreaSizeController(appliedPrefix);
+    return this._splitResizableAreaPersistenceService.createSplitAreaSizeController(appliedPrefix);
   });
 
   private sizeInternal = linkedSignal(() => {

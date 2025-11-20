@@ -1,0 +1,25 @@
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-split-foldable-area {
+  .folded {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: calc(100vh - 15rem);
+    min-width: 5rem;
+    cursor: pointer;
+    &:hover {
+      background: var.$gray-300;
+    }
+    span {
+      writing-mode: sideways-lr;
+      user-select: none;
+    }
+  }
+  &.active {
+    padding: 0 1rem;
+  }
+}

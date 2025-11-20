@@ -1,5 +1,5 @@
 import { Directive, inject, input, TemplateRef } from '@angular/core';
-import { SplitAreaSizeType } from '@exense/step-core';
+import { SplitAreaSizeType } from '../components/split-resizable-area/split-resizable-area.component';
 
 @Directive({
   selector: '[stepSplitSection]',

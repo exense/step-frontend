@@ -10,11 +10,11 @@ export interface SplitAreaSizeController {
 @Injectable({
   providedIn: 'root',
 })
-export class SplitAreaSizePersistenceService extends StorageProxy {
+export class SplitResizableAreaPersistenceService extends StorageProxy {
   private _screenWidth$ = inject(SCREEN_WIDTH);
 
   constructor(@Inject(LOCAL_STORAGE) _storage: Storage) {
-    super(_storage, 'SPLIT_AREA_SIZE_STATE');
+    super(_storage, 'SPLIT_RESIZALBE_AREA_STATE');
     this.setupTokensCleanupOnScreenChange();
   }
 

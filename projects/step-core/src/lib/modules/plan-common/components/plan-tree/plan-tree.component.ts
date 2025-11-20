@@ -86,16 +86,12 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     return rightPanel?.sizeType?.() || 'pixel';
   });
 
-  /** @Output() **/
   readonly externalObjectDrop = output<DropInfo>();
 
   @Input() isReadonly: boolean = false;
 
-  @ViewChild('area') splitAreaElementRef?: ElementRef<HTMLElement>;
-
   @ViewChild(TreeComponent) tree?: TreeComponent<ArtefactTreeNode>;
 
-  /** @ViewChild **/
   private dragData = viewChild(DragDataService);
 
   private actions: TreeAction[] = [
