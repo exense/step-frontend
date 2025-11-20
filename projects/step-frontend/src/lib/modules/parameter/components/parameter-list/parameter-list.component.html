@@ -34,11 +34,11 @@
           mat-flat-button
           color="primary"
           class="header-btn"
-          matTooltip="Upload via Automation Package"
+          matTooltip="Add entities by uploading an Automation Package"
           [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
           routerLink="/automation-package/list/upload/new/"
         >
-          <step-icon name="plus" /> AP
+          Upload Package
         </a>
         <a
           data-step-testid="new-parameter-btn"

@@ -36,10 +36,11 @@
           mat-flat-button
           color="primary"
           class="header-btn"
+          matTooltip="Add entities by uploading an Automation Package"
           [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
           routerLink="/automation-package/list/upload/new/"
         >
-          <step-icon name="plus" /> Automation Package
+          Upload Package
         </a>
         <a
           data-step-testid="new-keyword-btn"
