@@ -1,10 +1,11 @@
-import { Component, computed, inject, output, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, output, viewChild, ViewEncapsulation, effect } from '@angular/core';
 import {
   AugmentedKeywordsService,
   BulkSelectionType,
   EntitySelectionState,
   entitySelectionStateProvider,
   Keyword,
+  PlanEditorService,
   SelectionList,
   StepCoreModule,
   TableApiWrapperService,
@@ -14,6 +15,7 @@ import {
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
 import { PlanNodesDragPreviewComponent } from '../../plan-nodes-drag-preview/plan-nodes-drag-preview.component';
 import { KeywordDropInfoPipe } from './keyword-drop-info.pipe';
+import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-function-list',
@@ -37,14 +39,22 @@ import { KeywordDropInfoPipe } from './keyword-drop-info.pipe';
 export class PlanFunctionListComponent {
   private _selectionState = inject<EntitySelectionState<string, Keyword>>(EntitySelectionState);
   private _tableApi = inject(TableApiWrapperService);
+  private _planEditorService = inject(PlanEditorService);
   readonly dataSource = inject(
     AugmentedKeywordsService,
   ).createFilteredTableDataSource() as TableRemoteDataSource<Keyword>;
 
   private selectionList = viewChild('selectionList', { read: SelectionList<string, Keyword> });
 
-  protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
+  private reloadTargetExecutionParametersEffect = effect(() => {
+    this._planEditorService.targetExecutionParameters();
+    this.dataSource.reload({ immediateHideProgress: true });
+  });
 
+  protected readonly hasSelection = computed(() => this._selectionState.selectedSize() > 0);
+  protected readonly activatableEntitiesTableParams = computed(() =>
+    createActivatableEntitiesTableParams(this._planEditorService.targetExecutionParameters()),
+  );
   readonly addKeywords = output<string[]>();
 
   protected addKeyword(id: string): void {

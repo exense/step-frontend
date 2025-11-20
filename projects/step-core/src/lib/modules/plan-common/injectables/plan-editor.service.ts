@@ -1,7 +1,7 @@
 import { computed, effect, EffectRef, inject, Injectable, Injector, OnDestroy, signal } from '@angular/core';
 import { PlanEditorStrategy } from '../types/plan-editor-strategy';
 import { Subject } from 'rxjs';
-import { AbstractArtefact, Plan } from '../../../client/step-client-module';
+import { AbstractArtefact, type ExecutionParameters, Plan } from '../../../client/step-client-module';
 import { PlanContext } from '../types/plan-context.interface';
 
 @Injectable({
@@ -21,6 +21,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   private planContextInternal = signal<PlanContext | undefined>(undefined);
   private hasRedoInternal = signal(false);
   private hasUndoInternal = signal(false);
+  private targetExecutionParametersInternal = signal<Record<string, string>>({});
 
   readonly hasRedo = this.hasRedoInternal.asReadonly();
   readonly hasUndo = this.hasUndoInternal.asReadonly();
@@ -33,6 +34,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   });
 
   readonly strategyChanged$ = this.strategyChangedInternal$.asObservable();
+  readonly targetExecutionParameters = this.targetExecutionParametersInternal.asReadonly();
 
   ngOnDestroy(): void {
     this.strategyChangedInternal$.complete();
@@ -84,6 +86,7 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
     this.hasUndoInternal.set(false);
     this.hasRedoInternal.set(false);
     this.planContextInternal.set(undefined);
+    this.targetExecutionParametersInternal.set({});
   }
 
   addControl(artefactTypeId: string): void {
@@ -230,5 +233,9 @@ export class PlanEditorService implements PlanEditorStrategy, OnDestroy {
   terminateStrategySubscriptions(): void {
     this.strategySyncEffects.forEach((effectRef) => effectRef.destroy());
     this.strategySyncEffects = [];
+  }
+
+  setTargetExecutionParameters(params?: Record<string, string>): void {
+    this.targetExecutionParametersInternal.set(params || {});
   }
 }

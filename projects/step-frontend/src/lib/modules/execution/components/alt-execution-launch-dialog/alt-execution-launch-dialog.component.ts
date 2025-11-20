@@ -4,6 +4,7 @@ import {
   ArtefactService,
   ControllerService,
   IncludeTestcases,
+  PlanEditorService,
   RepositoryObjectReference,
   TableColumnsConfig,
   TablePersistenceConfig,
@@ -91,7 +92,9 @@ export class AltExecutionLaunchDialogComponent
         }),
         takeUntilDestroyed(this._destroyRef),
       )
-      .subscribe((executionParameters) => this.executionParameters.set(executionParameters));
+      .subscribe((executionParameters) => {
+        this.executionParameters.set(executionParameters);
+      });
   }
 
   override getIncludedTestcases(): IncludeTestcases | null | undefined {

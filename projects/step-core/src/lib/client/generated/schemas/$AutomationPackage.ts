@@ -44,6 +44,12 @@ export const $AutomationPackage = {
     automationPackageLibraryResource: {
       type: 'string',
     },
+    automationPackageResourceRevision: {
+      type: 'string',
+    },
+    automationPackageLibraryResourceRevision: {
+      type: 'string',
+    },
     functionsAttributes: {
       type: 'dictionary',
       contains: {

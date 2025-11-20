@@ -62,7 +62,7 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
   private _planArtefactResolver? = inject(PlanArtefactResolverService, { optional: true });
-  readonly _planEditService = inject(PlanEditorService);
+  readonly _planEditorService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
   readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
@@ -239,38 +239,38 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     const forceSkip = actionId === PlanTreeAction.DISABLE;
     switch (actionId) {
       case PlanTreeAction.RENAME:
-        this._planEditService.rename(artefact);
+        this._planEditorService.rename(artefact);
         break;
       case PlanTreeAction.MOVE_UP:
-        this._planEditService.moveUp(artefact);
+        this._planEditorService.moveUp(artefact);
         break;
       case PlanTreeAction.MOVE_DOWN:
-        this._planEditService.moveDown(artefact);
+        this._planEditorService.moveDown(artefact);
         break;
       case PlanTreeAction.MOVE_LEFT:
-        this._planEditService.moveOut(artefact);
+        this._planEditorService.moveOut(artefact);
         break;
       case PlanTreeAction.MOVE_RIGHT:
-        this._planEditService.moveInPrevSibling(artefact);
+        this._planEditorService.moveInPrevSibling(artefact);
         break;
       case PlanTreeAction.COPY:
-        this._planEditService.copy(artefact);
+        this._planEditorService.copy(artefact);
         break;
       case PlanTreeAction.PASTE:
-        this._planEditService.paste(artefact);
+        this._planEditorService.paste(artefact);
         break;
       case PlanTreeAction.DUPLICATE:
-        this._planEditService.duplicate(artefact);
+        this._planEditorService.duplicate(artefact);
         break;
       case PlanTreeAction.DELETE:
-        this._planEditService.delete(artefact);
+        this._planEditorService.delete(artefact);
         break;
       case PlanTreeAction.OPEN:
         this._planArtefactResolver?.openArtefact(artefact);
         break;
       case PlanTreeAction.DISABLE:
       case PlanTreeAction.ENABLE:
-        this._planEditService?.toggleSkip(artefact, forceSkip);
+        this._planEditorService?.toggleSkip(artefact, forceSkip);
         break;
       default:
         break;
@@ -281,8 +281,8 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
     // Timeout is needed to prevent update issue when clicking into the tree and leaving a property field that triggers
     // a plan change
     setTimeout(() => {
-      const ctx = this._planEditService.planContext();
-      this._planEditService.handlePlanContextChange(!ctx ? undefined : { ...ctx });
+      const ctx = this._planEditorService.planContext();
+      this._planEditorService.handlePlanContextChange(!ctx ? undefined : { ...ctx });
     }, 200);
   }
 

@@ -40,6 +40,7 @@ import {
   CommonEntitiesUrlsService,
   PlanContext,
   AuthService,
+  ExecutionParameters,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
@@ -113,7 +114,6 @@ export class PlanEditorBaseComponent
   private _dialogsService = inject(DialogsService);
   private _functionActions = inject(FunctionActionsService);
   private _artefactService = inject(ArtefactService);
-  public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
   private _matDialog = inject(MatDialog);
@@ -121,6 +121,7 @@ export class PlanEditorBaseComponent
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _auth = inject(AuthService);
   private _injector = inject(Injector);
+  public _planEditorService = inject(PlanEditorService);
 
   private planTypeChangeTerminator$?: Subject<void>;
 
@@ -158,7 +159,7 @@ export class PlanEditorBaseComponent
   private planControls = viewChild('planControls', { read: PlanControlsComponent });
 
   private effectCheckAccessToPlanTypeControl = effect(() => {
-    const planEditorType = this._planEditService.plan();
+    const planEditorType = this._planEditorService.plan();
     untracked(() => {
       if (this._auth.hasRight('plan-write', this._injector)) {
         this.planTypeControl.enable({ emitEvent: false });
@@ -191,7 +192,7 @@ export class PlanEditorBaseComponent
       return;
     }
     this._planEditorApi
-      .exportPlan(this.currentPlanId, `${this._planEditService.planContext()!.entity!.attributes!['name']}.sta`)
+      .exportPlan(this.currentPlanId, `${this._planEditorService.planContext()!.entity!.attributes!['name']}.sta`)
       .subscribe();
   }
 
@@ -200,7 +201,7 @@ export class PlanEditorBaseComponent
       return;
     }
 
-    const name = this._planEditService.planContext()!.entity!.attributes!['name'];
+    const name = this._planEditorService.planContext()!.entity!.attributes!['name'];
 
     this._dialogsService
       .enterValue('Clone plan as', `${name}_Copy`)
@@ -250,7 +251,7 @@ export class PlanEditorBaseComponent
 
     if (isPlan) {
       this._planEditorApi
-        .lookupPlan(this._planEditService.planContext()!.id!, artefact!.id!)
+        .lookupPlan(this._planEditorService.planContext()!.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -334,7 +335,7 @@ export class PlanEditorBaseComponent
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
     const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
-    this._planEditService.init(context!, artefactId);
+    this._planEditorService.init(context!, artefactId);
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
@@ -363,7 +364,7 @@ export class PlanEditorBaseComponent
     this.planTypeControl.valueChanges
       .pipe(
         map((item) => {
-          const context = this._planEditService.planContext();
+          const context = this._planEditorService.planContext();
           return { item, context };
         }),
         filter(({ item, context }) => !!item && !!context),
@@ -377,7 +378,11 @@ export class PlanEditorBaseComponent
       )
       .subscribe((context) => {
         this.planClass = context!.plan!._class;
-        this._planEditService.init(context);
+        this._planEditorService.init(context);
       });
+  }
+
+  setTargetExecutionParameters(executionParameters: Record<string, string>) {
+    this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }

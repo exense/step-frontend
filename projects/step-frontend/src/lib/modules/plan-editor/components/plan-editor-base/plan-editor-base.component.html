@@ -1,5 +1,5 @@
 <div>
-  <step-plan-alerts [planContext]="_planEditService.planContext()" />
+  <step-plan-alerts [planContext]="_planEditorService.planContext()" />
   @if (showInteractiveWarning$ | async) {
     <step-alert type="info">
       Welcome to the interactive mode. In this mode you can select tree nodes and run them directly by clicking the
@@ -19,18 +19,18 @@
       }
       <ng-content select="step-plan-editor-attributes" />
     </div>
-    @if (_planEditService.planContext(); as planContext) {
+    @if (_planEditorService.planContext(); as planContext) {
       <step-plan-editor-actions
         [planContext]="planContext"
         [showExecuteButton]="actionsConfig?.showExecuteButton"
         [showExportSourceButton]="actionsConfig?.showExportSourceButton"
-        [hasUndo]="_planEditService.hasUndo()"
-        [hasRedo]="_planEditService.hasRedo()"
+        [hasUndo]="_planEditorService.hasUndo()"
+        [hasRedo]="_planEditorService.hasRedo()"
         [isInteractiveSessionActive]="_interactiveSession.isActive$ | async"
         [repositoryObjectRef]="repositoryObjectRef"
-        (discardAll)="_planEditService.discardAll()"
-        (undo)="_planEditService.undo()"
-        (redo)="_planEditService.redo()"
+        (discardAll)="_planEditorService.discardAll()"
+        (undo)="_planEditorService.undo()"
+        (redo)="_planEditorService.redo()"
         (clone)="clonePlan()"
         (export)="exportPlan()"
         (startInteractive)="startInteractive()"
@@ -38,6 +38,7 @@
         (stop)="stopInteractive()"
         (showSource)="showPlanSource()"
         (runPlan)="runPlan.emit()"
+        (targetExecutionParametersChange)="setTargetExecutionParameters($event)"
       />
     }
   </div>
