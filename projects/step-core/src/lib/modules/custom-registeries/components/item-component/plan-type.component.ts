@@ -16,5 +16,4 @@ export interface PlanTypeContext {
 })
 export class PlanTypeComponent extends BaseItemComponent<CustomRegistryItem> {
   protected override readonly registryType: CustomRegistryType = CustomRegistryType.PLAN_TYPE;
-  @Input() override context?: PlanTypeContext;
 }
