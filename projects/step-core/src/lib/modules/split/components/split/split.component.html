@@ -1,7 +1,11 @@
 @for (section of sections(); track section.header(); let isLast = $last) {
-  <step-split-area [sizePrefix]="section.header()" [sizeType]="section.sizeType()" [padding]="section.padding()">
+  <step-split-resizable-area
+    [sizePrefix]="section.header()"
+    [sizeType]="section.sizeType()"
+    [padding]="section.padding()"
+  >
     <ng-container *ngTemplateOutlet="section._templateRef" />
-  </step-split-area>
+  </step-split-resizable-area>
   @if (!isLast) {
     <step-split-gutter />
   }

@@ -19,14 +19,14 @@ import { SplitComponent } from '../split/split.component';
 export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 
 @Component({
-  selector: 'step-split-area',
-  templateUrl: './split-area.component.html',
-  styleUrls: ['./split-area.component.scss'],
+  selector: 'step-split-resizable-area',
+  templateUrl: './split-resizable-area.component.html',
+  styleUrls: ['./split-resizable-area.component.scss'],
   host: {
     '(focusin)': 'handleFocusIn()',
   },
 })
-export class SplitAreaComponent implements AfterViewInit, OnDestroy {
+export class SplitResizableAreaComponent implements AfterViewInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private _splitComponent = inject(SplitComponent);
   private _splitAreaSizePersistenceService = inject(SplitAreaSizePersistenceService);
