@@ -13,6 +13,7 @@ import {
   output,
   computed,
   AfterViewInit,
+  OnDestroy,
 } from '@angular/core';
 import { Overlay, OverlayRef, FlexibleConnectedPositionStrategy, ConnectedPosition } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
@@ -38,9 +39,6 @@ export abstract class PopoverService {
   styleUrls: ['./popover.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  host: {
-    '(document:click)': 'handleDocumentClick()',
-  },
   providers: [
     {
       provide: PopoverService,
@@ -48,7 +46,7 @@ export abstract class PopoverService {
     },
   ],
 })
-export class PopoverComponent implements PopoverService, AfterViewInit {
+export class PopoverComponent implements PopoverService, AfterViewInit, OnDestroy {
   private readonly _el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _scrollDispatcher = inject(ScrollDispatcher);
   private readonly _destroyRef = inject(DestroyRef);
@@ -67,7 +65,7 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
   readonly toggledEvent = output<boolean>();
   readonly PopoverMode = PopoverMode;
 
-  protected toggled = false;
+  private toggled = false;
   private isPopoverFrozen = false;
   private tooltipTimeout?: ReturnType<typeof setTimeout>;
   private isMouseOverPopover = false;
@@ -86,6 +84,31 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setupClosePopoverOnScroll();
+  }
+
+  ngOnDestroy(): void {
+    // Clear timeout to prevent overlay creation, if it was scheduled
+    clearTimeout(this.tooltipTimeout);
+  }
+
+  openPopover(): void {
+    this.createOverlay();
+    if (this.overlayRef && !this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new TemplatePortal(this.popoverTemplate, this.vcr));
+    }
+    this.overlayRef?.updatePosition();
+
+    this.setBackdropActive(this.toggled);
+    this.toggledEvent.emit(this.toggled);
+  }
+
+  closePopover(): void {
+    if (this.overlayRef?.hasAttached?.()) {
+      this.setBackdropActive(false);
+      this.overlayRef.detach();
+    }
+    this.toggled = false;
+    this.toggledEvent.emit(false);
   }
 
   private createOverlay(): void {
@@ -144,26 +167,6 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     });
   }
 
-  private openPopover(): void {
-    this.createOverlay();
-    if (this.overlayRef && !this.overlayRef.hasAttached()) {
-      this.overlayRef.attach(new TemplatePortal(this.popoverTemplate, this.vcr));
-    }
-    this.overlayRef?.updatePosition();
-
-    this.setBackdropActive(this.toggled);
-    this.toggledEvent.emit(true);
-  }
-
-  private closePopover(): void {
-    if (this.overlayRef?.hasAttached()) {
-      this.setBackdropActive(false);
-      this.overlayRef.detach();
-    }
-    this.toggled = false;
-    this.toggledEvent.emit(false);
-  }
-
   private setBackdropActive(active: boolean): void {
     const backdrop = this.overlayRef?.backdropElement;
     if (!backdrop) return;
@@ -183,33 +186,25 @@ export class PopoverComponent implements PopoverService, AfterViewInit {
     }
   }
 
-  // This is used to close step-popover from inside components by triggering a document click
-  protected handleDocumentClick(): void {
-    if (this.mode() === PopoverMode.CLICK || !this.toggled) {
-      return;
-    }
-    this.closePopover();
-  }
-
-  protected onTriggerMouseEnter(): void {
+  protected handleTriggerMouseEnter(): void {
     if (this.mode() === PopoverMode.CLICK || this.toggled) return;
     this.isMouseOverTrigger = true;
     this.tooltipTimeout = setTimeout(() => this.openPopover(), 300);
   }
 
-  protected onTriggerMouseLeave(): void {
+  protected handleTriggerMouseLeave(): void {
     if (this.mode() === PopoverMode.CLICK) return;
     this.isMouseOverTrigger = false;
     clearTimeout(this.tooltipTimeout);
     this.scheduleCloseIfNotHovered();
   }
 
-  protected onPopoverMouseEnter(): void {
+  protected handlePopoverMouseEnter(): void {
     if (this.mode() === PopoverMode.CLICK) return;
     this.isMouseOverPopover = true;
   }
 
-  protected onPopoverMouseLeave(): void {
+  protected handlePopoverMouseLeave(): void {
     if (this.mode() === PopoverMode.CLICK) return;
     this.isMouseOverPopover = false;
     this.scheduleCloseIfNotHovered();

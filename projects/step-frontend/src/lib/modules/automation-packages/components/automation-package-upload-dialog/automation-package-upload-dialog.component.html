@@ -1,7 +1,7 @@
 <step-modal-window [title]="dialogTitle" [disableCloseByEsc]="!!progress$">
   <div class="advanced-settings-toggle" step-modal-window-title>
     <button tabindex="-1" mat-icon-button matTooltip="Display Advanced Settings" (click)="toggleAdvancedSettings()">
-      <step-icon [class.active]="showAdvancedSettings" name="settings"></step-icon>
+      <step-icon [class.active]="showAdvancedSettings()" name="settings"></step-icon>
     </button>
   </div>
   <div step-modal-window-body>
@@ -13,7 +13,7 @@
           This automation package would also update other packages. Select "Force" to proceed.
         </step-alert>
       }
-      @if (!isNewPackage && !_package?.automationPackageResource) {
+      @if (!isNewPackage && !automationPackage?.automationPackageResource) {
         <step-alert [type]="AlertType.WARNING">
           The Automation Package file is not available anymore, please select and upload it again.
           <step-icon
@@ -23,9 +23,9 @@
         </step-alert>
       }
       <form [formGroup]="form">
-        @switch (apType) {
+        @switch (apType()) {
           @case (UploadType.UPLOAD) {
-            <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
               <step-label>Automation Package (jar, DLL or ZIP file)</step-label>
               <step-label-addon>
                 <step-icon
@@ -37,8 +37,9 @@
               <step-resource-input
                 resourceType="automationPackage"
                 [disableServerPath]="true"
-                [withClearButton]="false"
+                [withClearButton]="true"
                 [withChooseExistingResourceButton]="false"
+                [withUploadFromFileSystem]="isApFileEmpty()"
                 formControlName="apFile"
               >
                 <step-suffix class="button-suffix">
@@ -46,7 +47,7 @@
                     type="button"
                     class="maven"
                     mat-stroked-button
-                    (click)="switchApType(UploadType.MAVEN)"
+                    (click)="apType.set(UploadType.MAVEN)"
                     matTooltip="Use maven snippet instead of uploading a file."
                   >
                     <step-icon name="maven"></step-icon>
@@ -56,14 +57,14 @@
             </step-form-field>
           }
           @case (UploadType.MAVEN) {
-            <step-form-field alignLabelAddon="near" [showRequiredMarker]="isNewPackage">
+            <step-form-field alignLabelAddon="near" [showRequiredMarker]="true">
               <step-label>Automation Package (Maven Snippet)</step-label>
               <step-label-addon>
                 <button
                   type="button"
                   class="active maven"
                   mat-stroked-button
-                  (click)="apType = UploadType.UPLOAD"
+                  (click)="apType.set(UploadType.UPLOAD)"
                   matTooltip="Use upload a file instead of using maven snippet."
                 >
                   <step-icon name="maven"></step-icon>
@@ -74,8 +75,8 @@
           }
           @default {}
         }
-        @if (showAdvancedSettings) {
-          @switch (libraryType) {
+        @if (showAdvancedSettings()) {
+          @switch (libraryType()) {
             @case (UploadType.UPLOAD) {
               <step-label>Libraries</step-label>
               <step-form-field alignLabelAddon="near">
@@ -87,6 +88,7 @@
                   [disableServerPath]="true"
                   [withClearButton]="true"
                   [withChooseExistingResourceButton]="true"
+                  [withUploadFromFileSystem]="isLibraryFileEmpty()"
                   [searchTypes]="existingLibrariesSearchTypes"
                   formControlName="libraryFile"
                 >
@@ -95,7 +97,7 @@
                       type="button"
                       class="maven"
                       mat-stroked-button
-                      (click)="switchLibraryType(UploadType.MAVEN)"
+                      (click)="libraryType.set(UploadType.MAVEN)"
                       matTooltip="Use maven snippet instead of uploading a file."
                     >
                       <step-icon name="maven"></step-icon>
@@ -115,7 +117,7 @@
                     type="button"
                     class="active maven"
                     mat-stroked-button
-                    (click)="libraryType = UploadType.UPLOAD"
+                    (click)="libraryType.set(UploadType.UPLOAD)"
                     matTooltip="Upload a file instead of using maven snippet."
                   >
                     <step-icon name="maven"></step-icon>
@@ -149,9 +151,12 @@
                 matTooltip="This value can be used to differentiate multiple versions of the same automation package (i.e. 1.0.0)"
               />
             </step-suffix>
-            @if (form.controls.versionName.hasError('requiredWhenOtherPresent')) {
-              <step-error> Version name is required when Activation Expression is set. </step-error>
-            }
+            <step-error>
+              <step-errors-list
+                [errors]="form.controls.versionName.errors"
+                [keysDictionary]="versionErrorsDictionary"
+              />
+            </step-error>
           </step-form-field>
           <step-form-field>
             <step-prefix>Activation Expression</step-prefix>
@@ -194,9 +199,12 @@
                 matTooltip="The activation expression is used to select the automation packages version during the execution of plans. Example: env == PROD"
               />
             </step-suffix>
-            @if (form.controls.activationExpression.hasError('requiredWhenOtherPresent')) {
-              <step-error> Activation Expression is required when Version name is set. </step-error>
-            }
+            <step-error>
+              <step-errors-list
+                [errors]="form.controls.activationExpression.errors"
+                [keysDictionary]="activationExpressionErrorDictionary"
+              />
+            </step-error>
           </step-form-field>
           <div [class.hidden]="!customKeywordAttributesForm.inputs().length">
             <h5>Custom keyword attributes</h5>
@@ -267,7 +275,7 @@
       </form>
     }
   </div>
-  <div step-modal-window-buttons [stepEntityRef]="_package">
+  <div step-modal-window-buttons [stepEntityRef]="automationPackage">
     <button type="button" mat-stroked-button mat-dialog-close [disabled]="!!progress$">Cancel</button>
     <button
       type="button"
@@ -283,7 +291,7 @@
       @if (!isNewPackage) {
         Update
       } @else {
-        @switch (apType) {
+        @switch (apType()) {
           @case (UploadType.UPLOAD) {
             Upload
           }
