@@ -10,6 +10,7 @@ import type { Function } from '../models/Function';
 import type { FunctionInputJsonObject } from '../models/FunctionInputJsonObject';
 import type { GetTokenHandleParameter } from '../models/GetTokenHandleParameter';
 import type { History } from '../models/History';
+import type { LookupCallFunctionRequest } from '../models/LookupCallFunctionRequest';
 import type { OutputJsonObject } from '../models/OutputJsonObject';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
 import type { TableRequest } from '../models/TableRequest';
@@ -308,6 +309,20 @@ export class KeywordsService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/functions/lookup',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * @param requestBody
+   * @returns Function default response
+   * @throws ApiError
+   */
+  public lookupCallFunctionWithBindings(requestBody?: LookupCallFunctionRequest): Observable<Function> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/functions/lookup-with-bindings',
       body: requestBody,
       mediaType: 'application/json',
     });

@@ -8,6 +8,7 @@ import type { AbstractArtefact } from '../models/AbstractArtefact';
 import type { AsyncTaskStatusTableBulkOperationReport } from '../models/AsyncTaskStatusTableBulkOperationReport';
 import type { CallPlan } from '../models/CallPlan';
 import type { History } from '../models/History';
+import type { LookupCallPlanRequest } from '../models/LookupCallPlanRequest';
 import type { Plan } from '../models/Plan';
 import type { PlanCompilationResult } from '../models/PlanCompilationResult';
 import type { TableBulkOperationRequest } from '../models/TableBulkOperationRequest';
@@ -354,6 +355,21 @@ export class PlansService {
     return this.httpRequest.request({
       method: 'POST',
       url: '/plans/lookup',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+
+  /**
+   * Returns the plan referenced by the given CallPlan applying provided binding parameters.
+   * @param requestBody
+   * @returns Plan default response
+   * @throws ApiError
+   */
+  public lookupCallPlanWithBindings(requestBody?: LookupCallPlanRequest): Observable<Plan> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/plans/lookup-with-bindings',
       body: requestBody,
       mediaType: 'application/json',
     });

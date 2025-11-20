@@ -1,10 +1,22 @@
-import { Component, EventEmitter, inject, Input, Output, viewChild, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  model,
+  Output,
+  viewChild,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   PlanContext,
   RepositoryObjectReference,
   ViewRegistryService,
   ExecutiontTaskParameters,
   CustomFormComponent,
+  ExecutionParameters,
+  PopoverMode,
 } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -41,8 +53,11 @@ export class PlanEditorActionsComponent {
   @Output() stop = new EventEmitter<void>();
   @Output() showSource = new EventEmitter<void>();
   @Output() runPlan = new EventEmitter<void>();
+  @Output() targetExecutionParametersChange = new EventEmitter<Record<string, string>>();
 
   @ViewChild('interactiveSessionTrigger', { read: MatMenuTrigger }) private interactiveSessionTrigger?: MatMenuTrigger;
+  @ViewChild('targetExecutionParameterTrigger', { read: MatMenuTrigger })
+  private targetExecutionParameterMenu?: MatMenuTrigger;
 
   private customForm = viewChild('interactiveSessionCustomForm', { read: CustomFormComponent });
 
@@ -53,12 +68,12 @@ export class PlanEditorActionsComponent {
     duplicate: 'Duplicate this plan',
     showSource: "Show plan's YAML source",
     export: 'Export this plan',
-    start: 'Execute this plan',
     resetInteractive: 'Reset the session of the interactive mode',
     startInteractiveShort: 'Start interactive session',
     startInteractive: 'Start an interactive session to debug this plan',
     stopInteractive: 'Stop interactive mode',
   };
+  protected targetExecutionParameters?: ExecutionParameters;
 
   protected startInteractiveSession(): void {
     const customForm = this.customForm();
@@ -82,4 +97,23 @@ export class PlanEditorActionsComponent {
 
     this.startInteractive.emit();
   }
+
+  protected toggleTargetParameterSelection(): void {
+    if (this._interactiveSession.hasExecutionParameters()) {
+      this.targetExecutionParameterMenu!.openMenu();
+      return;
+    }
+  }
+
+  setInteractiveSessionExecutionParameters(parameters?: Record<string, unknown>) {
+    this._interactiveSession.executionParameters.set(parameters);
+  }
+
+  setTargetExecutionParameters(parameters?: Record<string, unknown>) {
+    this.targetExecutionParameters = parameters;
+    this.targetExecutionParametersChange.emit(parameters as Record<string, string>);
+  }
+
+  protected readonly Object = Object;
+  protected readonly PopoverMode = PopoverMode;
 }
