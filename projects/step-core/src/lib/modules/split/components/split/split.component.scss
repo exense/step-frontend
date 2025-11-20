@@ -1,4 +1,25 @@
-:host {
+@use 'projects/step-core/styles/core-variables' as var;
+
+step-split {
   flex: 1;
   display: flex;
+
+  .foldable-items {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: space-between;
+    width: 100%;
+
+    step-split-foldable-area {
+      &:not(:first-child) {
+        border-left: 0.1rem solid var.$gray-300;
+      }
+      &:not(:last-child) {
+        border-right: 0.1rem solid var.$gray-300;
+      }
+      &.active {
+        flex: 1;
+      }
+    }
+  }
 }
