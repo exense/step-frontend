@@ -15,7 +15,7 @@ import {
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
 import { PlanNodesDragPreviewComponent } from '../../plan-nodes-drag-preview/plan-nodes-drag-preview.component';
 import { PlanDropInfoPipe } from './plan-drop-info.pipe';
-import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
+import { createActivatableEntitiesTableParams } from '../../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-otherplan-list',
