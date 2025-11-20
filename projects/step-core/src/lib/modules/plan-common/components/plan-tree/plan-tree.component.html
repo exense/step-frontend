@@ -1,12 +1,12 @@
-<step-split stepMaxHeightViewportHeightMinusOffsetTop>
+<step-split stepMaxHeightViewportHeightMinusOffsetTop sizePrefix="planEditor">
   @if (templateLeftPanel(); as left) {
-    <step-split-area [(size)]="_panelSizes.leftPanelSize" [sizeType]="sizeTypeLeftPanel()">
+    <step-split-area [sizePrefix]="headerLeftPanel()!" [sizeType]="sizeTypeLeftPanel()">
       <ng-container *ngTemplateOutlet="left" />
     </step-split-area>
     <step-split-gutter />
   }
 
-  <step-split-area [(size)]="_panelSizes.treeSize">
+  <step-split-area sizePrefix="tree">
     <step-drag-drop-container stepDropAreaId="planTree">
       <step-tree
         #tree
@@ -62,7 +62,7 @@
 
   <step-split-gutter />
 
-  <step-split-area sizeType="flex" padding="24px" [(size)]="_panelSizes.artefactDetailsSize">
+  <step-split-area sizePrefix="artefactDetails" sizeType="flex" padding="24px">
     @if (activeNode(); as activeNode) {
       @if (activeNode.originalArtefact; as selectedArtefact) {
         <step-artefact-details [artefact]="selectedArtefact" [readonly]="isReadonly" (onSave)="handlePlanChange()" />
@@ -81,7 +81,7 @@
 
   @if (templateRightPanel(); as right) {
     <step-split-gutter />
-    <step-split-area [(size)]="_panelSizes.rightPanelSize" [sizeType]="sizeTypeRightPanel()">
+    <step-split-area [sizePrefix]="headerRightPanel()!" [sizeType]="sizeTypeRightPanel()">
       <ng-container *ngTemplateOutlet="right" />
     </step-split-area>
   }

@@ -6,5 +6,6 @@ import { SplitAreaSizeType } from '../../split';
 })
 export class PlanTreeLeftPanelDirective {
   readonly _templateRef = inject(TemplateRef);
-  readonly sizeType = input<SplitAreaSizeType | ''>('', { alias: 'stepPlanTreeLeftPanel' });
+  readonly header = input.required<string>({ alias: 'stepPlanTreeLeftPanel' });
+  readonly sizeType = input<SplitAreaSizeType>('pixel', { alias: 'stepPlanTreeLeftPanelSizeType' });
 }

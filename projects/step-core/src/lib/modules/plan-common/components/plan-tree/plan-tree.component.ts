@@ -33,7 +33,6 @@ import { StepMaterialModule } from '../../../step-material/step-material.module'
 import { StepBasicsModule } from '../../../basics/step-basics.module';
 import { PlanTreeLeftPanelDirective } from '../../directives/plan-tree-left-panel.directive';
 import { PlanTreeRightPanelDirective } from '../../directives/plan-tree-right-panel.directive';
-import { PlanTreePanelSizesDirective } from './plan-tree-panel-sizes.directive';
 
 @Component({
   selector: 'step-plan-tree',
@@ -51,7 +50,6 @@ import { PlanTreePanelSizesDirective } from './plan-tree-panel-sizes.directive';
     ArtefactChildContainerSettingsComponent,
     AsyncPipe,
   ],
-  hostDirectives: [PlanTreePanelSizesDirective],
   providers: [
     {
       provide: TreeActionsService,
@@ -67,8 +65,6 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
   readonly _planEditService = inject(PlanEditorService);
   readonly _planInteractiveSession? = inject(PlanInteractiveSessionService, { optional: true });
 
-  protected readonly _panelSizes = inject(PlanTreePanelSizesDirective, { self: true });
-
   readonly activeNode: Signal<ArtefactTreeNode | undefined> = this._treeState.selectedNode;
 
   private readonly leftPanel = contentChild(PlanTreeLeftPanelDirective);
@@ -76,6 +72,9 @@ export class PlanTreeComponent implements AfterViewInit, TreeActionsService {
 
   protected readonly templateLeftPanel = computed(() => this.leftPanel()?._templateRef);
   protected readonly templateRightPanel = computed(() => this.rightPanel()?._templateRef);
+
+  protected readonly headerLeftPanel = computed(() => this.leftPanel()?.header());
+  protected readonly headerRightPanel = computed(() => this.rightPanel()?.header());
 
   protected readonly sizeTypeLeftPanel = computed(() => {
     const leftPanel = this.leftPanel();

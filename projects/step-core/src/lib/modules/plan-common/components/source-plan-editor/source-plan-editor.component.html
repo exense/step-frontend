@@ -1,12 +1,12 @@
 <step-plan-tree [isReadonly]="true">
-  <mat-card class="h-100" *stepPlanTreeLeftPanel="'flex'">
+  <mat-card class="h-100" *stepPlanTreeLeftPanel="'Source'; sizeType: 'flex'">
     <mat-card-title> Source </mat-card-title>
     <mat-card-content>
       <div #editor class="h-100"></div>
     </mat-card-content>
   </mat-card>
   @if (templateControls(); as controls) {
-    <div *stepPlanTreeRightPanel>
+    <div *stepPlanTreeRightPanel="'Libraries'">
       <ng-container *ngTemplateOutlet="controls" />
     </div>
   }

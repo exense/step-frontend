@@ -36,7 +36,6 @@ import {
   PlanOpenService,
   PlanContextInitializerService,
   PlanContextApiService,
-  PlanEditorPersistenceStateService,
   AugmentedPlansService,
   CommonEntitiesUrlsService,
   PlanContext,
@@ -117,7 +116,6 @@ export class PlanEditorBaseComponent
   public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
-  private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
   private _matDialog = inject(MatDialog);
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
@@ -159,9 +157,6 @@ export class PlanEditorBaseComponent
   protected planClass?: string;
   private planControls = viewChild('planControls', { read: PlanControlsComponent });
 
-  protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
-  protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
-
   private effectCheckAccessToPlanTypeControl = effect(() => {
     const planEditorType = this._planEditService.plan();
     untracked(() => {
@@ -189,26 +184,6 @@ export class PlanEditorBaseComponent
         (cPlanCtx?.currentValue as PlanContext)?.id,
       );
     }
-  }
-
-  handlePlanSizeChange(size: number): void {
-    this._planEditorPersistenceState.setPanelSize(PLAN_SIZE, size);
-  }
-
-  handlePlanControlsChange(size: number): void {
-    this._planEditorPersistenceState.setPanelSize(PLAN_CONTROLS_SIZE, size);
-  }
-
-  addControl(artefactTypeId: string): void {
-    this._planEditService.addControl(artefactTypeId);
-  }
-
-  addKeywords(keywordIds: string[]): void {
-    this._planEditService.addKeywords(keywordIds);
-  }
-
-  addPlans(planIds: string[]): void {
-    this._planEditService.addPlans(planIds);
   }
 
   exportPlan(): void {

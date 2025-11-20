@@ -1,17 +1,20 @@
 import {
   AfterViewInit,
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
   input,
   linkedSignal,
   OnDestroy,
-  output,
   signal,
+  untracked,
 } from '@angular/core';
 import { debounceTime, map, Subject, switchMap } from 'rxjs';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { SplitAreaSizePersistenceService } from '../../injectables/split-area-size-persistence.service';
+import { SplitComponent } from '../split/split.component';
 
 export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 
@@ -25,19 +28,34 @@ export type SplitAreaSizeType = 'pixel' | 'percent' | 'flex';
 })
 export class SplitAreaComponent implements AfterViewInit, OnDestroy {
   private _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private _splitComponent = inject(SplitComponent);
+  private _splitAreaSizePersistenceService = inject(SplitAreaSizePersistenceService);
+
   private sizeUpdateInternal$ = new Subject<void>();
 
   private isViewInitialized = signal(false);
 
   readonly padding = input<string | undefined>(undefined);
   readonly sizeType = input<SplitAreaSizeType>('pixel');
-  readonly size = input<number | undefined>(undefined);
+  readonly sizePrefix = input.required<string>();
 
-  private sizeInternal = linkedSignal(() => this.size());
+  private appliedPrefix = computed(() => {
+    const splitPrefix = this._splitComponent.sizePrefix();
+    const sizePrefix = this.sizePrefix();
+    return `${splitPrefix}_${sizePrefix}`;
+  });
+
+  private splitAreaSizeController = computed(() => {
+    const appliedPrefix = this.appliedPrefix();
+    return this._splitAreaSizePersistenceService.createSplitAreaSizeController(appliedPrefix);
+  });
+
+  private sizeInternal = linkedSignal(() => {
+    const sizeController = this.splitAreaSizeController();
+    return sizeController.getSize();
+  });
 
   readonly sizeUpdateDebounce = input(300);
-
-  readonly sizeChange = output<number | undefined>();
 
   private effectUpdateSize = effect(() => {
     const isViewInitialized = this.isViewInitialized();
@@ -78,7 +96,10 @@ export class SplitAreaComponent implements AfterViewInit, OnDestroy {
       map(() => this.sizeInternal()),
       takeUntilDestroyed(),
     )
-    .subscribe((size) => this.sizeChange.emit(size));
+    .subscribe((size) => {
+      const sizeController = untracked(() => this.splitAreaSizeController());
+      sizeController.setSize(size ?? 0);
+    });
 
   ngAfterViewInit(): void {
     this.isViewInitialized.set(true);

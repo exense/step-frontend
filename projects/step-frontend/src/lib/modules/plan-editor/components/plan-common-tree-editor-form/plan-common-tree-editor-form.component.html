@@ -1,6 +1,6 @@
 <step-plan-tree (externalObjectDrop)="handleExternalNodeDrop($event)">
   @if (controlTemplate(); as ctrlTemplate) {
-    <div *stepPlanTreeRightPanel>
+    <div *stepPlanTreeRightPanel="'Libraries'">
       <ng-container *ngTemplateOutlet="ctrlTemplate" />
     </div>
   }

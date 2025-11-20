@@ -1,9 +1,11 @@
 import { SplitComponent } from './components/split/split.component';
 import { SplitAreaComponent } from './components/split-area/split-area.component';
 import { SplitGutterComponent } from './components/split-gutter/split-gutter.component';
+import { SplitSectionDirective } from './directives/split-section.directive';
 
 export * from './components/split/split.component';
 export * from './components/split-area/split-area.component';
 export * from './components/split-gutter/split-gutter.component';
+export * from './directives/split-section.directive';
 
-export const SPLIT_EXPORTS = [SplitComponent, SplitAreaComponent, SplitGutterComponent];
+export const SPLIT_EXPORTS = [SplitComponent, SplitAreaComponent, SplitGutterComponent, SplitSectionDirective];
