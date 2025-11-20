@@ -16,6 +16,7 @@ import {
   ExecutiontTaskParameters,
   CustomFormComponent,
   ExecutionParameters,
+  PopoverMode,
 } from '@exense/step-core';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -114,4 +115,5 @@ export class PlanEditorActionsComponent {
   }
 
   protected readonly Object = Object;
+  protected readonly PopoverMode = PopoverMode;
 }

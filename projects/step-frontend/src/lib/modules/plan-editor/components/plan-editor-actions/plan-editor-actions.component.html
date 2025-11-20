@@ -95,17 +95,24 @@
 
 @if (_interactiveSession.hasExecutionParameters()) {
   <step-btn-group class="with-borders">
-    <button
-      type="button"
-      mat-stroked-button
-      [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
-      (click)="toggleTargetParameterSelection()"
-      matTooltip="Set execution parameters to accurately select keywords or plans with activation expressions. (advanced)"
-      matTooltipPosition="below"
-    >
-      <step-icon name="sliders" />
-    </button>
-
+    <step-popover [mode]="PopoverMode.HOVER">
+      <button
+        type="button"
+        mat-stroked-button
+        [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
+        (click)="toggleTargetParameterSelection()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="sliders" />
+      </button>
+      <step-popover-content>
+        Advanced: Set target execution parameters so the editor can display the right Keyword or Plan version (See
+        <a
+          href="https://step.dev/knowledgebase/devops/automation-packages-overview/#deploy-multiple-versions-of-the-same-automation-package"
+          >Automation Packages: Versions</a
+        >).
+      </step-popover-content>
+    </step-popover>
     <span
       class="interactive-trigger"
       #targetExecutionParameterTrigger
@@ -169,17 +176,6 @@
           stScreen="executionParameters"
         />
       }
-      <step-btn-group>
-        <button
-          type="button"
-          mat-stroked-button
-          (click)="setTargetExecutionParameters({})"
-          matTooltip="Reset target execution parameters"
-          matTooltipPosition="below"
-        >
-          Reset
-        </button>
-      </step-btn-group>
     </div>
   </span>
 </mat-menu>
