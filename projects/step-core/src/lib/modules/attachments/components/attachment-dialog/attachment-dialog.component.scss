@@ -64,13 +64,17 @@ step-attachment-dialog {
 
   video,
   img {
-    width: auto !important;
-    height: 100% !important;
     margin: 0 auto;
+  }
+
+  img {
+    object-fit: contain;
   }
 
   video {
     position: absolute;
+    width: auto !important;
+    height: 100% !important;
   }
 
   step-rich-editor {

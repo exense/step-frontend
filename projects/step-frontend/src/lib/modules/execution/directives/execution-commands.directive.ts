@@ -58,7 +58,7 @@ export class ExecutionCommandsDirective implements OnInit, ExecutionCommandsCont
     return this.isExecutionIsolated();
   }
 
-  protected executionParameters = model<Record<string, string>>({});
+  protected executionParameters = model<Record<string, any>>({});
 
   protected executionParameters$ = toObservable(this.execution).pipe(
     switchMap((execution) => {

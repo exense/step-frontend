@@ -8,7 +8,7 @@ export class GlobalReloadService {
   private items = new Set<Reloadable>();
 
   reloadData(): void {
-    this.items.forEach((item) => item.reload());
+    this.items.forEach((item) => item.reload(true));
   }
 
   register(reloadable: Reloadable): void {

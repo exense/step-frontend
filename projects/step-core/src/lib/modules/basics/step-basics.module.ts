@@ -79,6 +79,7 @@ import { DescriptionDirective } from './directives/description.directive';
 import { FilterAddonDirective } from './directives/filter-addon.directive';
 import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
 import { ResourceUrlPipe } from './pipes/resource-url.pipe';
+import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 
 @NgModule({
   imports: [
@@ -97,6 +98,7 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
     FilterAddonDirective,
     LongInlineTextComponent,
     ResourceUrlPipe,
+    NumberSeparateThousandsPipe,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -247,6 +249,7 @@ import { ResourceUrlPipe } from './pipes/resource-url.pipe';
     FilterAddonDirective,
     LongInlineTextComponent,
     ResourceUrlPipe,
+    NumberSeparateThousandsPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -395,3 +398,4 @@ export * from './components/long-inline-text/long-inline-text.component';
 export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';
+export * from './pipes/number-separate-thousands.pipe';

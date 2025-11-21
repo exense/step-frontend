@@ -15,6 +15,7 @@ import {
 import { map, of, pipe, switchMap, tap } from 'rxjs';
 import { SchedulerInvokerService } from '../../../execution/services/scheduler-invoker.service';
 import { Router } from '@angular/router';
+import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-plan-list',
@@ -94,4 +95,6 @@ export class PlanListComponent implements DialogParentService, SchedulerInvokerS
     const temporaryId = this._scheduledTaskTemporaryStorage.set(task);
     this._router.navigate(['/', 'plans', 'list', 'schedule', temporaryId]);
   }
+
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 }

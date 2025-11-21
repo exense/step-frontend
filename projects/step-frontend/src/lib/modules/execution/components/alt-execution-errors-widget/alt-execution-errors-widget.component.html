@@ -4,7 +4,8 @@
       <section class="error-info">
         <div>
           @if (singleError(); as singleError) {
-            <step-icon class="error" name="alert-triangle" /> This execution contains 1 error :&nbsp;<a
+            <step-icon class="error" name="alert-triangle" /> This execution contains
+            {{ totalErrorsCount()['FAILED'] }} {{ totalErrorsCount()['FAILED'] === 1 ? 'error' : 'errors' }}:&nbsp;<a
               class="error-message"
               href="#"
               (click)="onFindInTree(singleError.errorMessage); (false)"

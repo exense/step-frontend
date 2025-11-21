@@ -36,7 +36,6 @@ import {
   editScheduledTaskRoute,
   MultipleProjectsService,
   SearchPaginatorComponent,
-  StepBasicsModule,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -98,8 +97,8 @@ import { AltExecutionParametersComponent } from './components/alt-execution-para
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { catchError, filter, map, of, switchMap, take } from 'rxjs';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
   AGGREGATED_TREE_TAB_STATE,
@@ -168,6 +167,7 @@ import { StatusDistributionTooltipComponent } from './components/status-distribu
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { DOCUMENT } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -607,6 +607,26 @@ export class ExecutionModule {
             {
               path: '',
               redirectTo: 'report',
+            },
+            {
+              /**
+               * Sometimes url with additional outlets, can be broken by copy-pasting third-party tools (ex. Google Chat)
+               * It encodes the url replacing the bracket. In this case when such url will be pasted to browser,
+               * bracket will be interpreted as part of the path.
+               *
+               * This route handles such path, normalizes the url by decoding it and performs the redirect.
+               * **/
+              path: '(report',
+              canActivate: [
+                () => {
+                  const _router = inject(Router);
+                  const _doc = inject(DOCUMENT);
+                  let location = _doc.location.href;
+                  location = location.slice(location.indexOf('/executions'));
+                  location = decodeURI(location);
+                  return _router.parseUrl(location);
+                },
+              ],
             },
             stepRouteAdditionalConfig(
               {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, untracked } from '@angular/core';
 import {
   AugmentedControllerService,
   BaseReportDetailsComponent,
@@ -87,12 +87,29 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
 
   protected readonly failedChildren = toSignal(this.failedChildren$, { initialValue: [] });
 
+  /**
+   * Extract nodeId, to prevent unnecessary dataSource recreation
+   * **/
+  private nodeId = computed(() => {
+    const node = this.node();
+    return node?.id;
+  });
+
   protected readonly measuresDataSource = computed(() => {
-    const id = this.node()?.id;
+    const id = this.nodeId();
     if (!id) {
       return undefined;
     }
     return this.createMeasurementsDataSource(id);
+  });
+
+  /**
+   * Add additional effect to refresh dataSource when node changes, event id is the same
+   * **/
+  private effectRefreshMeasurements = effect(() => {
+    const node = this.node();
+    const measuresDataSource = untracked(() => this.measuresDataSource());
+    measuresDataSource?.reload?.();
   });
 
   protected copyInput(): void {

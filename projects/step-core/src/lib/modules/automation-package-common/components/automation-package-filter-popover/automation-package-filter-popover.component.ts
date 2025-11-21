@@ -54,7 +54,11 @@ export class AutomationPackageFilterPopoverComponent implements AfterViewInit {
     this._selectionState.updateSelection({ keys: ids });
   }
 
-  protected clearSelection(): void {
+  protected clearSelection($event?: MouseEvent): void {
+    if ($event) {
+      $event.preventDefault();
+    }
+
     this._selectionState.updateSelection({ keys: [] });
     setTimeout(() => {
       this.cleared.emit();

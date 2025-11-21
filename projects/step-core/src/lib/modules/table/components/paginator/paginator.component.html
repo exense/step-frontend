@@ -7,7 +7,10 @@
     </step-editable-dropdown-label>
   </div>
 }
-<div>{{ pageLabel() }}</div>
+<div class="sub-section">
+  <div>{{ pageLabel() }}</div>
+  <ng-content />
+</div>
 <div class="sub-section">
   <button
     type="button"

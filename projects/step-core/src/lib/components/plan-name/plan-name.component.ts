@@ -3,6 +3,7 @@ import { ReferenceArtefactNameConfig } from '../reference-artefact-name/referenc
 import { CallPlan, Plan, AugmentedPlansService, DynamicValueString } from '../../client/step-client-module';
 import { Observable } from 'rxjs';
 import { HintFor } from '../../shared/hint-for.enum';
+import { PlanEditorService } from '../../modules/plan-common';
 
 const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
   searchReference: 'No plan selected',
@@ -30,6 +31,8 @@ const PLAN_CAPTIONS: ReferenceArtefactNameConfig<CallPlan, Plan>['captions'] = {
 })
 export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, Plan> {
   private _plansApi = inject(AugmentedPlansService);
+  protected _planEditorService = inject(PlanEditorService);
+  readonly targetExecutionParameters = this._planEditorService.targetExecutionParameters;
 
   readonly artefactClass = 'CallPlan';
 
@@ -49,6 +52,9 @@ export class PlanNameComponent implements ReferenceArtefactNameConfig<CallPlan, 
   }
 
   lookupReference(artefact: CallPlan): Observable<Plan> {
-    return this._plansApi.lookupCallPlan(artefact);
+    return this._plansApi.lookupCallPlanWithBindings({
+      callPlan: artefact,
+      bindings: this._planEditorService.targetExecutionParameters(),
+    });
   }
 }

@@ -6,6 +6,7 @@
     matSortActive="executionTime"
     matSortDirection="desc"
     [matSortDisableClear]="true"
+    [calculateCounts]="calculateCounts()"
   >
     <step-bulk-operations
       data-step-testid="execution-bulk-operations"
@@ -28,7 +29,6 @@
         <step-entity-selection [entity]="element" />
       </td>
     </ng-container>
-    <step-entity-column-container entityName="executions" />
     <ng-container
       data-step-testid="execution-description"
       matColumnDef="description"
@@ -154,6 +154,21 @@
         <step-column-settings />
       </th>
       <td mat-cell *matCellDef></td>
+    </ng-container>
+    <ng-container *stepTablePaginatorContent>
+      <button
+        type="button"
+        mat-icon-button
+        [color]="calculateCounts() ? 'primary' : undefined"
+        [matTooltip]="
+          calculateCounts()
+            ? 'Click to disable loading the total number of executions to enhance performance.'
+            : 'Click to load the total number of executions. Note: this may slow down performance for large numbers of executions'
+        "
+        (click)="toggleCountsCalculation()"
+      >
+        <step-icon name="loader" />
+      </button>
     </ng-container>
   </step-table>
 </step-drag-drop-container>

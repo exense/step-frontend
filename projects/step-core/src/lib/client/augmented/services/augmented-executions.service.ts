@@ -50,14 +50,19 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
   }
 
   getExecutionsTableDataSource(): StepDataSource<Execution> {
-    return this._dataSourceFactory.createDataSource(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, {
-      description: 'description',
-      executionTime: 'startTime',
-      startTime: 'startTime',
-      endTime: 'endTime',
-      user: 'executionParameters.userID',
-      status: ['status', 'result'],
-    });
+    return this._dataSourceFactory.createDataSource(
+      AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      {
+        description: 'description',
+        executionTime: 'startTime',
+        startTime: 'startTime',
+        endTime: 'endTime',
+        user: 'executionParameters.userID',
+        status: ['status', 'result'],
+      },
+      undefined,
+      { includeGlobalEntities: false },
+    );
   }
 
   getExecutionsSelectionTableDataSource(): StepDataSource<Execution> {
@@ -119,7 +124,11 @@ export class AugmentedExecutionsService extends ExecutionsService implements Htt
       value: `${status}`,
     };
     return this._tableApiWrapper
-      .requestTable<Execution>(AugmentedExecutionsService.EXECUTIONS_TABLE_ID, { filters: [runningFilter] })
-      .pipe(map((response) => response.recordsFiltered));
+      .requestTable<Execution>(
+        AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+        { filters: [runningFilter], calculateCounts: false },
+        false,
+      )
+      .pipe(map((response) => response.data.length || 0));
   }
 }

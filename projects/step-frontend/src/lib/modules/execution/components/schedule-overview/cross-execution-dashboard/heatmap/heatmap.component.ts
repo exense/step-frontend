@@ -12,7 +12,7 @@ import {
   output,
   inject,
 } from '@angular/core';
-import { PaginatorComponent } from '@exense/step-core';
+import { PaginatorComponent, StepPageEvent } from '@exense/step-core';
 import { PageEvent } from '@angular/material/paginator';
 import { HeatMapColor, HeatmapColumn, HeatMapRow } from './types/heatmap-types';
 import { HeatmapPersistenceStateService } from './injectables/heatmap-persistence-state.service';
@@ -114,11 +114,12 @@ export class HeatmapComponent {
     }
   }
 
-  protected handlePageChange(page: PageEvent) {
+  
+  handlePageChange(page: StepPageEvent) {
     if (page.pageSize !== this.pageSize()) {
       page.pageIndex = 0;
     }
-    this._heatmapState.savePage(page);
+
     this.page.set(page.pageIndex);
     this.pageSize.set(page.pageSize);
   }

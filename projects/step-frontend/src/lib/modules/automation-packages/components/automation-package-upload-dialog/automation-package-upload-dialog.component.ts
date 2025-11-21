@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, viewChild } from '@angular/core';
 import {
   AceMode,
   AlertType,
@@ -12,8 +12,11 @@ import {
   ReloadableDirective,
   StepCoreModule,
   AutomationPackageUpdateResult,
+  RichEditorComponent,
+  ScreensService,
+  ActivationExpressionWizardDialogComponent,
 } from '@exense/step-core';
-import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
+import { catchError, map, Observable, of, pipe, switchMap, take, tap } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
@@ -22,6 +25,8 @@ import { AutomationPackagePermission } from '../../types/automation-package-perm
 import { UploadType } from '../../types/upload-type.enum';
 import { AutomationPackageResourceType } from '../../types/automation-package-resource-type.enum';
 import { AutomationPackageWarningsDialogComponent } from '../automation-package-warnings-dialog/automation-package-warnings-dialog.component';
+import { pairRequiredValidator } from '../../validators/pair-required.validators';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export interface AutomationPackageUploadDialogData {
   automationPackage?: AutomationPackage;
@@ -35,22 +40,25 @@ type DialogRef = MatDialogRef<AutomationPackageUploadDialogComponent, DialogRout
   styleUrls: ['./automation-package-upload-dialog.component.scss'],
   imports: [StepCoreModule, EntityRefDirective],
   hostDirectives: [ReloadableDirective],
-  host: {
-    '(keydown.enter)': 'upload()',
-  },
 })
 export class AutomationPackageUploadDialogComponent implements OnInit {
   private _api = inject(AugmentedAutomationPackagesService);
   private _dialogRef = inject<DialogRef>(MatDialogRef);
   private _fb = inject(FormBuilder).nonNullable;
   private _matDialog = inject(MatDialog);
+  private _screenService = inject(ScreensService);
 
-  protected _package = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA)?.automationPackage;
+  private apSnippetEditor = viewChild('apSnippetEditor', { read: RichEditorComponent });
+  private librarySnippetEditor = viewChild('librarySnippetEditor', { read: RichEditorComponent });
 
-  protected automationPackage: AutomationPackage = this._package || {};
+  private _dialogData = inject<AutomationPackageUploadDialogData>(MAT_DIALOG_DATA);
+
+  protected automationPackage: AutomationPackage = this._dialogData.automationPackage ?? {};
 
   protected readonly UploadType = UploadType;
   protected readonly AceMode = AceMode;
+  protected readonly AlertType = AlertType;
+  protected readonly AutomationPackagePermission = AutomationPackagePermission;
 
   protected readonly isNewPackage = !this.automationPackage.id;
   protected isAffectingOtherPackage = false;
@@ -60,48 +68,42 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   ];
 
   private effectSwitchTab = effect(() => {
-    if (this.apType === UploadType.UPLOAD) {
+    const apType = this.apType();
+    if (apType === UploadType.UPLOAD) {
       this.form.controls.apFile.markAsUntouched();
     } else {
       this.form.controls.apMavenSnippet.markAsUntouched();
     }
   });
 
-  private hasPrefilledAdvancedSettings(): boolean {
-    return !!(
-      this.automationPackage.versionName ||
-      this.automationPackage.activationExpression?.script ||
-      this.automationPackage.automationPackageLibraryResource ||
-      (this.automationPackage.plansAttributes && Object.keys(this.automationPackage.plansAttributes).length > 0) ||
-      (this.automationPackage.functionsAttributes &&
-        Object.keys(this.automationPackage.functionsAttributes).length > 0) ||
-      (this.automationPackage.tokenSelectionCriteria &&
-        Object.keys(this.automationPackage.tokenSelectionCriteria).length > 0) ||
-      this.automationPackage.executeFunctionsLocally
-    );
-  }
+  private effectApSnippetEditorAppears = effect(() => {
+    const apSnippetEditor = this.apSnippetEditor();
+    apSnippetEditor?.focusOnText?.();
+  });
+
+  private effectLibrarySnippetEditorAppears = effect(() => {
+    const librarySnippetEditor = this.librarySnippetEditor();
+    librarySnippetEditor?.focusOnText?.();
+  });
 
   protected readonly dialogTitle = this.isNewPackage
     ? 'New Automation Package'
     : `Edit Automation Package "${this.automationPackage.attributes?.['name'] ?? this.automationPackage.id}"`;
 
   protected progress$?: Observable<number>;
-  protected showAdvancedSettings: boolean = this.hasPrefilledAdvancedSettings();
+  protected showAdvancedSettings = signal(this.hasPrefilledAdvancedSettings());
 
   protected customPlanAttributes: Partial<Plan> = { attributes: {} };
   protected customKeywordAttributes: Partial<Keyword> = { attributes: {} };
   protected routingCriteria: KeyValue<string, string>[] = this.createTokenSelectionCriteria();
 
-  protected apType: UploadType = UploadType.UPLOAD;
-  protected libraryType: UploadType = UploadType.UPLOAD;
+  protected apType = signal(UploadType.UPLOAD);
+  protected libraryType = signal(UploadType.UPLOAD);
 
   protected form = this._fb.group({
-    apFile: this._fb.control(
-      this.automationPackage?.automationPackageResource || '',
-      this.isNewPackage ? Validators.required : null,
-    ),
-    apMavenSnippet: this._fb.control('', this.isNewPackage ? Validators.required : null),
-    libraryFile: this._fb.control(this.automationPackage?.automationPackageLibraryResource || ''),
+    apFile: this._fb.control(this.automationPackage?.automationPackageResource ?? '', Validators.required),
+    apMavenSnippet: this._fb.control('', Validators.required),
+    libraryFile: this._fb.control(this.automationPackage?.automationPackageLibraryResource ?? ''),
     libraryMavenSnippet: this._fb.control(''),
     versionName: this._fb.control(this.automationPackage.versionName),
     activationExpression: this._fb.control(this.automationPackage.activationExpression?.script),
@@ -115,7 +117,31 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       ),
     ),
   });
+  private apFileName = toSignal(this.form.controls.apFile.valueChanges, {
+    initialValue: this.form.controls.apFile.value,
+  });
+  protected readonly isApFileEmpty = computed(() => {
+    const apFileName = this.apFileName() ?? '';
+    return !apFileName.trim();
+  });
+
+  private libraryFileName = toSignal(this.form.controls.libraryFile.valueChanges, {
+    initialValue: this.form.controls.libraryFile.value,
+  });
+  protected readonly isLibraryFileEmpty = computed(() => {
+    const libraryFileName = this.libraryFileName() ?? '';
+    return !libraryFileName.trim();
+  });
+
   protected readonly routing = this.form.get('routing') as FormArray;
+
+  protected readonly versionErrorsDictionary: Record<string, string> = {
+    requiredWhenOtherPresent: 'Version name is required when Activation Expression is set.',
+  };
+
+  protected readonly activationExpressionErrorDictionary: Record<string, string> = {
+    requiredWhenOtherPresent: 'Activation Expression is required when Version name is set.',
+  };
 
   ngOnInit(): void {
     if (this.automationPackage.functionsAttributes) {
@@ -124,6 +150,8 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     if (this.automationPackage.plansAttributes) {
       this.customPlanAttributes = { attributes: this.automationPackage.plansAttributes } as Partial<Plan>;
     }
+
+    this.form.addValidators(pairRequiredValidator('versionName', 'activationExpression'));
   }
 
   protected upload(): void {
@@ -131,15 +159,20 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       return;
     }
 
-    if (this.isNewPackage && this.apType === UploadType.UPLOAD) {
-      if (this.form.controls.apFile.invalid) {
-        this.form.controls.apFile.markAsTouched();
-        return;
-      }
+    const apType = this.apType();
+    if (apType === UploadType.UPLOAD && this.form.controls.apFile.invalid) {
+      this.form.controls.apFile.markAsTouched();
+      return;
     }
 
-    if (this.apType === UploadType.MAVEN && this.form.controls.apMavenSnippet.invalid) {
+    if (apType === UploadType.MAVEN && this.form.controls.apMavenSnippet.invalid) {
       this.form.controls.apMavenSnippet.markAsTouched();
+      return;
+    }
+
+    if (this.form.controls.versionName.invalid || this.form.controls.activationExpression.invalid) {
+      this.form.controls.versionName.markAsTouched();
+      this.form.controls.activationExpression.markAsTouched();
       return;
     }
 
@@ -157,7 +190,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     // we have routing as array of key-value pairs but BE expects a map with key: value
     const tokenSelectionCriteria = routing
       ? Object.fromEntries(
-          routing.filter((kv) => kv.key && kv.key!.trim()).map(({ key, value }) => [key?.trim(), String(value ?? '')]),
+          routing.filter((kv) => !!kv.key?.trim?.()).map(({ key, value }) => [key?.trim?.(), String(value ?? '')]),
         )
       : undefined;
 
@@ -172,13 +205,14 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
       executeFunctionsLocally,
     };
 
-    if (this.apType === UploadType.UPLOAD) {
+    if (apType === UploadType.UPLOAD) {
       automationPackageParams.apResourceId = apFile;
     } else {
       automationPackageParams.apMavenSnippet = apMavenSnippet;
     }
 
-    if (this.libraryType === UploadType.UPLOAD) {
+    const libraryType = this.libraryType();
+    if (libraryType === UploadType.UPLOAD) {
       automationPackageParams.apLibraryResourceId = libraryFile;
     } else {
       automationPackageParams.apLibraryMavenSnippet = libraryMavenSnippet;
@@ -191,7 +225,7 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     });
   }
 
-  uploadAutomationPackage(automationPackageParams: AutomationPackageParams): Observable<boolean> {
+  protected uploadAutomationPackage(automationPackageParams: AutomationPackageParams): Observable<boolean> {
     const upload = this._api
       .overrideInterceptor(
         pipe(
@@ -221,11 +255,53 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
   }
 
   protected toggleAdvancedSettings(): void {
-    this.showAdvancedSettings = !this.showAdvancedSettings;
+    this.showAdvancedSettings.update((value) => !value);
   }
 
-  addRoutingCriterion() {
+  protected addRoutingCriterion(): void {
     this.routing.push(this._fb.group({ key: '', value: '' }));
+  }
+
+  protected addCondition(type?: 'AND' | 'OR'): void {
+    this._screenService
+      .getScreenInputsByScreenId('executionParameters')
+      .pipe(
+        take(1),
+        switchMap((inputs) =>
+          this._matDialog
+            .open(ActivationExpressionWizardDialogComponent, {
+              data: {
+                type,
+                inputs,
+                initialScript: (this.form.controls.activationExpression.value ?? '') as string,
+              },
+              width: '50rem',
+            })
+            .afterClosed(),
+        ),
+      )
+      .subscribe((finalScript?: string) => {
+        if (!finalScript) return;
+        const ctrl = this.form.controls.activationExpression;
+        ctrl?.setValue(finalScript);
+        ctrl?.markAsDirty();
+        ctrl?.markAsTouched();
+        ctrl?.updateValueAndValidity();
+      });
+  }
+
+  private hasPrefilledAdvancedSettings(): boolean {
+    return !!(
+      this.automationPackage.versionName ||
+      this.automationPackage.activationExpression?.script ||
+      this.automationPackage.automationPackageLibraryResource ||
+      (this.automationPackage.plansAttributes && Object.keys(this.automationPackage.plansAttributes).length > 0) ||
+      (this.automationPackage.functionsAttributes &&
+        Object.keys(this.automationPackage.functionsAttributes).length > 0) ||
+      (this.automationPackage.tokenSelectionCriteria &&
+        Object.keys(this.automationPackage.tokenSelectionCriteria).length > 0) ||
+      this.automationPackage.executeFunctionsLocally
+    );
   }
 
   private createTokenSelectionCriteria(): KeyValue<string, string>[] {
@@ -248,8 +324,4 @@ export class AutomationPackageUploadDialogComponent implements OnInit {
     }
     this._matDialog.open(AutomationPackageWarningsDialogComponent, { data: warnings });
   }
-
-  protected readonly AlertType = AlertType;
-  protected readonly AutomationPackagePermission = AutomationPackagePermission;
-  protected readonly AutomationPackageResourceType = AutomationPackageResourceType;
 }
