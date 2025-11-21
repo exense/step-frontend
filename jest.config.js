@@ -6,10 +6,11 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }], // Only transform .ts files
+    '^.+\\.ts$': 'ts-jest', // Only transform .ts files
   },
   transformIgnorePatterns: [
     '/node_modules/(?!flat)/', // Exclude modules except 'flat' from transformation
   ],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
 };
