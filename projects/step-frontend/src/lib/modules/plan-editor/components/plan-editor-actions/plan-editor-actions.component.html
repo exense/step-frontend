@@ -93,6 +93,35 @@
   <span class="interactive-trigger" #interactiveSessionTrigger [matMenuTriggerFor]="interactiveSessionMenu"></span>
 </step-btn-group>
 
+@if (_interactiveSession.hasExecutionParameters()) {
+  <step-btn-group class="with-borders">
+    <step-popover [mode]="PopoverMode.HOVER">
+      <button
+        type="button"
+        mat-stroked-button
+        [class.active]="targetExecutionParameters && Object.keys(targetExecutionParameters).length > 0"
+        (click)="toggleTargetParameterSelection()"
+        matTooltipPosition="below"
+      >
+        <step-icon name="sliders" />
+      </button>
+      <step-popover-content>
+        Advanced: Set target execution parameters so the editor can display the right Keyword or Plan version (See
+        <a
+          href="https://step.dev/knowledgebase/devops/automation-packages-overview/#deploy-multiple-versions-of-the-same-automation-package"
+          target="_blank"
+          >Automation Packages: Versions</a
+        >).
+      </step-popover-content>
+    </step-popover>
+    <span
+      class="interactive-trigger"
+      #targetExecutionParameterTrigger
+      [matMenuTriggerFor]="targetExecutionParameterMenu"
+    ></span>
+  </step-btn-group>
+}
+
 @if (showExecuteButton) {
   <step-btn-group class="with-borders">
     @for (editorAction of _planExecutionActions; track editorAction.id) {
@@ -102,7 +131,7 @@
       type="button"
       mat-stroked-button
       color="primary"
-      [matTooltip]="captions.start"
+      matTooltip="Execute this plan"
       matTooltipPosition="below"
       (click)="runPlan.emit()"
     >
@@ -110,6 +139,7 @@
     </button>
   </step-btn-group>
 }
+
 <mat-menu #interactiveSessionMenu="matMenu" class="execution-menu">
   <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
     <div class="interactive-parameters">
@@ -117,7 +147,7 @@
         <step-custom-forms
           #interactiveSessionCustomForm
           [stModel]="_interactiveSession.executionParameters()!"
-          (stModelChange)="_interactiveSession.executionParameters.set($event)"
+          (stModelChange)="setInteractiveSessionExecutionParameters($event)"
           stScreen="executionParameters"
         />
       }
@@ -132,6 +162,21 @@
           {{ captions.startInteractiveShort }}
         </button>
       </step-btn-group>
+    </div>
+  </span>
+</mat-menu>
+
+<mat-menu #targetExecutionParameterMenu="matMenu" class="execution-menu">
+  <span class="execution-menu" mat-menu-item [disableRipple]="true" (click)="$event.stopImmediatePropagation()">
+    <div class="interactive-parameters">
+      @if (_interactiveSession.hasExecutionParameters()) {
+        <step-custom-forms
+          #interactiveSessionCustomForm
+          [stModel]="targetExecutionParameters || {}"
+          (stModelChange)="setTargetExecutionParameters($event)"
+          stScreen="executionParameters"
+        />
+      }
     </div>
   </span>
 </mat-menu>

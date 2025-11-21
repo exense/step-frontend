@@ -51,3 +51,12 @@ step-icon.icon-small {
   height: 16px !important;
   margin-bottom: -5px;
 }
+
+.create-button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-btn {
+  border-radius: 2rem;
+}

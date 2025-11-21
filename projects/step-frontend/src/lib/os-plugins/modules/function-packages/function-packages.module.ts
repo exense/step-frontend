@@ -5,7 +5,6 @@ import {
   CheckProjectGuardConfig,
   CustomCellRegistryService,
   CustomSearchCellRegistryService,
-  DashletRegistryService,
   dialogRoute,
   EntityRefDirective,
   EntityRegistry,
@@ -22,7 +21,6 @@ import { FunctionPackageLinkComponent } from './components/function-package-link
 import { FunctionPackageSelectionComponent } from './components/function-package-selection/function-package-selection.component';
 
 import './components/function-package-selection/function-package-selection.component';
-import { UploadPackageBtnComponent } from './components/upload-package-btn/upload-package-btn.component';
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 import { PackageUrlPipe } from './pipes/package-url.pipe';
 
@@ -33,7 +31,6 @@ import { PackageUrlPipe } from './pipes/package-url.pipe';
     FunctionPackageListComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
-    UploadPackageBtnComponent,
     PackageUrlPipe,
   ],
   imports: [StepCoreModule, EntityRefDirective],
@@ -43,7 +40,6 @@ import { PackageUrlPipe } from './pipes/package-url.pipe';
     FunctionPackageListComponent,
     FunctionPackageSearchComponent,
     FunctionPackageSelectionComponent,
-    UploadPackageBtnComponent,
   ],
 })
 export class FunctionPackagesModule {
@@ -53,14 +49,12 @@ export class FunctionPackagesModule {
     private _viewRegistry: ViewRegistryService,
     private _quickAccessRoutes: QuickAccessRouteService,
     private _searchCellsRegistry: CustomSearchCellRegistryService,
-    private _dashletsRegistry: DashletRegistryService,
   ) {
     this.registerEntities();
     this.registerViews();
     this.registerCells();
     this.registerSearchCells();
     this.registerMenuItems();
-    this.registerDashlets();
   }
 
   private registerEntities(): void {
@@ -151,10 +145,6 @@ export class FunctionPackagesModule {
       parentId: 'automation-root',
     });
   }
-
-  private registerDashlets(): void {
-    this._dashletsRegistry.registerDashlet('uploadPackageBtn', UploadPackageBtnComponent);
-  }
 }
 
 export * from './components/function-package-configuration-dialog/function-package-configuration-dialog.component';
@@ -162,4 +152,3 @@ export * from './components/function-package-link/function-package-link.componen
 export * from './components/function-package-list/function-package-list.component';
 export * from './components/function-package-search/function-package-search.component';
 export * from './components/function-package-selection/function-package-selection.component';
-export * from './components/upload-package-btn/upload-package-btn.component';

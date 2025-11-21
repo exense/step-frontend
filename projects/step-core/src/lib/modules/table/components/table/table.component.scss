@@ -153,6 +153,10 @@ step-table {
       }
     }
   }
+
+  tr.row-deactivated {
+    opacity: 0.5;
+  }
 }
 
 @media print {

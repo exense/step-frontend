@@ -28,7 +28,7 @@
     "icons:generate": "node generate-icons.js",
     "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-sed-4316.stepcloud-test.ch/rest/private-openapi.json",
     "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
-    "openapi:generate:4316": "node generate-openapi-client.js https://stepos-sed-4316.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate": "node generate-openapi-client.js https://stepos-SED-4367.stepcloud-test.ch/rest/private-openapi.json",
     "lint:core": "ng lint @exense/step-core",
     "lint:step-frontend": "ng lint @exense/step-frontend",
     "lint:app": "ng lint @exense/step-app",
