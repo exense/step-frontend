@@ -2,6 +2,7 @@ const forceReadonlyInputs = require('./rules/force-readonly-inputs');
 const inlineStyleVariablesName = require('./rules/inline-style-variables-name');
 const inlineStyleVariablesNameHtml = require('./rules/inline-style-variables-name.html');
 const underscoreInjectable = require('./rules/underscore-injectable');
+const trackIsItemFiledHtml = require('./rules/track-is-item-field.html');
 
 module.exports = {
   meta: {
@@ -12,6 +13,7 @@ module.exports = {
     [inlineStyleVariablesName.RULE_NAME]: inlineStyleVariablesName.rule,
     [inlineStyleVariablesNameHtml.RULE_NAME]: inlineStyleVariablesNameHtml.rule,
     [underscoreInjectable.RULE_NAME]: underscoreInjectable.rule,
+    [trackIsItemFiledHtml.RULE_NAME]: trackIsItemFiledHtml.rule,
   },
   configs: {
     tsRecommended: [
@@ -27,6 +29,7 @@ module.exports = {
       {
         rules: {
           [`step-lint/${inlineStyleVariablesNameHtml.RULE_NAME}`]: 'error',
+          [`step-lint/${trackIsItemFiledHtml.RULE_NAME}`]: 'error',
         },
       },
     ],
