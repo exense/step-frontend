@@ -3,6 +3,7 @@ const inlineStyleVariablesName = require('./rules/inline-style-variables-name');
 const inlineStyleVariablesNameHtml = require('./rules/inline-style-variables-name.html');
 const underscoreInjectable = require('./rules/underscore-injectable');
 const trackIsItemFiledHtml = require('./rules/track-is-item-field.html');
+const redundantIf = require('./rules/redundant-if');
 
 module.exports = {
   meta: {
@@ -14,6 +15,7 @@ module.exports = {
     [inlineStyleVariablesNameHtml.RULE_NAME]: inlineStyleVariablesNameHtml.rule,
     [underscoreInjectable.RULE_NAME]: underscoreInjectable.rule,
     [trackIsItemFiledHtml.RULE_NAME]: trackIsItemFiledHtml.rule,
+    [redundantIf.RULE_NAME]: redundantIf.rule,
   },
   configs: {
     tsRecommended: [
@@ -22,6 +24,7 @@ module.exports = {
           [`step-lint/${forceReadonlyInputs.RULE_NAME}`]: 'error',
           [`step-lint/${inlineStyleVariablesName.RULE_NAME}`]: 'error',
           [`step-lint/${underscoreInjectable.RULE_NAME}`]: 'error',
+          [`step-lint/${redundantIf.RULE_NAME}`]: 'error',
         },
       },
     ],
