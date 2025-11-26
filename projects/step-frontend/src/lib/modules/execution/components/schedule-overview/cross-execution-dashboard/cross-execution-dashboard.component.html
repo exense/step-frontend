@@ -32,7 +32,11 @@
           [endTime]="lastExecution.endTime"
           [isRunning]="lastExecution.status === 'RUNNING'"
           [status]="lastExecution?.result"
-        />
+        >
+          <step-alt-execution-time-popover-title>
+            <div style="margin-bottom: 1rem">Last Execution</div>
+          </step-alt-execution-time-popover-title>
+        </step-alt-execution-time>
       } @else {
         <div>No execution</div>
       }

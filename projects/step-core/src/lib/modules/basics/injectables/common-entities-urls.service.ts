@@ -137,7 +137,7 @@ export class CommonEntitiesUrlsService {
       return '';
     }
     const id = typeof idOrPlan === 'string' ? idOrPlan : idOrPlan.id;
-    return `/plan-view/${id}/report`;
+    return `/plans/${id}/report`;
   }
 
   executionList(): string {

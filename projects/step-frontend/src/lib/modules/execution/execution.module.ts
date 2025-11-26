@@ -168,6 +168,7 @@ import { StatusDistributionBadgeComponent } from './components/status-distributi
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { DOCUMENT } from '@angular/common';
+import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 
 @NgModule({
   declarations: [
@@ -293,6 +294,7 @@ import { DOCUMENT } from '@angular/common';
     SearchPaginatorComponent,
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
+    AltExecutionTimePopoverTitleDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -482,7 +484,7 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'plan-view/:id',
+      path: 'plans/:id/report',
       component: PlanPageComponent,
       children: [
         {
