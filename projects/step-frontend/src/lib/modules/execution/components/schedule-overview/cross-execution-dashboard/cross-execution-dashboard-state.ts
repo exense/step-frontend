@@ -176,7 +176,7 @@ export abstract class CrossExecutionDashboardState {
             });
 
             let color = this._statusColors[seriesKey as Status];
-            const fill = color + 'cc';
+            const fill = color;
             const s: TSChartSeries = {
               id: seriesKey,
               scale: TimeSeriesConfig.SECONDARY_AXES_KEY,
@@ -206,7 +206,6 @@ export abstract class CrossExecutionDashboardState {
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
-          console.log(responseTimeData);
 
           const axes: Axis[] = [
             {
@@ -319,7 +318,7 @@ export abstract class CrossExecutionDashboardState {
                 }
                 let series: TSChartSeries[] = Array.from(allStatuses).map((status) => {
                   let color = this._statusColors[status as Status];
-                  const fill = color + 'cc';
+                  const fill = color;
                   const s: TSChartSeries = {
                     id: status,
                     scale: 'y',
@@ -402,7 +401,7 @@ export abstract class CrossExecutionDashboardState {
                   });
                   let series = Array.from(allStatuses).map((status) => {
                     let color = this._statusColors[status as Status];
-                    const fill = color + 'cc';
+                    const fill = color;
                     const s: TSChartSeries = {
                       id: status,
                       scale: 'y',
