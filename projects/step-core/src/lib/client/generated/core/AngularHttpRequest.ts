@@ -3,12 +3,11 @@
 /* eslint-disable */
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import type { Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import type { ApiRequestOptions } from './ApiRequestOptions';
+import { ApiRequestOptions } from './ApiRequestOptions';
 import { BaseHttpRequest } from './BaseHttpRequest';
-import type { OpenAPIConfig } from './OpenAPI';
-import { OpenAPI } from './OpenAPI';
+import { OpenAPI, OpenAPIConfig } from './OpenAPI';
 import { request as __request } from './request';
 
 @Injectable()
