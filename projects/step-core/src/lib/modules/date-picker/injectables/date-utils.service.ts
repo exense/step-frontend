@@ -49,6 +49,10 @@ export class DateUtilsService {
     return { start, end };
   }
 
+  areRangesEqual(a?: TimeRange | null, b?: TimeRange | null): boolean {
+    return a?.from === b?.from && a?.to === b?.to;
+  }
+
   areTimeRangeSelectionsEquals(a?: TimeRangeSelection, b?: TimeRangeSelection): boolean {
     if (a === b) {
       return true;
