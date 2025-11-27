@@ -343,6 +343,7 @@ export class TimeSeriesChartComponent implements OnInit, OnChanges, OnDestroy, T
           show: settings.xAxesSettings.show ?? true,
           incrs: settings.xAxesSettings.gridDisplayMultipliers,
           grid: { show: true },
+          labelSize: 300,
         },
         ...(settings.axes || []),
       ],

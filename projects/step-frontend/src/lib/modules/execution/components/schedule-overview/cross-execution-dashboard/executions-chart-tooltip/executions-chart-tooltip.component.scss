@@ -13,6 +13,25 @@ step-executions-chart-tooltip {
     }
   }
 
+  .duration-container {
+    display: flex;
+    flex-direction: row;
+    gap: 0.6rem;
+    font-size: 13px;
+    margin-top: 1.2rem;
+    margin-bottom: 0.8rem;
+
+    .icon {
+      width: 1em;
+      height: 1em;
+      border: 2px solid #0976b5;
+    }
+
+    .label {
+      font-weight: 500;
+    }
+  }
+
   .selected-series-title {
     font-weight: bold;
     margin: 0.5rem 0;
