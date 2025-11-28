@@ -6,6 +6,7 @@ const trackIsItemFiledHtml = require('./rules/track-is-item-field.html');
 const redundantIf = require('./rules/redundant-if');
 const templateRefInputs = require('./rules/template-ref-inputs');
 const booleanConversion = require('./rules/boolean-conversion');
+const groupOptionalParams = require('./rules/group-optional-params');
 
 module.exports = {
   meta: {
@@ -20,6 +21,7 @@ module.exports = {
     [redundantIf.RULE_NAME]: redundantIf.rule,
     [templateRefInputs.RULE_NAME]: templateRefInputs.rule,
     [booleanConversion.RULE_NAME]: booleanConversion.rule,
+    [groupOptionalParams.RULE_NAME]: groupOptionalParams.rule,
   },
   configs: {
     tsRecommended: [
@@ -31,6 +33,7 @@ module.exports = {
           [`step-lint/${redundantIf.RULE_NAME}`]: 'error',
           [`step-lint/${templateRefInputs.RULE_NAME}`]: 'error',
           [`step-lint/${booleanConversion.RULE_NAME}`]: 'error',
+          [`step-lint/${groupOptionalParams.RULE_NAME}`]: ['error', { minOptionalParams: 3 }],
         },
       },
     ],
