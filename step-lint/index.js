@@ -9,6 +9,7 @@ const booleanConversion = require('./rules/boolean-conversion');
 const groupOptionalParams = require('./rules/group-optional-params');
 const terminatorSubjectVoid = require('./rules/terminator-subject-void');
 const enumScreamingSnakeCase = require('./rules/enum-screaming-snake-case');
+const rxSubscriptionSize = require('./rules/rx-subscription-size');
 
 module.exports = {
   meta: {
@@ -26,6 +27,7 @@ module.exports = {
     [groupOptionalParams.RULE_NAME]: groupOptionalParams.rule,
     [terminatorSubjectVoid.RULE_NAME]: terminatorSubjectVoid.rule,
     [enumScreamingSnakeCase.RULE_NAME]: enumScreamingSnakeCase.rule,
+    [rxSubscriptionSize.RULE_NAME]: rxSubscriptionSize.rule,
   },
   configs: {
     tsRecommended: [
@@ -40,6 +42,7 @@ module.exports = {
           [`step-lint/${groupOptionalParams.RULE_NAME}`]: ['error', { minOptionalParams: 3 }],
           [`step-lint/${terminatorSubjectVoid.RULE_NAME}`]: 'error',
           [`step-lint/${enumScreamingSnakeCase.RULE_NAME}`]: 'error',
+          [`step-lint/${rxSubscriptionSize.RULE_NAME}`]: ['warn', { maximumRowsCount: 20 }],
         },
       },
     ],
