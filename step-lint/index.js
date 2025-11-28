@@ -8,6 +8,7 @@ const templateRefInputs = require('./rules/template-ref-inputs');
 const booleanConversion = require('./rules/boolean-conversion');
 const groupOptionalParams = require('./rules/group-optional-params');
 const terminatorSubjectVoid = require('./rules/terminator-subject-void');
+const enumScreamingSnakeCase = require('./rules/enum-screaming-snake-case');
 
 module.exports = {
   meta: {
@@ -24,6 +25,7 @@ module.exports = {
     [booleanConversion.RULE_NAME]: booleanConversion.rule,
     [groupOptionalParams.RULE_NAME]: groupOptionalParams.rule,
     [terminatorSubjectVoid.RULE_NAME]: terminatorSubjectVoid.rule,
+    [enumScreamingSnakeCase.RULE_NAME]: enumScreamingSnakeCase.rule,
   },
   configs: {
     tsRecommended: [
@@ -37,6 +39,7 @@ module.exports = {
           [`step-lint/${booleanConversion.RULE_NAME}`]: 'error',
           [`step-lint/${groupOptionalParams.RULE_NAME}`]: ['error', { minOptionalParams: 3 }],
           [`step-lint/${terminatorSubjectVoid.RULE_NAME}`]: 'error',
+          [`step-lint/${enumScreamingSnakeCase.RULE_NAME}`]: 'error',
         },
       },
     ],
