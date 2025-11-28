@@ -210,8 +210,7 @@ export class AugmentedAutomationPackagesService
       url = `${url}/${id}`;
     }
 
-    let body: FormData | string;
-    body = new FormData();
+    const body = new FormData();
 
     if (apMavenSnippet) {
       body.set('apMavenSnippet', apMavenSnippet);

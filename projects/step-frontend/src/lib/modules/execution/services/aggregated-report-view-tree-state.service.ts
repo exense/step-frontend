@@ -25,7 +25,8 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AggregatedReportViewTreeNodeUtilsService } from './aggregated-report-view-tree-node-utils.service';
 import { ERROR_STATUSES, Status } from '../../_common/shared/status.enum';
 
-export type AggregatedTreeStateInitOptions = TreeStateInitOptions & Pick<AggregatedReport, 'resolvedPartialPath'>;
+export type AggregatedTreeStateInitOptions = TreeStateInitOptions &
+  Pick<AggregatedReport, 'resolvedPartialPath'> & { resetSearch?: boolean };
 
 const ERROR_STATUSES_SEARCH_VALUE = ERROR_STATUSES.join(' | ');
 
@@ -113,13 +114,25 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
 
   private searchResultSet = toSignal(this.searchResultSet$);
 
+  private prevSearchResultValue?: string[];
+  private prevSearchResultHash?: string;
   readonly searchResult = computed(() => {
     const { tree } = this.treeData();
     const searchResultSet = this.searchResultSet();
+    let result: string[];
     if (!searchResultSet || searchResultSet.size === 0) {
-      return [];
+      result = [];
+    } else {
+      result = tree.map((node) => node.id).filter((nodeId) => searchResultSet.has(nodeId));
     }
-    return tree.map((node) => node.id).filter((nodeId) => searchResultSet.has(nodeId));
+    const hash = result.join('|');
+    if (hash === this.prevSearchResultHash) {
+      result = this.prevSearchResultValue ?? [];
+    } else {
+      this.prevSearchResultValue = result;
+      this.prevSearchResultHash = hash;
+    }
+    return result;
   });
 
   private searchResultChangeEffect = effect(() => {
@@ -146,7 +159,9 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     this.searchForErrorsOnlyInternal.set(false);
     this.errorLeafsRootNameInternal.set(undefined);
     this.errorsLeafsSet.set(undefined);
-    this.searchCtrl.setValue('');
+    if (options.resetSearch) {
+      this.searchCtrl.setValue('');
+    }
   }
 
   override ngOnDestroy() {

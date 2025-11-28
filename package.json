@@ -40,7 +40,8 @@
     "deploy:step-frontend:copy": "copyfiles .npmrc dist/step-frontend",
     "deploy:step-frontend:publish": "cd dist/step-frontend && npm publish",
     "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish",
-    "deploy": "npm run deploy:core && npm run deploy:step-frontend"
+    "deploy": "npm run deploy:core && npm run deploy:step-frontend",
+    "test": "jest"
   },
   "private": false,
   "dependencies": {
@@ -106,6 +107,9 @@
     "pretty-quick": "4.0.0",
     "shelljs": "0.9.2",
     "typescript": "5.5.4",
+    "jest": "29.5.0",
+    "@types/jest": "29.5.14",
+    "jest-preset-angular": "14.6.2",
     "ts-jest": "29.4.4"
   },
   "engines": {
