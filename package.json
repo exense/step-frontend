@@ -41,7 +41,8 @@
     "deploy:step-frontend:publish": "cd dist/step-frontend && npm publish",
     "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish",
     "deploy": "npm run deploy:core && npm run deploy:step-frontend",
-    "test": "jest"
+    "test": "jest",
+    "test:linter": "jest --config jest-lint.config.js"
   },
   "private": false,
   "dependencies": {
