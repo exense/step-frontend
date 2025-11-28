@@ -5,6 +5,7 @@ const underscoreInjectable = require('./rules/underscore-injectable');
 const trackIsItemFiledHtml = require('./rules/track-is-item-field.html');
 const redundantIf = require('./rules/redundant-if');
 const templateRefInputs = require('./rules/template-ref-inputs');
+const booleanConversion = require('./rules/boolean-conversion');
 
 module.exports = {
   meta: {
@@ -18,6 +19,7 @@ module.exports = {
     [trackIsItemFiledHtml.RULE_NAME]: trackIsItemFiledHtml.rule,
     [redundantIf.RULE_NAME]: redundantIf.rule,
     [templateRefInputs.RULE_NAME]: templateRefInputs.rule,
+    [booleanConversion.RULE_NAME]: booleanConversion.rule,
   },
   configs: {
     tsRecommended: [
@@ -28,6 +30,7 @@ module.exports = {
           [`step-lint/${underscoreInjectable.RULE_NAME}`]: 'error',
           [`step-lint/${redundantIf.RULE_NAME}`]: 'error',
           [`step-lint/${templateRefInputs.RULE_NAME}`]: 'error',
+          [`step-lint/${booleanConversion.RULE_NAME}`]: 'error',
         },
       },
     ],
