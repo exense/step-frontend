@@ -10,6 +10,7 @@ const groupOptionalParams = require('./rules/group-optional-params');
 const terminatorSubjectVoid = require('./rules/terminator-subject-void');
 const enumScreamingSnakeCase = require('./rules/enum-screaming-snake-case');
 const rxSubscriptionSize = require('./rules/rx-subscription-size');
+const rxNestedSubscription = require('./rules/rx-nested-subscription');
 
 module.exports = {
   meta: {
@@ -28,6 +29,7 @@ module.exports = {
     [terminatorSubjectVoid.RULE_NAME]: terminatorSubjectVoid.rule,
     [enumScreamingSnakeCase.RULE_NAME]: enumScreamingSnakeCase.rule,
     [rxSubscriptionSize.RULE_NAME]: rxSubscriptionSize.rule,
+    [rxNestedSubscription.RULE_NAME]: rxNestedSubscription.rule,
   },
   configs: {
     tsRecommended: [
@@ -43,6 +45,7 @@ module.exports = {
           [`step-lint/${terminatorSubjectVoid.RULE_NAME}`]: 'error',
           [`step-lint/${enumScreamingSnakeCase.RULE_NAME}`]: 'error',
           [`step-lint/${rxSubscriptionSize.RULE_NAME}`]: ['warn', { maximumRowsCount: 20 }],
+          [`step-lint/${rxNestedSubscription.RULE_NAME}`]: 'error',
         },
       },
     ],
