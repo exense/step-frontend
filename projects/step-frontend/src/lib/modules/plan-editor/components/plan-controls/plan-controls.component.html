@@ -1,0 +1,17 @@
+<step-tabs #tabs="StepTabs" [tabs]="componentTabs()" [(activeTabId)]="selectedTab" [shrink]="true" />
+<div class="tab-content">
+  @switch (selectedTab()) {
+    @case ('controls') {
+      <step-plan-artefact-list (onSelection)="_planEditorService.addControl($event)" />
+    }
+    @case ('keywords') {
+      <step-plan-function-list (addKeywords)="_planEditorService.addKeywords($event)" />
+    }
+    @case ('other') {
+      <step-plan-otherplan-list (addPlans)="_planEditorService.addPlans($event)" />
+    }
+    @case ('console') {
+      <step-keyword-calls #keywordCalls [keywordParameters$]="_interactiveSession.keywordParameters$" />
+    }
+  }
+</div>

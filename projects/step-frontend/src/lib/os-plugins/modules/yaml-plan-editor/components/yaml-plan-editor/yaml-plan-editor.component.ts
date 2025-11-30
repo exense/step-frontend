@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { AceMode, CustomComponent } from '@exense/step-core';
+import { Component, signal, TemplateRef } from '@angular/core';
+import { AceMode, CustomComponent, PlanTypeContext } from '@exense/step-core';
 
 @Component({
   selector: 'step-yaml-plan-editor',
@@ -8,6 +8,9 @@ import { AceMode, CustomComponent } from '@exense/step-core';
   standalone: false,
 })
 export class YamlPlanEditorComponent implements CustomComponent {
-  context?: unknown;
   protected readonly AceMode = AceMode;
+  protected readonly templateControls = signal<TemplateRef<unknown> | undefined>(undefined);
+  contextChange(previousContext?: PlanTypeContext, currentContext?: PlanTypeContext): void {
+    this.templateControls.set(currentContext?.templateControls);
+  }
 }

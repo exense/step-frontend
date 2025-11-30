@@ -1,7 +1,11 @@
 import { BaseItemComponent } from './base-item.component';
 import { CustomRegistryType } from '../../shared/custom-registry-type.enum';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, Input, TemplateRef, ViewEncapsulation } from '@angular/core';
 import { CustomRegistryItem } from '../../shared/custom-registry-item';
+
+export interface PlanTypeContext {
+  templateControls: TemplateRef<unknown>;
+}
 
 @Component({
   selector: 'step-plan-type',
