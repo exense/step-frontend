@@ -11,6 +11,7 @@ const terminatorSubjectVoid = require('./rules/terminator-subject-void');
 const enumScreamingSnakeCase = require('./rules/enum-screaming-snake-case');
 const rxSubscriptionSize = require('./rules/rx-subscription-size');
 const rxNestedSubscription = require('./rules/rx-nested-subscription');
+const componentPublicFields = require('./rules/component-public-fields');
 
 module.exports = {
   meta: {
@@ -30,6 +31,7 @@ module.exports = {
     [enumScreamingSnakeCase.RULE_NAME]: enumScreamingSnakeCase.rule,
     [rxSubscriptionSize.RULE_NAME]: rxSubscriptionSize.rule,
     [rxNestedSubscription.RULE_NAME]: rxNestedSubscription.rule,
+    [componentPublicFields.RULE_NAME]: componentPublicFields.rule,
   },
   configs: {
     tsRecommended: [
@@ -46,6 +48,103 @@ module.exports = {
           [`step-lint/${enumScreamingSnakeCase.RULE_NAME}`]: 'error',
           [`step-lint/${rxSubscriptionSize.RULE_NAME}`]: ['warn', { maximumRowsCount: 20 }],
           [`step-lint/${rxNestedSubscription.RULE_NAME}`]: 'error',
+          [`step-lint/${componentPublicFields.RULE_NAME}`]: [
+            'warn',
+            {
+              exclusions: [
+                {
+                  interfaceName: 'CustomComponent',
+                  exclusions: ['context', 'contextChange'],
+                },
+                {
+                  interfaceName: 'HasFilter',
+                  exclusions: ['hasFilter$', 'hasFilter'],
+                },
+                {
+                  interfaceName: 'TableHighlightItemContainer',
+                  exclusions: ['highlightedItem'],
+                },
+                {
+                  interfaceName: 'TableSearch',
+                  exclusions: ['onSearch', 'getSearchValue$'],
+                },
+                {
+                  interfaceName: 'TableFilter',
+                  exclusions: ['getTableFilterRequest'],
+                },
+                {
+                  interfaceName: 'Reloadable',
+                  exclusions: ['reload'],
+                },
+                {
+                  interfaceName: 'SelectionList',
+                  exclusions: [
+                    'selectAll',
+                    'selectVisible',
+                    'selectFiltered',
+                    'clearSelection',
+                    'select',
+                    'deselect',
+                    'toggleSelection',
+                    'selectIds',
+                    'checkCurrentSelectionState',
+                  ],
+                },
+                {
+                  interfaceName: 'TreeNodeTemplateContainerService',
+                  exclusions: ['treeNodeTemplate', 'treeNodeNameTemplate', 'treeNodeDetailsTemplate'],
+                },
+                {
+                  interfaceName: 'CustomColumnOptions',
+                  exclusions: ['options$'],
+                },
+                {
+                  interfaceName: 'CustomColumnsBaseComponent',
+                  exclusions: ['colDef', 'colDefLabel', 'searchColDef', 'columnsReady$'],
+                },
+                {
+                  interfaceName: 'ColumnContainer',
+                  exclusions: ['initColumns'],
+                },
+                {
+                  interfaceName: 'PlanEditorStrategy',
+                  exclusions: [
+                    'hasRedo',
+                    'hasUndo',
+                    'planContext',
+                    'handlePlanContextChange',
+                    'addControl',
+                    'addKeywords',
+                    'addPlans',
+                    'undo',
+                    'redo',
+                    'discardAll',
+                    'moveOut',
+                    'moveUp',
+                    'moveDown',
+                    'moveInNextSibling',
+                    'moveInPrevSibling',
+                    'delete',
+                    'copy',
+                    'paste',
+                    'pasteAfter',
+                    'duplicate',
+                    'rename',
+                    'toggleSkip',
+                    'init',
+                  ],
+                },
+                {
+                  interfaceName: 'TreeActionsService',
+                  exclusions: ['getActionsForNode', 'hasActionsForNode'],
+                },
+                {
+                  interfaceName: 'ArtefactContext',
+                  exclusions: ['artefact', 'artefactChange$', 'readonly', 'save'],
+                },
+              ],
+            },
+          ],
         },
       },
     ],
