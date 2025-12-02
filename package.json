@@ -25,9 +25,9 @@
     "prepare": "husky install",
     "push": "npm publish projects/step-core/ && npm publish dist/step-frontend/*.tgz",
     "icons:generate": "node generate-icons.js",
-    "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-sed-4053.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate:nhy": "node generate-openapi-client.js https://stepos-sed-4316.stepcloud-test.ch/rest/private-openapi.json",
     "openapi:generate:master": "node generate-openapi-client.js https://stepos-master.stepcloud-test.ch/rest/private-openapi.json",
-    "openapi:generate:4295": "node generate-openapi-client.js https://stepos-sed-4295.stepcloud-test.ch/rest/private-openapi.json",
+    "openapi:generate": "node generate-openapi-client.js https://stepos-SED-4367.stepcloud-test.ch/rest/private-openapi.json",
     "lint:core": "ng lint @exense/step-core",
     "lint:step-frontend": "ng lint @exense/step-frontend",
     "lint:app": "ng lint @exense/step-app",
@@ -38,7 +38,8 @@
     "deploy:step-frontend:copy": "copyfiles .npmrc dist/step-frontend",
     "deploy:step-frontend:publish": "cd dist/step-frontend && npm publish",
     "deploy:step-frontend": "npm run deploy:step-frontend:copy && npm run deploy:step-frontend:publish",
-    "deploy": "npm run deploy:core && npm run deploy:step-frontend"
+    "deploy": "npm run deploy:core && npm run deploy:step-frontend",
+    "test": "jest"
   },
   "private": false,
   "dependencies": {
@@ -97,7 +98,10 @@
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "shelljs": "0.9.2",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "jest": "29.5.0",
+    "@types/jest": "29.5.14",
+    "jest-preset-angular": "14.6.2"
   },
   "engines": {
     "node": ">=18.19.0"

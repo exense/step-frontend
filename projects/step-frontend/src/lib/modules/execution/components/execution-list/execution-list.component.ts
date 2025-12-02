@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnDestroy, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import {
   AugmentedExecutionsService,
   BulkSelectionType,
@@ -88,17 +88,19 @@ export class ExecutionListComponent implements OnDestroy {
     );
   });
 
+  protected readonly calculateCounts = signal(false);
+
   ngOnDestroy(): void {
     this.reloadRunningExecutionsCount$.complete();
     this._timeSeriesEntityService.clearCache();
   }
 
-  refreshTable(): void {
+  protected refreshTable(): void {
     this.dataSource.reload({ hideProgress: true, isForce: false });
     this.reloadRunningExecutionsCount$.next();
   }
 
-  handleRunningStatusClick(): void {
+  protected handleRunningStatusClick(): void {
     this.statusFilter()?.filterControl?.setValue?.([Status.RUNNING]);
   }
 
@@ -108,5 +110,9 @@ export class ExecutionListComponent implements OnDestroy {
       return;
     }
     this.statusFilter()?.filterControl?.setValue?.([...ERROR_STATUSES]);
+  }
+
+  protected toggleCountsCalculation(): void {
+    this.calculateCounts.update((value) => !value);
   }
 }

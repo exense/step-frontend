@@ -28,7 +28,18 @@
           <step-icon name="upload" />
         </a>
       </step-btn-group>
-      <step-btn-group>
+      <step-btn-group class="create-button-group">
+        <a
+          stepTestId="upload-package-btn"
+          mat-flat-button
+          color="primary"
+          class="header-btn"
+          matTooltip="Add entities by uploading an Automation Package"
+          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+          routerLink="/automation-package/list/upload/new/"
+        >
+          Upload Package
+        </a>
         <a
           data-step-testid="new-parameter-btn"
           type="button"

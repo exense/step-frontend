@@ -1,100 +1,121 @@
 @use 'projects/step-core/styles/core-variables' as var;
 
-.heatmap-table {
-  font-size: 1.2rem;
+step-heatmap {
+  .heatmap-table {
+    font-size: 1.2rem;
+    border-collapse: collapse;
+    width: 100%;
 
-  tbody {
-  }
-
-  td {
-    margin: 0;
-  }
-
-  thead tr {
-    border-bottom: 1px solid var.$gray-100;
-  }
-
-  th {
-    white-space: wrap;
-    text-align: left;
-    padding: 1rem 0.8rem;
-
-    input {
-      margin-top: 2px;
-      outline: unset;
-      opacity: 0.9;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      padding: 4px 8px;
+    tbody {
     }
 
-    &.sticky-col {
-      background-color: #fff;
+    td {
+      margin: 0;
     }
-  }
 
-  tbody tr:nth-child(even) {
-    background-color: var.$gray-50;
+    thead tr {
+      border-bottom: 1px solid var.$gray-100;
+    }
 
-    .sticky-col {
+    th {
+      white-space: wrap;
+      text-align: left;
+      padding: 1rem 0.8rem;
+
+      input {
+        margin-top: 2px;
+        outline: unset;
+        opacity: 0.9;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+      }
+
+      &.sticky-col {
+        background-color: #fff;
+      }
+    }
+
+    tbody tr:nth-child(even) {
       background-color: var.$gray-50;
+
+      .sticky-col {
+        background-color: var.$gray-50;
+      }
     }
-  }
 
-  tbody tr:nth-child(odd) {
-    background-color: #fff;
-
-    .sticky-col {
+    tbody tr:nth-child(odd) {
       background-color: #fff;
+
+      .sticky-col {
+        background-color: #fff;
+      }
+    }
+
+    td {
+      font-weight: normal;
+      padding: 0.2rem 0;
+      border-top: 1px solid var.$gray-100;
+      border-right: 1px solid var.$gray-100;
+    }
+
+    .label-header-container {
+      text-align: left;
+      min-width: 10rem;
+    }
+
+    .heatmap-cell {
+      cursor: pointer;
+
+      &:hover {
+        filter: brightness(110%);
+      }
     }
   }
 
-  td {
-    font-weight: normal;
-    padding: 0.2rem 0;
-    border-top: 1px solid var.$gray-100;
-    border-right: 1px solid var.$gray-100;
+  .scroll-x {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto; /* the ONLY horizontal scrollbar */
+    overscroll-behavior-x: contain; /* prevent scroll chaining to body */
+    -webkit-overflow-scrolling: touch;
+    min-width: 0; /* important if parent is a flex child */
+    min-height: 40rem;
+    margin-bottom: 2rem;
   }
 
-  .label-header-container {
+  .sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 3; /* above sticky header cells in same stack */
+  }
+
+  .footer-section {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8rem;
+
+    & > div:first-child {
+      flex-grow: 1;
+    }
+  }
+
+  .label-cell {
     text-align: left;
+    padding: 0.6rem;
+    min-width: 10rem;
   }
 
-  .heatmap-cell {
-    cursor: pointer;
-
-    &:hover {
-      filter: brightness(110%);
-    }
+  .content-row {
+    height: 3rem;
   }
-}
 
-.scroll-x {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto; /* the ONLY horizontal scrollbar */
-  overscroll-behavior-x: contain; /* prevent scroll chaining to body */
-  -webkit-overflow-scrolling: touch;
-  min-width: 0; /* important if parent is a flex child */
-  min-height: 40rem;
-  margin-bottom: 2rem;
-}
-
-.sticky-col {
-  position: sticky;
-  left: 0;
-  z-index: 3; /* above sticky header cells in same stack */
-}
-
-.footer-section {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8rem;
-}
-
-.heatmap-col-header {
-  font-weight: normal;
+  .heatmap-col-header {
+    font-weight: normal;
+    top: 0;
+    color: var.$white;
+  }
 }

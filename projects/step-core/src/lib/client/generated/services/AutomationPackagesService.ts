@@ -112,7 +112,7 @@ export class AutomationPackagesService {
 
   /**
    * @param formData
-   * @returns string default response
+   * @returns AutomationPackageUpdateResult default response
    * @throws ApiError
    */
   public createAutomationPackage(formData?: {
@@ -130,7 +130,7 @@ export class AutomationPackagesService {
     functionsAttributes?: string;
     tokenSelectionCriteria?: string;
     executeFunctionsLocally?: boolean;
-  }): Observable<string> {
+  }): Observable<AutomationPackageUpdateResult> {
     return this.httpRequest.request({
       method: 'POST',
       url: '/automation-packages',
@@ -262,6 +262,24 @@ export class AutomationPackagesService {
       path: {
         id: id,
       },
+    });
+  }
+
+  /**
+   * @param formData
+   * @returns AutomationPackageUpdateResult default response
+   * @throws ApiError
+   */
+  public deployAutomationPackageLibrary(formData?: {
+    file?: FormDataContentDisposition;
+    mavenSnippet?: string;
+    managedLibraryName?: string;
+  }): Observable<AutomationPackageUpdateResult> {
+    return this.httpRequest.request({
+      method: 'POST',
+      url: '/automation-packages/library',
+      formData: formData,
+      mediaType: 'multipart/form-data',
     });
   }
 

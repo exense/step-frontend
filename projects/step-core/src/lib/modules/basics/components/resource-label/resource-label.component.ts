@@ -3,6 +3,7 @@ import { Resource, AugmentedResourcesService } from '../../../../client/step-cli
 import { of, pipe } from 'rxjs';
 import { HttpHeaderResponse, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
+import { getResourceId, isResourceId } from '../../utils/resource-id';
 
 @Component({
   selector: 'step-resource-label',
@@ -23,11 +24,11 @@ export class ResourceLabelComponent implements OnChanges {
   isResource: boolean = false;
 
   private getResourceId(stModel: string): string {
-    return stModel.replace('resource:', '');
+    return getResourceId(stModel);
   }
 
   private getIsResource(stModel?: string): boolean {
-    return !!stModel && typeof stModel === 'string' && stModel.indexOf('resource:') == 0;
+    return !!stModel && typeof stModel === 'string' && isResourceId(stModel);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

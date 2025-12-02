@@ -25,5 +25,9 @@
         }
       }
     </div>
+    @if (timeRange(); as timeRange) {
+      <div class="separator"></div>
+      <div class="footer">{{ timeRange }}</div>
+    }
   </div>
 }
