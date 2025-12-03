@@ -7,17 +7,21 @@ import {
   Keyword,
   PlanEditorService,
   SelectionList,
+  StepCoreModule,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
-import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
+import { PlanNodesDragPreviewComponent } from '../../plan-nodes-drag-preview/plan-nodes-drag-preview.component';
+import { KeywordDropInfoPipe } from './keyword-drop-info.pipe';
+import { createActivatableEntitiesTableParams } from '../../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-function-list',
   templateUrl: './plan-function-list.component.html',
   styleUrls: ['./plan-function-list.component.scss'],
+  imports: [StepCoreModule, PlanNodesDragPreviewComponent, KeywordDropInfoPipe],
   encapsulation: ViewEncapsulation.None,
   providers: [
     ...entitySelectionStateProvider<string, Keyword>('id'),
@@ -31,7 +35,6 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
   host: {
     class: 'plan-editor-control-selections',
   },
-  standalone: false,
 })
 export class PlanFunctionListComponent {
   private _selectionState = inject<EntitySelectionState<string, Keyword>>(EntitySelectionState);

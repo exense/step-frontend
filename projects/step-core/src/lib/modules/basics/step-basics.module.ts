@@ -80,6 +80,7 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
 import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
 import { ResourceUrlPipe } from './pipes/resource-url.pipe';
 import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
+import { MaxHeightViewportHeightMinusOffsetTopDirective } from './directives/max-height-viewport-height-minus-offset-top.directive';
 
 @NgModule({
   imports: [
@@ -99,6 +100,7 @@ import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.p
     LongInlineTextComponent,
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -250,6 +252,7 @@ import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.p
     LongInlineTextComponent,
     ResourceUrlPipe,
     NumberSeparateThousandsPipe,
+    MaxHeightViewportHeightMinusOffsetTopDirective,
   ],
 })
 export class StepBasicsModule {}
@@ -399,3 +402,4 @@ export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';
 export * from './pipes/number-separate-thousands.pipe';
+export * from './directives/max-height-viewport-height-minus-offset-top.directive';

@@ -1,0 +1,8 @@
+@if (isFolded()) {
+  <div class="folded" (click)="activate.emit()">
+    <step-icon name="eye-off" />
+    <span>{{ header() }}</span>
+  </div>
+} @else {
+  <ng-content />
+}

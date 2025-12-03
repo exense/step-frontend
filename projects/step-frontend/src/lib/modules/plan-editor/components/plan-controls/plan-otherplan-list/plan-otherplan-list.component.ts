@@ -7,17 +7,21 @@ import {
   Plan,
   PlanEditorService,
   SelectionList,
+  StepCoreModule,
   TableApiWrapperService,
   tableColumnsConfigProvider,
   TableRemoteDataSource,
 } from '@exense/step-core';
 import { catchError, filter, map, Observable, of, switchMap } from 'rxjs';
-import { createActivatableEntitiesTableParams } from '../../injectables/activatable-entities-table-params';
+import { PlanNodesDragPreviewComponent } from '../../plan-nodes-drag-preview/plan-nodes-drag-preview.component';
+import { PlanDropInfoPipe } from './plan-drop-info.pipe';
+import { createActivatableEntitiesTableParams } from '../../../injectables/activatable-entities-table-params';
 
 @Component({
   selector: 'step-plan-otherplan-list',
   templateUrl: './plan-otherplan-list.component.html',
   styleUrls: ['./plan-otherplan-list.component.scss'],
+  imports: [StepCoreModule, PlanNodesDragPreviewComponent, PlanDropInfoPipe],
   encapsulation: ViewEncapsulation.None,
   providers: [
     ...entitySelectionStateProvider<string, Plan>('id'),
@@ -31,7 +35,6 @@ import { createActivatableEntitiesTableParams } from '../../injectables/activata
   host: {
     class: 'plan-editor-control-selections',
   },
-  standalone: false,
 })
 export class PlanOtherplanListComponent {
   private _selectionState = inject<EntitySelectionState<string, Plan>>(EntitySelectionState);
