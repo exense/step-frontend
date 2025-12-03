@@ -65,6 +65,16 @@ export class ExecutionsChartTooltipComponent {
     return `${new Date(bucketStart).toLocaleString()} - ${new Date(bucketEnd).toLocaleString()}`;
   });
 
+  readonly responseTime = computed(() => {
+    const contextData = this.data();
+    if (!contextData || !contextData.idx) {
+      return;
+    }
+    const lastSeries: TSChartSeries = contextData.series?.filter((s) => s.scale === 'y')?.[0];
+    const ms = lastSeries?.data[contextData.idx!];
+    return ms !== undefined ? TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(ms!) : undefined;
+  });
+
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
     const contextData = this.data();
     this.selectedSeriesExecutions = [];
@@ -74,13 +84,13 @@ export class ExecutionsChartTooltipComponent {
     if (!contextData) {
       return [];
     }
-    contextData.series = contextData.series.filter((s) => s.scale === this.scaleKey());
-    for (let i = contextData!.series.length - 1; i >= 0; i--) {
-      let series: TSChartSeries = contextData!.series[i]!;
+    const filteredSeries = contextData.series.filter((s) => s.scale === this.scaleKey());
+    for (let i = filteredSeries.length - 1; i >= 0; i--) {
+      let series: TSChartSeries = filteredSeries[i]!;
       let value =
         i === 0
           ? series.data[contextData?.idx!] || 0
-          : (series.data[contextData!.idx!] || 0) - (contextData!.series[i - 1].data[contextData!.idx!] || 0);
+          : (series.data[contextData!.idx!] || 0) - (filteredSeries[i - 1].data[contextData!.idx!] || 0);
       if (value) {
         transformedSeries.push({
           label: series.id,
