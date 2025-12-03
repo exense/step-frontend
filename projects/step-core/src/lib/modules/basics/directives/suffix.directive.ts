@@ -1,6 +1,7 @@
 import { Directive, HostBinding, Input } from '@angular/core';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-suffix',
   standalone: false,
 })

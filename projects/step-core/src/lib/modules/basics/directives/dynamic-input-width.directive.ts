@@ -1,6 +1,7 @@
 import { Directive, ElementRef, HostListener, inject, Input, OnInit } from '@angular/core';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[dynamicInputWidth]',
   standalone: false,
 })
