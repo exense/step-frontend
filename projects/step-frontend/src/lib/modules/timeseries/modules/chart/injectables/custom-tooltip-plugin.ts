@@ -80,8 +80,9 @@ export class CustomTooltipPlugin {
             return;
           }
           const idY = u.posToVal(top!, 'y');
+          const ySeries = u.series.slice(1) as TSChartSeries[];
           const contextData: TooltipContextData = {
-            series: u.series.slice(1) as TSChartSeries[], // skip x series
+            series: ySeries,
             idx: idx,
             idY: idY,
             xValues: u.data[0] as number[],
@@ -90,6 +91,8 @@ export class CustomTooltipPlugin {
           };
 
           // Emit event to parent, which will handle positioning using cdkOverlay
+          const boundingClientRect = over.getBoundingClientRect();
+
           ref.tooltipEvents.emit({
             type: 'POSITION_CHANGED',
             payload: {

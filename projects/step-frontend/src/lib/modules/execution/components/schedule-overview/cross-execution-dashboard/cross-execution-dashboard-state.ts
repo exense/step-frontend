@@ -214,7 +214,6 @@ export abstract class CrossExecutionDashboardState {
                 return vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v));
               },
               grid: { show: false },
-              size: 65,
             },
             {
               size: TimeSeriesConfig.CHART_LEGEND_SIZE,
