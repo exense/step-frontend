@@ -24,12 +24,17 @@ export class AttachmentUtilsService {
       return AttachmentType.SKIPPED;
     }
 
+    const typeCategory = this._fileTypeUtils.checkTypeCategory(attachment.mimeType);
+    let result = this.determineAttachmentTypes(typeCategory, attachment.mimeType);
+
     if (attachment.type === STREAMING_ATTACHMENT_META && !this.hasLines(attachment)) {
+      const streamingAttachmentMeta = attachment as StreamingAttachmentMeta;
+      if (streamingAttachmentMeta.status === 'COMPLETED' && result === AttachmentType.TRACE) {
+        return result;
+      }
       return AttachmentType.STREAMING_BINARY;
     }
 
-    const typeCategory = this._fileTypeUtils.checkTypeCategory(attachment.mimeType);
-    let result = this.determineAttachmentTypes(typeCategory, attachment.mimeType);
     if (result !== undefined && result !== AttachmentType.TEXT) {
       return result;
     }
