@@ -42,12 +42,12 @@ import {
   PopoverMode,
   ReloadableDirective,
   ReportNode,
+  smartSwitchMap,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
   TimeRange,
   TimeSeriesErrorEntry,
-  TimeSeriesErrorsRequest,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -77,6 +77,7 @@ import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
 import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
+import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -262,23 +263,10 @@ export class AltExecutionProgressComponent
     }),
   );
 
-  readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
-    map(([execution, rangeSelection]) => {
-      if (execution.id !== this._executionId()) {
-        // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
-        return undefined;
-      }
-      switch (rangeSelection.type) {
-        case 'FULL':
-          const now = new Date().getTime();
-          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
-        case 'ABSOLUTE':
-          return rangeSelection.absoluteSelection!;
-        case 'RELATIVE':
-          const endTime = execution.endTime || new Date().getTime();
-          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
-      }
-    }),
+  readonly timeRange$: Observable<TimeRange> = combineLatest([this.timeRangeSelection$, this.execution$]).pipe(
+    map(([rangeSelection, execution]) =>
+      convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId()),
+    ),
     filter((range): range is TimeRange => range !== undefined),
     shareReplay(1),
   ) as Observable<TimeRange>;
@@ -287,23 +275,28 @@ export class AltExecutionProgressComponent
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  readonly testCases$ = combineLatest([
-    this.execution$.pipe(
-      startWith(undefined),
-      map((execution) => execution?.id),
+  readonly testCases$ = combineLatest([this.execution$.pipe(startWith(undefined)), this.timeRangeSelection$]).pipe(
+    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+    smartSwitchMap(
+      (curr, prev) => {
+        return (
+          curr.execution?.id !== prev?.execution?.id ||
+          !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+        );
+      },
+      ({ execution, timeRangeSelection }) => {
+        if (!execution?.id || !timeRangeSelection) {
+          return of(undefined);
+        }
+        return this._executionsApi.getFlatAggregatedReportView(execution.id, {
+          range: convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId()),
+          filterArtefactClasses: ['TestCase'],
+          fetchCurrentOperations: true,
+        });
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
-    this.timeRange$,
-  ]).pipe(
-    switchMap(([id, range]) => {
-      if (!id) {
-        return of(undefined);
-      }
-      return this._executionsApi.getFlatAggregatedReportView(id, {
-        range,
-        filterArtefactClasses: ['TestCase'],
-        fetchCurrentOperations: true,
-      });
-    }),
     map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
   );
@@ -344,20 +337,47 @@ export class AltExecutionProgressComponent
         eid: execution.id,
       } as KeywordParameters;
     }),
+    distinctUntilChanged((a, b) => a.eid === b.eid),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
+
+  /**
+   * Logic to reload keyword's datasource when execution is refreshed
+   * **/
+  private refreshKeywordsSubscription = this.execution$
+    .pipe(
+      map((execution) => execution.id),
+      pairwise(),
+      filter((pair) => pair[0] === pair[1]),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this.keywordsDataSource.reload({ isForce: false }));
+
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
-  readonly errors$ = combineLatest([this.execution$, this.timeRange$]).pipe(
-    map(([execution, timeRange]) => {
-      const executionId = execution.id;
-      const errorsRequest: TimeSeriesErrorsRequest = { executionId, timeRange };
-      return errorsRequest;
-    }),
-    switchMap((request) => this._timeSeriesService.findErrors(request)),
+  readonly errors$ = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
+    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+    smartSwitchMap(
+      (curr, prev) => {
+        return (
+          curr.execution?.id !== prev?.execution?.id ||
+          !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+        );
+      },
+      ({ execution, timeRangeSelection }) => {
+        const executionId = execution?.id;
+        const timeRange = convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId());
+        if (!executionId || !timeRange) {
+          return of([]);
+        }
+        return this._timeSeriesService.findErrors({ executionId, timeRange });
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+    ),
     catchError(() => of([] as TimeSeriesErrorEntry[])),
     map((errors) => (!errors?.length ? undefined : errors)),
     shareReplay(1),
@@ -378,12 +398,17 @@ export class AltExecutionProgressComponent
       }
       return execution.id;
     }),
-    switchMap((eId) => {
-      if (!eId) {
-        return of(undefined);
-      }
-      return this._systemService.getCurrentOperations(eId);
-    }),
+    smartSwitchMap(
+      (curr, prev) => curr !== prev,
+      (eId) => {
+        if (!eId) {
+          return of(undefined);
+        }
+        return this._systemService.getCurrentOperations(eId);
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+    ),
   );
 
   ngOnInit(): void {
@@ -426,10 +451,21 @@ export class AltExecutionProgressComponent
   private setupTreeRefresh(): void {
     combineLatest([this.execution$, this.timeRangeSelection$])
       .pipe(
+        map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
         debounceTime(300),
-        switchMap(([execution, timeSelection]) => {
-          return this._treeLoader.load(execution, timeSelection);
-        }),
+        smartSwitchMap(
+          (curr, prev) => {
+            return (
+              curr.execution.id !== prev?.execution?.id ||
+              !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+            );
+          },
+          ({ execution, timeRangeSelection }) => {
+            return this._treeLoader.load(execution, timeRangeSelection);
+          },
+          this._destroyRef,
+          (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+        ),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {

@@ -3,18 +3,18 @@ import { interval, Observable, Subject, Subscription } from 'rxjs';
 import { AutoRefreshModel } from '../shared';
 import { Mutable } from '../modules/basics/types/mutable';
 
-type FieldAccessor = Mutable<Pick<AutoRefreshModel, 'autoIncreaseTo' | 'disabled' | 'interval'>>;
+type FieldAccessor = Mutable<Pick<AutoRefreshModel, 'autoIncreaseTo' | 'disabled' | 'interval' | 'isManuallyChanged'>>;
 
 class AutoRefreshModelImpl implements AutoRefreshModel {
   private intervalSubscription?: Subscription;
   private interval$?: Observable<unknown>;
-  private isManuallyChanged = false;
   private lastInterval?: number;
 
   private disableChangeInternal$ = new Subject<boolean>();
   private intervalChangeInternal$ = new Subject<number>();
   private refreshInternal$ = new Subject<void>();
 
+  readonly isManuallyChanged = false;
   readonly autoIncreaseTo?: number;
   readonly disabled: boolean = false;
   readonly interval: number = 0;
@@ -55,7 +55,7 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
   }
 
   setInterval(interval: number, isManualChange: boolean = false): void {
-    this.isManuallyChanged = isManualChange;
+    (this as FieldAccessor).isManuallyChanged = isManualChange;
     if (interval === this.interval) {
       return;
     }
@@ -88,7 +88,7 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
         newInterval = newInterval < this.autoIncreaseTo ? newInterval : this.autoIncreaseTo;
         this.setInterval(newInterval);
       }
-      this.isManuallyChanged = false;
+      (this as FieldAccessor).isManuallyChanged = false;
     });
   }
 }

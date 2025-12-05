@@ -7,15 +7,17 @@ import { combineLatest, debounceTime, distinctUntilChanged, map, shareReplay, st
 import { AltExecutionStorageService } from './alt-execution-storage.service';
 import { AltExecutionViewAllService } from './alt-execution-view-all.service';
 import { AltExecutionStateService } from './alt-execution-state.service';
+import { DateUtilsService } from '@exense/step-core';
 
 @Injectable()
 export abstract class AltReportNodesFilterService {
-  protected constructor(private storagePrefix: string) {
+  protected constructor(protected storagePrefix: string) {
     this.setupSyncWithStorage();
   }
 
   private _fb = inject(FormBuilder);
-  private _executionId = inject(EXECUTION_ID);
+  protected _executionId = inject(EXECUTION_ID);
+  protected _dateUtils = inject(DateUtilsService);
   private _executionStorage = inject(AltExecutionStorageService);
   private _viewAllService = inject(AltExecutionViewAllService);
   protected _executionState = inject(AltExecutionStateService);
