@@ -36,11 +36,12 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
   protected readonly UploadType = UploadType;
   protected readonly selectedType = signal(UploadType.UPLOAD);
 
-  private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+  private readonly displayInput = viewChild<ElementRef<HTMLInputElement>>('input');
 
   protected readonly AceMode = AceMode;
 
-  protected form = this._fb.group({
+  protected readonly form = this._fb.group({
     fileName: this._fb.control(''),
     mavenSnippet: this._fb.control(''),
     isManagedLibrary: this._fb.control(false),
@@ -51,7 +52,7 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
     initialValue: this.form.controls.isManagedLibrary.value,
   });
 
-  private effectSwitchType = effect(() => {
+  private readonly effectSwitchType = effect(() => {
     const selectedType = this.selectedType();
     if (selectedType === UploadType.UPLOAD) {
       toggleValidators(true, this.form.controls.fileName, Validators.required);
@@ -64,7 +65,7 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
     }
   });
 
-  private effectToggleManagedLibrary = effect(() => {
+  private readonly effectToggleManagedLibrary = effect(() => {
     const isManagedLibrary = this.isManagedLibrary();
     if (isManagedLibrary) {
       toggleValidators(true, this.form.controls.managedLibraryName, Validators.required);
@@ -92,9 +93,17 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
     this.setFile(this.fileInput()?.nativeElement.files?.[0] ?? undefined);
   }
 
-  protected setFile(file?: File) {
-    this.file = file;
-    this.form.controls.fileName.setValue(file?.name ?? '');
+  protected handleUploadContainerFileChange(files?: File[]): void {
+    this.setFile(files?.[0]);
+  }
+
+  protected handleDropAreaActiveChange(isActive: boolean): void {
+    const element = this.displayInput()?.nativeElement;
+    if (isActive) {
+      element?.focus?.();
+    } else {
+      element?.blur?.();
+    }
   }
 
   protected upload(): void {
@@ -138,6 +147,11 @@ export class AutomationPackageLibraryUploadDialogComponent implements OnInit {
         }),
       )
       .subscribe((result) => this._dialogRef.close({ isSuccess: result }));
+  }
+
+  private setFile(file?: File) {
+    this.file = file;
+    this.form.controls.fileName.setValue(file?.name ?? '');
   }
 
   private setFormValue(libraryResource: Resource): void {
