@@ -33,10 +33,21 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly total = input.required<number>();
 
   readonly hint = input('');
+  readonly notFoundTooltip = input('');
   readonly prevTooltip = input<string>('previous');
   readonly nextTooltip = input<string>('next (enter)');
 
   readonly disableNavButtonsWithControl = input(true);
+
+  protected readonly inputFieldTooltip = computed(() => {
+    const value = this.value();
+    const text = this.notFoundTooltip();
+    const total = this.total();
+    if (total === 0 && !!value && !!text) {
+      return text;
+    }
+    return undefined;
+  });
 
   private areNavButtonsDisabled = computed(() => {
     const isDisabled = this.isDisabled();

@@ -284,6 +284,7 @@ export class AggregatedReportViewTreeStateService extends TreeStateService<Aggre
     if (item?.singleInstanceReportNode?.error?.msg) {
       searchValues.push(item?.singleInstanceReportNode?.error?.msg);
     }
+    Object.keys(item?.countByErrorMessage ?? {}).forEach((error) => searchValues.push(error));
 
     searchValues.push(artefact?.attributes?.['name'] ?? '');
 

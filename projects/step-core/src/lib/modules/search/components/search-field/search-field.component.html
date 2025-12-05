@@ -17,6 +17,7 @@
     (blur)="handleBlur()"
     (keydown.enter)="next()"
     [disabled]="isDisabled()"
+    [matTooltip]="inputFieldTooltip()"
   />
   @if (fieldAddonTemplate(); as fieldAddonTemplate) {
     <step-suffix class="button-suffix">
