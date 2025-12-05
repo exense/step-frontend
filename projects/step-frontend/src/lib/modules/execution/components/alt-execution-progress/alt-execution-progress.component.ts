@@ -295,6 +295,7 @@ export class AltExecutionProgressComponent
         });
       },
       this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
@@ -375,6 +376,7 @@ export class AltExecutionProgressComponent
         return this._timeSeriesService.findErrors({ executionId, timeRange });
       },
       this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
     catchError(() => of([] as TimeSeriesErrorEntry[])),
     map((errors) => (!errors?.length ? undefined : errors)),
@@ -405,6 +407,7 @@ export class AltExecutionProgressComponent
         return this._systemService.getCurrentOperations(eId);
       },
       this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
   );
 
@@ -461,6 +464,7 @@ export class AltExecutionProgressComponent
             return this._treeLoader.load(execution, timeRangeSelection);
           },
           this._destroyRef,
+          (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
         ),
         takeUntilDestroyed(this._destroyRef),
       )

@@ -1,10 +1,12 @@
-import { map, Observable, pipe, shareReplay, Subject, switchMap, takeUntil, tap, UnaryFunction } from 'rxjs';
+import { map, Observable, of, pipe, shareReplay, Subject, switchMap, takeUntil, tap, UnaryFunction } from 'rxjs';
 import { DestroyRef } from '@angular/core';
+import { durationSwitchMap } from './duration-switch-map';
 
 export const smartSwitchMap = <Q, R>(
   isForce: (currentRequest: Q, previousRequest?: Q) => boolean,
   doRequest: (request: Q) => Observable<R>,
   destroyRef: DestroyRef,
+  requestComplete?: (duration: number) => void,
   logKey?: string,
 ): UnaryFunction<Observable<Q>, Observable<R>> => {
   let requestRef$: Observable<R> | undefined = undefined;
@@ -44,7 +46,8 @@ export const smartSwitchMap = <Q, R>(
       previousRequest = request;
       currentRequestTerminator$ = new Subject<void>();
       debugLog('START NEW REQUEST');
-      requestRef$ = doRequest(request).pipe(
+      requestRef$ = of(request).pipe(
+        durationSwitchMap(doRequest, requestComplete),
         tap(() => (requestRef$ = undefined)),
         takeUntil(currentRequestTerminator$),
         shareReplay(1),

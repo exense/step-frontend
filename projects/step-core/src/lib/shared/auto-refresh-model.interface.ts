@@ -5,6 +5,7 @@ export interface AutoRefreshModel {
   readonly disabled: boolean;
   readonly autoIncreaseTo?: number;
 
+  readonly isManuallyChanged: boolean;
   readonly disableChange$: Observable<boolean>;
   readonly intervalChange$: Observable<number>;
   readonly refresh$: Observable<void>;
