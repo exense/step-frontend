@@ -68,6 +68,10 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
     }
   }
 
+  resetManuallyChanged(): void {
+    (this as FieldAccessor).isManuallyChanged = false;
+  }
+
   private stopTimer(): void {
     if (this.intervalSubscription) {
       this.intervalSubscription.unsubscribe();
@@ -88,7 +92,6 @@ class AutoRefreshModelImpl implements AutoRefreshModel {
         newInterval = newInterval < this.autoIncreaseTo ? newInterval : this.autoIncreaseTo;
         this.setInterval(newInterval);
       }
-      (this as FieldAccessor).isManuallyChanged = false;
     });
   }
 }

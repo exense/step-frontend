@@ -13,6 +13,7 @@ export interface AutoRefreshModel {
   setInterval(interval: number, isManualChange?: boolean): void;
   setDisabled(disabled: boolean): void;
   setAutoIncreaseTo(autoIncreaseTo?: number): void;
+  resetManuallyChanged(): void;
 
   destroy(): void;
 }

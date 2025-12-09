@@ -94,10 +94,6 @@ class ActiveExecutionImpl implements ActiveExecution {
   }
 
   adjustAutoRefresh(requestDuration: number): void {
-    if (this.autoRefreshModel.isManuallyChanged) {
-      return;
-    }
-
     const durationAndIntervals = [
       2500,
       5_000,
@@ -116,6 +112,11 @@ class ActiveExecutionImpl implements ActiveExecution {
     for (let i = 0; i < durationAndIntervals.length - 3; i += 3) {
       const [min, max, result] = durationAndIntervals.slice(i, i + 3);
       if (requestDuration >= min && requestDuration < max) {
+        // In case of manuallyChanged value auto-update model only if selected model's interval is lower than calculated one.
+        if (this.autoRefreshModel.isManuallyChanged && this.autoRefreshModel.interval >= result) {
+          break;
+        }
+
         this.autoRefreshModel.setInterval(result);
         this.autoRefreshModel.setAutoIncreaseTo(result);
         break;
