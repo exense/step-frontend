@@ -5,11 +5,14 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: nowrap;
+  margin-bottom: 1rem;
 }
 
 .error-message {
   font-style: italic;
   color: var.$blue-700;
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
 }
 
 step-alt-report-widget {

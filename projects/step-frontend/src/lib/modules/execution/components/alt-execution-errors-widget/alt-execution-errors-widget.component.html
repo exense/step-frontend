@@ -4,18 +4,31 @@
       <section class="error-info">
         <div>
           @if (singleError(); as singleError) {
-            <step-icon class="error" name="alert-triangle" /> This execution contains
-            {{ totalErrorsCount()['FAILED'] }} {{ totalErrorsCount()['FAILED'] === 1 ? 'error' : 'errors' }}:&nbsp;<a
-              class="error-message"
+            <step-icon class="error" name="alert-triangle" />
+            <span
+              >This execution contains {{ failedCount() }} {{ failedCount() === 1 ? 'error' : 'errors' }}&nbsp;(<a
+                href="#"
+                (click)="showDetails.emit(); (false)"
+                >show in error table</a
+              >):</span
+            >
+            &nbsp;
+            <a
               href="#"
+              class="error-message"
+              stepClampFade
+              [lines]="5"
               (click)="onFindInTree(singleError.errorMessage); (false)"
               >{{ singleError.errorMessage }}</a
             >
           } @else {
-            <step-icon class="error" name="alert-triangle" /> This execution contains
-            {{ totalErrorsCount()['FAILED'] }} errors
+            <step-icon class="error" name="alert-triangle" />
+            <span>This execution contains {{ failedCount() }} errors</span>&nbsp;(<a
+              href="#"
+              (click)="showDetails.emit(); (false)"
+              >show in error table</a
+            >)
           }
-          &nbsp;(<a href="#" (click)="showDetails.emit(); (false)">show in error table</a>)
         </div>
       </section>
     }
