@@ -399,3 +399,5 @@ export * from './pipes/resource-url.pipe';
 export * from './utils/toggle-validators';
 export * from './utils/resource-id';
 export * from './pipes/number-separate-thousands.pipe';
+export * from './utils/smart-switch-map';
+export * from './utils/duration-switch-map';
