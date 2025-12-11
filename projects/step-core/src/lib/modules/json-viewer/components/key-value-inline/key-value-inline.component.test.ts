@@ -26,7 +26,7 @@ describe('KeyValueInlineComponent', () => {
       subItem: { item_1: 1, item_2: 2, item_3: 3 },
     });
 
-    fixture.detectChanges(true);
+    fixture.detectChanges();
     await fixture.whenStable();
 
     expect(element.nativeElement.textContent.trim()).toEqual(
@@ -35,7 +35,7 @@ describe('KeyValueInlineComponent', () => {
 
     fixture.componentRef.setInput('maxChars', 10);
 
-    fixture.detectChanges(true);
+    fixture.detectChanges();
     await fixture.whenStable();
 
     expect(element.nativeElement.textContent.trim()).toEqual('foo = FOO ...');
@@ -51,7 +51,7 @@ describe('KeyValueInlineComponent', () => {
       baz: { value: undefined, dynamic: true, expression: 'BAZ' } as DynamicValue,
     });
 
-    fixture.detectChanges(true);
+    fixture.detectChanges();
     await fixture.whenStable();
 
     expect(element.nativeElement.textContent.trim()).toEqual('foo = FOO  ¦ bar = BAR  ¦ baz = BAZ');
