@@ -90,7 +90,11 @@
   <div class="row">
     <step-alt-report-widget class="flex-grow-1" title="Errors">
       <step-alt-report-widget-content class="widget-content">
-        <step-alt-execution-errors [dataSource]="_state.errorsDataSource" [statusFilterItems]="availableErrorTypes()" />
+        <step-alt-execution-errors
+          [dataSource]="_state.errorsDataSource"
+          [statusFilterItems]="availableErrorTypes()"
+          [showActions]="false"
+        />
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
