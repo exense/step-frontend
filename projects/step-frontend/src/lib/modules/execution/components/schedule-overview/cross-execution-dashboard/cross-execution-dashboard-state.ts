@@ -206,7 +206,6 @@ export abstract class CrossExecutionDashboardState {
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
-          console.log(responseTimeData);
 
           const axes: Axis[] = [
             {

@@ -65,10 +65,6 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> im
     }),
   );
 
-  ngOnInit(): void {
-    console.log();
-  }
-
   searchFor($event: string) {
     if (!this.partialTree()) {
       return;

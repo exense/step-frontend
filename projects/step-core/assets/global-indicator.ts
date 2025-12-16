@@ -260,9 +260,7 @@
       }
       this.timerId = undefined;
       this.printMessageInDivContainer('.global-indicator-container__timeout-message', '');
-      console.log('this.timeout', this.timeout);
       this.timerId = setTimeout(() => {
-        console.log('timed out');
         this.printMessageInDivContainer('.global-indicator-container__timeout-message', this.fallbackMessage);
         this.timerId = undefined;
       }, this.timeout) as unknown as number;
