@@ -16,8 +16,8 @@ import { map, Observable } from 'rxjs';
 const ALL_COLUMNS = {
   errorMessage: 'errorMessage',
   errorCode: 'errorCode',
-  type: 'type',
-  code: 'code',
+  types: 'types',
+  count: 'count',
   percentage: 'percentage',
   actions: 'actions',
 };
