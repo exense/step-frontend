@@ -9,6 +9,7 @@ import { ActionColDirective } from './action-col.directive';
 
 @Directive({
   selector:
+    // eslint-disable-next-line @angular-eslint/directive-selector
     '[matColumnDef]:not([internal]):not([stepAdditionalCol]),step-custom-columns,step-entity-column-container,step-lock-column-container',
   standalone: false,
 })

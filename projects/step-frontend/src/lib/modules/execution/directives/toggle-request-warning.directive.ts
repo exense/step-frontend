@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'step-autorefresh-toggle[requestWarning]',
   exportAs: 'StepRequestWarning',
   hostDirectives: [
