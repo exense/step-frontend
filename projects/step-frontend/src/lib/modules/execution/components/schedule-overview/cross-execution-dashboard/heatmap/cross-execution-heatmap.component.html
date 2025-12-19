@@ -1,5 +1,10 @@
 <step-alt-report-widget class="flex-grow-1" [title]="dashletTitle()">
   <step-alt-report-widget-content class="widget-content">
+    @if (isLoading()) {
+      <div class="spinner-container">
+        <mat-spinner [diameter]="40" />
+      </div>
+    }
     @if (defaultDateRange(); as dateRange) {
       <div class="chart-actions-container">
         <step-tabs

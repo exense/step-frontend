@@ -3,19 +3,25 @@
   <div class="row">
     <div class="piechart-container">
       @if (_state.summaryData$ | async; as summary) {
+        @if (_state.summaryWidgetLoading()) {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
+        }
         <step-alt-report-node-summary title="Summary: Executions" [summary]="summary" [disableChartItemClick]="true" />
-      } @else {
-        <step-alt-report-widget title="Summary: Executions">
-          <step-alt-report-widget-content class="widget-content">
-            <ng-container *ngTemplateOutlet="loadingSpinner" />
-          </step-alt-report-widget-content>
-        </step-alt-report-widget>
+        <!--      } @else {-->
+        <!--        <step-alt-report-widget title="Summary: Executions">-->
+        <!--          <step-alt-report-widget-content class="widget-content">-->
+        <!--            <ng-container *ngTemplateOutlet="loadingSpinner" />-->
+        <!--          </step-alt-report-widget-content>-->
+        <!--        </step-alt-report-widget>-->
       }
     </div>
 
     <step-alt-report-widget class="flex-grow-1" title="Executions statuses over time">
       <step-alt-report-widget-content class="widget-content">
         @if (_state.executionsChartSettings$ | async; as executionsChartSettings) {
+          @if (_state.executionsChartLoading()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          }
           <step-timeseries-chart
             [settings]="executionsChartSettings"
             (zoomChange)="handleMainChartZoom($event)"
@@ -31,6 +37,7 @@
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
+
   <div class="row">
     <div class="flex-grow-1">
       <step-cross-execution-heatmap [defaultDateRange]="luxonDateRange()" #heatmap />
@@ -48,7 +55,13 @@
           />
         </div>
         @if (reportNodesChartType() === 'keywords') {
+          @if (_state.keywordsCountChartLoading()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          }
           @if (_state.keywordsChartSettings$ | async; as settings) {
+            @if (_state.keywordsCountChartLoading()) {
+              <ng-container *ngTemplateOutlet="loadingSpinner" />
+            }
             <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
               <ng-template tooltipContent let-data>
                 <div class="ts-tooltip">
@@ -66,6 +79,9 @@
           }
         } @else if (reportNodesChartType() === 'testcases') {
           @if (_state.testCasesChartSettings$ | async; as testCasesData) {
+            @if (_state.testCasesCountChartLoading()) {
+              <ng-container *ngTemplateOutlet="loadingSpinner" />
+            }
             <step-timeseries-chart [settings]="testCasesData.chart!" [height]="350">
               <ng-template tooltipContent let-data>
                 <div class="ts-tooltip">
@@ -90,6 +106,9 @@
   <div class="row">
     <step-alt-report-widget class="flex-grow-1" title="Errors">
       <step-alt-report-widget-content class="widget-content">
+        @if (_state.errorsTableLoading()) {
+          <ng-container *ngTemplateOutlet="loadingSpinner" />
+        }
         <step-alt-execution-errors [dataSource]="_state.errorsDataSource" [statusFilterItems]="availableErrorTypes()" />
       </step-alt-report-widget-content>
     </step-alt-report-widget>
