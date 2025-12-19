@@ -37,7 +37,7 @@ import { AltExecutionTreePartialComponent } from '../alt-execution-tree-partial/
   ],
   standalone: false,
 })
-export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> implements OnInit {
+export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> {
   private _controllerService = inject(AugmentedControllerService);
   private _artefactService = inject(ArtefactService);
   private _treeState = inject(AggregatedReportViewTreeStateService);
@@ -64,10 +64,6 @@ export class AltReportNodeDetailsComponent<R extends ReportNode = ReportNode> im
       );
     }),
   );
-
-  ngOnInit(): void {
-    console.log();
-  }
 
   searchFor($event: string) {
     if (!this.partialTree()) {

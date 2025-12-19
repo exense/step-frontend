@@ -37,7 +37,12 @@ export class ActiveExecutionContextService {
 
   manualRefresh(): void {
     const executionId = this.executionIdInternal$.value;
-    this._activeExecutionsService.getActiveExecution(executionId)?.manualRefresh();
+    this._activeExecutionsService.getActiveExecution(executionId)?.manualRefresh?.();
+  }
+
+  adjustAutoRefresh(requestDuration: number): void {
+    const executionId = this.executionIdInternal$.value;
+    this._activeExecutionsService.getActiveExecution(executionId)?.adjustAutoRefresh?.(requestDuration);
   }
 
   setupExecutionId(executionId: string): void {
