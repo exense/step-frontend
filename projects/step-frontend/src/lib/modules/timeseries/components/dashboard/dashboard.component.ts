@@ -107,6 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
   timeRange = input.required<TimeRange>();
+  showLoadingSpinnerOnLoad = input<boolean>(false);
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 

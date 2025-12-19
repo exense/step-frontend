@@ -129,7 +129,9 @@
 </section>
 
 <ng-template #loadingSpinner>
-  <div class="spinner-container">
-    <mat-spinner [diameter]="40" />
-  </div>
+  @if (_state.lastRefreshTrigger() !== 'auto') {
+    <div class="spinner-container">
+      <mat-spinner [diameter]="40" />
+    </div>
+  }
 </ng-template>

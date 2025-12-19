@@ -72,6 +72,7 @@ export class DashboardPageComponent implements OnInit {
   hasWritePermission = this._authService.hasRight('dashboard-write');
 
   isLoading = signal<boolean>(false);
+  lastRefreshTrigger = signal<'auto' | 'manual'>('manual');
 
   timeRange = computed<TimeRange | undefined>(() => {
     const pickerSelection = this.activeTimeRangeSelection();
@@ -112,7 +113,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleDashboardUpdate(dashboard: DashboardView) {
-    // this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
+    // the dashboard is editable. this will make sure there are no conflicts between the dashboard entity shared across this page and actual dashboard component
     const mergedDashboard: DashboardView = {
       ...dashboard,
       attributes: this.dashboard!()!.attributes,
@@ -127,6 +128,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleFullRangeChanged(range: TimeRange) {
+    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
@@ -140,6 +142,7 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
+    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set(pickerSelection);
   }
 
@@ -162,6 +165,7 @@ export class DashboardPageComponent implements OnInit {
 
   triggerRefresh() {
     let rangeSelection = this.activeTimeRangeSelection()!;
+    this.lastRefreshTrigger.set('auto');
     this.activeTimeRangeSelection.set({ ...rangeSelection });
   }
 

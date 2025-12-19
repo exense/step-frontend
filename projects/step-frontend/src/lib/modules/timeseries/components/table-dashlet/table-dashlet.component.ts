@@ -3,10 +3,12 @@ import {
   Component,
   EventEmitter,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
   Output,
+  signal,
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
@@ -92,10 +94,13 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() item!: DashboardItem;
   @Input() context!: TimeSeriesContext;
   @Input() editMode = false;
+  showLoadingSpinnerWhileLoading = input<boolean>(false);
 
   @Output() remove = new EventEmitter();
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
+
+  isLoading = signal<boolean>(false);
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
@@ -132,6 +137,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   refresh(blur?: boolean): Observable<any> {
+    this.isLoading.set(true);
     return this.fetchBaseData().pipe(tap(() => this.updateTableData()));
   }
 
@@ -375,6 +381,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.fetchLegendEntities(tableEntries).subscribe((updatedData) => {
       this.tableData$.next(updatedData);
       this.tableIsLoading = false;
+      this.isLoading.set(false);
     });
   }
 

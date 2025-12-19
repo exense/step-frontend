@@ -101,6 +101,7 @@
                 #chart
                 [editMode]="editMode"
                 [showExecutionLinks]="showExecutionLinks"
+                [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
                 [item]="dashlet"
                 [context]="mainEngine.state.context"
                 [height]="DASHLET_HEIGHT"
@@ -115,6 +116,7 @@
                 <div class="compare-mode-tag">Compare</div>
                 <step-chart-dashlet
                   #compareChart
+                  [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
                   [editMode]="editMode"
                   [item]="dashlet"
                   [context]="compareEngine!.state.context"
@@ -130,6 +132,7 @@
               <step-table-dashlet
                 #chart
                 [item]="dashlet"
+                [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
                 [context]="mainEngine.state.context"
                 [editMode]="editMode"
                 (remove)="handleChartDelete(i)"

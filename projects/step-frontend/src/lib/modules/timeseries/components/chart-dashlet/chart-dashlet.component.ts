@@ -2,10 +2,12 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
   output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -108,11 +110,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() height!: number;
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
+  showLoadingSpinnerWhileLoading = input<boolean>(false);
 
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+
+  isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -460,6 +465,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
         axes: axes,
         truncated: response.truncated,
       };
+      this.isLoading.set(false);
     });
   }
 
@@ -522,6 +528,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
+    this.isLoading.set(true);
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;

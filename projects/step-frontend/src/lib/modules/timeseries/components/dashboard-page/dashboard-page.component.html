@@ -42,6 +42,7 @@
 @if (timeRange() && dashboard()?.id && !isLoading()) {
   <step-timeseries-dashboard
     [id]="dashboard()!.id!"
+    [showLoadingSpinnerOnLoad]="lastRefreshTrigger() === 'manual'"
     [timeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"

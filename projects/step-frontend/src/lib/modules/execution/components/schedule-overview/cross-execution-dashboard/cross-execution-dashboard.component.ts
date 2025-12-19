@@ -53,14 +53,17 @@ export class CrossExecutionDashboardComponent implements OnInit {
   }
 
   handleRefreshIntervalChange(interval: number) {
+    this._state.lastRefreshTrigger.set('auto');
     this._state.refreshInterval.set(interval);
   }
 
   handleTimeRangeChange(selection: TimeRangePickerSelection) {
+    this._state.lastRefreshTrigger.set('manual');
     this._state.activeTimeRangeSelection.set(selection);
   }
 
   triggerRefresh() {
+    this._state.lastRefreshTrigger.set('auto');
     this._state.activeTimeRangeSelection.set({ ...this._state.activeTimeRangeSelection()! });
     this.fetchLastExecutionTrigger$.next();
   }
