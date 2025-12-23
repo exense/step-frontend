@@ -86,6 +86,7 @@ interface ProcessedBucketResponse {
   styleUrls: ['./table-dashlet.component.scss'],
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, TsComparePercentagePipe, TableEntryFormatPipe, MatTooltip],
+  standalone: true,
 })
 export class TableDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   readonly COMPARE_COLUMN_ID_SUFFIX = '_comp';

@@ -28,6 +28,7 @@ import { TIME_UNIT_DICTIONARY, TimeConvertersFactoryService, TimeRange, TimeUnit
   templateUrl: './time-range-picker.component.html',
   styleUrls: ['./time-range-picker.component.scss'],
   imports: [COMMON_IMPORTS],
+  standalone: true,
 })
 export class TimeRangePickerComponent implements OnInit {
   timeUnitOptions = [TimeUnit.MINUTE, TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH, TimeUnit.YEAR];

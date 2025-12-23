@@ -9,6 +9,7 @@ export interface DashboardState {
   getDashlets: () => QueryList<ChartDashlet>;
   getFilterBar: () => DashboardFilterBarComponent;
   getRanger: () => PerformanceViewTimeSelectionComponent;
+  lastChangeType: 'auto' | 'manual';
   refreshInProgress: boolean;
   refreshSubscription?: Subscription;
 }

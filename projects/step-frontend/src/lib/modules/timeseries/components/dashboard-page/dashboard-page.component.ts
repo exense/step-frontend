@@ -10,6 +10,7 @@ import {
   OnInit,
   signal,
   untracked,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import { COMMON_IMPORTS, TimeSeriesConfig, TimeSeriesContext, TimeSeriesUtils } from '../../modules/_common';
@@ -44,6 +45,7 @@ export class DashboardPageComponent implements OnInit {
   private _authService = inject(AuthService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activatedRoute = inject(ActivatedRoute);
+  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
 
   readonly timeRangeOptions: TimeRangePickerSelection[] = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
   activeTimeRangeSelection: WritableSignal<TimeRangePickerSelection | undefined> = signal(undefined);
@@ -141,11 +143,6 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
-    this.lastRefreshTrigger.set('manual');
-    this.activeTimeRangeSelection.set(pickerSelection);
-  }
-
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(
       context,
@@ -163,10 +160,18 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
+  handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
+    this.lastRefreshTrigger.set('manual');
+    this.activeTimeRangeSelection.set(pickerSelection);
+    let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
+    this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'manual' });
+  }
+
   triggerRefresh() {
-    let rangeSelection = this.activeTimeRangeSelection()!;
+    let pickerSelection = this.activeTimeRangeSelection()!;
     this.lastRefreshTrigger.set('auto');
-    this.activeTimeRangeSelection.set({ ...rangeSelection });
+    let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
+    this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
   }
 
   private subscribeToUrlNavigation() {

@@ -60,6 +60,7 @@ const ATTRIBUTES_REMOVAL_FUNCTION = (field: string) => {
   styleUrls: ['./dashboard-filter-bar.component.scss'],
   encapsulation: ViewEncapsulation.None,
   imports: [COMMON_IMPORTS, TsGroupingComponent, FilterBarItemComponent, MatDivider],
+  standalone: true,
 })
 export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   context = input.required<TimeSeriesContext>();
@@ -69,13 +70,17 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
   @Input() compactView = false;
   @Input() editMode = false;
 
-  compareModeEnabled = false;
-
-  readonly fullRangeChange = output<TimeRange>();
+  /**
+   * Output used to notify when the full time range of the dashboard should be changed. This is currently triggered only via "use selected execution's time range" filters.
+   */
+  readonly fullRangeRequestChange = output<TimeRange>();
 
   @ViewChild(PerformanceViewTimeSelectionComponent) timeSelection?: PerformanceViewTimeSelectionComponent;
   @ViewChildren(FilterBarItemComponent) filterComponents?: QueryList<FilterBarItemComponent>;
   @ViewChildren('appliedFilter', { read: ElementRef }) appliedFilters?: QueryList<ElementRef<HTMLElement>>;
+
+  filtersChange = output<TsFilteringSettings>();
+  groupingChange = output<string[]>();
 
   private _destroyRef = inject(DestroyRef);
 
@@ -123,9 +128,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (contextInput.getGroupDimensions()) {
       this.activeGrouping = contextInput.getGroupDimensions();
     }
-    contextInput.compareModeChange$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((settings) => (this.compareModeEnabled = settings.enabled));
     let contextFiltering = contextInput.getFilteringSettings();
     this.oqlValue = contextFiltering.oql || '';
     this.activeMode = contextFiltering.mode;
@@ -231,7 +233,8 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       this.rawMeasurementsModeActive = response.hasUnknownFields;
       // for grouping change, we will trigger refresh automatically. otherwise grouping and filters will change together
       if (!this.rawMeasurementsModeActive) {
-        this.context().updateGrouping(dimensions);
+        this.groupingChange.emit(dimensions);
+        // this.context().updateGrouping(dimensions);
       } else {
         // wait for the manual apply
       }
@@ -245,12 +248,14 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       hiddenFilters: this.context().getFilteringSettings().hiddenFilters,
       oql: this.oqlValue,
     };
-    this.context().setFilteringSettings(settings);
+    this.filtersChange.emit(settings);
+    // this.context().setFilteringSettings(settings);
   }
 
   manuallyApplyFilters() {
     if (this.haveNewGrouping()) {
-      this.context().updateGrouping(this.activeGrouping);
+      this.groupingChange.emit(this.activeGrouping);
+      // this.context().updateGrouping(this.activeGrouping);
     }
     if (this.activeMode === TsFilteringMode.STANDARD) {
       this.emitFiltersChange();
@@ -286,7 +291,7 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
     if (item.updateTimeSelectionOnFilterChange && item.searchEntities.length > 0) {
       // calculate the new time range. if all the entities were deleted, keep the last range.
       const newRange = this.getExecutionsTimeRange(item);
-      this.fullRangeChange.emit(newRange);
+      this.fullRangeRequestChange.emit(newRange);
     }
     this.emitFilterChange$.next();
   }

@@ -41,7 +41,7 @@
               </div>
             } @else {
               <div
-                (click)="updateTimeRangeFromSelection()"
+                (click)="updateFullTimeRangeFromSelection()"
                 class="round-btn grey-border align-with-ranger"
                 [class.disabled]="fullRangeSelected"
                 mat-icon-button
@@ -58,7 +58,9 @@
               [context]="mainEngine.state.context"
               [compactView]="compareModeEnabled"
               [showHiddenFilters]="compareModeEnabled"
-              (fullRangeChange)="handleMainFullRangeChange($event)"
+              (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
+              (groupingChange)="handleGroupingChange($event)"
+              (filtersChange)="handleFiltersChange($event)"
             />
             @if (!compareModeEnabled) {
               <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
@@ -85,7 +87,7 @@
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
               [compactView]="compareModeEnabled"
-              (fullRangeChange)="handleCompareFullRangeChange($event)"
+              (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
             />
           </div>
         }
@@ -93,6 +95,7 @@
     </div>
 
     @if (mainEngine.state) {
+      {{ mainEngine.state.lastChangeType }}
       <div class="dashlet-container">
         @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
           @if (dashlet.type === 'CHART') {
@@ -101,7 +104,7 @@
                 #chart
                 [editMode]="editMode"
                 [showExecutionLinks]="showExecutionLinks"
-                [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
+                [showLoadingSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
                 [item]="dashlet"
                 [context]="mainEngine.state.context"
                 [height]="DASHLET_HEIGHT"

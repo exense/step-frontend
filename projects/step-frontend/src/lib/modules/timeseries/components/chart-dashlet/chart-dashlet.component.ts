@@ -79,6 +79,7 @@ const resolutionLabels: Record<string, string> = {
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],
+  standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -110,7 +111,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() height!: number;
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
-  showLoadingSpinnerWhileLoading = input<boolean>(false);
+  showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   readonly remove = output();
   readonly shiftLeft = output();
