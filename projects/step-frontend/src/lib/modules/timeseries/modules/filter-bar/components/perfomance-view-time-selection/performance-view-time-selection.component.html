@@ -10,6 +10,11 @@
         (rangeChange)="onRangerSelectionChange($event)"
         (zoomReset)="onRangerZoomReset()"
       />
+      @if (showSpinnerWhileLoading() && isLoading()) {
+        <div class="spinner-container">
+          <mat-spinner [diameter]="28" />
+        </div>
+      }
     }
   </div>
 </div>

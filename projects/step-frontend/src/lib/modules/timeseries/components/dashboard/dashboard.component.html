@@ -29,7 +29,11 @@
         <div class="full-width-grow">
           <div class="time-section-container">
             <div class="ranger-section" [class.compact]="compareModeEnabled">
-              <step-execution-time-selection #timeSelection [context]="mainEngine.state.context" />
+              <step-execution-time-selection
+                #timeSelection
+                [context]="mainEngine.state.context"
+                [showSpinnerWhileLoading]="mainEngine.state.lastChangeType === 'manual'"
+              />
             </div>
             @if (compareModeEnabled) {
               <div
