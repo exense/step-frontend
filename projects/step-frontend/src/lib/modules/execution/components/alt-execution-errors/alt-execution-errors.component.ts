@@ -13,6 +13,15 @@ import {
 import { EXECUTION_ENDED_STATUSES, Status } from '../../../_common/step-common.module';
 import { map, Observable } from 'rxjs';
 
+const ALL_COLUMNS = {
+  errorMessage: 'errorMessage',
+  errorCode: 'errorCode',
+  types: 'types',
+  count: 'count',
+  percentage: 'percentage',
+  actions: 'actions',
+};
+
 @Component({
   selector: 'step-alt-execution-errors',
   templateUrl: './alt-execution-errors.component.html',
@@ -56,9 +65,19 @@ export class AltExecutionErrorsComponent {
   });
 
   readonly showExecutionsMenu = input(true);
+  readonly showActions = input(true);
 
   readonly statusFilterItems = input(EXECUTION_ENDED_STATUSES, {
     transform: (items?: Status[] | null) => (!items?.length ? EXECUTION_ENDED_STATUSES : items) as Status[],
+  });
+
+  protected readonly displayColumns = computed(() => {
+    const showActions = this.showActions();
+    let columns = Object.values(ALL_COLUMNS);
+    if (!showActions) {
+      columns = columns.filter((col) => col !== ALL_COLUMNS.actions);
+    }
+    return columns;
   });
 
   protected showError(errorMessage: string): void {

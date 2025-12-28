@@ -37,7 +37,6 @@
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>
-
   <div class="row">
     <div class="flex-grow-1">
       <step-cross-execution-heatmap [defaultDateRange]="luxonDateRange()" #heatmap />
@@ -109,7 +108,11 @@
         @if (_state.errorsTableLoading()) {
           <ng-container *ngTemplateOutlet="loadingSpinner" />
         }
-        <step-alt-execution-errors [dataSource]="_state.errorsDataSource" [statusFilterItems]="availableErrorTypes()" />
+        <step-alt-execution-errors
+          [dataSource]="_state.errorsDataSource"
+          [statusFilterItems]="availableErrorTypes()"
+          [showActions]="false"
+        />
       </step-alt-report-widget-content>
     </step-alt-report-widget>
   </div>

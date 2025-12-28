@@ -20,7 +20,7 @@
           <small>ID: {{ operation!.details!.id }}({{ operation!.details!.permits }})</small>
         }
         @if (operation?.details?.description; as description) {
-          <small>{{ operation!.details!.description }})</small>
+          <small>{{ operation!.details!.description }}</small>
         }
       }
       @case (SpecificOperations.TOKEN_SELECTION) {
