@@ -249,7 +249,6 @@ export class DashboardFilterBarComponent implements OnInit, OnDestroy {
       oql: this.oqlValue,
     };
     this.filtersChange.emit(settings);
-    // this.context().setFilteringSettings(settings);
   }
 
   manuallyApplyFilters() {

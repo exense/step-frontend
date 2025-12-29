@@ -113,13 +113,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   fullRangeSelected: boolean = true;
 
-  timeRangeChangeEffect = effect(() => {
-    // const timeRange = this.timeRange()!;
-    // this.mainEngine?.state.context.updateFullTimeRange(timeRange);
-    // this.compareEngine?.state.context.updateFullTimeRange(timeRange);
-    // this.refresh();
-  });
-
   /** @Output **/
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
