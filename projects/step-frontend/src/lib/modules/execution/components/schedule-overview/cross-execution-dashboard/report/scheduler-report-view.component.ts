@@ -103,6 +103,7 @@ export class SchedulerReportViewComponent implements OnInit {
   }
 
   handleMainChartZoom(timeRange: TimeRange) {
+    this._state.lastRefreshTrigger.set('manual');
     this._state.executionsChartSettings$.pipe(take(1)).subscribe((chartSettings) => {
       const base = chartSettings.xAxesSettings.values[0];
       const interval = chartSettings.xAxesSettings.values[1] - chartSettings.xAxesSettings.values[0];

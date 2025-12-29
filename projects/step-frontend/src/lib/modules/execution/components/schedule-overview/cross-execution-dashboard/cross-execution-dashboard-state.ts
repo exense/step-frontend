@@ -49,6 +49,8 @@ interface EntityWithKeywordsStats {
   statuses: Record<string, number>;
 }
 
+type KeywordsChartState = { chartSettings: TSChartSettings; lastExecutions: Execution[] };
+
 export type CrossExecutionViewType = 'task' | 'plan';
 
 export abstract class CrossExecutionDashboardState {
@@ -62,6 +64,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
   readonly plan = signal<Plan | null | undefined>(undefined);
+  readonly lastRefreshTrigger = signal<'init' | 'manual' | 'auto'>('init');
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -73,6 +76,12 @@ export abstract class CrossExecutionDashboardState {
   abstract readonly viewType: Signal<CrossExecutionViewType>;
   abstract readonly executionsTableFilter: Record<string, SearchValue>;
   abstract getViewType(): CrossExecutionViewType;
+
+  executionsChartLoading = signal<boolean>(false);
+  summaryWidgetLoading = signal<boolean>(false);
+  testCasesCountChartLoading = signal<boolean>(false);
+  keywordsCountChartLoading = signal<boolean>(false);
+  errorsTableLoading = signal<boolean>(false);
 
   updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.activeTimeRangeSelection.set(selection);
@@ -113,6 +122,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      this.summaryWidgetLoading.set(true);
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
@@ -138,12 +148,14 @@ export abstract class CrossExecutionDashboardState {
         items[keyAttributes['result'] as string] = bucket.count;
         total += bucket.count;
       });
+      this.summaryWidgetLoading.set(false);
       return { items: items, total: total };
     }),
   );
 
   executionsChartSettings$ = this.timeRange$.pipe(
     switchMap((timeRange) => {
+      this.executionsChartLoading.set(true);
       const statusAttribute = 'result';
       const oql = new OQLBuilder()
         .open('and')
@@ -225,6 +237,7 @@ export abstract class CrossExecutionDashboardState {
               },
             },
           ];
+          this.executionsChartLoading.set(false);
           return {
             title: '',
             showLegend: false,
@@ -268,8 +281,9 @@ export abstract class CrossExecutionDashboardState {
     shareReplay(1),
   );
 
-  keywordsChartSettings$ = this.lastExecutionsSorted$.pipe(
+  keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
+      this.keywordsCountChartLoading.set(true);
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
@@ -338,7 +352,9 @@ export abstract class CrossExecutionDashboardState {
                   return s;
                 });
                 this.cumulateSeriesData(series);
-                return this.createKeywordsChart(executions, series);
+                let chartSettings = this.createKeywordsChart(executions, series);
+                this.keywordsCountChartLoading.set(false);
+                return chartSettings;
               }),
             );
           }
@@ -351,6 +367,7 @@ export abstract class CrossExecutionDashboardState {
   testCasesChartSettings$: Observable<{ chart: TSChartSettings; hasData: boolean; lastExecutions: Execution[] }> =
     this.lastExecutionsSorted$.pipe(
       switchMap((executions) => {
+        this.testCasesCountChartLoading.set(true);
         return this.timeRange$.pipe(
           take(1),
           switchMap((timeRange) => {
@@ -421,6 +438,7 @@ export abstract class CrossExecutionDashboardState {
                     return s;
                   });
                   this.cumulateSeriesData(series);
+                  this.testCasesCountChartLoading.set(false);
                   return {
                     chart: this.createTestCasesChart(executions, series),
                     lastExecutions: executions,

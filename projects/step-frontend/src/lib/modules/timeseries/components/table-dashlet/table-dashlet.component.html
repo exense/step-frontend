@@ -95,6 +95,11 @@
 </div>
 
 <div class="table-container">
+  @if (isLoading() && showLoadingSpinnerWhileLoading()) {
+    <div class="spinner-container">
+      <mat-spinner [diameter]="40" />
+    </div>
+  }
   <step-table
     [dataSource]="tableDataSource"
     [inProgress]="tableIsLoading"

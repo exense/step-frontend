@@ -2,10 +2,12 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
+  input,
   Input,
   OnChanges,
   OnInit,
   output,
+  signal,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -77,6 +79,7 @@ const resolutionLabels: Record<string, string> = {
     TooltipContentDirective,
     ChartStandardTooltipComponent,
   ],
+  standalone: true,
 })
 export class ChartDashletComponent extends ChartDashlet implements OnInit, OnChanges {
   private readonly stepped = uPlot.paths.stepped; // this is a function from uplot wich allows to draw 'stepped' or 'stairs like' lines
@@ -108,11 +111,14 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Input() height!: number;
   @Input() editMode = false;
   @Input() showExecutionLinks = false;
+  showLoadingSpinnerWhileLoading = input<boolean>(true);
 
   readonly remove = output();
   readonly shiftLeft = output();
   readonly shiftRight = output();
   readonly zoomReset = output();
+
+  isLoading = signal<boolean>(false);
 
   groupingSelection: MetricAttributeSelection[] = [];
   selectedAggregate!: ChartAggregation;
@@ -460,6 +466,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
         axes: axes,
         truncated: response.truncated,
       };
+      this.isLoading.set(false);
     });
   }
 
@@ -522,6 +529,7 @@ export class ChartDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchDataAndCreateChart(): Observable<TimeSeriesAPIResponse> {
+    this.isLoading.set(true);
     const groupDimensions = this.getGroupDimensions();
     const oqlFilter = this.composeRequestFilter();
     this.requestOql = oqlFilter;

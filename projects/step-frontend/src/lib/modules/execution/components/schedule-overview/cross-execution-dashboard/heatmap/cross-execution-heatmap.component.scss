@@ -4,6 +4,16 @@
   height: 100%;
   gap: 2rem;
 
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    z-index: 100;
+  }
+
   .chart-actions-container {
     position: absolute;
     right: 2rem;
@@ -16,17 +26,6 @@
   .flex-grow-1 {
     flex-grow: 1;
     min-width: 0;
-  }
-
-  .spinner-container {
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto;
-    text-align: center;
-    top: 50%;
-    display: flex;
-    justify-content: center;
   }
 
   .trimmed-heatmap-placeholder {
