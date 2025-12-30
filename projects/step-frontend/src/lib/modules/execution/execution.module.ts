@@ -169,6 +169,7 @@ import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
+import { HistoryCellComponent } from './components/execution-history-cell/execution-history-cell.component';
 
 @NgModule({
   declarations: [
@@ -273,6 +274,7 @@ import { AltExecutionTimePopoverTitleDirective } from './components/alt-executio
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
     AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryCellComponent,
   ],
   imports: [
     StepCommonModule,

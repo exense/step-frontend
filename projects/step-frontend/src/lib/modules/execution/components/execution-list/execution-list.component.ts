@@ -96,8 +96,8 @@ export class ExecutionListComponent implements OnDestroy {
   }
 
   protected refreshTable(): void {
-    this.dataSource.reload({ hideProgress: true, isForce: false });
-    this.reloadRunningExecutionsCount$.next();
+    // this.dataSource.reload({ hideProgress: true, isForce: false });
+    // this.reloadRunningExecutionsCount$.next();
   }
 
   protected handleRunningStatusClick(): void {

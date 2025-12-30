@@ -15,7 +15,7 @@ export interface TreeNodePieChartSlice {
 })
 export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   readonly slices = input.required<TreeNodePieChartSlice[]>();
-  readonly size = input<number>(24);
+  readonly size = input<number>(40);
   readonly startAngleDeg = input<number>(-90);
   readonly circumferenceDeg = input<number>(360);
   readonly emptyColor = input<string>('#e5e7eb');
@@ -61,7 +61,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
         : { borderWidth: 1, borderColor: '#fff', hoverBorderWidth: 1 };
 
     const options = {
-      responsive: false,
+      responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
@@ -84,13 +84,15 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
         data: data,
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           animation: { duration: 0 },
           plugins: { legend: { display: false }, tooltip: { enabled: false } },
           elements: { arc: arcStyle },
         },
       }) as Chart;
-      canvasElement.nativeElement.width = size;
-      canvasElement.nativeElement.height = size;
+      // canvasElement.nativeElement.width = this.size();
+      // canvasElement.nativeElement.height = this.size();
+      console.log(size);
     }
   });
 
