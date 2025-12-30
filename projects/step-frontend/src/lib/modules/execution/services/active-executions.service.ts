@@ -5,8 +5,9 @@ import {
   AutoRefreshModel,
   AutoRefreshModelFactoryService,
   Execution,
+  durationSwitchMap,
 } from '@exense/step-core';
-import { BehaviorSubject, concatMap, filter, Observable, shareReplay, startWith, Subject, tap } from 'rxjs';
+import { BehaviorSubject, concatMap, filter, Observable, of, startWith, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { HttpStatusCode } from '@angular/common/http';
 import { TimeRangePickerSelection } from '../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
@@ -22,6 +23,7 @@ export interface ActiveExecution {
   getTimeRangeSelection(): TimeRangePickerSelection;
   updateChartsResolution(resolution: number): void;
   updateCompareModeEnabled(enabled: boolean): void;
+  adjustAutoRefresh(requestDuration: number): void;
   destroy(): void;
   manualRefresh(): void;
 }
@@ -69,7 +71,14 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.refresh$
       .pipe(
         startWith(() => undefined),
-        concatMap(() => this.loadExecution(this.executionId)),
+        concatMap(() => {
+          return of(this.executionId).pipe(
+            durationSwitchMap(
+              (executionId) => this.loadExecution(executionId),
+              (requestDuration) => this.adjustAutoRefresh(requestDuration),
+            ),
+          );
+        }),
       )
       .subscribe((execution) => {
         this.executionInternal$.next(execution);
@@ -82,6 +91,37 @@ class ActiveExecutionImpl implements ActiveExecution {
     this.autoRefreshModel.setDisabled(false);
     this.autoRefreshModel.setInterval(100);
     this.autoRefreshModel.setAutoIncreaseTo(5000);
+  }
+
+  adjustAutoRefresh(requestDuration: number): void {
+    const durationAndIntervals = [
+      2500,
+      5_000,
+      10_000,
+      5_000,
+      15_000,
+      30_000,
+      15_000,
+      30_000,
+      60_000,
+      30_000,
+      Infinity,
+      300_000,
+    ];
+
+    for (let i = 0; i < durationAndIntervals.length - 3; i += 3) {
+      const [min, max, result] = durationAndIntervals.slice(i, i + 3);
+      if (requestDuration >= min && requestDuration < max) {
+        // In case of manuallyChanged value auto-update model only if selected model's interval is lower than calculated one.
+        if (this.autoRefreshModel.isManuallyChanged && this.autoRefreshModel.interval >= result) {
+          break;
+        }
+
+        this.autoRefreshModel.setInterval(result);
+        this.autoRefreshModel.setAutoIncreaseTo(result);
+        break;
+      }
+    }
   }
 
   manualRefresh(): void {

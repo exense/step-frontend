@@ -206,7 +206,6 @@ export abstract class CrossExecutionDashboardState {
             paths: uPlot.paths.spline(),
             points: { show: false },
           };
-          console.log(responseTimeData);
 
           const axes: Axis[] = [
             {
@@ -215,6 +214,7 @@ export abstract class CrossExecutionDashboardState {
                 return vals.map((v) => TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(v));
               },
               grid: { show: false },
+              size: 65,
             },
             {
               size: TimeSeriesConfig.CHART_LEGEND_SIZE,

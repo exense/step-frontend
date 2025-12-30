@@ -1,6 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
 import { TimeSeriesErrorEntry } from '@exense/step-core';
-import { Status } from '../../../_common/shared/status.enum';
 
 @Component({
   selector: 'step-alt-execution-errors-widget',
@@ -20,22 +19,12 @@ export class AltExecutionErrorsWidgetComponent {
     return errors.length === 1 ? errors[0] : undefined;
   });
 
-  onFindInTree(message: string) {
+  protected readonly failedCount = computed(() => {
+    const errors = this.errors();
+    return errors.reduce((res, error) => res + error.count, 0);
+  });
+
+  protected onFindInTree(message: string) {
     this.searchFor.emit(message);
   }
-
-  protected readonly singleErrorCount = computed(() => {
-    const singleError = this.singleError();
-    if (!singleError) {
-      return undefined;
-    }
-    const status = singleError?.types?.[0] ?? Status.FAILED;
-    return { [status]: singleError.count };
-  });
-
-  protected readonly totalErrorsCount = computed(() => {
-    const errors = this.errors();
-    const total = errors.reduce((res, error) => res + error.count, 0);
-    return { [Status.FAILED]: total };
-  });
 }

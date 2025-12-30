@@ -11,6 +11,7 @@
       <ng-content select="step-alt-execution-time-suffix" />
     </section>
     <step-popover-content>
+      <ng-content select="step-alt-execution-time-popover-title" />
       <step-duration-description [startTime]="startTimeInput()" [endTime]="endTime()" [isRunning]="isRunning()" />
       <ng-content select="step-alt-execution-time-popover-addon" />
     </step-popover-content>

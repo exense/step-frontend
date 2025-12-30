@@ -1,37 +1,69 @@
-import { Component, EventEmitter, HostBinding, HostListener, Input, Output } from '@angular/core';
+import { Component, input, linkedSignal, OnDestroy, output } from '@angular/core';
+import { Subject, throttleTime } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'step-upload-container',
   templateUrl: './upload-container.component.html',
   styleUrls: ['./upload-container.component.scss'],
   standalone: false,
+  host: {
+    '[class.drop-area-active]': 'dropAreaActive()',
+    '(dragenter)': 'dragEnter()',
+    '(dragover)': 'dragOver($event)',
+    '(dragleave)': 'dragLeave()',
+    '(drop)': 'drop($event)',
+  },
 })
-export class UploadContainerComponent {
-  @HostBinding('class.drop-area-active') @Input() dropAreaActive?: boolean;
+export class UploadContainerComponent implements OnDestroy {
+  readonly isActive = input(true);
+  readonly dropAreaActiveInput = input<boolean | undefined>(undefined, { alias: 'dropAreaActive' });
+  readonly dropAreaActiveChange = output<boolean>();
+  readonly filesChange = output<File[]>();
 
-  @Output() dropAreaActiveChange = new EventEmitter<boolean>();
-  @Output() filesChange = new EventEmitter<File[]>();
+  protected readonly dropAreaActive = linkedSignal(() => this.dropAreaActiveInput());
 
-  @HostListener('dragenter')
-  onDragEnter(): void {
-    this.setDropAreaActive(true);
+  private readonly dropAreaActiveInternal$ = new Subject<boolean>();
+
+  private dropAreaActiveSubscription = this.dropAreaActiveInternal$
+    .pipe(throttleTime(300), takeUntilDestroyed())
+    .subscribe((dropAreaActive) => {
+      this.dropAreaActive.set(dropAreaActive);
+      this.dropAreaActiveChange.emit(dropAreaActive);
+    });
+
+  ngOnDestroy(): void {
+    this.dropAreaActiveInternal$.complete();
   }
 
-  @HostListener('dragover', ['$event'])
-  onDragOver(event: DragEvent): void {
+  protected dragEnter(): void {
+    if (!this.isActive()) {
+      return;
+    }
+    this.dropAreaActiveInternal$.next(true);
+  }
+
+  protected dragOver(event: DragEvent): void {
+    if (!this.isActive()) {
+      return;
+    }
     event.preventDefault();
   }
 
-  @HostListener('dragleave')
-  onDragLeave(): void {
-    this.setDropAreaActive(false);
+  protected dragLeave(): void {
+    if (!this.isActive()) {
+      return;
+    }
+    this.dropAreaActiveInternal$.next(false);
   }
 
-  @HostListener('drop', ['$event'])
-  onDrop(event: DragEvent): void {
+  protected drop(event: DragEvent): void {
+    if (!this.isActive()) {
+      return;
+    }
     event.preventDefault();
 
-    this.setDropAreaActive(false);
+    this.dropAreaActiveInternal$.next(false);
 
     if (!event.dataTransfer) {
       return;
@@ -56,10 +88,5 @@ export class UploadContainerComponent {
     }
 
     this.filesChange.emit(files);
-  }
-
-  private setDropAreaActive(dropAreaActive: boolean): void {
-    this.dropAreaActive = dropAreaActive;
-    this.dropAreaActiveChange.emit(dropAreaActive);
   }
 }

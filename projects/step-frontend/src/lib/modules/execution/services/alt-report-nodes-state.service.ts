@@ -4,19 +4,18 @@ import {
   catchError,
   combineLatest,
   distinctUntilChanged,
-  filter,
   finalize,
   map,
   Observable,
   of,
   switchMap,
-  tap,
 } from 'rxjs';
 import {
   Execution,
   ExecutionSummaryDto,
   FetchBucketsRequest,
   PrivateViewPluginService,
+  smartSwitchMap,
   TableDataSource,
   TimeRange,
   TimeSeriesAPIResponse,
@@ -25,6 +24,7 @@ import {
 import { ReportNodeSummary } from '../shared/report-node-summary';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AltReportNodesFilterService } from './alt-report-nodes-filter.service';
+import { convertPickerSelectionToTimeRange } from '../shared/convert-picker-selection';
 
 @Injectable()
 export abstract class AltReportNodesStateService<T> extends AltReportNodesFilterService implements OnDestroy {
@@ -67,15 +67,29 @@ export abstract class AltReportNodesStateService<T> extends AltReportNodesFilter
 
   private summaryTimeSeries$ = combineLatest([
     this._executionState.execution$,
-    this._executionState.timeRange$.pipe(filter((range) => !!range)),
+    this._executionState.timeRangeSelection$,
   ]).pipe(
-    map(([execution, timeRange]) => this.createFetchBucketRequest(execution, timeRange!)),
-    tap(() => this.summaryInProgressInternal$.next(true)),
-    switchMap((request) =>
-      this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
-        catchError(() => of(undefined)),
-        finalize(() => this.summaryInProgressInternal$.next(false)),
-      ),
+    map(([execution, range]) => ({ execution, range })),
+    smartSwitchMap(
+      (curr, prev) => {
+        return (
+          curr.execution?.id !== prev?.execution?.id ||
+          !this._dateUtils.areTimeRangeSelectionsEquals(curr.range, prev?.range)
+        );
+      },
+      ({ execution, range }) => {
+        const timeRange = convertPickerSelectionToTimeRange(range, execution, this._executionId());
+        if (!timeRange) {
+          return of(undefined);
+        }
+        const bucketRequest = this.createFetchBucketRequest(execution, timeRange);
+        this.summaryInProgressInternal$.next(true);
+        return this._timeSeriesService.getReportNodesTimeSeries(bucketRequest).pipe(
+          catchError(() => of(undefined)),
+          finalize(() => this.summaryInProgressInternal$.next(false)),
+        );
+      },
+      this._destroyRef,
     ),
   );
 
