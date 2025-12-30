@@ -63,7 +63,7 @@ export class WarningContainer {
 
 export const decorateWithWarnings = <T extends AbstractControl>(
   control: T,
-  destroyRefOrTerminator: DestroyRef | Subject<unknown>,
+  destroyRefOrTerminator: DestroyRef | Subject<unknown> | Subject<void>,
 ): T => {
   const container = new WarningContainer();
 
