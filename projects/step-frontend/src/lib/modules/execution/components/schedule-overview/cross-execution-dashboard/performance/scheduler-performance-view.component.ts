@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { AuthService, TimeRange } from '@exense/step-core';
 import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../../timeseries/modules/_common';
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
@@ -7,6 +7,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, pairwise } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
+import { DashboardComponent } from '../../../../../timeseries/components/dashboard/dashboard.component';
 
 @Component({
   selector: 'step-scheduler-performance-view',
@@ -21,6 +22,9 @@ export class SchedulerPerformanceViewComponent implements OnInit {
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
   protected readonly timeRange = signal<TimeRangePickerSelection | undefined>(undefined);
+
+  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
+
   isLoading = false;
 
   dashboardId?: string;
@@ -35,6 +39,13 @@ export class SchedulerPerformanceViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribeToUrlNavigation();
+    this._state.onRefreshTriggered.subscribe((timeRange) => {
+      this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
+    });
+    this._state.onTimeSelectionChanged.subscribe((timeRange) => {
+      this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'manual' });
+    });
+    // TODO unsubscribe
   }
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {

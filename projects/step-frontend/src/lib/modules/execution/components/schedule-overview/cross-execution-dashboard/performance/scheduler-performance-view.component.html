@@ -1,6 +1,7 @@
 @if (dashboardId) {
   @if (!isLoading) {
     <step-timeseries-dashboard
+      #dashboardComponent
       [id]="dashboardId!"
       [timeRange]="(_state.timeRange$ | async)!"
       [hiddenFilters]="dashboardFilters"

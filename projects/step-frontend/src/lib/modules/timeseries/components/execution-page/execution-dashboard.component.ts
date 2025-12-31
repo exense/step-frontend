@@ -64,6 +64,15 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
 
   private _destroyRef = inject(DestroyRef);
 
+  public refresh() {}
+
+  public updateFullTimeRange(
+    timeRange: TimeRange,
+    opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
+  ): void {
+    // this.dashboard.updateFullTimeRange()
+  }
+
   ngOnInit(): void {
     if (!this.execution) {
       throw new Error('Execution input is mandatory');
@@ -108,7 +117,8 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
       this.executionMode = this._executionViewModeService.getExecutionMode(this.execution());
       this.executionRange = this.getExecutionRange(this.execution());
-      this.dashboard?.refresh();
+      // this.dashboard?.refresh();
+      // TODO
     }
   }
 

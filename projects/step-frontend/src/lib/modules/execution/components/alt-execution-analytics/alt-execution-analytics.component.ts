@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, effect, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import { TimeSeriesContext } from '../../../timeseries/modules/_common';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
@@ -23,6 +23,10 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   isLoading = false;
 
   activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
+
+  effect = effect(() => {
+    console.log(this.activeTimeRangeSelection());
+  });
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, false);

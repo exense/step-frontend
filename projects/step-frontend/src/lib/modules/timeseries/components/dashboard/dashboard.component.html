@@ -45,7 +45,7 @@
               </div>
             } @else {
               <div
-                (click)="updateFullTimeRangeFromSelection()"
+                (click)="emitFullRangeUpdateRequest()"
                 class="round-btn grey-border align-with-ranger"
                 [class.disabled]="fullRangeSelected"
                 mat-icon-button

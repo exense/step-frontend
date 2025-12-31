@@ -65,6 +65,8 @@ export abstract class CrossExecutionDashboardState {
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
   readonly plan = signal<Plan | null | undefined>(undefined);
   readonly lastRefreshTrigger = signal<'init' | 'manual' | 'auto'>('init');
+  readonly onRefreshTriggered = new Subject<TimeRange>();
+  readonly onTimeSelectionChanged = new Subject<TimeRange>();
 
   // view settings
   activeTimeRangeSelection = signal<TimeRangePickerSelection | undefined>(undefined);
@@ -83,8 +85,10 @@ export abstract class CrossExecutionDashboardState {
   keywordsCountChartLoading = signal<boolean>(false);
   errorsTableLoading = signal<boolean>(false);
 
-  updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+  public updateTimeRangeSelection(selection: TimeRangePickerSelection) {
+    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set(selection);
+    this.onTimeSelectionChanged.next(this.convertSelectionToTimeRange(selection));
   }
 
   updateRefreshInterval(interval: number): void {
@@ -95,18 +99,20 @@ export abstract class CrossExecutionDashboardState {
     filter((value): value is TimeRangePickerSelection => value != null),
   );
 
+  public triggerRefresh() {
+    this.lastRefreshTrigger.set('auto');
+    this.activeTimeRangeSelection.set({ ...this.activeTimeRangeSelection()! });
+    this.fetchLastExecutionTrigger$.next();
+    let timeRangeSelection = this.activeTimeRangeSelection();
+    if (!timeRangeSelection) {
+      return;
+    }
+    const timeRange = this.convertSelectionToTimeRange(timeRangeSelection);
+    this.onRefreshTriggered.next(timeRange);
+  }
+
   readonly timeRange$: Observable<TimeRange> = this.timeRangeSelection$.pipe(
-    map((rangeSelection) => {
-      switch (rangeSelection.type) {
-        case 'FULL':
-          throw new Error('Full range is not supported');
-        case 'ABSOLUTE':
-          return rangeSelection.absoluteSelection!;
-        case 'RELATIVE':
-          const endTime = new Date().getTime();
-          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
-      }
-    }),
+    map(this.convertSelectionToTimeRange),
     filter((range): range is TimeRange => range !== undefined),
     shareReplay(1),
   ) as Observable<TimeRange>;
@@ -117,6 +123,18 @@ export abstract class CrossExecutionDashboardState {
     map((ex) => ({ execution: ex })),
     shareReplay(1),
   );
+
+  private convertSelectionToTimeRange(rangeSelection: TimeRangePickerSelection) {
+    switch (rangeSelection.type) {
+      case 'FULL':
+        throw new Error('Full range is not supported');
+      case 'ABSOLUTE':
+        return rangeSelection.absoluteSelection!;
+      case 'RELATIVE':
+        const endTime = new Date().getTime();
+        return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
+    }
+  }
 
   // charts
 

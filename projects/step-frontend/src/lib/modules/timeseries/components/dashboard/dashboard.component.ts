@@ -136,17 +136,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   mainEngine!: DashboardStateEngine;
   compareEngine?: DashboardStateEngine;
 
-  public refresh() {
-    if (!this.compareModeEnabled && this.mainEngine) {
-      this.mainEngine.triggerRefresh(false);
-      this.compareEngine?.triggerRefresh(false);
-    }
-  }
+  // public refresh() {
+  //   if (!this.compareModeEnabled && this.mainEngine) {
+  //     // this.mainEngine.triggerRefresh(false);
+  //     // this.compareEngine?.triggerRefresh(false);
+  //   }
+  // }
 
   public updateFullTimeRange(
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
   ): void {
+    console.log('updating full time range');
     this.mainEngine.state.lastChangeType = opts.actionType;
     this.mainEngine?.state.context.updateFullTimeRange(timeRange, opts.resetSelection);
   }
@@ -173,7 +174,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * This method is used to notify the parent component that the user wants to change the full time-range, to his current sub-selection
    * @protected
    */
-  protected updateFullTimeRangeFromSelection() {
+  protected emitFullRangeUpdateRequest() {
     if (!this.fullRangeSelected) {
       this.fullRangeUpdateRequest.emit(this.mainEngine.state.context.getSelectedTimeRange());
     }
