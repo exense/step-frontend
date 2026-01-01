@@ -101,7 +101,6 @@
     </div>
 
     @if (mainEngine.state) {
-      {{ mainEngine.state.lastChangeType }}
       <div class="dashlet-container">
         @for (dashlet of dashboard.dashlets; let i = $index; track dashlet.name) {
           @if (dashlet.type === 'CHART') {

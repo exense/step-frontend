@@ -107,7 +107,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
   initialTimeRange = input.required<TimeRange>();
-  // showLoadingSpinnerOnLoad = input<boolean>(false);
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
@@ -135,13 +134,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   mainEngine!: DashboardStateEngine;
   compareEngine?: DashboardStateEngine;
-
-  // public refresh() {
-  //   if (!this.compareModeEnabled && this.mainEngine) {
-  //     // this.mainEngine.triggerRefresh(false);
-  //     // this.compareEngine?.triggerRefresh(false);
-  //   }
-  // }
 
   public updateFullTimeRange(
     timeRange: TimeRange,
@@ -275,7 +267,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected saveEditChanges() {
     this.editMode = false;
     this.dashboard.grouping = this.mainEngine.state.context.getGroupDimensions();
-    // this.dashboard.timeRange = this.mainEngine.state.context.getTimeRangeSettings().pickerSelection;
     this.dashboard.resolution = this.resolution;
     this.dashboard.filters =
       this.filterBar?._internalFilters.map((item) => {
@@ -285,8 +276,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }) || [];
 
     this.dashboardUpdate.emit(this.dashboard);
-    // this._dashboardService.saveDashboard(this.dashboard).subscribe((response) => {});
-    // this.mainEngine.refreshAllCharts(false, true);
   }
 
   protected addTableDashlet(metric: MetricType) {
