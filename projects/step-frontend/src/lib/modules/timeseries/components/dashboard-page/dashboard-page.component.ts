@@ -74,7 +74,6 @@ export class DashboardPageComponent implements OnInit {
   hasWritePermission = this._authService.hasRight('dashboard-write');
 
   isLoading = signal<boolean>(false);
-  lastRefreshTrigger = signal<'auto' | 'manual'>('manual');
 
   timeRange = computed<TimeRange | undefined>(() => {
     const pickerSelection = this.activeTimeRangeSelection();
@@ -130,7 +129,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleFullRangeChanged(range: TimeRange) {
-    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set({ type: 'ABSOLUTE', absoluteSelection: range });
   }
 
@@ -161,7 +159,6 @@ export class DashboardPageComponent implements OnInit {
   }
 
   handleTimeRangeChange(pickerSelection: TimeRangePickerSelection) {
-    this.lastRefreshTrigger.set('manual');
     this.activeTimeRangeSelection.set(pickerSelection);
     let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
     this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'manual' });
@@ -169,7 +166,6 @@ export class DashboardPageComponent implements OnInit {
 
   triggerRefresh() {
     let pickerSelection = this.activeTimeRangeSelection()!;
-    this.lastRefreshTrigger.set('auto');
     let timeRange = TimeSeriesUtils.convertSelectionToTimeRange(pickerSelection);
     this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
   }

@@ -63,8 +63,8 @@
               [compactView]="compareModeEnabled"
               [showHiddenFilters]="compareModeEnabled"
               (fullRangeRequestChange)="handleMainFullRangeChangeRequest($event)"
-              (groupingChange)="handleGroupingChange($event)"
-              (filtersChange)="handleFiltersChange($event)"
+              (groupingChange)="handleGroupingChange(mainEngine, $event)"
+              (filtersChange)="handleFiltersChange(mainEngine, $event)"
             />
             @if (!compareModeEnabled) {
               <ng-container *ngTemplateOutlet="settingsButtonsTemplate" />
@@ -90,8 +90,10 @@
               #compareFilterBar
               [editMode]="editMode"
               [context]="compareEngine!.state.context"
-              [compactView]="compareModeEnabled"
+              [compactView]="true"
               (fullRangeRequestChange)="handleCompareFullRangeChange($event)"
+              (groupingChange)="handleGroupingChange(compareEngine!, $event)"
+              (filtersChange)="handleFiltersChange(compareEngine!, $event)"
             />
           </div>
         }
@@ -123,7 +125,7 @@
                 <div class="compare-mode-tag">Compare</div>
                 <step-chart-dashlet
                   #compareChart
-                  [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
+                  [showLoadingSpinnerWhileLoading]="compareEngine!.state.lastChangeType === 'manual'"
                   [editMode]="editMode"
                   [item]="dashlet"
                   [context]="compareEngine!.state.context"
@@ -139,7 +141,9 @@
               <step-table-dashlet
                 #chart
                 [item]="dashlet"
-                [showLoadingSpinnerWhileLoading]="showLoadingSpinnerOnLoad()"
+                [showLoadingSpinnerWhileLoading]="
+                  mainEngine!.state.lastChangeType === 'manual' || compareEngine?.state?.lastChangeType === 'manual'
+                "
                 [context]="mainEngine.state.context"
                 [editMode]="editMode"
                 (remove)="handleChartDelete(i)"

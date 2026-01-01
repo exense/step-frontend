@@ -43,7 +43,6 @@
   <step-timeseries-dashboard
     #dashboardComponent
     [id]="dashboard()!.id!"
-    [showLoadingSpinnerOnLoad]="lastRefreshTrigger() === 'manual'"
     [initialTimeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"

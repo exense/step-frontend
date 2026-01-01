@@ -40,7 +40,7 @@ import { Observable } from 'rxjs';
 })
 export class ExecutionDashboardComponent implements OnInit, OnChanges {
   execution = input.required<Execution>();
-  timeRange = input.required<TimeRange>();
+  initialTimeRange = input.required<TimeRange>();
   readonly fullRangeUpdateRequest = output<TimeRange>();
 
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
@@ -116,8 +116,8 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
       this.executionMode = this._executionViewModeService.getExecutionMode(this.execution());
-      const timeRange = this.getExecutionRange(this.execution());
-      this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
+      // const timeRange = this.getExecutionRange(this.execution());
+      // this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
     }
   }
 

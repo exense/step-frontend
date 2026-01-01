@@ -107,7 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
   initialTimeRange = input.required<TimeRange>();
-  showLoadingSpinnerOnLoad = input<boolean>(false);
+  // showLoadingSpinnerOnLoad = input<boolean>(false);
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
 
@@ -176,6 +176,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   protected emitFullRangeUpdateRequest() {
     if (!this.fullRangeSelected) {
+      this.mainEngine.state.lastChangeType = 'manual';
       this.fullRangeUpdateRequest.emit(this.mainEngine.state.context.getSelectedTimeRange());
     }
   }
@@ -215,14 +216,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     );
   }
 
-  protected handleGroupingChange(groupDimensions: string[]) {
-    this.mainEngine.state.lastChangeType = 'manual';
-    this.mainEngine.state.context.updateGrouping(groupDimensions);
+  protected handleGroupingChange(engine: DashboardStateEngine, groupDimensions: string[]) {
+    engine.state.lastChangeType = 'manual';
+    engine.state.context.updateGrouping(groupDimensions);
   }
 
-  protected handleFiltersChange(filters: TsFilteringSettings) {
-    this.mainEngine.state.lastChangeType = 'manual';
-    this.mainEngine.state.context.setFilteringSettings(filters);
+  protected handleFiltersChange(engine: DashboardStateEngine, filters: TsFilteringSettings) {
+    engine.state.lastChangeType = 'manual';
+    engine.state.context.setFilteringSettings(filters);
   }
 
   protected handleZoomReset() {
@@ -253,8 +254,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // minimum value should be one second
       return;
     }
+    this.mainEngine.state.lastChangeType = 'manual';
     this.mainEngine.state.context.updateChartsResolution(resolution);
-    this.compareEngine?.state.context.updateChartsResolution(resolution);
+    if (this.compareEngine) {
+      this.compareEngine.state.lastChangeType = 'manual';
+      this.compareEngine.state.context.updateChartsResolution(resolution);
+    }
   }
 
   protected enableEditMode() {

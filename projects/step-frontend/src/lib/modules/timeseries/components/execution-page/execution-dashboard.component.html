@@ -1,8 +1,8 @@
-@if (isInitialized && timeRange()) {
+@if (isInitialized && initialTimeRange()) {
   <step-timeseries-dashboard
     #dashboardComponent
     [id]="dashboardId"
-    [initialTimeRange]="timeRange()"
+    [initialTimeRange]="initialTimeRange()"
     [editable]="false"
     [hiddenFilters]="hiddenFilters"
     [showExecutionLinks]="false"

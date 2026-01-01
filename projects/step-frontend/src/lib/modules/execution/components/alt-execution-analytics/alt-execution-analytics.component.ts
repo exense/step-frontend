@@ -4,9 +4,12 @@ import { TimeSeriesContext } from '../../../timeseries/modules/_common';
 import { DashboardUrlParamsService } from '../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ExecutionDashboardComponent } from '../../../timeseries/components/execution-page/execution-dashboard.component';
-import { filter, pairwise } from 'rxjs';
+import { filter, map, Observable, pairwise, switchMap, withLatestFrom } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { TimeRange } from '@exense/step-core';
+import { ActiveExecution } from '../../services/active-executions.service';
+import { ActiveExecutionContextService } from '../../services/active-execution-context.service';
+import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 
 @Component({
   selector: 'step-alt-execution-analytics',
@@ -16,6 +19,7 @@ import { TimeRange } from '@exense/step-core';
 })
 export class AltExecutionAnalyticsComponent implements OnInit {
   readonly _state = inject(AltExecutionStateService);
+  private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _router = inject(Router);
   private _destroyRef = inject(DestroyRef);
@@ -23,6 +27,34 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   isLoading = false;
 
   activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
+
+  readonly timeRangeChange = this._activeExecutionContext.activeExecution$
+    .pipe(
+      takeUntilDestroyed(),
+      switchMap((active) => active.timeRangeSelectionChange$.pipe(withLatestFrom(active.execution$))),
+    )
+    .subscribe(([tr, execution]) => {
+      if (!tr || !execution) {
+        return;
+      }
+      const timeRange = convertPickerSelectionToTimeRange(tr, execution);
+      this.dashboardComponent()?.updateFullTimeRange(timeRange!, { actionType: 'manual' });
+    });
+
+  readonly autoRefreshTriggered = this._activeExecutionContext.activeExecution$
+    .pipe(
+      takeUntilDestroyed(),
+      switchMap((active) =>
+        active.execution$.pipe(map((execution) => [execution, active.getTimeRangeSelection()] as const)),
+      ),
+    )
+    .subscribe(([execution, timeRangeSelection]) => {
+      if (!timeRangeSelection || !execution) {
+        return;
+      }
+      const timeRange = convertPickerSelectionToTimeRange(timeRangeSelection, execution);
+      this.dashboardComponent()?.updateFullTimeRange(timeRange!, { actionType: 'auto' });
+    });
 
   effect = effect(() => {
     this.activeTimeRangeSelection();

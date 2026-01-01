@@ -10,7 +10,7 @@
 
   <step-execution-dashboard
     [execution]="execution()"
-    [timeRange]="timeRange()!"
+    [initialTimeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"
     (fullRangeUpdateRequest)="handleFullRangeChangeRequest($event)"

@@ -52,6 +52,7 @@ export class DashboardStateEngine {
       fullRange: timeRange,
       selectedRange: timeRange,
     };
+    this.state.lastChangeType = 'manual';
     this.state.context.updateTimeRangeSettings(timeRangeSettings);
   }
 
