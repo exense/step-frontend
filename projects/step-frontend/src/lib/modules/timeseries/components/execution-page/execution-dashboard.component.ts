@@ -7,6 +7,7 @@ import {
   OnInit,
   output,
   SimpleChanges,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import {
@@ -45,7 +46,7 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
   readonly contextSettingsChanged = output<TimeSeriesContext>(); // used to detect any change, useful for url updates
   readonly contextSettingsInit = output<TimeSeriesContext>(); // emit only first time when the context is created
 
-  @ViewChild(DashboardComponent) dashboard!: DashboardComponent;
+  private dashboardComponent = viewChild('dashboardComponent', { read: DashboardComponent });
 
   private _authService = inject(AuthService);
   protected _executionViewModeService = inject(ExecutionViewModeService);
@@ -64,13 +65,11 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
 
   private _destroyRef = inject(DestroyRef);
 
-  public refresh() {}
-
   public updateFullTimeRange(
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
   ): void {
-    // this.dashboard.updateFullTimeRange()
+    this.dashboardComponent()?.updateFullTimeRange(timeRange, opts);
   }
 
   ngOnInit(): void {
@@ -105,20 +104,20 @@ export class ExecutionDashboardComponent implements OnInit, OnChanges {
   }
 
   public getSelectedTimeRange() {
-    return this.dashboard.getSelectedTimeRange();
+    return this.dashboardComponent()!.getSelectedTimeRange();
   }
 
-  getExecutionRange(execution: Execution): Partial<TimeRange> {
-    return { from: execution.startTime, to: execution.endTime };
+  getExecutionRange(execution: Execution): TimeRange {
+    return { from: execution.startTime!, to: execution.endTime || new Date().getTime() };
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // we do the refresh based on execution change
     const executionChange = changes['execution'];
     if (executionChange?.currentValue !== executionChange?.previousValue && !executionChange?.firstChange) {
       this.executionMode = this._executionViewModeService.getExecutionMode(this.execution());
-      this.executionRange = this.getExecutionRange(this.execution());
-      // this.dashboard?.refresh();
-      // TODO
+      const timeRange = this.getExecutionRange(this.execution());
+      this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
     }
   }
 

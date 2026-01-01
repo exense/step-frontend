@@ -44,7 +44,7 @@
     #dashboardComponent
     [id]="dashboard()!.id!"
     [showLoadingSpinnerOnLoad]="lastRefreshTrigger() === 'manual'"
-    [timeRange]="timeRange()!"
+    [initialTimeRange]="timeRange()!"
     (contextSettingsChanged)="handleDashboardSettingsChange($event)"
     (contextSettingsInit)="handleDashboardSettingsInit($event)"
     [showExecutionLinks]="true"

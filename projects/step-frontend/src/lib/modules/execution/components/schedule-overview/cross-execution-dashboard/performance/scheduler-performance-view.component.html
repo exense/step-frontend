@@ -3,7 +3,7 @@
     <step-timeseries-dashboard
       #dashboardComponent
       [id]="dashboardId!"
-      [timeRange]="(_state.timeRange$ | async)!"
+      [initialTimeRange]="(_state.timeRange$ | async)!"
       [hiddenFilters]="dashboardFilters"
       [showExecutionLinks]="true"
       (contextSettingsChanged)="handleDashboardSettingsChange($event)"

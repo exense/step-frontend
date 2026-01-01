@@ -4,7 +4,7 @@ import { FilterBarItem, TimeSeriesConfig, TimeSeriesContext } from '../../../../
 import { TimeRangePickerSelection } from '../../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import { DashboardUrlParamsService } from '../../../../../timeseries/modules/_common/injectables/dashboard-url-params.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { filter, pairwise } from 'rxjs';
+import { filter, pairwise, takeUntil } from 'rxjs';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 import { DashboardComponent } from '../../../../../timeseries/components/dashboard/dashboard.component';
@@ -39,13 +39,12 @@ export class SchedulerPerformanceViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscribeToUrlNavigation();
-    this._state.onRefreshTriggered.subscribe((timeRange) => {
+    this._state.onRefreshTriggered.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
       this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'auto' });
     });
-    this._state.onTimeSelectionChanged.subscribe((timeRange) => {
+    this._state.onTimeSelectionChanged.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((timeRange) => {
       this.dashboardComponent()?.updateFullTimeRange(timeRange, { actionType: 'manual' });
     });
-    // TODO unsubscribe
   }
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {

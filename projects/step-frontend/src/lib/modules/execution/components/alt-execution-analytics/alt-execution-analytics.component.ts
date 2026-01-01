@@ -25,7 +25,7 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   activeTimeRangeSelection = toSignal(this._state.timeRangeSelection$);
 
   effect = effect(() => {
-    console.log(this.activeTimeRangeSelection());
+    this.activeTimeRangeSelection();
   });
 
   handleDashboardSettingsChange(context: TimeSeriesContext) {

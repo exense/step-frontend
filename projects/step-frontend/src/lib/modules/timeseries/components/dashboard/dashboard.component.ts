@@ -106,7 +106,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Input() editable: boolean = true;
   @Input() hiddenFilters: FilterBarItem[] = [];
   @Input() showExecutionLinks = true;
-  timeRange = input.required<TimeRange>();
+  initialTimeRange = input.required<TimeRange>();
   showLoadingSpinnerOnLoad = input<boolean>(false);
 
   timeRangeOptions = TimeSeriesConfig.ANALYTICS_TIME_SELECTION_OPTIONS;
@@ -366,8 +366,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return existingSettings!;
     } else {
       return {
-        fullRange: this.timeRange()!,
-        selectedRange: urlParams.selectedTimeRange || this.timeRange()!,
+        fullRange: this.initialTimeRange()!,
+        selectedRange: urlParams.selectedTimeRange || this.initialTimeRange()!,
       };
     }
   }
