@@ -24,10 +24,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this._auth.checkOidc();
-    if (this._auth.getConf()?.demo) {
-      this.credentials.password = 'init';
-      this.credentials.username = 'admin';
-    }
   }
 
   login() {

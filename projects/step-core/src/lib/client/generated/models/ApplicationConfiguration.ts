@@ -5,7 +5,6 @@
 export type ApplicationConfiguration = {
   authentication?: boolean;
   authenticatorName?: string;
-  demo?: boolean;
   debug?: boolean;
   noLoginMask?: boolean;
   passwordManagement?: boolean;
