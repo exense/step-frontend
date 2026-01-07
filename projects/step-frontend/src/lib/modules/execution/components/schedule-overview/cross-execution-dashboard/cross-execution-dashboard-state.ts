@@ -64,7 +64,7 @@ export abstract class CrossExecutionDashboardState {
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
   readonly plan = signal<Plan | null | undefined>(undefined);
-  readonly lastRefreshTrigger = signal<'init' | 'manual' | 'auto'>('init');
+  readonly lastRefreshTrigger = signal<'manual' | 'auto'>('manual');
   readonly onRefreshTriggered = new Subject<TimeRange>();
   readonly onTimeSelectionChanged = new Subject<TimeRange>();
 
@@ -308,6 +308,7 @@ export abstract class CrossExecutionDashboardState {
           const statusAttribute = 'status';
           const executionIdAttribute = 'executionId';
           if (executions.length === 0) {
+            this.keywordsCountChartLoading.set(false);
             return of(this.createKeywordsChart([], []));
           } else {
             const executionsIdsJoined =

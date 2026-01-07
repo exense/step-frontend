@@ -305,6 +305,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchBaseData(): Observable<ProcessedBucketResponse> {
+    this.isLoading.set(true);
     return this.fetchData(false).pipe(
       tap((response) => {
         this.baseBuckets = response.buckets;
