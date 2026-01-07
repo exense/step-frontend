@@ -391,6 +391,7 @@ export abstract class CrossExecutionDashboardState {
           take(1),
           switchMap((timeRange) => {
             if (executions.length === 0) {
+              this.testCasesCountChartLoading.set(false);
               return of({ chart: this.createTestCasesChart([], []), hasData: false, lastExecutions: [] });
             } else {
               const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ');
@@ -477,7 +478,8 @@ export abstract class CrossExecutionDashboardState {
     let filterItem = this.getDashboardFilter();
     // this is working only with searchEntities for now. extend it if needed
     const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter } });
+    console.log('reloading error tables');
+    this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter }, hideProgress: false });
   });
 
   private getDefaultBands(count: number, skipSeries = 0): Band[] {

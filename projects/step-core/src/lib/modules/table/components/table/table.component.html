@@ -1,4 +1,6 @@
-@if (useSpinner() && inProgress()) {
+{{ inProgressDataSource() }} {{ inProgressExternal() }}
+
+@if (inProgress()) {
   <div class="spinner-container">
     <mat-spinner />
   </div>

@@ -192,7 +192,7 @@ export class TableComponent<T>
   readonly indicatorMode = input<TableIndicatorMode>(TableIndicatorMode.SKELETON);
 
   readonly inProgressExternal = input(false, { alias: 'inProgress' });
-  private inProgressDataSource = signal(false);
+  protected inProgressDataSource = signal(false);
   protected readonly hasNext = signal(false);
   protected readonly totalFiltered = signal<number | null>(null);
   private isTableReadyToRenderColumns = signal(false);
@@ -424,6 +424,7 @@ export class TableComponent<T>
     this.dataSourceTerminator$?.next();
     this.dataSourceTerminator$?.complete();
     this.dataSourceTerminator$ = undefined;
+    console.log('terminate data source');
     this.inProgressDataSource.set(false);
     this.tableSelectionList?.destroy?.();
     this.tableSelectionList = undefined;
@@ -488,7 +489,9 @@ export class TableComponent<T>
       this.page!.firstPage();
     });
 
+    console.log(tableDataSource);
     tableDataSource!.inProgress$.pipe(takeUntil(this.dataSourceTerminator$)).subscribe((inProgress) => {
+      console.log('In progresss observable received', inProgress);
       this.inProgressDataSource.set(inProgress);
     });
 
