@@ -13,7 +13,6 @@ import { GlobalReloadService, Reloadable, SESSION_STORAGE } from '../../basics/s
 import { AuthContext } from '../types/auth-context.interface';
 import { AccessPermissionCondition, AccessPermissionGroup, NavigatorService } from '../../routing';
 import { CredentialsService } from './credentials.service';
-import { SelectedTenantIdService } from 'step-enterprise-frontend/plugins/step-enterprise-core/src/app/modules/multitenancy/services/selected-tenant-id.service';
 
 const OIDC_ENDPOINT_PARAM = 'startOidcEndPoint';
 
@@ -33,7 +32,6 @@ export class AuthService implements OnDestroy, Reloadable {
   private _serviceContext = inject(AppConfigContainerService);
   private _navigator = inject(NavigatorService);
   private _globalReloadService = inject(GlobalReloadService);
-  private _selectedTenantId = inject(SelectedTenantIdService);
 
   private triggerRightCheckInternal$ = new BehaviorSubject<unknown>(undefined);
 
@@ -116,7 +114,6 @@ export class AuthService implements OnDestroy, Reloadable {
 
   performPostLogoutActions(): void {
     this._sessionStorage.clear();
-    this._selectedTenantId.resetTenantId();
     this.setContext({ userID: ANONYMOUS });
     this._navigator.navigateToRoot();
   }
