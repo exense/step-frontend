@@ -23,8 +23,7 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   private currentRequestTerminator$?: Subject<void>;
   private requestRef$?: Observable<T[] | undefined>;
 
-  //@ts-ignore
-  override readonly inProgress$;
+  override readonly inProgress$ = of(false);
 
   constructor(
     private retrieveData: (request?: R) => Observable<T[] | undefined>,
@@ -43,7 +42,6 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   }
 
   override destroy(): void {
-    console.log('DESTROY datasource');
     super.destroy();
     this.inProgressInternal$?.complete();
     this.reload$?.complete();
@@ -59,18 +57,21 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     const reload$ = new BehaviorSubject<ReloadOptions<R> | undefined>(config.initialReloadOptions);
     const inProgressInternal$ = new BehaviorSubject<boolean>(false);
 
-    // Assign synchronously (no queueMicrotask needed)
-    this.reload$ = reload$;
-    this.inProgressInternal$ = inProgressInternal$;
-    (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
-
     const source$ = this.createDataStream(reload$, inProgressInternal$);
     super.setupStreams(source$, config);
 
-    if (this.pendingReload) {
-      this.reload$.next(this.pendingReload);
-      this.pendingReload = undefined;
-    }
+    // Assigning to the class fields is done asynchronously,
+    // because field definition is read like field initialization, which is invoked after constructor.
+    // It will override the value in case if it was assigned during the base constructor invocation.
+    queueMicrotask(() => {
+      this.reload$ = reload$;
+      this.inProgressInternal$ = inProgressInternal$;
+      (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
+      if (this.pendingReload) {
+        this.reload$.next(this.pendingReload);
+        this.pendingReload = undefined;
+      }
+    });
   }
 
   private terminateCurrentRequest(): void {
@@ -92,14 +93,11 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
         }
 
         const isProgressTriggered = !hideProgress && !immediateHideProgress;
-        console.log('IS PROGRESS TRIGGERED', isProgressTriggered, immediateHideProgress);
         if (isProgressTriggered) {
-          console.log('98');
           inProgressInternal$.next(true);
         }
 
         if (immediateHideProgress) {
-          console.log('103');
           inProgressInternal$.next(false);
         }
 
@@ -108,7 +106,6 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
         this.requestRef$ = this.retrieveData(request).pipe(
           tap(() => {
             if (isProgressTriggered) {
-              console.log('112');
               inProgressInternal$.next(false);
             }
             this.requestRef$ = undefined;

@@ -57,7 +57,6 @@ export class AltExecutionErrorsComponent {
     if (data instanceof TableLocalDataSource || data instanceof TableRemoteDataSource) {
       return data;
     }
-    console.log('-------------------------');
     if (data instanceof Array) {
       return this._timeSeriesApi.createErrorsLocalDataSource(data);
     }

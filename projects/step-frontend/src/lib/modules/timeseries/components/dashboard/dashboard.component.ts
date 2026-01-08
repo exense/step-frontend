@@ -139,7 +139,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     timeRange: TimeRange,
     opts: { actionType: 'manual' | 'auto'; resetSelection?: boolean },
   ): void {
-    console.log('updating full time range');
     this.mainEngine.state.lastChangeType = opts.actionType;
     this.mainEngine?.state.context.updateFullTimeRange(timeRange, opts.resetSelection);
   }

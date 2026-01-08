@@ -144,7 +144,6 @@ export class TableRemoteDataSource<T> implements TableDataSource<T> {
 
       const isProgressTriggered = !x.hideProgress;
       if (isProgressTriggered) {
-        console.log('Remote data source set true');
         this.inProgressInternal$.next(true);
       }
 

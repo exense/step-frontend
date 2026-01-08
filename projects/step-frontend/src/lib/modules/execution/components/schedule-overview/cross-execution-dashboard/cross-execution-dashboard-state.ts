@@ -483,7 +483,6 @@ export abstract class CrossExecutionDashboardState {
     let filterItem = this.getDashboardFilter();
     // this is working only with searchEntities for now. extend it if needed
     const filter = { [filterItem.attributeName]: filterItem.searchEntities[0]?.searchValue };
-    console.log('reloading error tables');
     this.errorsDataSource.reload({ request: { timeRange: timeRange, ...filter }, hideProgress: false });
   });
 
