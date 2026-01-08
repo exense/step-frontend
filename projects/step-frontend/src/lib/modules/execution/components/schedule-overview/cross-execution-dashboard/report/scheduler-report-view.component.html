@@ -37,7 +37,7 @@
     </div>
   </div>
   <div class="row">
-    <step-alt-report-widget class="flex-grow-1" [title]="byExecutionChartTitle()">
+    <step-alt-report-widget class="flex-grow-1" [title]="countChartTitle()">
       <step-alt-report-widget-content class="widget-content">
         <div class="chart-actions-container">
           <step-tabs
@@ -71,6 +71,9 @@
             </step-timeseries-chart>
           }
         } @else if (reportNodesChartType() === 'testcases') {
+          @if (_state.testCasesCountChartLoading()) {
+            <ng-container *ngTemplateOutlet="loadingSpinner" />
+          }
           @if (_state.testCasesChartSettings$ | async; as testCasesData) {
             @if (_state.testCasesCountChartLoading()) {
               <ng-container *ngTemplateOutlet="loadingSpinner" />

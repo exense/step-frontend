@@ -116,6 +116,7 @@ export class CrossExecutionHeatmapComponent implements OnInit, OnDestroy {
 
   protected switchType(newType: HeatMapChartType) {
     this.heatmapType.set(newType);
+    this._state.lastRefreshTrigger.set('manual');
   }
 
   readonly heatMapData$: Observable<HeatmapDataResponse> = combineLatest([

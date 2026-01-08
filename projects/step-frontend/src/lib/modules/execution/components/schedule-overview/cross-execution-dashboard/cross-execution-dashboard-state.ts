@@ -10,6 +10,7 @@ import {
   Subject,
   switchMap,
   take,
+  tap,
 } from 'rxjs';
 import { TimeRangePickerSelection } from '../../../../timeseries/modules/_common/types/time-selection/time-range-picker-selection';
 import {
@@ -296,6 +297,10 @@ export abstract class CrossExecutionDashboardState {
   );
 
   readonly lastExecutionsSorted$ = this.timeRange$.pipe(
+    tap(() => {
+      this.testCasesCountChartLoading.set(true);
+      this.keywordsCountChartLoading.set(true);
+    }),
     switchMap((timeRange) => this.fetchLastExecutions(timeRange)),
     map((executions) => {
       executions.sort((a, b) => a.startTime! - b.startTime!);
@@ -306,7 +311,6 @@ export abstract class CrossExecutionDashboardState {
 
   keywordsChartSettings$: Observable<KeywordsChartState> = this.lastExecutionsSorted$.pipe(
     switchMap((executions) => {
-      this.keywordsCountChartLoading.set(true);
       return this.timeRange$.pipe(
         take(1),
         switchMap((timeRange) => {
@@ -391,7 +395,6 @@ export abstract class CrossExecutionDashboardState {
   testCasesChartSettings$: Observable<{ chart: TSChartSettings; hasData: boolean; lastExecutions: Execution[] }> =
     this.lastExecutionsSorted$.pipe(
       switchMap((executions) => {
-        this.testCasesCountChartLoading.set(true);
         return this.timeRange$.pipe(
           take(1),
           switchMap((timeRange) => {

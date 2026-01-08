@@ -52,10 +52,16 @@ export class SchedulerReportViewComponent implements OnInit {
   );
 
   switchReportNodesChart(type: ReportNodesChartType) {
+    this._state.lastRefreshTrigger.set('manual');
+    if (type === 'keywords') {
+      this._state.keywordsCountChartLoading.set(true);
+    } else {
+      this._state.testCasesCountChartLoading.set(true);
+    }
     this.reportNodesChartType.set(type);
   }
 
-  readonly byExecutionChartTitle = computed(() => {
+  readonly countChartTitle = computed(() => {
     const label = this.reportNodesChartType() === 'keywords' ? 'Keyword calls count' : 'Test cases count';
     return `${label} (last ${this._state.LAST_EXECUTIONS_TO_DISPLAY} executions)`;
   });
