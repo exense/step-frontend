@@ -23,7 +23,8 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   private currentRequestTerminator$?: Subject<void>;
   private requestRef$?: Observable<T[] | undefined>;
 
-  override readonly inProgress$ = of(false);
+  //@ts-ignore
+  override readonly inProgress$;
 
   constructor(
     private retrieveData: (request?: R) => Observable<T[] | undefined>,
@@ -50,28 +51,20 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
   }
 
   protected override setupStreams(ignoredArrayFromConstructor: T[] | Observable<T[]>, config: TableFetchConfig<T, R>) {
-    // Initialization of these fields moved inside method `setupStreams`
-    // because it is invoked in the constructor.
-    // It means that all inline initializations will be done after,
-    // but these subject are already required to setup streams
     const reload$ = new BehaviorSubject<ReloadOptions<R> | undefined>(config.initialReloadOptions);
     const inProgressInternal$ = new BehaviorSubject<boolean>(false);
+
+    this.reload$ = reload$;
+    this.inProgressInternal$ = inProgressInternal$;
+    (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
 
     const source$ = this.createDataStream(reload$, inProgressInternal$);
     super.setupStreams(source$, config);
 
-    // Assigning to the class fields is done asynchronously,
-    // because field definition is read like field initialization, which is invoked after constructor.
-    // It will override the value in case if it was assigned during the base constructor invocation.
-    queueMicrotask(() => {
-      this.reload$ = reload$;
-      this.inProgressInternal$ = inProgressInternal$;
-      (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
-      if (this.pendingReload) {
-        this.reload$.next(this.pendingReload);
-        this.pendingReload = undefined;
-      }
-    });
+    if (this.pendingReload) {
+      this.reload$.next(this.pendingReload);
+      this.pendingReload = undefined;
+    }
   }
 
   private terminateCurrentRequest(): void {
