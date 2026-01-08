@@ -59,7 +59,6 @@ export abstract class CrossExecutionDashboardState {
   protected _executionService = inject(ExecutionsService);
   protected _timeSeriesService = inject(AugmentedTimeSeriesService);
   protected _statusColors = inject(STATUS_COLORS);
-  private _uPlotUtils = inject(UPlotUtilsService);
   private readonly fetchLastExecutionTrigger$ = new Subject<void>();
 
   readonly task = signal<ExecutiontTaskParameters | null | undefined>(undefined);
@@ -84,6 +83,9 @@ export abstract class CrossExecutionDashboardState {
   testCasesCountChartLoading = signal<boolean>(false);
   keywordsCountChartLoading = signal<boolean>(false);
   errorsTableLoading = signal<boolean>(false);
+  successRateValueLoading = signal<boolean>(false);
+  averageDurationValueLoading = signal<boolean>(false);
+  totalExecutionsValueLoading = signal<boolean>(false);
 
   public updateTimeRangeSelection(selection: TimeRangePickerSelection) {
     this.lastRefreshTrigger.set('manual');
@@ -141,6 +143,9 @@ export abstract class CrossExecutionDashboardState {
   readonly executionsDurationTimeSeriesData = this.timeRange$.pipe(
     switchMap((timeRange) => {
       this.summaryWidgetLoading.set(true);
+      this.successRateValueLoading.set(true);
+      this.totalExecutionsValueLoading.set(true);
+      this.averageDurationValueLoading.set(true);
       const oql = new OQLBuilder()
         .open('and')
         .append('attributes.metricType = "executions/duration"')
