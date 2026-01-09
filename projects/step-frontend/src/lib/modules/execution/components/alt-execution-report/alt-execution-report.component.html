@@ -1,4 +1,13 @@
 <section [class.small-screen]="!!(_isSmallScreen$ | async)" [class.print]="_mode === ViewMode.PRINT">
+  @if (_state.errors$ | async; as errors) {
+    <step-alt-execution-errors-widget
+      class="widget"
+      [style.--colSpan]="4"
+      [errors]="errors"
+      (showDetails)="scrollToErrorsSection()"
+      (searchFor)="searchFor($event)"
+    />
+  }
   @if (hasTestCases$ | async) {
     @if (_state.testCases$ | async) {
       <step-alt-report-nodes-testcases
@@ -52,17 +61,16 @@
       (fullRange)="_state.selectFullRange()"
     />
   }
-  @if (_state.errorsDataSource$ | async; as errorsDataSource) {
-    <step-alt-report-widget title="Errors" class="widget" [style.--colSpan]="4">
-      <step-alt-report-widget-content>
-        <step-alt-execution-errors
-          [dataSource]="errorsDataSource"
-          [statusFilterItems]="_state.availableErrorTypes$ | async"
-          [showExecutionsMenu]="false"
-        />
-      </step-alt-report-widget-content>
-    </step-alt-report-widget>
-  }
+  <step-alt-report-widget #errors title="Errors" class="widget" [style.--colSpan]="4">
+    <step-alt-report-widget-content>
+      <step-alt-execution-errors
+        [dataSource]="_state.errors$"
+        [statusFilterItems]="_state.availableErrorTypes$ | async"
+        [showExecutionsMenu]="false"
+        (searchFor)="searchFor($event)"
+      />
+    </step-alt-report-widget-content>
+  </step-alt-report-widget>
   @if (_state.currentOperations$ | async; as currentOperations) {
     <step-alt-report-current-operations [operations]="currentOperations" class="widget" [style.--colSpan]="2" />
   }

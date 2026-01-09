@@ -1,11 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, untracked } from '@angular/core';
 import {
   AugmentedControllerService,
   BaseReportDetailsComponent,
   DateFormat,
   Measure,
   ReportNode,
-  TableLocalDataSource,
+  TableDataSource,
+  TableRemoteDataSourceFactoryService,
 } from '@exense/step-core';
 import { KeywordReportNode } from '../../types/keyword.report-node';
 import { DOCUMENT } from '@angular/common';
@@ -26,6 +27,7 @@ import { AltExecutionStateService } from '../../../execution/services/alt-execut
 export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponent<KeywordReportNode> {
   private _controllerService = inject(AugmentedControllerService);
   private _altExecutionState = inject(AltExecutionStateService, { optional: true });
+  private _dataSourceFactory = inject(TableRemoteDataSourceFactoryService);
   private _window = inject(DOCUMENT).defaultView!;
 
   private reportNodesToRender = new Set([
@@ -85,17 +87,29 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
 
   protected readonly failedChildren = toSignal(this.failedChildren$, { initialValue: [] });
 
+  /**
+   * Extract nodeId, to prevent unnecessary dataSource recreation
+   * **/
+  private nodeId = computed(() => {
+    const node = this.node();
+    return node?.id;
+  });
+
   protected readonly measuresDataSource = computed(() => {
-    const measures = this.node()?.measures;
-    if (!measures?.length) {
+    const id = this.nodeId();
+    if (!id) {
       return undefined;
     }
-    return new TableLocalDataSource(
-      measures,
-      TableLocalDataSource.configBuilder<Measure>()
-        .addSortNumberPredicate('duration', (item: Measure) => item.duration)
-        .build(),
-    );
+    return this.createMeasurementsDataSource(id);
+  });
+
+  /**
+   * Add additional effect to refresh dataSource when node changes, event id is the same
+   * **/
+  private effectRefreshMeasurements = effect(() => {
+    const node = this.node();
+    const measuresDataSource = untracked(() => this.measuresDataSource());
+    measuresDataSource?.reload?.();
   });
 
   protected copyInput(): void {
@@ -126,6 +140,20 @@ export class CallKeywordReportDetailsComponent extends BaseReportDetailsComponen
     const paramsString = new URLSearchParams(params).toString();
     const url = `/#/analytics?${paramsString}`;
     this._window.open(url, '_blank');
+  }
+
+  private createMeasurementsDataSource(reportNodeId: string): TableDataSource<Measure> {
+    return this._dataSourceFactory.createDataSource(
+      'reportMeasurements',
+      {
+        begin: 'begin',
+        name: 'name',
+        duration: 'duration',
+      },
+      {
+        rnId: reportNodeId,
+      },
+    );
   }
 
   protected readonly DateFormat = DateFormat;

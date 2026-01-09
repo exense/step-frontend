@@ -1,7 +1,6 @@
 import {
   OnChanges,
   SimpleChanges,
-  TrackByFunction,
   AfterContentInit,
   Component,
   ContentChild,
@@ -11,6 +10,7 @@ import {
   Output,
   ViewChild,
   forwardRef,
+  ViewContainerRef,
 } from '@angular/core';
 import { MatMenu } from '@angular/material/menu';
 import {
@@ -19,7 +19,10 @@ import {
 } from '../../../custom-registeries/custom-registries.module';
 import { EntityMenuContentDirective } from '../../directives/entity-menu-content.directive';
 import { OperationCompleteHandler } from '../../injectables/operation-complete-handler';
-import { Mutable } from '../../../basics/step-basics.module';
+import { Mutable, StepBasicsModule } from '../../../basics/step-basics.module';
+import { EntityMenuItemDirective } from '../../directives/entity-menu-item.directive';
+import { EntityRefDirective } from '../../directives/entity-ref.directive';
+import { ENTITY_MENU_VIEW_CONTAINER_REF } from '../../injectables/entity-menu-view-container-ref.token';
 
 type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
 
@@ -27,19 +30,22 @@ type FieldAccessor = Mutable<Pick<EntityMenuComponent, 'hasContent'>>;
   selector: 'step-entity-menu',
   templateUrl: './entity-menu.component.html',
   styleUrls: ['./entity-menu.component.scss'],
+  imports: [StepBasicsModule, EntityMenuItemDirective, EntityRefDirective],
   providers: [
     {
       provide: OperationCompleteHandler,
       useExisting: forwardRef(() => EntityMenuComponent),
     },
+    {
+      provide: ENTITY_MENU_VIEW_CONTAINER_REF,
+      useFactory: () => inject(ViewContainerRef),
+    },
   ],
-  standalone: false,
 })
 export class EntityMenuComponent implements OperationCompleteHandler, AfterContentInit, OnChanges {
   private _menuItemRegistry = inject(EntityMenuItemsRegistryService);
 
   protected menuItems: EntityMenuItemInfo[] = [];
-  protected readonly trackByMenuItem: TrackByFunction<EntityMenuItemInfo> = (index, item) => item.menuId;
 
   readonly hasContent: boolean = false;
 

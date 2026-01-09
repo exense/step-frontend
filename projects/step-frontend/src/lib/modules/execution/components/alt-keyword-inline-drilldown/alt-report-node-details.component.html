@@ -1,5 +1,12 @@
 @if (node(); as node) {
-  <div>
+  <div class="grid">
+    @if (rootCauseErrors(); as rootCauseErrors) {
+      <step-error-root-causes
+        class="error-root-causes-container execution-report-node-details"
+        [data]="rootCauseErrors"
+        (onErrorSearch)="searchFor($event)"
+      />
+    }
     @if (detailsComponent(); as detailsComponent) {
       <step-custom-item-render [component]="detailsComponent" [context]="node" />
     } @else {
@@ -68,6 +75,7 @@
         </div>
       </div>
       <step-alt-execution-tree-partial
+        #partialTree
         [node]="node"
         [noPadding]="true"
         [showDetailsButton]="true"

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild, viewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, viewChild } from '@angular/core';
 import {
   AugmentedParametersService,
   AugmentedScreenService,
@@ -6,7 +6,9 @@ import {
   DateFormat,
   DialogRouteResult,
   Parameter,
+  ReloadableDirective,
   ScreensService,
+  ActivationExpressionWizardDialogComponent,
 } from '@exense/step-core';
 import { ParameterScopeRendererService } from '../../services/parameter-scope-renderer.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -15,7 +17,6 @@ import { SCOPE_ITEMS, ScopeItem } from '../../types/scope-items.token';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { DialogCommunicationService } from '../../services/dialog-communication.service';
-import { ParameterConditionDialogComponent } from '../parameter-condition-dialog/parameter-condition-dialog.component';
 import { catchError } from 'rxjs/operators';
 import { NgForm } from '@angular/forms';
 
@@ -35,6 +36,7 @@ interface ParameterEditDialogData {
       transition('hidden <=> visible', animate('300ms ease-in-out')),
     ]),
   ],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ParameterEditDialogComponent implements OnInit {
@@ -123,66 +125,29 @@ export class ParameterEditDialogComponent implements OnInit {
       });
   }
 
-  addCondition(type?: string) {
+  addCondition(type?: 'AND' | 'OR') {
     this._screenService
       .getScreenInputsByScreenId('executionParameters')
       .pipe(
         take(1),
-        switchMap((inputs) => {
-          const dialogRef = this._matDialog.open(ParameterConditionDialogComponent, {
-            data: { type, inputs },
-            width: '50rem',
-          });
-
-          return dialogRef.afterClosed();
-        }),
+        switchMap((inputs) =>
+          this._matDialog
+            .open(ActivationExpressionWizardDialogComponent, {
+              data: {
+                type,
+                inputs,
+                initialScript: this.parameter.activationExpression?.script ?? '', // pass current
+              },
+              width: '50rem',
+            })
+            .afterClosed(),
+        ),
       )
-      .subscribe((result) => {
-        const script = this.createGroovyExpression(result);
-        let tempScript = '';
-        if (result) {
-          switch (type) {
-            case 'OR':
-              tempScript = this.parameter.activationExpression!.script!;
-              this.parameter.activationExpression!.script! = `${tempScript} || ${script}`;
-              break;
-            case 'AND':
-              tempScript = this.parameter.activationExpression!.script!;
-              this.parameter.activationExpression!.script! = `${tempScript} && ${script}`;
-              break;
-            default:
-              this.parameter.activationExpression!.script! = script;
-          }
-        }
+      .subscribe((finalScript?: string) => {
+        if (!finalScript) return;
+        this.parameter.activationExpression ??= { script: '' as any }; // keep your typing shape
+        this.parameter.activationExpression!.script = finalScript;
       });
-  }
-
-  createGroovyExpression(input: any) {
-    let result = '';
-    const { key, predicate, value } = input;
-
-    switch (predicate) {
-      case 'equals':
-        result = `${key} == "${value}"`;
-        break;
-      case 'not_equals':
-        result = `${key} != "${value}"`;
-        break;
-      case 'matches':
-        result = `${key} =~ "${value}"`;
-        break;
-      case 'not_matches':
-        result = `${key} !~ "${value}"`;
-        break;
-      case 'exists':
-        result = `${key}`;
-        break;
-      case 'not_exists':
-        result = `!${key}`;
-        break;
-    }
-
-    return result;
   }
 
   selectScope(scopeItem: ScopeItem): void {

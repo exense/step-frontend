@@ -6,6 +6,9 @@ export const $DataPoolConfiguration = {
     forWrite: {
       type: 'DynamicValueBoolean',
     },
+    protect: {
+      type: 'DynamicValueBoolean',
+    },
     _class: {
       type: 'string',
       isRequired: true,

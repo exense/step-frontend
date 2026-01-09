@@ -35,6 +35,7 @@ import { TREE_EXPORTS } from './modules/tree';
 import { DynamicAttributePipe } from './pipes/dynamic-attribute.pipe';
 import { IsChartEmptyPipe } from './pipes/is-chart-empty.pipe';
 import { MatchingAuthenticator } from './pipes/matching-authenticator.pipe';
+import { IncludesStringPipe } from './pipes/includes-string.pipe';
 import { JsonViewerModule } from './modules/json-viewer/json-viewer.module';
 import { WaitingArtefactsAdvancedComponent } from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 import { FunctionActionsService } from './modules/keywords-common';
@@ -48,6 +49,7 @@ import { ReportNodeIconComponent } from './modules/artefacts-common/components/r
 import { AutomationPackageCommonModule } from './modules/automation-package-common/automation-package-common.module';
 import { LockColumnContainerComponent } from './components/lock-column-container/lock-column-container.component';
 import { LockColumnComponent } from './components/lock-column/lock-column.component';
+import { ActivationExpressionWizardDialogComponent } from './components/activation-expression-wizard-dialog/activation-expression-wizard-dialog.component';
 import { DatePickerModule } from './modules/date-picker/date-picker.module';
 import { EDITABLE_LABELS_EXPORTS } from './modules/editable-labels';
 import { CUSTOM_FORMS_EXPORTS } from './modules/custom-forms';
@@ -68,13 +70,15 @@ import { INFO_BANNER_EXPORTS } from './modules/info-banner';
 import { TAB_EXPORTS } from './modules/tabs';
 import { LIST_SELECTION_EXPORTS } from './modules/list-selection';
 import { SPLIT_EXPORTS } from './modules/split';
-import { AUTO_SHRANK_LIST_EXPORTS } from './modules/auto-srhank-list';
+import { AUTO_SHRINK_LIST_EXPORTS } from './modules/auto-shrink-list';
 import { JSON_VIEWER_EXT_EXPORTS } from './modules/json-viewer-ext';
 import { ARTEFACTS_COMMON_EXPORTS } from './modules/artefacts-common';
 import { ATTACHMENTS_EXPORTS } from './modules/attachments';
 import { SEARCH_EXPORTS } from './modules/search';
 import { KEYWORDS_COMMON_IMPORTS } from './modules/keywords-common';
 import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
+import { ScreenInputTypePipe } from './pipes/screen-input-type.pipe';
+import { ScreenInputOptionsPipe } from './pipes/screen-input-options.pipe';
 
 @NgModule({
   declarations: [
@@ -101,8 +105,12 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     HtmlDescriptionCellComponent,
     LockColumnContainerComponent,
     LockColumnComponent,
+    ActivationExpressionWizardDialogComponent,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    IncludesStringPipe,
+    ScreenInputTypePipe,
+    ScreenInputOptionsPipe,
   ],
   imports: [
     CommonModule,
@@ -141,7 +149,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     LIST_SELECTION_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
-    AUTO_SHRANK_LIST_EXPORTS,
+    AUTO_SHRINK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
     ARTEFACTS_COMMON_EXPORTS,
     ATTACHMENTS_EXPORTS,
@@ -190,6 +198,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     CronModule,
     HtmlDescriptionCellComponent,
     LockColumnComponent,
+    ActivationExpressionWizardDialogComponent,
     DatePickerModule,
     AUTH_EXPORTS,
     EDITABLE_LABELS_EXPORTS,
@@ -206,7 +215,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     INFO_BANNER_EXPORTS,
     TAB_EXPORTS,
     LIST_SELECTION_EXPORTS,
-    AUTO_SHRANK_LIST_EXPORTS,
+    AUTO_SHRINK_LIST_EXPORTS,
     JSON_VIEWER_EXT_EXPORTS,
     SPLIT_EXPORTS,
     TREE_EXPORTS,
@@ -215,6 +224,7 @@ import { RESOURCE_INPUT_IMPORTS } from './modules/resource-input';
     SEARCH_EXPORTS,
     ExtractUrlPipe,
     ExtractQueryParamsPipe,
+    IncludesStringPipe,
   ],
   providers: [
     CORE_INITIALIZER,
@@ -305,6 +315,7 @@ export * from './modules/is-used-by';
 export * from './pipes/dynamic-attribute.pipe';
 export * from './pipes/is-chart-empty.pipe';
 export * from './pipes/matching-authenticator.pipe';
+export * from './pipes/includes-string.pipe';
 export * from './modules/artefacts-common';
 export * from './services/deferred-link-processor.service';
 export * from './services/execution-close-handle.service';
@@ -328,6 +339,7 @@ export * from './modules/split';
 export * from './components/waiting-artefacts-advanced/waiting-artefacts-advanced.component';
 export * from './modules/plan-common/components/artefact-details/artefact-details.component';
 export * from './components/simple-outlet/simple-outlet.component';
+export * from './components/activation-expression-wizard-dialog/activation-expression-wizard-dialog.component';
 export * from './services/special-links.service';
 export * from './shared/special-links-strategy';
 export * from './modules/entity/pipes/cast-entity-to-plan.pipe';
@@ -343,7 +355,7 @@ export * from './modules/rich-editor';
 export * from './modules/multi-level-select';
 export { TestIdDirective } from './directives/test-id.directive';
 export * from './modules/info-banner';
-export * from './modules/auto-srhank-list';
+export * from './modules/auto-shrink-list';
 export * from './pipes/extract-url.pipe';
 export * from './pipes/extract-query-params.pipe';
 export * from './modules/search';

@@ -22,6 +22,7 @@ export class StatusIconPipe implements PipeTransform {
       case 'ESTIMATING':
       case 'PROVISIONING':
       case 'DEPROVISIONING':
+      case 'FORCING_ABORT':
         return 'refresh-cw';
       default:
         return 'square';

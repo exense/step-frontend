@@ -1,0 +1,48 @@
+@use 'sass:map';
+@use 'projects/step-core/styles/core-variables' as var;
+@use 'projects/step-frontend/styles/common-mixins' as common;
+
+:host {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+p {
+  white-space: nowrap;
+  margin: 0;
+}
+
+.error-count {
+  width: auto;
+  position: relative;
+  min-height: 2.5rem;
+
+  .text {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    margin-top: 0.3rem;
+
+    &.link {
+      cursor: pointer;
+      font-style: italic;
+    }
+
+    step-icon {
+      display: block;
+    }
+
+    span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+  }
+
+  step-icon.error {
+    color: var(--status-FAILED);
+    margin-right: 0.2rem;
+  }
+}

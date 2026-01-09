@@ -1,14 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 
 const MAX_DISPLAY_COUNT_IN_BADGE = 9;
 
@@ -19,25 +9,31 @@ const MAX_DISPLAY_COUNT_IN_BADGE = 9;
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  host: {
+    '(click)': 'handleClick($event)',
+  },
 })
-export class ExecutionRunningStatusHeaderComponent implements OnChanges {
-  @Input() runningExecutionsCount?: number | null;
-  @Output() statusBadgeClick = new EventEmitter<void>();
+export class ExecutionRunningStatusHeaderComponent {
+  readonly runningExecutionsCount = input(0, {
+    transform: (value?: number | null) => value ?? 0,
+  });
+  readonly statusBadgeClick = output<void>();
 
-  protected badgeText: string = '';
-  protected tooltipText: string = '';
+  protected badgeText = computed(() => {
+    const count = this.runningExecutionsCount();
+    return count > MAX_DISPLAY_COUNT_IN_BADGE ? '+' : count.toString();
+  });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    const cRunningExecutions = changes['runningExecutionsCount'];
-    if (cRunningExecutions?.previousValue !== cRunningExecutions?.currentValue || cRunningExecutions?.firstChange) {
-      const count = cRunningExecutions?.currentValue ?? 0;
-      this.badgeText = count > MAX_DISPLAY_COUNT_IN_BADGE ? '+' : count.toString();
-      this.tooltipText = `Currently running executions: ${count}`;
+  protected tooltipText = computed(() => {
+    const count = this.runningExecutionsCount();
+    if (count < 10) {
+      return `Currently running executions: ${count}`;
+    } else {
+      return `Currently running executions: 10 or more`;
     }
-  }
+  });
 
-  @HostListener('click', ['$event'])
-  handleBadgeClick(event: MouseEvent): void {
+  protected handleClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.classList.contains('step-badge')) {
       return;

@@ -17,4 +17,13 @@
   width: 6rem;
 }
 
+.create-button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-btn {
+  border-radius: 2rem;
+}
+
 @include core.table-common-cells;

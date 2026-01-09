@@ -1,11 +1,28 @@
 import { APP_INITIALIZER, FactoryProvider, inject, Injector, runInInjectionContext } from '@angular/core';
-import { ENTITY_ID, ICON, LABEL_ENTITY, LABEL_MENU, PATH } from './types/constants';
+import {
+  EDITOR_PATH,
+  AP_ENTITY_ID,
+  AP_ICON,
+  AP_LABEL_ENTITY,
+  LABEL_MENU,
+  AP_LIST_PATH,
+  REGEX_EDITOR,
+  AP_RESOURCE_LIBRARY_ENTITY_ID,
+  AP_RESOURCE_LIBRARY_LABEL_ENTITY,
+  AP_RESOURCE_ICON,
+  AP_RESOURCE_LIBRARY_EDITOR_PATH,
+  AP_RESOURCE_LIBRARY_REGEX_EDITOR,
+  AP_RESOURCE_LIBRARY_LIST_PATH,
+} from './types/constants';
 import {
   AugmentedAutomationPackagesService,
+  AugmentedResourcesService,
   AutomationPackageEntityTableRegistryService,
+  checkEntityGuardFactory,
   dialogRoute,
   EntityRegistry,
   InfoBannerService,
+  MultipleProjectsService,
   SimpleOutletComponent,
   ViewRegistryService,
 } from '@exense/step-core';
@@ -20,17 +37,20 @@ import { TableKeywordsComponent } from './components/table-keywords/table-keywor
 import { TableParametersComponent } from './components/table-parameters/table-parameters.component';
 import { TableTasksComponent } from './components/table-tasks/table-tasks.component';
 import { AutomationPackagesBulkOperationsRegisterService } from './injectables/automation-packages-bulk-operations-register.service';
+import { AutomationPackageLibraryListComponent } from './components/automation-package-library-list/automation-package-library-list.component';
+import { AutomationPackageLibraryUploadDialogComponent } from './components/automation-package-library-upload-dialog/automation-package-library-upload-dialog.component';
 
 const registerEntities = () => {
   const _entityRegistry = inject(EntityRegistry);
-  _entityRegistry.register(ENTITY_ID, LABEL_ENTITY, { icon: ICON });
+  _entityRegistry.register(AP_ENTITY_ID, AP_LABEL_ENTITY, { icon: AP_ICON });
+  _entityRegistry.register(AP_RESOURCE_LIBRARY_ENTITY_ID, AP_RESOURCE_LIBRARY_LABEL_ENTITY, { icon: AP_RESOURCE_ICON });
 };
 
 const registerRoutes = () => {
   const _viewRegistry = inject(ViewRegistryService);
   _viewRegistry.registerRoute(
     {
-      path: PATH,
+      path: 'automation-package',
       component: SimpleOutletComponent,
       children: [
         {
@@ -53,10 +73,26 @@ const registerRoutes = () => {
                 dialogRoute({
                   path: ':id',
                   dialogComponent: AutomationPackageUploadDialogComponent,
+                  canActivate: [
+                    checkEntityGuardFactory({
+                      entityType: AP_ENTITY_ID,
+                      getEntity: (id) => inject(AugmentedAutomationPackagesService).getAutomationPackageCached(id),
+                      getEditorUrl: (id) => `${EDITOR_PATH}/${id}`,
+                      isMatchEditorUrl: (url) => REGEX_EDITOR.test(url),
+                      getListUrl: () => AP_LIST_PATH,
+                    }),
+                  ],
                   resolve: {
                     automationPackage: (route: ActivatedRouteSnapshot) =>
-                      inject(AugmentedAutomationPackagesService).getAutomationPackage(route.params['id']),
+                      inject(AugmentedAutomationPackagesService).getAutomationPackageCached(route.params['id']),
                   },
+                  canDeactivate: [
+                    () => {
+                      inject(AugmentedAutomationPackagesService).clearCache();
+                      inject(MultipleProjectsService).cleanupProjectMessage();
+                      return true;
+                    },
+                  ],
                 }),
               ],
             },
@@ -83,6 +119,46 @@ const registerRoutes = () => {
             ),
           ],
         },
+        {
+          path: 'libraries',
+          component: AutomationPackageLibraryListComponent,
+          children: [
+            {
+              path: 'upload',
+              component: SimpleOutletComponent,
+              children: [
+                dialogRoute({
+                  path: 'new',
+                  dialogComponent: AutomationPackageLibraryUploadDialogComponent,
+                }),
+                dialogRoute({
+                  path: ':id',
+                  dialogComponent: AutomationPackageLibraryUploadDialogComponent,
+                  canActivate: [
+                    checkEntityGuardFactory({
+                      entityType: 'resource',
+                      getEntity: (id) => inject(AugmentedResourcesService).getResource(id),
+                      getEditorUrl: (id) => `${AP_RESOURCE_LIBRARY_EDITOR_PATH}/${id}`,
+                      isMatchEditorUrl: (url) => AP_RESOURCE_LIBRARY_REGEX_EDITOR.test(url),
+                      getListUrl: () => AP_RESOURCE_LIBRARY_LIST_PATH,
+                    }),
+                  ],
+                  resolve: {
+                    automationPackageLibrary: (route: ActivatedRouteSnapshot) =>
+                      inject(AugmentedResourcesService).getResourceCached(route.params['id']),
+                  },
+                  canDeactivate: [
+                    () => {
+                      inject(AugmentedResourcesService).cleanupCache();
+                      inject(MultipleProjectsService).cleanupProjectMessage();
+                      return true;
+                    },
+                  ],
+                }),
+              ],
+            },
+          ],
+        },
       ],
     },
     { accessPermissions: ['automation-package-read'] },
@@ -91,7 +167,7 @@ const registerRoutes = () => {
 
 const registerMenuEntries = () => {
   const _viewRegistry = inject(ViewRegistryService);
-  _viewRegistry.registerMenuEntry(LABEL_MENU, PATH, ICON, {
+  _viewRegistry.registerMenuEntry(LABEL_MENU, 'automation-package', AP_ICON, {
     parentId: 'automation-root',
     weight: 100,
   });

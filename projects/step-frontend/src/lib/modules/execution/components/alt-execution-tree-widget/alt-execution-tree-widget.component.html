@@ -1,6 +1,6 @@
 <step-alt-report-widget title="Execution tree" [applyOverflow]="true">
   <step-alt-report-widget-filter>
-    <step-btn-group class="with-round-borders">
+    <step-btn-group class="with-round-borders shrink collapse-buttons">
       <button
         type="button"
         mat-stroked-button
@@ -10,19 +10,28 @@
       >
         <step-icon name="collapse-all" />
       </button>
-    </step-btn-group>
-    <step-btn-group class="with-round-borders">
       <button type="button" mat-stroked-button (click)="expandAll()" matTooltip="Expand All" matTooltipPosition="below">
         <step-icon name="expand-all" />
       </button>
     </step-btn-group>
-    <step-alt-report-node-artefact-filter />
-    <step-alt-report-node-status-filter />
     <step-search-field
-      [formControl]="searchCtrl"
-      [(searchIndex)]="pageIndex"
-      [total]="foundItems()"
+      [formControl]="_treeSearch.searchCtrl"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
       [hint]="_treeSearchDescription"
+      notFoundTooltip="no results found"
+    />
+    <step-search-paginator
+      [isActive]="_treeSearch.isErrorSearchActive()"
+      (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
+      [isDisabled]="!_treeSearch.hasErrors()"
+      [inactiveTooltip]="_treeSearch.errorsButtonHint()"
+      activeTooltip="Close error search"
+      [hintTooltip]="_treeSearch.errorsSearchHint()"
+      prevTooltip="show previous error"
+      nextTooltip="show next error"
     />
   </step-alt-report-widget-filter>
   <step-alt-report-widget-content>
@@ -30,7 +39,7 @@
       #tree
       stepTreeAutoChooseVirtualScroll="340px"
       [applyVirtualScrollFrom]="150"
-      [showSpinnerForEmptyTree]="true"
+      [showSpinnerWhileTreeInitialize]="true"
     />
   </step-alt-report-widget-content>
 </step-alt-report-widget>

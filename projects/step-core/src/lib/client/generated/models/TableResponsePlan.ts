@@ -8,4 +8,5 @@ export type TableResponsePlan = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<Plan>;
+  hasNext?: boolean;
 };

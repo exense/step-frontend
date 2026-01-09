@@ -17,5 +17,8 @@ export const $TableResponseUserBookmark = {
         type: 'UserBookmark',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

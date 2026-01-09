@@ -34,6 +34,8 @@ import {
   ReportNode,
   SimpleOutletComponent,
   editScheduledTaskRoute,
+  MultipleProjectsService,
+  SearchPaginatorComponent,
 } from '@exense/step-core';
 import { ExecutionErrorsComponent } from './components/execution-errors/execution-errors.component';
 import { RepositoryPlanTestcaseListComponent } from './components/repository-plan-testcase-list/repository-plan-testcase-list.component';
@@ -95,7 +97,7 @@ import { AltExecutionParametersComponent } from './components/alt-execution-para
 import { AltExecutionLaunchDialogComponent } from './components/alt-execution-launch-dialog/alt-execution-launch-dialog.component';
 import { ActiveExecutionsService } from './services/active-executions.service';
 import { ActiveExecutionContextService } from './services/active-execution-context.service';
-import { ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { catchError, map, of, switchMap, take } from 'rxjs';
 import { AggregatedReportViewTreeNodeUtilsService } from './services/aggregated-report-view-tree-node-utils.service';
 import {
@@ -154,6 +156,19 @@ import { AltExecutionTimeSuffixDirective } from './components/alt-execution-time
 import { AltExecutionRepositoryLinkComponent } from './components/alt-execution-repository-link/alt-execution-repository-link.component';
 import { CrossExecutionExecutionTableComponent } from './components/schedule-overview/cross-execution-dashboard/executions-table/cross-execution-execution-table.component';
 import { ExecutionAgentsListComponent } from './components/execution-agents-list/execution-agents-list.component';
+import { TestCaseInlineRootCauseComponent } from './components/test-case-inline-root-cause/test-case-inline-root-cause.component';
+import { ErrorRootCausesComponent } from './components/error-root-causes/error-root-causes.component';
+import { AltExecutionErrorsWidgetComponent } from './components/alt-execution-errors-widget/alt-execution-errors-widget.component';
+import { ReportViewHeaderComponent } from './components/schedule-overview/cross-execution-dashboard/report/header/report-view-header.component';
+import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
+import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
+import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { DOCUMENT } from '@angular/common';
+import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 
 @NgModule({
   declarations: [
@@ -249,6 +264,15 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     PlanPageComponent,
     CrossExecutionExecutionTableComponent,
     ExecutionAgentsListComponent,
+    AltExecutionErrorsWidgetComponent,
+    ReportViewHeaderComponent,
+    CrossExecutionHeatmapComponent,
+    GradientLegendComponent,
+    StatusDistributionBadgeComponent,
+    StatusDistributionTooltipComponent,
+    HeatmapComponent,
+    AggregatedTreeNodeHistoryComponent,
+    AggregatedTreeNodeStatusesPiechartComponent,
   ],
   imports: [
     StepCommonModule,
@@ -267,6 +291,10 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     AltExecutionTimePrefixDirective,
     AltExecutionTimeSuffixDirective,
     AltExecutionTimePopoverAddonDirective,
+    SearchPaginatorComponent,
+    TestCaseInlineRootCauseComponent,
+    ErrorRootCausesComponent,
+    AltExecutionTimePopoverTitleDirective,
   ],
   exports: [
     ExecutionListComponent,
@@ -298,6 +326,7 @@ import { ExecutionAgentsListComponent } from './components/execution-agents-list
     DurationDescriptionComponent,
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
+    StatusCountBadgeComponent,
   ],
   providers: [
     {
@@ -444,6 +473,7 @@ export class ExecutionModule {
             canDeactivate: [
               () => {
                 inject(AugmentedExecutionsService).cleanupCache();
+                inject(MultipleProjectsService).cleanupProjectMessage();
                 return true;
               },
             ],
@@ -454,7 +484,7 @@ export class ExecutionModule {
       ],
     });
     this._viewRegistry.registerRoute({
-      path: 'plan-view/:id',
+      path: 'plans/:id/report',
       component: PlanPageComponent,
       children: [
         {
@@ -567,6 +597,7 @@ export class ExecutionModule {
           canDeactivate: [
             () => {
               inject(AugmentedExecutionsService).cleanupCache();
+              inject(MultipleProjectsService).cleanupProjectMessage();
               return true;
             },
             () => inject(AGGREGATED_TREE_TAB_STATE).cleanup(),
@@ -578,6 +609,26 @@ export class ExecutionModule {
             {
               path: '',
               redirectTo: 'report',
+            },
+            {
+              /**
+               * Sometimes url with additional outlets, can be broken by copy-pasting third-party tools (ex. Google Chat)
+               * It encodes the url replacing the bracket. In this case when such url will be pasted to browser,
+               * bracket will be interpreted as part of the path.
+               *
+               * This route handles such path, normalizes the url by decoding it and performs the redirect.
+               * **/
+              path: '(report',
+              canActivate: [
+                () => {
+                  const _router = inject(Router);
+                  const _doc = inject(DOCUMENT);
+                  let location = _doc.location.href;
+                  location = location.slice(location.indexOf('/executions'));
+                  location = decodeURI(location);
+                  return _router.parseUrl(location);
+                },
+              ],
             },
             stepRouteAdditionalConfig(
               {
@@ -746,16 +797,9 @@ export class ExecutionModule {
                   {
                     path: ':detailsId',
                     resolve: {
-                      aggregatedNode: (route: ActivatedRouteSnapshot) => {
+                      aggregatedNodeId: (route: ActivatedRouteSnapshot) => {
                         const detailsId = route.params['detailsId'];
-                        const _state = inject(AggregatedReportViewTreeStateContextService).getState();
-                        const aggregatedNodeId = detailsId.startsWith('agid_')
-                          ? detailsId.replace('agid_', '')
-                          : undefined;
-                        if (!aggregatedNodeId) {
-                          return undefined;
-                        }
-                        return _state.findNodeById(aggregatedNodeId);
+                        return detailsId.startsWith('agid_') ? detailsId.replace('agid_', '') : undefined;
                       },
                       resolvedPartialPath: () =>
                         inject(AggregatedReportViewTreeStateContextService).getState().resolvedPartialPath(),
@@ -763,22 +807,6 @@ export class ExecutionModule {
                         const detailsId = route.params['detailsId'];
                         return detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
                       },
-                      /*
-                      reportNode: (route: ActivatedRouteSnapshot) => {
-                        const detailsId = route.params['detailsId'];
-                        const _reportNodeDetailsState = inject(AltReportNodeDetailsStateService);
-                        const _controllerService = inject(AugmentedControllerService);
-                        const reportNodeId = detailsId.startsWith('rnid_') ? detailsId.replace('rnid_', '') : undefined;
-                        if (!reportNodeId) {
-                          return undefined;
-                        }
-                        const reportNode = _reportNodeDetailsState.getReportNode(reportNodeId);
-                        if (reportNode) {
-                          return reportNode;
-                        }
-                        return _controllerService.getReportNode(reportNodeId);
-                      },
-*/
                       searchStatus: (route: ActivatedRouteSnapshot) => {
                         const _queryParamNames = inject(REPORT_NODE_DETAILS_QUERY_PARAMS);
                         return route.queryParams[_queryParamNames.searchStatus] as Status | undefined;

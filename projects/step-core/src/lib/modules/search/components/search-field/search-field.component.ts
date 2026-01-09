@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChild,
+  effect,
+  input,
+  model,
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { StepBasicsModule } from '../../../basics/step-basics.module';
+import { SearchFieldAddonDirective } from '../../directives/search-field-addon.directive';
 
 type OnChange = (value: string) => void;
 type OnTouch = () => void;
@@ -23,16 +33,41 @@ export class SearchFieldComponent implements ControlValueAccessor {
   readonly total = input.required<number>();
 
   readonly hint = input('');
-  readonly hintIcon = input('alert-triangle');
+  readonly notFoundTooltip = input('');
+  readonly prevTooltip = input<string>('previous');
+  readonly nextTooltip = input<string>('next (enter)');
+
+  readonly disableNavButtonsWithControl = input(true);
+
+  protected readonly inputFieldTooltip = computed(() => {
+    const value = this.value();
+    const text = this.notFoundTooltip();
+    const total = this.total();
+    if (total === 0 && !!value && !!text) {
+      return text;
+    }
+    return undefined;
+  });
+
+  private areNavButtonsDisabled = computed(() => {
+    const isDisabled = this.isDisabled();
+    const disableNavButtonsWithControl = this.disableNavButtonsWithControl();
+    return disableNavButtonsWithControl ? isDisabled : false;
+  });
 
   protected readonly areButtonsActive = computed(() => {
-    const isDisabled = this.isDisabled();
+    const isDisabled = this.areNavButtonsDisabled();
     const value = (this.value() ?? '').trim();
     const total = this.total();
     if (isDisabled) {
       return false;
     }
     return !!value && total > 0;
+  });
+
+  protected readonly showButtons = computed(() => {
+    const value = (this.value() ?? '').trim();
+    return !!value;
   });
 
   protected readonly searchLabel = computed(() => {
@@ -50,6 +85,9 @@ export class SearchFieldComponent implements ControlValueAccessor {
     const total = this.total();
     this.searchIndex.set(0);
   });
+
+  private fieldAddon = contentChild(SearchFieldAddonDirective);
+  protected readonly fieldAddonTemplate = computed(() => this.fieldAddon()?._templateRef);
 
   constructor(public _ngControl: NgControl) {
     this._ngControl.valueAccessor = this;

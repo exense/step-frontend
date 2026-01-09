@@ -29,7 +29,6 @@ import { UploadContainerComponent } from './components/upload-container/upload-c
 import { JsonRawEditorFormattedComponent } from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
 import { LabelAddonDirective } from './directives/label-addon.directive';
 import { TimeInputComponent } from './components/time-input/time-input.component';
-import { ProjectSwitchDialogComponent } from './components/project-switch-dialog/project-switch-dialog.component';
 import { ArrayInputComponent } from './components/array-input/array-input.component';
 import { RouterModule } from '@angular/router';
 import { StringArrayInputComponent } from './components/string-array-input/string-array-input.component';
@@ -78,6 +77,9 @@ import { ElementSizeDirective } from './directives/element-size.directive';
 import { StatusIconClassDirective } from './directives/status-icon-class.directive';
 import { DescriptionDirective } from './directives/description.directive';
 import { FilterAddonDirective } from './directives/filter-addon.directive';
+import { LongInlineTextComponent } from './components/long-inline-text/long-inline-text.component';
+import { ResourceUrlPipe } from './pipes/resource-url.pipe';
+import { NumberSeparateThousandsPipe } from './pipes/number-separate-thousands.pipe';
 
 @NgModule({
   imports: [
@@ -94,6 +96,9 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ElementSizeDirective,
     StatusIconClassDirective,
     FilterAddonDirective,
+    LongInlineTextComponent,
+    ResourceUrlPipe,
+    NumberSeparateThousandsPipe,
   ],
   declarations: [
     ResourceLabelComponent,
@@ -124,7 +129,6 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     SingleItemArrayFilterComponent,
     ProgressBarComponent,
     UploadContainerComponent,
-    ProjectSwitchDialogComponent,
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
@@ -197,7 +201,6 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     UploadContainerComponent,
     JsonRawEditorFormattedComponent,
     LabelAddonDirective,
-    ProjectSwitchDialogComponent,
     TimeInputComponent,
     PerTimeUnitInputComponent,
     ArrayInputComponent,
@@ -244,6 +247,9 @@ import { FilterAddonDirective } from './directives/filter-addon.directive';
     ElementSizeDirective,
     StatusIconClassDirective,
     FilterAddonDirective,
+    LongInlineTextComponent,
+    ResourceUrlPipe,
+    NumberSeparateThousandsPipe,
   ],
 })
 export class StepBasicsModule {}
@@ -258,7 +264,6 @@ export * from './components/input-filter/input-filter.component';
 export * from './components/resource-label/resource-label.component';
 export * from './components/json-raw-editor/json-raw-editor.component';
 export * from './components/json-raw-editor-formatted/json-raw-editor-formatted.component';
-export * from './components/project-switch-dialog/project-switch-dialog.component';
 export * from './components/modal-window/modal-window.component';
 export * from './components/form-field/form-field.component';
 export * from './components/errors-list/errors-list.component';
@@ -315,7 +320,6 @@ export * from './types/is-used-by-dialog-data';
 export * from './types/is-used-by-search-type';
 export * from './injectables/multiple-projects.service';
 export * from './injectables/generate-api-key.service';
-export * from './injectables/app-config-container.service';
 export * from './injectables/file-downloader.service';
 export * from './injectables/popover-overlay.service';
 export * from './injectables/additional-initialization.service';
@@ -379,19 +383,22 @@ export { SelectComponentSearchCtrlContainer } from './injectables/select-compone
 export * from './injectables/dynamic-values-utils.service';
 export * from './types/reloadable';
 export * from './injectables/global-reload.service';
-export * from './types/image-type.enum';
-export * from './types/video-type.enum';
-export * from './types/text-type.enum';
-export * from './types/special-mime-type.enum';
-export * from './injectables/image-types.token';
-export * from './injectables/video-types.token';
-export * from './injectables/text-types.token';
-export * from './injectables/mime-types.token';
 export * from './directives/strategy-click.directive';
 export * from './injectables/click-strategy.token';
 export * from './types/click-strategy.type';
 export * from './directives/element-size.directive';
 export * from './injectables/element-size.service';
+export * from './injectables/indicator-state-factory.service';
 export * from './directives/status-icon-class.directive';
-export * from './injectables/app-host.token';
 export * from './directives/filter-addon.directive';
+export * from './types/type-info';
+export * from './types/file-types';
+export * from './injectables/file-type-utils.service';
+export * from './components/long-inline-text/long-inline-text.component';
+export * from './injectables/dialog-route-open-state.service';
+export * from './pipes/resource-url.pipe';
+export * from './utils/toggle-validators';
+export * from './utils/resource-id';
+export * from './pipes/number-separate-thousands.pipe';
+export * from './utils/smart-switch-map';
+export * from './utils/duration-switch-map';

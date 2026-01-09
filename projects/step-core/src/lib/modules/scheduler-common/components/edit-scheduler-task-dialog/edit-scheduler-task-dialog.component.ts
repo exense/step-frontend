@@ -50,6 +50,8 @@ import { RepositoryParametersSchemasService } from '../../../repository-paramete
 import { LIST_SELECTION_EXPORTS, SelectAll } from '../../../list-selection';
 import { catchError } from 'rxjs/operators';
 import { HasRightPipe } from '../../../auth';
+import { EntityRefDirective } from '../../../entity/directives/entity-ref.directive';
+import { ReloadableDirective } from '../../../routing';
 
 type EditDialogRef = MatDialogRef<EditSchedulerTaskDialogComponent, DialogRouteResult>;
 
@@ -66,6 +68,7 @@ export interface EditSchedulerTaskDialogData {
     task: ExecutiontTaskParameters;
     config?: EditSchedulerTaskDialogConfig;
   };
+  isSchedulePlan?: boolean;
 }
 
 const LOCAL_REPOSITORY_ID = 'local';
@@ -81,7 +84,9 @@ const LOCAL_REPOSITORY_ID = 'local';
     JSON_FORM_EXPORTS,
     LIST_SELECTION_EXPORTS,
     HasRightPipe,
+    EntityRefDirective,
   ],
+  hostDirectives: [ReloadableDirective],
   host: {
     '(keydown.enter)': 'save()',
   },
@@ -98,14 +103,13 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
   private _fb = inject(FormBuilder);
   private _jsonFieldUtils = inject(JsonFieldUtilsService);
   private _repositoryParamsSchemas = inject(RepositoryParametersSchemasService);
-  private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA).taskAndConfig;
-  private _cd = inject(ChangeDetectorRef);
+  private _dialogData = inject<EditSchedulerTaskDialogData>(MAT_DIALOG_DATA);
 
-  private config = this._dialogData.config;
+  private config = this._dialogData.taskAndConfig.config;
+  protected task = this._dialogData.taskAndConfig.task;
+  protected readonly isSchedulePlan = !!this._dialogData.isSchedulePlan;
 
   private customForms = viewChild(CustomFormWrapperComponent);
-
-  protected task = this._dialogData.task;
 
   protected hideUser = this.config?.hideUser;
 
@@ -195,7 +199,7 @@ export class EditSchedulerTaskDialogComponent implements OnInit, AfterViewInit {
     }
     taskModel2Form(this.task, this.taskForm, this._fb, this.config?.plan);
     const repositoryId = this.taskForm.controls.repositoryId.value;
-    this.isNew.set(!this.taskForm.controls.name.value);
+    this.isNew.set(!!this.isSchedulePlan || !this.taskForm.controls.name.value);
     this.isLocal.set(repositoryId === LOCAL_REPOSITORY_ID);
     this.paramsSchema.set(
       this._repositoryParamsSchemas.getSchema(repositoryId!) ?? {

@@ -1,3 +1,3 @@
 export abstract class Reloadable {
-  abstract reload(): void;
+  abstract reload(isCausedByProjectChange?: boolean): void;
 }

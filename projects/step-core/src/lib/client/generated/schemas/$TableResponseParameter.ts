@@ -17,5 +17,8 @@ export const $TableResponseParameter = {
         type: 'Parameter',
       },
     },
+    hasNext: {
+      type: 'boolean',
+    },
   },
 } as const;

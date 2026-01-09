@@ -9,6 +9,8 @@ import { HttpEvent } from '@angular/common/http';
 import { TimeSeriesErrorEntry } from '../shared/time-series-error-entry';
 import { TimeSeriesErrorsRequest } from '../shared/time-series-errors-request';
 import { TableFetchLocalDataSource } from '../../../modules/table/shared/table-fetch-local-data-source';
+import { TableLocalDataSource } from '../../../modules/table/shared/table-local-data-source';
+import { TableLocalDataSourceConfig } from '../../../modules/table/shared/table-local-data-source-config';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +37,8 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
       oqlFilter = `attributes.taskId = ${request.taskId}`;
     } else if (request.executionId) {
       oqlFilter = `attributes.executionId = ${request.executionId}`;
+    } else if (request.planId) {
+      oqlFilter = `attributes.planId = ${request.planId}`;
     }
 
     const executionsAttributesLimit = 10;
@@ -90,19 +94,29 @@ export class AugmentedTimeSeriesService extends TimeSeriesService implements Htt
     );
   }
 
-  createErrorsDataSource(): TableFetchLocalDataSource<TimeSeriesErrorEntry> {
+  createErrorsFetchDataSource(): TableFetchLocalDataSource<TimeSeriesErrorEntry> {
     return new TableFetchLocalDataSource(
       (request?: TimeSeriesErrorsRequest) => (!request ? of([]) : this.findErrors(request)),
-      TableFetchLocalDataSource.configBuilder<TimeSeriesErrorEntry>()
-        .addSearchNumberPredicate('errorCode', (item) => item.errorCode)
-        .addCustomSearchPredicate('types', (item, searchValue) => {
-          const search = new RegExp(searchValue, 'ig');
-          return item.types.some((type) => search.test(type));
-        })
-        .addSortNumberPredicate('errorCode', (item) => item.errorCode)
-        .addSortNumberPredicate('count', (item) => item.count)
-        .addSortNumberPredicate('percentage', (item) => item.percentage)
-        .build(),
+      this.createErrorsDataSourceConfig(),
     );
+  }
+
+  createErrorsLocalDataSource(
+    data: TimeSeriesErrorEntry[] | Observable<TimeSeriesErrorEntry[]>,
+  ): TableLocalDataSource<TimeSeriesErrorEntry> {
+    return new TableLocalDataSource(data, this.createErrorsDataSourceConfig());
+  }
+
+  private createErrorsDataSourceConfig(): TableLocalDataSourceConfig<TimeSeriesErrorEntry> {
+    return TableLocalDataSource.configBuilder<TimeSeriesErrorEntry>()
+      .addSearchNumberPredicate('errorCode', (item) => item.errorCode)
+      .addCustomSearchPredicate('types', (item, searchValue) => {
+        const search = new RegExp(searchValue, 'ig');
+        return item.types.some((type) => search.test(type));
+      })
+      .addSortNumberPredicate('errorCode', (item) => item.errorCode)
+      .addSortNumberPredicate('count', (item) => item.count)
+      .addSortNumberPredicate('percentage', (item) => item.percentage)
+      .build();
   }
 }

@@ -4,8 +4,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   AugmentedResourcesService,
   DialogRouteResult,
+  getResourceId,
+  isResourceId,
   ModalWindowComponent,
   MultipleProjectsService,
+  ReloadableDirective,
   Resource,
   ResourceInputService,
   StepCoreModule,
@@ -24,6 +27,7 @@ import { PredefinedResourceType } from './predefined-resource-type.enum';
   styleUrls: ['./resource-configuration-dialog.component.scss'],
   imports: [StepCoreModule],
   providers: [ResourceInputService],
+  hostDirectives: [ReloadableDirective],
 })
 export class ResourceConfigurationDialogComponent implements OnInit {
   private _formBuilder = inject(FormBuilder);
@@ -57,13 +61,13 @@ export class ResourceConfigurationDialogComponent implements OnInit {
   }
 
   protected handleContentChange(resourceId?: string): void {
-    if (!resourceId?.startsWith?.('resource:')) {
+    if (!resourceId || !isResourceId(resourceId)) {
       return;
     }
 
     this.loading = true;
 
-    this._resourcesService.getResource(resourceId.replace('resource:', '')).subscribe((resource) => {
+    this._resourcesService.getResource(getResourceId(resourceId)).subscribe((resource) => {
       this._resourceConfigurationDialogData.resource = resource;
       this.setFormValue(resource);
       this.loading = false;

@@ -1,8 +1,8 @@
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import {
   Component,
-  computed,
   DestroyRef,
+  forwardRef,
   inject,
   OnDestroy,
   OnInit,
@@ -11,6 +11,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
@@ -21,10 +22,8 @@ import {
   pairwise,
   scan,
   shareReplay,
-  skip,
   startWith,
   switchMap,
-  take,
   tap,
 } from 'rxjs';
 import {
@@ -35,6 +34,7 @@ import {
   AugmentedPlansService,
   AugmentedTimeSeriesService,
   DateUtilsService,
+  EntityRefService,
   Execution,
   ExecutionCloseHandleService,
   IncludeTestcases,
@@ -42,10 +42,12 @@ import {
   PopoverMode,
   ReloadableDirective,
   ReportNode,
+  smartSwitchMap,
   SystemService,
   TableDataSource,
   TableLocalDataSource,
   TimeRange,
+  TimeSeriesErrorEntry,
   ViewRegistryService,
 } from '@exense/step-core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -75,6 +77,7 @@ import { Status } from '../../../_common/step-common.module';
 import { AltExecutionCloseHandleService } from '../../services/alt-execution-close-handle.service';
 import { AggregatedTreeDataLoaderService } from '../../services/aggregated-tree-data-loader.service';
 import { ToggleRequestWarningDirective } from '../../directives/toggle-request-warning.directive';
+import { convertPickerSelectionToTimeRange } from '../../shared/convert-picker-selection';
 
 enum UpdateSelection {
   ALL = 'all',
@@ -137,11 +140,17 @@ interface RefreshParams {
       provide: ExecutionCloseHandleService,
       useClass: AltExecutionCloseHandleService,
     },
+    {
+      provide: EntityRefService,
+      useExisting: forwardRef(() => AltExecutionProgressComponent),
+    },
     AggregatedTreeDataLoaderService,
   ],
   standalone: false,
 })
-export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExecutionStateService {
+export class AltExecutionProgressComponent
+  implements OnInit, OnDestroy, AltExecutionStateService, EntityRefService<Execution>
+{
   private _urlParamsService = inject(DashboardUrlParamsService);
   private _activeExecutionContext = inject(ActiveExecutionContextService);
   private _activeExecutionsService = inject(ActiveExecutionsService);
@@ -187,6 +196,8 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     takeUntilDestroyed(),
   );
 
+  private execution = toSignal(this.execution$, { initialValue: undefined });
+
   protected isAnalyticsRoute$ = this._router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     startWith(null), // Emit an initial value when the component loads
@@ -196,22 +207,14 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   protected isAnalyticsRoute = toSignal(this.isAnalyticsRoute$);
 
-  readonly timeChangeTriggerOnExecutionChangeSubscription = this.activeExecution$
-    .pipe(takeUntilDestroyed(), skip(1)) // skip initialization call.
-    .subscribe((activeExecution) => {
-      // force trigger time range change
-      const timeRangeSelection = activeExecution.getTimeRangeSelection();
-      setTimeout(() => {
-        this.updateTimeRangeSelection({ ...timeRangeSelection });
-      }, 100);
-    });
-
+  /** Active execution's range selection data stream **/
   readonly timeRangeSelection$ = this.activeExecution$.pipe(
     switchMap((activeExecution) => activeExecution.timeRangeSelectionChange$.pipe(debounceTime(200))),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
+  /** Subscribes to active execution's range selection data stream and update url's parameters **/
   private updateUrlParamsSubscription = this.timeRangeSelection$
     .pipe(
       scan(
@@ -260,23 +263,10 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
     }),
   );
 
-  readonly timeRange$: Observable<TimeRange> = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
-    map(([execution, rangeSelection]) => {
-      if (execution.id !== this._executionId()) {
-        // when the execution changes, the activeExecution is triggered and the time-range will be updated and retrigger this
-        return undefined;
-      }
-      switch (rangeSelection.type) {
-        case 'FULL':
-          const now = new Date().getTime();
-          return { from: execution.startTime!, to: execution.endTime || Math.max(now, execution.startTime! + 5000) };
-        case 'ABSOLUTE':
-          return rangeSelection.absoluteSelection!;
-        case 'RELATIVE':
-          const endTime = execution.endTime || new Date().getTime();
-          return { from: endTime - rangeSelection.relativeSelection!.timeInMs, to: endTime };
-      }
-    }),
+  readonly timeRange$: Observable<TimeRange> = combineLatest([this.timeRangeSelection$, this.execution$]).pipe(
+    map(([rangeSelection, execution]) =>
+      convertPickerSelectionToTimeRange(rangeSelection, execution, this._executionId()),
+    ),
     filter((range): range is TimeRange => range !== undefined),
     shareReplay(1),
   ) as Observable<TimeRange>;
@@ -285,23 +275,28 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   readonly isExecutionCompleted$ = this.execution$.pipe(map((execution) => execution.status === 'ENDED'));
 
-  readonly testCases$ = combineLatest([
-    this.execution$.pipe(
-      startWith(undefined),
-      map((execution) => execution?.id),
+  readonly testCases$ = combineLatest([this.execution$.pipe(startWith(undefined)), this.timeRangeSelection$]).pipe(
+    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+    smartSwitchMap(
+      (curr, prev) => {
+        return (
+          curr.execution?.id !== prev?.execution?.id ||
+          !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+        );
+      },
+      ({ execution, timeRangeSelection }) => {
+        if (!execution?.id || !timeRangeSelection) {
+          return of(undefined);
+        }
+        return this._executionsApi.getFlatAggregatedReportView(execution.id, {
+          range: convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId()),
+          filterArtefactClasses: ['TestCase'],
+          fetchCurrentOperations: true,
+        });
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
     ),
-    this.timeRange$,
-  ]).pipe(
-    switchMap(([id, range]) => {
-      if (!id) {
-        return of(undefined);
-      }
-      return this._executionsApi.getFlatAggregatedReportView(id, {
-        range,
-        filterArtefactClasses: ['TestCase'],
-        fetchCurrentOperations: true,
-      });
-    }),
     map((result) => result?.aggregatedReportViews ?? []),
     shareReplay(1),
   );
@@ -342,17 +337,55 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         eid: execution.id,
       } as KeywordParameters;
     }),
+    distinctUntilChanged((a, b) => a.eid === b.eid),
     shareReplay(1),
     takeUntilDestroyed(),
   );
 
   private keywordsDataSource = (this._controllerService.createDataSource() as TableDataSource<ReportNode>).sharable();
+
+  /**
+   * Logic to reload keyword's datasource when execution is refreshed
+   * **/
+  private refreshKeywordsSubscription = this.execution$
+    .pipe(
+      map((execution) => execution.id),
+      pairwise(),
+      filter((pair) => pair[0] === pair[1]),
+      takeUntilDestroyed(),
+    )
+    .subscribe(() => this.keywordsDataSource.reload({ isForce: false }));
+
   readonly keywordsDataSource$ = of(this.keywordsDataSource);
 
-  private errorsDataSource = this._timeSeriesService.createErrorsDataSource().sharable();
-  readonly errorsDataSource$ = of(this.errorsDataSource);
-  readonly availableErrorTypes$ = this.errorsDataSource.allData$.pipe(
-    map((items) => items.reduce((res, item) => [...res, ...item.types], [] as string[])),
+  readonly errors$ = combineLatest([this.execution$, this.timeRangeSelection$]).pipe(
+    map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
+    smartSwitchMap(
+      (curr, prev) => {
+        return (
+          curr.execution?.id !== prev?.execution?.id ||
+          !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+        );
+      },
+      ({ execution, timeRangeSelection }) => {
+        const executionId = execution?.id;
+        const timeRange = convertPickerSelectionToTimeRange(timeRangeSelection, execution, this._executionId());
+        if (!executionId || !timeRange) {
+          return of([]);
+        }
+        return this._timeSeriesService.findErrors({ executionId, timeRange });
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+    ),
+    catchError(() => of([] as TimeSeriesErrorEntry[])),
+    map((errors) => (!errors?.length ? undefined : errors)),
+    shareReplay(1),
+    takeUntilDestroyed(),
+  );
+
+  readonly availableErrorTypes$ = this.errors$.pipe(
+    map((items) => (items ?? []).reduce((res, item) => [...res, ...item.types], [] as string[])),
     map((errorTypes) => Array.from(new Set(errorTypes)) as Status[]),
     shareReplay(1),
     takeUntilDestroyed(),
@@ -365,33 +398,28 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       }
       return execution.id;
     }),
-    switchMap((eId) => {
-      if (!eId) {
-        return of(undefined);
-      }
-      return this._systemService.getCurrentOperations(eId);
-    }),
+    smartSwitchMap(
+      (curr, prev) => curr !== prev,
+      (eId) => {
+        if (!eId) {
+          return of(undefined);
+        }
+        return this._systemService.getCurrentOperations(eId);
+      },
+      this._destroyRef,
+      (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+    ),
   );
 
   ngOnInit(): void {
-    const urlParams = this._urlParamsService.collectUrlParams();
-
-    // this component is responsible for triggering the initial timeRange (it can be either the existing one in state or the url one)
-    if (urlParams.timeRange) {
-      this.updateTimeRangeSelection(urlParams.timeRange);
-    } else {
-      // force event
-      let activeExecution = this._activeExecutionsService.getActiveExecution(this._executionId());
-      this.updateTimeRangeSelection({ ...activeExecution.getTimeRangeSelection() });
-    }
-
     this.setupTreeRefresh();
-    this.setupErrorsRefresh();
     this.setupToggleWarningReset();
-    this.subscribeToUrlNavigation();
+    this.setupNavigationHistoryChange();
   }
 
-  private subscribeToUrlNavigation() {
+  readonly currentEntity = this.execution;
+
+  private setupNavigationHistoryChange() {
     // subscribe to back and forward events
     this._router.events
       .pipe(
@@ -407,7 +435,7 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
         // analytics tab is handling events itself
         const isAnalytics = this.isAnalyticsRoute();
         if (!isAnalytics) {
-          let urlParams = this._urlParamsService.collectUrlParams();
+          const urlParams = this._urlParamsService.collectUrlParams();
           if (urlParams.timeRange) {
             this.updateTimeRangeSelection(urlParams.timeRange);
           }
@@ -418,20 +446,32 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
   ngOnDestroy(): void {
     this.keywordsDataSource.destroy();
     this.testCasesDataSource?.destroy();
-    this.errorsDataSource.destroy();
   }
 
   private setupTreeRefresh(): void {
     combineLatest([this.execution$, this.timeRangeSelection$])
       .pipe(
+        map(([execution, timeRangeSelection]) => ({ execution, timeRangeSelection })),
         debounceTime(300),
-        switchMap(([execution, timeSelection]) => {
-          return this._treeLoader.load(execution, timeSelection);
-        }),
+        smartSwitchMap(
+          (curr, prev) => {
+            return (
+              curr.execution.id !== prev?.execution?.id ||
+              !this._dateUtils.areTimeRangeSelectionsEquals(curr.timeRangeSelection, prev?.timeRangeSelection)
+            );
+          },
+          ({ execution, timeRangeSelection }) => {
+            return this._treeLoader.load(execution, timeRangeSelection);
+          },
+          this._destroyRef,
+          (duration) => this._activeExecutionContext.adjustAutoRefresh(duration),
+        ),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(({ aggregatedReportView, resolvedPartialPath }) => {
         if (!aggregatedReportView) {
+          this._aggregatedTreeTabState.init(undefined);
+          this._aggregatedTreeWidgetState.init(undefined);
           this.isTreeInitialized = false;
           return;
         }
@@ -451,15 +491,6 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
       .subscribe(() => {
         this._aggregatedTreeTabState.searchCtrl.setValue('');
         this._aggregatedTreeWidgetState.searchCtrl.setValue('');
-      });
-  }
-
-  private setupErrorsRefresh(): void {
-    combineLatest([this.execution$, this.timeRange$])
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(([execution, timeRange]) => {
-        const executionId = execution.id!;
-        this.errorsDataSource.reload({ request: { executionId, timeRange } });
       });
   }
 
@@ -501,28 +532,33 @@ export class AltExecutionProgressComponent implements OnInit, OnDestroy, AltExec
 
   protected readonly PopoverMode = PopoverMode;
 
+  /**
+   * Updates time range selection data in active execution
+   * **/
   updateTimeRangeSelection(selection: TimeRangePickerSelection): void {
-    this.execution$.pipe(take(1)).subscribe((execution) => {
-      if (selection.type === 'RELATIVE') {
-        let time = selection.relativeSelection!.timeInMs;
-        let now = new Date().getTime();
-        let end = execution.endTime || now - 5000;
-        let from = end - time;
-        if (from > end) {
-          // remove the 5 sec buffer
-          end = now;
-        }
-        selection!.absoluteSelection = { from: from, to: end };
-        if (!selection.relativeSelection!.label) {
-          let foundRelativeOption = this.timeRangeOptions.find(
-            (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
-          );
-          selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label;
-        }
-      } else if (selection.type === 'FULL') {
-        selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
+    const execution = this.execution();
+    if (!execution) {
+      return;
+    }
+    if (selection.type === 'RELATIVE') {
+      let time = selection.relativeSelection!.timeInMs;
+      let now = new Date().getTime();
+      let end = execution.endTime || now - 5000;
+      let from = end - time;
+      if (from > end) {
+        // remove the 5 sec buffer
+        end = now;
       }
-      this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
-    });
+      selection!.absoluteSelection = { from: from, to: end };
+      if (!selection.relativeSelection!.label) {
+        let foundRelativeOption = this.timeRangeOptions.find(
+          (o) => o.type === 'RELATIVE' && o.relativeSelection!.timeInMs === time,
+        );
+        selection.relativeSelection!.label = foundRelativeOption?.relativeSelection?.label;
+      }
+    } else if (selection.type === 'FULL') {
+      selection.absoluteSelection = { from: execution.startTime!, to: execution.endTime! };
+    }
+    this._activeExecutionsService.getActiveExecution(this._executionId()).updateTimeRange(selection);
   }
 }

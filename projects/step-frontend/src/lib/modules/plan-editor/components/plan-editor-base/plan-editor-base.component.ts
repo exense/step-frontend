@@ -1,14 +1,18 @@
 import {
   Component,
   DestroyRef,
+  effect,
   EventEmitter,
   forwardRef,
   inject,
+  Injector,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
+  untracked,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -36,10 +40,11 @@ import {
   PlanEditorPersistenceStateService,
   AugmentedPlansService,
   CommonEntitiesUrlsService,
-  ExecutiontTaskParameters,
   PlanContext,
+  AuthService,
+  ExecutionParameters,
 } from '@exense/step-core';
-import { catchError, debounceTime, filter, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, filter, map, Observable, of, pairwise, Subject, switchMap, takeUntil } from 'rxjs';
 import { KeywordCallsComponent } from '../../../execution/components/keyword-calls/keyword-calls.component';
 import { ArtefactTreeNodeUtilsService } from '../../injectables/artefact-tree-node-utils.service';
 import { InteractiveSessionService } from '../../injectables/interactive-session.service';
@@ -101,7 +106,8 @@ export class PlanEditorBaseComponent
     OnChanges,
     PlanInteractiveSessionService,
     PlanArtefactResolverService,
-    PlanContextInitializerService
+    PlanContextInitializerService,
+    OnDestroy
 {
   readonly _interactiveSession = inject(InteractiveSessionService);
   private _treeState = inject<TreeStateService<AbstractArtefact, ArtefactTreeNode>>(TreeStateService);
@@ -111,7 +117,6 @@ export class PlanEditorBaseComponent
   private _dialogsService = inject(DialogsService);
   private _functionActions = inject(FunctionActionsService);
   private _artefactService = inject(ArtefactService);
-  public _planEditService = inject(PlanEditorService);
   private _activatedRoute = inject(ActivatedRoute);
   private _planOpen = inject(PlanOpenService);
   private _planEditorPersistenceState = inject(PlanEditorPersistenceStateService);
@@ -119,6 +124,11 @@ export class PlanEditorBaseComponent
   private _router = inject(Router);
   private _commonEntitiesUrls = inject(CommonEntitiesUrlsService);
   private _destroyRef = inject(DestroyRef);
+  private _auth = inject(AuthService);
+  private _injector = inject(Injector);
+  public _planEditorService = inject(PlanEditorService);
+
+  private planTypeChangeTerminator$?: Subject<void>;
 
   private get artefactIdFromUrl(): string | undefined {
     const { artefactId } = this._activatedRoute.snapshot.queryParams ?? {};
@@ -149,7 +159,7 @@ export class PlanEditorBaseComponent
       }));
     }),
   );
-  planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
+  protected planTypeControl = new FormControl<{ planType: string; icon: string } | null>(null);
   protected componentTabs = [
     { id: 'controls', label: 'Controls' },
     { id: 'keywords', label: 'Keywords' },
@@ -164,10 +174,24 @@ export class PlanEditorBaseComponent
   protected planSize = this._planEditorPersistenceState.getPanelSize(PLAN_SIZE);
   protected planControlsSize = this._planEditorPersistenceState.getPanelSize(PLAN_CONTROLS_SIZE);
 
+  private effectCheckAccessToPlanTypeControl = effect(() => {
+    const planEditorType = this._planEditorService.plan();
+    untracked(() => {
+      if (this._auth.hasRight('plan-write', this._injector)) {
+        this.planTypeControl.enable({ emitEvent: false });
+      } else {
+        this.planTypeControl.disable({ emitEvent: false });
+      }
+    });
+  });
+
   ngOnInit(): void {
     this._interactiveSession.init();
     this.initConsoleTabToggle();
-    this.initPlanTypeChanges();
+  }
+
+  ngOnDestroy() {
+    this.terminatePlanTypeChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -189,15 +213,15 @@ export class PlanEditorBaseComponent
   }
 
   addControl(artefactTypeId: string): void {
-    this._planEditService.addControl(artefactTypeId);
+    this._planEditorService.addControl(artefactTypeId);
   }
 
   addKeywords(keywordIds: string[]): void {
-    this._planEditService.addKeywords(keywordIds);
+    this._planEditorService.addKeywords(keywordIds);
   }
 
   addPlans(planIds: string[]): void {
-    this._planEditService.addPlans(planIds);
+    this._planEditorService.addPlans(planIds);
   }
 
   exportPlan(): void {
@@ -205,7 +229,7 @@ export class PlanEditorBaseComponent
       return;
     }
     this._planEditorApi
-      .exportPlan(this.currentPlanId, `${this._planEditService.planContext()!.entity!.attributes!['name']}.sta`)
+      .exportPlan(this.currentPlanId, `${this._planEditorService.planContext()!.entity!.attributes!['name']}.sta`)
       .subscribe();
   }
 
@@ -214,7 +238,7 @@ export class PlanEditorBaseComponent
       return;
     }
 
-    const name = this._planEditService.planContext()!.entity!.attributes!['name'];
+    const name = this._planEditorService.planContext()!.entity!.attributes!['name'];
 
     this._dialogsService
       .enterValue('Clone plan as', `${name}_Copy`)
@@ -264,7 +288,7 @@ export class PlanEditorBaseComponent
 
     if (isPlan) {
       this._planEditorApi
-        .lookupPlan(this._planEditService.planContext()!.id!, artefact!.id!)
+        .lookupPlan(this._planEditorService.planContext()!.id!, artefact!.id!)
         .pipe(
           map((plan) => plan || NO_DATA),
           catchError((err) => {
@@ -338,6 +362,7 @@ export class PlanEditorBaseComponent
     }
 
     this.planClass = context.plan._class;
+    this.terminatePlanTypeChanges();
     this.planTypeControl.setValue(
       {
         planType: context!.plan!.root!._class,
@@ -345,10 +370,11 @@ export class PlanEditorBaseComponent
       },
       { emitEvent: false },
     );
+    this.setupPlanTypeChanges();
 
     const planOpenState = this._planOpen.getLastPlanOpenState();
     const artefactId = preselectArtefact ? planOpenState?.artefactId ?? this.artefactIdFromUrl : undefined;
-    this._planEditService.init(context!, artefactId);
+    this._planEditorService.init(context!, artefactId);
     if (planOpenState?.startInteractive) {
       this.startInteractive();
     }
@@ -389,12 +415,19 @@ export class PlanEditorBaseComponent
     (artefact.children || []).forEach((child) => this.synchronizeDynamicName(child));
   }
 
-  private initPlanTypeChanges(): void {
+  private terminatePlanTypeChanges(): void {
+    this.planTypeChangeTerminator$?.next?.();
+    this.planTypeChangeTerminator$?.complete?.();
+    this.planTypeChangeTerminator$ = undefined;
+  }
+
+  private setupPlanTypeChanges(): void {
+    this.terminatePlanTypeChanges();
+    this.planTypeChangeTerminator$ = new Subject<void>();
     this.planTypeControl.valueChanges
       .pipe(
-        takeUntilDestroyed(this._destroyRef),
         map((item) => {
-          const context = this._planEditService.planContext();
+          const context = this._planEditorService.planContext();
           return { item, context };
         }),
         filter(({ item, context }) => !!item && !!context),
@@ -404,10 +437,15 @@ export class PlanEditorBaseComponent
           return contextCopy;
         }),
         switchMap((context) => this._planEditorApi.savePlan(context)),
+        takeUntil(this.planTypeChangeTerminator$),
       )
       .subscribe((context) => {
         this.planClass = context!.plan!._class;
-        this._planEditService.init(context);
+        this._planEditorService.init(context);
       });
+  }
+
+  setTargetExecutionParameters(executionParameters: Record<string, string>) {
+    this._planEditorService.setTargetExecutionParameters(executionParameters);
   }
 }

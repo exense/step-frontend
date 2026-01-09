@@ -14,6 +14,7 @@ import {
   entitySelectionStateProvider,
 } from '@exense/step-core';
 import { FunctionConfigurationApiImplService } from '../../injectables/function-configuration-api-impl.service';
+import { AutomationPackagePermission } from '../../../automation-packages/types/automation-package-permission.enum';
 
 @Component({
   selector: 'step-function-list',
@@ -47,6 +48,7 @@ export class FunctionListComponent implements DialogParentService {
   readonly _hasPackages = !!inject(CustomCellRegistryService).getItemInfo('functionPackageLink');
   readonly dataSource = this._functionApiService.createFilteredTableDataSource();
   readonly returnParentUrl = '/functions';
+  readonly AutomationPackagePermission = AutomationPackagePermission;
 
   dialogSuccessfullyClosed(): void {
     this.dataSource.reload();

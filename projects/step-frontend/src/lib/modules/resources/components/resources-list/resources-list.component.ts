@@ -2,6 +2,7 @@ import { Component, forwardRef, inject } from '@angular/core';
 import {
   AugmentedResourcesService,
   DialogParentService,
+  EntityRefDirective,
   entitySelectionStateProvider,
   Resource,
   ResourceDialogsService,
@@ -11,13 +12,13 @@ import {
   tableColumnsConfigProvider,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { ResourceUrlPipe } from '../../pipes/resource-url.pipe';
+import { RESOURCE_FILTER } from '../../types/constants';
 
 @Component({
   selector: 'step-resources-list',
   templateUrl: './resources-list.component.html',
   styleUrls: ['./resources-list.component.scss'],
-  imports: [StepCoreModule, ResourceUrlPipe],
+  imports: [StepCoreModule, EntityRefDirective],
   providers: [
     tableColumnsConfigProvider({
       entityTableRemoteId: AugmentedResourcesService.RESOURCES_TABLE_ID,
@@ -35,6 +36,7 @@ export class ResourcesListComponent implements DialogParentService {
   private _resourcesService = inject(AugmentedResourcesService);
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
 
+  readonly RESOURCE_FILTER = RESOURCE_FILTER;
   readonly dataSource = this._resourcesService.createDataSource();
 
   readonly returnParentUrl = '/resources';

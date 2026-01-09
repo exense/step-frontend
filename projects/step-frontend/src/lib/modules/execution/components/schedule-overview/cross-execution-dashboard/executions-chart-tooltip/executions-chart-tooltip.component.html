@@ -7,6 +7,11 @@
         </div>
       }
     </div>
+    <div class="duration-container">
+      <div class="icon"></div>
+      <span class="label">Execution duration (AVG):</span>
+      <span>{{ responseTime() || '--' }}</span>
+    </div>
     <div>
       @if (selectedSeries) {
         <div class="separator"></div>
@@ -25,5 +30,9 @@
         }
       }
     </div>
+    @if (timeRange(); as timeRange) {
+      <div class="separator"></div>
+      <div class="footer">{{ timeRange }}</div>
+    }
   </div>
 }

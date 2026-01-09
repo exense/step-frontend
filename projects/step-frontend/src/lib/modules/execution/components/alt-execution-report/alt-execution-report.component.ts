@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, viewChild, ViewEncapsulation } from '@angular/core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
 import {
   ArtefactClass,
@@ -46,6 +46,8 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   private _hooks = inject(AggregatedTreeNodeDialogHooksService);
 
   private treeWidget = viewChild('treeWidget', { read: AltExecutionTreeWidgetComponent });
+  private treeWidgetContainer = viewChild('treeWidget', { read: ElementRef });
+  private errors = viewChild('errors', { read: ElementRef });
 
   protected readonly _state = inject(AltExecutionStateService);
 
@@ -98,6 +100,11 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
     });
   }
 
+  protected scrollToErrorsSection(): void {
+    const errorsElement = this.errors()?.nativeElement as HTMLHtmlElement | undefined;
+    errorsElement?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }
+
   protected handleOpenNodeInTreeWidget(node: ReportNode): void {
     this.treeWidget()?.focusNodeByArtefactId(node.artefactID!);
   }
@@ -117,4 +124,14 @@ export class AltExecutionReportComponent implements OnInit, OnDestroy, Aggregate
   protected readonly customPanels = this._executionCustomPanelRegistry.getItemInfos();
 
   protected readonly ViewMode = ViewMode;
+
+  searchFor($event: string) {
+    if (!this.treeWidget() || !this.treeWidgetContainer()) {
+      return;
+    }
+
+    this.treeWidgetContainer()!.nativeElement.scrollIntoView({ behavior: 'smooth' });
+
+    this.treeWidget()!.focusAndSearch($event);
+  }
 }

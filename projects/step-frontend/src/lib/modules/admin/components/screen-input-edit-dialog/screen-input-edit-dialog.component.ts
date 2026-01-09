@@ -1,5 +1,5 @@
 import { Component, DestroyRef, HostBinding, inject } from '@angular/core';
-import { AugmentedScreenService, DialogRouteResult, Input as SInput } from '@exense/step-core';
+import { AugmentedScreenService, DialogRouteResult, Input as SInput, ReloadableDirective } from '@exense/step-core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenInputEditDialogData } from '../../types/screen-input-edit-dialog-data.interface';
 import { CUSTOM_UI_COMPONENTS_FORMATTER, EXPRESSION_SCRIPT_FORMATTER } from '../../types/model-formatters';
@@ -14,6 +14,7 @@ type DialogRef = MatDialogRef<ScreenInputEditDialogComponent, DialogRouteResult>
   selector: 'step-screen-input-edit-dialog',
   templateUrl: './screen-input-edit-dialog.component.html',
   styleUrls: ['./screen-input-edit-dialog.component.scss'],
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class ScreenInputEditDialogComponent {

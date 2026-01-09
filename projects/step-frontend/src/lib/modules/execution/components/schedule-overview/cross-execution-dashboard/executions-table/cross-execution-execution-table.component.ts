@@ -11,12 +11,13 @@ import {
   SearchValue,
   StepDataSource,
   tableColumnsConfigProvider,
+  TableIndicatorMode,
   tablePersistenceConfigProvider,
 } from '@exense/step-core';
-import { BehaviorSubject, of, switchMap } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { ExecutionListFilterInterceptorService } from '../../../../services/execution-list-filter-interceptor.service';
 import { TimeSeriesEntityService } from '../../../../../timeseries/modules/_common';
-import { EXECUTION_STATUS_TREE, Status } from '../../../../../_common/shared/status.enum';
+import { EXECUTION_STATUS_TREE } from '../../../../../_common/shared/status.enum';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 @Component({
@@ -25,12 +26,12 @@ import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state
   styleUrls: ['./cross-execution-execution-table.component.scss'],
   providers: [
     tableColumnsConfigProvider({
-      entityTableRemoteId: AugmentedExecutionsService.EXECUTIONS_TABLE_ID,
+      entityTableRemoteId: 'crossExecutions',
       entityScreenId: 'executionParameters',
       entityScreenSubPath: 'executionParameters.customParameters',
     }),
     tablePersistenceConfigProvider('crossExecutionList', {
-      storePagination: false,
+      storePagination: true,
       storeSort: false,
       storeSearch: false,
     }),
@@ -52,13 +53,13 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
   readonly _augmentedExecutionsService = inject(AugmentedExecutionsService);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
   readonly statusItemsTree$ = of(EXECUTION_STATUS_TREE);
-  dataSource: StepDataSource<Execution> | undefined;
+  protected dataSource: StepDataSource<Execution> | undefined;
   readonly DateFormat = DateFormat;
 
-  hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
-  defaultDateRange = input<DateRange>();
+  readonly hiddenFilters = input<Record<string, string | string[] | SearchValue>>();
+  readonly defaultDateRange = input<DateRange>();
 
-  tableFilters = computed(() => {
+  protected tableFilters = computed(() => {
     const filters = this.hiddenFilters();
     const range = this.defaultDateRange();
     if (!range) {
@@ -84,4 +85,6 @@ export class CrossExecutionExecutionTableComponent implements OnInit, OnDestroy 
     this.dataSource!.reload({ hideProgress: true });
     this.reloadRunningExecutionsCount$.next();
   }
+
+  protected readonly TableIndicatorMode = TableIndicatorMode;
 }

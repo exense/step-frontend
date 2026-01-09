@@ -6,12 +6,18 @@
     matSort
     matSortActive="name"
     matSortDirection="asc"
+    [tableParams]="activatableEntitiesTableParams()"
     [matSortDisableClear]="true"
   >
     <div class="selection-control" *stepAdditionalHeader="'btngroup-bulk-import-create'">
       <step-bulk-selection />
       @if (hasSelection()) {
-        <button mat-icon-button matTooltip="Add selected plans" (click)="addAllPlans()">
+        <button
+          mat-icon-button
+          matTooltip="Add selected plans"
+          (click)="addAllPlans()"
+          [disabled]="!('plan-write' | hasRight | async)"
+        >
           <step-icon name="plus-circle" />
         </button>
       }
@@ -19,7 +25,11 @@
     <ng-container *stepRowsExtension="let rows">
       <step-drag-drop-container stepDropAreaId="planTree">
         @for (row of rows; track row) {
-          <step-drag-item [elRef]="row.elRef" [data]="row.data | planDropInfo" />
+          <step-drag-item
+            [elRef]="row.elRef"
+            [data]="row.data | planDropInfo"
+            [dragDisabled]="!('plan-write' | hasRight | async)"
+          />
         }
         <step-drag-preview>
           <step-plan-nodes-drag-preview />
@@ -35,7 +45,15 @@
     <ng-container matColumnDef="move">
       <th mat-header-cell *matHeaderCellDef></th>
       <td class="move" mat-cell *matCellDef="let element">
-        <step-icon name="drag-handle" matTooltip="drag & drop into tree" />
+        <div class="flex">
+          <step-icon name="drag-handle" matTooltip="drag & drop into tree" />
+          @if (!element['customFields'].activated) {
+            <step-icon
+              name="alert-circle"
+              matTooltip="The version of this plan doesn’t match the selected target execution parameters. Adjust them in the toolbar if needed."
+            />
+          }
+        </div>
       </td>
     </ng-container>
     <step-entity-column-container entityName="plans" />
@@ -74,7 +92,12 @@
         <div class="actions">
           <step-description-hint [description]="element.root.description" />
 
-          <button mat-icon-button matTooltip="Add plan" (click)="addPlan(element.id)">
+          <button
+            mat-icon-button
+            matTooltip="Add plan"
+            (click)="addPlan(element.id)"
+            [disabled]="!('plan-write' | hasRight | async)"
+          >
             <step-icon name="plus-circle"></step-icon>
           </button>
         </div>

@@ -1,5 +1,9 @@
 <step-modal-window [title]="_data.title" [stepZIndex]="1000">
   <div step-modal-window-body>
-    <step-is-used-by-list (close)="_dialogRef.close()" [id]="_data.id" [type]="_data.type"></step-is-used-by-list>
+    @if (isAutomationPackage) {
+      <step-automation-packages-used-by-resource-list [resourceId]="_data.id" (close)="_dialogRef.close()" />
+    } @else {
+      <step-is-used-by-list (close)="_dialogRef.close()" [id]="_data.id" [type]="_data.type" />
+    }
   </div>
 </step-modal-window>

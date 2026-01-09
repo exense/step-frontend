@@ -261,6 +261,9 @@
         margin-bottom: 0;
         box-sizing: border-box;
         outline: none;
+        &[disabled] {
+          background-color: var.$gray-100;
+        }
       }
 
       & > step-rich-editor {
@@ -322,6 +325,11 @@
         align-items: center;
         max-width: 200px;
         padding: 0 12px;
+
+        &.step-suffix--primary {
+          background-color: var.$dark-blue;
+          color: white;
+        }
       }
 
       step-prefix {

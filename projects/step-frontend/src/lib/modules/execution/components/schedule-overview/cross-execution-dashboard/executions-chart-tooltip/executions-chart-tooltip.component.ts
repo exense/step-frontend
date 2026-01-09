@@ -13,7 +13,7 @@ import { TooltipContextData } from '../../../../../timeseries/modules/chart/inje
 import { AugmentedTimeSeriesService, ExecutionsService, FetchBucketsRequest } from '@exense/step-core';
 import { TSChartSeries } from '../../../../../timeseries/modules/chart';
 import { of, switchMap } from 'rxjs';
-import { FilterUtils, OQLBuilder } from '../../../../../timeseries/modules/_common';
+import { FilterUtils, OQLBuilder, TimeSeriesConfig } from '../../../../../timeseries/modules/_common';
 import { CrossExecutionDashboardState } from '../cross-execution-dashboard-state';
 
 interface TransformedSeries {
@@ -46,10 +46,34 @@ export class ExecutionsChartTooltipComponent {
   reposition = output<void>();
 
   readonly data = input<TooltipContextData | undefined>(undefined);
+  readonly scaleKey = input.required<string>();
 
   selectedSeries?: TransformedSeries;
   selectedSeriesExecutions: ExecutionItem[] = [];
   executionsListTruncated: boolean = false;
+
+  readonly timeRange = computed(() => {
+    const contextData = this.data();
+    const bucketRange = (contextData?.xValues[1] || 0) - (contextData?.xValues[0] || 0);
+
+    if (!contextData || !bucketRange || !contextData.idx) {
+      return undefined;
+    }
+
+    const bucketStart = contextData.xValues[contextData.idx];
+    const bucketEnd = bucketStart + bucketRange;
+    return `${new Date(bucketStart).toLocaleString()} - ${new Date(bucketEnd).toLocaleString()}`;
+  });
+
+  readonly responseTime = computed(() => {
+    const contextData = this.data();
+    if (!contextData || !contextData.idx) {
+      return;
+    }
+    const lastSeries: TSChartSeries = contextData.series?.filter((s) => s.scale === 'y')?.[0];
+    const ms = lastSeries?.data[contextData.idx!];
+    return ms !== undefined ? TimeSeriesConfig.AXES_FORMATTING_FUNCTIONS.time(ms!) : undefined;
+  });
 
   readonly transformedData: Signal<TransformedSeries[]> = computed(() => {
     const contextData = this.data();
@@ -57,12 +81,16 @@ export class ExecutionsChartTooltipComponent {
     this.executionsListTruncated = false;
     this.selectedSeries = undefined;
     const transformedSeries: TransformedSeries[] = [];
-    for (let i = contextData!.series.length - 1; i >= 0; i--) {
-      let series: TSChartSeries = contextData!.series[i]!;
+    if (!contextData) {
+      return [];
+    }
+    const filteredSeries = contextData.series.filter((s) => s.scale === this.scaleKey());
+    for (let i = filteredSeries.length - 1; i >= 0; i--) {
+      let series: TSChartSeries = filteredSeries[i]!;
       let value =
         i === 0
           ? series.data[contextData?.idx!] || 0
-          : (series.data[contextData!.idx!] || 0) - (contextData!.series[i - 1].data[contextData!.idx!] || 0);
+          : (series.data[contextData!.idx!] || 0) - (filteredSeries[i - 1].data[contextData!.idx!] || 0);
       if (value) {
         transformedSeries.push({
           label: series.id,

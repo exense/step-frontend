@@ -16,6 +16,7 @@ import {
   ErrorMessageHandlerService,
   NoAccessEntityError,
   FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT,
+  ENTITY_ACCESS_DENIED_CODE,
 } from '@exense/step-core';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   private _errorMessageHandler = inject(ErrorMessageHandlerService);
   private _errorLogger = inject(HttpErrorLoggerService);
 
-  private handleHttpError(error: HttpErrorResponse, skip401: boolean = false): Observable<any> {
+  private handleHttpError(error: HttpErrorResponse, skip401: boolean = false, isGetRequest: boolean): Observable<any> {
     this._errorLogger.log('Network Error', error);
 
     if (error.status === HttpStatusCode.Unauthorized && skip401) {
@@ -32,8 +33,17 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     if (
       error.status === HttpStatusCode.Forbidden &&
-      error.error?.errorMessage === FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT
+      (error.error?.errorMessage === FORBIDDEN_ACCESS_FROM_CURRENT_CONTEXT ||
+        error.error?.errorName === ENTITY_ACCESS_DENIED_CODE)
     ) {
+      if (!isGetRequest) {
+        const { parsedError, logMessages } = this.parseHttpError(error);
+        const formattedError = HttpErrorInterceptor.formatError(parsedError);
+        if (!!logMessages?.length) {
+          logMessages.forEach((errorMessage) => console.error(errorMessage));
+        }
+        this.showError(formattedError);
+      }
       return throwError(() => new NoAccessEntityError(error));
     }
 
@@ -116,7 +126,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   }
 
   static formatError(error: any): string {
-    if (!error || (typeof error !== 'object' && !error.includes('{'))) {
+    if (!error || (typeof error !== 'object' && !error.startsWith('{'))) {
       /* make sure the error is no object or object parsed to string */
       return String(error);
     }
@@ -164,7 +174,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       tap((response: HttpEvent<any>) => {
         this.handleAsyncError(response);
       }),
-      catchError((error) => this.handleHttpError(error, true)),
+      catchError((error) => this.handleHttpError(error, true, req.method === 'GET')),
     );
   }
 }

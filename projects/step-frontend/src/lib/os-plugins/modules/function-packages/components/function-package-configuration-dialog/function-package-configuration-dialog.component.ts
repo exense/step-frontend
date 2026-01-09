@@ -9,6 +9,9 @@ import {
   ResourceInputBridgeService,
   CustomFormComponent,
   ResourceInputUtilsService,
+  MultipleProjectsService,
+  ReloadableDirective,
+  FunctionPackage,
 } from '@exense/step-core';
 import { catchError, debounceTime, filter, iif, map, of, switchMap, tap } from 'rxjs';
 import { KeyValue } from '@angular/common';
@@ -21,6 +24,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
   host: {
     '(keydown.enter)': 'save()',
   },
+  hostDirectives: [ReloadableDirective],
   standalone: false,
 })
 export class FunctionPackageConfigurationDialogComponent {
@@ -31,19 +35,24 @@ export class FunctionPackageConfigurationDialogComponent {
   protected _data = inject<FunctionPackageConfigurationDialogData>(MAT_DIALOG_DATA, { optional: true });
   private _resourceInputBridgeService = inject(ResourceInputBridgeService);
   private _resourceInputUtils = inject(ResourceInputUtilsService);
+  private _multipleProjects = inject(MultipleProjectsService);
 
   private customForm = viewChild('customAttributesForm', { read: CustomFormComponent });
 
-  readonly modalTitle = `${this._data?.functionPackage ? 'Edit' : 'New'} Keyword Package`;
+  readonly modalTitle = this._data?.functionPackage ? 'Edit Keyword Package' : 'New Keyword Package';
 
-  protected functionPackage = this._data?.functionPackage ?? { packageAttributes: {} };
+  protected functionPackage = this._data?.functionPackage ?? this.createEmptyPackage();
   protected customAttributes = { attributes: this.functionPackage.packageAttributes };
 
   protected readonly packageLocation = model(this.functionPackage?.packageLocation);
   protected readonly packageLibrariesLocation = model(this.functionPackage?.packageLibrariesLocation);
 
   private effectSyncPackageLocation = effect(() => {
-    this.functionPackage.packageLocation = this.packageLocation();
+    const packageLocation = this.packageLocation();
+    this.functionPackage = {
+      ...this.functionPackage,
+      packageLocation,
+    };
     // Immediately load preview, if value is valid resource id
     if (this._resourceInputUtils.isResourceValue(this.functionPackage.packageLocation)) {
       this.loadPackagePreview();
@@ -158,6 +167,17 @@ export class FunctionPackageConfigurationDialogComponent {
     this.loadPackagePreview();
   }
 
+  private createEmptyPackage(): FunctionPackage {
+    const project = this._multipleProjects.currentProject()?.projectId;
+    const result: FunctionPackage = {
+      packageAttributes: {},
+    };
+    if (project) {
+      result.attributes = { project };
+    }
+    return result;
+  }
+
   private loadPackagePreview(): void {
     of(undefined)
       .pipe(
@@ -169,7 +189,9 @@ export class FunctionPackageConfigurationDialogComponent {
         }),
         switchMap(() =>
           iif(
-            () => !this.functionPackage?.packageLocation,
+            () =>
+              !this.functionPackage?.packageLocation ||
+              !this._multipleProjects.isEntityBelongsToCurrentProject(this.functionPackage),
             of(undefined),
             this._api.packagePreview(this.functionPackage).pipe(
               map((response) => {

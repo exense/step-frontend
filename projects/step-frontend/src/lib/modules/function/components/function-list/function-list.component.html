@@ -32,6 +32,17 @@
       </step-btn-group>
       <step-btn-group class="create-keyword-button-group">
         <a
+          stepTestId="upload-package-btn"
+          mat-flat-button
+          color="primary"
+          class="header-btn"
+          matTooltip="Add entities by uploading an Automation Package"
+          [disabled]="!(AutomationPackagePermission.WRITE | hasRight | async)"
+          routerLink="/automation-package/list/upload/new/"
+        >
+          Upload Package
+        </a>
+        <a
           data-step-testid="new-keyword-btn"
           type="button"
           mat-mini-fab
@@ -43,7 +54,6 @@
         >
           <step-icon name="plus" />
         </a>
-        <step-dashlet data-step-testid="keywords-upload-package-btn" itemKey="uploadPackageBtn" />
       </step-btn-group>
     </section>
 
@@ -107,12 +117,12 @@
         <step-column-settings data-step-testid="keywords-actions-settings" />
       </th>
       <td mat-cell *matCellDef="let element" class="cell-actions">
-        <step-btn-group>
+        <step-btn-group [stepEntityRef]="element">
           <button
             data-step-testid="open-keyword-btn"
             mat-icon-button
             matTooltip="Open keyword in editor"
-            [disabled]="!('kw-write' | hasRight | async)"
+            [disabled]="!('kw-read' | hasRight | async)"
             (click)="editFunction(element)"
           >
             <step-icon name="edit-2" />
@@ -158,7 +168,7 @@
     <a
       data-step-testid="configure-keyword-btn"
       mat-menu-item
-      [disabled]="!('kw-write' | hasRight | async)"
+      [disabled]="!('kw-read' | hasRight | async)"
       [routerLink]="element | keywordConfigurerUrl"
     >
       <step-icon name="tool" />

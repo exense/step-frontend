@@ -13,30 +13,36 @@ export class ResourceInputConfigDirective {
   readonly isBounded = input(false);
   readonly supportsDirectory = input(false);
 
-  readonly withChooseExistingResourceButton = input(false);
+  readonly withChooseExistingResourceButton = input(true);
+  readonly searchTypes = input<string[] | undefined>(undefined);
   readonly withClearButton = input(true);
   readonly withDynamicSwitch = input(false);
   readonly preserveExistingResource = input(false);
   readonly disableServerPath = input(false);
+  readonly withUploadFromFileSystem = input(true);
 
   readonly config = computed<ResourceConfig>(() => {
     const type = this.type();
     const isBounded = this.isBounded();
     const supportsDirectory = this.supportsDirectory();
     const withChooseExistingResourceButton = this.withChooseExistingResourceButton();
+    const searchTypes = this.searchTypes();
     const withClearButton = this.withClearButton();
     const withDynamicSwitch = this.withDynamicSwitch();
     const preventExistingResource = this.preserveExistingResource();
     const disableServerPath = this.disableServerPath();
+    const withUploadFromFileSystem = this.withUploadFromFileSystem();
     return {
       type,
       isBounded,
       supportsDirectory,
       withChooseExistingResourceButton,
+      searchTypes,
       withClearButton,
       withDynamicSwitch,
       preventExistingResource,
       disableServerPath,
+      withUploadFromFileSystem,
     };
   });
 

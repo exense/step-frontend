@@ -3,9 +3,9 @@ import { inject, InjectionToken } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 type E = Pick<Required<Execution>, 'status' | 'result'>;
-type Status = E['status'] | E['result'] | 'UNKNOW' | 'DELAYED_UPDATE' | 'EMPTY';
+type Status = E['status'] | E['result'] | 'UNKNOW' | 'DELAYED_UPDATE' | 'SCHEDULED_RELOAD' | 'RELOAD_FAILED' | 'EMPTY';
 
-const COLORS: Record<Status, string> = {
+export const COLORS: Record<Status, string> = {
   EMPTY: '#e1e1e1',
   UNKNOW: '#dadada',
   ENDED: '#808080',
@@ -13,6 +13,8 @@ const COLORS: Record<Status, string> = {
   IMPORTING: '#ff8f15',
   EXPORTING: '#ff8f15',
   DELAYED_UPDATE: '#ff8f15',
+  SCHEDULED_RELOAD: '#ff8f15',
+  RELOAD_FAILED: '#ff595b',
   RUNNING: '#0082cd',
   ABORTING: '#ff595b',
   FORCING_ABORT: '#ff595b',

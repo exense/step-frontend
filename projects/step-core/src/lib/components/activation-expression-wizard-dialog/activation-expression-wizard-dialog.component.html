@@ -1,0 +1,62 @@
+<step-modal-window [title]="modalTitle">
+  <div step-modal-window-body>
+    <section>
+      <div [formGroup]="conditionForm">
+        <div class="binding-condition">
+          <step-form-field>
+            <step-select formControlName="key" placeholder="Key" [items]="bindingKeys" clearLabel="unset" />
+          </step-form-field>
+          <div class="predicate-flex">
+            <span class="predicate-line"></span>
+            <step-form-field class="predicate">
+              <step-select formControlName="predicate" [items]="predicates" [useClear]="false" />
+            </step-form-field>
+            <span class="predicate-line"></span>
+          </div>
+          @if (conditionForm.controls['predicate'].value; as predicateValue) {
+            @if (
+              predicateValue !== Predicate.EXISTS &&
+              predicateValue !== Predicate.NOT_EXISTS &&
+              predicateValue !== Predicate.MATCHES &&
+              predicateValue !== Predicate.NOT_MATCHES
+            ) {
+              @switch (conditionForm.controls['key'].value | screenInputType: inputs) {
+                @case ('dropdown') {
+                  <step-form-field>
+                    <step-autocomplete-input
+                      placeHolder="Value"
+                      formControlName="value"
+                      [possibleItems]="conditionForm.controls['key'].value | screenInputOptions: inputs"
+                      [valueLabelExtractor]="bindingKeyExtractor"
+                    />
+                  </step-form-field>
+                }
+                @case ('checkbox') {
+                  <step-form-field>
+                    <step-select formControlName="value" [items]="yesNoItems" clearLabel="unset" />
+                  </step-form-field>
+                }
+                @default {
+                  <step-form-field>
+                    <input type="text" placeholder="Value" formControlName="value" />
+                  </step-form-field>
+                }
+              }
+            }
+            @if (predicateValue === Predicate.MATCHES || predicateValue === Predicate.NOT_MATCHES) {
+              <step-form-field>
+                <input type="text" placeholder="Value" formControlName="value" />
+              </step-form-field>
+            }
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+  <div step-modal-window-buttons>
+    <button type="button" mat-stroked-button mat-dialog-close>Cancel</button>
+    <button type="button" mat-flat-button color="primary" [disabled]="conditionForm.invalid" (click)="save()">
+      Add
+    </button>
+  </div>
+</step-modal-window>

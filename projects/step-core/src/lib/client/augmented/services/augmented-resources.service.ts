@@ -1,12 +1,20 @@
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, of, OperatorFunction, tap } from 'rxjs';
-import { Resource, ResourcesService, ResourceUploadResponse } from '../../generated';
+import {
+  AsyncTaskStatusTableBulkOperationReport,
+  Resource,
+  ResourcesService,
+  ResourceUploadResponse,
+  TableBulkOperationRequest,
+} from '../../generated';
 import { TableRemoteDataSourceFactoryService, StepDataSource } from '../../table';
 import { uploadWithProgress } from '../shared/pipe-operators';
 import { HttpOverrideResponseInterceptor } from '../shared/http-override-response-interceptor';
 import { HttpRequestContextHolderService } from './http-request-context-holder.service';
 import { HttpOverrideResponseInterceptorService } from './http-override-response-interceptor.service';
+import { downloadFile } from '../shared/download-file';
+import { extendTableBulkOperationRequest } from '../shared/extend-table-bulk-operation-request';
 
 @Injectable({ providedIn: 'root' })
 export class AugmentedResourcesService extends ResourcesService implements HttpOverrideResponseInterceptor {
@@ -40,6 +48,13 @@ export class AugmentedResourcesService extends ResourcesService implements HttpO
       resourceName: 'resourceName',
       resourceType: 'resourceType',
     });
+  }
+
+  override bulkDelete1(
+    requestBody?: TableBulkOperationRequest,
+    filter?: string,
+  ): Observable<AsyncTaskStatusTableBulkOperationReport> {
+    return super.bulkDelete1(extendTableBulkOperationRequest(requestBody, filter));
   }
 
   /**
@@ -114,17 +129,7 @@ export class AugmentedResourcesService extends ResourcesService implements HttpO
 
   downloadResource(resourceId: string, fileName: string) {
     const url = this.getDownloadResourceUrl(resourceId);
-    fetch(url, { method: 'get' })
-      .then((res) => res.blob())
-      .then((res) => {
-        const aElement = document.createElement('a');
-        aElement.setAttribute('download', fileName);
-        const href = URL.createObjectURL(res);
-        aElement.href = href;
-        aElement.setAttribute('target', '_blank');
-        aElement.click();
-        URL.revokeObjectURL(href);
-      });
+    downloadFile(url, fileName);
   }
 
   getResourceCached(id: string): Observable<Resource> {

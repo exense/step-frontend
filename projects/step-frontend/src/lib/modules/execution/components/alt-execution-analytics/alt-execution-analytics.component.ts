@@ -45,7 +45,6 @@ export class AltExecutionAnalyticsComponent implements OnInit {
   }
 
   private subscribeToUrlNavigation() {
-    // subscribe to back and forward events
     this._router.events
       .pipe(
         takeUntilDestroyed(this._destroyRef),
@@ -58,7 +57,7 @@ export class AltExecutionAnalyticsComponent implements OnInit {
       )
       .subscribe(() => {
         this.isLoading = true;
-        let params = this._urlParamsService.collectUrlParams();
+        const params = this._urlParamsService.collectUrlParams();
         if (params.timeRange) {
           this._state.updateTimeRangeSelection(params.timeRange!);
         }

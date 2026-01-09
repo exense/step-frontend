@@ -7,17 +7,19 @@
 </ng-template>
 
 <ng-template #uploadResourceButtonTemplate>
-  <step-suffix class="button-suffix">
-    <button
-      type="button"
-      mat-stroked-button
-      matTooltip="Select from file system"
-      (click)="openFileChooser()"
-      [disabled]="isDisabled()"
-    >
-      <step-icon name="folder-plus" />
-    </button>
-  </step-suffix>
+  @if (_config.withUploadFromFileSystem()) {
+    <step-suffix class="button-suffix">
+      <button
+        type="button"
+        mat-stroked-button
+        matTooltip="Select from file system"
+        (click)="openFileChooser()"
+        [disabled]="isDisabled()"
+      >
+        <step-icon name="folder-plus" />
+      </button>
+    </step-suffix>
+  }
 </ng-template>
 
 <ng-template #chooseExistingResourceButtonTemplate>
@@ -97,6 +99,7 @@
       <ng-container *ngTemplateOutlet="uploadResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix" />
     </step-form-field>
   } @else if (!resourceNotExisting()) {
     <step-form-field
@@ -126,6 +129,7 @@
       <ng-container *ngTemplateOutlet="chooseExistingResourceButtonTemplate" />
       <ng-container *ngTemplateOutlet="clearButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix" />
     </step-form-field>
   } @else {
     <step-form-field
@@ -152,6 +156,7 @@
       />
       <ng-container *ngTemplateOutlet="clearButtonTemplate" />
       <ng-container *ngTemplateOutlet="dynamicSwitchTemplate" />
+      <ng-content select="step-suffix" />
     </step-form-field>
   }
 </step-upload-container>

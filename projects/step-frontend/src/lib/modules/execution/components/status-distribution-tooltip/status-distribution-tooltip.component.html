@@ -1,0 +1,17 @@
+<div class="container">
+  @for (statusItem of distribution(); track statusItem.status) {
+    <step-status-distribution-badge
+      [count]="statusItem.count"
+      [status]="statusItem.status"
+      [percentage]="statusItem.percentage"
+    />
+  }
+  @if (distribution().length === 0) {
+    <div class="no-data">No data</div>
+  }
+
+  <div class="footer">
+    <span>{{ timestamp() | date: 'dd.MM.yy / HH:mm:ss' }}</span>
+    <span class="label" [class.link]="!!link()" (click)="navigateToLink()">{{ linkLabel() }}</span>
+  </div>
+</div>

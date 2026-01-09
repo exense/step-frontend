@@ -1,19 +1,25 @@
-<mat-menu #popover [xPosition]="xPosition()" [yPosition]="yPosition()" [hasBackdrop]="false" [class]="popoverClass()">
-  <ng-template matMenuContent>
-    <span
-      mat-menu-item
-      [disableRipple]="true"
-      (keydown.tab)="$event.stopPropagation()"
-      (click)="$event.stopPropagation()"
-      class="mat-popover"
-      [class.no-padding]="noPadding()"
-    >
-      <div (mouseenter)="onPopoverMouseEnter()" (mouseleave)="onPopoverMouseLeave()">
-        <ng-content select="step-popover-content"></ng-content>
-      </div>
-    </span>
-  </ng-template>
-</mat-menu>
-<div [stepTriggerPopover]="popover">
+<div
+  class="trigger-wrapper"
+  (mouseenter)="handleTriggerMouseEnter()"
+  (mouseleave)="handleTriggerMouseLeave()"
+  (click)="handleClick($event)"
+>
   <ng-content></ng-content>
 </div>
+
+<ng-template #popoverTemplate>
+  <div
+    class="step-popover"
+    [class.no-padding]="noPadding()"
+    [class.with-border]="withBorder()"
+    [class.white-background]="whiteBackground()"
+    [class.small-font]="smallFont()"
+    [ngClass]="popoverClass()"
+    (mouseenter)="handlePopoverMouseEnter()"
+    (mouseleave)="handlePopoverMouseLeave()"
+  >
+    <div class="step-popover__arrow"></div>
+
+    <ng-content select="step-popover-content"></ng-content>
+  </div>
+</ng-template>

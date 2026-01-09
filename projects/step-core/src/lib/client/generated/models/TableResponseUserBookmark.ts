@@ -8,4 +8,5 @@ export type TableResponseUserBookmark = {
   recordsTotal?: number;
   recordsFiltered?: number;
   data?: Array<UserBookmark>;
+  hasNext?: boolean;
 };

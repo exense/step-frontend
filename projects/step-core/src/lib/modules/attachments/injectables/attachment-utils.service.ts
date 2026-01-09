@@ -1,56 +1,67 @@
 import { inject, Injectable } from '@angular/core';
-import { AttachmentMeta, AugmentedResourcesService } from '../../../client/step-client-module';
+import { AttachmentMeta, AugmentedResourcesService, StreamingAttachmentMeta } from '../../../client/step-client-module';
 import { AttachmentType } from '../types/attachment-type.enum';
-import {
-  IMAGE_TYPES,
-  ImageType,
-  SpecialMimeType,
-  TEXT_TYPES,
-  TextType,
-  VIDEO_TYPES,
-  VideoType,
-} from '../../basics/step-basics.module';
+import { FILE_TYPES, FileTypeUtilsService, TypeInfoCategory } from '../../basics/step-basics.module';
+import { AugmentedStreamingResourcesService } from '../../../client/augmented/services/augmented-streaming-resources.service';
+
+const SKIPPED_ATTACHMENT_META = 'step.attachments.SkippedAttachmentMeta';
+const STREAMING_ATTACHMENT_META = 'step.attachments.StreamingAttachmentMeta';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AttachmentUtilsService {
   private _resourceService = inject(AugmentedResourcesService);
-  private _imageTypes = inject(IMAGE_TYPES);
-  private _textTypes = inject(TEXT_TYPES);
-  private _videoTypes = inject(VIDEO_TYPES);
+  private _streamingResourceService = inject(AugmentedStreamingResourcesService);
+  private _fileTypeUtils = inject(FileTypeUtilsService);
 
   determineAttachmentType(attachment?: AttachmentMeta): AttachmentType {
     if (!attachment) {
       return AttachmentType.SKIPPED;
     }
 
-    if (attachment.type === 'step.attachments.SkippedAttachmentMeta') {
+    if (attachment.type === SKIPPED_ATTACHMENT_META) {
       return AttachmentType.SKIPPED;
     }
 
-    if (attachment.mimeType === SpecialMimeType.PLAYWRIGHT_TRACE) {
-      return AttachmentType.TRACE;
+    const typeCategory = this._fileTypeUtils.checkTypeCategory(attachment.mimeType);
+    let result = this.determineAttachmentTypes(typeCategory, attachment.mimeType);
+
+    if (attachment.type === STREAMING_ATTACHMENT_META && !this.hasLines(attachment)) {
+      const streamingAttachmentMeta = attachment as StreamingAttachmentMeta;
+      if (streamingAttachmentMeta.status === 'COMPLETED' && result === AttachmentType.TRACE) {
+        return result;
+      }
+      return AttachmentType.STREAMING_BINARY;
     }
 
+    if (result !== undefined && result !== AttachmentType.TEXT) {
+      return result;
+    }
+
+    // Type is unknown or text
+    if (this.hasLines(attachment)) {
+      // If meta has lines - it's streaming text
+      return AttachmentType.STREAMING_TEXT;
+    }
+
+    if (!!result) {
+      // Type is simple text
+      return result;
+    }
+
+    // Type is unknown and definitely not a streaming text.
+    // Make an attempt to determine attachment type by the extension
     const nameParts = (attachment.name ?? '').split('.');
     const extension = nameParts[nameParts.length - 1];
-    if (!extension) {
-      return AttachmentType.DEFAULT;
+
+    const typeInfo = this._fileTypeUtils.findByExtension(extension);
+    result = this.determineAttachmentTypes(typeInfo?.category, typeInfo?.mimeType);
+    if (result !== undefined) {
+      return result;
     }
 
-    if (this._imageTypes.has(extension as ImageType)) {
-      return AttachmentType.IMG;
-    }
-
-    if (this._videoTypes.has(extension as VideoType)) {
-      return AttachmentType.VIDEO;
-    }
-
-    if (this._textTypes.has(extension as TextType)) {
-      return AttachmentType.TEXT;
-    }
-
+    // Type hasn't been determined by mimeType or extension
     return AttachmentType.DEFAULT;
   }
 
@@ -66,6 +77,10 @@ export class AttachmentUtilsService {
         return 'alert-circle';
       case AttachmentType.TRACE:
         return 'playwright';
+      case AttachmentType.STREAMING_BINARY:
+        return 'binary-file';
+      case AttachmentType.STREAMING_TEXT:
+        return 'file-text';
       default:
         return 'paperclip';
     }
@@ -75,6 +90,54 @@ export class AttachmentUtilsService {
     if (!attachment) {
       return;
     }
-    this._resourceService.downloadResource(attachment.id!, attachment.name!);
+    if (attachment.type === STREAMING_ATTACHMENT_META) {
+      this._streamingResourceService.downloadResource(attachment.id!, attachment.name!);
+    } else {
+      this._resourceService.downloadResource(attachment.id!, attachment.name!);
+    }
+  }
+
+  getDownloadAttachmentUrl(attachment?: AttachmentMeta, isInline?: boolean): string {
+    if (!attachment) {
+      return '';
+    }
+    if (attachment.type === STREAMING_ATTACHMENT_META) {
+      return this._streamingResourceService.getDownloadResourceUrl(attachment.id!, isInline);
+    } else {
+      return this._resourceService.getDownloadResourceUrl(attachment.id!, isInline);
+    }
+  }
+
+  getAttachmentStreamingUrl(attachmentOrId?: string | AttachmentMeta): string | undefined {
+    if (!attachmentOrId) {
+      return undefined;
+    }
+    const id = typeof attachmentOrId === 'string' ? attachmentOrId : attachmentOrId.id;
+    return `/streaming/download/${id}`;
+  }
+
+  private determineAttachmentTypes(typeCategory?: TypeInfoCategory, mimeType?: string): AttachmentType | undefined {
+    if (typeCategory === TypeInfoCategory.IMAGE) {
+      return AttachmentType.IMG;
+    }
+    if (typeCategory === TypeInfoCategory.VIDEO) {
+      return AttachmentType.VIDEO;
+    }
+    if (typeCategory === TypeInfoCategory.OTHER) {
+      if (mimeType === FILE_TYPES.PLAYWRIGHT_TRACE.mimeType) {
+        return AttachmentType.TRACE;
+      } else {
+        return AttachmentType.DEFAULT;
+      }
+    }
+    if (typeCategory === TypeInfoCategory.TEXT) {
+      return AttachmentType.TEXT;
+    }
+    return undefined;
+  }
+
+  private hasLines(meta: AttachmentMeta): boolean {
+    const streamingMeta = meta as StreamingAttachmentMeta;
+    return streamingMeta.currentNumberOfLines !== undefined && streamingMeta.currentNumberOfLines !== null;
   }
 }

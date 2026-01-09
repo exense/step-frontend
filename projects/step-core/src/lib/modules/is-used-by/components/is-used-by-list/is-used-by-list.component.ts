@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { filter, map, startWith } from 'rxjs';
 import { FindReferencesResponse, ReferencesService } from '../../../../client/step-client-module';
 import { TableFetchLocalDataSource } from '../../../table/table.module';
@@ -25,6 +25,7 @@ interface FindReferenceWithLinkContext extends FindReferencesResponse {
   styleUrls: ['./is-used-by-list.component.scss'],
   imports: [StepBasicsModule, TableModule, PlanLinkComponent, KEYWORDS_COMMON_IMPORTS, EntityModule],
   providers: [ProjectNamePipe],
+  encapsulation: ViewEncapsulation.None,
 })
 export class IsUsedByListComponent implements OnInit {
   private _referencesService = inject(ReferencesService);
@@ -41,20 +42,24 @@ export class IsUsedByListComponent implements OnInit {
   entityType: string = '';
 
   readonly searchableReferences = new TableFetchLocalDataSource(
-    () =>
-      this._referencesService
+    () => {
+      if (this.type === 'AUTOMATION_PACKAGE') {
+        throw new Error('This component can not be use with automation package type');
+      }
+      return this._referencesService
         .findReferences({
           searchType: this.type,
           searchValue: this.id,
         })
-        .pipe(map((result) => result.map((item) => this.createReferenceWithLinkContext(item)))),
+        .pipe(map((result) => result.map((item) => this.createReferenceWithLinkContext(item))));
+    },
     TableFetchLocalDataSource.configBuilder<FindReferencesResponse>()
       .addSearchStringPredicate('project', (element) => this._projectName.transform(element))
       .addSortStringPredicate('project', (element) => this._projectName.transform(element))
       .build(),
   );
 
-  readonly emptyResults$ = this.searchableReferences.total$.pipe(
+  readonly emptyResults$ = this.searchableReferences.totalFiltered$.pipe(
     map((total) => total === 0),
     startWith(false),
   );

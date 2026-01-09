@@ -3,6 +3,28 @@
     <mat-spinner />
   </div>
 }
+<section class="controls-container">
+  <div class="controls">
+    <step-search-field
+      [formControl]="_treeSearch.searchCtrl"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
+      [hint]="_treeSearchDescription"
+    />
+    <step-search-paginator
+      [isActive]="_treeSearch.isErrorSearchActive()"
+      (isActiveChange)="_treeSearch.toggleIsErrorSearchActive()"
+      [(searchIndex)]="_treeSearch.pageIndex"
+      [total]="_treeSearch.foundItems()"
+      [isDisabled]="!_treeSearch.hasErrors()"
+      [inactiveTooltip]="_treeSearch.errorsButtonHint()"
+      activeTooltip="Close error search"
+      [hintTooltip]="_treeSearch.errorsSearchHint()"
+      prevTooltip="show previous error"
+      nextTooltip="show next error"
+    />
+  </div>
+</section>
 <step-alt-execution-tree #tree>
   <ng-container *stepAltExecutionTreeNodeAddon="let node; let isSelected = isSelected">
     @if (showDetailsButton() && !(node | isEmptyStatus) && !(node | isCurrentReportDetailsOpened)) {

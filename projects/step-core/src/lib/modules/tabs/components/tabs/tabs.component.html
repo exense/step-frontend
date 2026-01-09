@@ -5,6 +5,7 @@
         mat-tab-link
         [routerLink]="tab.link!"
         [relativeTo]="_activatedRoute"
+        queryParamsHandling="merge"
         stepTestId="tab-selector-{{ tab.id }}"
         routerLinkActive
         #rla="routerLinkActive"

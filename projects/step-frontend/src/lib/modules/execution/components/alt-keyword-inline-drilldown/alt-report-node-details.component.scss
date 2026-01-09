@@ -18,6 +18,7 @@ section {
   align-items: flex-start;
   margin: 1rem 0;
   gap: 1rem;
+
   &.col-view {
     flex-direction: column;
   }
@@ -33,7 +34,8 @@ step-alt-execution-tree-partial {
 }
 
 .tree-container {
-  margin-top: 4rem;
+  margin-top: 2rem;
+
   & > .data-container {
     height: 100%;
   }
@@ -43,9 +45,19 @@ step-alt-execution-tree-partial {
   position: relative;
   width: 4rem;
   height: 2rem;
+
   button {
     position: absolute;
     right: 0;
     margin-top: -1rem;
   }
+}
+
+.error-root-causes-container {
+  margin-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
 }
