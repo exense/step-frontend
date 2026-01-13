@@ -1,30 +1,32 @@
-import { TableLocalDataSource } from './table-local-data-source';
-import { BehaviorSubject, map, Observable, of, shareReplay, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { TableLocalDataSource, TableLocalDataSourceSetupResult } from './table-local-data-source';
+import { BehaviorSubject, map, Observable, shareReplay, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { TableLocalDataSourceConfig } from './table-local-data-source-config';
-import { Mutable } from '../../basics/step-basics.module';
 import { StepDataSourceReloadOptions } from '../../../client/table/shared/step-data-source';
 
 interface ReloadOptions<R> extends StepDataSourceReloadOptions {
   request?: R;
 }
 
-type FieldAccessor = Mutable<Pick<TableFetchLocalDataSource<any>, 'inProgress$'>>;
+type TableFetchLocalDataSourceSetupResult<R> = TableLocalDataSourceSetupResult & {
+  inProgressInternal$: BehaviorSubject<boolean>;
+  reload$: BehaviorSubject<ReloadOptions<R> | undefined>;
+};
 
 interface TableFetchConfig<T, R> extends TableLocalDataSourceConfig<T> {
   initialReloadOptions?: ReloadOptions<R>;
 }
 
-export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<T> {
+export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
+  T,
+  TableFetchLocalDataSourceSetupResult<R>
+> {
   private inProgressInternal$!: BehaviorSubject<boolean>;
+  private reload$!: BehaviorSubject<ReloadOptions<R> | undefined>;
 
-  private reload$?: BehaviorSubject<ReloadOptions<R> | undefined>;
   private pendingReload?: ReloadOptions<R>;
 
   private currentRequestTerminator$?: Subject<void>;
   private requestRef$?: Observable<T[] | undefined>;
-
-  //@ts-ignore
-  override readonly inProgress$;
 
   constructor(
     private retrieveData: (request?: R) => Observable<T[] | undefined>,
@@ -32,6 +34,12 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     initialReloadOptions?: ReloadOptions<R>,
   ) {
     super([], { ...config, initialReloadOptions } as TableLocalDataSourceConfig<T>);
+    this.inProgressInternal$ = this.fields.inProgressInternal$;
+    this.reload$ = this.fields.reload$;
+    if (this.pendingReload) {
+      this.reload$.next(this.pendingReload);
+      this.pendingReload = undefined;
+    }
   }
 
   override reload(reloadOptions?: ReloadOptions<R>): void {
@@ -50,21 +58,22 @@ export class TableFetchLocalDataSource<T, R = any> extends TableLocalDataSource<
     this.terminateCurrentRequest();
   }
 
-  protected override setupStreams(ignoredArrayFromConstructor: T[] | Observable<T[]>, config: TableFetchConfig<T, R>) {
+  protected override setupStreams(
+    ignoredArrayFromConstructor: T[] | Observable<T[]>,
+    config: TableFetchConfig<T, R>,
+  ): TableFetchLocalDataSourceSetupResult<R> {
     const reload$ = new BehaviorSubject<ReloadOptions<R> | undefined>(config.initialReloadOptions);
     const inProgressInternal$ = new BehaviorSubject<boolean>(false);
-
-    this.reload$ = reload$;
-    this.inProgressInternal$ = inProgressInternal$;
-    (this as FieldAccessor).inProgress$ = inProgressInternal$.asObservable();
+    const inProgress$ = inProgressInternal$.asObservable();
 
     const source$ = this.createDataStream(reload$, inProgressInternal$);
-    super.setupStreams(source$, config);
-
-    if (this.pendingReload) {
-      this.reload$.next(this.pendingReload);
-      this.pendingReload = undefined;
-    }
+    const fields = super.setupStreams(source$, config);
+    return {
+      ...fields,
+      reload$,
+      inProgressInternal$,
+      inProgress$,
+    };
   }
 
   private terminateCurrentRequest(): void {
