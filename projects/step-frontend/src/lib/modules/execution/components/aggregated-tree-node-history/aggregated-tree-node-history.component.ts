@@ -5,7 +5,6 @@ import {
   ExecutionsService,
   FetchBucketsRequest,
   STATUS_COLORS,
-  TimeSeriesAPIResponse,
   TimeSeriesService,
 } from '@exense/step-core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
@@ -123,18 +122,6 @@ export class AggregatedTreeNodeHistoryComponent {
 
   private fetchLastExecutionsByTask(beforeTime: number, taskId: string): Observable<Execution[]> {
     return this._executionService.getLastExecutionsByTaskId(taskId, this.previousExecutionsCount(), 0, beforeTime);
-  }
-
-  private fetchTimeSeriesArtefactsData(executionIds: string[]): Observable<TimeSeriesAPIResponse> {
-    const executionsIdsJoined = executionIds.map((eId) => `attributes.executionId = ${eId!}`).join(' or ') || '1 = 1';
-    const request: FetchBucketsRequest = {
-      start: 0,
-      end: new Date().getTime(),
-      numberOfBuckets: 1,
-      oqlFilter: `(attributes.artefactHash = ${this.artefactHashContainer().artefactHash!}) and (${executionsIdsJoined})`,
-      groupDimensions: ['executionId', 'status'],
-    };
-    return this._timeSeriesService.getReportNodesTimeSeries(request);
   }
 
   private padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
