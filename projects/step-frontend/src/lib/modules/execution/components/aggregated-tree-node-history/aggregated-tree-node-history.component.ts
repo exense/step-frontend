@@ -1,5 +1,4 @@
-import { Component, computed, effect, inject, input, OnInit, signal, ViewEncapsulation } from '@angular/core';
-import { AggregatedTreeNode } from '../../shared/aggregated-tree-node';
+import { Component, inject, input } from '@angular/core';
 import {
   BucketAttributes,
   Execution,
@@ -10,9 +9,10 @@ import {
   TimeSeriesService,
 } from '@exense/step-core';
 import { AltExecutionStateService } from '../../services/alt-execution-state.service';
-import { map, Observable, switchMap, take } from 'rxjs';
+import { combineLatestWith, map, Observable, switchMap, take } from 'rxjs';
 import { TreeNodePieChartSlice } from './execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { Status } from '../../../_common/shared/status.enum';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 interface ExecutionItem {
   execution: Execution;
@@ -25,21 +25,26 @@ interface HistoryChainData {
   currentExecution: ExecutionItem;
 }
 
+export interface HashContainer {
+  artefactHash: string;
+}
+
 @Component({
   selector: 'step-aggregated-tree-node-history',
   templateUrl: './aggregated-tree-node-history.component.html',
   styleUrl: './aggregated-tree-node-history.component.scss',
   standalone: false,
 })
-export class AggregatedTreeNodeHistoryComponent implements OnInit {
-  readonly artefactHash = input.required<string>();
-  readonly previousExecutionsCount = input.required<number>();
-  protected _executionService = inject(ExecutionsService);
+export class AggregatedTreeNodeHistoryComponent {
+  private _executionService = inject(ExecutionsService);
   private _executionState = inject(AltExecutionStateService);
   private _timeSeriesService = inject(TimeSeriesService);
   private _statusColors = inject(STATUS_COLORS);
 
-  previousExecutions = this._executionState.execution$.pipe(
+  readonly artefactHashContainer = input.required<HashContainer>();
+  readonly previousExecutionsCount = input.required<number>();
+
+  private previousExecutions$ = this._executionState.execution$.pipe(
     take(1),
     switchMap((ex) =>
       (ex.executionTaskID
@@ -49,54 +54,63 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
     ),
   );
 
-  historyArtefactsData: Observable<HistoryChainData> = this.previousExecutions.pipe(
-    switchMap((executions) => {
-      const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ') || '1 = 1';
-      const request: FetchBucketsRequest = {
-        start: 0,
-        end: new Date().getTime(),
-        numberOfBuckets: 1,
-        oqlFilter: `(attributes.artefactHash = ${this.artefactHash()}) and (${executionsIdsJoined})`,
-        groupDimensions: ['executionId', 'status'],
-      };
-      return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
-        map((response) => {
-          const slicesByExecution: Record<string, TreeNodePieChartSlice[]> = {};
-          response.matrixKeys.forEach((key: BucketAttributes, i: number) => {
-            const eId = key['executionId'];
-            const status: any = key['status'];
-            const value = response.matrix[i][0].count;
-            const color = this._statusColors[status as Status] || this._statusColors['TECHNICAL_ERROR'];
-            const newSlice: TreeNodePieChartSlice = { label: status, color: color, count: value };
-            let currentSlices = slicesByExecution[eId];
-            if (!currentSlices) {
-              currentSlices = [];
-              slicesByExecution[eId] = currentSlices;
-            }
-            currentSlices.push(newSlice);
-          });
-          return slicesByExecution;
-        }),
-        switchMap((slices) => {
-          const allExecutions: ExecutionItem[] = executions.map((e) => ({
-            execution: e,
-            statusSlices: slices[e.id!],
-            statusesCount: Object.fromEntries((slices[e.id!] || []).map((s) => [s.label, s.count])),
-          }));
-          return this._executionState.execution$.pipe(
-            map((currentExecution) => ({
-              previousExecutions: this.padArrayWithNull(allExecutions.slice(0, -1), this.previousExecutionsCount()), // remove the current execution
-              currentExecution: {
-                execution: currentExecution,
-                statusSlices: slices[currentExecution.id!],
-                statusesCount: Object.fromEntries((slices[currentExecution.id!] || []).map((s) => [s.label, s.count])),
-              },
-            })),
-          );
-        }),
-      );
-    }),
+  private artefactHashWithPreviousExecutions$ = toObservable(this.artefactHashContainer).pipe(
+    map((item) => item.artefactHash),
+    combineLatestWith(this.previousExecutions$),
+    map(([artefactHash, executions]) => ({ executions, artefactHash })),
   );
+
+  protected readonly historyArtefactsData$: Observable<HistoryChainData> =
+    this.artefactHashWithPreviousExecutions$.pipe(
+      switchMap(({ executions, artefactHash }) => {
+        const executionsIdsJoined = executions.map((e) => `attributes.executionId = ${e.id!}`).join(' or ') || '1 = 1';
+        const request: FetchBucketsRequest = {
+          start: 0,
+          end: new Date().getTime(),
+          numberOfBuckets: 1,
+          oqlFilter: `(attributes.artefactHash = ${artefactHash}) and (${executionsIdsJoined})`,
+          groupDimensions: ['executionId', 'status'],
+        };
+        return this._timeSeriesService.getReportNodesTimeSeries(request).pipe(
+          map((response) => {
+            const slicesByExecution: Record<string, TreeNodePieChartSlice[]> = {};
+            response.matrixKeys.forEach((key: BucketAttributes, i: number) => {
+              const eId = key['executionId'];
+              const status: any = key['status'];
+              const value = response.matrix[i][0].count;
+              const color = this._statusColors[status as Status] || this._statusColors['TECHNICAL_ERROR'];
+              const newSlice: TreeNodePieChartSlice = { label: status, color: color, count: value };
+              let currentSlices = slicesByExecution[eId];
+              if (!currentSlices) {
+                currentSlices = [];
+                slicesByExecution[eId] = currentSlices;
+              }
+              currentSlices.push(newSlice);
+            });
+            return slicesByExecution;
+          }),
+          switchMap((slices) => {
+            const allExecutions: ExecutionItem[] = executions.map((e) => ({
+              execution: e,
+              statusSlices: slices[e.id!],
+              statusesCount: Object.fromEntries((slices[e.id!] || []).map((s) => [s.label, s.count])),
+            }));
+            return this._executionState.execution$.pipe(
+              map((currentExecution) => ({
+                previousExecutions: this.padArrayWithNull(allExecutions.slice(0, -1), this.previousExecutionsCount()), // remove the current execution
+                currentExecution: {
+                  execution: currentExecution,
+                  statusSlices: slices[currentExecution.id!],
+                  statusesCount: Object.fromEntries(
+                    (slices[currentExecution.id!] || []).map((s) => [s.label, s.count]),
+                  ),
+                },
+              })),
+            );
+          }),
+        );
+      }),
+    );
 
   private fetchLastExecutionsByPlan(beforeTime: number, planId: string): Observable<Execution[]> {
     return this._executionService.findByCritera({
@@ -111,35 +125,19 @@ export class AggregatedTreeNodeHistoryComponent implements OnInit {
     return this._executionService.getLastExecutionsByTaskId(taskId, this.previousExecutionsCount(), 0, beforeTime);
   }
 
-  ngOnInit(): void {
-    this.previousExecutions.subscribe((executions) => {
-      const executionIds: string[] = executions.map((e) => e.id!);
-      this.fetchTimeSeriesArtefactsData(executionIds).subscribe((response) => {
-        const slicesByExecution: Record<string, TreeNodePieChartSlice> = {};
-        response.matrixKeys.forEach((key: BucketAttributes, i: number) => {
-          const eId = key['executionId'];
-          const status: any = key['status'];
-          const value = response.matrix[i][0].count;
-          const color = this._statusColors[status as Status] || this._statusColors['SKIPPED'];
-          slicesByExecution[eId] = { label: status, color: color, count: value };
-        });
-      });
-    });
-  }
-
   private fetchTimeSeriesArtefactsData(executionIds: string[]): Observable<TimeSeriesAPIResponse> {
     const executionsIdsJoined = executionIds.map((eId) => `attributes.executionId = ${eId!}`).join(' or ') || '1 = 1';
     const request: FetchBucketsRequest = {
       start: 0,
       end: new Date().getTime(),
       numberOfBuckets: 1,
-      oqlFilter: `(attributes.artefactHash = ${this.artefactHash()!}) and (${executionsIdsJoined})`,
+      oqlFilter: `(attributes.artefactHash = ${this.artefactHashContainer().artefactHash!}) and (${executionsIdsJoined})`,
       groupDimensions: ['executionId', 'status'],
     };
     return this._timeSeriesService.getReportNodesTimeSeries(request);
   }
 
-  padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
+  private padArrayWithNull(array: ExecutionItem[], size: number): (ExecutionItem | null)[] {
     const padCount = Math.max(0, size - (array?.length ?? 0));
     return Array(padCount)
       .fill(null)
