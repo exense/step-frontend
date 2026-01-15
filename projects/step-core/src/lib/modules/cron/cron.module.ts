@@ -64,6 +64,9 @@ import { TAB_EXPORTS } from '../tabs';
     MinutesEditorComponent,
     MonthlyDayEditorComponent,
     MonthlyWeekEditorComponent,
+    DayOfWeekSelectorComponent,
+    YearlyWeekEditorComponent,
+    YearlyDayEditorComponent,
   ],
 })
 export class CronModule {}
