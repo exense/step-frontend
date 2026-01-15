@@ -56,7 +56,15 @@ import { TAB_EXPORTS } from '../tabs';
     DatePickerModule,
     TAB_EXPORTS,
   ],
-  exports: [ValidateCronDirective],
+  exports: [
+    ValidateCronDirective,
+    EveryDayEditorComponent,
+    EveryWeekDayEditorComponent,
+    HoursEditorComponent,
+    MinutesEditorComponent,
+    MonthlyDayEditorComponent,
+    MonthlyWeekEditorComponent,
+  ],
 })
 export class CronModule {}
 
