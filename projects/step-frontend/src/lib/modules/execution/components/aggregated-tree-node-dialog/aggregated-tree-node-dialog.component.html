@@ -83,7 +83,7 @@
             }
           </div>
           <step-aggregated-tree-node-history
-            [artefactHash]="(aggregatedNode()?.artefactHash || selectedReportNode()?.artefactHash)!"
+            [artefactHashContainer]="artefactHashContainer()"
             [previousExecutionsCount]="PREVIOUS_EXECUTIONS_TO_DISPLAY"
           />
         </div>
