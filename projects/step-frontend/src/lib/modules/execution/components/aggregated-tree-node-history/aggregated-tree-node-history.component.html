@@ -1,5 +1,5 @@
 <div class="container">
-  @if (historyArtefactsData | async; as historyData) {
+  @if (historyArtefactsData$ | async; as historyData) {
     <div class="previous-executions-container">
       @for (executionItem of historyData.previousExecutions; track executionItem?.execution?.id! || $index) {
         @if (executionItem === null) {

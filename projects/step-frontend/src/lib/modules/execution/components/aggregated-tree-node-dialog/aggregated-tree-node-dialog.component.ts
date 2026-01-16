@@ -94,6 +94,14 @@ export class AggregatedTreeNodeDialogComponent implements OnInit {
 
   protected readonly selectedReportNode = toSignal(this.reportNode$);
   protected readonly aggregatedNode = toSignal(this.aggregatedNode$);
+
+  protected readonly artefactHashContainer = computed(() => {
+    const selectedReportNode = this.selectedReportNode();
+    const aggregatedNode = this.aggregatedNode();
+    const artefactHash = (aggregatedNode?.artefactHash || selectedReportNode?.artefactHash)!;
+    return { artefactHash };
+  });
+
   protected readonly resolvedPartialPath = this._data.resolvedPartialPath;
   protected readonly initialSearchStatus = this._data.searchStatus;
   protected readonly initialSearchStatusCount = this._data.searchStatusCount;
