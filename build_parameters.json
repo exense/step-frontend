@@ -9,7 +9,7 @@
       "PARAMETERS": [
         {
           "NAME": "ALL",
-          "URL": "nexus-staging https://nexus-enterprise-staging.exense.ch/repository/staging-npm/"
+          "URL": "nexus-staging https://nexus-enterprise-staging.stepcloud-test.ch/repository/staging-npm/"
         },
         {
           "NAME": "PRODUCTION",
@@ -24,7 +24,7 @@
       "PARAMETERS": [
         {
           "NAME": "ALL",
-          "URL": "nexus-staging::https://nexus-enterprise-staging.exense.ch/repository/staging-maven/"
+          "URL": "nexus-staging::https://nexus-enterprise-staging.stepcloud-test.ch/repository/staging-maven/"
         },
         {
           "NAME": "PRODUCTION",
