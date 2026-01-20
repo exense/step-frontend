@@ -26,7 +26,7 @@ import {
 } from '@exense/step-core';
 import { TsComparePercentagePipe } from './ts-compare-percentage.pipe';
 import { TableColumnType } from '../../modules/_common/types/table-column-type';
-import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { MatDialog } from '@angular/material/dialog';
 import { TableDashletSettingsComponent } from '../table-dashlet-settings/table-dashlet-settings.component';
@@ -110,7 +110,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   tableData$ = new BehaviorSubject<TableEntry[]>([]);
   tableDataSource: TableLocalDataSource<TableEntry> | undefined;
-  tableIsLoading = true;
 
   columnsDefinition: TableColumn[] = [];
   visibleColumnsIds: string[] = ['name'];
@@ -134,21 +133,32 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
     this.prepareState();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.fetchBaseData().subscribe(() => this.updateTableData());
-  }
-
-  refresh(blur?: boolean): Observable<any> {
     this.isLoading.set(true);
-    return this.fetchBaseData().pipe(tap(() => this.updateTableData()));
+    this.fetchBaseData()
+      .pipe(
+        switchMap(() => this.updateTableData()),
+        finalize(() => this.isLoading.set(false)),
+      )
+      .subscribe();
   }
 
-  refreshCompareData(): Observable<any> {
+  public refresh(blur?: boolean): Observable<any> {
+    this.isLoading.set(true);
+    return this.fetchBaseData().pipe(
+      switchMap(() => this.updateTableData()),
+      finalize(() => this.isLoading.set(false)),
+    );
+  }
+
+  public refreshCompareData(): Observable<any> {
+    this.isLoading.set(true);
     return this.fetchData(true).pipe(
       tap((response) => {
         this.compareBuckets = response.buckets;
         this.truncated = response.truncated;
-        this.updateTableData();
       }),
+      switchMap(() => this.updateTableData()),
+      finalize(() => this.isLoading.set(false)),
     );
   }
 
@@ -305,7 +315,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   private fetchBaseData(): Observable<ProcessedBucketResponse> {
-    this.isLoading.set(true);
     return this.fetchData(false).pipe(
       tap((response) => {
         this.baseBuckets = response.buckets;
@@ -380,11 +389,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   private updateTableData() {
     const tableEntries = this.mergeBaseAndCompareData();
-    this.fetchLegendEntities(tableEntries).subscribe((updatedData) => {
-      this.tableData$.next(updatedData);
-      this.tableIsLoading = false;
-      this.isLoading.set(false);
-    });
+    return this.fetchLegendEntities(tableEntries).pipe(
+      tap((updatedData) => {
+        this.tableData$.next(updatedData);
+      }),
+    );
   }
 
   private processResponse(response: TimeSeriesAPIResponse, context: TimeSeriesContext): ProcessedBucketResponse {

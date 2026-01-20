@@ -52,9 +52,6 @@
             <ng-container *ngTemplateOutlet="loadingSpinner" />
           }
           @if (_state.keywordsChartSettings$ | async; as settings) {
-            @if (_state.keywordsCountChartLoading()) {
-              <ng-container *ngTemplateOutlet="loadingSpinner" />
-            }
             <step-timeseries-chart [settings]="settings.chartSettings" [height]="350">
               <ng-template tooltipContent let-data>
                 <div class="ts-tooltip">
