@@ -49,7 +49,7 @@ import {
 import { TableDashletComponent } from '../table-dashlet/table-dashlet.component';
 import { ChartDashlet } from '../../modules/_common/types/chart-dashlet';
 import { DashboardStateEngine } from './dashboard-state-engine';
-import { forkJoin, map, Observable, of, tap } from 'rxjs';
+import { forkJoin, map, Observable, of, Subscription, tap } from 'rxjs';
 
 //@ts-ignore
 import uPlot = require('uplot');
@@ -134,6 +134,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   mainEngine!: DashboardStateEngine;
   compareEngine?: DashboardStateEngine;
+  compareModeChangesSubscription?: Subscription;
 
   public updateFullTimeRange(
     timeRange: TimeRange,
@@ -562,6 +563,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private disableCompareMode() {
+    if (this.compareModeChangesSubscription) {
+      this.compareModeChangesSubscription.unsubscribe();
+      this.compareModeChangesSubscription = undefined;
+    }
     this.mainEngine.state.context.disableCompareMode();
     this.dashlets.forEach((d) => {
       if (d.getType() === 'TABLE') {
@@ -591,7 +596,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private enableCompareMode() {
+    if (this.compareModeChangesSubscription) {
+      this.compareModeChangesSubscription.unsubscribe();
+      this.compareModeChangesSubscription = undefined;
+    }
     const mainState = this.mainEngine.state;
+    mainState.lastChangeType = 'manual';
     const mainTimeSettings = mainState.context.getTimeRangeSettings();
     const compareModeContext = this._timeSeriesContextFactory.createContext({
       dashlets: JSON.parse(JSON.stringify(this.dashboard.dashlets)), // clone
@@ -617,13 +627,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       refreshInProgress: false,
       lastChangeType: 'auto',
     };
-    compareModeContext.settingsChange$.subscribe(() => {
+
+    this.compareModeChangesSubscription = compareModeContext.settingsChange$.subscribe((x) => {
+      console.log('settings have changed', x);
       this.dashlets.forEach((d) => {
         if (d.getType() === 'TABLE') {
           (d as TableDashletComponent).refreshCompareData().subscribe();
         }
       });
     });
+
     this.compareEngine = new DashboardStateEngine(state);
     this.compareEngine.subscribeForContextChange();
     mainState.context.enableCompareMode(compareModeContext);
@@ -680,6 +693,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.mainEngine?.destroy();
     this.compareEngine?.destroy();
+    this.compareModeChangesSubscription?.unsubscribe();
     if (!this.storageId) {
       this.mainEngine?.state?.context?.destroy?.();
       this.compareEngine?.state?.context?.destroy?.();

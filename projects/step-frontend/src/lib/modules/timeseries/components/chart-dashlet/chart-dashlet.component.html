@@ -1,5 +1,5 @@
 <div>
-  @if (!_internalSettings) {
+  @if (!_internalSettings()) {
     <step-chart-skeleton [height]="height" />
   } @else {
     @if (isLoading() && showLoadingSpinnerWhileLoading()) {
@@ -11,7 +11,7 @@
       #chart
       (zoomReset)="handleZoomReset()"
       [syncKey]="context.id"
-      [settings]="_internalSettings!"
+      [settings]="_internalSettings()!"
       (lockStateChange)="handleLockStateChange($event)"
       [height]="height"
     >

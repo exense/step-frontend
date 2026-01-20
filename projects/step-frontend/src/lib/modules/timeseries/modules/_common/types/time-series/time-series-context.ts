@@ -77,16 +77,34 @@ export class TimeSeriesContext {
 
     // any specific context change will trigger the main stateChange
     this.settingsChange$ = merge(
-      this.compareModeChange$.pipe(skip(1)),
-      this.inProgress$.pipe(skip(1)), // TODO
-      this.activeGroupings$.pipe(skip(1)),
-      this.filterSettings$.pipe(skip(1)),
-      this.chartsResolution$.pipe(skip(1)),
-      this.chartsLockedState$.pipe(skip(1)), // TODO
-      this.fullTimeRangeChange$,
-      this.selectedTimeRangeChange$,
-      this.stateChangeInternal$,
-    ) as Observable<void>;
+      this.compareModeChange$.pipe(
+        skip(1),
+        map(() => 'compareModeChange$'),
+      ),
+      this.inProgress$.pipe(
+        skip(1),
+        map(() => 'inProgress$'),
+      ),
+      this.activeGroupings$.pipe(
+        skip(1),
+        map(() => 'activeGroupings$'),
+      ),
+      this.filterSettings$.pipe(
+        skip(1),
+        map(() => 'filterSettings$'),
+      ),
+      this.chartsResolution$.pipe(
+        skip(1),
+        map(() => 'chartsResolution$'),
+      ),
+      this.chartsLockedState$.pipe(
+        skip(1),
+        map(() => 'chartsLockedState$'),
+      ),
+      this.fullTimeRangeChange$.pipe(map(() => 'fullTimeRangeChange$')),
+      this.selectedTimeRangeChange$.pipe(map(() => 'selectedTimeRangeChange$')),
+      this.stateChangeInternal$.pipe(map(() => 'stateChangeInternal$')),
+    ) as unknown as Observable<void>;
   }
 
   getTimeRangeSettings() {

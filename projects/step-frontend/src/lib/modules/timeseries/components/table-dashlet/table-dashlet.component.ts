@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   EventEmitter,
   inject,
   input,
@@ -101,7 +102,11 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   @Output() shiftLeft = new EventEmitter();
   @Output() shiftRight = new EventEmitter();
 
-  isLoading = signal<boolean>(false);
+  isLoading = signal<boolean>(true);
+
+  logEffect = effect(() => {
+    console.log(this.isLoading());
+  });
 
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
@@ -133,7 +138,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     }
     this.prepareState();
     this.tableDataSource = new TableLocalDataSource(this.tableData$, this.getDatasourceConfig());
-    this.isLoading.set(true);
     this.fetchBaseData()
       .pipe(
         switchMap(() => this.updateTableData()),
@@ -143,6 +147,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   public refresh(blur?: boolean): Observable<any> {
+    console.log('refreshing');
     this.isLoading.set(true);
     return this.fetchBaseData().pipe(
       switchMap(() => this.updateTableData()),
@@ -230,12 +235,16 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   enableCompareMode(context: TimeSeriesContext) {
+    console.log('enabling compare mode in table dashlet');
     this.compareModeEnabled = true;
     this.compareContext = context;
     this.compareBuckets = this.baseBuckets;
     this.compareRequestOql = this.baseRequestOql;
     this.updateVisibleColumns();
-    this.updateTableData();
+    this.isLoading.set(true);
+    this.updateTableData()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe();
   }
 
   disableCompareMode() {
@@ -243,7 +252,10 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
     this.compareContext = undefined;
     this.compareBuckets = [];
     this.updateVisibleColumns();
-    this.updateTableData();
+    this.isLoading.set(true);
+    this.updateTableData()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe();
   }
 
   updateVisibleColumns(): void {
@@ -270,6 +282,7 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   onColumnPclValueChange(column: TableColumn, value: string) {
+    console.log('on pc value changes');
     const oldValue = column.pclValue;
     let parsedNumber: number = parseFloat(value);
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
