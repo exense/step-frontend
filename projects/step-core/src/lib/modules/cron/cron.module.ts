@@ -67,6 +67,7 @@ import { TAB_EXPORTS } from '../tabs';
     DayOfWeekSelectorComponent,
     YearlyWeekEditorComponent,
     YearlyDayEditorComponent,
+    PresetEditorComponent,
   ],
 })
 export class CronModule {}
