@@ -21,7 +21,7 @@ import { RelativeTimePickerComponent } from './components/relative-time-picker/r
     RelativeTimePickerComponent,
   ],
   imports: [StepBasicsModule],
-  exports: [DatePickerComponent, DatePickerDirective, DateRangePickerDirective],
+  exports: [DatePickerComponent, DatePickerDirective, DateRangePickerDirective, RelativeTimePickerComponent],
 })
 export class DatePickerModule {}
 
