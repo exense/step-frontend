@@ -28,7 +28,7 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
     const canvasElement = this.canvas();
     const size = this.size();
     const startAngle = this.startAngleDeg();
-    const circ = this.circumferenceDeg();
+    const circumference = this.circumferenceDeg();
     const emptyColor = this.emptyColor();
 
     if (!canvasElement) return;
@@ -62,19 +62,19 @@ export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
 
     const options = {
       responsive: true,
-      maintainAspectRatio: false,
       animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       elements: { arc: arcStyle },
       rotation: (startAngle * Math.PI) / 180,
-      circumference: (circ * Math.PI) / 180,
+      circumference,
     } as const;
 
     if (this.chart) {
       // update in place
       this.chart.data.labels = data.labels as any;
-      this.chart.data.datasets[0].data = data.datasets[0].data as any;
-      (this.chart.data.datasets[0] as any).backgroundColor = data.datasets[0].backgroundColor as any;
+      this.chart.data.datasets[0].data = data.datasets[0].data as number[];
+      (this.chart.data.datasets[0] as any).backgroundColor = data.datasets[0].backgroundColor as string[];
+      (this.chart.options as any).elements.arc = options.elements.arc;
       (this.chart.options as any).rotation = options.rotation;
       (this.chart.options as any).circumference = options.circumference;
       this.chart.update();

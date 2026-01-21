@@ -23,12 +23,15 @@ import { Mutable } from '../../basics/step-basics.module';
 import { RequestContainer } from '../types/request-container';
 import { StepPageEvent } from '../types/step-page-event';
 
-type FieldAccessor = Mutable<
-  Pick<
-    TableLocalDataSource<any>,
-    'data$' | 'allData$' | 'totalFiltered$' | 'forceNavigateToFirstPage$' | 'allFiltered$' | 'hasNext$'
-  >
->;
+type Fields =
+  | 'data$'
+  | 'allData$'
+  | 'totalFiltered$'
+  | 'forceNavigateToFirstPage$'
+  | 'allFiltered$'
+  | 'hasNext$'
+  | 'inProgress$';
+export type TableLocalDataSourceSetupResult = Mutable<Pick<TableLocalDataSource<any>, Fields>>;
 
 interface Request {
   page?: StepPageEvent;
@@ -38,7 +41,9 @@ interface Request {
 
 const isSimpleType = (value: any) => ['string', 'number', 'boolean'].includes(typeof value);
 
-export class TableLocalDataSource<T> implements TableDataSource<T> {
+export class TableLocalDataSource<T, S extends TableLocalDataSourceSetupResult = TableLocalDataSourceSetupResult>
+  implements TableDataSource<T>
+{
   static configBuilder<X>(): TableLocalDataSourceConfigBuilder<X> {
     return new TableLocalDataSourceConfigBuilder();
   }
@@ -49,8 +54,9 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
   private _request$ = new BehaviorSubject<RequestContainer<Request>>({});
   private isSharable = false;
 
-  readonly inProgress$: Observable<boolean> = of(false);
+  protected fields: S;
 
+  readonly inProgress$!: Observable<boolean>;
   readonly allData$!: Observable<T[]>;
   readonly allFiltered$!: Observable<T[]>;
   readonly data$!: Observable<T[]>;
@@ -62,13 +68,20 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     source: T[] | Observable<T[]>,
     private _config: TableLocalDataSourceConfig<T> = {},
   ) {
-    this.setupStreams(source, _config);
+    this.fields = this.setupStreams(source, _config);
+    this.totalFiltered$ = this.fields.totalFiltered$;
+    this.data$ = this.fields.data$;
+    this.allFiltered$ = this.fields.allFiltered$;
+    this.allData$ = this.fields.allData$;
+    this.hasNext$ = this.fields.hasNext$;
+    this.inProgress$ = this.fields.inProgress$;
+    this.forceNavigateToFirstPage$ = this.fields.forceNavigateToFirstPage$;
   }
 
   protected setupStreams(
     source: T[] | undefined | Observable<T[] | undefined>,
     config: TableLocalDataSourceConfig<T>,
-  ): void {
+  ): S {
     const source$ = source instanceof Array || source === undefined ? of(source as T[] | undefined) : source;
     this._source$ = source$.pipe(takeUntil(this._terminator$));
 
@@ -78,7 +91,7 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
     ]).pipe(
       map(([src, req]) => {
         let total: number | null = null;
-        let totalFiltered = 0;
+        let totalFiltered = null;
 
         if ((!req?.page && !req.search && !req.sort) || !src) {
           return {
@@ -112,14 +125,14 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       shareReplay(1),
     );
 
-    const self = this as FieldAccessor;
-    self.totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
-    self.data$ = requestResult$.pipe(map((r) => r.data));
-    self.allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
-    self.allData$ = requestResult$.pipe(map((r) => r.allData));
-    self.hasNext$ = requestResult$.pipe(map((r) => r.hasNext));
+    const totalFiltered$ = requestResult$.pipe(map((r) => r.totalFiltered));
+    const data$ = requestResult$.pipe(map((r) => r.data));
+    const allFiltered$ = requestResult$.pipe(map((r) => r.allFiltered));
+    const allData$ = requestResult$.pipe(map((r) => r.allData));
+    const hasNext$ = requestResult$.pipe(map((r) => r.hasNext));
+    const inProgress$ = of(false);
 
-    self.forceNavigateToFirstPage$ = combineLatest([this.data$, this.totalFiltered$]).pipe(
+    const forceNavigateToFirstPage$ = combineLatest([data$, totalFiltered$]).pipe(
       map(([data, totalFiltered]) => {
         const recordsInPage = (data || []).length;
         const recordsFiltered = totalFiltered || 0;
@@ -131,6 +144,16 @@ export class TableLocalDataSource<T> implements TableDataSource<T> {
       // but sum previous data maybe rendered
       switchMap(() => timer(100)),
     );
+
+    return {
+      totalFiltered$,
+      data$,
+      allFiltered$,
+      allData$,
+      hasNext$,
+      inProgress$,
+      forceNavigateToFirstPage$,
+    } as S;
   }
 
   private getItemValue(item: T, field: string): string {
