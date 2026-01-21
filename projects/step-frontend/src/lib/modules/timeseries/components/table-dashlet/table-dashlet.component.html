@@ -95,7 +95,6 @@
 </div>
 
 <div class="table-container">
-  {{ isLoading() }}
   @if (isLoading() && showLoadingSpinnerWhileLoading()) {
     <div class="spinner-container">
       <mat-spinner [diameter]="40" />

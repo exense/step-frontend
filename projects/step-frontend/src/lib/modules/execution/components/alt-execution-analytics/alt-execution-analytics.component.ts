@@ -56,10 +56,6 @@ export class AltExecutionAnalyticsComponent implements OnInit {
       this.dashboardComponent()?.updateFullTimeRange(timeRange!, { actionType: 'auto' });
     });
 
-  effect = effect(() => {
-    this.activeTimeRangeSelection();
-  });
-
   handleDashboardSettingsChange(context: TimeSeriesContext) {
     this._urlParamsService.updateUrlParamsFromContext(context, this.activeTimeRangeSelection()!, undefined, false);
   }

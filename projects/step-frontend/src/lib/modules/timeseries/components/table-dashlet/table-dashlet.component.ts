@@ -104,10 +104,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
 
   isLoading = signal<boolean>(true);
 
-  logEffect = effect(() => {
-    console.log(this.isLoading());
-  });
-
   private _timeSeriesService = inject(TimeSeriesService);
   private _matDialog = inject(MatDialog);
   private _timeSeriesEntityService = inject(TimeSeriesEntityService);
@@ -282,7 +278,6 @@ export class TableDashletComponent extends ChartDashlet implements OnInit, OnCha
   }
 
   onColumnPclValueChange(column: TableColumn, value: string) {
-    console.log('on pc value changes');
     const oldValue = column.pclValue;
     let parsedNumber: number = parseFloat(value);
     const validPclValue = !isNaN(parsedNumber) && parsedNumber > 0 && parsedNumber < 100;
