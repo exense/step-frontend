@@ -40,3 +40,4 @@ export {
   STEP_DATE_FORMAT_CONFIG,
   STEP_DATE_TIME_FORMAT_PROVIDERS,
 } from './injectables/step-date-format-config.providers';
+export * from './components/relative-time-picker/relative-time-picker.component';

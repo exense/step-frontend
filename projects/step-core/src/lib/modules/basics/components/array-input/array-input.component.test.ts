@@ -64,6 +64,8 @@ describe('ArrayInputComponent', () => {
   });
 
   it('Render options', async () => {
+    fixture.detectChanges();
+    await fixture.whenStable();
     const autoComplete = await loader.getHarness(MatAutocompleteHarness);
     await autoComplete.focus();
 
