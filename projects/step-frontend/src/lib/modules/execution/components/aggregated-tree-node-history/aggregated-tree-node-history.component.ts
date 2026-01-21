@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import {
   BucketAttributes,
   Execution,
@@ -12,6 +12,8 @@ import { combineLatestWith, map, Observable, switchMap, take } from 'rxjs';
 import { TreeNodePieChartSlice } from './execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { Status } from '../../../_common/shared/status.enum';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { sign } from 'chart.js/helpers';
+import { HistoryNodeItem } from './history-nodes/history-nodes.component';
 
 interface ExecutionItem {
   execution: Execution;
@@ -110,6 +112,17 @@ export class AggregatedTreeNodeHistoryComponent {
         );
       }),
     );
+
+  newData: Observable<{ currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] }> = this.historyArtefactsData$.pipe(
+    map((data) => {
+      return {
+        currentNode: {
+          statusSlices: data.currentExecution.statusSlices,
+        },
+        pastNodes: [],
+      } as { currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] };
+    }),
+  );
 
   private fetchLastExecutionsByPlan(beforeTime: number, planId: string): Observable<Execution[]> {
     return this._executionService.findByCritera({

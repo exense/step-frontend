@@ -1,0 +1,62 @@
+<div class="container">
+  <div class="previous-executions-container">
+    @for (node of paddedPastExecutions(); track $index) {
+      @if (showTooltip()) {
+        <ng-container
+          *ngTemplateOutlet="nodeItemWithPopover; context: { item: node, last: $last, isCurrentExecution: false }"
+        ></ng-container>
+      } @else {
+        <ng-container
+          *ngTemplateOutlet="nodeItem; context: { item: node, last: $last, isCurrentExecution: false }"
+        ></ng-container>
+      }
+    }
+  </div>
+
+  @if (showTooltip()) {
+    <ng-container
+      *ngTemplateOutlet="nodeItemWithPopover; context: { item: currentNode(), last: false, isCurrentExecution: true }"
+    ></ng-container>
+  } @else {
+    <ng-container
+      *ngTemplateOutlet="nodeItem; context: { item: currentNode(), last: false, isCurrentExecution: true }"
+    ></ng-container>
+  }
+</div>
+
+<ng-template #nodeItemWithPopover let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
+  <step-popover [noPadding]="true">
+    <ng-container *ngTemplateOutlet="nodeItem; context: { item: item }"></ng-container>
+
+    <step-popover-content>
+      <step-status-distribution-tooltip
+        [statuses]="{ PASSED: 3 }"
+        [linkLabel]="isCurrentExecution ? 'Current execution' : 'See execution'"
+        [link]="isCurrentExecution ? '' : '/executions/' + item.execution.id!"
+        [timestamp]="item.execution.startTime!"
+      />
+    </step-popover-content>
+  </step-popover>
+</ng-template>
+
+<ng-template #nodeItem let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
+  <div
+    class="history-item-container"
+    [class.highlight]="isCurrentExecution"
+    [class.connect-line]="!isCurrentExecution"
+    [class.arrow]="last && !isCurrentExecution"
+  >
+    @if (item) {
+      <step-aggregated-tree-node-statuses-piechart [slices]="item.statusSlices" [highlight]="isCurrentExecution" />
+
+      @if (showTimestamps()) {
+        <div class="timestamp">
+          <div>{{ item.execution.startTime! | date: 'dd.MM' }}</div>
+          <div>{{ item.execution.startTime! | date: 'HH:mm' }}</div>
+        </div>
+      }
+    } @else {
+      <div class="empty-piechart" [style.width.px]="nodesSize()" [style.height.px]="nodesSize()"></div>
+    }
+  </div>
+</ng-template>

@@ -1,0 +1,41 @@
+import { Component, computed, effect, input, signal } from '@angular/core';
+import {
+  AggregatedTreeNodeStatusesPiechartComponent,
+  TreeNodePieChartSlice,
+} from '../execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { StatusDistributionTooltipComponent } from '../../status-distribution-tooltip/status-distribution-tooltip.component';
+import { StepBasicsModule } from '@exense/step-core';
+
+export interface HistoryNodeItem {
+  statusSlices: TreeNodePieChartSlice[];
+}
+
+@Component({
+  selector: 'step-history-nodes',
+  templateUrl: './history-nodes.component.html',
+  styleUrl: './history-nodes.component.scss',
+  standalone: true,
+  imports: [StepBasicsModule, AggregatedTreeNodeStatusesPiechartComponent, StatusDistributionTooltipComponent],
+})
+export class HistoryNodesComponent {
+  nodesCount = input.required<number>();
+  showTimestamps = input<boolean>();
+  showTooltip = input<boolean>(false);
+  pastNodes = input.required<HistoryNodeItem[]>();
+  currentNode = input.required<HistoryNodeItem>();
+  nodesSize = input<number>(20);
+
+  paddedPastExecutions = computed(() => {
+    return this.padArrayWithNull(this.pastNodes().slice(0, -1), this.nodesCount());
+  });
+
+  logEffect = effect(() => {
+    console.log(this.pastNodes());
+    console.log(this.paddedPastExecutions());
+  });
+
+  private padArrayWithNull(array: HistoryNodeItem[], size: number): HistoryNodeItem[] {
+    const padCount = Math.max(0, size - (array?.length ?? 0));
+    return Array(padCount).fill(null).concat(array);
+  }
+}

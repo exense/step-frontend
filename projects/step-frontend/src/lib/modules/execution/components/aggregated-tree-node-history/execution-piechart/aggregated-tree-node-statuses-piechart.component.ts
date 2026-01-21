@@ -11,7 +11,7 @@ export interface TreeNodePieChartSlice {
   selector: 'step-aggregated-tree-node-statuses-piechart',
   templateUrl: './aggregated-tree-node-statuses-piechart.component.html',
   styleUrls: ['./aggregated-tree-node-statuses-piechart.component.scss'],
-  standalone: false,
+  standalone: true,
 })
 export class AggregatedTreeNodeStatusesPiechartComponent implements OnDestroy {
   readonly slices = input.required<TreeNodePieChartSlice[]>();

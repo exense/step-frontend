@@ -18,30 +18,30 @@
         }
       }
     </div>
-    <ng-container
-      *ngTemplateOutlet="
-        historyItem;
-        context: { item: historyData.currentExecution, last: false, isCurrentExecution: true }
-      "
+  }
+</div>
+<div>
+  @if (newData | async; as x) {
+    <step-history-nodes
+      [nodesCount]="9"
+      [nodesSize]="40"
+      [showTooltip]="false"
+      [showTimestamps]="false"
+      [currentNode]="x.currentNode"
+      [pastNodes]="[]"
     />
+    {{ x.currentNode | json }}
   }
 </div>
 
 <ng-template #historyItem let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
   <step-popover [noPadding]="true">
-    <div
-      class="history-item-container"
-      [class.highlight]="isCurrentExecution"
-      [class.connect-line]="!isCurrentExecution"
-      [class.arrow]="last && !isCurrentExecution"
-    >
-      <step-aggregated-tree-node-statuses-piechart [slices]="item.statusSlices" [highlight]="isCurrentExecution" />
-
-      <div class="timestamp">
-        <div>{{ item.execution.startTime! | date: 'dd.MM' }}</div>
-        <div>{{ item.execution.startTime! | date: 'HH:mm' }}</div>
-      </div>
-    </div>
+    <ng-container
+      *ngTemplateOutlet="
+        historyItemContent;
+        context: { item: item, last: last, isCurrentExecution: isCurrentExecution }
+      "
+    ></ng-container>
 
     <step-popover-content>
       <step-status-distribution-tooltip
@@ -52,4 +52,20 @@
       />
     </step-popover-content>
   </step-popover>
+</ng-template>
+
+<ng-template #historyItemContent let-item="item" let-last="last" let-isCurrentExecution="isCurrentExecution">
+  <div
+    class="history-item-container"
+    [class.highlight]="isCurrentExecution"
+    [class.connect-line]="!isCurrentExecution"
+    [class.arrow]="last && !isCurrentExecution"
+  >
+    <step-aggregated-tree-node-statuses-piechart [slices]="item.statusSlices" [highlight]="isCurrentExecution" />
+
+    <div class="timestamp">
+      <div>{{ item.execution.startTime! | date: 'dd.MM' }}</div>
+      <div>{{ item.execution.startTime! | date: 'HH:mm' }}</div>
+    </div>
+  </div>
 </ng-template>

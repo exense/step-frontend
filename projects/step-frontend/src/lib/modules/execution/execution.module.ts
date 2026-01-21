@@ -166,10 +166,11 @@ import { HeatmapComponent } from './components/schedule-overview/cross-execution
 import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
-import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { HistoryCellComponent } from './components/execution-history-cell/execution-history-cell.component';
+import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
+import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
 
 @NgModule({
   declarations: [
@@ -270,10 +271,8 @@ import { HistoryCellComponent } from './components/execution-history-cell/execut
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
     StatusDistributionBadgeComponent,
-    StatusDistributionTooltipComponent,
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
-    AggregatedTreeNodeStatusesPiechartComponent,
     HistoryCellComponent,
   ],
   imports: [
@@ -297,6 +296,9 @@ import { HistoryCellComponent } from './components/execution-history-cell/execut
     TestCaseInlineRootCauseComponent,
     ErrorRootCausesComponent,
     AltExecutionTimePopoverTitleDirective,
+    AggregatedTreeNodeStatusesPiechartComponent,
+    HistoryNodesComponent,
+    StatusDistributionTooltipComponent,
   ],
   exports: [
     ExecutionListComponent,
@@ -329,6 +331,7 @@ import { HistoryCellComponent } from './components/execution-history-cell/execut
     AltExecutionTreeNodeAddonDirective,
     ExecutionAgentsListComponent,
     StatusCountBadgeComponent,
+    HistoryNodesComponent,
   ],
   providers: [
     {

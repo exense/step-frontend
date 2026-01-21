@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, Signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 interface StatusDistribution {
   status: string;
@@ -11,7 +12,8 @@ interface StatusDistribution {
   selector: 'step-status-distribution-tooltip',
   templateUrl: './status-distribution-tooltip.component.html',
   styleUrls: ['./status-distribution-tooltip.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [DatePipe],
 })
 export class StatusDistributionTooltipComponent {
   private _router = inject(Router);

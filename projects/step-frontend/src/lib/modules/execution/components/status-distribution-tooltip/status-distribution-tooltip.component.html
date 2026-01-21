@@ -1,10 +1,10 @@
 <div class="container">
   @for (statusItem of distribution(); track statusItem.status) {
-    <step-status-distribution-badge
-      [count]="statusItem.count"
-      [status]="statusItem.status"
-      [percentage]="statusItem.percentage"
-    />
+    <!--    <step-status-distribution-badge-->
+    <!--      [count]="statusItem.count"-->
+    <!--      [status]="statusItem.status"-->
+    <!--      [percentage]="statusItem.percentage"-->
+    <!--    />-->
   }
   @if (distribution().length === 0) {
     <div class="no-data">No data</div>
