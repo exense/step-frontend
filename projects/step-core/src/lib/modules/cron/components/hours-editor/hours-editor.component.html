@@ -1,15 +1,15 @@
 <h4 data-step-testid="title-hours-editor">Every</h4>
 <section class="editor-content">
-  <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)">
+  <mat-select [ngModel]="hour" (ngModelChange)="handleHourChange($event)" [disabled]="!isActive">
     <mat-option *ngFor="let h of _HOURS; trackBy: trackByKeyValue" [value]="h.key">{{ h.value }}</mat-option>
   </mat-select>
   <span>hour(s) on minute</span>
-  <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)">
+  <mat-select [ngModel]="minute" (ngModelChange)="handleMinuteChange($event)" [disabled]="!isActive">
     <mat-option [value]="0">00</mat-option>
     <mat-option *ngFor="let m of _MINUTES; trackBy: trackByKeyValue" [value]="m.key">{{ m.value }}</mat-option>
   </mat-select>
   <span>and second</span>
-  <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)">
+  <mat-select [ngModel]="second" (ngModelChange)="handleSecondChange($event)" [disabled]="!isActive">
     <mat-option *ngFor="let s of _SECONDS; trackBy: trackByKeyValue" [value]="s.key">{{ s.value }}</mat-option>
   </mat-select>
 </section>
