@@ -8,7 +8,14 @@ import { StepBasicsModule } from '@exense/step-core';
 
 export interface HistoryNodeItem {
   statusSlices: TreeNodePieChartSlice[];
+  timestamp?: number;
+  tooltipLinkLabel?: string;
+  tooltipLink?: string;
 }
+
+// interface HistoryNodeItemInternal extends HistoryNodeItem{
+//   statusesCount?: Record<string, number>;
+// }
 
 @Component({
   selector: 'step-history-nodes',

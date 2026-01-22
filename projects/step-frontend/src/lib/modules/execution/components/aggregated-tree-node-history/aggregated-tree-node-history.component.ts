@@ -98,7 +98,7 @@ export class AggregatedTreeNodeHistoryComponent {
             }));
             return this._executionState.execution$.pipe(
               map((currentExecution) => ({
-                previousExecutions: this.padArrayWithNull(allExecutions.slice(0, -1), this.previousExecutionsCount()), // remove the current execution
+                previousExecutions: allExecutions.slice(0, -1), // remove the current execution
                 currentExecution: {
                   execution: currentExecution,
                   statusSlices: slices[currentExecution.id!],
@@ -118,8 +118,17 @@ export class AggregatedTreeNodeHistoryComponent {
       return {
         currentNode: {
           statusSlices: data.currentExecution.statusSlices,
+          timestamp: data.currentExecution.execution.startTime!,
+          tooltipLinkLabel: 'Current Execution',
         },
-        pastNodes: [],
+        pastNodes: data.previousExecutions.map((item) => {
+          return {
+            statusSlices: item?.statusSlices,
+            timestamp: item?.execution?.startTime,
+            tooltipLinkLabel: 'See Execution',
+            tooltipLink: '/executions/' + item?.execution.id,
+          };
+        }),
       } as { currentNode: HistoryNodeItem; pastNodes: HistoryNodeItem[] };
     }),
   );

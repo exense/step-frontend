@@ -163,14 +163,14 @@ import { ReportViewHeaderComponent } from './components/schedule-overview/cross-
 import { CrossExecutionHeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/cross-execution-heatmap.component';
 import { GradientLegendComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/legend/gradient-legend.component';
 import { HeatmapComponent } from './components/schedule-overview/cross-execution-dashboard/heatmap/heatmap.component';
-import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
-import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
 import { AggregatedTreeNodeHistoryComponent } from './components/aggregated-tree-node-history/aggregated-tree-node-history.component';
 import { DOCUMENT } from '@angular/common';
 import { AltExecutionTimePopoverTitleDirective } from './components/alt-execution-time/alt-execution-time-popover-title.directive';
 import { HistoryCellComponent } from './components/execution-history-cell/execution-history-cell.component';
 import { AggregatedTreeNodeStatusesPiechartComponent } from './components/aggregated-tree-node-history/execution-piechart/aggregated-tree-node-statuses-piechart.component';
 import { HistoryNodesComponent } from './components/aggregated-tree-node-history/history-nodes/history-nodes.component';
+import { StatusDistributionBadgeComponent } from './components/status-distribution-tooltip/badge/status-distribution-badge.component';
+import { StatusDistributionTooltipComponent } from './components/status-distribution-tooltip/status-distribution-tooltip.component';
 
 @NgModule({
   declarations: [
@@ -270,7 +270,6 @@ import { HistoryNodesComponent } from './components/aggregated-tree-node-history
     ReportViewHeaderComponent,
     CrossExecutionHeatmapComponent,
     GradientLegendComponent,
-    StatusDistributionBadgeComponent,
     HeatmapComponent,
     AggregatedTreeNodeHistoryComponent,
     HistoryCellComponent,
@@ -298,6 +297,7 @@ import { HistoryNodesComponent } from './components/aggregated-tree-node-history
     AltExecutionTimePopoverTitleDirective,
     AggregatedTreeNodeStatusesPiechartComponent,
     HistoryNodesComponent,
+    StatusDistributionBadgeComponent,
     StatusDistributionTooltipComponent,
   ],
   exports: [

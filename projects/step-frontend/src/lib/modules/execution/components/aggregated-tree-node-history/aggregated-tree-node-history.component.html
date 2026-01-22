@@ -23,14 +23,13 @@
 <div>
   @if (newData | async; as x) {
     <step-history-nodes
-      [nodesCount]="9"
+      [nodesCount]="8"
       [nodesSize]="40"
-      [showTooltip]="false"
+      [showTooltip]="true"
       [showTimestamps]="false"
       [currentNode]="x.currentNode"
-      [pastNodes]="[]"
+      [pastNodes]="x.pastNodes"
     />
-    {{ x.currentNode | json }}
   }
 </div>
 
@@ -45,7 +44,7 @@
 
     <step-popover-content>
       <step-status-distribution-tooltip
-        [statuses]="item.statusesCount"
+        [statuses]="[]"
         [linkLabel]="isCurrentExecution ? 'Current execution' : 'See execution'"
         [link]="isCurrentExecution ? '' : '/executions/' + item.execution.id!"
         [timestamp]="item.execution.startTime!"
