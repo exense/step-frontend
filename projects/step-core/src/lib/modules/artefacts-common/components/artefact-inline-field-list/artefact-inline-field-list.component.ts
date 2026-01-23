@@ -18,6 +18,7 @@ const MIN_WIDTH = 100;
 const PADDINGS = 6;
 const GAP = 6;
 const CAP_ICON_SPACE = 20;
+const OFFSET = 15;
 
 @Component({
   selector: 'step-artefact-inline-field-list',
@@ -49,7 +50,7 @@ export class ArtefactInlineFieldListComponent {
       return items;
     }
 
-    availableWidth = availableWidth - listPrefixWidth - 15;
+    availableWidth = availableWidth - listPrefixWidth - OFFSET;
     const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth);
 
     if (elementsToDisplay.length === items.length) {

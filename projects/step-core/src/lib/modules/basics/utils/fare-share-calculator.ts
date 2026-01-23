@@ -50,7 +50,7 @@ export class FareShareCalculator {
 
   reallocate(): boolean {
     const totalWidth = this.countTotalWidth();
-    if (totalWidth >= this.availableWidth) {
+    if (totalWidth >= this.availableWidth || !this.fareShareApplied) {
       return false;
     }
     const unallocated = this.availableWidth - totalWidth;
@@ -70,13 +70,13 @@ export class FareShareCalculator {
   static calculateWidths(widthContainers: { totalWidth?: number }[], gap: number, padding: number = 0): number {
     return widthContainers
       .filter((item) => !!item.totalWidth)
-      .map((item) => item.totalWidth)
+      .map((item) => item.totalWidth!)
       .reduce((res, total, index, self) => {
-        let value = res! + total! + padding;
+        let value = res + total + padding;
         if (index < self.length - 1) {
           value += gap;
         }
         return value;
-      }, 0)!;
+      }, 0);
   }
 }

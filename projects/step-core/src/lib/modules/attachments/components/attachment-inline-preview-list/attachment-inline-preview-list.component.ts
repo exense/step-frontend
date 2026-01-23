@@ -20,6 +20,7 @@ const GAP = 5;
 const MIN_WIDTH = 150;
 const PADDINGS = 6;
 const CAP_ICON_SPACE = 20;
+const OFFSET = 15;
 
 @Component({
   selector: 'step-attachment-inline-preview-list',
@@ -56,7 +57,7 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       return items;
     }
 
-    availableWidth = availableWidth - listPrefixWidth - 15;
+    availableWidth = availableWidth - listPrefixWidth - OFFSET;
     const elementsToDisplay = this.determineElementsToDisplay(renderedElements, availableWidth);
 
     if (elementsToDisplay.length === items.length) {
@@ -104,9 +105,9 @@ export class AttachmentInlinePreviewListComponent implements AfterViewInit {
       }
 
       if (totalWidth !== 0) {
-        totalWidth += GAP + PADDINGS;
+        totalWidth += GAP;
       }
-      totalWidth += width;
+      totalWidth += width + PADDINGS;
       if (totalWidth >= availableWidth) {
         break;
       }
